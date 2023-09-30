@@ -22,25 +22,22 @@ portable to both FPGAs and ASICs. The result is a very tedious and error-prone
 hardware design process. Therefore, we propose a tool to generate portable Verilog
 code using a Python API.
 
-This project will benefit from a significant body of work that has been constructed over the years
+This project will benefit from a significant body of work constructed over the years and described in the following links.
 
 
 ### Useful Links
 
-[IOb-SoC](https://github.com/IObundle/iob-soc)
-
-IOb-SoC is a System-on-Chip (SoC) template comprising an open-source RISC-V processor, a memory subsystem, and a UART.
+[IOb-SoC](https://github.com/IObundle/iob-soc) is a System-on-Chip (SoC) template comprising an open-source RISC-V processor, a memory subsystem, and a UART.
 This is the departing repository; it already uses a collection of Python scripts to create a build directory to compile and run various tools.
 
-[IOb-Lib](https://github.com/IObundle/iob-lib.git)
 
-This repository contains a set of Python scripts, Verilog, and C sources to simplify the development of subsystem IP cores.
-It is used as a submodule in the IOb-SoC repository, and associated projects.
+[IOb-Lib](https://github.com/IObundle/iob-lib.git) contains a set of Python scripts, Verilog, and C sources to simplify the development of subsystem IP cores.
+It is used as a submodule in the IOb-SoC repository and associated projects.
 
 
-[IOb-SoC-OpenCryptoHW](https://github.com/IObundle/iob-soc-opencryptohw.git)
-This project aims to develop reconfigurable open-source cryptographic hardware IP cores for Next Generation Internet. With the Internet of Things upon us, security and privacy are more important than ever.
+[IOb-SoC-OpenCryptoHW](https://github.com/IObundle/iob-soc-opencryptohw.git) is a reconfigurable cryptographic hardware IP core for Next Generation Internet.
+Security and privacy are more important than ever with the Internet of Things.
 
-[IOb-Py2HW](https://github.com/IObundle/iob-py2hw.git)
 
-This repository aims to develop a Python generator of portable Verilog code. Py2HW is not a High-Level Synthesis (HLS) language. It is instead a tool to help hardware designers produce readable, lint-clean and portable Verilog code that can be used seamlessly in any FPGA or ASIC. 
+[IOb-Py2HW](https://github.com/IObundle/iob-py2hw.git) aims to develop a Python generator of portable Verilog code. Py2HW is not a High-Level Synthesis (HLS) language. It is instead a tool to help hardware designers produce readable, lint-clean, and portable Verilog code that can be used seamlessly in any FPGA or ASIC. 
+

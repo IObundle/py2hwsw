@@ -8,4 +8,7 @@ setup(name='py2hwsw',
       author_email='some_email@some.provider',
       license='Some license',
       packages=['py2hwsw'],
+	  entry_points = {
+		'console_scripts': ['py2hwsw = py2hwsw.py2hwsw:main']
+	  },
       zip_safe=False)

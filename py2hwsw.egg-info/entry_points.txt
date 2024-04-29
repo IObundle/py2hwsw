@@ -1,0 +1,2 @@
+[console_scripts]
+py2hwsw = py2hwsw.py2hwsw:main

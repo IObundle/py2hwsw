@@ -1,0 +1,8 @@
+Metadata-Version: 2.1
+Name: py2hwsw
+Version: 0.1
+Summary: A Python framework for managing embedded HW/SW projects
+Home-page: https://github.com/IObundle/py2hwsw
+Author: IObundle
+Author-email: some_email@some.provider
+License: Some license

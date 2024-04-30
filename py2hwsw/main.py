@@ -10,4 +10,4 @@ def main():
 	for arg in sys.argv[1:]:
 		args += arg + " "
 
-	os.system("python \"" + py2hwsw_path + "\" " + args)
+	os.system("python3 \"" + py2hwsw_path + "\" " + args)

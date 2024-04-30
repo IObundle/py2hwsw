@@ -3,13 +3,17 @@ import os
 import iob_colors
 import re
 
+from param_gen import has_params
+
 
 # Find include statements inside a list of lines and replace them by the contents of the included file and return the new list of lines
-def replace_includes_in_lines(lines, VSnippetFiles):
+def replace_includes_in_lines(lines, VSnippetFiles, ignore_snippets):
     for line in lines:
         if re.search(r'`include ".*\.vs"', line):
             # retrieve the name of the file to be included
             tail = line.split('"')[1]
+            if tail in ignore_snippets:
+                continue
             found_vs = False
             for VSnippetFile in VSnippetFiles:
                 if tail == os.path.basename(VSnippetFile):
@@ -31,7 +35,7 @@ def replace_includes_in_lines(lines, VSnippetFiles):
                     for include_line in include_lines:
                         if re.search(r'`include ".*\.vs"', include_line):
                             include_lines = replace_includes_in_lines(
-                                include_lines, VSnippetFiles
+                                include_lines, VSnippetFiles, ignore_snippets
                             )
                     # replace the include statement with the content of the file
                     lines[lines.index(line)] = "".join(include_lines)
@@ -45,14 +49,11 @@ def replace_includes_in_lines(lines, VSnippetFiles):
 
 
 # Function to search recursively for every verilog file inside the search_path
-def replace_includes(setup_dir="", build_dir=""):
+def replace_includes(setup_dir="", build_dir="", ignore_snippets=[]):
     VSnippetFiles = []
     VerilogFiles = []
     SearchPaths = f"{build_dir}/hardware"
-    VSnippetDir = f"{setup_dir}/hardware/aux"
     ExcludeDirs = ["hardware/fpga/db", "hardware/fpga/ip"]
-
-    os.makedirs(VSnippetDir, exist_ok=True)
 
     for root, dirs, files in os.walk(SearchPaths):
         # Skip directories from ExcludeDirs
@@ -67,6 +68,7 @@ def replace_includes(setup_dir="", build_dir=""):
                 VerilogFiles.append(f"{root}/{file}")
 
     for VerilogFile in VerilogFiles:
+        print(f"Replacing includes in {VerilogFile}")
         with open(VerilogFile, "r") as source:
             try:
                 lines = source.readlines()
@@ -76,15 +78,14 @@ def replace_includes(setup_dir="", build_dir=""):
                 )
                 exit(1)
             # replace the include statements with the content of the file
-            new_lines = replace_includes_in_lines(lines, VSnippetFiles)
+            new_lines = replace_includes_in_lines(lines, VSnippetFiles, ignore_snippets)
         # write the new file
         with open(VerilogFile, "w") as source:
             source.writelines(new_lines)
 
-    # Remove the VSnippetFiles
+    # Remove .vs files from current directory
     for VSnippetFile in VSnippetFiles:
         os.remove(VSnippetFile)
-    os.rmdir(VSnippetDir)
 
     print(
         f"{iob_colors.INFO}Replaced Verilog Snippet includes with respective content and deleted the files.{iob_colors.ENDC}"
@@ -160,3 +161,50 @@ def inplace_change(filename, old_string, new_string):
         )
         s = s.replace(old_string, new_string)
         f.write(s)
+
+
+def generate_verilog(core):
+    """Generate main Verilog module of given core
+    if it does not exist yet (may be defined manually or generated previously).
+    """
+    out_dir = core.build_dir + "/hardware/src"
+    file_path = os.path.join(out_dir, f"{core.name}.v")
+
+    if os.path.exists(file_path):
+        print(
+            f"Note: Not generating '{core.name}.v'. Module already exists (probably created manually or generated previously)."
+        )
+        return
+
+    f_module = open(file_path, "w+")
+
+    if has_params(core.confs):
+        params_line = f'#(\n    `include "{core.name}_params.vs"\n) ('
+    else:
+        params_line = "("
+
+    module_body_lines = ""
+    if core.wires:
+        module_body_lines += f'    `include "{core.name}_wires.vs"\n\n'
+
+    if core.csrs:
+        module_body_lines += f'    `include "{core.name}_swreg_inst.vs"\n\n'
+
+    if core.blocks:
+        module_body_lines += f'    `include "{core.name}_blocks.vs"\n\n'
+
+    if core.snippets:
+        module_body_lines += f'    `include "{core.name}_snippets.vs"\n\n'
+
+    f_module.write(
+        f"""`timescale 1ns / 1ps
+`include "{core.name}_conf.vh"
+
+module {core.name} {params_line}
+    `include "{core.name}_io.vs"
+);
+{module_body_lines}
+endmodule
+"""
+    )
+    f_module.close()

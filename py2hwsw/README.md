@@ -21,7 +21,7 @@ black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://gith
         ```make
         # repository top level Makefile
         format:
-           @./$(LIB_DIR)/scripts/sw_format.py black
+           @./lib/scripts/sw_format.py black
         ```
 #### C/C++ Code
 - Recommended C/C++ code style: [LLVM](https://llvm.org/docs/CodingStandards.html)
@@ -38,7 +38,7 @@ black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://gith
         ```make
         # repository top level Makefile
         format:
-           @./$(LIB_DIR)/scripts/sw_format.py clang
+           @./lib/scripts/sw_format.py clang
         ```
 
 ## Tests

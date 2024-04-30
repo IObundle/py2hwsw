@@ -243,7 +243,7 @@ def gen_ports_list(core):
 
     if_ports_list = []
 
-    for interface in core.ios:
+    for interface in core.ports:
         # Skip doc_only interfaces
         if "doc_only" in interface.keys() and interface["doc_only"]:
             continue
@@ -502,6 +502,14 @@ def generate_ipxact_xml(core, sw_regs, dest_dir):
     @param dest_dir: destination directory
     return: None
     """
+
+    # try to open file document/tsrc/intro.tex and read it into self.description
+    try:
+        with open(f"document/tsrc/intro.tex", "r") as file:
+            core.description = file.read()
+    except:
+        print("ERROR: Could not open document/tsrc/intro.tex")
+        exit(1)
 
     # Add the CSR IF,
     core_name = core.name + "_" + core.csr_if

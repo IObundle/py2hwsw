@@ -2,21 +2,18 @@
 
 import os
 import sys
-import re
 import subprocess
 from pathlib import Path
 import shutil
 import importlib.util
-import copy_srcs
 
 # IObundle scripts imported:
 import if_gen
-from submodule_utils import import_setup, set_default_submodule_dirs
 import iob_colors
-import inspect
-import config_gen as mk_conf
 
-LIB_DIR = "submodules/LIB"
+
+def get_lib_dir():
+    return os.path.join(os.path.dirname(__file__), "..")
 
 
 # This function sets up the flows for this core
@@ -42,7 +39,7 @@ def flows_setup(python_module):
 
 
 def hw_setup(python_module):
-    # Create module's version TeX file. Also create *_version.vh Verilog Header if we do not have regs.
+    # Create module's version TeX file. Also create *_version.vh Verilog Header if we do not have csrs.
     if python_module.is_top_module:
         version_file(python_module)
 
@@ -56,7 +53,7 @@ def sim_setup(python_module):
 
     # Copy LIB sim files
     shutil.copytree(
-        f"{LIB_DIR}/{sim_dir}",
+        f"{get_lib_dir()}/{sim_dir}",
         f"{build_dir}/{sim_dir}",
         dirs_exist_ok=True,
         ignore=shutil.ignore_patterns("*.pdf"),
@@ -65,13 +62,13 @@ def sim_setup(python_module):
 
 # Setup fpga files, but only the ones in the board_list
 def fpga_setup(python_module):
-    # If board_list is None, then do nothing
-    if python_module.board_list == None:
+    # If board_list is empty, then do nothing
+    if not python_module.board_list:
         return
 
     build_dir = python_module.build_dir
     fpga_dir = "hardware/fpga"
-    src_dir = f"{LIB_DIR}/{fpga_dir}"
+    src_dir = f"{get_lib_dir()}/{fpga_dir}"
     dst_dir = f"{build_dir}/{fpga_dir}"
     tools_list = ["quartus", "vivado"]
 
@@ -115,7 +112,7 @@ def lint_setup(python_module):
 
     # Copy LIB lint files
     shutil.copytree(
-        f"{LIB_DIR}/{lint_dir}",
+        f"{get_lib_dir()}/{lint_dir}",
         f"{build_dir}/{lint_dir}",
         dirs_exist_ok=True,
     )
@@ -126,9 +123,11 @@ def syn_setup(python_module):
     build_dir = python_module.build_dir
     syn_dir = "hardware/syn"
 
-    for file in Path(f"{LIB_DIR}/{syn_dir}").rglob("*"):
+    for file in Path(f"{get_lib_dir()}/{syn_dir}").rglob("*"):
         src_file = file.as_posix()
-        dest_file = os.path.join(build_dir, src_file.replace(LIB_DIR, "").strip("/"))
+        dest_file = os.path.join(
+            build_dir, src_file.replace(get_lib_dir(), "").strip("/")
+        )
         if os.path.isfile(src_file):
             os.makedirs(os.path.dirname(dest_file), exist_ok=True)
             shutil.copyfile(f"{src_file}", f"{dest_file}")
@@ -181,7 +180,7 @@ def sw_setup(python_module):
 
     os.makedirs(build_dir + "/software/src", exist_ok=True)
     # Copy LIB software Makefile
-    shutil.copy(f"{LIB_DIR}/software/Makefile", f"{build_dir}/software/Makefile")
+    shutil.copy(f"{get_lib_dir()}/software/Makefile", f"{build_dir}/software/Makefile")
 
     # Create 'scripts/' directory
     python_setup(build_dir)
@@ -191,7 +190,7 @@ def python_setup(build_dir):
     dest_dir = f"{build_dir}/scripts"
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
-    copy_files(LIB_DIR, dest_dir, ["iob_colors.py"], "*.py")
+    copy_files(get_lib_dir(), dest_dir, ["iob_colors.py"], "*.py")
 
 
 def doc_setup(python_module):
@@ -200,20 +199,21 @@ def doc_setup(python_module):
 
     # Copy LIB tex files if not present
     os.makedirs(f"{build_dir}/document/tsrc", exist_ok=True)
-    for file in os.listdir(f"{LIB_DIR}/document/tsrc"):
+    for file in os.listdir(f"{get_lib_dir()}/document/tsrc"):
         shutil.copy2(
-            f"{LIB_DIR}/document/tsrc/{file}", f"{build_dir}/document/tsrc/{file}"
+            f"{get_lib_dir()}/document/tsrc/{file}", f"{build_dir}/document/tsrc/{file}"
         )
 
     # Copy LIB figures
     os.makedirs(f"{build_dir}/document/figures", exist_ok=True)
-    for file in os.listdir(f"{LIB_DIR}/document/figures"):
+    for file in os.listdir(f"{get_lib_dir()}/document/figures"):
         shutil.copy2(
-            f"{LIB_DIR}/document/figures/{file}", f"{build_dir}/document/figures/{file}"
+            f"{get_lib_dir()}/document/figures/{file}",
+            f"{build_dir}/document/figures/{file}",
         )
 
     # Copy document Makefile
-    shutil.copy2(f"{LIB_DIR}/document/Makefile", f"{build_dir}/document/Makefile")
+    shutil.copy2(f"{get_lib_dir()}/document/Makefile", f"{build_dir}/document/Makefile")
 
     # General documentation
     write_git_revision_short_hash(f"{build_dir}/document/tsrc")
@@ -233,86 +233,11 @@ def write_git_revision_short_hash(dst_dir):
     file.write(text)
 
 
-# Setup python submodules recursively (the deeper ones in the tree are setup first)
-# python_module: python module of *_setup.py of the core/system, should contain setup_dir
-def setup_submodules(python_module):
-    modules_dictionary = {}
-
-    set_default_submodule_dirs(python_module)
-    submodule_dirs = python_module.submodules["dirs"]
-
-    for setup_type in python_module.submodules:
-        # Skip non "*_setup" dictionaies
-        if not setup_type.endswith("_setup"):
-            continue
-
-        # Iterate through every module in list
-        idx = 0
-        while idx < len(python_module.submodules[setup_type]["modules"]):
-            item = python_module.submodules[setup_type]["modules"][idx]
-            idx += 1
-
-            # If item is a tuple then it contains optional parameters
-            if type(item) == tuple:
-                # Save optional_parameters in a variable
-                optional_parameters = item[1]
-                # Convert item to a string
-                item = item[0]
-            else:
-                optional_parameters = None
-
-            # Skip non 'submodule' items
-            if item not in submodule_dirs:
-                continue
-
-            # Only allow submodule sin hw_setup list. (The other processes will be handled by the setup function of the module).
-            # Note: Maybe we should create a dedicated list to import submodules? This way it won't be as confusing as to why only the 'hw_setup' list is used for submodules.
-            #       The outer for loop of this function, only exists to execute this asser and warn the user if he is not using hw_setup. Otherwise we could just use the 'hw_setup' list.
-            assert (
-                setup_type == "hw_setup"
-            ), f"{iob_colors.FAIL}Only 'hw_setup' list can contain submodules. Please remove '{item}' from '{setup_type}' list.{iob_colors.ENDC}"
-
-            # Only import if the item has a _setup.py file
-            for fname in os.listdir(submodule_dirs[item]):
-                if fname.endswith("_setup.py"):
-                    break
-            else:
-                continue
-
-            # Import module
-            module = import_setup(
-                submodule_dirs[item],
-                not_top_module=True,
-                build_dir=python_module.build_dir,
-                setup_dir=submodule_dirs[item],
-                module_parameters=optional_parameters,
-            )
-
-            # Setup submodules from this imported module
-            setup_submodules(module)
-
-            # Call main function to setup this module
-            module.main()
-
-            # Remove this module
-            idx -= 1
-            del python_module.submodules[setup_type]["modules"][idx]
-
-
-# Setup submodules in modules_dictionary
-def submodule_setup(python_module):
-    modules_dictionary = python_module.modules_dictionary
-
-    # Setup submodules by the order they appear in modules_dictionary
-    for module in modules_dictionary:
-        module.main()
-
-
 # Include headers and srcs from given python module (module_name)
 # headers: List of headers that will be appedend by the list of headers in the .py module.
 # srcs: List of srcs that will be appedend by the list of srcs in the .py module.
 # module_name: name of the python module to include. Can also be the name of a src module (with the same extension as passed in the module_extension parameter).
-# LIB_DIR: root directory of the LIB
+# lib_dir: root directory of the LIB
 # add_sim_srcs: If True, then the list of simulation sources will be appended to the srcs list
 # add_fpga_srcs: If True, then the list of FPGA sources will be appended to the srcs list
 # module_parameters: optional argument. Allows passing an optional object with parameters to a hardware module.
@@ -321,7 +246,7 @@ def lib_module_setup(
     headers,
     srcs,
     module_name,
-    lib_dir=LIB_DIR,
+    lib_dir=get_lib_dir(),
     add_sim_srcs=False,
     add_fpga_srcs=False,
     module_parameters=None,
@@ -373,6 +298,7 @@ def lib_module_setup(
 
 def copy_files(src_dir, dest_dir, sources=[], pattern="*", copy_all=False):
     files_copied = []
+    print(src_dir)
     if (sources != []) or copy_all:
         os.makedirs(dest_dir, exist_ok=True)
         for path in Path(src_dir).rglob(pattern):
@@ -460,8 +386,8 @@ def version_file(
     with open(tex_file, "w") as tex_f:
         tex_f.write(core_previous_version)
 
-    # Don't create version.vh if module has regs (because it already has the VERSION register)
-    if python_module.regs:
+    # Don't create version.vh if module has csrs (because it already has the VERSION register)
+    if python_module.csrs:
         return
 
     vh_file = f"{verilog_dir}/{core_name}_version.vh"
@@ -478,3 +404,170 @@ def version_str_to_digits(version_str):
     version_str = version_str.replace("V", "")
     major_ver, minor_ver = version_str.split(".")
     return f"{int(major_ver):02d}{int(minor_ver):02d}"
+
+
+def copy_with_rename(old_core_name, new_core_name):
+    """Creates a function that:
+    - Renames any '<old_core_name>' string inside the src file and in its filename, to the given '<new_core_name>' string argument.
+    """
+
+    def copy_func(src, dst):
+        dst = os.path.join(
+            os.path.dirname(dst),
+            os.path.basename(
+                dst.replace(old_core_name, new_core_name).replace(
+                    old_core_name.upper(), new_core_name.upper()
+                )
+            ),
+        )
+        # print(f"### DEBUG: {src} {dst}")
+        try:
+            file_perms = os.stat(src).st_mode
+            with open(src, "r") as file:
+                lines = file.readlines()
+            for idx in range(len(lines)):
+                lines[idx] = (
+                    lines[idx]
+                    .replace(old_core_name, new_core_name)
+                    .replace(old_core_name.upper(), new_core_name.upper())
+                )
+            with open(dst, "w") as file:
+                file.writelines(lines)
+        except:
+            shutil.copyfile(src, dst)
+        # Set file permissions equal to source file
+        os.chmod(dst, file_perms)
+
+    return copy_func
+
+
+def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
+    """Copy and rename files from a given setup subdirectory to the build directory
+    :param core: The core object
+    :param directory: The directory to copy
+    :param exclude_file_list: List of wildcards for files to exclude
+    """
+    # Skip this directory if it does not exist
+    if not os.path.isdir(os.path.join(core.setup_dir, directory)):
+        return
+
+    # If we are handling the `hardware/src` directory,
+    # copy to the correct destination based on setup_purpose.
+    if directory == "hardware/src":
+        dst_directory = core.PURPOSE_DIRS[core.purpose]
+        if core.use_netlist:
+            # copy SETUP_DIR/CORE.v netlist instead of
+            # SETUP_DIR/hardware/src
+            shutil.copyfile(
+                os.path.join(core.setup_dir, f"{core.name}.v"),
+                os.path.join(core.build_dir, f"{dst_directory}/{core.name}.v"),
+            )
+            return
+    elif directory == "hardware/fpga":
+        # Skip if board_list is empty
+        if not core.board_list:
+            return
+
+        tools_list = ["quartus", "vivado"]
+
+        # Copy everything except the tools directories
+        shutil.copytree(
+            os.path.join(core.setup_dir, directory),
+            os.path.join(core.build_dir, directory),
+            dirs_exist_ok=True,
+            copy_function=copy_with_rename(core.original_name, core.name),
+            ignore=shutil.ignore_patterns(*exclude_file_list, *tools_list),
+        )
+
+        # if it is the fpga directory, only copy the directories in the cores board_list
+        for fpga in core.board_list:
+            # search for the fpga directory in the cores setup_dir/hardware/fpga
+            # in both quartus and vivado directories
+            for tools_dir in tools_list:
+                setup_tools_dir = os.path.join(core.setup_dir, directory, tools_dir)
+                build_tools_dir = os.path.join(core.build_dir, directory, tools_dir)
+                setup_fpga_dir = os.path.join(setup_tools_dir, fpga)
+                build_fpga_dir = os.path.join(build_tools_dir, fpga)
+
+                # if the fpga directory is found, copy it to the build_dir
+                if os.path.isdir(setup_fpga_dir):
+                    # Copy the tools directory files only
+                    for file in os.listdir(setup_tools_dir):
+                        setup_file = os.path.join(setup_tools_dir, file)
+                        if os.path.isfile(setup_file):
+                            copy_with_rename(core.name, core.name)(
+                                setup_file,
+                                os.path.join(build_tools_dir, file),
+                            )
+                    # Copy the fpga directory
+                    shutil.copytree(
+                        setup_fpga_dir,
+                        build_fpga_dir,
+                        dirs_exist_ok=True,
+                        copy_function=copy_with_rename(core.original_name, core.name),
+                        ignore=shutil.ignore_patterns(*exclude_file_list),
+                    )
+                    break
+            else:
+                raise Exception(
+                    f"{iob_colors.FAIL}FPGA directory {fpga} not found in {core.setup_dir}/hardware/fpga/{iob_colors.ENDC}"
+                )
+
+        # No need to copy any more files in this directory
+        return
+
+    else:
+        dst_directory = directory
+
+    # Copy tree of this directory, renaming files, and overriding destination ones.
+    # Note: The `copy_with_rename` may throw errors when
+    #       trying to rename binary files from the doc dir.
+    #       The main branch used a dedicated script to copy doc files
+    #       without renaming them. Maybe here we should try to
+    #       implement it with a try catch block.
+    shutil.copytree(
+        os.path.join(core.setup_dir, directory),
+        os.path.join(core.build_dir, dst_directory),
+        dirs_exist_ok=True,
+        copy_function=copy_with_rename(core.original_name, core.name),
+        ignore=shutil.ignore_patterns(*exclude_file_list),
+    )
+
+
+def copy_rename_setup_directory(core, exclude_file_list=[]):
+    """Copy and rename files from the module's setup dir.
+    Any string from the files in the setup dir that matches the
+    module's class name (core.original_name) will be replaced by the
+    module's name (core.name).
+    For example, if we create a new IOb-SoC module with
+    `iob_soc(name="iob_soc_sut")` then the `iob_soc.v` file from
+    the iob-soc setup dir will have all instances of the string 'iob_soc'
+    replaced with the new string 'iob_soc_sut'.
+
+    :param list exclude_file_list: list of strings, each string representing an ignore pattern for the source files.
+                                   For example, using the ignore pattern '*.v' would prevent from copying every Verilog source file.
+                                   Note, if want to ignore a file that is going to be renamed with the new core name,
+                                   we would still use the old core name in the ignore patterns.
+                                   For example, if we dont want it to generate the 'new_name_firmware.c' based on the 'old_name_firmware.c',
+                                   then we should add 'old_name_firmware.c' to the ignore list.
+    """
+
+    # Files that should always be copied
+    dir_list = [
+        "hardware/src",
+        "software",
+    ]
+    # Files that should only be copied if it is top module
+    if core.is_top_module:
+        dir_list += [
+            "hardware/simulation",
+            "hardware/common_src",
+            "hardware/fpga",
+            "hardware/syn",
+            "hardware/lint",
+            "doc",
+        ]
+
+    # Copy sources
+    for directory in dir_list:
+        copy_rename_setup_subdir(core, directory, exclude_file_list)

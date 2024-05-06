@@ -79,6 +79,7 @@ class iob_core(iob_module, iob_instance):
         self.set_default_attribute("previous_version", self.version, str)
         self.set_default_attribute("setup_dir", "", str)
         self.set_default_attribute("build_dir", "", str)
+        self.set_default_attribute("autoaddr", True, bool)
         # Overlap Read and Write register addresses
         self.set_default_attribute("rw_overlap", False, bool)
         self.set_default_attribute("use_netlist", False, bool)

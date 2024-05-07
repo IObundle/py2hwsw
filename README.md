@@ -41,3 +41,7 @@ Security and privacy are more important than ever with the Internet of Things.
 
 [IOb-Py2HW](https://github.com/IObundle/iob-py2hw.git) aims to develop a Python generator of portable Verilog code. Py2HW is not a High-Level Synthesis (HLS) language. It is instead a tool to help hardware designers produce readable, lint-clean, and portable Verilog code that can be used seamlessly in any FPGA or ASIC. 
 
+### Install with pip
+
+Use the following command to install the `py2hwsw` program with [pip](https://pip.pypa.io/en/stable/) globally:
+`pip install git+https://github.com/IObundle/py2hwsw#egg=py2hwsw`

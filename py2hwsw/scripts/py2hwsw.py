@@ -1,5 +1,6 @@
-#!/usr/bin/env -S python3 -B
+#!/usr/bin/env -S python3
 
+import sys
 import argparse
 
 from iob_base import fail_with_msg
@@ -7,6 +8,8 @@ from iob_core import iob_core
 
 
 if __name__ == "__main__":
+    sys.dont_write_bytecode = True
+
     parser = argparse.ArgumentParser(
         description="Python to hardware/software generator"
     )

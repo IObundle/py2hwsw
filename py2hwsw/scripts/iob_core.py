@@ -21,7 +21,13 @@ import ipxact_gen
 
 from iob_module import iob_module
 from iob_instance import iob_instance
-from iob_base import find_obj_in_list, fail_with_msg, find_file, import_python_module
+from iob_base import (
+    find_obj_in_list,
+    fail_with_msg,
+    find_file,
+    import_python_module,
+    nix_permission_hack,
+)
 import sw_tools
 import verilog_format
 import verilog_lint
@@ -79,6 +85,7 @@ class iob_core(iob_module, iob_instance):
         self.set_default_attribute("previous_version", self.version, str)
         self.set_default_attribute("setup_dir", "", str)
         self.set_default_attribute("build_dir", "", str)
+        self.set_default_attribute("autoaddr", True, bool)
         # Overlap Read and Write register addresses
         self.set_default_attribute("rw_overlap", False, bool)
         self.set_default_attribute("use_netlist", False, bool)
@@ -267,6 +274,7 @@ class iob_core(iob_module, iob_instance):
         shutil.copyfile(
             f"{copy_srcs.get_lib_dir()}/build.mk", f"{self.build_dir}/Makefile"
         )
+        nix_permission_hack(f"{self.build_dir}/Makefile")
 
     def _remove_duplicate_sources(self):
         """Remove sources in the build directory from subfolders that exist in `hardware/src`"""

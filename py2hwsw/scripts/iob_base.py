@@ -189,3 +189,10 @@ def import_python_module(module_path, module_name=None):
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
+
+
+def nix_permission_hack(path):
+    """Set write permissions on all files and subdirectories in a given directory
+    This is a hack to prevent issues with permissions on Nix systems.
+    """
+    os.system("chmod -R ug+w " + path)

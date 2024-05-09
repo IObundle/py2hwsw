@@ -8,6 +8,7 @@ import copy_srcs
 import csr_gen
 from iob_csr import iob_csr, iob_csr_group
 from iob_base import find_obj_in_list
+import iob_core
 
 
 def auto_setup_iob_ctls(core):
@@ -17,9 +18,7 @@ def auto_setup_iob_ctls(core):
 
     # Auto-add iob_ctls module, except if use_netlist
     if core.name != "iob_ctls" and not core.use_netlist:
-        from iob_ctls import iob_ctls
-
-        iob_ctls()
+        iob_core.iob_core.get_core_obj("iob_ctls")
 
 
 def build_regs_table(core):

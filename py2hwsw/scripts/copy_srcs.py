@@ -10,6 +10,7 @@ import importlib.util
 # IObundle scripts imported:
 import if_gen
 import iob_colors
+from iob_base import nix_permission_hack
 
 
 def get_lib_dir():
@@ -58,6 +59,7 @@ def sim_setup(python_module):
         dirs_exist_ok=True,
         ignore=shutil.ignore_patterns("*.pdf"),
     )
+    nix_permission_hack(f"{build_dir}/{sim_dir}")
 
 
 # Setup fpga files, but only the ones in the board_list
@@ -79,6 +81,7 @@ def fpga_setup(python_module):
         dirs_exist_ok=True,
         ignore=shutil.ignore_patterns("*.pdf", *tools_list),
     )
+    nix_permission_hack(dst_dir)
 
     # Copy LIB fpga directories only if their name is present in the board_list
     for fpga in python_module.board_list:
@@ -97,6 +100,7 @@ def fpga_setup(python_module):
                             shutil.copy2(
                                 setup_tool_file, os.path.join(dst_dir, tool, file)
                             )
+                            nix_permission_hack(os.path.join(dst_dir, tool, file))
                 # then copy the fpga directory (excluding any .pdf)
                 shutil.copytree(
                     setup_fpga_dir,
@@ -104,6 +108,7 @@ def fpga_setup(python_module):
                     dirs_exist_ok=True,
                     ignore=shutil.ignore_patterns("*.pdf"),
                 )
+                nix_permission_hack(os.path.join(dst_dir, tool, fpga))
 
 
 def lint_setup(python_module):
@@ -116,6 +121,7 @@ def lint_setup(python_module):
         f"{build_dir}/{lint_dir}",
         dirs_exist_ok=True,
     )
+    nix_permission_hack(f"{build_dir}/{lint_dir}")
 
 
 # synthesis
@@ -131,6 +137,7 @@ def syn_setup(python_module):
         if os.path.isfile(src_file):
             os.makedirs(os.path.dirname(dest_file), exist_ok=True)
             shutil.copyfile(f"{src_file}", f"{dest_file}")
+            nix_permission_hack(dest_file)
 
 
 # Check if any *_setup.py modules exist (like sim_setup.py, fpga_setup.py, ...).
@@ -181,6 +188,7 @@ def sw_setup(python_module):
     os.makedirs(build_dir + "/software/src", exist_ok=True)
     # Copy LIB software Makefile
     shutil.copy(f"{get_lib_dir()}/software/Makefile", f"{build_dir}/software/Makefile")
+    nix_permission_hack(f"{build_dir}/software/Makefile")
 
     # Create 'scripts/' directory
     python_setup(build_dir)
@@ -203,6 +211,7 @@ def doc_setup(python_module):
         shutil.copy2(
             f"{get_lib_dir()}/document/tsrc/{file}", f"{build_dir}/document/tsrc/{file}"
         )
+        nix_permission_hack(f"{build_dir}/document/tsrc/{file}")
 
     # Copy LIB figures
     os.makedirs(f"{build_dir}/document/figures", exist_ok=True)
@@ -211,9 +220,11 @@ def doc_setup(python_module):
             f"{get_lib_dir()}/document/figures/{file}",
             f"{build_dir}/document/figures/{file}",
         )
+        nix_permission_hack(f"{build_dir}/document/figures/{file}")
 
     # Copy document Makefile
     shutil.copy2(f"{get_lib_dir()}/document/Makefile", f"{build_dir}/document/Makefile")
+    nix_permission_hack(f"{build_dir}/document/Makefile")
 
     # General documentation
     write_git_revision_short_hash(f"{build_dir}/document/tsrc")
@@ -311,6 +322,7 @@ def copy_files(src_dir, dest_dir, sources=[], pattern="*", copy_all=False):
                     or (os.stat(src_file).st_mtime < os.stat(dest_file).st_mtime)
                 ):
                     shutil.copy(src_file, dest_file)
+                    nix_permission_hack(dest_file)
                     files_copied.append(file)
                 elif not (os.path.isfile(src_file)):
                     print(

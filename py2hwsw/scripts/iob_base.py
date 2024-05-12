@@ -81,16 +81,17 @@ class iob_attribute_properties:
 #
 
 
-def find_obj_in_list(obj_list, obj_name):
+def find_obj_in_list(obj_list, obj_name, process_func=lambda o: o):
     """Returns an object with a given name from a list of objects
     param obj_list: list of objects (or dictionaries) to search
     param obj_name: name of the object to find
+    param process_func: optional function to apply to each object
     """
     # Support dictionaries as well
     if obj_list and isinstance(obj_list[0], dict):
-        return next((o for o in obj_list if o["name"] == obj_name), None)
+        return next((o for o in obj_list if process_func(o)["name"] == obj_name), None)
 
-    return next((o for o in obj_list if o.name == obj_name), None)
+    return next((o for o in obj_list if process_func(o).name == obj_name), None)
 
 
 def convert_dict2obj_list(dict_list: dict, obj_class):

@@ -19,16 +19,16 @@ Hardware Design Languages such as Verilog and VHDL give a lot of flexibility to
 users. Still, the design tools reject most of their features and force users to
 use a small, low-level subset if we want the code to be human-readable and
 portable to both FPGAs and ASICs. The result is a very tedious and error-prone
-hardware design process. Therefore, we propose a tool to generate portable Verilog
+hardware design process. So, we'd like to propose a tool to generate portable Verilog
 code using a Python API.
 
-This project will benefit from a significant body of work constructed over the years and described in the following links.
+This project will benefit from a significant body of work constructed over the years, which is described in the following links.
 
 
 ### Useful Links
 
 [IOb-SoC](https://github.com/IObundle/iob-soc) is a System-on-Chip (SoC) template comprising an open-source RISC-V processor, a memory subsystem, and a UART.
-This is the departing repository; it already uses a collection of Python scripts to create a build directory to compile and run various tools.
+IOb-SoC is the departing repository; it already uses a collection of Python scripts to create a build directory for compiling and running various tools.
 
 
 [IOb-Lib](https://github.com/IObundle/iob-lib.git) contains a set of Python scripts, Verilog, and C sources to simplify the development of subsystem IP cores.
@@ -45,3 +45,7 @@ Security and privacy are more important than ever with the Internet of Things.
 
 Use the following command to install the `py2hwsw` program with [pip](https://pip.pypa.io/en/stable/) globally:
 `pip install git+https://github.com/IObundle/py2hwsw#egg=py2hwsw`
+
+### Usage examples
+
+Since this project started recently, usage examples are still being constructed and will be available soon.

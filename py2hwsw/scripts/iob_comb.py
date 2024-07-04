@@ -1,5 +1,8 @@
 from dataclasses import dataclass, field
+from iob_base import find_obj_in_list, convert_dict2obj_list, fail_with_msg
+from iob_signal import iob_signal, iob_signal_reference
 from iob_snippet import iob_snippet
+from iob_wire import *
 
 @dataclass
 class iob_comb(iob_snippet):
@@ -13,9 +16,18 @@ def create_comb(core, *args, **kwargs):
     """Create a Verilog combinatory circuit to insert in a given core."""
     # Ensure 'combs' list exists
     core.set_default_attribute("combs", [])
-    comb = iob_comb(*args, **kwargs)
+    verilog_code = kwargs.get('verilog_code',None)
+    outputs = kwargs.get('outputs',None)
+    for signal_name in outputs:
+        signal = find_signal_in_wires(core.wires + core.ports, signal_name)
+        if signal not None:
+            signal.isreg = True
+        else:
+            fail_with_msg(
+                f"output '{signal_name}' not found in wires/ports lists!"
+            )
+    comb = iob_comb(outputs=outputs,verilog_code=verilog_code)
     core.combs.append(comb)
-    # TODO: find signals in outputs list and change to reg
                                                 
 if __name__ == '__main__':
     circ = iob_comb(outputs=['a'],verilog_code='a = b & c\n')

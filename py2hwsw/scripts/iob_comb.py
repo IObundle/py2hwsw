@@ -10,7 +10,7 @@ class iob_comb(iob_snippet):
 
     def __post_init__(self):
         """Wrap verilog code with the always block"""
-        self.verilog_code = f'''\talways @ (*)\n\t\tbegin\n''' + '''\t\t\t''' +  self.verilog_code + '''\t\tend\n'''
+        self.verilog_code = f'''\talways @ (*)\n\t\tbegin\n''' + '''\t\t\t''' +  self.verilog_code + '''\n\t\tend'''
 
 def create_comb(core, *args, **kwargs):
     """Create a Verilog combinatory circuit to insert in a given core."""
@@ -20,7 +20,7 @@ def create_comb(core, *args, **kwargs):
     outputs = kwargs.get('outputs',None)
     for signal_name in outputs:
         signal = find_signal_in_wires(core.wires + core.ports, signal_name)
-        if signal not None:
+        if signal != None:
             signal.isreg = True
         else:
             fail_with_msg(
@@ -30,5 +30,5 @@ def create_comb(core, *args, **kwargs):
     core.combs.append(comb)
                                                 
 if __name__ == '__main__':
-    circ = iob_comb(outputs=['a'],verilog_code='a = b & c\n')
+    circ = iob_comb(outputs=['a'],verilog_code='a = b & c;')
     print(circ.verilog_code)

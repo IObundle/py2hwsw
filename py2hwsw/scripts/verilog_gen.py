@@ -193,6 +193,9 @@ def generate_verilog(core):
     if core.blocks:
         module_body_lines += f'    `include "{core.name}_blocks.vs"\n\n'
 
+    if core.combs:
+        module_body_lines += f'    `include "{core.name}_combs.vs"\n\n'
+
     if core.snippets:
         module_body_lines += f'    `include "{core.name}_snippets.vs"\n\n'
 

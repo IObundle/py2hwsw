@@ -98,6 +98,14 @@ def create_wrapper_files(build_dir, name, ios, confs, num_extmem_connections):
         create_ku040_interconnect_s_portmap(out_dir, name, num_extmem_connections)
         create_ku040_rstn(out_dir, name, num_extmem_connections)
 
+    # Wires for extmem portmaps
+    src_dir = os.path.join(build_dir, "hardware/src")
+    mwrap_extmem_wires_str = f"""
+      `include "iob_bus_{num_extmem_connections}_axi_wire.vs"
+    """
+    with open(f"{src_dir}/iob_mwrap_extmem_wires.vs", "w") as fd_mwrap_extmem_wires:
+        fd_mwrap_extmem_wires.write(mwrap_extmem_wires_str)
+
 
 def create_interconnect_instance(out_dir, name, num_extmem_connections):
     # Create strings for awlock and arlock

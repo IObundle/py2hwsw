@@ -68,7 +68,7 @@ class iob_module(iob_base):
             "combs",
             [],
             list,
-            get_list_attr_handler(self.create_snippet),
+            get_list_attr_handler(self.create_comb),
             "List of core Verilog combinatory circuits.",
         )
         # List of instances of other cores inside this core

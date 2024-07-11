@@ -82,6 +82,11 @@ def generate_reg_hw(core, csr_gen_obj, reg_table):
                 core.csr_if,
                 core.confs,
             )
+            csr_gen_obj.write_tbcode(
+                reg_table,
+                core.build_dir + "/hardware/simulation/src",
+                core.name,
+            )
 
 
 def generate_reg_sw(core, csr_gen_obj, reg_table):

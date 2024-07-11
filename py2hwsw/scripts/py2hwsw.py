@@ -6,6 +6,7 @@ import argparse
 from iob_base import fail_with_msg
 from iob_core import iob_core
 
+PY2HWSW_VERSION = 0.7
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True
@@ -47,6 +48,11 @@ if __name__ == "__main__":
         dest="verilog_lint",
         action="store_false",
         help="Disable verilog linter",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {PY2HWSW_VERSION}",
     )
     args = parser.parse_args()
 

@@ -106,16 +106,16 @@ class csr_gen:
         )
 
         # signal to indicate if the register is addressed
-        f.write(f"wire {name}_addressed;\n")
+        f.write(f"wire {name}_addressed_w;\n")
 
         # test if addr and addr_w are int and substitute with their values
         if isinstance(addr, int) and isinstance(addr_w, int):
             f.write(
-                f"assign {name}_addressed = (waddr >= {addr}) && (waddr < {addr+2**addr_w});\n"
+                f"assign {name}_addressed_w = (waddr >= {addr}) && (waddr < {addr+2**addr_w});\n"
             )
         else:
             f.write(
-                f"assign {name}_addressed = (waddr >= {addr}) && (waddr < ({addr}+(2**({addr_w}))));\n"
+                f"assign {name}_addressed_w = (waddr >= {addr}) && (waddr < ({addr}+(2**({addr_w}))));\n"
             )
 
         if auto:  # generate register
@@ -142,7 +142,7 @@ class csr_gen:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
             f.write(f"wire {name}_wen;\n")
             f.write(
-                f"assign {name}_wen = (iob_valid_i & iob_ready_o) & ((|iob_wstrb_i) & {name}_addressed);\n"
+                f"assign {name}_wen = (iob_valid_i & iob_ready_o) & ((|iob_wstrb_i) & {name}_addressed_w);\n"
             )
             f.write(f"iob_reg_e #(\n")
             f.write(f"  .DATA_W({n_bits}),\n")
@@ -157,7 +157,7 @@ class csr_gen:
             f.write(");\n")
         else:  # compute wen
             f.write(
-                f"assign {name}_wen_o = ({name}_addressed & (iob_valid_i & iob_ready_o))? |iob_wstrb_i: 1'b0;\n"
+                f"assign {name}_wen_o = ({name}_addressed_w & (iob_valid_i & iob_ready_o))? |iob_wstrb_i: 1'b0;\n"
             )
             f.write(f"assign {name}_wdata_o = {name}_wdata;\n")
 
@@ -178,13 +178,12 @@ class csr_gen:
         )
 
         if not auto:  # output read enable
-            if "W" not in row.type:
-                f.write(f"wire {name}_addressed;\n")
-                f.write(
-                    f"assign {name}_addressed = (iob_addr_i >= {addr}) && (iob_addr_i < ({addr}+(2**({addr_w}))));\n"
-                )
+            f.write(f"wire {name}_addressed_r;\n")
             f.write(
-                f"assign {name}_ren_o = {name}_addressed & (iob_valid_i & iob_ready_o) & (~|iob_wstrb_i);\n"
+                f"assign {name}_addressed_r = (iob_addr_i >= {addr}) && (iob_addr_i < ({addr}+(2**({addr_w}))));\n"
+            )
+            f.write(
+                f"assign {name}_ren_o = {name}_addressed_r & (iob_valid_i & iob_ready_o) & (~|iob_wstrb_i);\n"
             )
 
     # generate ports for swreg module
@@ -893,6 +892,170 @@ class csr_gen:
                 )
                 fsw.write("}\n\n")
         fsw.close()
+
+    def write_tbcode(self, table, out_dir, top):
+        # Write Verilator code as well
+        self.write_verilator_code(table, out_dir, top)
+
+        os.makedirs(out_dir, exist_ok=True)
+        fsw = open(f"{out_dir}/{top}_swreg_emb_tb.vs", "w")
+        core_prefix = f"{top}_".upper()
+        # fsw.write(f'`include "{top}_swreg_def.vh"\n\n')
+
+        fsw.write("\n// SWreg Core Setters and Getters\n")
+
+        for row in table:
+            name = row.name
+            n_bits = row.n_bits
+            log2n_items = row.log2n_items
+            n_bytes = self.bceil(n_bits, 3) / 8
+            if n_bytes == 3:
+                n_bytes = 4
+            addr_w = self.calc_addr_w(log2n_items, n_bytes)
+            if "W" in row.type:
+                sw_type = f"[{int(n_bytes*8)}-1:0]"
+                addr_arg = ""
+                addr_arg = ""
+                addr_shift = ""
+                if addr_w / n_bytes > 1:
+                    addr_arg = ", input reg [ADDR_W-1:0] addr"
+                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
+                fsw.write(
+                    f"task static {core_prefix}SET_{name}(input reg {sw_type} value{addr_arg});\n"
+                )
+                fsw.write(
+                    f"  iob_write( (`{core_prefix}{name}_ADDR){addr_shift}, value, `{core_prefix}{name}_W);\n"
+                )
+                fsw.write("endtask\n\n")
+            if "R" in row.type:
+                sw_type = f"[{int(n_bytes*8)}-1:0]"
+                addr_arg = ""
+                addr_shift = ""
+                if addr_w / n_bytes > 1:
+                    addr_arg = "input reg [ADDR_W-1:0] addr, "
+                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
+                fsw.write(
+                    f"task static {core_prefix}GET_{name}({addr_arg}output reg {sw_type} rvalue);\n"
+                )
+                fsw.write(
+                    f"  iob_read( (`{core_prefix}{name}_ADDR){addr_shift}, rvalue, `{core_prefix}{name}_W);\n"
+                )
+                fsw.write("endtask\n\n")
+        fsw.close()
+
+    def write_verilator_code(self, table, out_dir, top):
+        self.write_swheader_verilator(table, out_dir, top)
+        os.makedirs(out_dir, exist_ok=True)
+        fsw = open(f"{out_dir}/{top}_swreg_emb_verilator.c", "w")
+        core_prefix = f"{top}_".upper()
+        fsw.write(f'#include "{top}_swreg_verilator.h"\n\n')
+
+        fsw.write("\n// Core Setters and Getters\n")
+
+        for row in table:
+            name = row.name
+            n_bits = row.n_bits
+            log2n_items = row.log2n_items
+            n_bytes = self.bceil(n_bits, 3) / 8
+            if n_bytes == 3:
+                n_bytes = 4
+            addr_w = self.calc_addr_w(log2n_items, n_bytes)
+            if "W" in row.type:
+                sw_type = self.swreg_type(name, n_bytes)
+                addr_arg = ""
+                addr_arg = ""
+                addr_shift = ""
+                if addr_w / n_bytes > 1:
+                    addr_arg = ", int addr"
+                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
+                fsw.write(
+                    f"void {core_prefix}SET_{name}({sw_type} value{addr_arg}, iob_native_t *native_if) {{\n"
+                )
+                fsw.write(
+                    f"  iob_write(({core_prefix}{name}_ADDR){addr_shift}, value, {core_prefix}{name}_W, native_if);\n"
+                )
+                fsw.write("}\n\n")
+            if "R" in row.type:
+                sw_type = self.swreg_type(name, n_bytes)
+                addr_arg = ""
+                addr_shift = ""
+                if addr_w / n_bytes > 1:
+                    addr_arg = "int addr, "
+                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
+                fsw.write(
+                    f"{sw_type} {core_prefix}GET_{name}({addr_arg}iob_native_t *native_if) {{\n"
+                )
+                fsw.write(
+                    f"  return ({sw_type})iob_read(({core_prefix}{name}_ADDR){addr_shift}, native_if);\n"
+                )
+                fsw.write("}\n\n")
+        fsw.close()
+
+    def write_swheader_verilator(self, table, out_dir, top):
+        os.makedirs(out_dir, exist_ok=True)
+        fswhdr = open(f"{out_dir}/{top}_swreg_verilator.h", "w")
+
+        core_prefix = f"{top}_".upper()
+
+        fswhdr.write(f"#ifndef H_{core_prefix}SWREG_VERILATOR_H\n")
+        fswhdr.write(f"#define H_{core_prefix}SWREG_VERILATOR_H\n\n")
+        fswhdr.write("#include <stdint.h>\n\n")
+        fswhdr.write('#include "iob_tasks.h"\n\n')
+
+        fswhdr.write("//used address space width\n")
+        fswhdr.write(f"#define  {core_prefix}SWREG_ADDR_W {self.core_addr_w}\n\n")
+
+        fswhdr.write("//used address space width\n")
+        fswhdr.write(f"#define  {core_prefix}SWREG_ADDR_W {self.core_addr_w}\n\n")
+
+        fswhdr.write("//Addresses\n")
+        for row in table:
+            name = row.name
+            if "W" in row.type or "R" in row.type:
+                fswhdr.write(f"#define {core_prefix}{name}_ADDR {row.addr}\n")
+
+        fswhdr.write("\n//Data widths (bit)\n")
+        for row in table:
+            name = row.name
+            n_bits = row.n_bits
+            n_bytes = int(self.bceil(n_bits, 3) / 8)
+            if n_bytes == 3:
+                n_bytes = 4
+            if "W" in row.type or "R" in row.type:
+                fswhdr.write(f"#define {core_prefix}{name}_W {n_bytes*8}\n")
+
+        # fswhdr.write("\n// Base Address\n")
+        # fswhdr.write(f"void {core_prefix}INIT_BASEADDR(uint32_t addr);\n")
+
+        fswhdr.write("\n// Core Setters and Getters\n")
+        for row in table:
+            name = row.name
+            n_bits = row.n_bits
+            log2n_items = row.log2n_items
+            n_bytes = self.bceil(n_bits, 3) / 8
+            if n_bytes == 3:
+                n_bytes = 4
+            addr_w = self.calc_addr_w(log2n_items, n_bytes)
+            if "W" in row.type:
+                sw_type = self.swreg_type(name, n_bytes)
+                addr_arg = ""
+                if addr_w / n_bytes > 1:
+                    addr_arg = ", int addr"
+                fswhdr.write(
+                    f"void {core_prefix}SET_{name}({sw_type} value{addr_arg}, iob_native_t *native_if);\n"
+                )
+            if "R" in row.type:
+                sw_type = self.swreg_type(name, n_bytes)
+                addr_arg = ""
+                if addr_w / n_bytes > 1:
+                    addr_arg = "int addr, "
+                fswhdr.write(
+                    f"{sw_type} {core_prefix}GET_{name}({addr_arg}iob_native_t *native_if);\n"
+                )
+
+        fswhdr.write(f"\n#endif // H_{core_prefix}_SWREG_VERILATOR_H\n")
+
+        fswhdr.close()
 
     # check if address is aligned
     @staticmethod

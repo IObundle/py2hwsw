@@ -32,13 +32,14 @@ def generate_ports(core):
 
         for idx, s in enumerate(port.signals):
             dir = s.direction
+            reg = " reg " if s.isreg else " "
             width = "[" + str(s.width) + "-1:0]"
             port_name = get_signal_name_with_dir_suffix(s)
             if port_idx < len(core.ports) - 1 or idx < len(port.signals) - 1:
                 comma = ","
             else:
                 comma = ""
-            lines.append(f"    {dir} {width} {port_name}{comma}\n")
+            lines.append(f"    {dir}{reg}{width} {port_name}{comma}\n")
 
         # Close ifdef if conditional interface
         if port.if_defined:

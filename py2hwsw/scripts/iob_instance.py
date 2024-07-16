@@ -18,10 +18,33 @@ class iob_instance(iob_base):
                           Key: Verilog parameter name, Value: Verilog parameter value
         """
         self.set_default_attribute(
-            "instance_name", instance_name or self.__class__.__name__ + "_inst", str
+            "instance_name",
+            instance_name or self.__class__.__name__ + "_inst",
+            str,
+            descr="Name of the instance",
         )
-        self.set_default_attribute("description", "Default description", str)
+        self.set_default_attribute(
+            "description",
+            "Default description",
+            str,
+            descr="Description of the instance",
+        )
         # Verilog parameter values
-        self.set_default_attribute("parameters", parameters, Dict)
+        self.set_default_attribute(
+            "parameters", parameters, Dict, descr="Verilog parameter values"
+        )
         # Only use this instance in Verilog if this Verilog macro is defined
-        self.set_default_attribute("if_defined", None, str)
+        self.set_default_attribute(
+            "if_defined",
+            None,
+            str,
+            descr="Only use this instance in Verilog if this Verilog macro is defined",
+        )
+        # Select if should intantiate inside another Verilog module.
+        # May be False if this is a software only module.
+        self.set_default_attribute(
+            "create_verilog_instance",
+            True,
+            bool,
+            descr="Select if should intantiate the module inside another Verilog module.",
+        )

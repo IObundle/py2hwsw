@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List
 
 import if_gen
 from iob_base import find_obj_in_list, convert_dict2obj_list, fail_with_msg
-from iob_signal import iob_signal, iob_signal_reference
+from iob_signal import iob_signal, iob_signal_reference, get_real_signal
 
 
 @dataclass
@@ -11,15 +11,8 @@ class iob_wire:
     """Class to represent a wire in an iob module"""
 
     name: str = ""
-
-    """ 'if_gen' related arguments """
-    wire_prefix: str = ""
-    mult: str | int = 1
-    widths: Dict[str, str] = field(default_factory=dict)
-    file_prefix: str = ""
-    param_prefix: str = ""
-
-    """ Other wire arguments """
+    # interface to auto-generate with if_gen.py
+    interface: if_gen.interface = None
     descr: str = "Default description"
     # Only set the wire if this Verilog macro is defined
     if_defined: str = ""
@@ -33,12 +26,12 @@ class iob_wire:
         if not self.name:
             fail_with_msg("Wire name is not set", ValueError)
 
-        if self.name in if_gen.if_names:
+        if self.interface:
             self.signals += if_gen.get_signals(
-                self.name,
+                self.interface.type,
                 "",
-                self.mult,
-                self.widths,
+                self.interface.mult,
+                self.interface.widths,
             )
 
             # Remove signal direction information
@@ -50,7 +43,7 @@ class iob_wire:
                     signal.pop("direction")
 
 
-def create_wire(core, *args, signals=[], **kwargs):
+def create_wire(core, *args, signals=[], interface=None, **kwargs):
     """Creates a new wire object and adds it to the core's wire list
     param core: core object
     """
@@ -60,7 +53,9 @@ def create_wire(core, *args, signals=[], **kwargs):
     replace_duplicate_signals_by_references(core.wires + core.ports, signals)
     # Convert user signal dictionaries into 'iob_signal' objects
     sig_obj_list = convert_dict2obj_list(signals, iob_signal)
-    wire = iob_wire(*args, signals=sig_obj_list, **kwargs)
+    # Convert user interface dictionary into 'if_gen.interface' object
+    interface_obj = if_gen.dict2interface(interface) if interface else None
+    wire = iob_wire(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
     core.wires.append(wire)
 
 
@@ -83,15 +78,6 @@ def get_wire_signal(core, wire_name: str, signal_name: str):
         )
 
     return iob_signal_reference(signal=signal)
-
-
-def get_real_signal(signal):
-    """Given a signal reference, follow the reference (recursively) and
-    return the real signal
-    """
-    while isinstance(signal, iob_signal_reference):
-        signal = signal.signal
-    return signal
 
 
 def replace_duplicate_signals_by_references(wires, signals):

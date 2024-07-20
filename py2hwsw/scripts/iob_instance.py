@@ -43,7 +43,7 @@ class iob_instance(iob_base):
         # Select if should intantiate inside another Verilog module.
         # May be False if this is a software only module.
         self.set_default_attribute(
-            "create_verilog_instance",
+            "instantiate",
             True,
             bool,
             descr="Select if should intantiate the module inside another Verilog module.",

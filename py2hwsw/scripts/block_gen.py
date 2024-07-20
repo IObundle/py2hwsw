@@ -6,8 +6,7 @@ from latex import write_table
 
 import iob_colors
 from iob_port import get_signal_name_with_dir_suffix
-from iob_wire import get_real_signal
-import if_gen
+from iob_signal import get_real_signal
 
 
 # Generate blocks.tex file with TeX table of blocks (Verilog modules instances)

@@ -70,6 +70,14 @@ class iob_module(iob_base):
             get_list_attr_handler(self.create_instance),
             "List of instances of other cores inside this core.",
         )
+        # List of software modules required by this core
+        self.set_default_attribute(
+            "sw_modules",
+            [],
+            list,
+            get_list_attr_handler(self.create_sw_instance),
+            "List of software modules required by this core.",
+        )
 
     def create_conf(self, *args, **kwargs):
         create_conf(self, *args, **kwargs)
@@ -92,6 +100,11 @@ class iob_module(iob_base):
     def create_instance(self, **kwargs):
         """Import core and create an instance of it inside this module"""
         # Method body implemented in subclass
+
+    def create_sw_instance(self, **kwargs):
+        """Import core and run its setup process"""
+        # Setup process is equal to normal core, but should not be instantiated in Verilog
+        self.create_instance(instantiate=False, **kwargs)
 
     def update_global_top_module(self):
         """Update global top module if it has not been set before.

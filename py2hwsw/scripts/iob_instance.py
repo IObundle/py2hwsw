@@ -11,6 +11,7 @@ class iob_instance(iob_base):
         *args,
         instance_name: str = None,
         parameters: Dict = {},
+        instantiate: bool = True,
         **kwargs,
     ):
         """Build a (Verilog) instance
@@ -44,7 +45,7 @@ class iob_instance(iob_base):
         # May be False if this is a software only module.
         self.set_default_attribute(
             "instantiate",
-            True,
+            instantiate,
             bool,
             descr="Select if should intantiate the module inside another Verilog module.",
         )

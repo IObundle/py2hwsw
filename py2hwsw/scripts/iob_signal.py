@@ -23,7 +23,8 @@ class iob_signal:
 
     def get_verilog_wire(self):
         """Generate a verilog wire string from this signal"""
-        return f"wire [{self.width}-1:0] {self.name};\n"
+        width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
+        return f"wire {width_str}{self.name};\n"
 
     def assert_direction(self):
         if not self.direction:
@@ -33,7 +34,10 @@ class iob_signal:
         """Generate a verilog port string from this signal"""
         self.assert_direction()
         comma_char = "," if comma else ""
-        return f"{self.direction} [{self.width}-1:0] {self.get_verilog_port_name()}{comma_char}\n"
+        width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
+        return (
+            f"{self.direction} {width_str}{self.get_verilog_port_name()}{comma_char}\n"
+        )
 
     def get_verilog_port_name(self):
         """Return the verilog port name, including direction suffix"""
@@ -44,6 +48,12 @@ class iob_signal:
             return f"{self.name}_o"
         else:
             return f"{self.name}_io"
+
+    def get_width_int(self):
+        try:
+            return int(self.width)
+        except ValueError:
+            return self.width
 
 
 @dataclass

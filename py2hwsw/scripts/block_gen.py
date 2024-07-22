@@ -66,6 +66,8 @@ def generate_blocks(core):
     f_blocks = open(f"{out_dir}/{core.name}_blocks.vs", "w+")
 
     for instance in core.blocks:
+        if not instance.instantiate:
+            continue
         # Open ifdef if conditional interface
         if instance.if_defined:
             f_blocks.write(f"`ifdef {core.name.upper()}_{instance.if_defined}\n")

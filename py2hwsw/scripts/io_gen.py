@@ -19,7 +19,8 @@ def reverse_port(port_type):
 def generate_ports(core):
     out_dir = core.build_dir + "/hardware/src"
 
-    lines = []
+    f_io = open(f"{out_dir}/{core.name}_io.vs", "w+")
+
     for port_idx, port in enumerate(core.ports):
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
@@ -27,17 +28,19 @@ def generate_ports(core):
 
         # Open ifdef if conditional interface
         if port.if_defined:
-            lines.append(f"`ifdef {core.name.upper()}_{port.if_defined}\n")
+            f_io.write(f"`ifdef {core.name.upper()}_{port.if_defined}\n")
+
+        f_io.write(f"    // {port.name}\n")
 
         for signal_idx, signal in enumerate(port.signals):
             is_last_signal = (
                 port_idx == len(core.ports) - 1 and signal_idx == len(port.signals) - 1
             )
-            lines.append("    " + signal.get_verilog_port(comma=not is_last_signal))
+            f_io.write("    " + signal.get_verilog_port(comma=not is_last_signal))
 
         # Close ifdef if conditional interface
         if port.if_defined:
-            lines.append("`endif\n")
+            f_io.write("`endif\n")
 
         # Also generate snippets for all interface subtypes (portmaps, tb_portmaps, wires, ...)
         # Note: This is only used by manually written verilog modules.
@@ -50,8 +53,6 @@ def generate_ports(core):
                 if file.endswith(".vs"):
                     os.rename(file, f"{out_dir}/{file}")
 
-    f_io = open(f"{out_dir}/{core.name}_io.vs", "w+")
-    f_io.writelines(lines)
     f_io.close()
 
 

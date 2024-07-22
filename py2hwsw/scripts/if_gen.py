@@ -920,7 +920,7 @@ def write_s_tb_wire(fout, wire_prefix, wires):
 #
 
 
-def get_signals(name, if_type="", mult=1, widths={}):
+def get_signals(name, if_type="", mult=1, widths={}, signal_prefix=""):
     """Get list of signals for given interface
     param if_type: Type of interface.
                    Examples: '' (unspecified), 'master', 'slave', ...
@@ -940,6 +940,9 @@ def get_signals(name, if_type="", mult=1, widths={}):
     if mult > 1:
         for signal in signals:
             signal.width = f"({mult}*{signal.width})"
+
+    for signal in signals:
+        signal.name = signal_prefix + signal.name
 
     return signals
 
@@ -988,7 +991,7 @@ def gen_wires(interface):
     mult = interface.mult
     widths = interface.widths
 
-    signals = get_signals(name, mult, widths)
+    signals = get_signals(name, "", mult, widths)
 
     fout = open(file_prefix + name + "_wire.vs", "w")
     write_wire(fout, wire_prefix, signals)

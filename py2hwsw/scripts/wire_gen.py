@@ -18,6 +18,8 @@ def generate_wires(core):
         if wire.if_defined:
             f_wires.write(f"`ifdef {core.name.upper()}_{wire.if_defined}\n")
 
+        f_wires.write(f"    // {wire.name}\n")
+
         for signal in wire.signals:
             if isinstance(signal, iob_signal):
                 f_wires.write("    " + signal.get_verilog_wire())

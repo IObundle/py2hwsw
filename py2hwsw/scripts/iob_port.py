@@ -26,6 +26,7 @@ class iob_port(iob_wire):
                 self.interface.subtype,
                 self.interface.mult,
                 self.interface.widths,
+                self.interface.port_prefix,
             )
 
         for signal in self.signals:

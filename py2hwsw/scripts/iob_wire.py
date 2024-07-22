@@ -32,6 +32,7 @@ class iob_wire:
                 "",
                 self.interface.mult,
                 self.interface.widths,
+                self.interface.wire_prefix,
             )
 
             # Remove signal direction information
@@ -39,8 +40,8 @@ class iob_wire:
                 # Skip signal references
                 if isinstance(signal, iob_signal_reference):
                     continue
-                if "direction" in signal:
-                    signal.pop("direction")
+                if signal.direction:
+                    signal.direction = ""
 
 
 def create_wire(core, *args, signals=[], interface=None, **kwargs):
@@ -93,6 +94,7 @@ def replace_duplicate_signals_by_references(wires, signals):
         original_signal = find_signal_in_wires(wires, signal["name"])
         if not original_signal:
             continue
+        original_signal = get_real_signal(original_signal)
         # print(f"[DEBUG] Replacing signal '{signal['name']}' by reference to original.")
         # Verify that new signal has same parameters as the original_signal
         for key, value in signal.items():

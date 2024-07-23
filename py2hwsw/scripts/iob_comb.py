@@ -10,6 +10,7 @@ class iob_comb(iob_snippet):
 
     def __post_init__(self):
         """Wrap verilog code with the always block"""
+        super().__post_init__()
         self.verilog_code = f'''\talways @ (*)\n\t\tbegin\n''' + '''\t\t\t''' +  self.verilog_code + '''\n\t\tend'''
 
 def create_comb(core, *args, **kwargs):
@@ -30,5 +31,6 @@ def create_comb(core, *args, **kwargs):
     core.combs.append(comb)
                                                 
 if __name__ == '__main__':
-    circ = iob_comb(outputs=['a'],verilog_code='a = b & c;')
+    circ = iob_comb(outputs=[],verilog_code='a = b & c;')
+    print(circ.outputs)
     print(circ.verilog_code)

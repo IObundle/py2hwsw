@@ -9,6 +9,7 @@ class iob_signal:
 
     name: str = ""
     width: str or int = 1
+    isreg: bool = False
     descr: str = "Default description"
 
     # Only used when signal belongs to a port

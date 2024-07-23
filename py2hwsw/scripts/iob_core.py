@@ -14,6 +14,7 @@ import io_gen
 import wire_gen
 import reg_gen
 import block_gen
+import comb_gen
 import snippet_gen
 import doc_gen
 import verilog_gen
@@ -157,6 +158,9 @@ class iob_core(iob_module, iob_instance):
         # Generate instances
         if self.generate_hw:
             block_gen.generate_blocks(self)
+
+        # Generate combs
+        comb_gen.generate_combs(self)
 
         # Generate snippets
         snippet_gen.generate_snippets(self)

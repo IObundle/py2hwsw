@@ -71,12 +71,18 @@ def generate_blocks(core):
         # Open ifdef if conditional interface
         if instance.if_defined:
             f_blocks.write(f"`ifdef {core.name.upper()}_{instance.if_defined}\n")
+        if instance.if_not_defined:
+            f_blocks.write(f"`ifndef {core.name.upper()}_{instance.if_not_defined}\n")
+
+        params_str = ""
+        if instance.parameters:
+            params_str = f"""#(
+        `include "{instance.instance_name}_inst_params.vs"
+    ) """
 
         f_blocks.write(
             f"""\
-    {instance.name} #(
-        `include "{instance.instance_name}_inst_params.vs"
-    ) {instance.instance_name} (
+    {instance.name} {params_str}{instance.instance_name} (
 {get_instance_port_connections(instance)}
     );
 
@@ -84,7 +90,7 @@ def generate_blocks(core):
         )
 
         # Close ifdef if conditional interface
-        if instance.if_defined:
+        if instance.if_defined or instance.if_not_defined:
             f_blocks.write("`endif\n")
 
     f_blocks.close()

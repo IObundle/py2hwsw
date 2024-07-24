@@ -17,6 +17,8 @@ def generate_wires(core):
         # Open ifdef if conditional interface
         if wire.if_defined:
             f_wires.write(f"`ifdef {core.name.upper()}_{wire.if_defined}\n")
+        if wire.if_not_defined:
+            f_wires.write(f"`ifndef {core.name.upper()}_{wire.if_not_defined}\n")
 
         f_wires.write(f"    // {wire.name}\n")
 
@@ -25,7 +27,7 @@ def generate_wires(core):
                 f_wires.write("    " + signal.get_verilog_wire())
 
         # Close ifdef if conditional interface
-        if wire.if_defined:
+        if wire.if_defined or wire.if_not_defined:
             f_wires.write("`endif\n")
 
         # Generate the specific interface snippet as well

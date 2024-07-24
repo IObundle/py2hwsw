@@ -937,7 +937,7 @@ def get_signals(name, if_type="", mult=1, widths={}, signal_prefix=""):
     # TODO: Code to support other if_types
     # For example, the rs232 has not type.
 
-    if mult > 1:
+    if mult != 1:
         for signal in signals:
             signal.width = f"({mult}*{signal.width})"
 

@@ -16,6 +16,7 @@ class iob_wire:
     descr: str = "Default description"
     # Only set the wire if this Verilog macro is defined
     if_defined: str = ""
+    if_not_defined: str = ""
     # List of signals belonging to this wire
     # (each signal is similar to a Verilog wire)
     signals: List = field(default_factory=list)

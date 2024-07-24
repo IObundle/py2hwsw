@@ -41,6 +41,13 @@ class iob_instance(iob_base):
             str,
             descr="Only use this instance in Verilog if this Verilog macro is defined",
         )
+        # Only use this instance in Verilog if this Verilog macro is not defined
+        self.set_default_attribute(
+            "if_not_defined",
+            None,
+            str,
+            descr="Only use this instance in Verilog if this Verilog macro is not defined",
+        )
         # Select if should intantiate inside another Verilog module.
         # May be False if this is a software only module.
         self.set_default_attribute(

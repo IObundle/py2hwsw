@@ -77,7 +77,7 @@ def generate_blocks(core):
         params_str = ""
         if instance.parameters:
             params_str = f"""#(
-        `include "{instance.instance_name}_inst_params.vs"
+        `include "{instance.instance_name}_{id(instance)}_inst_params.vs"
     ) """
 
         f_blocks.write(

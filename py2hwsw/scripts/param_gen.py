@@ -39,6 +39,6 @@ def generate_inst_params(core):
         lines.append(f"        .{p_name}({p_value}),\n")
     if lines:
         lines[-1] = lines[-1].replace(",\n", "\n")
-    file2create = open(f"{out_dir}/{core.instance_name}_inst_params.vs", "w")
+    file2create = open(f"{out_dir}/{core.instance_name}_{id(core)}_inst_params.vs", "w")
     file2create.writelines(lines)
     file2create.close()

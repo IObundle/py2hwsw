@@ -11,7 +11,6 @@ def has_params(confs):
 
 def generate_params(core):
     module_parameters = [p for p in core.confs if p.type in ["P", "F"]]
-    instance_parameters = core.parameters
     out_dir = core.build_dir + "/hardware/src"
 
     if not has_params(core.confs):

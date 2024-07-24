@@ -28,7 +28,13 @@ def generate_params(core):
     file2create.writelines(lines)
     file2create.close()
 
+    generate_inst_params(core)
+
+
+def generate_inst_params(core):
     # Generate inst_params.vs
+    instance_parameters = core.parameters
+    out_dir = core.build_dir + "/hardware/src"
     lines = []
     for p_name, p_value in instance_parameters.items():
         lines.append(f"        .{p_name}({p_value}),\n")

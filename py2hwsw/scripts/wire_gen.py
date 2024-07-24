@@ -16,9 +16,9 @@ def generate_wires(core):
     for wire in core.wires:
         # Open ifdef if conditional interface
         if wire.if_defined:
-            f_wires.write(f"`ifdef {core.name.upper()}_{wire.if_defined}\n")
+            f_wires.write(f"`ifdef {wire.if_defined}\n")
         if wire.if_not_defined:
-            f_wires.write(f"`ifndef {core.name.upper()}_{wire.if_not_defined}\n")
+            f_wires.write(f"`ifndef {wire.if_not_defined}\n")
 
         f_wires.write(f"    // {wire.name}\n")
 

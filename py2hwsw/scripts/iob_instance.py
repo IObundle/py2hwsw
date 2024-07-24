@@ -11,6 +11,8 @@ class iob_instance(iob_base):
         *args,
         instance_name: str = None,
         parameters: Dict = {},
+        if_defined: str = None,
+        if_not_defined: str = None,
         instantiate: bool = True,
         **kwargs,
     ):
@@ -37,14 +39,14 @@ class iob_instance(iob_base):
         # Only use this instance in Verilog if this Verilog macro is defined
         self.set_default_attribute(
             "if_defined",
-            None,
+            if_defined,
             str,
             descr="Only use this instance in Verilog if this Verilog macro is defined",
         )
         # Only use this instance in Verilog if this Verilog macro is not defined
         self.set_default_attribute(
             "if_not_defined",
-            None,
+            if_not_defined,
             str,
             descr="Only use this instance in Verilog if this Verilog macro is not defined",
         )

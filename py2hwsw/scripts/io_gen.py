@@ -28,9 +28,9 @@ def generate_ports(core):
 
         # Open ifdef if conditional interface
         if port.if_defined:
-            f_io.write(f"`ifdef {core.name.upper()}_{port.if_defined}\n")
+            f_io.write(f"`ifdef {port.if_defined}\n")
         if port.if_not_defined:
-            f_io.write(f"`ifndef {core.name.upper()}_{port.if_not_defined}\n")
+            f_io.write(f"`ifndef {port.if_not_defined}\n")
 
         f_io.write(f"    // {port.name}\n")
 

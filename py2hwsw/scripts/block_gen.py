@@ -70,9 +70,9 @@ def generate_blocks(core):
             continue
         # Open ifdef if conditional interface
         if instance.if_defined:
-            f_blocks.write(f"`ifdef {core.name.upper()}_{instance.if_defined}\n")
+            f_blocks.write(f"`ifdef {instance.if_defined}\n")
         if instance.if_not_defined:
-            f_blocks.write(f"`ifndef {core.name.upper()}_{instance.if_not_defined}\n")
+            f_blocks.write(f"`ifndef {instance.if_not_defined}\n")
 
         params_str = ""
         if instance.parameters:

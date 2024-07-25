@@ -5,6 +5,7 @@ from iob_wire import create_wire, get_wire_signal
 from iob_csr import create_csr_group
 from iob_snippet import create_snippet
 from iob_comb import create_comb
+from iob_fsm import create_fsm
 
 
 class iob_module(iob_base):
@@ -71,6 +72,14 @@ class iob_module(iob_base):
             get_list_attr_handler(self.create_comb),
             "List of core Verilog combinatory circuits.",
         )
+        # List of core Verilog finite state machines
+        self.set_default_attribute(
+            "fsms",
+            [],
+            list,
+            get_list_attr_handler(self.create_fsm),
+            "List of core Verilog finite state machines.",
+        )
         # List of instances of other cores inside this core
         self.set_default_attribute(
             "blocks",
@@ -100,6 +109,9 @@ class iob_module(iob_base):
 
     def create_comb(self, *args, **kwargs):
         create_comb(self, *args, **kwargs)
+
+    def create_fsm(self, *args, **kwargs):
+        create_fsm(self, *args, **kwargs)
 
     def create_instance(self, **kwargs):
         """Import core and create an instance of it inside this module"""

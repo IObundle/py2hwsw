@@ -167,7 +167,7 @@ def generate_verilog(core):
     """Generate main Verilog module of given core
     if it does not exist yet (may be defined manually or generated previously).
     """
-    out_dir = core.build_dir + "/hardware/src"
+    out_dir = os.path.join(core.build_dir, core.PURPOSE_DIRS[core.purpose])
     file_path = os.path.join(out_dir, f"{core.name}.v")
 
     if os.path.exists(file_path):

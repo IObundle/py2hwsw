@@ -19,6 +19,10 @@ ifneq ($(wildcard ../src),)
 VFLAGS+=-incdir ../src
 endif
 
+ifneq ($(wildcard ../common_src),)
+VFLAGS+=-incdir ../common_src
+endif
+
 ifneq ($(wildcard src),)
 VFLAGS+=-incdir src
 endif

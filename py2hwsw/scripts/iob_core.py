@@ -123,6 +123,7 @@ class iob_core(iob_module, iob_instance):
             "hardware": "hardware/src",
             "simulation": "hardware/simulation/src",
             "fpga": "hardware/fpga/src",
+            "common": "hardware/common_src",
         }
 
         # Connect ports of this instance to external wires (wires of the instantiator)
@@ -281,6 +282,7 @@ class iob_core(iob_module, iob_instance):
         os.makedirs(f"{self.build_dir}/hardware/src", exist_ok=True)
         os.makedirs(f"{self.build_dir}/hardware/simulation/src", exist_ok=True)
         os.makedirs(f"{self.build_dir}/hardware/fpga/src", exist_ok=True)
+        os.makedirs(f"{self.build_dir}/hardware/common_src", exist_ok=True)
 
         os.makedirs(f"{self.build_dir}/doc", exist_ok=True)
         os.makedirs(f"{self.build_dir}/doc/tsrc", exist_ok=True)

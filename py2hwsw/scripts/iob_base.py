@@ -85,13 +85,21 @@ def find_obj_in_list(obj_list, obj_name, process_func=lambda o: o):
     """Returns an object with a given name from a list of objects
     param obj_list: list of objects (or dictionaries) to search
     param obj_name: name of the object to find
-    param process_func: optional function to apply to each object
+    param process_func: optional function to apply to each object before comparing
     """
+    if not obj_list:
+        return None
+    processed_objs = list(process_func(o) for o in obj_list)
     # Support dictionaries as well
-    if obj_list and isinstance(obj_list[0], dict):
-        return next((o for o in obj_list if process_func(o)["name"] == obj_name), None)
-
-    return next((o for o in obj_list if process_func(o).name == obj_name), None)
+    if isinstance(obj_list[0], dict):
+        for obj, obj_processed in zip(obj_list, processed_objs):
+            if obj_processed and obj_processed["name"] == obj_name:
+                return obj
+    else:
+        for obj, obj_processed in zip(obj_list, processed_objs):
+            if obj_processed and obj_processed.name == obj_name:
+                return obj
+    return None
 
 
 def convert_dict2obj_list(dict_list: dict, obj_class):

@@ -107,12 +107,14 @@ def replace_duplicate_signals_by_references(wires, signals):
         signals[idx] = iob_signal_reference(signal=original_signal)
 
 
-def find_signal_in_wires(wires, signal_name):
-    """Search for a signal in given list of wires"""
+def find_signal_in_wires(wires, signal_name, process_func=get_real_signal):
+    """Search for a signal in given list of wires
+    param wires: list of wires
+    param signal_name: name of signal to search for
+    param process_func: function to process each signal before search
+    """
     for wire in wires:
-        signal = find_obj_in_list(
-            wire.signals, signal_name, process_func=get_real_signal
-        )
+        signal = find_obj_in_list(wire.signals, signal_name, process_func=process_func)
         if signal:
             return signal
     return None

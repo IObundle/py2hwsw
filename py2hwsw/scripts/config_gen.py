@@ -21,6 +21,8 @@ def conf_vh(macros, top_module, out_dir):
     for macro in macros:
         if macro.if_defined:
             file2create.write(f"`ifdef {macro.if_defined}\n")
+        if macro.if_not_defined:
+            file2create.write(f"`ifndef {macro.if_not_defined}\n")
         # Only insert macro if its is not a bool define, and if so only insert it if it is true
         if type(macro.val) != bool:
             m_name = macro.name.upper()
@@ -29,7 +31,7 @@ def conf_vh(macros, top_module, out_dir):
         elif macro.val:
             m_name = macro.name.upper()
             file2create.write(f"`define {core_prefix}{m_name} 1\n")
-        if macro.if_defined:
+        if macro.if_defined or macro.if_not_defined:
             file2create.write("`endif\n")
     # file2create.write(f"\n`endif // VH_{fname}_VH\n")
 
@@ -177,5 +179,9 @@ def generate_confs(core):
                 )
             )
 
-    conf_vh(core.confs, core.name, core.build_dir + "/hardware/src")
+    conf_vh(
+        core.confs,
+        core.name,
+        os.path.join(core.build_dir, core.PURPOSE_DIRS[core.purpose]),
+    )
     conf_h(core.confs, core.name, core.build_dir + "/software/include")

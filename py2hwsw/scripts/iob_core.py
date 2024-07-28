@@ -103,6 +103,18 @@ class iob_core(iob_module, iob_instance):
         # Select if should generate hardware from python
         self.set_default_attribute("generate_hw", True, bool)
 
+        self.abort_reason = None
+        # Don't setup this core if using a project wide special target.
+        if __class__.global_special_target:
+            self.abort_reason = "special_target"
+        # Don't setup this core if it is the same as the top module.
+        # May happen if the top module is listed in 'blocks' of a submodule (likely wrapper).
+        if (
+            attributes["original_name"] == __class__.global_top_module.original_name
+            and not self.is_top_module
+        ):
+            self.abort_reason = "duplicate_setup"
+
         # Read 'attributes' dictionary and set corresponding core attributes
         self.parse_attributes_dict(attributes)
 
@@ -112,19 +124,22 @@ class iob_core(iob_module, iob_instance):
             "hardware": "hardware/src",
             "simulation": "hardware/simulation/src",
             "fpga": "hardware/fpga/src",
+            "common": "hardware/common_src",
         }
 
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, instantiator)
 
-        # Don't setup this module if using a project wide special target.
-        if __class__.global_special_target:
-            return
-
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
         self.setup_dir = find_module_setup_dir(self.original_name)[0]
         # print(f"{self.name} {self.build_dir} {self.is_top_module}")  # DEBUG
+
+        if self.abort_reason:
+            # Generate instance parameters when aborted due to duplicate setup
+            if self.abort_reason == "duplicate_setup":
+                param_gen.generate_inst_params(self)
+            return
 
         self.__create_build_dir()
 
@@ -228,7 +243,7 @@ class iob_core(iob_module, iob_instance):
         param core_name: Name of the core
         param instance_name: Verilog instance name
         """
-        if __class__.global_special_target:
+        if self.abort_reason:
             return
         assert core_name, fail_with_msg("Missing core_name argument", ValueError)
         # Ensure 'blocks' list exists
@@ -271,6 +286,7 @@ class iob_core(iob_module, iob_instance):
         os.makedirs(f"{self.build_dir}/hardware/src", exist_ok=True)
         os.makedirs(f"{self.build_dir}/hardware/simulation/src", exist_ok=True)
         os.makedirs(f"{self.build_dir}/hardware/fpga/src", exist_ok=True)
+        os.makedirs(f"{self.build_dir}/hardware/common_src", exist_ok=True)
 
         os.makedirs(f"{self.build_dir}/doc", exist_ok=True)
         os.makedirs(f"{self.build_dir}/doc/tsrc", exist_ok=True)

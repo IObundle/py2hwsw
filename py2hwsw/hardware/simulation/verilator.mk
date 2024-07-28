@@ -1,6 +1,6 @@
 VTOP?=$(NAME)
 
-VFLAGS+=--cc --exe -I. -I../src -Isrc --top-module $(VTOP)
+VFLAGS+=--cc --exe -I. -I../src -I../common_src -Isrc --top-module $(VTOP)
 VFLAGS+=-Wno-lint --Wno-UNOPTFLAT
 VFLAGS+=--no-timing
 # Include embedded headers
@@ -28,7 +28,7 @@ comp: $(VHDR) $(VSRC) $(HEX)
 	cd ./obj_dir && make -f $(SIM_OBJ).mk
 
 exec: comp
-       $(V_MULTI_THREAD_STR) ./obj_dir/$(SIM_OBJ)
+	$(V_MULTI_THREAD_STR) ./obj_dir/$(SIM_OBJ)
 
 clean: gen-clean
 	@rm -rf obj_dir

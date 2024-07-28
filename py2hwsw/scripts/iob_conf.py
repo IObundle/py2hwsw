@@ -11,6 +11,7 @@ class iob_conf:
     descr: str = "Default description"
     # Only set this macro if the Verilog macro specified here is defined
     if_defined: str = ""
+    if_not_defined: str = ""
 
     def __post_init__(self):
         if not self.name:

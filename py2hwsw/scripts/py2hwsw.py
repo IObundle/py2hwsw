@@ -1,4 +1,4 @@
-#!/usr/bin/env -S python3
+#!/usr/bin/env python3
 
 import sys
 import argparse
@@ -6,7 +6,7 @@ import argparse
 from iob_base import fail_with_msg
 from iob_core import iob_core
 
-PY2HWSW_VERSION = 0.7
+PY2HWSW_VERSION = "0.7.4"
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True

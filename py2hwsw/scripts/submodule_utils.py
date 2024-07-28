@@ -202,6 +202,8 @@ def get_module_io(ios, confs=None, corename=None):
             # Add ifdef attribute to every signal if table also has it
             if "if_defined" in table.keys():
                 signal["if_defined"] = table["if_defined"]
+            if "if_not_defined" in table.keys():
+                signal["if_not_defined"] = table["if_not_defined"]
             # Save the name without prefix in an attribute
             signal["name_without_prefix"] = signal["name"]
             # Save the interface name in an attribute

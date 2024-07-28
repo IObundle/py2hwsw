@@ -2,7 +2,7 @@
 
 # Read the Verilog files
 
-yosys read_verilog -I./src -I../src ../src/*.v
+yosys read_verilog -I./src -I../src -I../common_src ../src/*.v
 # Synthesize the design
 yosys synth -top iob_soc
 

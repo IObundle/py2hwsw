@@ -199,6 +199,15 @@ def python_setup(build_dir):
     if not os.path.exists(dest_dir):
         os.mkdir(dest_dir)
     copy_files(get_lib_dir(), dest_dir, ["iob_colors.py"], "*.py")
+    for file in [
+        "board_client.py",
+        "console.py",
+        "console_ethernet.py",
+        "makehex.py",
+        "hex_split.py",
+    ]:
+        shutil.copy(f"{get_lib_dir()}/scripts/{file}", f"{dest_dir}/{file}")
+        os.chmod(f"{dest_dir}/{file}", 0o755)
 
 
 def doc_setup(python_module):

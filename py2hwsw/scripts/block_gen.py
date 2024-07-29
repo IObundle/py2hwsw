@@ -5,6 +5,7 @@
 from latex import write_table
 
 import iob_colors
+from iob_base import fail_with_msg
 from iob_port import get_signal_name_with_dir_suffix
 from iob_signal import get_real_signal
 
@@ -116,14 +117,23 @@ def get_instance_port_connections(instance):
             else:
                 e_signal_name = real_e_signal.name
 
-            comma = (
-                ","
+            comma = ""
+            if port_idx < len(instance.ports) - 1 or idx < len(port.signals) - 1:
+                comma = ","
+
+            port_width = ""
+            if signal.width != real_e_signal.width:
+                port_width = f" [{signal.width}-1:0]"
                 if (
-                    (port_idx < len(instance.ports) - 1)
-                    or (idx < len(port.signals) - 1)
-                )
-                else ""
+                    type(signal.width) is int
+                    and type(real_e_signal.width) is int
+                    and signal.width > real_e_signal.width
+                ):
+                    fail_with_msg(
+                        f"Port '{port.name}' has signal '{port_name}' with width '{signal.width}' which is greater than external signal width {real_e_signal.width}!"
+                    )
+            instance_portmap += (
+                f"        .{port_name}({e_signal_name}{port_width}){comma}\n"
             )
-            instance_portmap += f"        .{port_name}({e_signal_name}){comma}\n"
 
     return instance_portmap

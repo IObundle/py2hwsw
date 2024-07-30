@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 import re
 from typing import List
-from iob_base import fail_with_msg
+from iob_base import fail_with_msg, find_obj_in_list
 from iob_wire import *
 from iob_signal import iob_signal
 
@@ -31,16 +31,37 @@ class iob_snippet:
 
         for signal_name in outputs:
             if signal_name.endswith("_o"):
-                signal = find_signal_in_wires(core.wires + core.ports, signal_name[:-2])
+                for wire in core.ports:
+                    signal = find_obj_in_list(
+                            wire.signals, signal_name[:-2], process_func=filter_outputs
+                        )
             elif signal_name.endswith("_io"):
-                signal = find_signal_in_wires(core.wires + core.ports, signal_name[:-3])
+                for wire in core.ports:
+                    signal = find_obj_in_list(
+                            wire.signals, signal_name[:-3], process_func=filter_inouts
+                        )
             else:
-                signal = find_signal_in_wires(core.wires + core.ports, signal_name)
+                signal = find_signal_in_wires(core.wires, signal_name)
             if signal != None:
                 signal.isreg = True
             else:
                 fail_with_msg(f"output '{signal_name}' not found in wires/ports lists!")
 
+def filter_outputs(signal: iob_signal) -> iob_signal:
+    """Filter a list of signals by direction"""
+    signal = get_real_signal(signal)
+    if signal.direction == "output":
+        return signal
+    else:
+        return iob_signal(name="placeholder")
+
+def filter_inouts(signal: iob_signal) -> iob_signal:
+    """Filter a list of signals by direction"""
+    signal = get_real_signal(signal)
+    if signal.direction == "inout":
+        return signal
+    else:
+        return iob_signal(name="placeholder")
 
 def create_snippet(core, *args, **kwargs):
     """Create a Verilog snippet to insert in given core."""

@@ -13,10 +13,8 @@ class iob_snippet:
     verilog_code: str = ""
 
     def set_needed_reg(self, core):
-        assign_regex = re.compile(r"\bassign\s+(\w+)\s*=")
-        localparam_regex = re.compile(r"\blocalparam\s+(\w+)\s*=")
-        blocking_regex = re.compile(r"\b(\w+)\s*=")
-        non_blocking_regex = re.compile(r"\b(\w+)\s*<=")
+        blocking_regex = re.compile(r"^\s*(\w+)\s*=", re.MULTILINE)
+        non_blocking_regex = re.compile(r"^\s*(\w+)\s*<=", re.MULTILINE)
 
         outputs = set()
 
@@ -25,12 +23,6 @@ class iob_snippet:
 
         for match in non_blocking_regex.findall(self.verilog_code):
             outputs.add(match)
-
-        for match in assign_regex.findall(self.verilog_code):
-            outputs.discard(match)
-
-        for match in localparam_regex.findall(self.verilog_code):
-            outputs.discard(match)
 
         for signal_name in outputs:
             if signal_name.endswith("_o"):

@@ -196,6 +196,9 @@ def generate_verilog(core):
     if core.combs:
         module_body_lines += f'    `include "{core.name}_combs.vs"\n\n'
 
+    if core.fsms:
+        module_body_lines += f'    `include "{core.name}_fsms.vs"\n\n'
+
     if core.snippets:
         module_body_lines += f'    `include "{core.name}_snippets.vs"\n\n'
 

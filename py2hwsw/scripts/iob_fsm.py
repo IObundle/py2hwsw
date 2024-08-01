@@ -35,12 +35,47 @@ end
         print(self.verilog_code)
 def create_fsm(core, *args, **kwargs):
     """Create a Verilog finite state machine to insert in a given core."""
-    # Ensure 'fsms' list exists
     core.set_default_attribute("fsms", [])
-    #TODO: go through arguments and build verilog code and add clk rst en if necessary
+
+    fsm_nr = len(core.fsms)
+
+    verilog_code = verilog_code.replace("pc", f"pc{fsm_nr}")
 
     fsm = iob_fsm(verilog_code=verilog_code)
+
+    reg_name = f"fms{fsm_nr}_state_reg"
+
+    core.create_wire(name=f"pc{fsm_nr}",
+                     signals={
+                         "name": f"pc{fsm_nr}",
+                         "width": fsm.state_reg_width,
+                         "isreg": True})
+
+    core.create_wire(name=f"pc{fsm_nr}_nxt",
+                     signals={
+                         "name": f"pc{fsm_nr}_nxt",
+                         "width": fsm.state_reg_width,
+                         "isreg": True})
+
+    if not any(port["name"] == "clk_en_rst" for port in core.ports):
+        core.create_port(name="clk_en_rst", 
+                         interface={
+                             "type": "clk_en_rst",
+                             "subtype": "slave"},
+                         descr="clock enable and reset")
+
+    core.create_instance(core_name="iob_reg",
+                         instance_name=reg_name,
+                         parameters={
+                            "DATA_W": fsm.state_reg_width},
+                            "RST_VAL": 1},
+                         connect={
+                            "clk_en_rst": "clk_en_rst",
+                            "data_i": f"pc{fsm_nr}_nxt",
+                            "data_o": f"pc{fsm_nr}"})
+                        
     fsm.set_needed_reg(core)
+
     core.fsms.append(fsm)
 
 if __name__ == "__main__":

@@ -26,7 +26,7 @@ class iob_fsm(iob_snippet):
         self.verilog_code = f"""
 always @* begin
     pc_nxt = pc + 1;
-    case (state)
+    case (pc)
         {'\n'.join(self.states)}
     endcase
 end
@@ -38,25 +38,31 @@ def create_fsm(core, *args, **kwargs):
 
     fsm_nr = len(core.fsms)
 
-    verilog_code = verilog_code.replace("pc", f"pc{fsm_nr}")
+    verilog_code = kwargs.get("verilog_code", "")
 
     fsm = iob_fsm(verilog_code=verilog_code)
 
+    fsm.verilog_code = fsm.verilog_code.replace("pc", f"pc{fsm_nr}")
+
     reg_name = f"fms{fsm_nr}_state_reg"
 
-    core.create_wire(name=f"pc{fsm_nr}",
-                     signals={
-                         "name": f"pc{fsm_nr}",
-                         "width": fsm.state_reg_width,
-                         "isreg": True})
+    core.create_wire(name = f"pc{fsm_nr}",
+                     signals = [
+                         {
+                             "name": f"pc{fsm_nr}",
+                             "width": fsm.state_reg_width,
+                             "isreg": True
+                         }])
 
-    core.create_wire(name=f"pc{fsm_nr}_nxt",
-                     signals={
-                         "name": f"pc{fsm_nr}_nxt",
-                         "width": fsm.state_reg_width,
-                         "isreg": True})
+    core.create_wire(name = f"pc{fsm_nr}_nxt",
+                     signals = [
+                         {
+                             "name": f"pc{fsm_nr}_nxt",
+                             "width": fsm.state_reg_width,
+                             "isreg": True
+                         }])
 
-    if not any(port["name"] == "clk_en_rst" for port in core.ports):
+    if not any(port.name == "clk_en_rst" for port in core.ports):
         core.create_port(name="clk_en_rst", 
                          interface={
                              "type": "clk_en_rst",

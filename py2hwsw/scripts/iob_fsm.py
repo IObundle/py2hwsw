@@ -32,7 +32,6 @@ always @* begin
 end
 """
         
-        print(self.verilog_code)
 def create_fsm(core, *args, **kwargs):
     """Create a Verilog finite state machine to insert in a given core."""
     core.set_default_attribute("fsms", [])
@@ -67,7 +66,7 @@ def create_fsm(core, *args, **kwargs):
     core.create_instance(core_name="iob_reg",
                          instance_name=reg_name,
                          parameters={
-                            "DATA_W": fsm.state_reg_width},
+                            "DATA_W": fsm.state_reg_width,
                             "RST_VAL": 1},
                          connect={
                             "clk_en_rst": "clk_en_rst",
@@ -77,23 +76,3 @@ def create_fsm(core, *args, **kwargs):
     fsm.set_needed_reg(core)
 
     core.fsms.append(fsm)
-
-if __name__ == "__main__":
-    iob = iob_fsm(verilog_code="""
-    state1:
-        if (input) begin
-            state <= 1;
-        end
-
-        if (input) begin
-            state <= 2;
-        end
-
-        if (input) begin
-            state <= 3;
-        end
-
-        if (input) begin
-            pc_nxt <= state1;
-        end
-""")

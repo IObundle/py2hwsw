@@ -23,14 +23,16 @@ class iob_fsm(iob_snippet):
         for i, state in enumerate(self.states[:-1]):
             self.states[i] = f"{i}: begin\n{state}\nend"
         self.states[-1] = f"default: begin\n{self.states[-1]}\nend"
+        joined_states = "\n".join(self.states)
         self.verilog_code = f"""
 always @* begin
     pc_nxt = pc + 1;
     case (pc)
-        {'\n'.join(self.states)}
+        {joined_states}
     endcase
 end
 """
+    
         
 def create_fsm(core, *args, **kwargs):
     """Create a Verilog finite state machine to insert in a given core."""

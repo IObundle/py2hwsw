@@ -97,6 +97,13 @@ def generate_blocks(core):
     f_blocks.close()
 
 
+def convert_int(val):
+  """Try to convert val to int"""
+  try:
+    return int(val)
+  except ValueError:
+    return 0
+
 def get_instance_port_connections(instance):
     """Returns a multi-line string with all port's signals connections
     for the given Verilog instance.
@@ -121,17 +128,20 @@ def get_instance_port_connections(instance):
             if port_idx < len(instance.ports) - 1 or idx < len(port.signals) - 1:
                 comma = ","
 
+            # Auto-generate bit selection if port is smaller than external signal
+            # Most significant bits of external signal are discarded
+            # NOTE: This will suppress warnings if connection was made by mistake with wrong width.
+            #       Should we keep this functionality?
             port_width = ""
-            if signal.width != real_e_signal.width:
-                port_width = f" [{signal.width}-1:0]"
-                if (
-                    type(signal.width) is int
-                    and type(real_e_signal.width) is int
-                    and signal.width > real_e_signal.width
-                ):
+            signal_int = convert_int(signal.width)
+            e_signal_int = convert_int(real_e_signal.width)
+            if signal_int and e_signal_int and signal_int < e_signal_int:
+                port_width = f" [{signal_int}-1:0]"
+            if signal_int and e_signal_int and signal_int > e_signal_int:
                     fail_with_msg(
                         f"Port '{port.name}' has signal '{port_name}' with width '{signal.width}' which is greater than external signal width {real_e_signal.width}!"
                     )
+
             instance_portmap += (
                 f"        .{port_name}({e_signal_name}{port_width}){comma}\n"
             )

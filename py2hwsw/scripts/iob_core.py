@@ -161,14 +161,14 @@ class iob_core(iob_module, iob_instance):
         # Generate parameters
         param_gen.generate_params(self)
 
+        # Generate csr interface
+        csr_gen_obj, reg_table = reg_gen.generate_csr(self)
+
         # Generate ios
         io_gen.generate_ports(self)
 
         # Generate wires
         wire_gen.generate_wires(self)
-
-        # Generate csr interface
-        csr_gen_obj, reg_table = reg_gen.generate_csr(self)
 
         # Generate instances
         if self.generate_hw:

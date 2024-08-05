@@ -10,6 +10,8 @@ class iob_signal:
     name: str = ""
     width: str or int = 1
     isvar: bool = False
+    isreg: bool = False
+    reg_signals: list[str] = []
     descr: str = "Default description"
 
     # Only used when signal belongs to a port
@@ -24,7 +26,7 @@ class iob_signal:
 
     def get_verilog_wire(self):
         """Generate a verilog wire string from this signal"""
-        wire_type = "reg" if self.isvar else "wire"
+        wire_type = "reg" if self.isvar or self.isreg else "wire"
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
         return f"{wire_type} {width_str}{self.name};\n"
 
@@ -36,7 +38,7 @@ class iob_signal:
         """Generate a verilog port string from this signal"""
         self.assert_direction()
         comma_char = "," if comma else ""
-        port_type = " reg" if self.isvar else ""
+        port_type = " reg" if self.isvar or self.isreg else ""
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
         return f"{self.direction}{port_type} {width_str}{self.get_verilog_port_name()}{comma_char}\n"
 

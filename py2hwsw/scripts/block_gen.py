@@ -5,6 +5,7 @@
 from latex import write_table
 
 import iob_colors
+from iob_base import fail_with_msg
 from iob_port import get_signal_name_with_dir_suffix
 from iob_signal import get_real_signal
 
@@ -96,6 +97,13 @@ def generate_blocks(core):
     f_blocks.close()
 
 
+def convert_int(val):
+  """Try to convert val to int"""
+  try:
+    return int(val)
+  except ValueError:
+    return 0
+
 def get_instance_port_connections(instance):
     """Returns a multi-line string with all port's signals connections
     for the given Verilog instance.
@@ -116,14 +124,26 @@ def get_instance_port_connections(instance):
             else:
                 e_signal_name = real_e_signal.name
 
-            comma = (
-                ","
-                if (
-                    (port_idx < len(instance.ports) - 1)
-                    or (idx < len(port.signals) - 1)
-                )
-                else ""
+            comma = ""
+            if port_idx < len(instance.ports) - 1 or idx < len(port.signals) - 1:
+                comma = ","
+
+            # Auto-generate bit selection if port is smaller than external signal
+            # Most significant bits of external signal are discarded
+            # NOTE: This will suppress warnings if connection was made by mistake with wrong width.
+            #       Should we keep this functionality?
+            port_width = ""
+            signal_int = convert_int(signal.width)
+            e_signal_int = convert_int(real_e_signal.width)
+            if signal_int and e_signal_int and signal_int < e_signal_int:
+                port_width = f" [{signal_int}-1:0]"
+            if signal_int and e_signal_int and signal_int > e_signal_int:
+                    fail_with_msg(
+                        f"Port '{port.name}' of instance '{instance.name}' has signal '{port_name}' with width '{signal.width}' which is greater than external signal width {real_e_signal.width}!"
+                    )
+
+            instance_portmap += (
+                f"        .{port_name}({e_signal_name}{port_width}){comma}\n"
             )
-            instance_portmap += f"        .{port_name}({e_signal_name}){comma}\n"
 
     return instance_portmap

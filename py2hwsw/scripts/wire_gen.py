@@ -20,11 +20,15 @@ def generate_wires(core):
         if wire.if_not_defined:
             f_wires.write(f"`ifndef {wire.if_not_defined}\n")
 
-        f_wires.write(f"    // {wire.name}\n")
 
+        signals_code = ""
         for signal in wire.signals:
             if isinstance(signal, iob_signal):
-                f_wires.write("    " + signal.get_verilog_wire())
+                signals_code += "    " + signal.get_verilog_wire()
+        if signals_code:
+            f_wires.write(f"    // {wire.name}\n")
+            f_wires.write(signals_code)
+
 
         # Close ifdef if conditional interface
         if wire.if_defined or wire.if_not_defined:

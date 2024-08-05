@@ -327,12 +327,12 @@ class csr_gen:
             f_inst.write(
                 f"""
     //iob native interface wires
-    `include "iob_wire.vs"
+    `include "{top}_iob_wire.vs"
 """
             )
             if csr_if == "apb":
                 f_inst.write(
-                    """
+                    f"""
 
     ///////////////////////////////////////////////////////////////
     // APB to IOb converter
@@ -341,7 +341,7 @@ class csr_gen:
         .APB_ADDR_W(ADDR_W),
         .APB_DATA_W(DATA_W)
     ) apb2iob_0 (
-        `include "clk_en_rst_s_s_portmap.vs"
+        `include "{top}_clk_en_rst_s_s_portmap.vs"
         // APB slave i/f
         .apb_addr_i  (apb_addr_i),    //Byte address of the transfer.
         .apb_sel_i   (apb_sel_i),     //Slave select.
@@ -365,7 +365,7 @@ class csr_gen:
                 )
             elif csr_if == "axil":
                 f_inst.write(
-                    """
+                    f"""
 
     ///////////////////////////////////////////////////////////////
     // AXIL to IOb converter
@@ -374,7 +374,7 @@ class csr_gen:
         .AXIL_ADDR_W(ADDR_W),
         .AXIL_DATA_W(DATA_W)
     ) axil2iob_0 (
-        `include "clk_en_rst_s_s_portmap.vs"
+        `include "{top}_clk_en_rst_s_s_portmap.vs"
         // AXIL slave i/f
         .axil_awaddr_i (axil_awaddr_i),   //Address write channel address.
         .axil_awprot_i (axil_awprot_i),   //Address write channel protection type.
@@ -424,9 +424,9 @@ class csr_gen:
         f_inst.write("swreg_0 (\n")
         self.gen_portmap(table, f_inst)
         if iob_if:
-            f_inst.write('    `include "iob_s_s_portmap.vs"\n')
+            f_inst.write(f'    `include "{top}_iob_s_s_portmap.vs"\n')
         else:
-            f_inst.write('    `include "iob_s_portmap.vs"\n')
+            f_inst.write(f'    `include "{top}_iob_s_portmap.vs"\n')
         f_inst.write("    .clk_i(clk_i),\n")
         f_inst.write("    .cke_i(cke_i),\n")
         f_inst.write("    .arst_i(arst_i)\n")
@@ -464,7 +464,7 @@ class csr_gen:
 
         # ports
         self.gen_port(table, f_gen)
-        f_gen.write('    `include "iob_s_port.vs"\n')
+        f_gen.write(f'    `include "{top}_iob_s_port.vs"\n')
         f_gen.write("    //General Interface Signals\n")
         f_gen.write("    input clk_i,\n")
         f_gen.write("    input cke_i,\n")

@@ -9,6 +9,7 @@ import csr_gen
 from iob_csr import iob_csr, iob_csr_group
 from iob_base import find_obj_in_list
 import iob_core
+from iob_signal import get_real_signal
 
 
 def auto_setup_iob_ctls(core):
@@ -104,6 +105,20 @@ def generate_reg_sw(core, csr_gen_obj, reg_table):
                 reg_table, core.build_dir + "/software/src", core.name
             )
 
+def update_signals_with_swreg_addr_w(core, csr_gen_obj):
+    """Search through every core signal width for the special keyword '/*SWREG_ADDR_W*/'
+    and replace with the corresponding width of the swreg address signal"""
+    if not csr_gen_obj:
+        return
+    for wire in core.wires + core.ports:
+        for signal in wire.signals:
+            real_signal = get_real_signal(signal)
+            if type(real_signal.width) is not str:
+                continue
+            real_signal.width = real_signal.width.replace("/*SWREG_ADDR_W*/", str(csr_gen_obj.core_addr_w))
+        # Replace in wire.interface "ADDR_W" as well
+        if wire.interface and "ADDR_W" in wire.interface.widths:
+            wire.interface.widths["ADDR_W"] = wire.interface.widths["ADDR_W"].replace("/*SWREG_ADDR_W*/", str(csr_gen_obj.core_addr_w))
 
 def generate_csr(core):
     """Generate hw, sw and doc files"""
@@ -111,4 +126,5 @@ def generate_csr(core):
     generate_reg_hw(core, csr_gen_obj, reg_table)
     generate_reg_sw(core, csr_gen_obj, reg_table)
     auto_setup_iob_ctls(core)
+    update_signals_with_swreg_addr_w(core, csr_gen_obj)
     return csr_gen_obj, reg_table

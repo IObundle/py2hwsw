@@ -76,6 +76,8 @@ def dict2interface(interface_dict):
         "descr": "cpu instruction bus",
     },
     """
+    if not interface_dict:
+        return None
     interface_attributes = interface.__dataclass_fields__.keys()
     # Extract 'widths' from dictionary
     widths = {}

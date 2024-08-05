@@ -56,7 +56,9 @@ def create_wire(core, *args, signals=[], interface=None, **kwargs):
     # Convert user signal dictionaries into 'iob_signal' objects
     sig_obj_list = convert_dict2obj_list(signals, iob_signal)
     # Convert user interface dictionary into 'if_gen.interface' object
-    interface_obj = if_gen.dict2interface(interface) if interface else None
+    interface_obj = if_gen.dict2interface(interface)
+    if interface_obj and not interface_obj.file_prefix:
+        interface_obj.file_prefix = core.name + "_"
     wire = iob_wire(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
     core.wires.append(wire)
 

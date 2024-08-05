@@ -139,7 +139,7 @@ def get_instance_port_connections(instance):
                 port_width = f" [{signal_int}-1:0]"
             if signal_int and e_signal_int and signal_int > e_signal_int:
                     fail_with_msg(
-                        f"Port '{port.name}' has signal '{port_name}' with width '{signal.width}' which is greater than external signal width {real_e_signal.width}!"
+                        f"Port '{port.name}' of instance '{instance.name}' has signal '{port_name}' with width '{signal.width}' which is greater than external signal width {real_e_signal.width}!"
                     )
 
             instance_portmap += (

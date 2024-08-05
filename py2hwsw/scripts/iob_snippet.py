@@ -40,7 +40,7 @@ class iob_snippet:
             else:
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name)
             if signal is not None:
-                signal.isreg = True
+                signal.isvar = True
             else:
                 fail_with_msg(f"output '{signal_name}' not found in wires/ports lists!")
 

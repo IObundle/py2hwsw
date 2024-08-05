@@ -40,15 +40,15 @@ class iob_snippet:
             elif signal_name.endswith("_nxt"):
                 signal = find_signal_in_wires(core.wires, signal_name[:-4])
                 signal.isreg = True
-                signal.reg_signals.add("_nxt")
+                signal.reg_signals.append("_nxt")
             elif signal_name.endswith("_rst"):
                 signal = find_signal_in_wires(core.wires, signal_name[:-4])
                 signal.isreg = True
-                signal.reg_signals.add("_rst")
+                signal.reg_signals.append("_rst")
             elif signal_name.endswith("_en"):
                 signal = find_signal_in_wires(core.wires, signal_name[:-3])
                 signal.isreg = True
-                signal.reg_signals.add("_en")
+                signal.reg_signals.append("_en")
             else:
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name)
 
@@ -110,14 +110,14 @@ class iob_snippet:
                                          interface={
                                              "type": "clk_en_rst",
                                              "subtype": "slave"},
-                                         description="Clock enable and reset signal")
+                                         descr="Clock enable and reset signal")
 
-                        core.create_instance(core_name = reg_type,
-                                             instance_name = f"{signal.name}_reg",
-                                             parameters = {
-                                                 "DATA_W": signal.width},
-                                                 "RST_VAL": 0},
-                                             connect = connect)
+                    core.create_instance(core_name = reg_type,
+                                         instance_name = f"{signal.name}_reg",
+                                         parameters = {
+                                             "DATA_W": signal.width,
+                                             "RST_VAL": 0},
+                                         connect = connect)
                                          
 def generate_direction_process_func(direction):
     """Generates a process function that returns a signal if it matches the direction"""

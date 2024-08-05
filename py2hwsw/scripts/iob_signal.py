@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from iob_base import fail_with_msg
 
@@ -11,7 +11,7 @@ class iob_signal:
     width: str or int = 1
     isvar: bool = False
     isreg: bool = False
-    reg_signals: list[str] = []
+    reg_signals: list[str] = field(default_factory=list)
     descr: str = "Default description"
 
     # Only used when signal belongs to a port

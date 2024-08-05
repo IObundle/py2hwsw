@@ -12,7 +12,8 @@ class iob_fsm(iob_snippet):
         self.state_reg_width = (len(self.states) - 1).bit_length()
         self.state_names = {}
         for i, state in enumerate(self.states):
-            tag = re.search(r"\b(\w+):", state)
+            print(state + '\n')
+            tag = re.search(r"^\s*(\w+):", state)
             tag = tag.group(1) if tag else None
             if tag:
                 self.state_names[tag] = i

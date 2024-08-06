@@ -12,7 +12,6 @@ class iob_fsm(iob_snippet):
         self.state_reg_width = (len(self.states) - 1).bit_length()
         self.state_names = {}
         for i, state in enumerate(self.states):
-            print(state + '\n')
             tag = re.search(r"^\s*(\w+):", state)
             tag = tag.group(1) if tag else None
             if tag:
@@ -47,41 +46,15 @@ def create_fsm(core, *args, **kwargs):
 
     fsm.verilog_code = fsm.verilog_code.replace("pc", f"pc{fsm_nr}")
 
-    reg_name = f"fms{fsm_nr}_state_reg"
-
     core.create_wire(name = f"pc{fsm_nr}",
                      signals = [
                          {
                              "name": f"pc{fsm_nr}",
-                             "width": fsm.state_reg_width,
-                             "isreg": True
+                             "width": fsm.state_reg_width
                          }])
 
-    core.create_wire(name = f"pc{fsm_nr}_nxt",
-                     signals = [
-                         {
-                             "name": f"pc{fsm_nr}_nxt",
-                             "width": fsm.state_reg_width,
-                             "isreg": True
-                         }])
-
-    if not any(port.name == "clk_en_rst" for port in core.ports):
-        core.create_port(name="clk_en_rst", 
-                         interface={
-                             "type": "clk_en_rst",
-                             "subtype": "slave"},
-                         descr="clock enable and reset")
-
-    core.create_instance(core_name="iob_reg",
-                         instance_name=reg_name,
-                         parameters={
-                            "DATA_W": fsm.state_reg_width,
-                            "RST_VAL": 1},
-                         connect={
-                            "clk_en_rst": "clk_en_rst",
-                            "data_i": f"pc{fsm_nr}_nxt",
-                            "data_o": f"pc{fsm_nr}"})
-                        
     fsm.set_needed_reg(core)
+
+    fsm.infer_registers(core)
 
     core.fsms.append(fsm)

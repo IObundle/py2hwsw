@@ -15,6 +15,7 @@ import wire_gen
 import reg_gen
 import block_gen
 import comb_gen
+import fsm_gen
 import snippet_gen
 import doc_gen
 import verilog_gen
@@ -176,6 +177,9 @@ class iob_core(iob_module, iob_instance):
 
         # Generate combs
         comb_gen.generate_combs(self)
+
+        # Generate fsms
+        fsm_gen.generate_fsms(self)
 
         # Generate snippets
         snippet_gen.generate_snippets(self)

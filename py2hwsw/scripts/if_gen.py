@@ -895,7 +895,7 @@ def write_single_wire(fout, wire_prefix, wire, for_tb):
     if for_tb:
         wire_name = wire_name + get_suffix(reverse_direction(wire.direction))
         wtype = get_tbsignal_type(wire.direction)
-    if wire.isreg:
+    if wire.isvar or wire.isreg:
         wtype = "reg"
     width_str = f" [{wire.width}-1:0] "
     fout.write(wtype + width_str + wire_name + ";\n")

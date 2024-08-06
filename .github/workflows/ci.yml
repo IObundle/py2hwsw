@@ -44,7 +44,7 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 10
     if: ${{ !cancelled() }}
-    needs: [ examples ]
+    needs: [ lib ]
 
     steps:
       - uses: actions/checkout@v4

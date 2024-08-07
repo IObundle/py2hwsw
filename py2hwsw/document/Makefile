@@ -28,7 +28,7 @@ signature.tex:
 
 #make figures
 figs:
-       make -C ./figures figs
+	make -C ./figures figs
 
 pb_figs:
 	make -C ./figures pb_figs
@@ -38,8 +38,8 @@ build: debug $(DOC).pdf
 
 #build presentation document type
 presentation.pdf: figs presentation.tex
-       pdflatex -jobname pres presentation.tex
-       pdflatex -jobname pres presentation.tex
+	pdflatex -jobname pres presentation.tex
+	pdflatex -jobname pres presentation.tex
 
 #build product brief document type
 pb.pdf: debug results pb_figs pbtop.tex

@@ -587,7 +587,7 @@ def copy_rename_setup_directory(core, exclude_file_list=[]):
             "hardware/fpga",
             "hardware/syn",
             "hardware/lint",
-            "doc",
+            "document",
         ]
 
     # Copy sources

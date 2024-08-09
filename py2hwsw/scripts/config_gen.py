@@ -182,6 +182,6 @@ def generate_confs(core):
     conf_vh(
         core.confs,
         core.name,
-        os.path.join(core.build_dir, core.PURPOSE_DIRS[core.purpose]),
+        os.path.join(core.build_dir, core.dest_dir),
     )
     conf_h(core.confs, core.name, core.build_dir + "/software/include")

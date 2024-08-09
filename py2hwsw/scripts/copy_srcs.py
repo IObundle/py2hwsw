@@ -474,15 +474,15 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
         return
 
     # If we are handling the `hardware/src` directory,
-    # copy to the correct destination based on setup_purpose.
+    # copy to the correct destination based on 'dest_dir' attribute.
     if directory == "hardware/src":
-        dst_directory = core.PURPOSE_DIRS[core.purpose]
+        dst_directory = core.dest_dir
         if core.use_netlist:
             # copy SETUP_DIR/CORE.v netlist instead of
             # SETUP_DIR/hardware/src
             shutil.copyfile(
                 os.path.join(core.setup_dir, f"{core.name}.v"),
-                os.path.join(core.build_dir, f"{dst_directory}/{core.name}.v"),
+                os.path.join(core.build_dir, dst_directory, f"{core.name}.v"),
             )
             return
     elif directory == "hardware/fpga":

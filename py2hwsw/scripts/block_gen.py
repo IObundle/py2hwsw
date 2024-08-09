@@ -24,11 +24,11 @@ def generate_blocks_table_tex(out_dir):
         """
 \\begin{table}[H]
   \\centering
-  \\begin{tabularx}{\\textwidth}{|l|X|}
+  \\begin{tabularx}{\\textwidth}{|l|l|X|}
 
     \\hline
     \\rowcolor{iob-green}
-    {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
+    {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
 
     \\input blocks_module_tab
 
@@ -50,10 +50,13 @@ def generate_blocks_tex(blocks, out_dir):
 
     tex_table = []
     for block in blocks:
+        if not block.instantiate:
+            continue
         tex_table.append(
             [
                 block.name,
-                block.description,
+                block.instance_name,
+                block.instance_description,
             ]
         )
 
@@ -83,7 +86,7 @@ def generate_blocks(core):
 
         f_blocks.write(
             f"""\
-    // {instance.description}
+    // {instance.instance_description}
     {instance.name} {params_str}{instance.instance_name} (
 {get_instance_port_connections(instance)}
     );

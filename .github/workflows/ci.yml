@@ -21,7 +21,7 @@ on:
 
 jobs:
 
-  examples:
+  lib:
     runs-on: self-hosted
     timeout-minutes: 5
     if: ${{ !cancelled() }}
@@ -31,11 +31,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: 'recursive'
-      - name: run py2hwsw on examples
+      - name: run py2hwsw on lib
         run: |
           py2hwsw () { `pwd`/py2hwsw/scripts/py2hwsw.py $@; };\
           export -f py2hwsw;\
-          for f in `find examples -name "*.py"`; do\
+          for f in `find py2hwsw/lib -name "*.py"`; do\
             py2hwsw `basename $f .py` print_build_dir;\
           done;
 
@@ -44,7 +44,7 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 10
     if: ${{ !cancelled() }}
-    needs: [ examples ]
+    needs: [ lib ]
 
     steps:
       - uses: actions/checkout@v4

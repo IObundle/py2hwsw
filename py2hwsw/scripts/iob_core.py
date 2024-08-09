@@ -501,9 +501,11 @@ def find_module_setup_dir(core_name):
     """
     file_path = find_file(iob_core.global_project_root, core_name, [".py", ".json"])
     if not file_path:
-        fail_with_msg(
-            f"Setup directory of {core_name} not found in {iob_core.global_project_root}!"
-        )
+        file_path = find_file(os.path.join(os.path.dirname(__file__), "../lib"), core_name, [".py", ".json"])
+        if not file_path:
+            fail_with_msg(
+                    f"Setup directory of {core_name} not found in {iob_core.global_project_root}!"
+            )
 
     file_ext = os.path.splitext(file_path)[1]
     # print("Found setup dir based on location of: " + file_path, file=sys.stderr)

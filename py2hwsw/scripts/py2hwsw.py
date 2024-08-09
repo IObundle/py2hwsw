@@ -6,7 +6,7 @@ import argparse
 from iob_base import fail_with_msg
 from iob_core import iob_core
 
-PY2HWSW_VERSION = "0.7.7"
+PY2HWSW_VERSION = "0.7.8"
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         "Parameters will be passed as a dictionary to the `setup` function. "
         # Would be nice to use spaces between params but not possible due to argparse bug:
         # https://github.com/python/cpython/pull/20924
-        "Format: param1=value1;param2=value2;...",
+        "Format: param1=value1:param2=value2:...",
     )
 
     parser.add_argument(
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     py_params = {}
     if args.py_params:
-        for param in args.py_params.split(";"):
+        for param in args.py_params.split(":"):
             k, v = param.split("=")
             py_params[k] = v
 

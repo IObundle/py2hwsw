@@ -26,6 +26,12 @@ class iob_module(iob_base):
         self.set_default_attribute(
             "name", "", str, descr="Name of the generated module."
         )
+        self.set_default_attribute(
+            "description",
+            "Default description",
+            str,
+            descr="Description of the module",
+        )
         # List of module macros and Verilog (false-)parameters
         self.set_default_attribute(
             "confs",

@@ -292,8 +292,8 @@ class iob_core(iob_module, iob_instance):
         os.makedirs(f"{self.build_dir}/hardware/fpga/src", exist_ok=True)
         os.makedirs(f"{self.build_dir}/hardware/common_src", exist_ok=True)
 
-        os.makedirs(f"{self.build_dir}/doc", exist_ok=True)
-        os.makedirs(f"{self.build_dir}/doc/tsrc", exist_ok=True)
+        os.makedirs(f"{self.build_dir}/document", exist_ok=True)
+        os.makedirs(f"{self.build_dir}/document/tsrc", exist_ok=True)
 
         shutil.copyfile(
             f"{copy_srcs.get_lib_dir()}/build.mk", f"{self.build_dir}/Makefile"

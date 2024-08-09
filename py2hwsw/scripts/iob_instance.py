@@ -10,6 +10,7 @@ class iob_instance(iob_base):
         self,
         *args,
         instance_name: str = None,
+        instance_description: str = None,
         parameters: Dict = {},
         if_defined: str = None,
         if_not_defined: str = None,
@@ -27,8 +28,8 @@ class iob_instance(iob_base):
             descr="Name of the instance",
         )
         self.set_default_attribute(
-            "description",
-            "Default description",
+            "instance_description",
+            instance_description or "Default description",
             str,
             descr="Description of the instance",
         )

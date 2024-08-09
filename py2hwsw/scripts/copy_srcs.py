@@ -205,6 +205,7 @@ def python_setup(build_dir):
         "console_ethernet.py",
         "makehex.py",
         "hex_split.py",
+        "hex_join.py",
     ]:
         shutil.copy(f"{get_lib_dir()}/scripts/{file}", f"{dest_dir}/{file}")
         os.chmod(f"{dest_dir}/{file}", 0o755)
@@ -586,7 +587,7 @@ def copy_rename_setup_directory(core, exclude_file_list=[]):
             "hardware/fpga",
             "hardware/syn",
             "hardware/lint",
-            "doc",
+            "document",
         ]
 
     # Copy sources

@@ -39,14 +39,26 @@ class iob_snippet:
                 )
             elif signal_name.endswith("_nxt"):
                 signal = find_signal_in_wires(core.wires, signal_name[:-4])
+                if not signal:
+                    fail_with_msg(
+                        f"Could not find signal '{signal_name[:-4]}' in wires of '{core.name}' for register implied by '{signal_name}'."
+                    )
                 signal.isreg = True
                 signal.reg_signals.append("_nxt")
             elif signal_name.endswith("_rst"):
                 signal = find_signal_in_wires(core.wires, signal_name[:-4])
+                if not signal:
+                    fail_with_msg(
+                        f"Could not find signal '{signal_name[:-4]}' in wires of '{core.name}' for register implied by '{signal_name}'."
+                    )
                 signal.isreg = True
                 signal.reg_signals.append("_rst")
             elif signal_name.endswith("_en"):
                 signal = find_signal_in_wires(core.wires, signal_name[:-3])
+                if not signal:
+                    fail_with_msg(
+                        f"Could not find signal '{signal_name[:-3]}' in wires of '{core.name}' for register implied by '{signal_name}'."
+                    )
                 signal.isreg = True
                 signal.reg_signals.append("_en")
             else:
@@ -55,7 +67,7 @@ class iob_snippet:
             if signal is not None:
                 signal.isvar = True
             else:
-                fail_with_msg(f"output '{signal_name}' not found in wires/ports lists!")
+                fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
 
     def infer_registers(self, core):
         for wire in core.wires:
@@ -64,35 +76,33 @@ class iob_snippet:
                 if signal.isreg:
                     reg_type = "iob_reg"
                     connect = {
-                            "clk_en_rst": "clk_en_rst",
-                            "data_i": f"{signal.name}_nxt",
-                            "data_o": f"{signal.name}"}
+                        "clk_en_rst": "clk_en_rst",
+                        "data_i": f"{signal.name}_nxt",
+                        "data_o": f"{signal.name}",
+                    }
                     if any(reg_signal == "_nxt" for reg_signal in signal.reg_signals):
-                        core.create_wire(name = f"{signal.name}_nxt",
-                                         signals = [
-                                             {
-                                                 "name": f"{signal.name}_nxt",
-                                                 "width": signal.width,
-                                                 "isvar": True
-                                             }])
+                        core.create_wire(
+                            name=f"{signal.name}_nxt",
+                            signals=[
+                                {
+                                    "name": f"{signal.name}_nxt",
+                                    "width": signal.width,
+                                    "isvar": True,
+                                }
+                            ],
+                        )
                     _reg_signals = []
                     connect_key = None
                     if any(reg_signal == "_en" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                                {
-                                    "name": f"{signal.name}_en",
-                                    "width": 1,
-                                    "isvar": True
-                                })
+                            {"name": f"{signal.name}_en", "width": 1, "isvar": True}
+                        )
                         reg_type = "iob_reg_e"
                         connect_key = "en_i"
                     if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                                {
-                                    "name": f"{signal.name}_rst",
-                                    "width": 1,
-                                    "isvar": True
-                                })
+                            {"name": f"{signal.name}_rst", "width": 1, "isvar": True}
+                        )
                         if reg_type.endswith("_e"):
                             reg_type = "iob_reg_re"
                             connect_key = "en_rst"
@@ -101,24 +111,26 @@ class iob_snippet:
                             connect_key = "rst"
 
                     if reg_type != "iob_reg":
-                        core.create_wire(name = f"{signal.name}_reg_signals",
-                                         signals = _reg_signals)
+                        core.create_wire(
+                            name=f"{signal.name}_reg_signals", signals=_reg_signals
+                        )
                         connect[connect_key] = f"{signal.name}_reg_signals"
 
                     if not any(port.name == "clk_en_rst" for port in core.ports):
-                        core.create_port(name = "clk_en_rst",
-                                         interface={
-                                             "type": "clk_en_rst",
-                                             "subtype": "slave"},
-                                         descr="Clock enable and reset signal")
+                        core.create_port(
+                            name="clk_en_rst",
+                            interface={"type": "clk_en_rst", "subtype": "slave"},
+                            descr="Clock enable and reset signal",
+                        )
 
-                    core.create_instance(core_name = reg_type,
-                                         instance_name = f"{signal.name}_reg",
-                                         parameters = {
-                                             "DATA_W": signal.width,
-                                             "RST_VAL": 0},
-                                         connect = connect)
-                                         
+                    core.create_instance(
+                        core_name=reg_type,
+                        instance_name=f"{signal.name}_reg",
+                        parameters={"DATA_W": signal.width, "RST_VAL": 0},
+                        connect=connect,
+                    )
+
+
 def generate_direction_process_func(direction):
     """Generates a process function that returns a signal if it matches the direction"""
 

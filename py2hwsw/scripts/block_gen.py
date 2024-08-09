@@ -24,11 +24,11 @@ def generate_blocks_table_tex(out_dir):
         """
 \\begin{table}[H]
   \\centering
-  \\begin{tabularx}{\\textwidth}{|l|X|}
+  \\begin{tabularx}{\\textwidth}{|l|l|X|}
 
     \\hline
     \\rowcolor{iob-green}
-    {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
+    {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
 
     \\input blocks_module_tab
 
@@ -50,10 +50,13 @@ def generate_blocks_tex(blocks, out_dir):
 
     tex_table = []
     for block in blocks:
+        if not block.instantiate:
+            continue
         tex_table.append(
             [
                 block.name,
-                block.description,
+                block.instance_name,
+                block.instance_description,
             ]
         )
 
@@ -83,6 +86,7 @@ def generate_blocks(core):
 
         f_blocks.write(
             f"""\
+    // {instance.instance_description}
     {instance.name} {params_str}{instance.instance_name} (
 {get_instance_port_connections(instance)}
     );
@@ -98,11 +102,12 @@ def generate_blocks(core):
 
 
 def convert_int(val):
-  """Try to convert val to int"""
-  try:
-    return int(val)
-  except ValueError:
-    return 0
+    """Try to convert val to int"""
+    try:
+        return int(val)
+    except ValueError:
+        return 0
+
 
 def get_instance_port_connections(instance):
     """Returns a multi-line string with all port's signals connections
@@ -138,9 +143,9 @@ def get_instance_port_connections(instance):
             if signal_int and e_signal_int and signal_int < e_signal_int:
                 port_width = f" [{signal_int}-1:0]"
             if signal_int and e_signal_int and signal_int > e_signal_int:
-                    fail_with_msg(
-                        f"Port '{port.name}' of instance '{instance.name}' has signal '{port_name}' with width '{signal.width}' which is greater than external signal width {real_e_signal.width}!"
-                    )
+                fail_with_msg(
+                    f"Port '{port.name}' of instance '{instance.name}' has signal '{port_name}' with width '{signal.width}' which is greater than external signal width {real_e_signal.width}!"
+                )
 
             instance_portmap += (
                 f"        .{port_name}({e_signal_name}{port_width}){comma}\n"

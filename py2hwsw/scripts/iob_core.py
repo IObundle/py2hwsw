@@ -151,29 +151,29 @@ class iob_core(iob_module, iob_instance):
         config_gen.generate_confs(self)
 
         # Generate parameters
-        param_gen.generate_params(self)
+        param_gen.generate_params_snippets(self)
 
         # Generate csr interface
         csr_gen_obj, reg_table = reg_gen.generate_csr(self)
 
         # Generate ios
-        io_gen.generate_ports(self)
+        io_gen.generate_ports_snippet(self)
 
         # Generate wires
-        wire_gen.generate_wires(self)
+        wire_gen.generate_wires_snippet(self)
 
         # Generate instances
         if self.generate_hw:
-            block_gen.generate_blocks(self)
+            block_gen.generate_blocks_snippet(self)
 
         # Generate combs
-        comb_gen.generate_combs(self)
+        comb_gen.generate_combs_snippet(self)
 
         # Generate fsms
-        fsm_gen.generate_fsms(self)
+        fsm_gen.generate_fsms_snippet(self)
 
         # Generate snippets
-        snippet_gen.generate_snippets(self)
+        snippet_gen.generate_snippets_snippet(self)
 
         # Generate main Verilog module
         if self.generate_hw:

@@ -2,12 +2,22 @@
 
 
 def generate_snippets(core):
-    out_dir = core.build_dir + "/hardware/src"
-
-    f_snippets = open(f"{out_dir}/{core.name}_snippets.vs", "w+")
-
+    """Generate verilog code with snippets of this module.
+    returns: Generated verilog code
+    """
+    code = ""
     for snippet in core.snippets:
-        f_snippets.write(snippet.verilog_code)
-        f_snippets.write("\n")
+        code += snippet.verilog_code
+        code += "\n"
 
-    f_snippets.close()
+    return code
+
+
+def generate_snippets_snippet(core):
+    """Write verilog snippet ('.vs' file) with snippets ('snippets' list) of this core.
+    This snippet may be included manually in verilog modules if needed.
+    """
+    code = generate_snippets(core)
+    out_dir = core.build_dir + "/hardware/src"
+    with open(f"{out_dir}/{core.name}_snippets.vs", "w+") as f:
+        f.write(code)

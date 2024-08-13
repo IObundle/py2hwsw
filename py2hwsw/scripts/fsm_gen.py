@@ -2,12 +2,22 @@
 
 
 def generate_fsms(core):
-    out_dir = core.build_dir + "/hardware/src"
-
-    f_fsms = open(f"{out_dir}/{core.name}_fsms.vs", "w+")
-
+    """Generate verilog code with fsms of this module.
+    returns: Generated verilog code
+    """
+    code = ""
     for fsm in core.fsms:
-        f_fsms.write(fsm.verilog_code)
-        f_fsms.write("\n")
+        code += fsm.verilog_code
+        code += "\n"
 
-    f_fsms.close()
+    return code
+
+
+def generate_fsms_snippet(core):
+    """Write verilog snippet ('.vs' file) with fsms of this core.
+    This snippet may be included manually in verilog modules if needed.
+    """
+    code = generate_fsms(core)
+    out_dir = core.build_dir + "/hardware/src"
+    with open(f"{out_dir}/{core.name}_fsms.vs", "w+") as f:
+        f.write(code)

@@ -3,7 +3,13 @@ import os
 import iob_colors
 import re
 
-from param_gen import has_params
+import param_gen
+import io_gen
+import wire_gen
+import block_gen
+import comb_gen
+import fsm_gen
+import snippet_gen
 
 
 # Find include statements inside a list of lines and replace them by the contents of the included file and return the new list of lines
@@ -167,7 +173,7 @@ def generate_verilog(core):
     """Generate main Verilog module of given core
     if it does not exist yet (may be defined manually or generated previously).
     """
-    out_dir = os.path.join(core.build_dir, core.PURPOSE_DIRS[core.purpose])
+    out_dir = os.path.join(core.build_dir, core.dest_dir)
     file_path = os.path.join(out_dir, f"{core.name}.v")
 
     if os.path.exists(file_path):
@@ -178,29 +184,29 @@ def generate_verilog(core):
 
     f_module = open(file_path, "w+")
 
-    if has_params(core.confs):
-        params_line = f'#(\n    `include "{core.name}_params.vs"\n) ('
+    if param_gen.has_params(core.confs):
+        params_line = f"#(\n{param_gen.generate_params(core)}) ("
     else:
         params_line = "("
 
     module_body_lines = ""
     if core.wires:
-        module_body_lines += f'    `include "{core.name}_wires.vs"\n\n'
+        module_body_lines += wire_gen.generate_wires(core) + "\n\n"
 
     if core.csrs:
         module_body_lines += f'    `include "{core.name}_swreg_inst.vs"\n\n'
 
     if core.blocks:
-        module_body_lines += f'    `include "{core.name}_blocks.vs"\n\n'
+        module_body_lines += block_gen.generate_blocks(core) + "\n\n"
 
     if core.combs:
-        module_body_lines += f'    `include "{core.name}_combs.vs"\n\n'
+        module_body_lines += comb_gen.generate_combs(core) + "\n\n"
 
     if core.fsms:
-        module_body_lines += f'    `include "{core.name}_fsms.vs"\n\n'
+        module_body_lines += fsm_gen.generate_fsms(core) + "\n\n"
 
     if core.snippets:
-        module_body_lines += f'    `include "{core.name}_snippets.vs"\n\n'
+        module_body_lines += snippet_gen.generate_snippets(core) + "\n\n"
 
     f_module.write(
         f"""`timescale 1ns / 1ps
@@ -208,7 +214,7 @@ def generate_verilog(core):
 `include "{core.name}_conf.vh"
 
 module {core.name} {params_line}
-    `include "{core.name}_io.vs"
+{io_gen.generate_ports(core)}\
 );
 {module_body_lines}
 endmodule

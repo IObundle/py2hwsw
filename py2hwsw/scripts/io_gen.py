@@ -17,10 +17,10 @@ def reverse_port(port_type):
 
 
 def generate_ports(core):
-    out_dir = core.build_dir + "/hardware/src"
-
-    f_io = open(f"{out_dir}/{core.name}_io.vs", "w+")
-
+    """Generate verilog code with ports of this module.
+    returns: Generated verilog code
+    """
+    code = ""
     for port_idx, port in enumerate(core.ports):
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
@@ -28,22 +28,38 @@ def generate_ports(core):
 
         # Open ifdef if conditional interface
         if port.if_defined:
-            f_io.write(f"`ifdef {port.if_defined}\n")
+            code += f"`ifdef {port.if_defined}\n"
         if port.if_not_defined:
-            f_io.write(f"`ifndef {port.if_not_defined}\n")
+            code += f"`ifndef {port.if_not_defined}\n"
 
-        f_io.write(f"    // {port.name}\n")
+        code += f"    // {port.name}\n"
 
         for signal_idx, signal in enumerate(port.signals):
             is_last_signal = (
                 port_idx == len(core.ports) - 1 and signal_idx == len(port.signals) - 1
             )
-            f_io.write("    " + signal.get_verilog_port(comma=not is_last_signal))
+            code += "    " + signal.get_verilog_port(comma=not is_last_signal)
 
         # Close ifdef if conditional interface
         if port.if_defined or port.if_not_defined:
-            f_io.write("`endif\n")
+            code += "`endif\n"
 
+    return code
+
+
+def generate_ports_snippet(core):
+    """Write verilog snippet ('.vs' file) with ports of this core.
+    This snippet may be included manually in verilog modules if needed.
+    """
+    code = generate_ports(core)
+    out_dir = core.build_dir + "/hardware/src"
+    with open(f"{out_dir}/{core.name}_io.vs", "w+") as f:
+        f.write(code)
+
+    for port_idx, port in enumerate(core.ports):
+        # If port has 'doc_only' attribute set to True, skip it
+        if port.doc_only:
+            continue
         # Also generate snippets for all interface subtypes (portmaps, tb_portmaps, wires, ...)
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.
@@ -54,8 +70,6 @@ def generate_ports(core):
             for file in os.listdir("."):
                 if file.endswith(".vs"):
                     os.rename(file, f"{out_dir}/{file}")
-
-    f_io.close()
 
 
 # Generate if.tex file with list TeX tables of IOs

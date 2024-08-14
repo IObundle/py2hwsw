@@ -50,14 +50,14 @@ class iob_core(iob_module, iob_instance):
     def __init__(
         self,
         *args,
-        purpose: str = "hardware",
+        dest_dir: str = "hardware/src",
         attributes={},
         connect: dict = {},
         instantiator=None,
         **kwargs,
     ):
         """Build a core (includes module and instance attributes)
-        param purpose: Purpose for setup of the core (hardware/simulation/fpga)
+        param dest_dir: Destination directory, within the build directory, for the core
         param attributes: py2hwsw dictionary describing the core
             Notes:
                 1) Each key/value pair in the dictionary describes an attribute name and
@@ -69,8 +69,8 @@ class iob_core(iob_module, iob_instance):
                    dictionary datatypes into the internal IObundle datatypes.
                    For example, it converts a 'wire' dict into an `iob_wire` object.
                 4) If another constructor argument is also given (like the argument
-                   'purpose'), and this dictionary also contains a key for the same
-                   attribute (like the key 'purpose'), then the value given in the
+                   'dest_dir'), and this dictionary also contains a key for the same
+                   attribute (like the key 'dest_dir'), then the value given in the
                    dictionary will override the one from the constructor argument.
         param connect: External wires to connect to ports of this instance
                        Key: Port name, Value: Wire name
@@ -98,7 +98,7 @@ class iob_core(iob_module, iob_instance):
         # List of FPGAs supported by this core
         self.set_default_attribute("board_list", [], list)
         # Where to copy sources of this core
-        self.set_default_attribute("purpose", purpose, str)
+        self.set_default_attribute("dest_dir", dest_dir, str)
         # Don't replace snippets mentioned in this list
         self.set_default_attribute("ignore_snippets", [], list)
         # Select if should generate hardware from python
@@ -118,15 +118,6 @@ class iob_core(iob_module, iob_instance):
 
         # Read 'attributes' dictionary and set corresponding core attributes
         self.parse_attributes_dict(attributes)
-
-        # Read-only dictionary with relation between the 'purpose' and
-        # the corresponding source folder
-        self.PURPOSE_DIRS: dict = {
-            "hardware": "hardware/src",
-            "simulation": "hardware/simulation/src",
-            "fpga": "hardware/fpga/src",
-            "common": "hardware/common_src",
-        }
 
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, instantiator)
@@ -160,29 +151,29 @@ class iob_core(iob_module, iob_instance):
         config_gen.generate_confs(self)
 
         # Generate parameters
-        param_gen.generate_params(self)
+        param_gen.generate_params_snippets(self)
 
         # Generate csr interface
         csr_gen_obj, reg_table = reg_gen.generate_csr(self)
 
         # Generate ios
-        io_gen.generate_ports(self)
+        io_gen.generate_ports_snippet(self)
 
         # Generate wires
-        wire_gen.generate_wires(self)
+        wire_gen.generate_wires_snippet(self)
 
         # Generate instances
         if self.generate_hw:
-            block_gen.generate_blocks(self)
+            block_gen.generate_blocks_snippet(self)
 
         # Generate combs
-        comb_gen.generate_combs(self)
+        comb_gen.generate_combs_snippet(self)
 
         # Generate fsms
-        fsm_gen.generate_fsms(self)
+        fsm_gen.generate_fsms_snippet(self)
 
         # Generate snippets
-        snippet_gen.generate_snippets(self)
+        snippet_gen.generate_snippets_snippet(self)
 
         # Generate main Verilog module
         if self.generate_hw:
@@ -286,11 +277,7 @@ class iob_core(iob_module, iob_instance):
     def __create_build_dir(self):
         """Create build directory if it doesn't exist"""
         os.makedirs(self.build_dir, exist_ok=True)
-        # Create hardware directories
-        os.makedirs(f"{self.build_dir}/hardware/src", exist_ok=True)
-        os.makedirs(f"{self.build_dir}/hardware/simulation/src", exist_ok=True)
-        os.makedirs(f"{self.build_dir}/hardware/fpga/src", exist_ok=True)
-        os.makedirs(f"{self.build_dir}/hardware/common_src", exist_ok=True)
+        os.makedirs(os.path.join(self.build_dir, self.dest_dir), exist_ok=True)
 
         os.makedirs(f"{self.build_dir}/document", exist_ok=True)
         os.makedirs(f"{self.build_dir}/document/tsrc", exist_ok=True)
@@ -302,11 +289,12 @@ class iob_core(iob_module, iob_instance):
 
     def _remove_duplicate_sources(self):
         """Remove sources in the build directory from subfolders that exist in `hardware/src`"""
-        # Go through all subfolders defined in PURPOSE_DIRS
-        for subfolder in self.PURPOSE_DIRS.values():
-            # Skip hardware folder
-            if subfolder == "hardware/src":
-                continue
+        # Go through all subfolders that may contain duplicate sources
+        for subfolder in [
+            "hardware/simulation/src",
+            "hardware/fpga/src",
+            "hardware/common_src",
+        ]:
 
             # Get common srcs between `hardware/src` and current subfolder
             common_srcs = find_common_deep(
@@ -501,10 +489,14 @@ def find_module_setup_dir(core_name):
     """
     file_path = find_file(iob_core.global_project_root, core_name, [".py", ".json"])
     if not file_path:
-        file_path = find_file(os.path.join(os.path.dirname(__file__), "../lib"), core_name, [".py", ".json"])
+        file_path = find_file(
+            os.path.join(os.path.dirname(__file__), "../lib"),
+            core_name,
+            [".py", ".json"],
+        )
         if not file_path:
             fail_with_msg(
-                    f"Setup directory of {core_name} not found in {iob_core.global_project_root}!"
+                f"Setup directory of {core_name} not found in {iob_core.global_project_root}!"
             )
 
     file_ext = os.path.splitext(file_path)[1]

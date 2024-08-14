@@ -88,19 +88,15 @@ def fpga_setup(python_module):
         for tool in tools_list:
             setup_fpga_dir = os.path.join(src_dir, tool, fpga)
             if os.path.isdir(setup_fpga_dir):
-                # if the tool does not exist in the build directory, then create it
-                # and copy only files (not directories) in tool directory
-                if not os.path.isdir(os.path.join(dst_dir, tool)):
-                    os.makedirs(os.path.join(dst_dir, tool))
-                    setup_tool_dir = os.path.join(src_dir, tool)
-                    # copy files in tool directory
-                    for file in os.listdir(setup_tool_dir):
-                        setup_tool_file = os.path.join(setup_tool_dir, file)
-                        if os.path.isfile(setup_tool_file):
-                            shutil.copy2(
-                                setup_tool_file, os.path.join(dst_dir, tool, file)
-                            )
-                            nix_permission_hack(os.path.join(dst_dir, tool, file))
+                os.makedirs(os.path.join(dst_dir, tool), exist_ok=True)
+                setup_tool_dir = os.path.join(src_dir, tool)
+                # Copy only files (not directories) in tool directory
+                for file in os.listdir(setup_tool_dir):
+                    setup_tool_file = os.path.join(setup_tool_dir, file)
+                    dst_file = os.path.join(dst_dir, tool, file)
+                    if os.path.isfile(setup_tool_file):
+                        shutil.copy2(setup_tool_file, dst_file)
+                        nix_permission_hack(dst_file)
                 # then copy the fpga directory (excluding any .pdf)
                 shutil.copytree(
                     setup_fpga_dir,
@@ -474,15 +470,15 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
         return
 
     # If we are handling the `hardware/src` directory,
-    # copy to the correct destination based on setup_purpose.
+    # copy to the correct destination based on 'dest_dir' attribute.
     if directory == "hardware/src":
-        dst_directory = core.PURPOSE_DIRS[core.purpose]
+        dst_directory = core.dest_dir
         if core.use_netlist:
             # copy SETUP_DIR/CORE.v netlist instead of
             # SETUP_DIR/hardware/src
             shutil.copyfile(
                 os.path.join(core.setup_dir, f"{core.name}.v"),
-                os.path.join(core.build_dir, f"{dst_directory}/{core.name}.v"),
+                os.path.join(core.build_dir, dst_directory, f"{core.name}.v"),
             )
             return
     elif directory == "hardware/fpga":

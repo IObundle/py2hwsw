@@ -8,6 +8,7 @@ import iob_colors
 from iob_base import fail_with_msg
 from iob_port import get_signal_name_with_dir_suffix
 from iob_signal import get_real_signal
+import param_gen
 
 
 # Generate blocks.tex file with TeX table of blocks (Verilog modules instances)
@@ -64,41 +65,48 @@ def generate_blocks_tex(blocks, out_dir):
 
 
 def generate_blocks(core):
-    """Generate Verilog instances of core"""
-    out_dir = core.build_dir + "/hardware/src"
-
-    f_blocks = open(f"{out_dir}/{core.name}_blocks.vs", "w+")
-
+    """Generate verilog code with verilog instances of this module.
+    returns: Generated verilog code
+    """
+    code = ""
     for instance in core.blocks:
         if not instance.instantiate:
             continue
         # Open ifdef if conditional interface
         if instance.if_defined:
-            f_blocks.write(f"`ifdef {instance.if_defined}\n")
+            code += f"`ifdef {instance.if_defined}\n"
         if instance.if_not_defined:
-            f_blocks.write(f"`ifndef {instance.if_not_defined}\n")
+            code += f"`ifndef {instance.if_not_defined}\n"
 
         params_str = ""
         if instance.parameters:
             params_str = f"""#(
-        `include "{instance.instance_name}_{id(instance)}_inst_params.vs"
+{param_gen.generate_inst_params(instance)}\
     ) """
 
-        f_blocks.write(
-            f"""\
+        code += f"""\
     // {instance.instance_description}
     {instance.name} {params_str}{instance.instance_name} (
-{get_instance_port_connections(instance)}
+{get_instance_port_connections(instance)}\
     );
 
 """
-        )
 
         # Close ifdef if conditional interface
         if instance.if_defined or instance.if_not_defined:
-            f_blocks.write("`endif\n")
+            code += "`endif\n"
 
-    f_blocks.close()
+    return code
+
+
+def generate_blocks_snippet(core):
+    """Write verilog snippet ('.vs' file) with blocks of this core.
+    This snippet may be included manually in verilog modules if needed.
+    """
+    code = generate_blocks(core)
+    out_dir = core.build_dir + "/hardware/src"
+    with open(f"{out_dir}/{core.name}_blocks.vs", "w+") as f:
+        f.write(code)
 
 
 def convert_int(val):

@@ -34,7 +34,7 @@ class iob_fsm(iob_snippet):
                 _states[j] = state.replace(state_name, f"{self.state_reg_width}'b{i:0{self.state_reg_width}b}")
         for tag, loop in _for_loops.items():
             _states[_state_names[tag]] = f"{loop['init']};\n{_states[_state_names[tag]]}"
-            _states[_state_names[tag+"_endfor"]] = f"{_states[_state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {self.state_reg_width}'b{_state_names[tag]:0{self.state_reg_width}b};\nend"
+            _states[_state_names[tag+"_endfor"]] = f"{_states[_state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {self.state_reg_width}'b{_state_names[tag]+1:0{self.state_reg_width}b};\nend"
         for i, state in enumerate(_states[:-1]):
             _states[i] = f"{i}: begin\n{state}\nend"
         _states[-1] = f"default: begin\n{_states[-1]}\nend"

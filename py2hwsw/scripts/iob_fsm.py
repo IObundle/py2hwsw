@@ -10,7 +10,7 @@ class iob_fsm(iob_snippet):
     def __post_init__(self):
         _states = self.verilog_code.split("\n\n")
         self.state_reg_width = (len(_states) - 1).bit_length()
-        _state_names = {}
+        self.state_names = {}
         _for_loops = {}
         for i, state in enumerate(_states):
             tag = re.search(r"^\s*(\w+):", state)
@@ -25,21 +25,25 @@ class iob_fsm(iob_snippet):
                         "cond": cond,
                         "update": update
                     }
-                    #remove for loop from state
                     state = re.sub(r"for\s*\([^)]+\)", "", state)
-                _state_names[tag] = i
+                self.state_names[tag] = i
                 _states[i] = state.replace(f"{tag}:", "")
-        for state_name, i in _state_names.items():
-            for j, state in enumerate(_states):
-                _states[j] = state.replace(state_name, f"{self.state_reg_width}'b{i:0{self.state_reg_width}b}")
         for tag, loop in _for_loops.items():
-            _states[_state_names[tag]] = f"{loop['init']};\n{_states[_state_names[tag]]}"
-            _states[_state_names[tag+"_endfor"]] = f"{_states[_state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {self.state_reg_width}'b{_state_names[tag]+1:0{self.state_reg_width}b};\nend"
+            _states[self.state_names[tag]] = f"\n{loop['init']};\n{_states[self.state_names[tag]]}"
+            _states[self.state_names[tag+"_endfor"]] = f"{_states[self.state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
         for i, state in enumerate(_states[:-1]):
             _states[i] = f"{i}: begin\n{state}\nend"
+            _states[i] = re.sub(r"\n\s*\n", "\n", _states[i])
         _states[-1] = f"default: begin\n{_states[-1]}\nend"
+        _states[-1] = re.sub(r"\n\s*\n", "\n", _states[-1])
+        localparams = ""
+        for state_name, i in self.state_names.items():
+            _states[i] = re.sub(r"^{i}:", f"{state_name}:", _states[i])
+            if not state_name.endswith("_endfor"):
+                localparams += f"localparam {state_name} = {i};\n"
         joined_states = "\n".join(_states)
         self.verilog_code = f"""
+{localparams}
 always @* begin
     pc_nxt = pc + 1;
     case (pc)

@@ -309,13 +309,19 @@ def main():
 
         # process command
         if byte == ENQ:
+            # Only send ACK once if received multiple ENQ
             if not gotENQ:
                 gotENQ = True
                 if SerialFlag:
                     ser.write(ACK)
                 else:
                     tb_write(ACK)
-        elif byte == EOT:
+            continue
+        else:
+            # Reset gotENQ if received non-ENQ
+            gotENQ = False
+
+        if byte == EOT:
             print(f"{PROGNAME}: exiting...")
             clean_exit()
         elif byte == FTX:

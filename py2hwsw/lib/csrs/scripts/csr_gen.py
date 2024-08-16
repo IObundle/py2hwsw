@@ -5,14 +5,83 @@
 
 import sys
 import os
-from math import ceil, log
+from math import ceil, log, log2
 from latex import write_table
-from submodule_utils import eval_param_expression_from_config
 import iob_colors
+import re
 
 
-# Use a class for the entire module, as it may be imported multiple times, but must have instance variables (multiple cores/submodules have different registers)
+def clog2(val):
+    """Used by eval_param_expression"""
+    return ceil(log2(val))
+
+
+def eval_param_expression(param_expression, params_dict):
+    """Given a mathematical string with parameters, replace every parameter by
+    its numeric value and tries to evaluate the string.
+    param_expression: string defining a math expression that may contain parameters
+    params_dict: dictionary of parameters, where the key is the parameter name and the value is its value
+    """
+    if type(param_expression) is int:
+        return param_expression
+    else:
+        original_expression = param_expression
+        # Split string to separate parameters/macros from the rest
+        split_expression = re.split(r"([^\w_])", param_expression)
+        # Replace each parameter, following the reverse order of parameter list.
+        # The reversed order allows replacing parameters recursively (parameters may
+        # have values with parameters that came before).
+        for param_name, param_value in reversed(params_dict.items()):
+            # Replace every instance of this parameter by its value
+            for idx, word in enumerate(split_expression):
+                if word == param_name:
+                    # Replace parameter/macro by its value
+                    split_expression[idx] = param_value
+                    # Remove '`' char if it was a macro
+                    if idx > 0 and split_expression[idx - 1] == "`":
+                        split_expression[idx - 1] = ""
+                    # resplit the string in case the parameter value contains other parameters
+                    split_expression = re.split(r"([^\w_])", "".join(split_expression))
+        # Join back the string
+        param_expression = "".join(split_expression)
+        # Evaluate $clog2 expressions
+        param_expression = param_expression.replace("$clog2", "clog2")
+        # Evaluate IOB_MAX and IOB_MIN expressions
+        param_expression = param_expression.replace("`IOB_MAX", "max")
+        param_expression = param_expression.replace("`IOB_MIN", "min")
+
+        # Try to calculate string as it should only contain numeric values
+        try:
+            return eval(param_expression)
+        except:
+            sys.exit(
+                f"Error: string '{original_expression}' evaluated to '{param_expression}' is not a numeric expression."
+            )
+
+
+def eval_param_expression_from_config(param_expression, confs, param_attribute):
+    """Given a mathematical string with parameters, replace every parameter by its
+    numeric value and tries to evaluate the string. The parameters are taken from the
+    confs dictionary.
+    param_expression: string defining a math expression that may contain parameters.
+    confs: list of dictionaries, each of which describes a parameter and has attributes:
+           'name', 'val' and 'max'.
+    param_attribute: name of the attribute in the paramater that contains the value to
+           replace in string given. Attribute names are: 'val', 'min, or 'max'.
+    """
+    # Create parameter dictionary with correct values to be replaced in string
+    params_dict = {}
+    for param in confs:
+        params_dict[param["name"]] = param[param_attribute]
+
+    return eval_param_expression(param_expression, params_dict)
+
+
 class csr_gen:
+    """Use a class for the entire module, as it may be imported multiple times, but
+    must have instance variables (multiple cores/submodules have different registers)
+    """
+
     def __init__(self):
         self.cpu_n_bytes = 4
         self.core_addr_w = None
@@ -81,7 +150,7 @@ class csr_gen:
             if n_bytes == 1:
                 return log2n_items
             else:
-                return f"{log2n_items}+{ceil(log(n_bytes,2))}"
+                return f"{log2n_items}+{ceil(log(n_bytes, 2))}"
 
     def gen_wr_reg(self, row, f):
         name = row.name
@@ -144,7 +213,7 @@ class csr_gen:
             f.write(
                 f"    assign {name}_wen = (iob_valid_i & iob_ready_o) & ((|iob_wstrb_i) & {name}_addressed_w);\n"
             )
-            f.write(f"    iob_reg_e #(\n")
+            f.write("    iob_reg_e #(\n")
             f.write(f"      .DATA_W({n_bits}),\n")
             f.write(f"      .RST_VAL({rst_val_str})\n")
             f.write(f"    ) {name}_datareg (\n")
@@ -186,15 +255,15 @@ class csr_gen:
                 f"    assign {name}_ren_o = {name}_addressed_r & (iob_valid_i & iob_ready_o) & (~|iob_wstrb_i);\n"
             )
 
-    # generate ports for swreg module
+    # generate ports for csrs module
     def gen_port(self, table, f):
         for row in table:
             name = row.name
             n_bits = row.n_bits
             auto = row.autoreg
 
-            # VERSION is not a register, it is an internal constant
-            if name != "VERSION":
+            # version is not a register, it is an internal constant
+            if name != "version":
                 if "W" in row.type:
                     if auto:
                         f.write(
@@ -213,8 +282,8 @@ class csr_gen:
                         )
                     else:
                         f.write(
-                            f""" 
-    input [{self.verilog_max(n_bits,1)}-1:0] {name}_rdata_i,
+                            f"""
+    input [{self.verilog_max(n_bits, 1)}-1:0] {name}_rdata_i,
     input {name}_rvalid_i,
     output {name}_ren_o,
     input {name}_rready_i,
@@ -243,8 +312,8 @@ class csr_gen:
             n_bits = row.n_bits
             auto = row.autoreg
 
-            # VERSION is not a register, it is an internal constant
-            if name != "VERSION":
+            # version is not a register, it is an internal constant
+            if name != "version":
                 if "W" in row.type:
                     if auto:
                         f.write(
@@ -272,14 +341,14 @@ class csr_gen:
                         )
         f.write("\n")
 
-    # generate portmap for swreg instance in top module
+    # generate portmap for csrs instance in top module
     def gen_portmap(self, table, f):
         for row in table:
             name = row.name
             auto = row.autoreg
 
-            # VERSION is not a register, it is an internal constant
-            if name != "VERSION":
+            # version is not a register, it is an internal constant
+            if name != "version":
                 if "W" in row.type:
                     if auto:
                         f.write(f"    .{name}_o({name}_wr),\n")
@@ -300,28 +369,105 @@ class csr_gen:
 """
                         )
 
-    def get_swreg_inst_params(self, core_confs):
-        """Return multi-line string with parameters for swreg instance"""
-        param_list = [p for p in core_confs if p.type == "P"]
+    def gen_ports(self, table):
+        """Generate ports for csrs instance"""
+        ports = []
+        for row in table:
+            name = row.name
+            auto = row.autoreg
+            n_bits = row.n_bits
+            register_signals = []
+
+            # version is not a register, it is an internal constant
+            if name == "version":
+                continue
+
+            if "W" in row.type:
+                if auto:
+                    register_signals.append({
+                        "name": name,
+                        "direction": "output",
+                        "width": self.verilog_max(n_bits, 1),
+                    })
+                else:
+                    register_signals += [
+                        {
+                            "name": f"{name}_wdata",
+                            "direction": "output",
+                            "width": self.verilog_max(n_bits, 1),
+                        },
+                        {
+                            "name": f"{name}_wen",
+                            "direction": "output",
+                            "width": "1",
+                        },
+                        {
+                            "name": f"{name}_wready",
+                            "direction": "input",
+                            "width": "1",
+                        },
+                    ]
+            if "R" in row.type:
+                if auto:
+                    register_signals.append({
+                        "name": name,
+                        "direction": "input",
+                        "width": self.verilog_max(n_bits, 1),
+                    })
+                else:
+                    register_signals += [
+                        {
+                            "name": f"{name}_rdata",
+                            "direction": "input",
+                            "width": self.verilog_max(n_bits, 1),
+                        },
+                        {
+                            "name": f"{name}_rvalid",
+                            "direction": "input",
+                            "width": "1",
+                        },
+                        {
+                            "name": f"{name}_ren",
+                            "direction": "output",
+                            "width": "1",
+                        },
+                        {
+                            "name": f"{name}_rready",
+                            "direction": "input",
+                            "width": "1",
+                        },
+                    ]
+
+            ports.append({
+                "name": name,
+                "descr": f"{name} register interface",
+                "signals": register_signals,
+            })
+
+        return ports
+
+    def get_csrs_inst_params(self, core_confs):
+        """Return multi-line string with parameters for csrs instance"""
+        param_list = [p for p in core_confs if p["type"] == "P"]
         if not param_list:
             return ""
 
         param_str = "#(\n"
         for idx, param in enumerate(param_list):
             comma = "," if idx < len(param_list) - 1 else ""
-            param_str += f"    .{param.name}({param.name}){comma}\n"
+            param_str += f"    .{param['name']}({param['name']}){comma}\n"
         param_str += ") "
         return param_str
 
     def write_hwcode(self, table, out_dir, top, csr_if, core_confs):
         #
-        # SWREG INSTANCE
+        # CSRS INSTANCE
         #
 
         iob_if = csr_if == "iob"
 
         os.makedirs(out_dir, exist_ok=True)
-        f_inst = open(f"{out_dir}/{top}_swreg_inst.vs", "w")
+        f_inst = open(f"{out_dir}/{top}_csrs_inst.vs", "w")
 
         if not iob_if:
             f_inst.write(
@@ -419,9 +565,9 @@ class csr_gen:
         # connection wires
         self.gen_inst_wire(table, f_inst)
 
-        f_inst.write(f"    {top}_swreg_gen ")
-        f_inst.write(self.get_swreg_inst_params(core_confs))
-        f_inst.write("swreg_0 (\n")
+        f_inst.write(f"    {top}_csrs ")
+        f_inst.write(self.get_csrs_inst_params(core_confs))
+        f_inst.write("csrs_0 (\n")
         self.gen_portmap(table, f_inst)
         if iob_if:
             f_inst.write(f'    `include "{top}_iob_s_s_portmap.vs"\n')
@@ -432,12 +578,13 @@ class csr_gen:
         f_inst.write("    .arst_i(arst_i)\n")
 
         f_inst.write("\n);\n")
+        f_inst.close()
 
         #
-        # SWREG MODULE
+        # CSRS MODULE
         #
 
-        f_gen = open(f"{out_dir}/{top}_swreg_gen.v", "w")
+        f_gen = open(f"{out_dir}/{top}_csrs.v", "w")
 
         # time scale
         f_gen.write("`timescale 1ns / 1ps\n\n")
@@ -451,10 +598,10 @@ class csr_gen:
 
         # includes
         f_gen.write(f'`include "{top}_conf.vh"\n')
-        f_gen.write(f'`include "{top}_swreg_def.vh"\n\n')
+        f_gen.write(f'`include "{top}_csrs_def.vh"\n\n')
 
         # declaration
-        f_gen.write(f"module {top}_swreg_gen\n")
+        f_gen.write(f"module {top}_csrs\n")
 
         # parameters
         f_gen.write("#(\n")
@@ -599,7 +746,7 @@ class csr_gen:
                     )
                     f_gen.write(f"        if({aux_read_reg}) ")
                 f_gen.write(f"begin\n")
-                if name == "VERSION":
+                if name == "version":
                     rst_val = row.rst_val
                     f_gen.write(
                         f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = 16'h{rst_val}|{8*n_bytes}'d0;\n"
@@ -714,21 +861,20 @@ endmodule
         )
 
         f_gen.close()
-        f_inst.close()
 
-    # Generate *_swreg_lparam.vs file. Macros from this file contain the default values of the registers. These should not be used inside the instance of the core/system.
+    # Generate *_csrs_lparam.vs file. Macros from this file contain the default values of the registers. These should not be used inside the instance of the core/system.
     def write_lparam_header(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        f_def = open(f"{out_dir}/{top}_swreg_lparam.vs", "w")
+        f_def = open(f"{out_dir}/{top}_csrs_lparam.vs", "w")
         f_def.write("//used address space width\n")
-        addr_w_prefix = f"{top}_swreg".upper()
+        addr_w_prefix = f"{top}_csrs".upper()
         f_def.write(f"localparam {addr_w_prefix}_ADDR_W = {self.core_addr_w};\n\n")
         f_def.write("//These macros only contain default values for the registers\n")
         f_def.write("//address macros\n")
         macro_prefix = f"{top}_".upper()
         f_def.write("//addresses\n")
         for row in table:
-            name = row.name
+            name = row.name.upper()
             n_bits = row.n_bits
             n_bytes = self.bceil(n_bits, 3) / 8
             if n_bytes == 3:
@@ -748,19 +894,19 @@ endmodule
             )
         f_def.close()
 
-    # Generate *_swreg_def.vh file. Macros from this file should only be used inside the instance of the core/system since they may contain parameters which are only known by the instance.
+    # Generate *_csrs_def.vh file. Macros from this file should only be used inside the instance of the core/system since they may contain parameters which are only known by the instance.
     def write_hwheader(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        f_def = open(f"{out_dir}/{top}_swreg_def.vh", "w")
+        f_def = open(f"{out_dir}/{top}_csrs_def.vh", "w")
         f_def.write("//used address space width\n")
-        addr_w_prefix = f"{top}_swreg".upper()
+        addr_w_prefix = f"{top}_csrs".upper()
         f_def.write(f"`define {addr_w_prefix}_ADDR_W {self.core_addr_w}\n\n")
         f_def.write("//These macros may be dependent on instance parameters\n")
         f_def.write("//address macros\n")
         macro_prefix = f"{top}_".upper()
         f_def.write("//addresses\n")
         for row in table:
-            name = row.name
+            name = row.name.upper()
             n_bits = row.n_bits
             n_bytes = self.bceil(n_bits, 3) / 8
             if n_bytes == 3:
@@ -776,10 +922,10 @@ endmodule
             )
         f_def.close()
 
-    # Get C type from swreg n_bytes
+    # Get C type from csrs n_bytes
     # uses unsigned int types from C stdint library
     @staticmethod
-    def swreg_type(name, n_bytes):
+    def csr_type(name, n_bytes):
         type_dict = {1: "uint8_t", 2: "uint16_t", 4: "uint32_t", 8: "uint64_t"}
         try:
             type_try = type_dict[n_bytes]
@@ -792,26 +938,26 @@ endmodule
 
     def write_swheader(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        fswhdr = open(f"{out_dir}/{top}_swreg.h", "w")
+        fswhdr = open(f"{out_dir}/{top}_csrs.h", "w")
 
         core_prefix = f"{top}_".upper()
 
-        fswhdr.write(f"#ifndef H_{core_prefix}SWREG_H\n")
-        fswhdr.write(f"#define H_{core_prefix}SWREG_H\n\n")
+        fswhdr.write(f"#ifndef H_{core_prefix}CSRS_H\n")
+        fswhdr.write(f"#define H_{core_prefix}CSRS_H\n\n")
         fswhdr.write("#include <stdint.h>\n\n")
 
         fswhdr.write("//used address space width\n")
-        fswhdr.write(f"#define  {core_prefix}SWREG_ADDR_W {self.core_addr_w}\n\n")
+        fswhdr.write(f"#define  {core_prefix}CSRS_ADDR_W {self.core_addr_w}\n\n")
 
         fswhdr.write("//Addresses\n")
         for row in table:
-            name = row.name
+            name = row.name.upper()
             if "W" in row.type or "R" in row.type:
                 fswhdr.write(f"#define {core_prefix}{name}_ADDR {row.addr}\n")
 
         fswhdr.write("\n//Data widths (bit)\n")
         for row in table:
-            name = row.name
+            name = row.name.upper()
             n_bits = row.n_bits
             n_bytes = int(self.bceil(n_bits, 3) / 8)
             if n_bytes == 3:
@@ -825,6 +971,7 @@ endmodule
         fswhdr.write("\n// Core Setters and Getters\n")
         for row in table:
             name = row.name
+            name_upper = name.upper()
             n_bits = row.n_bits
             log2n_items = row.log2n_items
             n_bytes = self.bceil(n_bits, 3) / 8
@@ -832,29 +979,29 @@ endmodule
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             if "W" in row.type:
-                sw_type = self.swreg_type(name, n_bytes)
+                sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 if addr_w / n_bytes > 1:
                     addr_arg = ", int addr"
                 fswhdr.write(
-                    f"void {core_prefix}SET_{name}({sw_type} value{addr_arg});\n"
+                    f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg});\n"
                 )
             if "R" in row.type:
-                sw_type = self.swreg_type(name, n_bytes)
+                sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 if addr_w / n_bytes > 1:
                     addr_arg = "int addr"
-                fswhdr.write(f"{sw_type} {core_prefix}GET_{name}({addr_arg});\n")
+                fswhdr.write(f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg});\n")
 
-        fswhdr.write(f"\n#endif // H_{core_prefix}_SWREG_H\n")
+        fswhdr.write(f"\n#endif // H_{core_prefix}_CSRS_H\n")
 
         fswhdr.close()
 
     def write_swcode(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        fsw = open(f"{out_dir}/{top}_swreg_emb.c", "w")
+        fsw = open(f"{out_dir}/{top}_csrs_emb.c", "w")
         core_prefix = f"{top}_".upper()
-        fsw.write(f'#include "{top}_swreg.h"\n\n')
+        fsw.write(f'#include "{top}_csrs.h"\n\n')
         fsw.write("\n// Base Address\n")
         fsw.write("static int base;\n")
         fsw.write(f"void {core_prefix}INIT_BASEADDR(uint32_t addr) {{\n")
@@ -865,6 +1012,7 @@ endmodule
 
         for row in table:
             name = row.name
+            name_upper = name.upper()
             n_bits = row.n_bits
             log2n_items = row.log2n_items
             n_bytes = self.bceil(n_bits, 3) / 8
@@ -872,7 +1020,7 @@ endmodule
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             if "W" in row.type:
-                sw_type = self.swreg_type(name, n_bytes)
+                sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 addr_arg = ""
                 addr_shift = ""
@@ -880,22 +1028,22 @@ endmodule
                     addr_arg = ", int addr"
                     addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
                 fsw.write(
-                    f"void {core_prefix}SET_{name}({sw_type} value{addr_arg}) {{\n"
+                    f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg}) {{\n"
                 )
                 fsw.write(
-                    f"  (*( (volatile {sw_type} *) ( (base) + ({core_prefix}{name}_ADDR){addr_shift}) ) = (value));\n"
+                    f"  (*( (volatile {sw_type} *) ( (base) + ({core_prefix}{name_upper}_ADDR){addr_shift}) ) = (value));\n"
                 )
                 fsw.write("}\n\n")
             if "R" in row.type:
-                sw_type = self.swreg_type(name, n_bytes)
+                sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 addr_shift = ""
                 if addr_w / n_bytes > 1:
                     addr_arg = "int addr"
                     addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(f"{sw_type} {core_prefix}GET_{name}({addr_arg}) {{\n")
+                fsw.write(f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg}) {{\n")
                 fsw.write(
-                    f"  return (*( (volatile {sw_type} *) ( (base) + ({core_prefix}{name}_ADDR){addr_shift}) ));\n"
+                    f"  return (*( (volatile {sw_type} *) ( (base) + ({core_prefix}{name_upper}_ADDR){addr_shift}) ));\n"
                 )
                 fsw.write("}\n\n")
         fsw.close()
@@ -905,14 +1053,14 @@ endmodule
         self.write_verilator_code(table, out_dir, top)
 
         os.makedirs(out_dir, exist_ok=True)
-        fsw = open(f"{out_dir}/{top}_swreg_emb_tb.vs", "w")
+        fsw = open(f"{out_dir}/{top}_csrs_emb_tb.vs", "w")
         core_prefix = f"{top}_".upper()
-        # fsw.write(f'`include "{top}_swreg_def.vh"\n\n')
+        # fsw.write(f'`include "{top}_csrs_def.vh"\n\n')
 
-        fsw.write("\n// SWreg Core Setters and Getters\n")
+        fsw.write("\n// CSRS Core Setters and Getters\n")
 
         for row in table:
-            name = row.name
+            name = row.name.upper()
             n_bits = row.n_bits
             log2n_items = row.log2n_items
             n_bytes = self.bceil(n_bits, 3) / 8
@@ -953,14 +1101,15 @@ endmodule
     def write_verilator_code(self, table, out_dir, top):
         self.write_swheader_verilator(table, out_dir, top)
         os.makedirs(out_dir, exist_ok=True)
-        fsw = open(f"{out_dir}/{top}_swreg_emb_verilator.c", "w")
+        fsw = open(f"{out_dir}/{top}_csrs_emb_verilator.c", "w")
         core_prefix = f"{top}_".upper()
-        fsw.write(f'#include "{top}_swreg_verilator.h"\n\n')
+        fsw.write(f'#include "{top}_verilator.h"\n\n')
 
         fsw.write("\n// Core Setters and Getters\n")
 
         for row in table:
             name = row.name
+            name_upper = name.upper()
             n_bits = row.n_bits
             log2n_items = row.log2n_items
             n_bytes = self.bceil(n_bits, 3) / 8
@@ -968,7 +1117,7 @@ endmodule
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             if "W" in row.type:
-                sw_type = self.swreg_type(name, n_bytes)
+                sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 addr_arg = ""
                 addr_shift = ""
@@ -976,54 +1125,54 @@ endmodule
                     addr_arg = ", int addr"
                     addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
                 fsw.write(
-                    f"void {core_prefix}SET_{name}({sw_type} value{addr_arg}, iob_native_t *native_if) {{\n"
+                    f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg}, iob_native_t *native_if) {{\n"
                 )
                 fsw.write(
-                    f"  iob_write(({core_prefix}{name}_ADDR){addr_shift}, value, {core_prefix}{name}_W, native_if);\n"
+                    f"  iob_write(({core_prefix}{name_upper}_ADDR){addr_shift}, value, {core_prefix}{name_upper}_W, native_if);\n"
                 )
                 fsw.write("}\n\n")
             if "R" in row.type:
-                sw_type = self.swreg_type(name, n_bytes)
+                sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 addr_shift = ""
                 if addr_w / n_bytes > 1:
                     addr_arg = "int addr, "
                     addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
                 fsw.write(
-                    f"{sw_type} {core_prefix}GET_{name}({addr_arg}iob_native_t *native_if) {{\n"
+                    f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg}iob_native_t *native_if) {{\n"
                 )
                 fsw.write(
-                    f"  return ({sw_type})iob_read(({core_prefix}{name}_ADDR){addr_shift}, native_if);\n"
+                    f"  return ({sw_type})iob_read(({core_prefix}{name_upper}_ADDR){addr_shift}, native_if);\n"
                 )
                 fsw.write("}\n\n")
         fsw.close()
 
     def write_swheader_verilator(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        fswhdr = open(f"{out_dir}/{top}_swreg_verilator.h", "w")
+        fswhdr = open(f"{out_dir}/{top}_csrs_verilator.h", "w")
 
         core_prefix = f"{top}_".upper()
 
-        fswhdr.write(f"#ifndef H_{core_prefix}SWREG_VERILATOR_H\n")
-        fswhdr.write(f"#define H_{core_prefix}SWREG_VERILATOR_H\n\n")
+        fswhdr.write(f"#ifndef H_{core_prefix}CSRS_VERILATOR_H\n")
+        fswhdr.write(f"#define H_{core_prefix}CSRS_VERILATOR_H\n\n")
         fswhdr.write("#include <stdint.h>\n\n")
         fswhdr.write('#include "iob_tasks.h"\n\n')
 
         fswhdr.write("//used address space width\n")
-        fswhdr.write(f"#define  {core_prefix}SWREG_ADDR_W {self.core_addr_w}\n\n")
+        fswhdr.write(f"#define  {core_prefix}CSRS_ADDR_W {self.core_addr_w}\n\n")
 
         fswhdr.write("//used address space width\n")
-        fswhdr.write(f"#define  {core_prefix}SWREG_ADDR_W {self.core_addr_w}\n\n")
+        fswhdr.write(f"#define  {core_prefix}CSRS_ADDR_W {self.core_addr_w}\n\n")
 
         fswhdr.write("//Addresses\n")
         for row in table:
-            name = row.name
+            name = row.name.upper()
             if "W" in row.type or "R" in row.type:
                 fswhdr.write(f"#define {core_prefix}{name}_ADDR {row.addr}\n")
 
         fswhdr.write("\n//Data widths (bit)\n")
         for row in table:
-            name = row.name
+            name = row.name.upper()
             n_bits = row.n_bits
             n_bytes = int(self.bceil(n_bits, 3) / 8)
             if n_bytes == 3:
@@ -1037,6 +1186,7 @@ endmodule
         fswhdr.write("\n// Core Setters and Getters\n")
         for row in table:
             name = row.name
+            name_upper = name.upper()
             n_bits = row.n_bits
             log2n_items = row.log2n_items
             n_bytes = self.bceil(n_bits, 3) / 8
@@ -1044,23 +1194,23 @@ endmodule
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             if "W" in row.type:
-                sw_type = self.swreg_type(name, n_bytes)
+                sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 if addr_w / n_bytes > 1:
                     addr_arg = ", int addr"
                 fswhdr.write(
-                    f"void {core_prefix}SET_{name}({sw_type} value{addr_arg}, iob_native_t *native_if);\n"
+                    f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg}, iob_native_t *native_if);\n"
                 )
             if "R" in row.type:
-                sw_type = self.swreg_type(name, n_bytes)
+                sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 if addr_w / n_bytes > 1:
                     addr_arg = "int addr, "
                 fswhdr.write(
-                    f"{sw_type} {core_prefix}GET_{name}({addr_arg}iob_native_t *native_if);\n"
+                    f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg}iob_native_t *native_if);\n"
                 )
 
-        fswhdr.write(f"\n#endif // H_{core_prefix}_SWREG_VERILATOR_H\n")
+        fswhdr.write(f"\n#endif // H_{core_prefix}_CSRS_VERILATOR_H\n")
 
         fswhdr.close()
 
@@ -1087,9 +1237,9 @@ endmodule
     # check autoaddr configuration
     @staticmethod
     def check_autoaddr(autoaddr, row):
-        is_version = row.name == "VERSION"
+        is_version = row.name == "version"
         if is_version:
-            # VERSION has always automatic address
+            # version has always automatic address
             return -1
 
         # invalid autoaddr + register addr configurations
@@ -1163,13 +1313,13 @@ endmodule
 
         return table
 
-    # Generate swreg.tex file with list TeX tables of regs
+    # Generate csrs.tex file with list TeX tables of regs
     @staticmethod
-    def generate_swreg_tex(regs, out_dir):
+    def generate_csrs_tex(regs, out_dir):
         os.makedirs(out_dir, exist_ok=True)
-        swreg_file = open(f"{out_dir}/swreg.tex", "w")
+        csrs_file = open(f"{out_dir}/csrs.tex", "w")
 
-        swreg_file.write(
+        csrs_file.write(
             """
     The software accessible registers of the core are described in the following
     tables. The tables give information on the name, read/write capability, address, width in bits, and a textual description.
@@ -1177,7 +1327,7 @@ endmodule
         )
 
         for table in regs:
-            swreg_file.write(
+            csrs_file.write(
                 """
     \\begin{table}[H]
       \\centering
@@ -1189,7 +1339,7 @@ endmodule
 
         \\input """
                 + table.name
-                + """_swreg_tab
+                + """_csrs_tab
      
       \\end{tabularx}
       \\caption{"""
@@ -1197,13 +1347,13 @@ endmodule
                 + """}
       \\label{"""
                 + table.name
-                + """_swreg_tab:is}
+                + """_csrs_tab:is}
     \\end{table}
     """
             )
 
-        swreg_file.write("\\clearpage")
-        swreg_file.close()
+        csrs_file.write("\\clearpage")
+        csrs_file.close()
 
     # Generate TeX tables of registers
     # regs: list of tables containing registers, as defined in <corename>_setup.py
@@ -1212,8 +1362,8 @@ endmodule
     @classmethod
     def generate_regs_tex(self, regs, regs_with_addr, out_dir):
         os.makedirs(out_dir, exist_ok=True)
-        # Create swreg.tex file
-        self.generate_swreg_tex(regs, out_dir)
+        # Create csrs.tex file
+        self.generate_csrs_tex(regs, out_dir)
 
         for table in regs:
             tex_table = []
@@ -1235,4 +1385,4 @@ endmodule
                     ]
                 )
 
-            write_table(f"{out_dir}/{table.name}_swreg", tex_table)
+            write_table(f"{out_dir}/{table.name}_csrs", tex_table)

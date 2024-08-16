@@ -6,9 +6,9 @@ def generate_fsms(core):
     returns: Generated verilog code
     """
     if core.fsms != None:
-        code = core.fsms.verilog_code + "\n"
+        return core.fsms.verilog_code + "\n"
 
-    return code
+    return ""
 
 
 def generate_fsms_snippet(core):

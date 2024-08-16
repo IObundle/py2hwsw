@@ -6,9 +6,9 @@ def generate_combs(core):
     returns: Generated verilog code
     """
     if core.combs != None:
-        code = core.combs.verilog_code + "\n"
+        return core.combs.verilog_code + "\n"
 
-    return code
+    return ""
 
 
 def generate_combs_snippet(core):

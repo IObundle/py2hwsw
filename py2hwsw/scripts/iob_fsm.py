@@ -68,13 +68,16 @@ end
         
 def create_fsm(core, *args, **kwargs):
     """Create a Verilog finite state machine to insert in a given core."""
-    core.set_default_attribute("fsms", [])
-
-    fsm_nr = len(core.fsms)
+    if core.combs != None:
+        raise ValueError("Combinational logic is mutually exclusive with FSMs. Create separate submodules for each.")
+    if core.fsms != None:
+        raise ValueError("Multiple FSMs are not supported. Create separate submodules for each.")
 
     verilog_code = kwargs.get("verilog_code", "")
 
     fsm = iob_fsm(verilog_code=verilog_code)
+
+    core.set_default_attribute("fsms", fsm)
 
     core.create_wire(
         name = fsm.state_reg_name,

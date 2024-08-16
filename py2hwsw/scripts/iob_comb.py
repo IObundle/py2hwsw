@@ -18,10 +18,13 @@ class iob_comb(iob_snippet):
 
 def create_comb(core, *args, **kwargs):
     """Create a Verilog combinatory circuit to insert in a given core."""
-    # Ensure 'combs' list exists
-    core.set_default_attribute("combs", [])
+    if core.fsms != None:
+        raise ValueError("Comb circuits and FSMs are mutually exclusive. Use separate submodules.")
+    if core.combs != None:
+        raise ValueError("Multiple comb circuits are not supported. Use separate submodules.")
     verilog_code = kwargs.get("verilog_code", None)
     comb = iob_comb(verilog_code=verilog_code)
+    core.set_default_attribute("combs", comb)
     comb.set_needed_reg(core)
     comb.infer_registers(core)
     core.combs.append(comb)

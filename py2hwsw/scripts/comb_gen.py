@@ -5,10 +5,7 @@ def generate_combs(core):
     """Generate verilog code with combs of this module.
     returns: Generated verilog code
     """
-    code = ""
-    for comb in core.combs:
-        code += comb.verilog_code
-        code += "\n"
+    code = core.combs.verilog_code + "\n"
 
     return code
 

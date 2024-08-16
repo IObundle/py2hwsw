@@ -5,10 +5,7 @@ def generate_fsms(core):
     """Generate verilog code with fsms of this module.
     returns: Generated verilog code
     """
-    code = ""
-    for fsm in core.fsms:
-        code += fsm.verilog_code
-        code += "\n"
+    code = core.fsms.verilog_code + "\n"
 
     return code
 

@@ -11,6 +11,12 @@ class iob_fsm(iob_snippet):
     def __post_init__(self):
         if self.type not in ["prog", "fsm"]:
             raise ValueError("type must be either 'prog' or 'fsm'")
+        if self.type == "fsm":
+            self.state_reg_name = "state"
+            update_statement = "state_nxt <= state;"
+        else:
+            self.state_reg_name = "pc"
+            update_statement = "pc_nxt = pc + 1;"
         _states = self.verilog_code.split("\n\n")
         self.state_reg_width = (len(_states) - 1).bit_length()
         self.state_names = {}
@@ -52,8 +58,8 @@ class iob_fsm(iob_snippet):
         self.verilog_code = f"""
 {localparams}
 always @* begin
-    pc_nxt = pc + 1;
-    case (pc)
+    {update_statement}
+    case ({self.state_reg_name})
         {joined_states}
     endcase
 end
@@ -70,14 +76,10 @@ def create_fsm(core, *args, **kwargs):
 
     fsm = iob_fsm(verilog_code=verilog_code)
 
-    fsm.verilog_code = fsm.verilog_code.replace("pc", f"pc{fsm_nr}")
-
-    core.create_wire(name = f"pc{fsm_nr}",
-                     signals = [
-                         {
-                             "name": f"pc{fsm_nr}",
-                             "width": fsm.state_reg_width
-                         }])
+    core.create_wire(
+        name = fsm.state_reg_name,
+        signals = [{"name": fsm.state_reg_name, "width": fsm.state_reg_width}]
+    )
 
     fsm.set_needed_reg(core)
 

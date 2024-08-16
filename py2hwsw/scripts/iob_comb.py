@@ -24,10 +24,9 @@ def create_comb(core, *args, **kwargs):
         raise ValueError("Multiple comb circuits are not supported. Use separate submodules.")
     verilog_code = kwargs.get("verilog_code", None)
     comb = iob_comb(verilog_code=verilog_code)
-    core.set_default_attribute("combs", comb)
     comb.set_needed_reg(core)
     comb.infer_registers(core)
-    core.combs.append(comb)
+    core.set_default_attribute("combs", comb)
 
 
 if __name__ == "__main__":

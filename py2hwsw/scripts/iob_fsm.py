@@ -77,8 +77,6 @@ def create_fsm(core, *args, **kwargs):
 
     fsm = iob_fsm(verilog_code=verilog_code)
 
-    core.set_default_attribute("fsms", fsm)
-
     core.create_wire(
         name = fsm.state_reg_name,
         signals = [{"name": fsm.state_reg_name, "width": fsm.state_reg_width}]
@@ -88,4 +86,4 @@ def create_fsm(core, *args, **kwargs):
 
     fsm.infer_registers(core)
 
-    core.fsms.append(fsm)
+    core.set_default_attribute("fsms", fsm)

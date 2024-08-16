@@ -6,8 +6,11 @@ import re
 @dataclass
 class iob_fsm(iob_snippet):
     """Class to represent a Verilog finite state machine in an iob module"""
+    type: str = "prog"
 
     def __post_init__(self):
+        if self.type not in ["prog", "fsm"]:
+            raise ValueError("type must be either 'prog' or 'fsm'")
         _states = self.verilog_code.split("\n\n")
         self.state_reg_width = (len(_states) - 1).bit_length()
         self.state_names = {}
@@ -29,8 +32,12 @@ class iob_fsm(iob_snippet):
                 self.state_names[tag] = i
                 _states[i] = state.replace(f"{tag}:", "")
         for tag, loop in _for_loops.items():
-            _states[self.state_names[tag]] = f"\n{loop['init']};\n{_states[self.state_names[tag]]}"
-            _states[self.state_names[tag+"_endfor"]] = f"{_states[self.state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+            if loop['init'] != "":
+                _states[self.state_names[tag]] = f"\n{loop['init']};\n{_states[self.state_names[tag]]}"
+            if loop['update'] != "":
+                _states[self.state_names[tag+"_endfor"]] = f"{_states[self.state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+            else:
+                _states[self.state_names[tag+"_endfor"]] = f"{_states[self.state_names[tag+'_endfor']]}\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
         for i, state in enumerate(_states[:-1]):
             _states[i] = f"{i}: begin\n{state}\nend"
             _states[i] = re.sub(r"\n\s*\n", "\n", _states[i])

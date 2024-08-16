@@ -51,7 +51,7 @@ class iob_fsm(iob_snippet):
         _states[-1] = re.sub(r"\n\s*\n", "\n", _states[-1])
         localparams = ""
         for state_name, i in self.state_names.items():
-            _states[i] = re.sub(r"^{i}:", f"{state_name}:", _states[i])
+            _states[i] = _states[i].replace(f"{i}:", f"{state_name}:",1)
             if not state_name.endswith("_endfor"):
                 localparams += f"localparam {state_name} = {i};\n"
         joined_states = "\n".join(_states)
@@ -73,6 +73,8 @@ def create_fsm(core, *args, **kwargs):
     if core.fsms != None:
         raise ValueError("Multiple FSMs are not supported. Create separate submodules for each.")
 
+    core.set_default_attribute("fsms", None)
+
     verilog_code = kwargs.get("verilog_code", "")
 
     fsm = iob_fsm(verilog_code=verilog_code)
@@ -86,4 +88,4 @@ def create_fsm(core, *args, **kwargs):
 
     fsm.infer_registers(core)
 
-    core.set_default_attribute("fsms", fsm)
+    core.fsms = fsm

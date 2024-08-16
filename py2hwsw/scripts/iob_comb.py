@@ -22,11 +22,12 @@ def create_comb(core, *args, **kwargs):
         raise ValueError("Comb circuits and FSMs are mutually exclusive. Use separate submodules.")
     if core.combs != None:
         raise ValueError("Multiple comb circuits are not supported. Use separate submodules.")
+    core.set_default_attribute("combs", None)
     verilog_code = kwargs.get("verilog_code", None)
     comb = iob_comb(verilog_code=verilog_code)
     comb.set_needed_reg(core)
     comb.infer_registers(core)
-    core.set_default_attribute("combs", comb)
+    core.combs = comb
 
 
 if __name__ == "__main__":

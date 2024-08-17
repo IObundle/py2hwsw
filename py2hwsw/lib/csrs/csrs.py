@@ -37,20 +37,20 @@ def setup(py_params_dict):
         "generate_hw": False,
         "confs": [
             {
-                "name": "DATA_W",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "NA",
-                "descr": "Data bus width.",
-            },
-            {
                 "name": "ADDR_W",
                 "type": "P",
-                "val": "0",
+                "val": "ND",
                 "min": "0",
                 "max": "NA",
                 "descr": "Address bus width",
+            },
+            {
+                "name": "DATA_W",
+                "type": "P",
+                "val": "32",
+                "min": "0",
+                "max": "NA",
+                "descr": "Data bus width.",
             },
         ],
         "ports": [
@@ -133,6 +133,7 @@ def setup(py_params_dict):
     # TODO: Append csr_if to config_build.mk ?
     # file2create.write(f"CSR_IF={python_module.csr_if}\n\n")
 
-    # TODO: Auto-add verilog parameters ?
+    # Set correct address width macro
+    attributes_dict["confs"][0]["val"] = csr_gen_obj.core_addr_w
 
     return attributes_dict

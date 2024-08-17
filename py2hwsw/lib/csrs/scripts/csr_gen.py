@@ -898,9 +898,7 @@ endmodule
     def write_hwheader(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
         f_def = open(f"{out_dir}/{top}_csrs_def.vh", "w")
-        f_def.write("//used address space width\n")
-        addr_w_prefix = f"{top}_csrs".upper()
-        f_def.write(f"`define {addr_w_prefix}_ADDR_W {self.core_addr_w}\n\n")
+        f_def.write(f'`include "{top}_csrs_conf.vh"\n')
         f_def.write("//These macros may be dependent on instance parameters\n")
         f_def.write("//address macros\n")
         macro_prefix = f"{top}_".upper()

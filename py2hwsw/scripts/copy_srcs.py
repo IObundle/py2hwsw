@@ -40,7 +40,7 @@ def flows_setup(python_module):
 
 
 def hw_setup(python_module):
-    # Create module's version TeX file. Also create *_version.vh Verilog Header if we do not have csrs.
+    # Create module's version TeX file, also create *_version.vh Verilog Header.
     if python_module.is_top_module:
         version_file(python_module)
 
@@ -404,10 +404,6 @@ def version_file(
     with open(tex_file, "w") as tex_f:
         tex_f.write(core_previous_version)
 
-    # Don't create version.vh if module has csrs (because it already has the VERSION register)
-    if python_module.csrs:
-        return
-
     vh_file = f"{verilog_dir}/{core_name}_version.vh"
     vh_version_string = "0"
     for c in core_version:
@@ -417,16 +413,10 @@ def version_file(
         vh_f.write(f"`define VERSION {vh_version_string}")
 
 
-# Given a version string (like "V0.12"), return a 4 digit string representing the version (like "0012")
-def version_str_to_digits(version_str):
-    version_str = version_str.replace("V", "")
-    major_ver, minor_ver = version_str.split(".")
-    return f"{int(major_ver):02d}{int(minor_ver):02d}"
-
-
 def copy_with_rename(old_core_name, new_core_name):
     """Creates a function that:
-    - Renames any '<old_core_name>' string inside the src file and in its filename, to the given '<new_core_name>' string argument.
+    - Renames any '<old_core_name>' string inside the src file and in its filename,
+    to the given '<new_core_name>' string argument.
     """
 
     def copy_func(src, dst):

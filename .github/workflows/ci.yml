@@ -35,7 +35,7 @@ jobs:
         run: |
           py2hwsw () { `pwd`/py2hwsw/scripts/py2hwsw.py $@; };\
           export -f py2hwsw;\
-          for f in `find py2hwsw/lib -name "*.py"`; do\
+          for f in `find py2hwsw/lib -type f -name "*.py" ! -path "*/scripts/*" ! -name "csrs.py"`; do\
             py2hwsw `basename $f .py` print_build_dir;\
           done;
 

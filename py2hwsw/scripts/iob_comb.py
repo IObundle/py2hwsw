@@ -20,8 +20,6 @@ def create_comb(core, *args, **kwargs):
     """Create a Verilog combinatory circuit to insert in a given core."""
     if core.fsms != None:
         raise ValueError("Comb circuits and FSMs are mutually exclusive. Use separate submodules.")
-    if core.combs != None:
-        raise ValueError("Multiple comb circuits are not supported. Use separate submodules.")
     core.set_default_attribute("combs", None)
     verilog_code = kwargs.get("verilog_code", None)
     comb = iob_comb(verilog_code=verilog_code)

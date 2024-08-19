@@ -169,7 +169,7 @@ def setup(py_params_dict):
 """,
             },
         ],
-        "fsms": {
+        "fsm": {
             "verilog_code": """
         idle:
             if (start_i) begin

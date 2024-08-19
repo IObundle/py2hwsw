@@ -31,7 +31,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "combs": {
+        "comb": {
             "verilog_code": """if (sel_i)
                     y_o = b_i;
                 else

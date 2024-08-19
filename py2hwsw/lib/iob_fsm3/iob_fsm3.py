@@ -12,7 +12,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "fsms": {
+        "fsm": {
             "verilog_code": """
 A: a_o = 0;
 

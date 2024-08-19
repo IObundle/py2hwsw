@@ -73,7 +73,7 @@ def conf_h(macros, top_module, out_dir):
 def config_build_mk(python_module):
     file2create = open(f"{python_module.build_dir}/config_build.mk", "w")
     file2create.write(f"NAME={python_module.name}\n")
-    file2create.write(f"CSR_IF={python_module.csr_if}\n\n")
+    file2create.write("CSR_IF ?=iob\n")
     file2create.write(f"BUILD_DIR_NAME={python_module.build_dir.split('/')[-1]}\n")
     file2create.write(f"IS_FPGA={int(python_module.is_system)}\n")
 
@@ -160,25 +160,6 @@ def update_define(confs, define_name, should_set):
 
 
 def generate_confs(core):
-    # Auto-add VERSION macro if there are software registers
-    if core.csrs:
-        found_version_macro = False
-        if core.confs:
-            for macro in core.confs:
-                if macro.name == "VERSION":
-                    found_version_macro = True
-        if not found_version_macro:
-            core.confs.append(
-                iob_conf(
-                    name="VERSION",
-                    type="M",
-                    val="16'h" + copy_srcs.version_str_to_digits(core.version),
-                    min="NA",
-                    max="NA",
-                    descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
-                )
-            )
-
     conf_vh(
         core.confs,
         core.name,

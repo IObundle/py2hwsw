@@ -193,9 +193,6 @@ def generate_verilog(core):
     if core.wires:
         module_body_lines += wire_gen.generate_wires(core) + "\n\n"
 
-    if core.csrs:
-        module_body_lines += f'    `include "{core.name}_swreg_inst.vs"\n\n'
-
     if core.blocks:
         module_body_lines += block_gen.generate_blocks(core) + "\n\n"
 

@@ -3,7 +3,6 @@
 # TODO: account for log2n_items in the memory map
 
 import math
-import io_gen
 import if_gen
 import re
 import os
@@ -11,6 +10,24 @@ import os
 # Generates IP-XACT for the given core
 #
 #
+
+
+def find_suffix_from_list(full_string, list_of_suffix_strings):
+    """
+    Given a string and a list of possible suffixes, check if string given has a suffix from the list
+    Returns a tuple:
+        -(prefix, suffix): 'prefix' is the full_string with the suffix removed.
+            'suffix' is the string from the list that is a suffix of the full_string.
+        -(None, None): if no suffix is found
+    """
+    return next(
+        (
+            (full_string[: -len(i)], i)
+            for i in list_of_suffix_strings
+            if full_string.endswith(i)
+        ),
+        (None, None),
+    )
 
 
 def replace_params_with_ids(string, parameters_list, double_usage_count=False):
@@ -249,9 +266,7 @@ def gen_ports_list(core):
             continue
 
         # Check if this interface is a standard interface (from if_gen.py)
-        if_prefix, if_name = io_gen.find_suffix_from_list(
-            interface["name"], if_gen.interfaces
-        )
+        if_prefix, if_name = find_suffix_from_list(interface["name"], if_gen.interfaces)
         if if_name:
             # Generate the ports list for the interface
             if_gen.create_signal_table(if_name)
@@ -512,6 +527,7 @@ def generate_ipxact_xml(core, sw_regs, dest_dir):
         exit(1)
 
     # Add the CSR IF,
+    # TODO: Core no longer has csrs. Now csrs have their own lib module (csrs.py)
     core_name = core.name + "_" + core.csr_if
 
     # Core name to be displayed in the xml file

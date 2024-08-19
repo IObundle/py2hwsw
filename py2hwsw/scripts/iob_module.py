@@ -1,8 +1,7 @@
-from iob_base import iob_base, process_elements_from_list, fail_with_msg
+from iob_base import iob_base, process_elements_from_list
 from iob_conf import create_conf
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
-from iob_csr import create_csr_group
 from iob_snippet import create_snippet
 from iob_comb import *
 from iob_fsm import *
@@ -53,14 +52,6 @@ class iob_module(iob_base):
             list,
             get_list_attr_handler(self.create_wire),
             "List of module wires.",
-        )
-        # List of core Control/Status Registers
-        self.set_default_attribute(
-            "csrs",
-            [],
-            list,
-            get_list_attr_handler(self.create_csr_group),
-            "List of core Control/Status Registers.",
         )
         # List of core Verilog snippets
         self.set_default_attribute(
@@ -114,9 +105,6 @@ class iob_module(iob_base):
 
     def get_wire_signal(self, *args, **kwargs):
         return get_wire_signal(self, *args, **kwargs)
-
-    def create_csr_group(self, *args, **kwargs):
-        create_csr_group(self, *args, **kwargs)
 
     def create_snippet(self, *args, **kwargs):
         create_snippet(self, *args, **kwargs)

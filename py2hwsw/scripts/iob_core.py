@@ -12,7 +12,6 @@ import config_gen
 import param_gen
 import io_gen
 import wire_gen
-import reg_gen
 import block_gen
 import comb_gen
 import fsm_gen
@@ -81,15 +80,10 @@ class iob_core(iob_module, iob_instance):
         iob_instance.__init__(self, *args, **kwargs)
         # Ensure global top module is set
         self.update_global_top_module(attributes)
-        # CPU interface for control status registers
-        self.set_default_attribute("csr_if", "iob", str)
         self.set_default_attribute("version", "", str)
         self.set_default_attribute("previous_version", self.version, str)
         self.set_default_attribute("setup_dir", "", str)
         self.set_default_attribute("build_dir", "", str)
-        self.set_default_attribute("autoaddr", True, bool)
-        # Overlap Read and Write register addresses
-        self.set_default_attribute("rw_overlap", False, bool)
         self.set_default_attribute("use_netlist", False, bool)
         self.set_default_attribute(
             "is_top_module", __class__.global_top_module == self, bool
@@ -153,9 +147,6 @@ class iob_core(iob_module, iob_instance):
         # Generate parameters
         param_gen.generate_params_snippets(self)
 
-        # Generate csr interface
-        csr_gen_obj, reg_table = reg_gen.generate_csr(self)
-
         # Generate ios
         io_gen.generate_ports_snippet(self)
 
@@ -195,7 +186,7 @@ class iob_core(iob_module, iob_instance):
             # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
             self._remove_duplicate_sources()
             # Generate docs
-            doc_gen.generate_docs(self, csr_gen_obj, reg_table)
+            doc_gen.generate_docs(self)
             # Generate ipxact file
             # if self.generate_ipxact: #TODO: When should this be generated?
             #    ipxact_gen.generate_ipxact_xml(self, reg_table, self.build_dir + "/ipxact")
@@ -444,6 +435,7 @@ class iob_core(iob_module, iob_instance):
             core_dict = core_module.setup(
                 {
                     "core_name": core_name,
+                    "build_dir": __class__.global_build_dir,
                     **kwargs,
                 }
             )
@@ -487,17 +479,17 @@ def find_module_setup_dir(core_name):
     returns: The path to the setup directory
     returns: The file extension
     """
-    file_path = find_file(iob_core.global_project_root, core_name, [".py", ".json"])
+    file_path = find_file(
+        iob_core.global_project_root, core_name, [".py", ".json"]
+    ) or find_file(
+        os.path.join(os.path.dirname(__file__), "../lib"),
+        core_name,
+        [".py", ".json"],
+    )
     if not file_path:
-        file_path = find_file(
-            os.path.join(os.path.dirname(__file__), "../lib"),
-            core_name,
-            [".py", ".json"],
+        fail_with_msg(
+            f"Setup directory of '{core_name}' not found in {iob_core.global_project_root}!"
         )
-        if not file_path:
-            fail_with_msg(
-                f"Setup directory of {core_name} not found in {iob_core.global_project_root}!"
-            )
 
     file_ext = os.path.splitext(file_path)[1]
     # print("Found setup dir based on location of: " + file_path, file=sys.stderr)

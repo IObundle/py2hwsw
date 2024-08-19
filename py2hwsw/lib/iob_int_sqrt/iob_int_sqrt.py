@@ -169,9 +169,8 @@ def setup(py_params_dict):
 """,
             },
         ],
-        "fsms": [
-            {
-                "verilog_code": """
+        "fsms": {
+            "verilog_code": """
         idle:
             if (start_i) begin
                 a_nxt = op_i;
@@ -191,7 +190,6 @@ def setup(py_params_dict):
             end else begin
                 pc_nxt = idle; end
 """,
-            }
-        ],
+        }
     }
     return attributes_dict

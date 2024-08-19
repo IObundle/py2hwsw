@@ -63,7 +63,7 @@ class iob_module(iob_base):
         )
         # List of core Verilog combinatory circuits
         self.set_default_attribute(
-            "combs",
+            "comb",
             None,
             iob_comb,
             lambda y: self.create_comb(**y),
@@ -71,7 +71,7 @@ class iob_module(iob_base):
         )
         # List of core Verilog finite state machines
         self.set_default_attribute(
-            "fsms",
+            "fsm",
             None,
             iob_fsm,
             lambda y: self.create_fsm(**y),

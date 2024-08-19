@@ -28,6 +28,8 @@ class iob_fsm(iob_snippet):
                 for_loop = re.search(r"for\s*\(([^)]+)\)", state)
                 for_loop = for_loop.group(1) if for_loop else None
                 if for_loop:
+                    if self.type == "fsm":
+                        raise ValueError("for loops are not suported in FSMs")
                     init, cond, update = for_loop.split(";")
                     _for_loops[tag] = {
                         "init": init,

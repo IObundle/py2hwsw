@@ -66,16 +66,16 @@ class iob_module(iob_base):
             "combs",
             None,
             iob_comb,
-            get_list_attr_handler(self.create_comb),
-            "List of core Verilog combinatory circuits.",
+            lambda y: self.create_comb(**y),
+            "Verilog combinatory circuit.",
         )
         # List of core Verilog finite state machines
         self.set_default_attribute(
             "fsms",
             None,
             iob_fsm,
-            get_list_attr_handler(self.create_fsm),
-            "List of core Verilog finite state machines.",
+            lambda y: self.create_fsm(**y),
+            "Verilog finite state machine.",
         )
         # List of instances of other cores inside this core
         self.set_default_attribute(

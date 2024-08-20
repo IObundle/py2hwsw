@@ -25,4 +25,4 @@ def create_comb(core, *args, **kwargs):
     comb = iob_comb(verilog_code=verilog_code)
     comb.set_needed_reg(core)
     comb.infer_registers(core)
-    core.combs = comb
+    core.comb = comb

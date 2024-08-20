@@ -41,7 +41,7 @@ def setup(py_params_dict):
                 "type": "P",
                 "val": "ND",
                 "min": "0",
-                "max": "NA",
+                "max": "32",
                 "descr": "Address bus width",
             },
             {
@@ -49,7 +49,7 @@ def setup(py_params_dict):
                 "type": "P",
                 "val": "32",
                 "min": "0",
-                "max": "NA",
+                "max": "32",
                 "descr": "Data bus width.",
             },
         ],

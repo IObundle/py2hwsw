@@ -196,11 +196,11 @@ def generate_verilog(core):
     if core.blocks:
         module_body_lines += block_gen.generate_blocks(core) + "\n\n"
 
-    if core.combs:
-        module_body_lines += comb_gen.generate_combs(core) + "\n\n"
+    if core.comb:
+        module_body_lines += comb_gen.generate_comb(core) + "\n\n"
 
-    if core.fsms:
-        module_body_lines += fsm_gen.generate_fsms(core) + "\n\n"
+    if core.fsm:
+        module_body_lines += fsm_gen.generate_fsm(core) + "\n\n"
 
     if core.snippets:
         module_body_lines += snippet_gen.generate_snippets(core) + "\n\n"

@@ -6,11 +6,20 @@ import re
 @dataclass
 class iob_fsm(iob_snippet):
     """Class to represent a Verilog finite state machine in an iob module"""
+    type: str = "prog"
 
     def __post_init__(self):
+        if self.type not in ["prog", "fsm"]:
+            raise ValueError("type must be either 'prog' or 'fsm'")
+        if self.type == "fsm":
+            self.state_reg_name = "state"
+            update_statement = "state_nxt <= state;"
+        else:
+            self.state_reg_name = "pc"
+            update_statement = "pc_nxt = pc + 1;"
         _states = self.verilog_code.split("\n\n")
         self.state_reg_width = (len(_states) - 1).bit_length()
-        _state_names = {}
+        self.state_names = {}
         _for_loops = {}
         for i, state in enumerate(_states):
             tag = re.search(r"^\s*(\w+):", state)
@@ -19,30 +28,40 @@ class iob_fsm(iob_snippet):
                 for_loop = re.search(r"for\s*\(([^)]+)\)", state)
                 for_loop = for_loop.group(1) if for_loop else None
                 if for_loop:
+                    if self.type == "fsm":
+                        raise ValueError("for loops are not suported in FSMs")
                     init, cond, update = for_loop.split(";")
                     _for_loops[tag] = {
                         "init": init,
                         "cond": cond,
                         "update": update
                     }
-                    #remove for loop from state
                     state = re.sub(r"for\s*\([^)]+\)", "", state)
-                _state_names[tag] = i
+                self.state_names[tag] = i
                 _states[i] = state.replace(f"{tag}:", "")
-        for state_name, i in _state_names.items():
-            for j, state in enumerate(_states):
-                _states[j] = state.replace(state_name, f"{self.state_reg_width}'b{i:0{self.state_reg_width}b}")
         for tag, loop in _for_loops.items():
-            _states[_state_names[tag]] = f"{loop['init']};\n{_states[_state_names[tag]]}"
-            _states[_state_names[tag+"_endfor"]] = f"{_states[_state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {self.state_reg_width}'b{_state_names[tag]:0{self.state_reg_width}b};\nend"
+            if loop['init'] != "":
+                _states[self.state_names[tag]] = f"\n{loop['init']};\n{_states[self.state_names[tag]]}"
+            if loop['update'] != "":
+                _states[self.state_names[tag+"_endfor"]] = f"{_states[self.state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+            else:
+                _states[self.state_names[tag+"_endfor"]] = f"{_states[self.state_names[tag+'_endfor']]}\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
         for i, state in enumerate(_states[:-1]):
             _states[i] = f"{i}: begin\n{state}\nend"
+            _states[i] = re.sub(r"\n\s*\n", "\n", _states[i])
         _states[-1] = f"default: begin\n{_states[-1]}\nend"
+        _states[-1] = re.sub(r"\n\s*\n", "\n", _states[-1])
+        localparams = ""
+        for state_name, i in self.state_names.items():
+            _states[i] = _states[i].replace(f"{i}:", f"{state_name}:",1)
+            if not state_name.endswith("_endfor"):
+                localparams += f"localparam {state_name} = {i};\n"
         joined_states = "\n".join(_states)
         self.verilog_code = f"""
+{localparams}
 always @* begin
-    pc_nxt = pc + 1;
-    case (pc)
+    {update_statement}
+    case ({self.state_reg_name})
         {joined_states}
     endcase
 end
@@ -51,25 +70,22 @@ end
         
 def create_fsm(core, *args, **kwargs):
     """Create a Verilog finite state machine to insert in a given core."""
-    core.set_default_attribute("fsms", [])
+    if core.comb != None:
+        raise ValueError("Combinational logic is mutually exclusive with FSMs. Create separate submodules for each.")
 
-    fsm_nr = len(core.fsms)
+    core.set_default_attribute("fsm", None)
 
     verilog_code = kwargs.get("verilog_code", "")
 
     fsm = iob_fsm(verilog_code=verilog_code)
 
-    fsm.verilog_code = fsm.verilog_code.replace("pc", f"pc{fsm_nr}")
-
-    core.create_wire(name = f"pc{fsm_nr}",
-                     signals = [
-                         {
-                             "name": f"pc{fsm_nr}",
-                             "width": fsm.state_reg_width
-                         }])
+    core.create_wire(
+        name = fsm.state_reg_name,
+        signals = [{"name": fsm.state_reg_name, "width": fsm.state_reg_width}]
+    )
 
     fsm.set_needed_reg(core)
 
     fsm.infer_registers(core)
 
-    core.fsms.append(fsm)
+    core.fsm = fsm

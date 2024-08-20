@@ -31,15 +31,13 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "combs": [
-            {
-                "verilog_code": """if (sel_i)
+        "comb": {
+            "verilog_code": """if (sel_i)
                     y_o = b_i;
                 else
                     y_o = a_i;
                 """,
             }
-        ],
     }
 
     return attributes_dict

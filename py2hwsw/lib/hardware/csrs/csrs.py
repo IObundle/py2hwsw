@@ -10,8 +10,7 @@ from iob_csr import create_csr_group
 
 def setup(py_params_dict):
     params = {
-        # 'instantiator' is a standard object passed by py2hwsw in py_params_dict
-        "name": py_params_dict["instantiator"].name + "_csrs",
+        "name": py_params_dict["instantiator"]["name"] + "_csrs",
         "version": "1.0",
         "csr_if": "iob",
         "csrs": [],

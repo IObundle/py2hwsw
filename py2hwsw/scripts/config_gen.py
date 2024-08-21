@@ -117,20 +117,6 @@ def generate_confs_tex(confs, out_dir):
     # Write table with true parameters and macros
     write_table(f"{out_dir}/confs", tex_table)
 
-    # Write list of derived parameters
-    file2create = open(f"{out_dir}/derived_params.tex", "w")
-    file2create.write("\\begin{description}\n")
-    for derv_param in derv_params:
-        # replace underscores and $clog2 with \_ and $\log_2
-        for i in range(len(derv_param)):
-            derv_param[i] = str(derv_param[i]).replace("_", "\\_")
-            derv_param[i] = derv_param[i].replace("$clog2", "log2")
-        # write the line
-        file2create.write(
-            f"  \\item[{derv_param[0]}] {derv_param[2]} Value: {derv_param[1]}.\n"
-        )
-    file2create.write("\\end{description}\n")
-
 
 # Select if a define from the confs dictionary is set or not
 # define_name: name of the macro in confs (its called define because it is unvalued, it is either set or unset)

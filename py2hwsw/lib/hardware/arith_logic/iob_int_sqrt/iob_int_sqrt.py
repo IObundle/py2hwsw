@@ -165,7 +165,7 @@ def setup(py_params_dict):
         assign a_in = {a[DATA_W-3:0], 2'b00};
         assign tmp =  r[SIZE_W+1] ? left + right : left - right;
         assign res_o = q;
-        assign done_o = ~pc0;
+        assign done_o = ~pc;
 """,
             },
         ],

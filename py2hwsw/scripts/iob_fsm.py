@@ -18,7 +18,6 @@ class iob_fsm(iob_snippet):
             self.state_reg_name = "pc"
             update_statement = "pc_nxt = pc + 1;"
         _states = self.verilog_code.split("\n\n")
-        self.state_reg_width = (len(_states) - 1).bit_length()
         self.state_names = {}
         _for_loops = {}
         tag = re.search(r"^\s*(\w+):", _states[0])
@@ -26,6 +25,7 @@ class iob_fsm(iob_snippet):
         if tag == "default_assignments":
             update_statement += f"{_states[0].replace(f'{tag}:','')}"
             _states = _states[1:]
+        self.state_reg_width = (len(_states) - 1).bit_length()
         for i, state in enumerate(_states):
             tag = re.search(r"^\s*(\w+):", state)
             tag = tag.group(1) if tag else None

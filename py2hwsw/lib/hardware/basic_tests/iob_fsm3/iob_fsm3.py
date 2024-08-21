@@ -12,9 +12,8 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "fsms": [
-            {
-                "verilog_code": """
+        "fsm": {
+            "verilog_code": """
 A: a_o = 0;
 
 B: a_o = 1;
@@ -31,7 +30,6 @@ begin
 end
 """
             }
-        ],
     }
 
     return attributes_dict

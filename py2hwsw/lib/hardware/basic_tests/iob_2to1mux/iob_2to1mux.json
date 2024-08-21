@@ -46,9 +46,7 @@
             ]
         }
     ],
-    "combs": [
-        {
-            "verilog_code": "if (sel_i)\n                    y_o = b_i;\n                else\n                    y_o = a_i;"
-        }
-    ]
+    "comb": {
+        "verilog_code": "if (sel_i)\n                    y_o = b_i;\n                else\n                    y_o = a_i;\n                "
+    }
 }

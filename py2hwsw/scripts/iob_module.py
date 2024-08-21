@@ -3,8 +3,8 @@ from iob_conf import create_conf
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
-from iob_comb import create_comb
-from iob_fsm import create_fsm
+from iob_comb import *
+from iob_fsm import *
 
 
 class iob_module(iob_base):
@@ -63,19 +63,19 @@ class iob_module(iob_base):
         )
         # List of core Verilog combinatory circuits
         self.set_default_attribute(
-            "combs",
-            [],
-            list,
-            get_list_attr_handler(self.create_comb),
-            "List of core Verilog combinatory circuits.",
+            "comb",
+            None,
+            iob_comb,
+            lambda y: self.create_comb(**y),
+            "Verilog combinatory circuit.",
         )
         # List of core Verilog finite state machines
         self.set_default_attribute(
-            "fsms",
-            [],
-            list,
-            get_list_attr_handler(self.create_fsm),
-            "List of core Verilog finite state machines.",
+            "fsm",
+            None,
+            iob_fsm,
+            lambda y: self.create_fsm(**y),
+            "Verilog finite state machine.",
         )
         # List of instances of other cores inside this core
         self.set_default_attribute(

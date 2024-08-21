@@ -157,11 +157,11 @@ class iob_core(iob_module, iob_instance):
         if self.generate_hw:
             block_gen.generate_blocks_snippet(self)
 
-        # Generate combs
-        comb_gen.generate_combs_snippet(self)
+        # Generate comb
+        comb_gen.generate_comb_snippet(self)
 
-        # Generate fsms
-        fsm_gen.generate_fsms_snippet(self)
+        # Generate fsm
+        fsm_gen.generate_fsm_snippet(self)
 
         # Generate snippets
         snippet_gen.generate_snippets_snippet(self)

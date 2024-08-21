@@ -13,8 +13,10 @@ class iob_snippet:
     verilog_code: str = ""
 
     def set_needed_reg(self, core):
-        blocking_regex = re.compile(r"^\s*(\w+)\s*=", re.MULTILINE)
-        non_blocking_regex = re.compile(r"^\s*(\w+)\s*<=", re.MULTILINE)
+        blocking_regex = re.compile(r"^\s*(\w+)\s*(?:\[[^\]]*\])?\s*=", re.MULTILINE)
+        non_blocking_regex = re.compile(
+            r"^\s*(\w+)\s*(?:\[[^\]]*\])?\s*<=", re.MULTILINE
+        )
 
         outputs = set()
 

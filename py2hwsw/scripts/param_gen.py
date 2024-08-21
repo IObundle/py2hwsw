@@ -20,10 +20,15 @@ def generate_params(core):
 
     lines = []
     core_prefix = f"{core.name}_".upper()
-    for parameter in module_parameters:
+    for idx, parameter in enumerate(module_parameters):
         p_name = parameter.name.upper()
-        lines.append(f"    parameter {p_name} = `{core_prefix}{p_name},\n")
-    lines[-1] = lines[-1].replace(",\n", "\n")
+        p_comment = ""
+        comma = "," if idx < len(module_parameters) - 1 else ""
+        if parameter.type == "F":
+            p_comment = "  // Don't change this parameter value!"
+        lines.append(
+            f"    parameter {p_name} = `{core_prefix}{p_name}{comma}{p_comment}\n"
+        )
 
     return "".join(lines)
 

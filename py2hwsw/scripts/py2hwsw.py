@@ -6,7 +6,7 @@ import argparse
 from iob_base import fail_with_msg
 from iob_core import iob_core
 
-PY2HWSW_VERSION = "0.7.9"
+PY2HWSW_VERSION = "0.7.10"
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True
@@ -20,7 +20,13 @@ if __name__ == "__main__":
         type=str,
         default="setup",
         help="The target action to perform on the core.",
-        choices=["setup", "clean", "print_build_dir", "print_py2hwsw_attributes"],
+        choices=[
+            "setup",
+            "clean",
+            "print_build_dir",
+            "print_core_dict",
+            "print_py2hwsw_attributes",
+        ],
     )
     parser.add_argument(
         "--build_dir",
@@ -85,6 +91,8 @@ if __name__ == "__main__":
         iob_core.clean_build_dir(args.core_name)
     elif args.target == "print_build_dir":
         iob_core.print_build_dir(args.core_name)
+    elif args.target == "print_core_dict":
+        iob_core.print_core_dict(args.core_name)
     elif args.target == "print_py2hwsw_attributes":
         iob_core.print_py2hwsw_attributes(args.core_name)
     else:

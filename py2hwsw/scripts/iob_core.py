@@ -395,6 +395,15 @@ class iob_core(iob_module, iob_instance):
         print(module.build_dir)
 
     @staticmethod
+    def print_core_dict(core_name):
+        """Print core attributes dictionary."""
+        # Set project wide special target (will prevent normal setup)
+        __class__.global_special_target = "print_core_dict"
+        # Build a new module instance, to obtain its attributes
+        module = __class__.get_core_obj(core_name)
+        print(json.dumps(module.attributes, indent=4))
+
+    @staticmethod
     def print_py2hwsw_attributes(core_name):
         """Print the supported py2hw attributes of this core.
         The attributes listed can be used in the 'attributes' dictionary of the

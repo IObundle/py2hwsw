@@ -98,6 +98,8 @@ class iob_core(iob_module, iob_instance):
         # Select if should generate hardware from python
         self.set_default_attribute("generate_hw", True, bool)
 
+        self.attributes_dict = attributes
+
         self.abort_reason = None
         # Don't setup this core if using a project wide special target.
         if __class__.global_special_target:
@@ -393,6 +395,15 @@ class iob_core(iob_module, iob_instance):
         print(module.build_dir)
 
     @staticmethod
+    def print_core_dict(core_name):
+        """Print core attributes dictionary."""
+        # Set project wide special target (will prevent normal setup)
+        __class__.global_special_target = "print_core_dict"
+        # Build a new module instance, to obtain its attributes
+        module = __class__.get_core_obj(core_name)
+        print(json.dumps(module.attributes, indent=4))
+
+    @staticmethod
     def print_py2hwsw_attributes(core_name):
         """Print the supported py2hw attributes of this core.
         The attributes listed can be used in the 'attributes' dictionary of the
@@ -428,6 +439,9 @@ class iob_core(iob_module, iob_instance):
                 os.path.join(core_dir, f"{core_name}.py"),
             )
             core_module = sys.modules[core_name]
+            instantiator = (
+                kwargs.pop("instantiator") if "instantiator" in kwargs else None
+            )
             # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
             # obtain the core's py2hwsw dictionary.
             # Give it a dictionary with all arguments of this function, since the user
@@ -436,11 +450,16 @@ class iob_core(iob_module, iob_instance):
                 {
                     "core_name": core_name,
                     "build_dir": __class__.global_build_dir,
+                    "py2hwsw_target": __class__.global_special_target or "setup",
+                    "instantiator": (
+                        instantiator.attributes_dict if instantiator else ""
+                    ),
                     **kwargs,
                 }
             )
             instance = __class__.py2hw(
                 core_dict,
+                instantiator=instantiator,
                 # Note, any of the arguments below can have their values overridden by
                 # the core_dict
                 **kwargs,

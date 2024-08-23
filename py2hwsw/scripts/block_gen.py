@@ -127,6 +127,15 @@ def get_instance_port_connections(instance):
             port.e_connect
         ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
         instance_portmap += f"        // {port.name} port\n"
+        assert len(port.signals) == len(
+            port.e_connect.signals
+        ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals from external connection '{port.e_connect.name}'!
+Port '{port.name}' has the following signals:
+{"\n".join("- " + port.name for port in port.signals)}
+
+External connection '{port.e_connect.name}' has the following signals:
+{"\n".join("- " + port.name for port in port.e_connect.signals)}
+{iob_colors.ENDC}"""
         # Connect individual signals
         for idx, signal in enumerate(port.signals):
             port_name = get_signal_name_with_dir_suffix(signal)

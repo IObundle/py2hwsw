@@ -99,10 +99,7 @@ def generate_reg_hw(core, csr_gen_obj, reg_table):
     )
     csr_gen_obj.write_hwcode(
         reg_table,
-        core["build_dir"] + "/hardware/src",
-        name,
-        core["csr_if"],
-        core["confs"],
+        core,
     )
     csr_gen_obj.write_tbcode(
         reg_table,

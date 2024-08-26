@@ -29,29 +29,26 @@ def setup(py_params_dict):
 
     assert params["build_dir"], print("Error: Register build dir empty.")
 
+    # Copy instantiator confs but remove ADDR_W
+    confs = [
+        {
+            "name": "ADDR_W",
+            "type": "P",
+            "val": "ND",
+            "min": "0",
+            "max": "32",
+            "descr": "Address bus width",
+        },
+    ]
+    for conf in py_params_dict["instantiator"]["confs"]:
+        if conf["name"] != "ADDR_W":
+            confs.append(conf)
+
     attributes_dict = {
         "original_name": "csrs",
         "name": params["name"],
         "version": params["version"],
-        "generate_hw": False,
-        "confs": [
-            {
-                "name": "ADDR_W",
-                "type": "P",
-                "val": "ND",
-                "min": "0",
-                "max": "32",
-                "descr": "Address bus width",
-            },
-            {
-                "name": "DATA_W",
-                "type": "P",
-                "val": "32",
-                "min": "0",
-                "max": "32",
-                "descr": "Data bus width.",
-            },
-        ],
+        "confs": confs,
         "ports": [
             {
                 "name": "clk_en_rst",
@@ -72,16 +69,20 @@ def setup(py_params_dict):
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",
             },
         ],
+        "wires": [],
         "blocks": [
             {
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_inst",
+                "instantiate": False,
             },
             {
                 "core_name": "iob_reg_e",
                 "instance_name": "iob_reg_e_inst",
+                "instantiate": False,
             },
         ],
+        "snippets": [],
     }
 
     # Convert csrs dictionaries to objects

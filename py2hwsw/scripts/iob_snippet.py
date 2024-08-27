@@ -53,7 +53,6 @@ class iob_snippet:
                     fail_with_msg(
                         f"Could not find signal '{signal_name[:-4]}' in wires of '{core.name}' for register implied by '{signal_name}'."
                     )
-                signal.isreg = True
                 signal.reg_signals.append("_rst")
             elif signal_name.endswith("_en"):
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name[:-3])
@@ -61,7 +60,6 @@ class iob_snippet:
                     fail_with_msg(
                         f"Could not find signal '{signal_name[:-3]}' in wires of '{core.name}' for register implied by '{signal_name}'."
                     )
-                signal.isreg = True
                 signal.reg_signals.append("_en")
             else:
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name)

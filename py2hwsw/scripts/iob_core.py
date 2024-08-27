@@ -28,6 +28,7 @@ from iob_base import (
     find_file,
     import_python_module,
     nix_permission_hack,
+    add_traceback_msg,
 )
 import sw_tools
 import verilog_format
@@ -358,7 +359,13 @@ class iob_core(iob_module, iob_instance):
         param core_dict: The core dictionary using py2hw dictionary syntax
         param kwargs: Optional additional arguments to pass directly to the core
         """
-        return cls(attributes=core_dict, **kwargs)
+        try:
+            return cls(attributes=core_dict, **kwargs)
+        except Exception:
+            add_traceback_msg(f"Failed to setup core '{core_dict['name']}'.")
+            if "instantiator" in kwargs and kwargs["instantiator"]:
+                raise
+            exit(1)
 
     @classmethod
     def read_py2hw_json(cls, filepath, **kwargs):

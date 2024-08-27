@@ -2,7 +2,12 @@ from dataclasses import dataclass, field
 from typing import List
 
 import if_gen
-from iob_base import find_obj_in_list, convert_dict2obj_list, fail_with_msg
+from iob_base import (
+    find_obj_in_list,
+    convert_dict2obj_list,
+    fail_with_msg,
+    add_traceback_msg,
+)
 from iob_signal import iob_signal, iob_signal_reference, get_real_signal
 
 
@@ -49,18 +54,22 @@ def create_wire(core, *args, signals=[], interface=None, **kwargs):
     """Creates a new wire object and adds it to the core's wire list
     param core: core object
     """
-    # Ensure 'wires' list exists
-    core.set_default_attribute("wires", [])
-    # Check if there are any references to signals in other wires/ports
-    replace_duplicate_signals_by_references(core.wires + core.ports, signals)
-    # Convert user signal dictionaries into 'iob_signal' objects
-    sig_obj_list = convert_dict2obj_list(signals, iob_signal)
-    # Convert user interface dictionary into 'if_gen.interface' object
-    interface_obj = if_gen.dict2interface(interface)
-    if interface_obj and not interface_obj.file_prefix:
-        interface_obj.file_prefix = core.name + "_"
-    wire = iob_wire(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
-    core.wires.append(wire)
+    try:
+        # Ensure 'wires' list exists
+        core.set_default_attribute("wires", [])
+        # Check if there are any references to signals in other wires/ports
+        replace_duplicate_signals_by_references(core.wires + core.ports, signals)
+        # Convert user signal dictionaries into 'iob_signal' objects
+        sig_obj_list = convert_dict2obj_list(signals, iob_signal)
+        # Convert user interface dictionary into 'if_gen.interface' object
+        interface_obj = if_gen.dict2interface(interface)
+        if interface_obj and not interface_obj.file_prefix:
+            interface_obj.file_prefix = core.name + "_"
+        wire = iob_wire(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
+        core.wires.append(wire)
+    except Exception:
+        add_traceback_msg(f"Failed to create wire '{kwargs['name']}'.")
+        raise
 
 
 def get_wire_signal(core, wire_name: str, signal_name: str):
@@ -103,7 +112,7 @@ def replace_duplicate_signals_by_references(wires, signals):
         for key, value in signal.items():
             if original_signal.__dict__[key] != value:
                 fail_with_msg(
-                    f"Signal '{signal['name']}' has different '{key}' than the original signal!"
+                    f"Signal reference '{signal['name']}' has different '{key}' than the original signal!"
                 )
         # Replace signal by a reference to the original
         signals[idx] = iob_signal_reference(signal=original_signal)

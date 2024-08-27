@@ -54,6 +54,7 @@ def setup(py_params_dict):
                     {
                         "name": "iob_r_data",
                         "width": "DATA_W",
+                        "isvar": True,
                         "direction": "output",
                     },
                 ],

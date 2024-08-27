@@ -161,6 +161,21 @@ def add_traceback_msg(msg):
 
 
 #
+# Debug
+#
+debug_level = 0
+
+
+def debug(msg, level=0):
+    """Print a message if project debug_level >= level
+    :param str msg: message to print
+    :param int level: debug level
+    """
+    if debug_level >= level:
+        print(f"[Debug {level}]: " + msg)
+
+
+#
 # Other methods
 #
 

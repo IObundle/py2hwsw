@@ -10,6 +10,7 @@ import block_gen
 import comb_gen
 import fsm_gen
 import snippet_gen
+from iob_base import debug
 
 
 # Find include statements inside a list of lines and replace them by the contents of the included file and return the new list of lines
@@ -74,7 +75,7 @@ def replace_includes(setup_dir="", build_dir="", ignore_snippets=[]):
                 VerilogFiles.append(f"{root}/{file}")
 
     for VerilogFile in VerilogFiles:
-        print(f"Replacing includes in {VerilogFile}")
+        debug(f"Replacing includes in {VerilogFile}", 1)
         with open(VerilogFile, "r") as source:
             try:
                 lines = source.readlines()
@@ -177,8 +178,9 @@ def generate_verilog(core):
     file_path = os.path.join(out_dir, f"{core.name}.v")
 
     if os.path.exists(file_path):
-        print(
-            f"Note: Not generating '{core.name}.v'. Module already exists (probably created manually or generated previously)."
+        debug(
+            f"Not generating '{core.name}.v'. Module already exists (probably created manually or generated previously).",
+            1,
         )
         return
 

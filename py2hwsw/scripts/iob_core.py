@@ -29,6 +29,7 @@ from iob_base import (
     import_python_module,
     nix_permission_hack,
     add_traceback_msg,
+    debug,
 )
 import sw_tools
 import verilog_format
@@ -283,11 +284,25 @@ class iob_core(iob_module, iob_instance):
         """
         if self.abort_reason:
             return
+        # Don't setup other destinations (like simulation) if this is a submodule and
+        # the sub-submodule (we are trying to setup) is not for hardware/src/
+        if not self.is_top_module and (
+            self.dest_dir == "hardware/src"
+            and "dest_dir" in kwargs
+            and kwargs["dest_dir"] != "hardware/src"
+        ):
+            debug(f"Not setting up submodule '{core_name}' of '{self.name}' core!", 1)
+            return
+
         assert core_name, fail_with_msg("Missing core_name argument", ValueError)
         # Ensure 'blocks' list exists
         self.set_default_attribute("blocks", [])
         # Ensure global top module is set
         self.update_global_top_module()
+
+        # Set submodule destination dir equal to current module
+        if "dest_dir" not in kwargs:
+            kwargs["dest_dir"] = self.dest_dir
 
         instance = self.get_core_obj(
             core_name, instance_name=instance_name, instantiator=self, **kwargs

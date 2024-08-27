@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
-from iob_snippet import iob_snippet
+from iob_comb import iob_comb
 import re
 
 
 @dataclass
-class iob_fsm(iob_snippet):
+class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
     type: str = "prog"
 

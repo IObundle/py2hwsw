@@ -67,6 +67,7 @@ def setup(py_params_dict):
                     {
                         "name": "data_o_reg",
                         "width": "DATA_W",
+                        "isvar": True,
                     },
                 ],
             },

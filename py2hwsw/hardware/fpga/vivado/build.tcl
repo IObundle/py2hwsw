@@ -25,39 +25,39 @@ set_property part $PART [current_project]
 
 
 #set pre-map custom assignments
-if {[file exists "vivado/premap.tcl"]} {
-    source "vivado/premap.tcl"
+if {[file exists "vivado/vivado_premap.tcl"]} {
+    source "vivado/vivado_premap.tcl"
 }
 
 
 #read design constraints and synthesize design
 if { $IS_FPGA == "1" } {
     puts "Synthesizing for FPGA"
-    read_xdc vivado/$BOARD/$NAME\_dev.sdc
+    read_xdc vivado/$BOARD/$BOARD.sdc
     if {[file exists "src/$NAME.sdc"]} {
         read_xdc src/$NAME.sdc
     }
     if {[file exists "../src/$NAME\_$CSR_IF.sdc"]} {
         read_xdc ../src/$NAME\_$CSR_IF.sdc
     }
-    if {[file exists "vivado/$NAME\_tool.sdc"]} {
-        read_xdc vivado/$NAME\_tool.sdc
+    if {[file exists "vivado/vivado\_tool.sdc"]} {
+        read_xdc vivado/vivado\_tool.sdc
     }
     synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD -part $PART -top $NAME -verbose
 } else {
     #read design constraints
     puts "Out of context synthesis"
-    read_xdc -mode out_of_context vivado/$BOARD/$NAME\_dev.sdc
+    read_xdc -mode out_of_context vivado/$BOARD/$BOARD.sdc
     read_xdc -mode out_of_context src/$NAME.sdc
-    if {[file exists "vivado/$NAME\_tool.sdc"]} {
-        read_xdc -mode out_of_context vivado/$NAME\_tool.sdc
+    if {[file exists "vivado/vivado\_tool.sdc"]} {
+        read_xdc -mode out_of_context vivado/vivado\_tool.sdc
     }
     synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD -part $PART -top $NAME -mode out_of_context -flatten_hierarchy full -verbose
 }
 
 #set post-map custom assignments
-if {[file exists "vivado/postmap.tcl"]} {
-    source "vivado/postmap.tcl"
+if {[file exists "vivado/vivado_postmap.tcl"]} {
+    source "vivado/vivado_postmap.tcl"
 }
 
 opt_design

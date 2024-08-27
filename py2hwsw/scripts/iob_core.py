@@ -81,23 +81,72 @@ class iob_core(iob_module, iob_instance):
         iob_instance.__init__(self, *args, **kwargs)
         # Ensure global top module is set
         self.update_global_top_module(attributes)
-        self.set_default_attribute("version", "", str)
-        self.set_default_attribute("previous_version", self.version, str)
-        self.set_default_attribute("setup_dir", "", str)
-        self.set_default_attribute("build_dir", "", str)
-        self.set_default_attribute("use_netlist", False, bool)
         self.set_default_attribute(
-            "is_top_module", __class__.global_top_module == self, bool
+            "version",
+            "",
+            str,
+            descr="Core version.",
         )
-        self.set_default_attribute("is_system", False, bool)
-        # List of FPGAs supported by this core
-        self.set_default_attribute("board_list", [], list)
-        # Where to copy sources of this core
-        self.set_default_attribute("dest_dir", dest_dir, str)
-        # Don't replace snippets mentioned in this list
-        self.set_default_attribute("ignore_snippets", [], list)
-        # Select if should generate hardware from python
-        self.set_default_attribute("generate_hw", True, bool)
+        self.set_default_attribute(
+            "previous_version",
+            self.version,
+            str,
+            descr="Core previous version.",
+        )
+        self.set_default_attribute(
+            "setup_dir",
+            "",
+            str,
+            descr="Path to root setup folder of the core.",
+        )
+        self.set_default_attribute(
+            "build_dir",
+            "",
+            str,
+            descr="Path to folder of build directory to be generated for this project.",
+        )
+        self.set_default_attribute(
+            "use_netlist",
+            False,
+            bool,
+            descr="Copy `<SETUP_DIR>/CORE.v` netlist instead of `<SETUP_DIR>/hardware/src/*`",
+        )
+        self.set_default_attribute(
+            "is_top_module",
+            __class__.global_top_module == self,
+            bool,
+            descr="Selects if core is top module. Auto-filled. DO NOT CHANGE.",
+        )
+        self.set_default_attribute(
+            "is_system",
+            False,
+            bool,
+            descr="Sets `IS_FPGA=1` in config_build.mk",
+        )
+        self.set_default_attribute(
+            "board_list",
+            [],
+            list,
+            descr="List of FPGAs supported by this core. A standard folder will be created for each board in this list.",
+        )
+        self.set_default_attribute(
+            "dest_dir",
+            dest_dir,
+            str,
+            descr="Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`",
+        )
+        self.set_default_attribute(
+            "ignore_snippets",
+            [],
+            list,
+            descr="List of `.vs` file includes in verilog to ignore.",
+        )
+        self.set_default_attribute(
+            "generate_hw",
+            True,
+            bool,
+            descr="Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.",
+        )
 
         self.attributes_dict = attributes
 
@@ -384,13 +433,15 @@ class iob_core(iob_module, iob_instance):
         __class__.global_special_target = "clean"
         # Build a new module instance, to obtain its attributes
         module = __class__.get_core_obj(core_name)
+        # Don't try to clean if build dir doesn't exist
+        if not os.path.exists(module.build_dir):
+            return
+
         print(
-            f"{iob_colors.ENDC}Cleaning build directory: {module.build_dir}{iob_colors.ENDC}"
+            f"{iob_colors.INFO}Cleaning build directory: {module.build_dir}{iob_colors.ENDC}"
         )
-        # if build_dir exists run make clean in it
-        if os.path.exists(module.build_dir):
-            os.system(f"make -C {module.build_dir} clean")
-        shutil.rmtree(module.build_dir, ignore_errors=True)
+        os.system(f"make -C {module.build_dir} clean")
+        shutil.rmtree(module.build_dir)
 
     @staticmethod
     def print_build_dir(core_name):

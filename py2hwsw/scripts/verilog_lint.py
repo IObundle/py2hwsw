@@ -2,8 +2,8 @@
 # Python3 script to parse directories to search and create lists of files for each combination of the directories
 # Example directory combinations:
 #  [ hardware/src, hardware/simulation/src ]                            -> The 'base' directory is 'hardware/simulation/src'
-#  [ hardware/src, hardware/fpga/src, hardware/fpga/vivado/BASYS3/ ]    -> The 'base' directory is 'hardware/fpga/vivado/BASYS3/'
-#  [ hardware/src, hardware/fpga/src, hardware/fpga/quartus/CYCLONEV/ ] -> The 'base' directory is 'hardware/fpga/quartus/CYCLONEV/'
+#  [ hardware/src, hardware/fpga/src, hardware/fpga/vivado/basys3/ ]    -> The 'base' directory is 'hardware/fpga/vivado/BASYS3/'
+#  [ hardware/src, hardware/fpga/src, hardware/fpga/quartus/cyclonev/ ] -> The 'base' directory is 'hardware/fpga/quartus/CYCLONEV/'
 #  ...
 import os
 import sys

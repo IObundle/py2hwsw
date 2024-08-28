@@ -197,11 +197,15 @@ def str_to_kwargs(attrs: dict = {}):
                 parts = re.findall(r"(?:\$\w)?(?:'[^']*'|\S+)", args[0])
                 new_kwargs = {}
                 for key, value in enumerate([arg for arg in parts if not arg.startswith("$")]):
+                    if value.startswith("'") and value.endswith("'"):
+                        value = value[1:-1]
                     new_kwargs[attrs[key]] = value
                 for i in parts:
                     if i.startswith("$"):
                         key = attrs[i[1]]
                         value = i[2:]
+                        if value.startswith("'") and value.endswith("'"):
+                            value = value[1:-1]
                         new_kwargs[key] = value
                 return func(core, **new_kwargs)
             else:

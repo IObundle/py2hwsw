@@ -3,6 +3,8 @@ import os
 from dataclasses import dataclass
 import importlib
 import traceback
+import re
+from functools import wraps
 
 import iob_colors
 
@@ -173,6 +175,43 @@ def debug(msg, level=0):
     """
     if debug_level >= level:
         print(f"[Debug {level}]: " + msg)
+
+
+#
+# Decorators
+#
+
+
+def str_to_kwargs(attrs: dict = {}):
+    """Decorator to convert a string to keyword arguments
+    Any method decorated with str_to_kwargs can take a string as its argument 
+    The string must be of the form: 'arg0 arg1 arg2 $<letter>kwarg0 $<letter>kwarg1 ...'
+    param attrs: dictionary of attributes to convert. 
+    Must take the form {<letter>: <attribute>, int: <attribute>} 
+    where int is the index of the args
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(core, *args, **kwargs):
+            if len(args) == 1 and isinstance(args[0], str):
+                parts = re.findall(r"(?:\$\w)?(?:'[^']*'|\S+)", args[0])
+                new_kwargs = {}
+                for key, value in enumerate([arg for arg in parts if not arg.startswith("$")]):
+                    if value.startswith("'") and value.endswith("'"):
+                        value = value[1:-1]
+                    new_kwargs[attrs[key]] = value
+                for i in parts:
+                    if i.startswith("$"):
+                        key = attrs[i[1]]
+                        value = i[2:]
+                        if value.startswith("'") and value.endswith("'"):
+                            value = value[1:-1]
+                        new_kwargs[key] = value
+                return func(core, **new_kwargs)
+            else:
+                return func(core, *args, **kwargs)
+        return wrapper
+    return decorator
 
 
 #

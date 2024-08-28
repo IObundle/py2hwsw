@@ -34,23 +34,23 @@ if {[file exists "vivado/vivado_premap.tcl"]} {
 if { $IS_FPGA == "1" } {
     puts "Synthesizing for FPGA"
     read_xdc vivado/$BOARD/$BOARD.sdc
-    if {[file exists "src/$NAME.sdc"]} {
-        read_xdc src/$NAME.sdc
+    if {[file exists "src/fpga.sdc"]} {
+        read_xdc src/fpga.sdc
     }
-    if {[file exists "../src/$NAME\_$CSR_IF.sdc"]} {
-        read_xdc ../src/$NAME\_$CSR_IF.sdc
+    if {[file exists "src/fpga\_$CSR_IF.sdc"]} {
+        read_xdc src/fpga\_$CSR_IF.sdc
     }
-    if {[file exists "vivado/vivado\_tool.sdc"]} {
-        read_xdc vivado/vivado\_tool.sdc
+    if {[file exists "vivado/vivado.sdc"]} {
+        read_xdc vivado/vivado.sdc
     }
     synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD -part $PART -top $NAME -verbose
 } else {
     #read design constraints
     puts "Out of context synthesis"
     read_xdc -mode out_of_context vivado/$BOARD/$BOARD.sdc
-    read_xdc -mode out_of_context src/$NAME.sdc
-    if {[file exists "vivado/vivado\_tool.sdc"]} {
-        read_xdc -mode out_of_context vivado/vivado\_tool.sdc
+    read_xdc -mode out_of_context src/fpga.sdc
+    if {[file exists "vivado/vivado.sdc"]} {
+        read_xdc -mode out_of_context vivado/vivado.sdc
     }
     synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD -part $PART -top $NAME -mode out_of_context -flatten_hierarchy full -verbose
 }

@@ -21,7 +21,7 @@ BOARD ?= cyclonev_gt_dk
 #fpga toolchain
 FPGA_TOOL:=$(shell find . -name $(BOARD) | cut -d"/" -f2)
 
-FPGA_TOP ?=$(NAME)_fpga_wrapper
+FPGA_TOP ?=$(BOARD)
 
 ifeq ($(FPGA_TOOL),)
 $(error Cannot find FPGA toolchain for board $(BOARD). Please make sure that the board name is correct and that the board is supported by the FPGA toolchain)
@@ -38,8 +38,8 @@ VSRC += $(wildcard ../src/*.v) $(wildcard ./src/*.v)
 VHDR += $(wildcard ../common_src/*.vh)
 VSRC += $(wildcard ../common_src/*.v)
 
-ifneq ($(wildcard $(FPGA_TOOL)/$(BOARD)/$(NAME)_fpga_wrapper.v),)
-VSRC+=$(FPGA_TOOL)/$(BOARD)/$(NAME)_fpga_wrapper.v
+ifneq ($(wildcard $(FPGA_TOOL)/$(BOARD)/$(FPGA_TOP).v),)
+VSRC+=$(FPGA_TOOL)/$(BOARD)/$(FPGA_TOP).v
 endif
 
 UFLAGS+=FPGA_TOP=$(FPGA_TOP)

@@ -2,6 +2,7 @@ import sys
 import os
 from dataclasses import dataclass
 import importlib
+import traceback
 
 import iob_colors
 
@@ -139,6 +140,39 @@ def fail_with_msg(msg, exception_type=Exception):
 def warn_with_msg(msg):
     """Print a warning with a given message"""
     print(iob_colors.WARNING + msg + iob_colors.ENDC)
+
+
+#
+# Exception handling
+#
+printed_traceback = False
+
+
+def add_traceback_msg(msg):
+    """Should be called in exception handler block of try/except block.
+    It prints the traceback on the first call.
+    It also prints the message given.
+    """
+    global printed_traceback
+    if not printed_traceback:
+        printed_traceback = True
+        traceback.print_exc()
+    print(iob_colors.FAIL + msg + iob_colors.ENDC)
+
+
+#
+# Debug
+#
+debug_level = 0
+
+
+def debug(msg, level=0):
+    """Print a message if project debug_level >= level
+    :param str msg: message to print
+    :param int level: debug level
+    """
+    if debug_level >= level:
+        print(f"[Debug {level}]: " + msg)
 
 
 #

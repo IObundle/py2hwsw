@@ -4,7 +4,6 @@
 # new standard interface, add the name to the interface_names list, and an
 # interface dictionary as below run this script with the -h option for help
 
-import re
 from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Dict
@@ -28,6 +27,8 @@ if_names = [
     "ram_tdp",
     "ram_2p",
     "rs232",
+    "wb",
+    "wb_full",
 ]
 
 if_types = [
@@ -762,6 +763,129 @@ def get_rs232_ports():
 
     return ports
 
+
+#
+# Wishbone
+#
+
+
+@parse_widths
+def get_wb_ports():
+    ports = [
+        iob_signal(
+            name="wb_dat",
+            direction="input",
+            width=DATA_W,
+            descr="Data input.",
+        ),
+        iob_signal(
+            name="wb_dat",
+            direction="output",
+            width=DATA_W,
+            descr="Data output.",
+        ),
+        iob_signal(
+            name="wb_ack",
+            direction="input",
+            width=1,
+            descr="Acknowledge input. Indicates normal termination of a bus cycle.",
+        ),
+        iob_signal(
+            name="wb_adr",
+            direction="output",
+            width=ADDR_W,
+            descr="Address output. Passes binary address.",
+        ),
+        iob_signal(
+            name="wb_cyc",
+            direction="output",
+            width=1,
+            descr="Cycle output. Indicates a valid bus cycle.",
+        ),
+        iob_signal(
+            name="wb_sel",
+            direction="output",
+            width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
+            descr="Select output. Indicates where valid data is expected on the data bus.",
+        ),
+        iob_signal(
+            name="wb_stb",
+            direction="output",
+            width=1,
+            descr="Strobe output. Indicates valid access.",
+        ),
+        iob_signal(
+            name="wb_we",
+            direction="output",
+            width=1,
+            descr="Write enable. Indicates write access.",
+        ),
+    ]
+
+    return ports
+
+
+@parse_widths
+def get_wb_full_ports():
+    ports = get_wb_ports()
+    ports += [
+        iob_signal(
+            name="wb_clk",
+            direction="input",
+            width=1,
+            descr="Clock input.",
+        ),
+        iob_signal(
+            name="wb_rst",
+            direction="input",
+            width=1,
+            descr="Reset input.",
+        ),
+        iob_signal(
+            name="wb_tgd",
+            direction="input",
+            width=1,
+            descr="Data tag type. Contains information associated with data lines [dat] and [strb].",
+        ),
+        iob_signal(
+            name="wb_tgd",
+            direction="output",
+            width=1,
+            descr="Data tag type. Contains information associated with data lines [dat] and [strb].",
+        ),
+        iob_signal(
+            name="wb_err",
+            direction="input",
+            width=1,
+            descr="Error input. Indicates abnormal cycle termination.",
+        ),
+        iob_signal(
+            name="wb_lock",
+            direction="output",
+            width=1,
+            descr="Lock output. Indicates current bus cycle is uninterruptable.",
+        ),
+        iob_signal(
+            name="wb_rty",
+            direction="input",
+            width=1,
+            descr="Retry input. Indicates interface is not ready to accept or send data, and cycle should be retried.",
+        ),
+        iob_signal(
+           name="wb_tga",
+           direction="output",
+           width=1,
+           descr="Address tag type. Contains information associated with address lines [adr], and is qualified by signal [stb].",
+        ),
+        iob_signal(
+           name="wb_tgc",
+           direction="output",
+           width=1,
+           descr="Cycle tag type. Contains information associated with bus cycles, and is qualified by signal [cyc].",
+        ),
+    ]
+
+    return ports
 
 #
 # Handle signal direction

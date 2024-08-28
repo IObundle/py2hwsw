@@ -49,7 +49,7 @@ if {$IS_FPGA != "1"} {
 
 
 #read synthesis design constraints
-set_global_assignment -name SDC_FILE ./quartus/$BOARD/$NAME\_dev.sdc
+set_global_assignment -name SDC_FILE ./quartus/$BOARD/$BOARD.sdc
 set_global_assignment -name SDC_FILE ./src/$NAME.sdc
 
 set_global_assignment -name SYNCHRONIZER_IDENTIFICATION "Forced if Asynchronous"
@@ -64,6 +64,11 @@ if {$USE_QUARTUS_PRO == 1} {
     set synth_tool "syn"
 } else {
     set synth_tool "map"
+}
+
+#read pre-synthesis script
+if {[file exists "quartus/quartus\_premap.tcl"]} {
+    source quartus/quartus\_premap.tcl
 }
 
 #Incremental compilation
@@ -98,15 +103,15 @@ if {$IS_FPGA != "1"} {
 }
 
 #read post-synthesis script
-if {[file exists "quartus/postmap.tcl"]} {
-    source quartus/postmap.tcl
+if {[file exists "quartus/quartus\_postmap.tcl"]} {
+    source quartus/quartus\_postmap.tcl
 }
 
 #read implementation design constraints
-if {[file exists "quartus/$NAME\_tool.sdc"] == 0} {
-    puts [open "quartus/$NAME\_tool.sdc" w] "derive_clock_uncertainty"
+if {[file exists "quartus/quartus\_tool.sdc"] == 0} {
+    puts [open "quartus/quartus\_tool.sdc" w] "derive_clock_uncertainty"
 }
-set_global_assignment -name SDC_FILE ./quartus/$NAME\_tool.sdc
+set_global_assignment -name SDC_FILE ./quartus/quartus\_tool.sdc
 
 #run quartus fit
 if {[catch {execute_module -tool fit} result]} {

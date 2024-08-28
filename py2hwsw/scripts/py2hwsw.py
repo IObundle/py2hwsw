@@ -3,6 +3,7 @@
 import sys
 import argparse
 
+import iob_base
 from iob_base import fail_with_msg
 from iob_core import iob_core
 
@@ -66,6 +67,13 @@ if __name__ == "__main__":
         help="Disable verilog linter",
     )
     parser.add_argument(
+        "--debug_level",
+        dest="debug_level",
+        type=int,
+        default=0,
+        help="Set the debug level (default: 0)",
+    )
+    parser.add_argument(
         "--version",
         action="version",
         version=f"%(prog)s {PY2HWSW_VERSION}",
@@ -78,6 +86,7 @@ if __name__ == "__main__":
     iob_core.global_project_root = args.project_root
     iob_core.global_project_vformat = args.verilog_format
     iob_core.global_project_vlint = args.verilog_lint
+    iob_base.debug_level = args.debug_level
 
     py_params = {}
     if args.py_params:

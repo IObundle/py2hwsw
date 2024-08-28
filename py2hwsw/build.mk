@@ -7,7 +7,7 @@ SHELL:=bash
 
 export SIMULATOR ?= icarus
 export SYNTHESIZER ?= yosys
-export BOARD ?= CYCLONEV-GT-DK
+export BOARD ?= cyclonev_gt_dk
 
 include config_build.mk
 

@@ -142,5 +142,7 @@ def get_list_attr_handler(func):
         x,
         # 'y' is a dictionary describing an object in py2hw syntax
         # '**y' is used to unpack the dictionary and pass it as arguments to 'func'
-        lambda y: func(**y),
+        lambda y: (
+            func(**y) if isinstance(y, dict) else func(y)
+        ),
     )

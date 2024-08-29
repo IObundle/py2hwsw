@@ -4,9 +4,11 @@ def setup(py_params_dict):
         "name": "iob_int_sqrt",
         "version": "0.1",
         "confs": [
-            "DATA_W P 32 $mNA $MNA $D'Data bus width'",
-            "FRACTIONAL_W P 0 $mNA $MNA $D'Fractional part width'",
-            "REAL_W P 'DATA_W - FRACTIONAL_W' $mNA $MNA $D'Real part width'",
+            """
+            DATA_W P 32 $mNA $MNA $D'Data bus width'
+            FRACTIONAL_W P 0 $mNA $MNA $D'Fractional part width'
+            REAL_W P 'DATA_W - FRACTIONAL_W' $mNA $MNA $D'Real part width'
+            """,
             "SIZE_W P '(REAL_W / 2) + FRACTIONAL_W' $mNA $MNA $D'Size width'",
             "END_COUNT F '(DATA_W + FRACTIONAL_W) >> 1' $mNA $MNA $D'End count'",
             "COUNT_W F '$clog2(END_COUNT)' $mNA $MNA $D'Count width'",

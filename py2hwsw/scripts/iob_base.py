@@ -194,16 +194,19 @@ def str_to_kwargs(attrs: dict = {}):
         @wraps(func)
         def wrapper(core, *args, **kwargs):
             if len(args) == 1 and isinstance(args[0], str):
-                parts = re.findall(r"(?:\$\w)?(?:'[^']*'|\S+)", args[0])
-                new_kwargs = {}
-                for key, value in enumerate([arg for arg in parts if not arg.startswith("$")]):
-                    new_kwargs[attrs[key]] = value.strip("'")
-                for i in parts:
-                    if i.startswith("$"):
-                        key = attrs[i[1]]
-                        value = i[2:]
-                        new_kwargs[key] = value.strip("'")
-                return func(core, **new_kwargs)
+                lines = [line for line in args[0].split('\n') if line.strip()]
+                for line in lines:
+                    parts = re.findall(r"(?:\$\w)?(?:'[^']*'|\S+)", args[0])
+                    new_kwargs = {}
+                    for key, value in enumerate([arg for arg in parts if not arg.startswith("$")]):
+                        new_kwargs[attrs[key]] = value.strip("'")
+                    for i in parts:
+                        if i.startswith("$"):
+                            key = attrs[i[1]]
+                            value = i[2:]
+                            new_kwargs[key] = value.strip("'")
+                    func(core, **new_kwargs)
+                return None 
             else:
                 return func(core, *args, **kwargs)
         return wrapper

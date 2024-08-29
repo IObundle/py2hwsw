@@ -196,7 +196,7 @@ def str_to_kwargs(attrs: dict = {}):
             if len(args) == 1 and isinstance(args[0], str):
                 lines = [line for line in args[0].split('\n') if line.strip()]
                 for line in lines:
-                    parts = re.findall(r"(?:\$\w)?(?:'[^']*'|\S+)", args[0])
+                    parts = re.findall(r"(?:\$\w)?(?:'[^']*'|\S+)", line)
                     new_kwargs = {}
                     for key, value in enumerate([arg for arg in parts if not arg.startswith("$")]):
                         new_kwargs[attrs[key]] = value.strip("'")

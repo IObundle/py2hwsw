@@ -452,6 +452,7 @@ class csr_gen:
         """
 
         wires = []
+        blocks = []
         snippet = ""
         # macros
         snippet += """
@@ -467,7 +468,7 @@ class csr_gen:
     localparam WAIT_REQ = 1'd0;
     localparam WAIT_RVALID = 1'd1;
 """
-        wires.append(
+        wires += [
             {
                 "name": "state",
                 "descr": "",
@@ -475,8 +476,30 @@ class csr_gen:
                     {"name": "state", "width": 1},
                 ],
             },
+            {
+                "name": "state_nxt",
+                "descr": "",
+                "signals": [
+                    {"name": "state_nxt", "width": 1, "isreg": True},
+                ],
+            },
+        ]
+        blocks.append(
+            {
+                "core_name": "iob_reg",
+                "instance_name": "state_reg",
+                "instance_description": "state register",
+                "parameters": {
+                    "DATA_W": 1,
+                    "RST_VAL": "1'b0",
+                },
+                "connect": {
+                    "clk_en_rst": "clk_en_rst",
+                    "data_i": "state_nxt",
+                    "data_o": "state",
+                },
+            }
         )
-
 
         # write address
         snippet += "\n    //write address\n"
@@ -512,12 +535,19 @@ class csr_gen:
 
 """
         wires += [
-            # Implicit "iob_reg"
+            # iob_regs
             {
                 "name": "rvalid",
                 "descr": "",
                 "signals": [
                     {"name": "rvalid", "width": 1},
+                ],
+            },
+            {
+                "name": "rvalid_nxt",
+                "descr": "",
+                "signals": [
+                    {"name": "rvalid_nxt", "width": 1, "isreg": True},
                 ],
             },
             {
@@ -528,10 +558,24 @@ class csr_gen:
                 ],
             },
             {
+                "name": "rdata_nxt",
+                "descr": "",
+                "signals": [
+                    {"name": "rdata_nxt", "width": 8*self.cpu_n_bytes, "isreg": True},
+                ],
+            },
+            {
                 "name": "ready",
                 "descr": "",
                 "signals": [
                     {"name": "ready", "width": 1},
+                ],
+            },
+            {
+                "name": "ready_nxt",
+                "descr": "",
+                "signals": [
+                    {"name": "ready_nxt", "width": 1, "isreg": True},
                 ],
             },
             # Wires of type "reg"
@@ -539,22 +583,66 @@ class csr_gen:
                 "name": "rvalid_int",
                 "descr": "",
                 "signals": [
-                    {"name": "rvalid_int", "width": 1},
+                    {"name": "rvalid_int", "width": 1, "isvar": True},
                 ],
             },
             {
                 "name": "wready_int",
                 "descr": "",
                 "signals": [
-                    {"name": "wready_int", "width": 1},
+                    {"name": "wready_int", "width": 1, "isvar": True},
                 ],
             },
             {
                 "name": "rready_int",
                 "descr": "",
                 "signals": [
-                    {"name": "rready_int", "width": 1},
+                    {"name": "rready_int", "width": 1, "isvar": True},
                 ],
+            },
+        ]
+        blocks += [
+            {
+                "core_name": "iob_reg",
+                "instance_name": "rvalid_reg",
+                "instance_description": "rvalid register",
+                "parameters": {
+                    "DATA_W": 1,
+                    "RST_VAL": "1'b0",
+                },
+                "connect": {
+                    "clk_en_rst": "clk_en_rst",
+                    "data_i": "rvalid_nxt",
+                    "data_o": "rvalid",
+                },
+            },
+            {
+                "core_name": "iob_reg",
+                "instance_name": "rdata_reg",
+                "instance_description": "rdata register",
+                "parameters": {
+                    "DATA_W": 8*self.cpu_n_bytes,
+                    "RST_VAL": "1'b0",
+                },
+                "connect": {
+                    "clk_en_rst": "clk_en_rst",
+                    "data_i": "rdata_nxt",
+                    "data_o": "rdata",
+                },
+            },
+            {
+                "core_name": "iob_reg",
+                "instance_name": "ready_reg",
+                "instance_description": "ready register",
+                "parameters": {
+                    "DATA_W": 1,
+                    "RST_VAL": "1'b0",
+                },
+                "connect": {
+                    "clk_en_rst": "clk_en_rst",
+                    "data_i": "ready_nxt",
+                    "data_o": "ready",
+                },
             },
         ]
 
@@ -568,7 +656,7 @@ class csr_gen:
                             "name": aux_read_reg,
                             "descr": "",
                             "signals": [
-                                {"name": aux_read_reg, "width": 1},
+                                {"name": aux_read_reg, "width": 1, "isvar": True},
                             ],
                         },
                     )
@@ -684,6 +772,7 @@ class csr_gen:
 """
 
         core_attributes["wires"] += wires
+        core_attributes["blocks"] += blocks
         core_attributes["snippets"] += [
             {"verilog_code": snippet}
         ]

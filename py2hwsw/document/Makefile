@@ -92,6 +92,7 @@ doctop:
 ifeq ($(DOC),rn)
 	echo "\def\RN{Y}" >> $(DOC)top.tex
 endif
+	if [ $(SECTIONCLEARPAGE) ]; then echo "\def\SECTIONCLEARPAGE{Y}" >> $(DOC)top.tex; fi
 	if [ $(RESULTS) ]; then echo "\def\RESULTS{Y}" >> $(DOC)top.tex; fi
 	if [ $(INTEL_FPGA)$(AMD_FPGA) ]; then echo "\def\FPGA{Y}" >> $(DOC)top.tex; fi
 	if [ $(AMD_FPGA) ]; then echo "\def\AMD{Y}" >> $(DOC)top.tex; fi

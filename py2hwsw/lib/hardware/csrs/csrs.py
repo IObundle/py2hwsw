@@ -1,11 +1,98 @@
 import sys
 import os
+import copy
 
 # Add csrs scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
 
 import reg_gen
 from iob_csr import create_csr_group
+
+interrupt_csrs = {
+    "name": "interrupt_csrs",
+    "descr": "Interrupt control and status registers",
+    "regs": [
+        {
+            "name": "status",
+            "type": "R",
+            "n_bits": 32,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "autoreg": True,
+            "descr": "Interrupts status: active (1), inactive (0).",
+        },
+        {
+            "name": "mask",
+            "type": "W",
+            "n_bits": 32,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "autoreg": True,
+            "descr": "Interrupts mask: enable (0), disable (1) for each interrupt.",
+        },
+        {
+            "name": "clear",
+            "type": "W",
+            "n_bits": 32,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "autoreg": True,
+            "descr": "Interrupts clear: clear (1), do not clear (0) for each interrupt.",
+        },
+    ],
+}
+
+fifo_csrs = {
+    "name": "fifo_csrs",
+    "descr": "FIFO control and status registers",
+    "regs": [
+        {
+            "name": "data",
+            "type": "RW",
+            "n_bits": 32,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "autoreg": True,
+            "descr": "Read/write data from/to FIFO.",
+        },
+        {
+            "name": "thresh",
+            "type": "W",
+            "n_bits": 32,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "autoreg": True,
+            "descr": "Interrupt upper level threshold: an interrupt is triggered when the number of words in the FIFO reaches this upper level threshold.",
+        },
+        {
+            "name": "empty",
+            "type": "R",
+            "n_bits": 1,
+            "rst_val": 1,
+            "log2n_items": 0,
+            "autoreg": True,
+            "descr": "Empty (1) or non-empty (0).",
+        },
+        {
+            "name": "full",
+            "type": "R",
+            "n_bits": 1,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "autoreg": True,
+            "descr": "Full (1), or non-full (0).",
+        },
+        {
+            "name": "level",
+            "type": "R",
+            "n_bits": 32,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "autoreg": True,
+            "descr": "Number of words in FIFO.",
+        },
+    ],
+}
 
 
 def setup(py_params_dict):
@@ -18,6 +105,10 @@ def setup(py_params_dict):
         # Overlap Read and Write register addresses
         "rw_overlap": False,
         "build_dir": "",
+        # Auto-add interrupt csrs: status, mask, clear
+        "interrupt_csrs": False,
+        # List of FIFO names. Will auto-add each FIFO csrs: full, empty, level, etc
+        "fifo_csrs": [],
     }
 
     # Update params with values from py_params_dict
@@ -89,6 +180,16 @@ def setup(py_params_dict):
     csrs_obj_list = []
     for group in params["csrs"]:
         csrs_obj_list.append(create_csr_group(**group))
+
+    # Auto-add csrs
+    if params["interrupt_csrs"]:
+        csrs_obj_list.append(interrupt_csrs)
+    for fifo_name in params["fifo_csrs"]:
+        local_fifo_csrs = copy.deepcopy(fifo_csrs)
+        local_fifo_csrs["name"] = fifo_name + "_" + fifo_csrs["name"]
+        for reg in local_fifo_csrs["regs"]:
+            reg["name"] = fifo_name + "_" + reg["name"]
+        csrs_obj_list.append(local_fifo_csrs)
 
     attributes_with_csrs = attributes_dict | {
         "csrs": csrs_obj_list,

@@ -59,9 +59,7 @@ jobs:
           submodules: 'recursive'
       - name: run LIB test
         run: |
-          export py2hwsw_dir=$(pwd);\
-          py2hwsw () { $py2hwsw_dir/py2hwsw/scripts/py2hwsw.py $@; };\
-          export -f py2hwsw;\
+          export PY2HWSW_PATH=$(pwd);\
           cd iob-soc;\
-          py2hwsw --version;\
+          nix-shell --run 'py2hwsw --version';\
           make -C lib/ sim-test;

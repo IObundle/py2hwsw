@@ -23,21 +23,36 @@ keepaspectratio]{bg.pdf}%
 \section*{Overview}
 \input{intro}
 
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
 \section*{Features}
 \input{features}
 
 \newpage
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
 \section*{Block Diagram}
 \input{bd}
 
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
 \section*{Deliverables}
 \input{deliverables}
 
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
 \section*{Benefits}
 \input{benefits}
 
 
 \ifdefined\RESULTS
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
 \section*{Implementation Results}
 \input{fpga_results}
 \input{asic_results}

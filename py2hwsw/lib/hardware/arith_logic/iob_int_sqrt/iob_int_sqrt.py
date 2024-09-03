@@ -5,13 +5,24 @@ def setup(py_params_dict):
         "version": "0.1",
         "confs": [
             """
-            DATA_W P 32 $mNA $MNA $D'Data bus width'
-            FRACTIONAL_W P 0 $mNA $MNA $D'Fractional part width'
-            REAL_W P 'DATA_W - FRACTIONAL_W' $mNA $MNA $D'Real part width'
+            DATA_W -t P -v 32 -m NA -M NA
+            Data bus width
+
+            FRACTIONAL_W -t P -v 0 -m NA -M NA
+            Fractional part width
+
+            REAL_W -t P -v 'DATA_W - FRACTIONAL_W' -m NA -M NA
+            Real part width
+
+            SIZE_W -t P -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
+            Size width
+
+            END_COUNT -t F -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA
+            End count
+
+            COUNT_W -t F -v $clog2(END_COUNT) -m NA -M NA
+            Count width
             """,
-            "SIZE_W P '(REAL_W / 2) + FRACTIONAL_W' $mNA $MNA $D'Size width'",
-            "END_COUNT F '(DATA_W + FRACTIONAL_W) >> 1' $mNA $MNA $D'End count'",
-            "COUNT_W F '$clog2(END_COUNT)' $mNA $MNA $D'Count width'",
         ],
         "ports": [
             {

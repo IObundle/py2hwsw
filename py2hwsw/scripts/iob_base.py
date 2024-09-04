@@ -197,9 +197,14 @@ def str_to_kwargs(attrs: list):
         def wrapper(core, *args, **kwargs):
             if len(args) == 1 and isinstance(args[0], str):
                 parser = argparse.ArgumentParser()
+                dicts = {}
                 for attr in attrs:
                     if isinstance(attr, str):
                         parser.add_argument(attr)
+                    elif len(attr) >= 3:
+                        parser.add_argument(attr[0], dest=attr[1], **attr[2])
+                        if len(attr) == 4:
+                            dicts[attr[1]] = attr[3]
                     else:
                         parser.add_argument(attr[0], dest=attr[1])
                 lines = [line.strip() for line in args[0].split("\n\n") if line.strip()]
@@ -207,7 +212,11 @@ def str_to_kwargs(attrs: list):
                     line, descr = line.split("\n", 1)
                     parts = shlex.split(line)
                     args = parser.parse_args(parts)
-                    func(core, descr=descr.strip(), **vars(args))
+                    kwargs = vars(args)
+                    for arg in kwargs:
+                        if arg in dicts:
+                            kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
+                    func(core, descr=descr.strip(), **kwargs)
                 return None 
             else:
                 return func(core, *args, **kwargs)

@@ -14,27 +14,16 @@ def setup(py_params_dict):
             },
         ],
         "ports": [
-            {
-                "name": "a",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "a", "width": "W", "direction": "input"},
-                ],
-            },
-            {
-                "name": "b",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "b", "width": "W", "direction": "input"},
-                ],
-            },
-            {
-                "name": "y",
-                "descr": "Output port",
-                "signals": [
-                    {"name": "y", "width": "W", "direction": "output"},
-                ],
-            },
+            """
+            a -s a W input
+            Input port
+
+            b -s b W input
+            Input port
+
+            y -s y W output
+            Output port
+            """,
         ],
         "snippets": [{"verilog_code": "   assign y_o = a_i | b_i;"}],
     }

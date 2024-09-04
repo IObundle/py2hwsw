@@ -4,7 +4,7 @@ from typing import Dict
 import iob_colors
 import if_gen
 from iob_wire import iob_wire
-from iob_base import convert_dict2obj_list, fail_with_msg
+from iob_base import convert_dict2obj_list, fail_with_msg, str_to_kwargs
 from iob_signal import iob_signal
 
 
@@ -41,7 +41,8 @@ class iob_port(iob_wire):
         """Connects the port to an external wire"""
         self.e_connect = wire
 
-
+attrs = ["name", ["-i", "interface", {"nargs": 2}, ["type", "subtype"]], ["-s", "signals", {"nargs": 3, "action": "append"}, ["name", "width", "direction"]]]
+@str_to_kwargs(attrs)
 def create_port(core, *args, signals=[], interface=None, **kwargs):
     """Creates a new port object and adds it to the core's port list
     Also creates a new internal module wire to connect to the new port

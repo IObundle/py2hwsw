@@ -7,6 +7,7 @@ from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
     add_traceback_msg,
+    str_to_kwargs,
 )
 from iob_signal import iob_signal, iob_signal_reference, get_real_signal
 
@@ -49,7 +50,8 @@ class iob_wire:
                 if signal.direction:
                     signal.direction = ""
 
-
+attrs = ["name", ["-i", "interface", {"nargs": 2}, ["type", "subtype"]], ["-s", "signals", {"nargs": 2, "action": "append"}, ["name", "width"]]]
+@str_to_kwargs(attrs)
 def create_wire(core, *args, signals=[], interface=None, **kwargs):
     """Creates a new wire object and adds it to the core's wire list
     param core: core object

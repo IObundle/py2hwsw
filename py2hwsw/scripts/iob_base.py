@@ -186,11 +186,10 @@ def debug(msg, level=0):
 
 def str_to_kwargs(attrs: list):
     """Decorator to convert a string to keyword arguments
-    Any method decorated with str_to_kwargs can take a string as its argument 
-    The string must be of the form: 'arg0 arg1 arg2 $<letter>kwarg0 $<letter>kwarg1 ...'
-    param attrs: dictionary of attributes to convert. 
-    Must take the form {<letter>: <attribute>, int: <attribute>} 
-    where int is the index of the args
+    If the argument is a string, interpret it as a command line argument.
+    param attrs: list of attributes to parse: if it is a positional argument, it is a string
+    if it is a keyword argument, it is the arguments for argparse.ArgumentParser.add_argument
+    if it is a keyword argument as a dictionary, the 4th element is a list of keys to the dictionary
     """
     def decorator(func):
         @wraps(func)

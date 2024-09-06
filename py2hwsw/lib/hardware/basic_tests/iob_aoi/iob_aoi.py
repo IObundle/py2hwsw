@@ -72,18 +72,10 @@ def setup(py_params_dict):
                     "y": "and_ab_out",
                 },
             },
-            {
-                "core_name": "iob_and",
-                "instance_name": "iob_and_cd",
-                "parameters": {
-                    "W": 1,
-                },
-                "connect": {
-                    "a": "c",
-                    "b": "d",
-                    "y": "and_cd_out",
-                },
-            },
+            """
+            iob_and io_and_cd -p W 1 -c a c b d y and_cd_out
+            Second and gate
+            """,
             {
                 "core_name": "iob_or",
                 "instance_name": "iob_or_abcd",

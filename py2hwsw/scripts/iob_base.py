@@ -214,8 +214,15 @@ def str_to_kwargs(attrs: list):
                     kwargs = vars(args)
                     for arg in kwargs:
                         if arg in dicts:
-                            kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
-                    func(core, descr=descr.strip(), **kwargs)
+                            if isinstance(dicts[arg], str):
+                                if dicts[arg] == "pairs":
+                                    kwargs[arg] = dict(zip(kwargs[arg][::2], kwargs[arg][1::2]))
+                            else:
+                                kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
+                    if attrs[0] == "core_name":
+                        func(core, instance_description=descr.strip(), **kwargs)
+                    else:
+                        func(core, descr=descr.strip(), **kwargs)
                 return None 
             else:
                 return func(core, *args, **kwargs)

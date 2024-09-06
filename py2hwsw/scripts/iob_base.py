@@ -218,6 +218,19 @@ def str_to_kwargs(attrs: list):
                             if isinstance(dicts[arg], str):
                                 if dicts[arg] == "pairs":
                                     kwargs[arg] = dict(zip(kwargs[arg][::2], kwargs[arg][1::2]))
+                                elif dicts[arg] == "ports":
+                                    new_args = []
+                                    for port in kwargs[arg]:
+                                        direction = "_"
+                                        if "<" in port:
+                                            direction = direction + "i"
+                                        elif ">" in port:
+                                            direction = direction + "o"
+                                        else:
+                                            core.fail_with_msg(f"{arg} must be in the format port-->connection for output ports and port<--connection for input ports")
+                                        port = port.replace("<", "").replace(">", "")
+                                        port, connection = port.split("--")
+                                        new_args.append({port + direction: connection})
                             else:
                                 kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
                     if attrs[0] == "core_name":

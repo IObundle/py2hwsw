@@ -277,7 +277,7 @@ class iob_core(iob_module, iob_instance):
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
-    attrs = ["core_name", "instance_name", ["-p", "parameters", {"nargs": "+"}, "pairs"], ["-c","connect", {"nargs": "+"}, "pairs"]]
+    attrs = ["core_name", "instance_name", ["-p", "parameters", {"nargs": "+"}, "pairs"], ["-c","connect", {"nargs": "+"}, "ports"]]
 
     @str_to_kwargs(attrs)
     def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):

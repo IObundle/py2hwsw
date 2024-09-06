@@ -73,7 +73,7 @@ def setup(py_params_dict):
                 },
             },
             """
-            iob_and io_and_cd -p W 1 -c a c b d y and_cd_out
+            iob_and io_and_cd -p W 1 -c a<--c b<--d y-->and_cd_out
             Second and gate
             """,
             {

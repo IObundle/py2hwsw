@@ -190,6 +190,7 @@ def str_to_kwargs(attrs: list):
     param attrs: list of attributes to parse: if it is a positional argument, it is a string
     if it is a keyword argument, it is the arguments for argparse.ArgumentParser.add_argument
     if it is a keyword argument as a dictionary, the 4th element is a list of keys to the dictionary
+    if the 4th element is "pairs", the dictionary is created from pairs of values
     """
     def decorator(func):
         @wraps(func)

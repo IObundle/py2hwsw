@@ -130,7 +130,7 @@ def get_instance_port_connections(instance):
         newlinechar = "\n"
         assert len(port.signals) == len(
             port.e_connect.signals
-        ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals from external connection '{port.e_connect.name}'!
+        ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
 Port '{port.name}' has the following signals:
 {newlinechar.join("- " + get_real_signal(port).name for port in port.signals)}
 

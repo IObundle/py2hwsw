@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from iob_base import find_obj_in_list, fail_with_msg
 
 
 def has_params(confs):
@@ -37,6 +38,7 @@ def generate_inst_params(core):
     """Generate verilog code with assignment of values for the verilog parameters of this instance.
     returns: Generated verilog code
     """
+    validate_params(core)
     instance_parameters = core.parameters
     lines = []
     for p_name, p_value in instance_parameters.items():
@@ -60,3 +62,29 @@ def generate_params_snippets(core):
     out_dir = core.build_dir + "/hardware/src"
     with open(f"{out_dir}/{core.instance_name}_{id(core)}_inst_params.vs", "w") as f:
         f.write(code)
+
+def validate_params(core):
+    """Check if all parameters are within the allowed range"""
+    for p_name, p_value in core.parameters.items():
+        if isinstance(p_value, str):
+            continue
+        conf = find_obj_in_list(core.confs, p_name)
+        try:
+            min_val = int(conf.min)
+            print(min_val)
+            if p_value < conf.min:
+                fail_with_msg(
+                    f"Parameter '{p_name}' value '{p_value}' is out of range [{conf.min}, {conf.max}]"
+                )
+        except:
+            pass
+        try:
+            max_val = int(conf.max)
+            print(max_val)
+            if p_value > conf.max:
+                fail_with_msg(
+                    f"Parameter '{p_name}' value '{p_value}' is out of range [{conf.min}, {conf.max}]"
+                )
+        except:
+            pass
+

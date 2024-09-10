@@ -337,13 +337,7 @@ class iob_core(iob_module, iob_instance):
                 fail_with_msg(
                     f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
                 )
-            if direction not None:
-                dir_names = {"i": "input", "o": "output", "io": "inout", "s": "slave", "m": "master"}
-                if direction not in dir_names:
-                    fail_with_msg(
-                        f"Direction '{direction}' not recognized!"
-                    )
-                direction = dir_names.get(direction)
+            if direction != None:
                 if direction in ["input","output"]:
                     for signal in port.signals:
                         if signal.direction != direction:
@@ -355,6 +349,10 @@ class iob_core(iob_module, iob_instance):
                         fail_with_msg(
                             f"Interface '{port.interface.type}' in port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is not a '{direction}' interface!"
                         )
+                elif direction != "inout":
+                    fail_with_msg(
+                        f"Direction '{direction}' not supported for port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}'!"
+                    )
 
             port.connect_external(wire)
 

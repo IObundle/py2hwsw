@@ -69,22 +69,17 @@ def validate_params(core):
         if isinstance(p_value, str):
             continue
         conf = find_obj_in_list(core.confs, p_name)
+
         try:
             min_val = int(conf.min)
-            print(min_val)
-            if p_value < conf.min:
-                fail_with_msg(
-                    f"Parameter '{p_name}' value '{p_value}' is out of range [{conf.min}, {conf.max}]"
-                )
         except:
-            pass
+            min_val = 0
         try:
             max_val = int(conf.max)
-            print(max_val)
-            if p_value > conf.max:
-                fail_with_msg(
-                    f"Parameter '{p_name}' value '{p_value}' is out of range [{conf.min}, {conf.max}]"
-                )
         except:
-            pass
+            max_val = 2**31 - 1
+        if p_value < min_val or p_value > max_val:
+            fail_with_msg(
+                f"Parameter '{p_name}' value '{p_value}' is out of range [{min_val}, {max_val}]"
+            )
 

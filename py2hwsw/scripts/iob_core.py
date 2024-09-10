@@ -317,11 +317,14 @@ class iob_core(iob_module, iob_instance):
     def connect_instance_ports(self, connect, instantiator):
         """
         param connect: External wires to connect to ports of this instance
-                       Key: Port name, Value: Wire name
+                       Key: Port name or tupple (Port name, direction/interface subtype), Value: Wire name
         param instantiator: Module that is instantiating this instance
         """
         # Connect instance ports to external wires
         for port_name, wire_name in connect.items():
+            direction = None
+            if isinstance(port_name, tuple):
+                port_name, direction = port_name
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(
@@ -334,6 +337,25 @@ class iob_core(iob_module, iob_instance):
                 fail_with_msg(
                     f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
                 )
+            if direction not None:
+                dir_names = {"i": "input", "o": "output", "io": "inout", "s": "slave", "m": "master"}
+                if direction not in dir_names:
+                    fail_with_msg(
+                        f"Direction '{direction}' not recognized!"
+                    )
+                direction = dir_names.get(direction)
+                if direction in ["input","output"]:
+                    for signal in port.signals:
+                        if signal.direction != direction:
+                            fail_with_msg(
+                                f"Signal '{signal.name}' in port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is not a '{direction}' signal!"
+                            )
+                elif direction in ["slave","master"]:
+                    if port.interface.subtype != direction:
+                        fail_with_msg(
+                            f"Interface '{port.interface.type}' in port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is not a '{direction}' interface!"
+                        )
+
             port.connect_external(wire)
 
     def __create_build_dir(self):

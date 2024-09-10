@@ -1,5 +1,7 @@
 import sys
 import os
+import shlex
+import argparse
 from dataclasses import dataclass
 import importlib
 import traceback
@@ -182,7 +184,7 @@ def debug(msg, level=0):
 #
 
 
-def str_to_kwargs(attrs: dict = {}):
+def str_to_kwargs(attrs: list):
     """Decorator to convert a string to keyword arguments
     Any method decorated with str_to_kwargs can take a string as its argument 
     The string must be of the form: 'arg0 arg1 arg2 $<letter>kwarg0 $<letter>kwarg1 ...'
@@ -194,18 +196,27 @@ def str_to_kwargs(attrs: dict = {}):
         @wraps(func)
         def wrapper(core, *args, **kwargs):
             if len(args) == 1 and isinstance(args[0], str):
-                lines = [line for line in args[0].split('\n') if line.strip()]
+                parser = argparse.ArgumentParser()
+                dicts = {}
+                for attr in attrs:
+                    if isinstance(attr, str):
+                        parser.add_argument(attr)
+                    elif len(attr) >= 3:
+                        parser.add_argument(attr[0], dest=attr[1], **attr[2])
+                        if len(attr) == 4:
+                            dicts[attr[1]] = attr[3]
+                    else:
+                        parser.add_argument(attr[0], dest=attr[1])
+                lines = [line.strip() for line in args[0].split("\n\n") if line.strip()]
                 for line in lines:
-                    parts = re.findall(r"(?:\$\w)?(?:'[^']*'|\S+)", line)
-                    new_kwargs = {}
-                    for key, value in enumerate([arg for arg in parts if not arg.startswith("$")]):
-                        new_kwargs[attrs[key]] = value.strip("'")
-                    for i in parts:
-                        if i.startswith("$"):
-                            key = attrs[i[1]]
-                            value = i[2:]
-                            new_kwargs[key] = value.strip("'")
-                    func(core, **new_kwargs)
+                    line, descr = line.split("\n", 1)
+                    parts = shlex.split(line)
+                    args = parser.parse_args(parts)
+                    kwargs = vars(args)
+                    for arg in kwargs:
+                        if arg in dicts:
+                            kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
+                    func(core, descr=descr.strip(), **kwargs)
                 return None 
             else:
                 return func(core, *args, **kwargs)

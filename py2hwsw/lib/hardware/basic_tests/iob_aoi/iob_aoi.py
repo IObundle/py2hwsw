@@ -48,27 +48,16 @@ def setup(py_params_dict):
             },
         ],
         "wires": [
-            {
-                "name": "and_ab_out",
-                "descr": "and ab output",
-                "signals": [
-                    {"name": "aab", "width": 1},
-                ],
-            },
-            {
-                "name": "and_cd_out",
-                "descr": "and cd output",
-                "signals": [
-                    {"name": "cad", "width": 1},
-                ],
-            },
-            {
-                "name": "or_out",
-                "descr": "or output",
-                "signals": [
-                    {"name": "or_out", "width": 1},
-                ],
-            },
+            """
+            and_ab_out -s aab 1
+            and ab output
+
+            and_cd_out -s cad 1
+            and cd output
+
+            or_out -s oab 1
+            or output
+            """,
         ],
         "blocks": [
             {

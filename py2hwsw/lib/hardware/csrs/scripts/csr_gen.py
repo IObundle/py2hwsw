@@ -169,7 +169,7 @@ class csr_gen:
 
         # compute wdata with only the needed bits
         lines += f"    wire [{self.verilog_max(n_bits, 1)}-1:0] {name}_wdata; \n"
-        lines += f"    assign {name}_wdata = iob_wdata_i[{self.boffset(addr,self.cpu_n_bytes)}+:{self.verilog_max(n_bits,1)}];\n"
+        lines += f"    assign {name}_wdata = internal_iob_wdata[{self.boffset(addr,self.cpu_n_bytes)}+:{self.verilog_max(n_bits,1)}];\n"
 
         # signal to indicate if the register is addressed
         lines += f"    wire {name}_addressed_w;\n"
@@ -203,7 +203,7 @@ class csr_gen:
             else:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
             lines += f"    wire {name}_wen;\n"
-            lines += f"    assign {name}_wen = (iob_valid_i & iob_ready_o) & ((|iob_wstrb_i) & {name}_addressed_w);\n"
+            lines += f"    assign {name}_wen = (internal_iob_valid & internal_iob_ready) & ((|internal_iob_wstrb) & {name}_addressed_w);\n"
             lines += "    iob_reg_e #(\n"
             lines += f"      .DATA_W({n_bits}),\n"
             lines += f"      .RST_VAL({rst_val_str})\n"
@@ -216,7 +216,7 @@ class csr_gen:
             lines += f"      .data_o ({name}_o)\n"
             lines += "    );\n"
         else:  # compute wen
-            lines += f"    assign {name}_wen_o = ({name}_addressed_w & (iob_valid_i & iob_ready_o))? |iob_wstrb_i: 1'b0;\n"
+            lines += f"    assign {name}_wen_o = ({name}_addressed_w & (internal_iob_valid & internal_iob_ready))? |internal_iob_wstrb: 1'b0;\n"
             lines += f"    assign {name}_wdata_o = {name}_wdata;\n"
 
         return lines
@@ -238,8 +238,8 @@ class csr_gen:
 
         if not auto:  # output read enable
             lines += f"    wire {name}_addressed_r;\n"
-            lines += f"    assign {name}_addressed_r = (iob_addr_i >= {addr}) && (iob_addr_i < ({addr}+(2**({addr_w}))));\n"
-            lines += f"    assign {name}_ren_o = {name}_addressed_r & (iob_valid_i & iob_ready_o) & (~|iob_wstrb_i);\n"
+            lines += f"    assign {name}_addressed_r = (internal_iob_addr >= {addr}) && (internal_iob_addr < ({addr}+(2**({addr_w}))));\n"
+            lines += f"    assign {name}_ren_o = {name}_addressed_r & (internal_iob_valid & internal_iob_ready) & (~|internal_iob_wstrb);\n"
 
         return lines
 
@@ -451,6 +451,21 @@ class csr_gen:
         """ Generates and appends verilog code to core "snippets" list.
         """
 
+        ports = [
+            {
+                "name": "csrs_iob_output",
+                "descr": "Give user logic access to csrs internal IOb signals",
+                "signals": [
+                    {"name": "csrs_iob_valid", "direction": "output", "width": 1},
+                    {"name": "csrs_iob_addr", "direction": "output", "width": "ADDR_W"},
+                    {"name": "csrs_iob_wdata", "direction": "output", "width": "DATA_W"},
+                    {"name": "csrs_iob_wstrb", "direction": "output", "width": "DATA_W/8"},
+                    {"name": "csrs_iob_rvalid", "direction": "output", "width": 1},
+                    {"name": "csrs_iob_rdata", "direction": "output", "width": "DATA_W"},
+                    {"name": "csrs_iob_ready", "direction": "output", "width": 1},
+                ],
+            }
+        ]
         wires = []
         blocks = []
         snippet = ""
@@ -469,6 +484,16 @@ class csr_gen:
     localparam WAIT_RVALID = 1'd1;
 """
         wires += [
+            {
+                "name": "internal_iob",
+                "descr": "Internal iob interface",
+                "interface": {
+                    "type": "iob",
+                    "wire_prefix": "internal_",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
+            },
             {
                 "name": "state",
                 "descr": "",
@@ -501,16 +526,93 @@ class csr_gen:
             }
         )
 
+        # Connect internal IOb signals to output port for user logic
+        snippet += """
+   assign csrs_iob_valid_o = internal_iob_valid;
+   assign csrs_iob_addr_o = internal_iob_addr;
+   assign csrs_iob_wdata_o = internal_iob_wdata;
+   assign csrs_iob_wstrb_o = internal_iob_wstrb;
+   assign csrs_iob_rvalid_o = internal_iob_rvalid;
+   assign csrs_iob_rdata_o = internal_iob_rdata;
+   assign csrs_iob_ready_o = internal_iob_ready;
+"""
+
+        if core_attributes["csr_if"] == "iob":
+            # "IOb" CSR_IF
+            snippet += """
+   assign internal_iob_valid = iob_valid_i;
+   assign internal_iob_addr = iob_addr_i;
+   assign internal_iob_wdata = iob_wdata_i;
+   assign internal_iob_wstrb = iob_wstrb_i;
+   assign iob_rvalid_o = internal_iob_rvalid;
+   assign iob_rdata_o = internal_iob_rdata;
+   assign iob_ready_o = internal_iob_ready;
+"""
+        elif core_attributes["csr_if"] == "apb":
+            # "APB" CSR_IF
+            blocks.append(
+                {
+                    "core_name": "apb2iob",
+                    "instance_name": "apb2iob_coverter",
+                    "instance_description": "Convert APB port into internal IOb interface",
+                    "parameters": {
+                        "APB_ADDR_W": "ADDR_W",
+                        "APB_DATA_W": "DATA_W",
+                    },
+                    "connect": {
+                        "clk_en_rst": "clk_en_rst",
+                        "apb": "control_if",
+                        "iob": "internal_iob",
+                    },
+                }
+            )
+        elif core_attributes["csr_if"] == "axil":
+            # "AXI_Lite" CSR_IF
+            blocks.append(
+                {
+                    "core_name": "axil2iob",
+                    "instance_name": "axil2iob_coverter",
+                    "instance_description": "Convert AXI-Lite port into internal IOb interface",
+                    "parameters": {
+                        "ADDR_W": "ADDR_W",
+                        "DATA_W": "DATA_W",
+                    },
+                    "connect": {
+                        "clk_en_rst": "clk_en_rst",
+                        "axil": "control_if",
+                        "iob": "internal_iob",
+                    },
+                }
+            )
+        elif core_attributes["csr_if"] == "axi":
+            # "AXI" CSR_IF
+            blocks.append(
+                {
+                    "core_name": "axi2iob",
+                    "instance_name": "axi2iob_coverter",
+                    "instance_description": "Convert AXI port into internal IOb interface",
+                    "parameters": {
+                        "ADDR_WIDTH": "ADDR_W",
+                        "DATA_WIDTH": "DATA_W",
+                    },
+                    "connect": {
+                        "clk_en_rst": "clk_en_rst",
+                        "axi": "control_if",
+                        "iob": "internal_iob",
+                    },
+                }
+            )
+
         # write address
         snippet += "\n    //write address\n"
 
         # extract address byte offset
         snippet += "    wire [($clog2(WSTRB_W)+1)-1:0] byte_offset;\n"
-        snippet += "    iob_ctls #(.W(WSTRB_W), .MODE(0), .SYMBOL(0)) bo_inst (.data_i(iob_wstrb_i), .count_o(byte_offset));\n"
+        snippet += "    iob_ctls #(.W(WSTRB_W), .MODE(0), .SYMBOL(0)) bo_inst (.data_i(internal_iob_wstrb), .count_o(byte_offset));\n"
 
         # compute write address
         snippet += "    wire [ADDR_W-1:0] waddr;\n"
-        snippet += "    assign waddr = `IOB_WORD_ADDR(iob_addr_i) + byte_offset;\n"
+        snippet += "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr) + byte_offset;\n"
 
         # insert write register logic
         for row in table:
@@ -529,9 +631,9 @@ class csr_gen:
 
         # use variables to compute response
         snippet += """
-    assign iob_rvalid_o = rvalid;
-    assign iob_rdata_o = rdata;
-    assign iob_ready_o = ready;
+    assign internal_iob_rvalid = rvalid;
+    assign internal_iob_rdata = rdata;
+    assign internal_iob_ready = ready;
 
 """
         wires += [
@@ -664,7 +766,7 @@ class csr_gen:
         snippet += f"""
     always @* begin
         rdata_nxt = {8*self.cpu_n_bytes}'d0;
-        rvalid_int = (iob_valid_i & iob_ready_o) & (~(|iob_wstrb_i));
+        rvalid_int = (internal_iob_valid & internal_iob_ready) & (~(|internal_iob_wstrb));
         rready_int = 1'b1;
         wready_int = 1'b1;
 
@@ -701,10 +803,10 @@ class csr_gen:
                 if self.bfloor(addr, addr_w_base) == self.bfloor(
                     addr_last, addr_w_base
                 ):
-                    snippet += f"        {aux_read_reg} = (`IOB_WORD_ADDR(iob_addr_i) == {self.bfloor(addr, addr_w_base)});\n"
+                    snippet += f"        {aux_read_reg} = (`IOB_WORD_ADDR(internal_iob_addr) == {self.bfloor(addr, addr_w_base)});\n"
                     snippet += f"        if({aux_read_reg}) "
                 else:
-                    snippet += f"            {aux_read_reg} = ((`IOB_WORD_ADDR(iob_addr_i) >= {self.bfloor(addr, addr_w_base)}) && (`IOB_WORD_ADDR(iob_addr_i) < {self.bfloor(addr_last, addr_w_base)}));\n"
+                    snippet += f"            {aux_read_reg} = ((`IOB_WORD_ADDR(internal_iob_addr) >= {self.bfloor(addr, addr_w_base)}) && (`IOB_WORD_ADDR(internal_iob_addr) < {self.bfloor(addr_last, addr_w_base)}));\n"
                     snippet += f"        if({aux_read_reg}) "
                 snippet += f"begin\n"
                 if name == "version":
@@ -751,10 +853,10 @@ class csr_gen:
         //FSM state machine
         case(state)
             WAIT_REQ: begin
-                if(iob_valid_i & (!iob_ready_o)) begin // Wait for a valid request
-                    ready_nxt = |iob_wstrb_i ? wready_int : rready_int;
+                if(internal_iob_valid & (!internal_iob_ready)) begin // Wait for a valid request
+                    ready_nxt = |internal_iob_wstrb ? wready_int : rready_int;
                     // If is read and ready, go to WAIT_RVALID
-                    if (ready_nxt && (!(|iob_wstrb_i))) begin
+                    if (ready_nxt && (!(|internal_iob_wstrb))) begin
                         state_nxt = WAIT_RVALID;
                     end
                 end
@@ -771,6 +873,7 @@ class csr_gen:
     end //always @*
 """
 
+        core_attributes["ports"] += ports
         core_attributes["wires"] += wires
         core_attributes["blocks"] += blocks
         core_attributes["snippets"] += [

@@ -214,7 +214,7 @@ def str_to_kwargs(attrs: list):
                     args = parser.parse_args(parts)
                     kwargs = vars(args)
                     for arg in kwargs:
-                        if arg in dicts:
+                        if arg in dicts and kwargs[arg] is not None:
                             if isinstance(dicts[arg], str):
                                 if dicts[arg] == "pairs":
                                     kwargs[arg] = dict(zip(kwargs[arg][::2], kwargs[arg][1::2]))

@@ -214,7 +214,7 @@ def str_to_kwargs(attrs: list):
                     args = parser.parse_args(parts)
                     kwargs = vars(args)
                     for arg in kwargs:
-                        if arg in dicts:
+                        if arg in dicts and kwargs[arg] is not None:
                             kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
                     func(core, descr=descr.strip(), **kwargs)
                 return None 

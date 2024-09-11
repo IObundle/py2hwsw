@@ -580,7 +580,7 @@ def find_module_setup_dir(core_name):
     )
     if not file_path:
         fail_with_msg(
-            f"Setup directory of '{core_name}' not found in {iob_core.global_project_root}!"
+            f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!"
         )
 
     file_ext = os.path.splitext(file_path)[1]

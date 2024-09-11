@@ -32,7 +32,7 @@ interrupt_csrs = [
 def find_and_update_interrupt_csrs(csrs_dict):
     """Given a dictionary of CSRs, find the interrupt CSRs group and update the dictionary
     accordingly.
-    User should provide a CSRs of type "INTERRUPT". This CSR will be replaced by interrupt_csrs.
+    User should provide a CSR of type "INTERRUPT". This CSR will be replaced by interrupt_csrs.
     """
     csr_group_ref = None
     csr_ref = None

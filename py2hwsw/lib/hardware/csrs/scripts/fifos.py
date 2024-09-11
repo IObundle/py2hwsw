@@ -52,7 +52,7 @@ fifo_csrs = [
 def find_and_update_fifo_csrs(csrs_dict):
     """Given a dictionary of CSRs, find the fifo CSRs group and update the dictionary
     accordingly.
-    User should provide a CSRs of type "*FIFO". This CSR will be replaced by fifo_csrs.
+    User should provide a CSR of type "*FIFO". This CSR will be replaced by fifo_csrs.
     """
     csr_group_ref = None
     csr_ref = None

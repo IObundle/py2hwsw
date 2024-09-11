@@ -181,6 +181,13 @@ class csr_gen:
             lines += f"    assign {name}_addressed_w = (waddr >= {addr}) && (waddr < ({addr}+(2**({addr_w}))));\n"
 
         if auto:  # generate register
+            n_items = 2**eval_param_expression_from_config(log2n_items, self.config, "max")
+            # Create addressed signal for each reg in regfile
+            if n_items > 1:
+                for idx in range(n_items):
+                    name_idx = f"{name}_{idx}"
+                    lines += f"    assign {name_idx}_addressed_w = (waddr >= {addr+idx*addr_w}) && (waddr < ({addr+(idx+1)*addr_w}));\n"
+
             # fill remaining bits with 0s
             if isinstance(n_bits, str):
                 if rst_val != 0:
@@ -202,19 +209,21 @@ class csr_gen:
                     rst_val_str = "{" + str(n_bits) + "{1'd0}}"
             else:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
-            lines += f"    wire {name}_wen;\n"
-            lines += f"    assign {name}_wen = (internal_iob_valid & internal_iob_ready) & ((|internal_iob_wstrb) & {name}_addressed_w);\n"
-            lines += "    iob_reg_e #(\n"
-            lines += f"      .DATA_W({n_bits}),\n"
-            lines += f"      .RST_VAL({rst_val_str})\n"
-            lines += f"    ) {name}_datareg (\n"
-            lines += "      .clk_i  (clk_i),\n"
-            lines += "      .cke_i  (cke_i),\n"
-            lines += "      .arst_i (arst_i),\n"
-            lines += f"      .en_i   ({name}_wen),\n"
-            lines += f"      .data_i ({name}_wdata),\n"
-            lines += f"      .data_o ({name}_o)\n"
-            lines += "    );\n"
+            for idx in range(n_items):
+                name_idx = f"{name}_{idx}" if n_items > 1 else name
+                lines += f"    wire {name_idx}_wen;\n"
+                lines += f"    assign {name_idx}_wen = (internal_iob_valid & internal_iob_ready) & ((|internal_iob_wstrb) & {name_idx}_addressed_w);\n"
+                lines += "    iob_reg_e #(\n"
+                lines += f"      .DATA_W({n_bits}),\n"
+                lines += f"      .RST_VAL({rst_val_str})\n"
+                lines += f"    ) {name_idx}_datareg (\n"
+                lines += "      .clk_i  (clk_i),\n"
+                lines += "      .cke_i  (cke_i),\n"
+                lines += "      .arst_i (arst_i),\n"
+                lines += f"      .en_i   ({name_idx}_wen),\n"
+                lines += f"      .data_i ({name}_wdata),\n"
+                lines += f"      .data_o ({name_idx}_o)\n"
+                lines += "    );\n\n"
         else:  # compute wen
             lines += f"    assign {name}_wen_o = ({name}_addressed_w & (internal_iob_valid & internal_iob_ready))? |internal_iob_wstrb: 1'b0;\n"
             lines += f"    assign {name}_wdata_o = {name}_wdata;\n"
@@ -242,41 +251,6 @@ class csr_gen:
             lines += f"    assign {name}_ren_o = {name}_addressed_r & (internal_iob_valid & internal_iob_ready) & (~|internal_iob_wstrb);\n"
 
         return lines
-
-    # generate ports for csrs module
-    def gen_port(self, table, f):
-        for row in table:
-            name = row.name
-            n_bits = row.n_bits
-            auto = row.autoreg
-
-            # version is not a register, it is an internal constant
-            if name != "version":
-                if "W" in row.type:
-                    if auto:
-                        f.write(
-                            f"    output [{self.verilog_max(n_bits,1)}-1:0] {name}_o,\n"
-                        )
-                    else:
-                        f.write(
-                            f"    output [{self.verilog_max(n_bits,1)}-1:0] {name}_wdata_o,\n"
-                        )
-                        f.write(f"    output {name}_wen_o,\n")
-                        f.write(f"    input {name}_wready_i,\n")
-                if "R" in row.type:
-                    if auto:
-                        f.write(
-                            f"    input [{self.verilog_max(n_bits,1)}-1:0] {name}_i,\n"
-                        )
-                    else:
-                        f.write(
-                            f"""
-    input [{self.verilog_max(n_bits, 1)}-1:0] {name}_rdata_i,
-    input {name}_rvalid_i,
-    output {name}_ren_o,
-    input {name}_rready_i,
-"""
-                        )
 
     # auxiliar read register case name
     def aux_read_reg_case_name(self, row):
@@ -364,6 +338,7 @@ class csr_gen:
             name = row.name
             auto = row.autoreg
             n_bits = row.n_bits
+            log2n_items = row.log2n_items
             register_signals = []
 
             # version is not a register, it is an internal constant
@@ -372,11 +347,14 @@ class csr_gen:
 
             if "W" in row.type:
                 if auto:
-                    register_signals.append({
-                        "name": name,
-                        "direction": "output",
-                        "width": self.verilog_max(n_bits, 1),
-                    })
+                    n_items = 2**eval_param_expression_from_config(log2n_items, self.config, "max")
+                    for idx in range(n_items):
+                        name_idx = f"{name}_{idx}" if n_items > 1 else name
+                        register_signals.append({
+                            "name": name_idx,
+                            "direction": "output",
+                            "width": self.verilog_max(n_bits, 1),
+                        })
                 else:
                     register_signals += [
                         {

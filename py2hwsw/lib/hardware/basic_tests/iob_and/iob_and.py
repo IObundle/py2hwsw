@@ -15,10 +15,16 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "and_i",
+                "name": "a",
                 "descr": "Input port",
                 "signals": [
                     {"name": "a", "width": "W", "direction": "input"},
+                ],
+            },
+            {
+                "name": "b",
+                "descr": "Input port",
+                "signals": [
                     {"name": "b", "width": "W", "direction": "input"},
                 ],
             },

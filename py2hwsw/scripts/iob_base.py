@@ -209,9 +209,9 @@ def str_to_kwargs(attrs: list):
                         parser.add_argument(attr[0], dest=attr[1])
                 lines = [line.strip() for line in args[0].split("\n\n") if line.strip()]
                 for line in lines:
-                    line, descr = line.split("\n", 1)
                     parts = shlex.split(line)
-                    args = parser.parse_args(parts)
+                    descr = parts[-1]
+                    args = parser.parse_args(parts[:-1])
                     kwargs = vars(args)
                     for arg in kwargs:
                         if arg in dicts and kwargs[arg] is not None:

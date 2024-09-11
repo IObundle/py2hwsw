@@ -50,13 +50,13 @@ def setup(py_params_dict):
         "wires": [
             """
             and_ab_out -s aab 1
-            and ab output
+            'and ab output'
 
             and_cd_out -s cad 1
-            and cd output
+            'and cd output'
 
             or_out -s oab 1
-            or output
+            'or output'
             """,
         ],
         "blocks": [
@@ -74,7 +74,7 @@ def setup(py_params_dict):
             },
             """
             iob_and io_and_cd -p W 1 -c a<--c b<--d y-->and_cd_out
-            Second and gate
+            'Second and gate'
             """,
             {
                 "core_name": "iob_or",

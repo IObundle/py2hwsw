@@ -60,7 +60,7 @@
         }
     ],
     "wires": [
-        "\n            and_ab_out -s aab 1\n            and ab output\n\n            and_cd_out -s cad 1\n            and cd output\n\n            or_out -s oab 1\n            or output\n            "
+        "\n            and_ab_out -s aab 1\n            'and ab output'\n\n            and_cd_out -s cad 1\n            'and cd output'\n\n            or_out -s oab 1\n            'or output'\n            "
     ],
     "blocks": [
         {
@@ -75,7 +75,7 @@
                 "y": "and_ab_out"
             }
         },
-        "\n            iob_and io_and_cd -p W 1 -c a<--c b<--d y-->and_cd_out\n            Second and gate\n            ",
+        "\n            iob_and io_and_cd -p W 1 -c a<--c b<--d y-->and_cd_out\n            'Second and gate'\n            ",
         {
             "core_name": "iob_or",
             "instance_name": "iob_or_abcd",

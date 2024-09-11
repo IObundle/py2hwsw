@@ -16,13 +16,13 @@ def setup(py_params_dict):
         "ports": [
             """
             a -s a W input
-            Input port
+            'Input port'
 
             b -s b W input
-            Input port
+            'Input port'
 
             y -s y W output
-            Output port
+            'Output port'
             """,
         ],
         "snippets": [{"verilog_code": "   assign y_o = a_i | b_i;"}],

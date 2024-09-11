@@ -221,16 +221,43 @@ def str_to_kwargs(attrs: list):
                                 elif dicts[arg] == "ports":
                                     new_args = []
                                     for port in kwargs[arg]:
-                                        direction = "_"
-                                        if "<" in port:
-                                            direction = direction + "i"
-                                        elif ">" in port:
-                                            direction = direction + "o"
-                                        else:
-                                            core.fail_with_msg(f"{arg} must be in the format port-->connection for output ports and port<--connection for input ports")
-                                        port = port.replace("<", "").replace(">", "")
+                                        p = find_obj_in_list(core.ports, port)
+                                        if "--" in port:
+                                            if len(p.signals) != 1:
+                                                fail_with_msg(f"Port {port} must have exactly one signal, for groups use ==")
+                                            if p.signals[0].direction == "input" and "<--" in port and not '<-->' in port:
+                                                direction = "input"
+                                            elif p.signals[0].direction == "output" and "-->" in port and not '<-->' in port:
+                                                direction = "output"
+                                            elif p.signals[0].direction == "inout" and "<-->" in port:
+                                                direction = "inout"
+                                            else:
+                                                fail_with_msg(f"Port {p}'s direction does not match the connection. Use '<--', '-->', or '<-->' for input, output, or inout ports, respectively.")
+                                        elif "==" in port:
+                                            if not p.interface:
+                                                if "<==" in port and not '<==>' in port:
+                                                    direction = "input"
+                                                elif "==>" in port and not '<==>' in port:
+                                                    direction = "output"
+                                                elif "<==>" in port and not '<<' in port and not '>>' in port:
+                                                    direction = "inout"
+                                                else:
+                                                    fail_with_msg(f"Port {p}'s direction does not match the connection. Use '<==', '==>', or '<==>' for input, output, or inout ports, respectively.")
+                                                for signal in p.signals:
+                                                    if signal.direction != direction and direction != "inout":
+                                                        fail_with_msg(f"Port {p} has a signal with direction {signal.direction}, but the connection is {direction}")
+                                            else:
+                                                if "<<==>" in port:
+                                                    direction = "slave"
+                                                elif "<==>>" in port:
+                                                    direction = "master"
+                                                else:
+                                                    fail_with_msg(f"Port {p}'s interface subtype does not match the connection. Use '<<==>' or '<==>>' for slave or master ports, respectively.")
+                                                if p.interface.subtype != direction:
+                                                    fail_with_msg(f"Port {p} has a subtype {p.interface.subtype}, but the connection is {direction}")
+                                        port = port.replace("<", "").replace(">", "").replace("=", "-")
                                         port, connection = port.split("--")
-                                        new_args.append({port + direction: connection})
+                                        new_args.append({(port, direction): connection})
                             else:
                                 kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
                     if attrs[0] == "core_name":

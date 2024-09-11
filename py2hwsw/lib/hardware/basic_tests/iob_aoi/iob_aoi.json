@@ -1,1 +1,103 @@
-{"original_name": "iob_aoi", "name": "iob_aoi", "version": "0.1", "ports": [{"name": "a", "descr": "Input port", "signals": [{"name": "a", "width": 1, "direction": "input"}]}, {"name": "b", "descr": "Input port", "signals": [{"name": "b", "width": 1, "direction": "input"}]}, {"name": "c", "descr": "Input port", "signals": [{"name": "c", "width": 1, "direction": "input"}]}, {"name": "d", "descr": "Input port", "signals": [{"name": "d", "width": 1, "direction": "input"}]}, {"name": "y", "descr": "Output port", "signals": [{"name": "y", "width": 1, "direction": "output"}]}], "wires": [{"name": "and_ab_out", "descr": "and ab output", "signals": [{"name": "aab", "width": 1}]}, {"name": "and_cd_out", "descr": "and cd output", "signals": [{"name": "cad", "width": 1}]}, {"name": "or_out", "descr": "or output", "signals": [{"name": "or_out", "width": 1}]}], "blocks": [{"core_name": "iob_and", "instance_name": "iob_and_ab", "parameters": {"W": 1}, "connect": {"a": "a", "b": "b", "y": "and_ab_out"}}, {"core_name": "iob_and", "instance_name": "iob_and_cd", "parameters": {"W": 1}, "connect": {"a": "c", "b": "d", "y": "and_cd_out"}}, {"core_name": "iob_or", "instance_name": "iob_or_abcd", "parameters": {"W": 1}, "connect": {"a": "and_ab_out", "b": "and_cd_out", "y": "or_out"}}, {"core_name": "iob_inv", "instance_name": "iob_inv_out", "parameters": {"W": 1}, "connect": {"a": "or_out", "y": "y"}}]}
+{
+    "original_name": "iob_aoi",
+    "name": "iob_aoi",
+    "version": "0.1",
+    "ports": [
+        {
+            "name": "a",
+            "descr": "Input port",
+            "signals": [
+                {
+                    "name": "a",
+                    "width": 1,
+                    "direction": "input"
+                }
+            ]
+        },
+        {
+            "name": "b",
+            "descr": "Input port",
+            "signals": [
+                {
+                    "name": "b",
+                    "width": 1,
+                    "direction": "input"
+                }
+            ]
+        },
+        {
+            "name": "c",
+            "descr": "Input port",
+            "signals": [
+                {
+                    "name": "c",
+                    "width": 1,
+                    "direction": "input"
+                }
+            ]
+        },
+        {
+            "name": "d",
+            "descr": "Input port",
+            "signals": [
+                {
+                    "name": "d",
+                    "width": 1,
+                    "direction": "input"
+                }
+            ]
+        },
+        {
+            "name": "y",
+            "descr": "Output port",
+            "signals": [
+                {
+                    "name": "y",
+                    "width": 1,
+                    "direction": "output"
+                }
+            ]
+        }
+    ],
+    "wires": [
+        "\n            and_ab_out -s aab 1\n            and ab output\n\n            and_cd_out -s cad 1\n            and cd output\n\n            or_out -s oab 1\n            or output\n            "
+    ],
+    "blocks": [
+        {
+            "core_name": "iob_and",
+            "instance_name": "iob_and_ab",
+            "parameters": {
+                "W": 1
+            },
+            "connect": {
+                "a": "a",
+                "b": "b",
+                "y": "and_ab_out"
+            }
+        },
+        "\n            iob_and io_and_cd -p W 1 -c a<--c b<--d y-->and_cd_out\n            Second and gate\n            ",
+        {
+            "core_name": "iob_or",
+            "instance_name": "iob_or_abcd",
+            "parameters": {
+                "W": 1
+            },
+            "connect": {
+                "a": "and_ab_out",
+                "b": "and_cd_out",
+                "y": "or_out"
+            }
+        },
+        {
+            "core_name": "iob_inv",
+            "instance_name": "iob_inv_out",
+            "parameters": {
+                "W": 1
+            },
+            "connect": {
+                "a": "or_out",
+                "y": "y"
+            }
+        }
+    ]
+}

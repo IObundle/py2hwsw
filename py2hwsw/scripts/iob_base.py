@@ -219,9 +219,11 @@ def str_to_kwargs(attrs: list):
                                 if dicts[arg] == "pairs":
                                     kwargs[arg] = dict(zip(kwargs[arg][::2], kwargs[arg][1::2]))
                                 elif dicts[arg] == "ports":
-                                    new_args = []
+                                    new_args = {}
                                     for port in kwargs[arg]:
-                                        p = find_obj_in_list(core.ports, port)
+                                        p = port.replace("<", "").replace(">", "").replace("=", "-")
+                                        p, connection = p.split("--")
+                                        p = find_obj_in_list(core.ports, p)
                                         if "--" in port:
                                             if len(p.signals) != 1:
                                                 fail_with_msg(f"Port {port} must have exactly one signal, for groups use ==")
@@ -255,9 +257,8 @@ def str_to_kwargs(attrs: list):
                                                     fail_with_msg(f"Port {p}'s interface subtype does not match the connection. Use '<<==>' or '<==>>' for slave or master ports, respectively.")
                                                 if p.interface.subtype != direction:
                                                     fail_with_msg(f"Port {p} has a subtype {p.interface.subtype}, but the connection is {direction}")
-                                        port = port.replace("<", "").replace(">", "").replace("=", "-")
-                                        port, connection = port.split("--")
-                                        new_args.append({(port, direction): connection})
+                                        new_args.update({(p.name, direction): connection})
+                                    kwargs[arg] = new_args
                             else:
                                 kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
                     if attrs[0] == "core_name":

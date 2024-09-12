@@ -67,9 +67,9 @@ def setup(py_params_dict):
                     "W": 1,
                 },
                 "connect": {
-                    ("a","i"): "a",
-                    ("b","i"): "b",
-                    ("y","o"): "and_ab_out",
+                    "a i": "a",
+                    "b i": "b",
+                    "y o": "and_ab_out",
                 },
             },
             """
@@ -86,9 +86,9 @@ def setup(py_params_dict):
                     "W": 1,
                 },
                 "connect": {
-                    ("a", "input"): "and_ab_out",
-                    ("b", "input"): "and_cd_out",
-                    ("y", "output"): "or_out",
+                    "a input": "and_ab_out",
+                    "b input": "and_cd_out",
+                    "y output": "or_out",
                 },
             },
             {

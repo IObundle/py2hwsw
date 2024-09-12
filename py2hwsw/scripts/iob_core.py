@@ -324,8 +324,8 @@ class iob_core(iob_module, iob_instance):
         for port_name, wire_name in connect.items():
             direction = None
             dir_names = {"i":"input", "o":"output", "io":"inout", "s":"slave", "m":"master"}
-            if isinstance(port_name, tuple):
-                port_name, direction = port_name
+            if " " in port_name:
+                port_name, direction = port_name.split()
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(

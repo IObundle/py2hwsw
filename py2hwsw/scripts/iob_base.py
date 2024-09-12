@@ -245,7 +245,7 @@ def str_to_kwargs(attrs: list):
                                                 direction = "master"
                                             else:
                                                 fail_with_msg(f"Connection type not recognized. Use '<==', '==>', '<==>', '<<==>', or '<==>>' for input, output, inout, slave, or master ports, respectively.")
-                                        new_args.update({(p, direction): connection})
+                                        new_args.update({f"{p} {direction}": connection})
                                     kwargs[arg] = new_args
                             else:
                                 kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]

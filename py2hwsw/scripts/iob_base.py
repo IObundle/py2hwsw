@@ -227,14 +227,14 @@ def str_to_kwargs(attrs: list):
                                         if "--" in port:
                                             if len(p.signals) != 1:
                                                 fail_with_msg(f"Port {port} must have exactly one signal, for groups use ==")
-                                            if p.signals[0].direction == "input" and "<--" in port and not '<-->' in port:
+                                            if "<--" in port and not '<-->' in port:
                                                 direction = "input"
-                                            elif p.signals[0].direction == "output" and "-->" in port and not '<-->' in port:
+                                            elif "-->" in port and not '<-->' in port:
                                                 direction = "output"
-                                            elif p.signals[0].direction == "inout" and "<-->" in port:
+                                            elif "<-->" in port:
                                                 direction = "inout"
                                             else:
-                                                fail_with_msg(f"Port {p}'s direction does not match the connection. Use '<--', '-->', or '<-->' for input, output, or inout ports, respectively.")
+                                                fail_with_msg(f"Connection type not recognized. Use '<--', '-->', or '<-->' for input, output, or inout ports, respectively.")
                                         elif "==" in port:
                                             if not p.interface:
                                                 if "<==" in port and not '<==>' in port:
@@ -244,19 +244,14 @@ def str_to_kwargs(attrs: list):
                                                 elif "<==>" in port and not '<<' in port and not '>>' in port:
                                                     direction = "inout"
                                                 else:
-                                                    fail_with_msg(f"Port {p}'s direction does not match the connection. Use '<==', '==>', or '<==>' for input, output, or inout ports, respectively.")
-                                                for signal in p.signals:
-                                                    if signal.direction != direction and direction != "inout":
-                                                        fail_with_msg(f"Port {p} has a signal with direction {signal.direction}, but the connection is {direction}")
+                                                    fail_with_msg(f"Connection type not recognized. Use '<==', '==>', or '<==>' for input, output, or mixed ports, respectively.")
                                             else:
                                                 if "<<==>" in port:
                                                     direction = "slave"
                                                 elif "<==>>" in port:
                                                     direction = "master"
                                                 else:
-                                                    fail_with_msg(f"Port {p}'s interface subtype does not match the connection. Use '<<==>' or '<==>>' for slave or master ports, respectively.")
-                                                if p.interface.subtype != direction:
-                                                    fail_with_msg(f"Port {p} has a subtype {p.interface.subtype}, but the connection is {direction}")
+                                                    fail_with_msg(f"Connection type not recognized. Use '<<==>' or '<==>>' for slave or master ports, respectively.")
                                         new_args.update({(p.name, direction): connection})
                                     kwargs[arg] = new_args
                             else:

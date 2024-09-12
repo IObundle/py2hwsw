@@ -349,7 +349,12 @@ class iob_core(iob_module, iob_instance):
                         fail_with_msg(
                             f"Interface '{port.interface.type}' in port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is not a '{direction}' interface!"
                         )
-                elif direction != "inout":
+                elif direction == "inout":
+                    if not port.signals:
+                        fail_with_msg(
+                            f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' has no explicit signals to connect to! Use slave or master to describe interface."
+                        )
+                else:
                     fail_with_msg(
                         f"Direction '{direction}' not supported for port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}'!"
                     )

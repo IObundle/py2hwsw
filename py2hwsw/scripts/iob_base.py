@@ -223,10 +223,7 @@ def str_to_kwargs(attrs: list):
                                     for port in kwargs[arg]:
                                         p = port.replace("<", "").replace(">", "").replace("=", "-")
                                         p, connection = p.split("--")
-                                        p = find_obj_in_list(core.ports, p)
                                         if "--" in port:
-                                            if len(p.signals) != 1:
-                                                fail_with_msg(f"Port {port} must have exactly one signal, for groups use ==")
                                             if "<--" in port and not '<-->' in port:
                                                 direction = "input"
                                             elif "-->" in port and not '<-->' in port:
@@ -236,23 +233,19 @@ def str_to_kwargs(attrs: list):
                                             else:
                                                 fail_with_msg(f"Connection type not recognized. Use '<--', '-->', or '<-->' for input, output, or inout ports, respectively.")
                                         elif "==" in port:
-                                            if not p.interface:
-                                                if "<==" in port and not '<==>' in port:
-                                                    direction = "input"
-                                                elif "==>" in port and not '<==>' in port:
-                                                    direction = "output"
-                                                elif "<==>" in port and not '<<' in port and not '>>' in port:
-                                                    direction = "inout"
-                                                else:
-                                                    fail_with_msg(f"Connection type not recognized. Use '<==', '==>', or '<==>' for input, output, or mixed ports, respectively.")
+                                            if "<==" in port and not '<==>' in port:
+                                                direction = "input"
+                                            elif "==>" in port and not '<==>' in port:
+                                                direction = "output"
+                                            elif "<==>" in port and not '<<' in port and not '>>' in port:
+                                                direction = "inout"
+                                            elif "<<==>" in port:
+                                                direction = "slave"
+                                            elif "<==>>" in port:
+                                                direction = "master"
                                             else:
-                                                if "<<==>" in port:
-                                                    direction = "slave"
-                                                elif "<==>>" in port:
-                                                    direction = "master"
-                                                else:
-                                                    fail_with_msg(f"Connection type not recognized. Use '<<==>' or '<==>>' for slave or master ports, respectively.")
-                                        new_args.update({(p.name, direction): connection})
+                                                fail_with_msg(f"Connection type not recognized. Use '<==', '==>', '<==>', '<<==>', or '<==>>' for input, output, inout, slave, or master ports, respectively.")
+                                        new_args.update({(p, direction): connection})
                                     kwargs[arg] = new_args
                             else:
                                 kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]

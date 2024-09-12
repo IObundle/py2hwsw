@@ -67,13 +67,16 @@ def setup(py_params_dict):
                     "W": 1,
                 },
                 "connect": {
-                    "a": "a",
-                    "b": "b",
-                    "y": "and_ab_out",
+                    ("a","i"): "a",
+                    ("b","i"): "b",
+                    ("y","o"): "and_ab_out",
                 },
             },
             """
-            iob_and io_and_cd -p W 1 -c a<--c b<--d y-->and_cd_out
+            iob_and io_and_cd -p W 1 -c 
+            a<--c 
+            b<--d 
+            y-->and_cd_out
             'Second and gate'
             """,
             {
@@ -83,9 +86,9 @@ def setup(py_params_dict):
                     "W": 1,
                 },
                 "connect": {
-                    "a": "and_ab_out",
-                    "b": "and_cd_out",
-                    "y": "or_out",
+                    ("a", "input"): "and_ab_out",
+                    ("b", "input"): "and_cd_out",
+                    ("y", "output"): "or_out",
                 },
             },
             {

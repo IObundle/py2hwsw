@@ -52,4 +52,4 @@ def find_and_update_interrupt_csrs(csrs_dict):
     csr_group_ref["regs"] += interrupt_csrs
 
     # Remove original csr from csr_group
-    csr_group_ref["regs"].pop(csr_ref)
+    csr_group_ref["regs"].remove(csr_ref)

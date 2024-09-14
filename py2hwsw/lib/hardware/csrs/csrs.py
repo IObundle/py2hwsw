@@ -89,7 +89,7 @@ def setup(py_params_dict):
     }
 
     find_and_update_interrupt_csrs(params["csrs"])
-    find_and_update_fifo_csrs(params["csrs"])
+    find_and_update_fifo_csrs(params["csrs"], attributes_dict)
 
     # Convert csrs dictionaries to objects
     csrs_obj_list = []
@@ -133,8 +133,10 @@ def setup(py_params_dict):
             }
         )
 
-    # Add ports for registers
-    attributes_dict["ports"] += csr_gen_obj.gen_ports(reg_table)
+    # Add ports and internal wires for registers
+    auto_ports, auto_wires = csr_gen_obj.gen_ports_wires(reg_table)
+    attributes_dict["ports"] += auto_ports
+    attributes_dict["wires"] += auto_wires
 
     # TODO: Append csr_if to config_build.mk ?
     # file2create.write(f"CSR_IF={python_module.csr_if}\n\n")

@@ -163,6 +163,7 @@ class csr_gen:
         addr = row.addr
         addr_w = self.calc_verilog_addr_w(log2n_items, n_bytes)
         auto = row.autoreg
+        suffix = "" if row.internal_use else "_o"
 
         lines = ""
         lines += f"\n\n//NAME: {name};\n//TYPE: {row.type}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); AUTO: {auto}\n\n"
@@ -183,10 +184,14 @@ class csr_gen:
         if auto:  # generate register
             n_items = 2**eval_param_expression_from_config(log2n_items, self.config, "max")
             # Create addressed signal for each reg in regfile
-            if n_items > 1:
+            if n_items > 1 and isinstance(addr, int) and isinstance(addr_w, int):
                 for idx in range(n_items):
                     name_idx = f"{name}_{idx}"
-                    lines += f"    assign {name_idx}_addressed_w = (waddr >= {addr+idx*addr_w}) && (waddr < ({addr+(idx+1)*addr_w}));\n"
+                    lines += f"    wire {name_idx}_addressed_w = (waddr >= {addr+idx*addr_w}) && (waddr < ({addr+(idx+1)*addr_w}));\n"
+            elif n_items > 1:
+                for idx in range(n_items):
+                    name_idx = f"{name}_{idx}"
+                    lines += f"    wire {name_idx}_addressed_w = (waddr >= {addr}+{idx}*{addr_w}) && (waddr < ({addr}+({idx+1})*{addr_w}));\n"
 
             # fill remaining bits with 0s
             if isinstance(n_bits, str):
@@ -222,11 +227,11 @@ class csr_gen:
                 lines += "      .arst_i (arst_i),\n"
                 lines += f"      .en_i   ({name_idx}_wen),\n"
                 lines += f"      .data_i ({name}_wdata),\n"
-                lines += f"      .data_o ({name_idx}_o)\n"
+                lines += f"      .data_o ({name_idx}{suffix})\n"
                 lines += "    );\n\n"
         else:  # compute wen
-            lines += f"    assign {name}_wen_o = ({name}_addressed_w & (internal_iob_valid & internal_iob_ready))? |internal_iob_wstrb: 1'b0;\n"
-            lines += f"    assign {name}_wdata_o = {name}_wdata;\n"
+            lines += f"    assign {name}_wen{suffix} = ({name}_addressed_w & (internal_iob_valid & internal_iob_ready))? |internal_iob_wstrb: 1'b0;\n"
+            lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
 
         return lines
 
@@ -241,6 +246,7 @@ class csr_gen:
         addr = row.addr
         addr_w = self.calc_verilog_addr_w(log2n_items, n_bytes)
         auto = row.autoreg
+        suffix = "" if row.internal_use else "_o"
 
         lines = ""
         lines += f"\n\n//NAME: {name};\n//TYPE: {row.type}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); AUTO: {auto}\n\n"
@@ -248,7 +254,7 @@ class csr_gen:
         if not auto:  # output read enable
             lines += f"    wire {name}_addressed_r;\n"
             lines += f"    assign {name}_addressed_r = (internal_iob_addr >= {addr}) && (internal_iob_addr < ({addr}+(2**({addr_w}))));\n"
-            lines += f"    assign {name}_ren_o = {name}_addressed_r & (internal_iob_valid & internal_iob_ready) & (~|internal_iob_wstrb);\n"
+            lines += f"    assign {name}_ren{suffix} = {name}_addressed_r & (internal_iob_valid & internal_iob_ready) & (~|internal_iob_wstrb);\n"
 
         return lines
 
@@ -331,9 +337,11 @@ class csr_gen:
 """
                         )
 
-    def gen_ports(self, table):
-        """Generate ports for csrs instance"""
+    def gen_ports_wires(self, table):
+        """Generate ports and internal wires for csrs instance.
+        """
         ports = []
+        wires = []
         for row in table:
             name = row.name
             auto = row.autoreg
@@ -365,12 +373,12 @@ class csr_gen:
                         {
                             "name": f"{name}_wen",
                             "direction": "output",
-                            "width": "1",
+                            "width": 1,
                         },
                         {
                             "name": f"{name}_wready",
                             "direction": "input",
-                            "width": "1",
+                            "width": 1,
                         },
                     ]
             if "R" in row.type:
@@ -390,27 +398,36 @@ class csr_gen:
                         {
                             "name": f"{name}_rvalid",
                             "direction": "input",
-                            "width": "1",
+                            "width": 1,
                         },
                         {
                             "name": f"{name}_ren",
                             "direction": "output",
-                            "width": "1",
+                            "width": 1,
                         },
                         {
                             "name": f"{name}_rready",
                             "direction": "input",
-                            "width": "1",
+                            "width": 1,
                         },
                     ]
 
-            ports.append({
-                "name": name,
-                "descr": f"{name} register interface",
-                "signals": register_signals,
-            })
+            if row.internal_use:
+                for reg in register_signals:
+                    reg.pop('direction')
+                wires.append({
+                    "name": name,
+                    "descr": f"{name} register interface",
+                    "signals": register_signals,
+                })
+            else:
+                ports.append({
+                    "name": name,
+                    "descr": f"{name} register interface",
+                    "signals": register_signals,
+                })
 
-        return ports
+        return ports, wires
 
     def get_csrs_inst_params(self, core_confs):
         """Return multi-line string with parameters for csrs instance"""
@@ -774,6 +791,7 @@ class csr_gen:
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             addr_w_base = max(log(self.cpu_n_bytes, 2), addr_w)
             auto = row.autoreg
+            suffix = "" if row.internal_use else "_i"
 
             if "R" in row.type:
                 aux_read_reg = self.aux_read_reg_case_name(row)
@@ -791,14 +809,14 @@ class csr_gen:
                     rst_val = row.rst_val
                     snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = 16'h{rst_val}|{8*n_bytes}'d0;\n"
                 elif auto:
-                    snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {name}_i|{8*n_bytes}'d0;\n"
+                    snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {name}{suffix}|{8*n_bytes}'d0;\n"
                 else:
                     snippet += f"""
-            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {name}_rdata_i|{8*n_bytes}'d0;
-            rvalid_int = {name}_rvalid_i;
+            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {name}_rdata{suffix}|{8*n_bytes}'d0;
+            rvalid_int = {name}_rvalid{suffix};
 """
                 if not auto:
-                    snippet += f"            rready_int = {name}_rready_i;\n"
+                    snippet += f"            rready_int = {name}_rready{suffix};\n"
                 snippet += "        end\n\n"
 
         # write register response
@@ -812,12 +830,13 @@ class csr_gen:
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             auto = row.autoreg
+            suffix = "" if row.internal_use else "_i"
 
             if "W" in row.type:
                 if not auto:
                     # get wready
                     snippet += f"        if((waddr >= {addr}) && (waddr < {addr + 2**addr_w})) begin\n"
-                    snippet += f"            wready_int = {name}_wready_i;\n        end\n"
+                    snippet += f"            wready_int = {name}_wready{suffix};\n        end\n"
 
         snippet += """
 

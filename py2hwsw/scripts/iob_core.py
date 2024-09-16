@@ -277,7 +277,7 @@ class iob_core(iob_module, iob_instance):
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
-    attrs = ["core_name", "instance_name", ["-p", "parameters", {"nargs": "+"}, "pairs"], ["-c","connect", {"nargs": "+"}, "ports"]]
+    attrs = ["core_name", "instance_name", ["-p", "parameters", {"nargs": "+"}, "pairs"], ["-c","connect", {"nargs": "+"}, "pairs"]]
 
     @str_to_kwargs(attrs)
     def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):
@@ -341,7 +341,7 @@ class iob_core(iob_module, iob_instance):
             if direction != None:
                 if direction in dir_names:
                     direction = dir_names[direction]
-                if direction in ["input","output"]:
+                if direction in ["input","output","inout"]:
                     for signal in port.signals:
                         if signal.direction != direction:
                             fail_with_msg(
@@ -361,6 +361,11 @@ class iob_core(iob_module, iob_instance):
                     fail_with_msg(
                         f"Direction '{direction}' not supported for port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}'!"
                     )
+            else:
+                if len(port.signals) > 1 and all(signal.direction == port.signals[0].direction for signal in port.signals):
+                    fail_with_msg(
+                        f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' has all the signals with the same direction! Must specify the direction of the port. '{port_name} {port.signals[0].direction}'."
+                       )
 
             port.connect_external(wire)
 

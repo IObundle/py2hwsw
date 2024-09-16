@@ -370,6 +370,10 @@ class iob_core(iob_module, iob_instance):
                     fail_with_msg(
                         f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is an interface! Must specify the subtype of the interface. '{port_name} {port.interface.subtype}'."
                     )
+                elif len(port.signals) == 1:
+                    fail_with_msg(
+                        f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' has only one signal! Must specify the direction of the port. '{port_name} {port.signals[0].direction}'."
+                    )
 
             port.connect_external(wire)
 

@@ -82,9 +82,9 @@ def setup(py_params_dict):
                     "RST_VAL": "RST_VAL",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst",
-                    "data_i": "data_next",
-                    "data_o": "data_o",
+                    "clk_en_rst s": "clk_en_rst",
+                    "data_i i": "data_next",
+                    "data_o o": "data_o",
                 },
             },
         ],

@@ -96,10 +96,10 @@ def setup(py_params_dict):
                     "RST_VAL": "RST_VAL",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst",
+                    "clk_en_rst s": "clk_en_rst",
                     "rst": "iob_reg_re_rst",
-                    "data_i": "data_int",
-                    "data_o": "data_o",
+                    "data_i i": "data_int",
+                    "data_o o": "data_o",
                 },
             },
         ],

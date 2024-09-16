@@ -362,10 +362,14 @@ class iob_core(iob_module, iob_instance):
                         f"Direction '{direction}' not supported for port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}'!"
                     )
             else:
-                if len(port.signals) > 1 and all(signal.direction == port.signals[0].direction for signal in port.signals):
+                if len(port.signals) > 1 and all(signal.direction == port.signals[0].direction for signal in port.signals) and not port.interface:
                     fail_with_msg(
                         f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' has all the signals with the same direction! Must specify the direction of the port. '{port_name} {port.signals[0].direction}'."
                        )
+                elif port.interface:
+                    fail_with_msg(
+                        f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is an interface! Must specify the subtype of the interface. '{port_name} {port.interface.subtype}'."
+                    )
 
             port.connect_external(wire)
 

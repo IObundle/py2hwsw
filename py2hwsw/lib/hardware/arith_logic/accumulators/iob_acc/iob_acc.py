@@ -94,10 +94,10 @@ def setup(py_params_dict):
         "blocks": [
             """
             iob_reg_re reg0 -p DATA_W DATA_W RST_VAL RST_VAL -c
-            clk_en_rst<<==>clk_en_rst 
-            en_rst<==en_rst
-            data_i<--data_int
-            data_o-->data_o
+            'clk_en_rst s' clk_en_rst 
+            'en_rst i' en_rst
+            'data_i i' data_int
+            'data_o o' data_o
             'Accomulator register with synchronous reset and enable'
             """
         ],

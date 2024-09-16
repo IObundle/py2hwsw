@@ -75,7 +75,7 @@
                 "y o": "and_ab_out"
             }
         },
-        "\n            iob_and io_and_cd -p W 1 -c \n            a<--c \n            b<--d \n            y-->and_cd_out\n            'Second and gate'\n            ",
+        "\n            iob_and io_and_cd -p W 1 -c \n            'a i' c \n            'b i' d \n            'y o' d_cd_out\n            'Second and gate'\n            ",
         {
             "core_name": "iob_or",
             "instance_name": "iob_or_abcd",

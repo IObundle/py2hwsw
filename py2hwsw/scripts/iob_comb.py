@@ -83,9 +83,9 @@ class iob_comb(iob_snippet):
                 if signal.isreg:
                     reg_type = "iob_reg"
                     connect = {
-                        "clk_en_rst": "clk_en_rst",
-                        "data_i": f"{signal.name}_nxt",
-                        "data_o": f"{signal.name}",
+                        "clk_en_rst s": "clk_en_rst",
+                        "data_i i": f"{signal.name}_nxt",
+                        "data_o o": f"{signal.name}",
                     }
                     if any(reg_signal == "_nxt" for reg_signal in signal.reg_signals):
                         if not any(wire.name == f"{signal.name}_nxt" for wire in core.wires):
@@ -123,7 +123,7 @@ class iob_comb(iob_snippet):
                             core.create_wire(
                                 name=f"{signal.name}_reg_signals", signals=_reg_signals
                             )
-                            connect[connect_key] = f"{signal.name}_reg_signals"
+                            connect[connect_key + " i"] = f"{signal.name}_reg_signals"
 
                     if not any(port.name == "clk_en_rst" for port in core.ports):
                         core.create_port(

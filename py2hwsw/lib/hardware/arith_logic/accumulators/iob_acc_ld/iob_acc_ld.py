@@ -23,7 +23,7 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_en_rst",
+                "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
                     "subtype": "slave",
@@ -31,7 +31,7 @@ def setup(py_params_dict):
                 "descr": "clock, clock enable and reset",
             },
             {
-                "name": "en_rst",
+                "name": "en_rst_i",
                 "descr": "Enable and Synchronous reset interface",
                 "signals": [
                     {
@@ -92,19 +92,18 @@ def setup(py_params_dict):
                     },
                 ],
             },
+        ],
+        "wires": [
             {
-                "name": "data_nxt_o",
-                "descr": "Output port",
+                "name": "data_nxt",
+                "descr": "Sum result",
                 "signals": [
                     {
                         "name": "data_nxt",
                         "width": "DATA_W+1",
-                        "direction": "output",
                     },
                 ],
             },
-        ],
-        "wires": [
             {
                 "name": "data_int",
                 "descr": "data_int wire",
@@ -122,17 +121,17 @@ def setup(py_params_dict):
                     "RST_VAL": "RST_VAL",
                 },
                 "connect": {
-                    "clk_en_rst slave": "clk_en_rst",
-                    "en_rst input": "en_rst",
-                    "data_i input": "data_nxt_o",
-                    "data_o output": "data_int",
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "en_rst_i": "en_rst_i",
+                    "data_i": "data_nxt",
+                    "data_o": "data_int",
                 },
             },
         ],
         "snippets": [
             {
                 "verilog_code": """
-            assign data_nxt_o = ld_i ? ld_val_i : data_o + incr_i;
+            assign data_nxt = ld_i ? ld_val_i : data_o + incr_i;
             assign data_o = data_int[DATA_W-1:0];
             """,
             },

@@ -23,7 +23,7 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_en_rst",
+                "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
                     "subtype": "slave",
@@ -31,7 +31,7 @@ def setup(py_params_dict):
                 "descr": "clock, clock enable and reset",
             },
             {
-                "name": "en_rst",
+                "name": "en_rst_i",
                 "descr": "Enable and Synchronous reset interface",
                 "signals": [
                     {
@@ -49,7 +49,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "incr",
+                "name": "incr_i",
                 "descr": "Input port",
                 "signals": [
                     {
@@ -70,19 +70,18 @@ def setup(py_params_dict):
                     },
                 ],
             },
+        ],
+        "wires": [
             {
                 "name": "data_nxt",
-                "descr": "Output port",
+                "descr": "Sum result",
                 "signals": [
                     {
                         "name": "data_nxt",
                         "width": "DATA_W+1",
-                        "direction": "output",
                     },
                 ],
             },
-        ],
-        "wires": [
             {
                 "name": "data_int",
                 "descr": "data_int wire",
@@ -93,18 +92,18 @@ def setup(py_params_dict):
         ],
         "blocks": [
             """
-            iob_reg_re reg0 -p DATA_W DATA_W RST_VAL RST_VAL -c
-            'clk_en_rst s' clk_en_rst 
-            'en_rst i' en_rst
-            'data_i i' data_int
-            'data_o o' data_o
+            iob_reg_re reg0 -p DATA_W:DATA_W RST_VAL:RST_VAL -c
+            clk_en_rst_s:clk_en_rst_s 
+            en_rst_i:en_rst_i
+            data_i_i:data_int
+            data_o_o:data_o
             'Accomulator register with synchronous reset and enable'
             """
         ],
         "snippets": [
             {
                 "verilog_code": f"""
-       assign data_nxt_o = data_o + incr_i;
+       assign data_nxt = data_o + incr_i;
        assign data_int = data_nxt_o[DATA_W-1:0];
             """,
             },

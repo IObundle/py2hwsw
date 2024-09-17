@@ -29,7 +29,7 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_rst",
+                "name": "clk_rst_s",
                 "interface": {
                     "type": "clk_rst",
                     "subtype": "slave",

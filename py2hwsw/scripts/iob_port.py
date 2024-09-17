@@ -40,6 +40,11 @@ class iob_port(iob_wire):
                 self.interface.widths,
                 self.interface.port_prefix,
             )
+        elif _direction in ["slave", "master"]:
+            fail_with_msg(
+                f"Port '{self.name}' is a '{_direction}' port but no interface is defined",
+                ValueError,
+            )
 
         for signal in self.signals:
             if not signal.direction:

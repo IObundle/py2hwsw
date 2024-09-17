@@ -23,7 +23,7 @@ class iob_port(iob_wire):
         _sufix_dict = {"_i": "input", "_o": "output", "_io": "inout", "_s": "slave", "_m": "master"}
         _direction = None
         for sufix, d in _sufix_dict.items():
-            if self.name.endswith(suf):
+            if self.name.endswith(sufix):
                 _direction = d
                 break
 

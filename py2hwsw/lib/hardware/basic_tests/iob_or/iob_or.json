@@ -13,7 +13,7 @@
         }
     ],
     "ports": [
-        "\n            a -s a W input\n            'Input port'\n\n            b -s b W input\n            'Input port'\n\n            y -s y W output\n            'Output port'\n            "
+        "\n            a_i -s a W input\n            'Input port'\n\n            b_i -s b W input\n            'Input port'\n\n            y_o -s y W output\n            'Output port'\n            "
     ],
     "snippets": [
         {

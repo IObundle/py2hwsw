@@ -4,7 +4,7 @@
     "version": "0.1",
     "ports": [
         {
-            "name": "a",
+            "name": "a_i",
             "descr": "Input port",
             "signals": [
                 {
@@ -15,7 +15,7 @@
             ]
         },
         {
-            "name": "b",
+            "name": "b_i",
             "descr": "Input port",
             "signals": [
                 {
@@ -26,7 +26,7 @@
             ]
         },
         {
-            "name": "c",
+            "name": "c_i",
             "descr": "Input port",
             "signals": [
                 {
@@ -37,7 +37,7 @@
             ]
         },
         {
-            "name": "d",
+            "name": "d_i",
             "descr": "Input port",
             "signals": [
                 {
@@ -48,7 +48,7 @@
             ]
         },
         {
-            "name": "y",
+            "name": "y_o",
             "descr": "Output port",
             "signals": [
                 {
@@ -70,12 +70,12 @@
                 "W": 1
             },
             "connect": {
-                "a i": "a",
-                "b i": "b",
-                "y o": "and_ab_out"
+                "a_i": "a_i",
+                "b_i": "b_i",
+                "y_o": "and_ab_out"
             }
         },
-        "\n            iob_and io_and_cd -p W 1 -c \n            'a i' c \n            'b i' d \n            'y o' d_cd_out\n            'Second and gate'\n            ",
+        "\n            iob_and io_and_cd -p W:1 -c \n            a_i:c_i \n            b_i:d_i \n            y_o:and_cd_out\n            'Second and gate'\n            ",
         {
             "core_name": "iob_or",
             "instance_name": "iob_or_abcd",
@@ -83,9 +83,9 @@
                 "W": 1
             },
             "connect": {
-                "a input": "and_ab_out",
-                "b input": "and_cd_out",
-                "y output": "or_out"
+                "a_i": "and_ab_out",
+                "b_i": "and_cd_out",
+                "y_o": "or_out"
             }
         },
         {
@@ -95,8 +95,8 @@
                 "W": 1
             },
             "connect": {
-                "a": "or_out",
-                "y": "y"
+                "a_i": "or_out",
+                "y_o": "y_o"
             }
         }
     ]

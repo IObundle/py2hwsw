@@ -12,35 +12,35 @@ def setup(py_params_dict):
         "version": "0.1",
         "ports": [
             {
-                "name": "a",
+                "name": "a_i",
                 "descr": "Input port",
                 "signals": [
                     {"name": "a", "width": 1, "direction": "input"},
                 ],
             },
             {
-                "name": "b",
+                "name": "b_i",
                 "descr": "Input port",
                 "signals": [
                     {"name": "b", "width": 1, "direction": "input"},
                 ],
             },
             {
-                "name": "c",
+                "name": "c_i",
                 "descr": "Input port",
                 "signals": [
                     {"name": "c", "width": 1, "direction": "input"},
                 ],
             },
             {
-                "name": "d",
+                "name": "d_i",
                 "descr": "Input port",
                 "signals": [
                     {"name": "d", "width": 1, "direction": "input"},
                 ],
             },
             {
-                "name": "y",
+                "name": "y_o",
                 "descr": "Output port",
                 "signals": [
                     {"name": "y", "width": 1, "direction": "output"},
@@ -67,16 +67,16 @@ def setup(py_params_dict):
                     "W": 1,
                 },
                 "connect": {
-                    "a i": "a",
-                    "b i": "b",
-                    "y o": "and_ab_out",
+                    "a_i": "a_i",
+                    "b_i": "b_i",
+                    "y_o": "and_ab_out",
                 },
             },
             """
-            iob_and io_and_cd -p W 1 -c 
-            'a i' c 
-            'b i' d 
-            'y o' d_cd_out
+            iob_and io_and_cd -p W:1 -c 
+            a_i:c_i 
+            b_i:d_i 
+            y_o:and_cd_out
             'Second and gate'
             """,
             {
@@ -86,9 +86,9 @@ def setup(py_params_dict):
                     "W": 1,
                 },
                 "connect": {
-                    "a input": "and_ab_out",
-                    "b input": "and_cd_out",
-                    "y output": "or_out",
+                    "a_i": "and_ab_out",
+                    "b_i": "and_cd_out",
+                    "y_o": "or_out",
                 },
             },
             {
@@ -98,8 +98,8 @@ def setup(py_params_dict):
                     "W": 1,
                 },
                 "connect": {
-                    "a": "or_out",
-                    "y": "y",
+                    "a_i": "or_out",
+                    "y_o": "y_o",
                 },
             },
         ],

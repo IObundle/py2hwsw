@@ -14,7 +14,7 @@
     ],
     "ports": [
         {
-            "name": "a",
+            "name": "a_i",
             "descr": "Input port",
             "signals": [
                 {
@@ -25,7 +25,7 @@
             ]
         },
         {
-            "name": "y",
+            "name": "y_o",
             "descr": "Output port",
             "signals": [
                 {

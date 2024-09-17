@@ -15,14 +15,14 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "a",
+                "name": "a_i",
                 "descr": "Input port",
                 "signals": [
                     {"name": "a", "width": "W", "direction": "input"},
                 ],
             },
             {
-                "name": "y",
+                "name": "y_o",
                 "descr": "Output port",
                 "signals": [
                     {"name": "y", "width": "W", "direction": "output"},

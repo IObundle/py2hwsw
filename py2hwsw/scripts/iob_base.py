@@ -217,7 +217,7 @@ def str_to_kwargs(attrs: list):
                         if arg in dicts and kwargs[arg] is not None:
                             if isinstance(dicts[arg], str):
                                 if dicts[arg] == "pairs":
-                                    kwargs[arg] = dict(zip(kwargs[arg][::2], kwargs[arg][1::2]))
+                                    kwargs[arg] = dict(pair.split(":") for pair in kwargs[arg])
                             else:
                                 kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
                     if attrs[0] == "core_name":

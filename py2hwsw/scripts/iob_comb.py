@@ -83,7 +83,7 @@ class iob_comb(iob_snippet):
                 if signal.isreg:
                     reg_type = "iob_reg"
                     connect = {
-                        "clk_en_rst": "clk_en_rst",
+                        "clk_en_rst_s": "clk_en_rst_s",
                         "data_i": f"{signal.name}_nxt",
                         "data_o": f"{signal.name}",
                     }
@@ -125,9 +125,9 @@ class iob_comb(iob_snippet):
                             )
                             connect[connect_key] = f"{signal.name}_reg_signals"
 
-                    if not any(port.name == "clk_en_rst" for port in core.ports):
+                    if not any(port.name == "clk_en_rst_s" for port in core.ports):
                         core.create_port(
-                            name="clk_en_rst",
+                            name="clk_en_rst_s",
                             interface={"type": "clk_en_rst", "subtype": "slave"},
                             descr="Clock enable and reset signal",
                         )

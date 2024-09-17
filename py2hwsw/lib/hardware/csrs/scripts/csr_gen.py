@@ -609,8 +609,8 @@ class csr_gen:
                     "instance_name": "axil2iob_coverter",
                     "instance_description": "Convert AXI-Lite port into internal IOb interface",
                     "parameters": {
-                        "ADDR_W": "ADDR_W",
-                        "DATA_W": "DATA_W",
+                        "AXIL_ADDR_W": "ADDR_W",
+                        "AXIL_DATA_W": "DATA_W",
                     },
                     "connect": {
                         "clk_en_rst": "clk_en_rst",

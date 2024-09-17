@@ -20,7 +20,19 @@ class iob_port(iob_wire):
         if not self.name:
             fail_with_msg("Port name is not set", ValueError)
 
+        _sufix_dict = {"_i": "input", "_o": "output", "_io": "inout", "_s": "slave", "_m": "master"}
+        _direction = None
+        for sufix, d in _sufix_dict.items():
+            if self.name.endswith(suf):
+                _direction = d
+                break
+
         if self.interface:
+            if self.interface.subtype != _direction:
+                fail_with_msg(
+                    f"Interface subtype '{self.interface.subtype}' does not match port name '{self.name}'",
+                    ValueError,
+                )
             self.signals += if_gen.get_signals(
                 self.interface.type,
                 self.interface.subtype,
@@ -35,6 +47,11 @@ class iob_port(iob_wire):
             elif signal.direction not in ["input", "output", "inout"]:
                 raise Exception(
                     "Error: Direction must be 'input', 'output', or 'inout'."
+                )
+            if _direction in ["input","output","inout"] and signal.direction != _direction:
+                fail_with_msg(
+                    f"Signal direction '{signal.direction}' does not match port name '{self.name}'",
+                    ValueError,
                 )
 
     def connect_external(self, wire):

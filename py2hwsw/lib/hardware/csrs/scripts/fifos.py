@@ -114,7 +114,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
     fifo_type = "R" if csr_ref["type"].endswith("FIFO_R") else "W"
 
     #
-    # Confs: Copied from iob_fifo_sync.py
+    # Confs: Based on confs from iob_fifo_sync.py
     #
     # Needed to define widths of FIFO ports based on verilog parameters
     attributes_dict["confs"] += [
@@ -122,7 +122,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
             "name": f"{FIFO_NAME}_W_DATA_W",
             "descr": "",
             "type": "P",
-            "val": "21",
+            "val": 32 if fifo_type == "W" else csr_ref["n_bits"],
             "min": "NA",
             "max": "NA",
         },
@@ -130,7 +130,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
             "name": f"{FIFO_NAME}_R_DATA_W",
             "descr": "",
             "type": "P",
-            "val": "21",
+            "val": 32 if fifo_type == "R" else csr_ref["n_bits"],
             "min": "NA",
             "max": "NA",
         },
@@ -138,7 +138,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
             "name": f"{FIFO_NAME}_ADDR_W",
             "descr": "Higher ADDR_W lower DATA_W",
             "type": "P",
-            "val": "21",
+            "val": csr_ref["log2n_items"],
             "min": "NA",
             "max": "NA",
         },
@@ -371,6 +371,12 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
         {
             "core_name": "iob_fifo_sync",
             "instance_name": fifo_name,
+            "instance_description": f"Synchronous FIFO {fifo_name}",
+            "parameters": {
+                "W_DATA_W": f"{FIFO_NAME}_W_DATA_W",
+                "R_DATA_W": f"{FIFO_NAME}_R_DATA_W",
+                "ADDR_W": f"{FIFO_NAME}_ADDR_W",
+            },
             "connect": {
                 "clk_en_rst": "clk_en_rst",
                 "rst": f"{fifo_name}_rst",

@@ -152,6 +152,30 @@ class csr_gen:
             else:
                 return f"{log2n_items}+{ceil(log(n_bytes, 2))}"
 
+    def gen_regfile_read_addr_logic(self, row):
+        """ Generate regfile access logic via read address.
+        """
+        name = row.name
+        n_bits = row.n_bits
+        log2n_items = row.log2n_items
+        n_items = 2**eval_param_expression_from_config(log2n_items, self.config, "max")
+
+        lines = f"""
+   reg {name}_rdata_reg;
+   assign {name}_rdata_o = {name}_rdata_reg;
+   always @(*) begin
+      case ({name}_raddr_i)
+"""
+        for idx in range(n_items):
+            lines += f"         {log2n_items}'d{idx}: {name}_rdata_reg = {name}_{idx}_o;\n"
+
+        lines += f"""\
+         default: {name}_rdata_reg = {n_bits}'b0; // Default case to handle invalid address
+      endcase
+   end
+"""
+        return lines
+
     def gen_wr_reg(self, row):
         name = row.name
         rst_val = int(row.rst_val)
@@ -229,6 +253,8 @@ class csr_gen:
                 lines += f"      .data_i ({name}_wdata),\n"
                 lines += f"      .data_o ({name_idx}{suffix})\n"
                 lines += "    );\n\n"
+            if n_items > 1:
+                lines += self.gen_regfile_read_addr_logic(row)
         else:  # compute wen
             lines += f"    assign {name}_wen{suffix} = ({name}_addressed_w & (internal_iob_valid & internal_iob_ready))? |internal_iob_wstrb: 1'b0;\n"
             lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
@@ -363,6 +389,20 @@ class csr_gen:
                             "direction": "output",
                             "width": self.verilog_max(n_bits, 1),
                         })
+                    if n_items > 1:
+                        # Add interface to read registers via address
+                        register_signals += [
+                            {
+                                "name": f"{name}_raddr",
+                                "direction": "input",
+                                "width": log2n_items,
+                            },
+                            {
+                                "name": f"{name}_rdata",
+                                "direction": "output",
+                                "width": self.verilog_max(n_bits, 1),
+                            },
+                        ]
                 else:
                     register_signals += [
                         {

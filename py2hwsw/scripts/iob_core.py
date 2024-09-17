@@ -317,15 +317,11 @@ class iob_core(iob_module, iob_instance):
     def connect_instance_ports(self, connect, instantiator):
         """
         param connect: External wires to connect to ports of this instance
-                       Key: Port name or tupple (Port name, direction/interface subtype), Value: Wire name
+                       Key: Port name, Value: Wire name
         param instantiator: Module that is instantiating this instance
         """
         # Connect instance ports to external wires
         for port_name, wire_name in connect.items():
-            direction = None
-            dir_names = {"i":"input", "o":"output", "io":"inout", "s":"slave", "m":"master"}
-            if " " in port_name:
-                port_name, direction = port_name.split()
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(
@@ -338,43 +334,6 @@ class iob_core(iob_module, iob_instance):
                 fail_with_msg(
                     f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
                 )
-            if direction != None:
-                if direction in dir_names:
-                    direction = dir_names[direction]
-                if direction in ["input","output","inout"]:
-                    for signal in port.signals:
-                        if signal.direction != direction:
-                            fail_with_msg(
-                                f"Signal '{signal.name}' in port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is not a '{direction}' signal!"
-                            )
-                elif direction in ["slave","master"]:
-                    if port.interface.subtype != direction:
-                        fail_with_msg(
-                            f"Interface '{port.interface.type}' in port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is not a '{direction}' interface!"
-                        )
-                elif direction == "inout":
-                    if not port.signals:
-                        fail_with_msg(
-                            f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' has no explicit signals to connect to! Use slave or master to describe interface."
-                        )
-                else:
-                    fail_with_msg(
-                        f"Direction '{direction}' not supported for port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}'!"
-                    )
-            else:
-                if len(port.signals) > 1 and all(signal.direction == port.signals[0].direction for signal in port.signals) and not port.interface:
-                    fail_with_msg(
-                        f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' has all the signals with the same direction! Must specify the direction of the port. '{port_name} {port.signals[0].direction}'."
-                       )
-                elif port.interface:
-                    fail_with_msg(
-                        f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' is an interface! Must specify the subtype of the interface. '{port_name} {port.interface.subtype}'."
-                    )
-                elif len(port.signals) == 1:
-                    fail_with_msg(
-                        f"Port '{port_name}' of instance '{self.instance_name}' of module '{instantiator.name}' has only one signal! Must specify the direction of the port. '{port_name} {port.signals[0].direction}'."
-                    )
-
             port.connect_external(wire)
 
     def __create_build_dir(self):

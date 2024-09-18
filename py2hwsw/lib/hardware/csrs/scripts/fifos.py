@@ -150,7 +150,7 @@ def create_fifos_instances(attributes_dict, sync_fifos, async_fifos):
         #
         attributes_dict["ports"] += [
             {
-                "name": f"{fifo_name}_rst",
+                "name": f"{fifo_name}_rst_i",
                 "descr": "Synchronous reset interface. Connects directly to FIFO.",
                 "signals": [
                     {
@@ -258,7 +258,7 @@ def create_fifos_instances(attributes_dict, sync_fifos, async_fifos):
                 ],
             },
             {
-                "name": f"{fifo_name}_fifo",
+                "name": f"{fifo_name}_fifo_o",
                 "descr": "Connects directly to FIFO",
                 "signals": [
                     {
@@ -322,8 +322,8 @@ def create_fifos_instances(attributes_dict, sync_fifos, async_fifos):
                 "core_name": "iob_fifo_sync",
                 "instance_name": fifo_name,
                 "connect": {
-                    "clk_en_rst": "clk_en_rst",
-                    "rst": f"{fifo_name}_rst",
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "rst_i": f"{fifo_name}_rst",
                     "write": f"{fifo_name}_write_int",
                     "read": f"{fifo_name}_read_int",
                     "extmem": f"{fifo_name}_extmem",

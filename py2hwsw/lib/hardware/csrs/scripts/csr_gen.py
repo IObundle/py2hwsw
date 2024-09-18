@@ -453,7 +453,7 @@ class csr_gen:
 
         ports = [
             {
-                "name": "csrs_iob_output",
+                "name": "csrs_iob_o",
                 "descr": "Give user logic access to csrs internal IOb signals",
                 "signals": [
                     {"name": "csrs_iob_valid", "direction": "output", "width": 1},
@@ -560,9 +560,9 @@ class csr_gen:
                         "APB_DATA_W": "DATA_W",
                     },
                     "connect": {
-                        "clk_en_rst": "clk_en_rst",
-                        "apb": "control_if",
-                        "iob": "internal_iob",
+                        "clk_en_rst_s": "clk_en_rst_s",
+                        "apb_s": "control_if_s",
+                        "iob_m": "internal_iob",
                     },
                 }
             )
@@ -578,9 +578,9 @@ class csr_gen:
                         "DATA_W": "DATA_W",
                     },
                     "connect": {
-                        "clk_en_rst": "clk_en_rst",
-                        "axil": "control_if",
-                        "iob": "internal_iob",
+                        "clk_en_rst_s": "clk_en_rst_s",
+                        "axil_s": "control_if_s",
+                        "iob_m": "internal_iob",
                     },
                 }
             )
@@ -596,9 +596,9 @@ class csr_gen:
                         "DATA_WIDTH": "DATA_W",
                     },
                     "connect": {
-                        "clk_en_rst": "clk_en_rst",
-                        "axi": "control_if",
-                        "iob": "internal_iob",
+                        "clk_en_rst_s": "clk_en_rst_s",
+                        "axi_s": "control_if_s",
+                        "iob_m": "internal_iob",
                     },
                 }
             )
@@ -713,7 +713,7 @@ class csr_gen:
                     "RST_VAL": "1'b0",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst",
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "rvalid_nxt",
                     "data_o": "rvalid",
                 },
@@ -727,7 +727,7 @@ class csr_gen:
                     "RST_VAL": "1'b0",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst",
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "rdata_nxt",
                     "data_o": "rdata",
                 },
@@ -741,7 +741,7 @@ class csr_gen:
                     "RST_VAL": "1'b0",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst",
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "ready_nxt",
                     "data_o": "ready",
                 },

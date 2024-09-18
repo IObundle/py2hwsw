@@ -92,7 +92,7 @@ def setup(py_params_dict):
         "confs": confs,
         "ports": [
             {
-                "name": "clk_en_rst",
+                "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
                     "subtype": "slave",
@@ -100,7 +100,7 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
             {
-                "name": "control_if",
+                "name": "control_if_s",
                 "interface": {
                     "type": params["csr_if"],
                     "subtype": "slave",

@@ -48,18 +48,10 @@ class iob_core(iob_module, iob_instance):
     # Project wide special target. Used when we don't want to run normal setup (for example, when cleaning).
     global_special_target: str = ""
 
-    def __init__(
-        self,
-        *args,
-        dest_dir: str = "hardware/src",
-        attributes={},
-        connect: dict = {},
-        instantiator=None,
-        **kwargs,
-    ):
+    def __init__(self, *args, **kwargs):
         """Build a core (includes module and instance attributes)
-        param dest_dir: Destination directory, within the build directory, for the core
-        param attributes: py2hwsw dictionary describing the core
+        :param str dest_dir: Destination directory, within the build directory, for the core
+        :param dict attributes: py2hwsw dictionary describing the core
             Notes:
                 1) Each key/value pair in the dictionary describes an attribute name and
                    corresponding attribute value of the core.
@@ -73,10 +65,22 @@ class iob_core(iob_module, iob_instance):
                    'dest_dir'), and this dictionary also contains a key for the same
                    attribute (like the key 'dest_dir'), then the value given in the
                    dictionary will override the one from the constructor argument.
-        param connect: External wires to connect to ports of this instance
+        :param dict connect: External wires to connect to ports of this instance
                        Key: Port name, Value: Wire name
-        param instantiator: Module that is instantiating this instance
+        :param iob_core instantiator: Module that is instantiating this instance
+        :param bool is_parent: If this core is a parent core
         """
+        # Arguments used by this class
+        dest_dir = kwargs.get("dest_dir", "hardware/src")
+        attributes = kwargs.get("attributes", {})
+        connect = kwargs.get("connect", {})
+        instantiator = kwargs.get("instantiator", None)
+        is_parent = kwargs.get("is_parent", False)
+
+        # Create core based on 'parent' core (if applicable)
+        if self.handle_parent(*args, **kwargs):
+            return
+
         # Inherit attributes from superclasses
         iob_module.__init__(self, *args, **kwargs)
         iob_instance.__init__(self, *args, **kwargs)
@@ -147,6 +151,12 @@ class iob_core(iob_module, iob_instance):
             True,
             bool,
             descr="Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.",
+        )
+        self.set_default_attribute(
+            "parent",
+            {},
+            dict,
+            descr="Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
         )
 
         self.attributes_dict = attributes
@@ -233,18 +243,47 @@ class iob_core(iob_module, iob_instance):
         # TODO as well: Each module has a local `snippets` list.
         # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
-        if self.is_top_module:
-            # Replace Verilog snippet includes
-            self._replace_snippet_includes()
-            # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
-            self._remove_duplicate_sources()
-            # Generate docs
-            doc_gen.generate_docs(self)
-            # Generate ipxact file
-            # if self.generate_ipxact: #TODO: When should this be generated?
-            #    ipxact_gen.generate_ipxact_xml(self, reg_table, self.build_dir + "/ipxact")
-            # Lint and format sources
-            self.lint_and_format()
+        if self.is_top_module and not is_parent:
+            self.post_setup()
+
+    def post_setup(self):
+        """Scripts to run at the end of the top module's setup"""
+        # Replace Verilog snippet includes
+        self._replace_snippet_includes()
+        # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
+        self._remove_duplicate_sources()
+        # Generate docs
+        doc_gen.generate_docs(self)
+        # Generate ipxact file
+        # if self.generate_ipxact: #TODO: When should this be generated?
+        #    ipxact_gen.generate_ipxact_xml(self, reg_table, self.build_dir + "/ipxact")
+        # Lint and format sources
+        self.lint_and_format()
+
+    def handle_parent(self, *args, **kwargs):
+        """Create a new core based on parent core.
+        returns: True if parent core was used. False otherwise.
+        """
+        parent = kwargs.get("parent")
+        if not parent:
+            return False
+
+        is_parent = kwargs.get("is_parent", False)
+        belongs_to_top_module = not __class__.global_top_module
+
+        # Setup parent core
+        # FIXME: Append lists to parent: confs, ports, etc
+        self.get_core_obj(parent["core_name"], **kwargs)
+
+        # Copy files from the module's setup dir
+        # FIXME: Need attributes set
+        copy_srcs.copy_rename_setup_directory(self)
+
+        # Run post setup
+        if belongs_to_top_module and not is_parent:
+            self.post_setup()
+
+        return True
 
     def update_global_top_module(self, attributes={}):
         """Update the global top module and the global build directory.

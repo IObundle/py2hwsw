@@ -519,7 +519,7 @@ class csr_gen:
                     "RST_VAL": "1'b0",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst",
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "state_nxt",
                     "data_o": "state",
                 },

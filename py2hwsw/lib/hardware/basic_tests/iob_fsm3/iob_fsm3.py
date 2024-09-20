@@ -5,7 +5,7 @@ def setup(py_params_dict):
         "version": "0.1",
         "ports": [
             {
-                "name": "a",
+                "name": "a_o",
                 "descr": "Output port",
                 "signals": [
                     {"name": "a", "width": "8", "direction": "output"},

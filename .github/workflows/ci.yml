@@ -42,7 +42,7 @@ jobs:
 
   iob-soc-lib:
     runs-on: self-hosted
-    timeout-minutes: 10
+    timeout-minutes: 15
     if: ${{ !cancelled() }}
     needs: [ lib ]
 

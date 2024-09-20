@@ -10,30 +10,36 @@ def setup(py_params_dict):
         "original_name": "iob_aoi",
         "name": "iob_aoi",
         "version": "0.1",
+        "confs": [
+            """
+            W -t P -v 1 -m 1 -M 32
+            'Ports width'
+            """
+        ],
         "ports": [
             """
-            a_i -s a 1 input
+            a_i -s a W input
             'Input port a'
 
-            b_i -s b 1 input
+            b_i -s b W input
             'Input port b'
 
-            c_i -s c 1 input
+            c_i -s c W input
             'Input port c'
 
-            d_i -s d 1 input
+            d_i -s d W input
             'Input port d'
 
-            y_o -s y 1 output
+            y_o -s y W output
             'Output port y'
             """
         ],
         "wires": [
             """
-            and_ab_out -s aab 1
+            and_ab_out -s aab W
             'and ab output'
 
-            and_cd_out -s cad 1
+            and_cd_out -s cad W
             'and cd output'
 
             or_out -s oab 1
@@ -42,25 +48,25 @@ def setup(py_params_dict):
         ],
         "blocks": [
             """
-            iob_and iob_and_ab -p W:1 -c
+            iob_and iob_and_ab -p W:W -c
             a_i:a_i
             b_i:b_i
             y_o:and_ab_out
             'First and gate'
 
-            iob_and io_and_cd -p W:1 -c 
+            iob_and io_and_cd -p W:W -c 
             a_i:c_i 
             b_i:d_i 
             y_o:and_cd_out
             'Second and gate'
 
-            iob_or iob_or_abcd -p W:1 -c
+            iob_or iob_or_abcd -p W:W -c
             a_i:and_ab_out
             b_i:and_cd_out
             y_o:or_out
             'Or gate'
 
-            iob_inv iob_inv_out -p W:1 -c
+            iob_inv iob_inv_out -p W:W -c
             a_i:or_out
             y_o:y_o
             'Inverter'

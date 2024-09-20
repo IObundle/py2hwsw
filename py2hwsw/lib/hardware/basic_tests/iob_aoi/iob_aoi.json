@@ -2,13 +2,16 @@
     "original_name": "iob_aoi",
     "name": "iob_aoi",
     "version": "0.1",
+    "confs": [
+        "\n            W -t P -v 1 -m 1 -M 32\n            'Ports width'\n            "
+    ],
     "ports": [
-        "\n            a_i -s a 1 input\n            'Input port a'\n\n            b_i -s b 1 input\n            'Input port b'\n\n            c_i -s c 1 input\n            'Input port c'\n\n            d_i -s d 1 input\n            'Input port d'\n\n            y_o -s y 1 output\n            'Output port y'\n            "
+        "\n            a_i -s a W input\n            'Input port a'\n\n            b_i -s b W input\n            'Input port b'\n\n            c_i -s c W input\n            'Input port c'\n\n            d_i -s d W input\n            'Input port d'\n\n            y_o -s y W output\n            'Output port y'\n            "
     ],
     "wires": [
-        "\n            and_ab_out -s aab 1\n            'and ab output'\n\n            and_cd_out -s cad 1\n            'and cd output'\n\n            or_out -s oab 1\n            'or output'\n            "
+        "\n            and_ab_out -s aab W\n            'and ab output'\n\n            and_cd_out -s cad W\n            'and cd output'\n\n            or_out -s oab 1\n            'or output'\n            "
     ],
     "blocks": [
-        "\n            iob_and iob_and_ab -p W:1 -c\n            a_i:a_i\n            b_i:b_i\n            y_o:and_ab_out\n            'First and gate'\n\n            iob_and io_and_cd -p W:1 -c \n            a_i:c_i \n            b_i:d_i \n            y_o:and_cd_out\n            'Second and gate'\n\n            iob_or iob_or_abcd -p W:1 -c\n            a_i:and_ab_out\n            b_i:and_cd_out\n            y_o:or_out\n            'Or gate'\n\n            iob_inv iob_inv_out -p W:1 -c\n            a_i:or_out\n            y_o:y_o\n            'Inverter'\n            "
+        "\n            iob_and iob_and_ab -p W:W -c\n            a_i:a_i\n            b_i:b_i\n            y_o:and_ab_out\n            'First and gate'\n\n            iob_and io_and_cd -p W:W -c \n            a_i:c_i \n            b_i:d_i \n            y_o:and_cd_out\n            'Second and gate'\n\n            iob_or iob_or_abcd -p W:W -c\n            a_i:and_ab_out\n            b_i:and_cd_out\n            y_o:or_out\n            'Or gate'\n\n            iob_inv iob_inv_out -p W:W -c\n            a_i:or_out\n            y_o:y_o\n            'Inverter'\n            "
     ]
 }

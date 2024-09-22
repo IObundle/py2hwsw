@@ -3,6 +3,7 @@ import os
 import shutil
 import json
 from pathlib import Path
+import copy
 
 import iob_colors
 
@@ -159,7 +160,7 @@ class iob_core(iob_module, iob_instance):
             descr="Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
         )
 
-        self.attributes_dict = attributes
+        self.attributes_dict = copy.deepcopy(attributes)
 
         self.abort_reason = None
         # Don't setup this core if using a project wide special target.
@@ -264,26 +265,89 @@ class iob_core(iob_module, iob_instance):
         """Create a new core based on parent core.
         returns: True if parent core was used. False otherwise.
         """
-        parent = kwargs.get("parent")
+        is_parent = kwargs.pop("is_parent", False)
+        attributes = kwargs.pop("attributes", {})
+        child_attributes = kwargs.pop("child_attributes", {})
+        if is_parent:
+            self.append_child_attributes(attributes, child_attributes)
+
+        # Don't setup parent core if this one does not have parent
+        parent = attributes.get("parent")
         if not parent:
             return False
 
-        is_parent = kwargs.get("is_parent", False)
+        assert parent["core_name"] != attributes["original_name"], fail_with_msg(
+            f"Parent and child cannot have the same name: '{parent['core_name']}'"
+        )
+
         belongs_to_top_module = not __class__.global_top_module
+        # Check if this child module is the first one called (It is the leaf child of the top module. Does not have any other childs.)
+        is_first_module_called = belongs_to_top_module and not is_parent
+
+        name = attributes.get("name", attributes["original_name"])
+        # Update global build dir to match this module's name and version
+        if is_first_module_called and not __class__.global_build_dir:
+            version = attributes.get("version", "1.0")
+            __class__.global_build_dir = f"../{name}_V{version}"
 
         # Setup parent core
-        # FIXME: Append lists to parent: confs, ports, etc
-        self.get_core_obj(parent["core_name"], **kwargs)
+        parent_module = self.get_core_obj(
+            parent["core_name"],
+            is_parent=True,
+            name=name,
+            child_attributes=attributes,
+            **kwargs,
+        )
+
+        # Copy parent attributes to child
+        self.__dict__.update(parent_module.__dict__)
+        self.setup_dir = find_module_setup_dir(attributes["original_name"])[0]
+
+        if self.abort_reason:
+            return True
 
         # Copy files from the module's setup dir
-        # FIXME: Need attributes set
         copy_srcs.copy_rename_setup_directory(self)
 
         # Run post setup
-        if belongs_to_top_module and not is_parent:
+        if is_first_module_called:
             self.post_setup()
 
         return True
+
+    @staticmethod
+    def append_child_attributes(parent_attributes, child_attributes):
+        """Appends/Overrides parent attributes with child attributes"""
+        for child_attribute_name, child_value in child_attributes.items():
+            # Don't override child-specific attributes
+            if child_attribute_name in ["original_name", "setup_dir", "parent"]:
+                continue
+
+            # Override other attributes of type string
+            if type(child_value) is str:
+                parent_attributes[child_attribute_name] = child_value
+                continue
+
+            # Override or append elements from list attributes
+            assert (
+                type(child_value) is list
+            ), f"Invalid type for attribute '{child_attribute_name}': {type(child_value)}"
+
+            # Select identifier attribute. Used to compare if should override each element.
+            identifier = "name"
+            if child_attribute_name in ["blocks", "sw_modules"]:
+                identifier = "core_name"
+
+            # Process each object from list
+            for child_obj in child_value:
+                # Find object and override it
+                for idx, obj in enumerate(parent_attributes[child_attribute_name]):
+                    if obj[identifier] == child_obj[identifier]:
+                        parent_attributes[child_attribute_name][idx] = child_obj
+                        continue
+
+                # Otherwise append it to list
+                parent_attributes[child_attribute_name].append(child_obj)
 
     def update_global_top_module(self, attributes={}):
         """Update the global top module and the global build directory.
@@ -293,17 +357,9 @@ class iob_core(iob_module, iob_instance):
         super().update_global_top_module()
         # Ensure top module has a build dir (and associated attributes)
         if __class__.global_top_module == self:
-            # Attribute default values
-            original_name = self.__class__.__name__
-            name = self.original_name
-            version = "1.0"
-            # Extract values from attributes dict if available
-            if "original_name" in attributes:
-                original_name = attributes["original_name"]
-            if "name" in attributes:
-                name = attributes["name"]
-            if "version" in attributes:
-                version = attributes["version"]
+            original_name = attributes.get("original_name", self.__class__.__name__)
+            name = attributes.get("name", self.original_name)
+            version = attributes.get("version", "1.0")
             # Set attributes
             if not hasattr(self, "original_name") or not self.original_name:
                 self.original_name = original_name
@@ -513,7 +569,7 @@ class iob_core(iob_module, iob_instance):
         __class__.global_special_target = "print_core_dict"
         # Build a new module instance, to obtain its attributes
         module = __class__.get_core_obj(core_name)
-        print(json.dumps(module.attributes, indent=4))
+        print(json.dumps(module.attributes_dict, indent=4))
 
     @staticmethod
     def print_py2hwsw_attributes(core_name):
@@ -560,7 +616,7 @@ class iob_core(iob_module, iob_instance):
             # may want to use any of them to manipulate the core attributes.
             core_dict = core_module.setup(
                 {
-                    "core_name": core_name,
+                    # "core_name": core_name,
                     "build_dir": __class__.global_build_dir,
                     "py2hwsw_target": __class__.global_special_target or "setup",
                     "instantiator": (

@@ -372,7 +372,12 @@ class iob_core(iob_module, iob_instance):
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
-    attrs = ["core_name", "instance_name", ["-p", "parameters", {"nargs": "+"}, "pairs"], ["-c","connect", {"nargs": "+"}, "pairs"]]
+    attrs = [
+        "core_name",
+        "instance_name",
+        ["-p", "parameters", {"nargs": "+"}, "pairs"],
+        ["-c", "connect", {"nargs": "+"}, "pairs"],
+    ]
 
     @str_to_kwargs(attrs)
     def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):
@@ -412,16 +417,29 @@ class iob_core(iob_module, iob_instance):
     def connect_instance_ports(self, connect, instantiator):
         """
         param connect: External wires to connect to ports of this instance
-                       Key: Port name, Value: Wire name
+                       Key: Port name, Value: Wire name or tuple with wire name and signal bit slices
+                       Tuple has format:
+                       (wire_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
         param instantiator: Module that is instantiating this instance
         """
         # Connect instance ports to external wires
-        for port_name, wire_name in connect.items():
+        for port_name, connection_value in connect.items():
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(
                     f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!"
                 )
+
+            bit_slices = {}
+            if type(connection_value) is str:
+                wire_name = connection_value
+            else:
+                wire_name = connection_value[0]
+                # Convert tuple to dictionary
+                for item in connection_value[1:]:
+                    signal_name, bit_slice = item.split("[")
+                    bit_slices[signal_name] = "[" + bit_slice
+
             wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(
                 instantiator.ports, wire_name
             )
@@ -429,7 +447,7 @@ class iob_core(iob_module, iob_instance):
                 fail_with_msg(
                     f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
                 )
-            port.connect_external(wire)
+            port.connect_external(wire, bit_slices=bit_slices)
 
     def __create_build_dir(self):
         """Create build directory if it doesn't exist"""

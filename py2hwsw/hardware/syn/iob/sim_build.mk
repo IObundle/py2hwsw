@@ -1,0 +1,1 @@
+VSRC+= ../syn/$(NODE)/*.v

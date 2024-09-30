@@ -31,6 +31,7 @@ from iob_base import (
     nix_permission_hack,
     add_traceback_msg,
     debug,
+    str_to_kwargs,
 )
 import sw_tools
 import verilog_format
@@ -371,6 +372,9 @@ class iob_core(iob_module, iob_instance):
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
+    attrs = ["core_name", "instance_name", ["-p", "parameters", {"nargs": "+"}, "pairs"], ["-c","connect", {"nargs": "+"}, "pairs"]]
+
+    @str_to_kwargs(attrs)
     def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):
         """Create an instante of a module, but only if we are not using a
         project wide special target (like clean)

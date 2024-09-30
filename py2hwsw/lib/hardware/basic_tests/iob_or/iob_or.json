@@ -13,39 +13,7 @@
         }
     ],
     "ports": [
-        {
-            "name": "a",
-            "descr": "Input port",
-            "signals": [
-                {
-                    "name": "a",
-                    "width": "W",
-                    "direction": "input"
-                }
-            ]
-        },
-        {
-            "name": "b",
-            "descr": "Input port",
-            "signals": [
-                {
-                    "name": "b",
-                    "width": "W",
-                    "direction": "input"
-                }
-            ]
-        },
-        {
-            "name": "y",
-            "descr": "Output port",
-            "signals": [
-                {
-                    "name": "y",
-                    "width": "W",
-                    "direction": "output"
-                }
-            ]
-        }
+        "\n            a_i -s a W input\n            'Input port'\n\n            b_i -s b W input\n            'Input port'\n\n            y_o -s y W output\n            'Output port'\n            "
     ],
     "snippets": [
         {

@@ -1,7 +1,7 @@
 def setup(py_params_dict):
     attributes_dict = {
-        "original_name": "iob_reg_re",
-        "name": "iob_reg_re",
+        "original_name": "iob_acc",
+        "name": "iob_acc",
         "version": "0.1",
         "confs": [
             {
@@ -28,7 +28,7 @@ def setup(py_params_dict):
                     "type": "clk_en_rst",
                     "subtype": "slave",
                 },
-                "descr": "Clock, clock enable and reset",
+                "descr": "clock, clock enable and reset",
             },
             {
                 "name": "en_rst_i",
@@ -49,11 +49,11 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "data_i",
+                "name": "incr_i",
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "data",
+                        "name": "incr",
                         "width": "DATA_W",
                         "direction": "input",
                     },
@@ -73,40 +73,38 @@ def setup(py_params_dict):
         ],
         "wires": [
             {
+                "name": "data_nxt",
+                "descr": "Sum result",
+                "signals": [
+                    {
+                        "name": "data_nxt",
+                        "width": "DATA_W+1",
+                    },
+                ],
+            },
+            {
                 "name": "data_int",
                 "descr": "data_int wire",
                 "signals": [
                     {"name": "data_int", "width": "DATA_W"},
                 ],
             },
-            {
-                "name": "iob_reg_re_rst",
-                "descr": "iob_reg_re_rst wire",
-                "signals": [
-                    {"name": "rst"},
-                ],
-            },
         ],
         "blocks": [
-            {
-                "core_name": "iob_reg_r",
-                "instance_name": "reg0",
-                "parameters": {
-                    "DATA_W": "DATA_W",
-                    "RST_VAL": "RST_VAL",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "rst_i": "iob_reg_re_rst",
-                    "data_i": "data_int",
-                    "data_o": "data_o",
-                },
-            },
+            """
+            iob_reg_re reg0 -p DATA_W:DATA_W RST_VAL:RST_VAL -c
+            clk_en_rst_s:clk_en_rst_s 
+            en_rst_i:en_rst_i
+            data_i_i:data_int
+            data_o_o:data_o
+            'Accomulator register with synchronous reset and enable'
+            """
         ],
         "snippets": [
             {
-                "verilog_code": """
-        assign data_int = en_i ? data_i : data_o;
+                "verilog_code": f"""
+       assign data_nxt = data_o + incr_i;
+       assign data_int = data_nxt_o[DATA_W-1:0];
             """,
             },
         ],

@@ -10,104 +10,68 @@ def setup(py_params_dict):
         "original_name": "iob_aoi",
         "name": "iob_aoi",
         "version": "0.1",
+        "confs": [
+            """
+            W -t P -v 1 -m 1 -M 32
+            'Ports width'
+            """
+        ],
         "ports": [
-            {
-                "name": "a",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "a", "width": 1, "direction": "input"},
-                ],
-            },
-            {
-                "name": "b",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "b", "width": 1, "direction": "input"},
-                ],
-            },
-            {
-                "name": "c",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "c", "width": 1, "direction": "input"},
-                ],
-            },
-            {
-                "name": "d",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "d", "width": 1, "direction": "input"},
-                ],
-            },
-            {
-                "name": "y",
-                "descr": "Output port",
-                "signals": [
-                    {"name": "y", "width": 1, "direction": "output"},
-                ],
-            },
+            """
+            a_i -s a W input
+            'Input port a'
+
+            b_i -s b W input
+            'Input port b'
+
+            c_i -s c W input
+            'Input port c'
+
+            d_i -s d W input
+            'Input port d'
+
+            y_o -s y W output
+            'Output port y'
+            """
         ],
         "wires": [
             """
-            and_ab_out -s aab 1
-            and ab output
+            and_ab_out -s aab W
+            'and ab output'
 
-            and_cd_out -s cad 1
-            and cd output
+            and_cd_out -s cad W
+            'and cd output'
 
             or_out -s oab 1
-            or output
+            'or output'
             """,
         ],
         "blocks": [
-            {
-                "core_name": "iob_and",
-                "instance_name": "iob_and_ab",
-                "parameters": {
-                    "W": 1,
-                },
-                "connect": {
-                    "a": "a",
-                    "b": "b",
-                    "y": "and_ab_out",
-                },
-            },
-            {
-                "core_name": "iob_and",
-                "instance_name": "iob_and_cd",
-                "parameters": {
-                    "W": 1,
-                },
-                "connect": {
-                    "a": "c",
-                    "b": "d",
-                    "y": "and_cd_out",
-                },
-            },
-            {
-                "core_name": "iob_or",
-                "instance_name": "iob_or_abcd",
-                "parameters": {
-                    "W": 1,
-                },
-                "connect": {
-                    "a": "and_ab_out",
-                    "b": "and_cd_out",
-                    "y": "or_out",
-                },
-            },
-            {
-                "core_name": "iob_inv",
-                "instance_name": "iob_inv_out",
-                "parameters": {
-                    "W": 1,
-                },
-                "connect": {
-                    "a": "or_out",
-                    "y": "y",
-                },
-            },
-        ],
+            """
+            iob_and iob_and_ab -p W:W -c
+            a_i:a_i
+            b_i:b_i
+            y_o:and_ab_out
+            'First and gate'
+
+            iob_and io_and_cd -p W:W -c 
+            a_i:c_i 
+            b_i:d_i 
+            y_o:and_cd_out
+            'Second and gate'
+
+            iob_or iob_or_abcd -p W:W -c
+            a_i:and_ab_out
+            b_i:and_cd_out
+            y_o:or_out
+            'Or gate'
+
+            iob_inv iob_inv_out -p W:W -c
+            a_i:or_out
+            y_o:y_o
+            'Inverter'
+            """
+        ]
     }
 
     return attributes_dict

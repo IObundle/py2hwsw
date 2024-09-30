@@ -1,7 +1,7 @@
 def setup(py_params_dict):
     attributes_dict = {
-        "original_name": "iob_reg_re",
-        "name": "iob_reg_re",
+        "original_name": "iob_acc_ld",
+        "name": "iob_acc_ld",
         "version": "0.1",
         "confs": [
             {
@@ -28,7 +28,7 @@ def setup(py_params_dict):
                     "type": "clk_en_rst",
                     "subtype": "slave",
                 },
-                "descr": "Clock, clock enable and reset",
+                "descr": "clock, clock enable and reset",
             },
             {
                 "name": "en_rst_i",
@@ -49,11 +49,33 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "data_i",
+                "name": "ld_i",
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "data",
+                        "name": "ld",
+                        "width": 1,
+                        "direction": "input",
+                    },
+                ],
+            },
+            {
+                "name": "ld_val_i",
+                "descr": "Input port",
+                "signals": [
+                    {
+                        "name": "ld_val",
+                        "width": "DATA_W",
+                        "direction": "input",
+                    },
+                ],
+            },
+            {
+                "name": "incr_i",
+                "descr": "Input port",
+                "signals": [
+                    {
+                        "name": "incr",
                         "width": "DATA_W",
                         "direction": "input",
                     },
@@ -73,40 +95,44 @@ def setup(py_params_dict):
         ],
         "wires": [
             {
-                "name": "data_int",
-                "descr": "data_int wire",
+                "name": "data_nxt",
+                "descr": "Sum result",
                 "signals": [
-                    {"name": "data_int", "width": "DATA_W"},
+                    {
+                        "name": "data_nxt",
+                        "width": "DATA_W+1",
+                    },
                 ],
             },
             {
-                "name": "iob_reg_re_rst",
-                "descr": "iob_reg_re_rst wire",
+                "name": "data_int",
+                "descr": "data_int wire",
                 "signals": [
-                    {"name": "rst"},
+                    {"name": "data_int", "width": "DATA_W+1"},
                 ],
             },
         ],
         "blocks": [
             {
-                "core_name": "iob_reg_r",
+                "core_name": "iob_reg_re",
                 "instance_name": "reg0",
                 "parameters": {
-                    "DATA_W": "DATA_W",
+                    "DATA_W": "DATA_W+1",
                     "RST_VAL": "RST_VAL",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "rst_i": "iob_reg_re_rst",
-                    "data_i": "data_int",
-                    "data_o": "data_o",
+                    "en_rst_i": "en_rst_i",
+                    "data_i": "data_nxt",
+                    "data_o": "data_int",
                 },
             },
         ],
         "snippets": [
             {
                 "verilog_code": """
-        assign data_int = en_i ? data_i : data_o;
+            assign data_nxt = ld_i ? ld_val_i : data_o + incr_i;
+            assign data_o = data_int[DATA_W-1:0];
             """,
             },
         ],

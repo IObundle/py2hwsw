@@ -12,4 +12,5 @@ SYN_SCP_FLAGS=$(YOSYS_SCP_FLAGS)
 SYN_SYNC_FLAGS=$(YOSYS_SYNC_FLAGS)
 
 synth: $(VHDR) $(VSRC)
-	yosys -l yosys.log $(SYNTHESIZER)/build.tcl 
+	mkdir -p results
+	yosys -l yosys.log -c $(SYNTHESIZER)/build.tcl

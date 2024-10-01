@@ -44,7 +44,7 @@ class iob_signal:
         comma_char = "," if comma else ""
         port_type = " reg" if self.isvar or self.isreg else ""
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
-        return f"{self.direction}{port_type} {width_str}{self.name()}{comma_char}\n"
+        return f"{self.direction}{port_type} {width_str}{self.name}{comma_char}\n"
 
     def get_width_int(self):
         try:

@@ -800,6 +800,17 @@ def get_wb_full_ports():
 # Handle signal direction
 #
 
+# reverse direction in name's suffix
+def reverse_name_direction(name):
+    if name.endswith("_i"):
+        return name[:-2] + "_o"
+    elif name.endswith("_o"):
+        return name[:-2] + "_i"
+    elif name.endswith("_io"):
+        return name
+    else:
+        print(f"ERROR: reverse_name_direction: invalid argument {name}.")
+        exit(1)
 
 # reverse module signal direction
 def reverse_direction(direction):
@@ -816,6 +827,7 @@ def reverse_signals_dir(signals):
     new_signals = deepcopy(signals)
     for signal in new_signals:
         signal.direction = reverse_direction(signal.direction)
+        signal.name = reverse_name_direction(signal.name)
     return new_signals
 
 
@@ -851,7 +863,7 @@ def get_suffix(direction):
 # Write single port with given bus width, and name to file
 def write_port(fout, port_prefix, port):
     direction = port.direction
-    name = port_prefix + port.name + get_suffix(direction)
+    name = port_prefix + port.name
     width_str = f" [{port.width}-1:0] "
     fout.write(direction + width_str + name + "," + "\n")
 
@@ -869,36 +881,26 @@ def write_s_port(fout, port_prefix, port_list):
 # Portmap
 #
 
-
-def get_port_name(port_prefix, port):
-    suffix = get_suffix(port.direction)
-    port_name = port_prefix + port.name + suffix
-    return (suffix, port_name)
-
-
 # Generate portmap string for a single port but width and name
-def get_portmap_string(port_prefix, wire_prefix, port, connect_to_port):
-    suffix, port_name = get_port_name(port_prefix, port)
+def get_portmap_string(port_prefix, wire_prefix, port):
+    port_name = port_prefix + port.name
     wire_name = wire_prefix + port.name
-    if connect_to_port:
-        wire_name = wire_name + suffix
     return f".{port_name}({wire_name}),\n"
 
 
 # Write single port with to file
-def write_portmap(fout, port_prefix, wire_prefix, port, connect_to_port):
+def write_portmap(fout, port_prefix, wire_prefix, port):
     portmap_string = get_portmap_string(
         port_prefix,
         wire_prefix,
         port,
-        connect_to_port,
     )
     fout.write(portmap_string)
 
 
 def write_m_portmap(fout, port_prefix, wire_prefix, port_list):
     for port in port_list:
-        write_portmap(fout, port_prefix, wire_prefix, port, False)
+        write_portmap(fout, port_prefix, wire_prefix, port)
 
 
 def write_s_portmap(fout, port_prefix, wire_prefix, port_list):
@@ -907,7 +909,7 @@ def write_s_portmap(fout, port_prefix, wire_prefix, port_list):
 
 def write_m_m_portmap(fout, port_prefix, wire_prefix, port_list):
     for port in port_list:
-        write_portmap(fout, port_prefix, wire_prefix, port, True)
+        write_portmap(fout, port_prefix, wire_prefix, port)
 
 
 def write_s_s_portmap(fout, port_prefix, wire_prefix, port_list):
@@ -918,7 +920,6 @@ def write_s_s_portmap(fout, port_prefix, wire_prefix, port_list):
 # Wire
 #
 
-
 # Write wire with given name, bus size, width to file
 def write_single_wire(fout, wire_prefix, wire, for_tb):
     if isinstance(wire, iob_signal_reference):
@@ -926,7 +927,7 @@ def write_single_wire(fout, wire_prefix, wire, for_tb):
     wire_name = wire_prefix + wire.name
     wtype = "wire"
     if for_tb:
-        wire_name = wire_name + get_suffix(reverse_direction(wire.direction))
+        wire_name = reverse_name_direction(wire_name)
         wtype = get_tbsignal_type(wire.direction)
     if wire.isvar or wire.isreg:
         wtype = "reg"

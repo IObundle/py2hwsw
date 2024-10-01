@@ -134,44 +134,37 @@ ADDR_W = 32
 def get_iob_ports():
     return [
         iob_signal(
-            name="iob_valid",
-            direction="output",
+            name="iob_valid_o",
             width=1,
             descr="Request address is valid.",
         ),
         iob_signal(
-            name="iob_addr",
-            direction="output",
+            name="iob_addr_o",
             width=ADDR_W,
             descr="Address.",
         ),
         iob_signal(
-            name="iob_wdata",
-            direction="output",
+            name="iob_wdata_o",
             width=DATA_W,
             descr="Write data.",
         ),
         iob_signal(
-            name="iob_wstrb",
-            direction="output",
+            name="iob_wstrb_o",
             width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
             descr="Write strobe.",
         ),
         iob_signal(
-            name="iob_rvalid",
-            direction="input",
+            name="iob_rvalid_i",
             width=1,
             descr="Read data valid.",
         ),
         iob_signal(
-            name="iob_rdata",
-            direction="input",
+            name="iob_rdata_i",
             width=DATA_W,
             descr="Read data.",
         ),
         iob_signal(
-            name="iob_ready",
-            direction="input",
+            name="iob_ready_i",
             width=1,
             descr="Interface ready.",
         ),
@@ -182,14 +175,12 @@ def get_iob_ports():
 def get_clk_rst_ports():
     return [
         iob_signal(
-            name="clk",
-            direction="output",
+            name="clk_o",
             width=1,
             descr="Clock",
         ),
         iob_signal(
-            name="arst",
-            direction="output",
+            name="arst_o",
             width=1,
             descr="Asynchronous active-high reset",
         ),
@@ -202,8 +193,7 @@ def get_clk_en_rst_ports():
     return [
         clk_rst_ports[0],
         iob_signal(
-            name="cke",
-            direction="output",
+            name="cke_o",
             width=1,
             descr="Enable",
         ),
@@ -214,20 +204,17 @@ def get_clk_en_rst_ports():
 def get_mem_ports(suffix):
     return [
         iob_signal(
-            name="clk" + "_" + suffix,
-            direction="output",
+            name="clk" + "_" + suffix + "_o",
             width=1,
             descr=f"Clock port {suffix}",
         ),
         iob_signal(
-            name="en" + "_" + suffix,
-            direction="output",
+            name="en" + "_" + suffix + "_o",
             width=1,
             descr=f"Enable port {suffix}",
         ),
         iob_signal(
-            name="addr" + "_" + suffix,
-            direction="output",
+            name="addr" + "_" + suffix + "_o",
             width=ADDR_W,
             descr="Address port {suffix}",
         ),
@@ -238,8 +225,7 @@ def get_mem_read_ports(suffix):
     mem_ports = get_mem_ports(suffix)
     mem_read_ports = mem_ports + [
         iob_signal(
-            name="rdata" + "_" + suffix,
-            direction="input",
+            name="rdata" + "_" + suffix + "_i",
             width=DATA_W,
             descr="Data port {suffix}",
         ),
@@ -251,14 +237,12 @@ def get_mem_write_ports(suffix):
     mem_ports = get_mem_ports(suffix)
     mem_write_ports = mem_ports + [
         iob_signal(
-            name="wdata" + "_" + suffix,
-            direction="output",
+            name="wdata" + "_" + suffix + "_o",
             width=DATA_W,
             descr="Data port {suffix}",
         ),
         iob_signal(
-            name="wstrb" + "_" + suffix,
-            direction="output",
+            name="wstrb" + "_" + suffix + "_o",
             width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
             descr="Write strobe port {suffix}",
         ),
@@ -330,68 +314,57 @@ LEN_W = 8
 def get_axil_write_ports():
     return [
         iob_signal(
-            name="axil_awaddr",
-            direction="output",
+            name="axil_awaddr_o",
             width=ADDR_W,
             descr="Address write channel address.",
         ),
         iob_signal(
-            name="axil_awprot",
-            direction="output",
+            name="axil_awprot_o",
             width=PROT_W,
             descr="Address write channel protection type. Set to 000 if master output; ignored if slave input.",
         ),
         iob_signal(
-            name="axil_awvalid",
-            direction="output",
+            name="axil_awvalid_o",
             width=1,
             descr="Address write channel valid.",
         ),
         iob_signal(
-            name="axil_awready",
-            direction="input",
+            name="axil_awready_i",
             width=1,
             descr="Address write channel ready.",
         ),
         iob_signal(
-            name="axil_wdata",
-            direction="output",
+            name="axil_wdata_o",
             width=DATA_W,
             descr="Write channel data.",
         ),
         iob_signal(
-            name="axil_wstrb",
-            direction="output",
+            name="axil_wstrb_o",
             width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
             descr="Write channel write strobe.",
         ),
         iob_signal(
-            name="axil_wvalid",
-            direction="output",
+            name="axil_wvalid_o",
             width=1,
             descr="Write channel valid.",
         ),
         iob_signal(
-            name="axil_wready",
-            direction="input",
+            name="axil_wready_i",
             width=1,
             descr="Write channel ready.",
         ),
         iob_signal(
-            name="axil_bresp",
-            direction="input",
+            name="axil_bresp_i",
             width=RESP_W,
             descr="Write response channel response.",
         ),
         iob_signal(
-            name="axil_bvalid",
-            direction="input",
+            name="axil_bvalid_i",
             width=1,
             descr="Write response channel valid.",
         ),
         iob_signal(
-            name="axil_bready",
-            direction="output",
+            name="axil_bready_o",
             width=1,
             descr="Write response channel ready.",
         ),
@@ -402,50 +375,42 @@ def get_axil_write_ports():
 def get_axil_read_ports():
     return [
         iob_signal(
-            name="axil_araddr",
-            direction="output",
+            name="axil_araddr_o",
             width=ADDR_W,
             descr="Address read channel address.",
         ),
         iob_signal(
-            name="axil_arprot",
-            direction="output",
+            name="axil_arprot_o",
             width=PROT_W,
             descr="Address read channel protection type. Set to 000 if master output; ignored if slave input.",
         ),
         iob_signal(
-            name="axil_arvalid",
-            direction="output",
+            name="axil_arvalid_o",
             width=1,
             descr="Address read channel valid.",
         ),
         iob_signal(
-            name="axil_arready",
-            direction="input",
+            name="axil_arready_i",
             width=1,
             descr="Address read channel ready.",
         ),
         iob_signal(
-            name="axil_rdata",
-            direction="input",
+            name="axil_rdata_i",
             width=DATA_W,
             descr="Read channel data.",
         ),
         iob_signal(
-            name="axil_rresp",
-            direction="input",
+            name="axil_rresp_i",
             width=RESP_W,
             descr="Read channel response.",
         ),
         iob_signal(
-            name="axil_rvalid",
-            direction="input",
+            name="axil_rvalid_i",
             width=1,
             descr="Read channel valid.",
         ),
         iob_signal(
-            name="axil_rready",
-            direction="output",
+            name="axil_rready_o",
             width=1,
             descr="Read channel ready.",
         ),
@@ -466,56 +431,47 @@ def get_axi_write_ports():
 
     return axil_write + [
         iob_signal(
-            name="axi_awid",
-            direction="output",
+            name="axi_awid_o",
             width=ID_W,
             descr="Address write channel ID.",
         ),
         iob_signal(
-            name="axi_awlen",
-            direction="output",
+            name="axi_awlen_o",
             width=LEN_W,
             descr="Address write channel burst length.",
         ),
         iob_signal(
-            name="axi_awsize",
-            direction="output",
+            name="axi_awsize_o",
             width=SIZE_W,
             descr="Address write channel burst size. This signal indicates the size of each transfer in the burst.",
         ),
         iob_signal(
-            name="axi_awburst",
-            direction="output",
+            name="axi_awburst_o",
             width=BURST_W,
             descr="Address write channel burst type.",
         ),
         iob_signal(
-            name="axi_awlock",
-            direction="output",
+            name="axi_awlock_o",
             width=LOCK_W,
             descr="Address write channel lock type.",
         ),
         iob_signal(
-            name="axi_awcache",
-            direction="output",
+            name="axi_awcache_o",
             width=CACHE_W,
             descr="Address write channel memory type. Set to 0000 if master output; ignored if slave input.",
         ),
         iob_signal(
-            name="axi_awqos",
-            direction="output",
+            name="axi_awqos_o",
             width=QOS_W,
             descr="Address write channel quality of service.",
         ),
         iob_signal(
-            name="axi_wlast",
-            direction="output",
+            name="axi_wlast_o",
             width=1,
             descr="Write channel last word flag.",
         ),
         iob_signal(
-            name="axi_bid",
-            direction="input",
+            name="axi_bid_i",
             width=ID_W,
             descr="Write response channel ID.",
         ),
@@ -531,56 +487,47 @@ def get_axi_read_ports():
 
     return axil_read + [
         iob_signal(
-            name="axi_arid",
-            direction="output",
+            name="axi_arid_o",
             width=ID_W,
             descr="Address read channel ID.",
         ),
         iob_signal(
-            name="axi_arlen",
-            direction="output",
+            name="axi_arlen_o",
             width=LEN_W,
             descr="Address read channel burst length.",
         ),
         iob_signal(
-            name="axi_arsize",
-            direction="output",
+            name="axi_arsize_o",
             width=SIZE_W,
             descr="Address read channel burst size. This signal indicates the size of each transfer in the burst.",
         ),
         iob_signal(
-            name="axi_arburst",
-            direction="output",
+            name="axi_arburst_o",
             width=BURST_W,
             descr="Address read channel burst type.",
         ),
         iob_signal(
-            name="axi_arlock",
-            direction="output",
+            name="axi_arlock_o",
             width=LOCK_W,
             descr="Address read channel lock type.",
         ),
         iob_signal(
-            name="axi_arcache",
-            direction="output",
+            name="axi_arcache_o",
             width=CACHE_W,
             descr="Address read channel memory type. Set to 0000 if master output; ignored if slave input.",
         ),
         iob_signal(
-            name="axi_arqos",
-            direction="output",
+            name="axi_arqos_o",
             width=QOS_W,
             descr="Address read channel quality of service.",
         ),
         iob_signal(
-            name="axi_rid",
-            direction="input",
+            name="axi_rid_i",
             width=ID_W,
             descr="Read channel ID.",
         ),
         iob_signal(
-            name="axi_rlast",
-            direction="input",
+            name="axi_rlast_i",
             width=1,
             descr="Read channel last word.",
         ),
@@ -596,26 +543,22 @@ def get_axi_ports():
 def get_axis_ports():
     return [
         iob_signal(
-            name="axis_tvalid",
-            direction="output",
+            name="axis_tvalid_o",
             width=1,
             descr="axis stream valid.",
         ),
         iob_signal(
-            name="axis_tready",
-            direction="input",
+            name="axis_tready_i",
             width=1,
             descr="axis stream ready.",
         ),
         iob_signal(
-            name="axis_tdata",
-            direction="output",
+            name="axis_tdata_o",
             width=DATA_W,
             descr="axis stream data.",
         ),
         iob_signal(
-            name="axis_tlast",
-            direction="output",
+            name="axis_tlast_o",
             width=1,
             descr="axis stream last.",
         ),
@@ -631,50 +574,42 @@ def get_axis_ports():
 def get_apb_ports():
     return [
         iob_signal(
-            name="apb_addr",
-            direction="output",
+            name="apb_addr_o",
             width=ADDR_W,
             descr="Byte address of the transfer.",
         ),
         iob_signal(
-            name="apb_sel",
-            direction="output",
+            name="apb_sel_o",
             width=1,
             descr="Slave select.",
         ),
         iob_signal(
-            name="apb_enable",
-            direction="output",
+            name="apb_enable_o",
             width=1,
             descr="Enable. Indicates the number of clock cycles of the transfer.",
         ),
         iob_signal(
-            name="apb_write",
-            direction="output",
+            name="apb_write_o",
             width=1,
             descr="Write. Indicates the direction of the operation.",
         ),
         iob_signal(
-            name="apb_wdata",
-            direction="output",
+            name="apb_wdata_o",
             width=DATA_W,
             descr="Write data.",
         ),
         iob_signal(
-            name="apb_wstrb",
-            direction="output",
+            name="apb_wstrb_o",
             width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
             descr="Write strobe.",
         ),
         iob_signal(
-            name="apb_rdata",
-            direction="input",
+            name="apb_rdata_i",
             width=DATA_W,
             descr="Read data.",
         ),
         iob_signal(
-            name="apb_ready",
-            direction="input",
+            name="apb_ready_i",
             width=1,
             descr="Ready. Indicates the end of a transfer.",
         ),
@@ -694,8 +629,7 @@ def get_rs232_ports():
     if N_PINS == 9:
         ports += [
             iob_signal(
-                name="rs232_dcd",
-                direction="input",
+                name="rs232_dcd_i",
                 width=1,
                 descr="Data carrier detect.",
             ),
@@ -703,14 +637,12 @@ def get_rs232_ports():
     if N_PINS in [2, 4]:
         ports += [
             iob_signal(
-                name="rs232_rxd",
-                direction="input",
+                name="rs232_rxd_i",
                 width=1,
                 descr="Receive data.",
             ),
             iob_signal(
-                name="rs232_txd",
-                direction="output",
+                name="rs232_txd_o",
                 width=1,
                 descr="Transmit data.",
             ),
@@ -718,20 +650,17 @@ def get_rs232_ports():
     if N_PINS == 9:
         ports += [
             iob_signal(
-                name="rs232_dtr",
-                direction="output",
+                name="rs232_dtr_o",
                 width=1,
                 descr="Data terminal ready.",
             ),
             iob_signal(
-                name="rs232_gnd",
-                direction="input",
+                name="rs232_gnd_i",
                 width=1,
                 descr="Ground.",
             ),
             iob_signal(
-                name="rs232_dsr",
-                direction="input",
+                name="rs232_dsr_i",
                 width=1,
                 descr="Data set ready.",
             ),
@@ -739,14 +668,12 @@ def get_rs232_ports():
     if N_PINS == 4:
         ports += [
             iob_signal(
-                name="rs232_rts",
-                direction="output",
+                name="rs232_rts_o",
                 width=1,
                 descr="Request to send.",
             ),
             iob_signal(
-                name="rs232_cts",
-                direction="input",
+                name="rs232_cts_i",
                 width=1,
                 descr="Clear to send.",
             ),
@@ -754,8 +681,7 @@ def get_rs232_ports():
     if N_PINS == 9:
         ports += [
             iob_signal(
-                name="rs232_ri",
-                direction="input",
+                name="rs232_ri_i",
                 width=1,
                 descr="Ring indicator.",
             ),
@@ -773,50 +699,42 @@ def get_rs232_ports():
 def get_wb_ports():
     ports = [
         iob_signal(
-            name="wb_dat",
-            direction="input",
+            name="wb_dat_i",
             width=DATA_W,
             descr="Data input.",
         ),
         iob_signal(
-            name="wb_dat",
-            direction="output",
+            name="wb_dat_o",
             width=DATA_W,
             descr="Data output.",
         ),
         iob_signal(
-            name="wb_ack",
-            direction="input",
+            name="wb_ack_i",
             width=1,
             descr="Acknowledge input. Indicates normal termination of a bus cycle.",
         ),
         iob_signal(
-            name="wb_adr",
-            direction="output",
+            name="wb_adr_o",
             width=ADDR_W,
             descr="Address output. Passes binary address.",
         ),
         iob_signal(
-            name="wb_cyc",
-            direction="output",
+            name="wb_cyc_o",
             width=1,
             descr="Cycle output. Indicates a valid bus cycle.",
         ),
         iob_signal(
-            name="wb_sel",
-            direction="output",
+            name="wb_sel_o",
             width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
             descr="Select output. Indicates where valid data is expected on the data bus.",
         ),
         iob_signal(
-            name="wb_stb",
-            direction="output",
+            name="wb_stb_o",
             width=1,
             descr="Strobe output. Indicates valid access.",
         ),
         iob_signal(
-            name="wb_we",
-            direction="output",
+            name="wb_we_o",
             width=1,
             descr="Write enable. Indicates write access.",
         ),
@@ -830,56 +748,47 @@ def get_wb_full_ports():
     ports = get_wb_ports()
     ports += [
         iob_signal(
-            name="wb_clk",
-            direction="input",
+            name="wb_clk_i",
             width=1,
             descr="Clock input.",
         ),
         iob_signal(
-            name="wb_rst",
-            direction="input",
+            name="wb_rst_i",
             width=1,
             descr="Reset input.",
         ),
         iob_signal(
-            name="wb_tgd",
-            direction="input",
+            name="wb_tgd_i",
             width=1,
             descr="Data tag type. Contains information associated with data lines [dat] and [strb].",
         ),
         iob_signal(
-            name="wb_tgd",
-            direction="output",
+            name="wb_tgd_o",
             width=1,
             descr="Data tag type. Contains information associated with data lines [dat] and [strb].",
         ),
         iob_signal(
-            name="wb_err",
-            direction="input",
+            name="wb_err_i",
             width=1,
             descr="Error input. Indicates abnormal cycle termination.",
         ),
         iob_signal(
-            name="wb_lock",
-            direction="output",
+            name="wb_lock_o",
             width=1,
             descr="Lock output. Indicates current bus cycle is uninterruptable.",
         ),
         iob_signal(
-            name="wb_rty",
-            direction="input",
+            name="wb_rty_i",
             width=1,
             descr="Retry input. Indicates interface is not ready to accept or send data, and cycle should be retried.",
         ),
         iob_signal(
-           name="wb_tga",
-           direction="output",
+           name="wb_tga_o",
            width=1,
            descr="Address tag type. Contains information associated with address lines [adr], and is qualified by signal [stb].",
         ),
         iob_signal(
-           name="wb_tgc",
-           direction="output",
+           name="wb_tgc_o",
            width=1,
            descr="Cycle tag type. Contains information associated with bus cycles, and is qualified by signal [cyc].",
         ),

@@ -14,6 +14,9 @@ class iob_signal:
     reg_signals: list[str] = field(default_factory=list)
     descr: str = "Default description"
 
+    # Direction is used by csrs
+    direction: str = ""
+
     def __post_init__(self):
         if not self.name:
             fail_with_msg("Signal name is not set", ValueError)

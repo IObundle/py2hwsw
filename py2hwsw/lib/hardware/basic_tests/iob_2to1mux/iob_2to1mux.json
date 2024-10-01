@@ -18,19 +18,16 @@
             "descr": "Input port",
             "signals": [
                 {
-                    "name": "a",
-                    "width": "W",
-                    "direction": "input"
+                    "name": "a_i",
+                    "width": "W"
                 },
                 {
-                    "name": "b",
-                    "width": "W",
-                    "direction": "input"
+                    "name": "b_i",
+                    "width": "W"
                 },
                 {
-                    "name": "sel",
-                    "width": "1",
-                    "direction": "input"
+                    "name": "sel_i",
+                    "width": "1"
                 }
             ]
         },
@@ -39,9 +36,8 @@
             "descr": "Output port",
             "signals": [
                 {
-                    "name": "y",
-                    "width": "W",
-                    "direction": "output"
+                    "name": "y_o",
+                    "width": "W"
                 }
             ]
         }

@@ -380,18 +380,15 @@ class csr_gen:
                 else:
                     register_signals += [
                         {
-                            "name": f"{name}_wdata",
-                            "direction": "output",
+                            "name": f"{name}_wdata_o",
                             "width": self.verilog_max(n_bits, 1),
                         },
                         {
-                            "name": f"{name}_wen",
-                            "direction": "output",
+                            "name": f"{name}_wen_o",
                             "width": "1",
                         },
                         {
-                            "name": f"{name}_wready",
-                            "direction": "input",
+                            "name": f"{name}_wready_i",
                             "width": "1",
                         },
                     ]
@@ -405,23 +402,19 @@ class csr_gen:
                 else:
                     register_signals += [
                         {
-                            "name": f"{name}_rdata",
-                            "direction": "input",
+                            "name": f"{name}_rdata_i",
                             "width": self.verilog_max(n_bits, 1),
                         },
                         {
-                            "name": f"{name}_rvalid",
-                            "direction": "input",
+                            "name": f"{name}_rvalid_i",
                             "width": "1",
                         },
                         {
-                            "name": f"{name}_ren",
-                            "direction": "output",
+                            "name": f"{name}_ren_o",
                             "width": "1",
                         },
                         {
-                            "name": f"{name}_rready",
-                            "direction": "input",
+                            "name": f"{name}_rready_i",
                             "width": "1",
                         },
                     ]
@@ -456,13 +449,13 @@ class csr_gen:
                 "name": "csrs_iob_o",
                 "descr": "Give user logic access to csrs internal IOb signals",
                 "signals": [
-                    {"name": "csrs_iob_valid", "direction": "output", "width": 1},
-                    {"name": "csrs_iob_addr", "direction": "output", "width": "ADDR_W"},
-                    {"name": "csrs_iob_wdata", "direction": "output", "width": "DATA_W"},
-                    {"name": "csrs_iob_wstrb", "direction": "output", "width": "DATA_W/8"},
-                    {"name": "csrs_iob_rvalid", "direction": "output", "width": 1},
-                    {"name": "csrs_iob_rdata", "direction": "output", "width": "DATA_W"},
-                    {"name": "csrs_iob_ready", "direction": "output", "width": 1},
+                    {"name": "csrs_iob_valid_o", "width": 1},
+                    {"name": "csrs_iob_addr_o", "width": "ADDR_W"},
+                    {"name": "csrs_iob_wdata_o", "width": "DATA_W"},
+                    {"name": "csrs_iob_wstrb_o", "width": "DATA_W/8"},
+                    {"name": "csrs_iob_rvalid_o", "width": 1},
+                    {"name": "csrs_iob_rdata_o", "width": "DATA_W"},
+                    {"name": "csrs_iob_ready_o", "width": 1},
                 ],
             }
         ]

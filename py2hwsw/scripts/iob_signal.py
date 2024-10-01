@@ -34,6 +34,10 @@ class iob_signal:
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
         return f"{wire_type} {width_str}{self.name};\n"
 
+    def assert_direction(self):
+        if not self.direction:
+            fail_with_msg(f"Signal '{self.name}' has no direction", ValueError)
+
     def get_verilog_port(self, comma=True):
         """Generate a verilog port string from this signal"""
         self.assert_direction()

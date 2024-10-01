@@ -37,13 +37,13 @@ class iob_comb(iob_snippet):
             if signal_name.endswith("_o"):
                 signal = find_signal_in_wires(
                     core.ports,
-                    signal_name[:-2],
+                    signal_name,
                     process_func=generate_direction_process_func("output"),
                 )
             elif signal_name.endswith("_io"):
                 signal = find_signal_in_wires(
                     core.ports,
-                    signal_name[:-3],
+                    signal_name,
                     process_func=generate_direction_process_func("inout"),
                 )
             elif signal_name.endswith("_nxt"):

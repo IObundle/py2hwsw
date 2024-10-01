@@ -337,18 +337,19 @@ class iob_core(iob_module, iob_instance):
             # Select identifier attribute. Used to compare if should override each element.
             identifier = "name"
             if child_attribute_name in ["blocks", "sw_modules"]:
-                identifier = "core_name"
+                identifier = "instance_name"
 
             # Process each object from list
             for child_obj in child_value:
                 # Find object and override it
                 for idx, obj in enumerate(parent_attributes[child_attribute_name]):
                     if obj[identifier] == child_obj[identifier]:
+                        debug(f"Overriding {child_obj[identifier]}", 1)
                         parent_attributes[child_attribute_name][idx] = child_obj
-                        continue
-
-                # Otherwise append it to list
-                parent_attributes[child_attribute_name].append(child_obj)
+                        break
+                else:
+                    # Didn't override, so append it to list
+                    parent_attributes[child_attribute_name].append(child_obj)
 
     def update_global_top_module(self, attributes={}):
         """Update the global top module and the global build directory.

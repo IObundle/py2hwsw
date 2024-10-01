@@ -14,15 +14,16 @@ class iob_signal:
     reg_signals: list[str] = field(default_factory=list)
     descr: str = "Default description"
 
-    # Only used when signal belongs to a port
-    direction: str = ""
-
     def __post_init__(self):
         if not self.name:
             fail_with_msg("Signal name is not set", ValueError)
 
-        if self.direction not in ["", "input", "output", "inout"]:
-            fail_with_msg(f"Invalid signal direction: '{self.direction}'", ValueError)
+        if self.name.endswith("_i"): 
+            self.direction = "input"
+        elif self.name.endswith("_o"):
+            self.direction = "output"
+        elif self.name.endswith("_io"):
+            self.direction = "inout"
 
     def get_verilog_wire(self):
         """Generate a verilog wire string from this signal"""
@@ -30,34 +31,19 @@ class iob_signal:
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
         return f"{wire_type} {width_str}{self.name};\n"
 
-    def assert_direction(self):
-        if not self.direction:
-            fail_with_msg(f"Signal '{self.name}' has no direction", ValueError)
-
     def get_verilog_port(self, comma=True):
         """Generate a verilog port string from this signal"""
         self.assert_direction()
         comma_char = "," if comma else ""
         port_type = " reg" if self.isvar or self.isreg else ""
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
-        return f"{self.direction}{port_type} {width_str}{self.get_verilog_port_name()}{comma_char}\n"
-
-    def get_verilog_port_name(self):
-        """Return the verilog port name, including direction suffix"""
-        self.assert_direction()
-        if self.direction == "input":
-            return f"{self.name}_i"
-        elif self.direction == "output":
-            return f"{self.name}_o"
-        else:
-            return f"{self.name}_io"
+        return f"{self.direction}{port_type} {width_str}{self.name()}{comma_char}\n"
 
     def get_width_int(self):
         try:
             return int(self.width)
         except ValueError:
             return self.width
-
 
 @dataclass
 class iob_signal_reference:

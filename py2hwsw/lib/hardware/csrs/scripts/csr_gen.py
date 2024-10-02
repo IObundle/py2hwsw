@@ -629,10 +629,15 @@ class csr_gen:
                     "parameters": {
                         "ADDR_WIDTH": "ADDR_W",
                         "DATA_WIDTH": "DATA_W",
+                        "AXI_ID_WIDTH": "1",
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
-                        "axi_s": "control_if_s",
+                        "axi_s": (
+                            "control_if_s",
+                            "axi_awlock_i[0]",
+                            "axi_arlock_i[0]",
+                        ),
                         "iob_m": "internal_iob",
                     },
                 }

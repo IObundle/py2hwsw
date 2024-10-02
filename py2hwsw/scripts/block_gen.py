@@ -144,12 +144,11 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
             if port_idx < len(instance.ports) - 1 or idx < len(port.signals) - 1:
                 comma = ","
 
-            bit_slice = ""
-            if real_e_signal.name in port.e_connect_bit_slices:
-                bit_slice = port.e_connect_bit_slices[real_e_signal.name]
+            for bit_slice in port.e_connect_bit_slices:
+                if e_signal_name in bit_slice:
+                    e_signal_name = bit_slice
+                    break
 
-            instance_portmap += (
-                f"        .{port_name}({e_signal_name}{bit_slice}){comma}\n"
-            )
+            instance_portmap += f"        .{port_name}({e_signal_name}){comma}\n"
 
     return instance_portmap

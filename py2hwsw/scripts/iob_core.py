@@ -431,15 +431,12 @@ class iob_core(iob_module, iob_instance):
                     f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!"
                 )
 
-            bit_slices = {}
+            bit_slices = []
             if type(connection_value) is str:
                 wire_name = connection_value
             else:
                 wire_name = connection_value[0]
-                # Convert tuple to dictionary
-                for item in connection_value[1:]:
-                    signal_name, bit_slice = item.split("[")
-                    bit_slices[signal_name] = "[" + bit_slice
+                bit_slices = connection_value[1:]
 
             wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(
                 instantiator.ports, wire_name

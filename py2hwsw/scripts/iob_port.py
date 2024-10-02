@@ -15,7 +15,7 @@ class iob_port(iob_wire):
     # External wire that connects this port
     e_connect: iob_wire | None = None
     # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
-    e_connect_bit_slices: Dict[str, str] = field(default_factory=dict)
+    e_connect_bit_slices: list = field(default_factory=list)
     doc_only: bool = False
 
     def __post_init__(self):
@@ -73,8 +73,7 @@ class iob_port(iob_wire):
     def connect_external(self, wire, bit_slices={}):
         """Connects the port to an external wire
         :param iob_wire wire: external wire
-        :param dict bit_slices: bit slices of signals in wire
-            Dictionary format: Name: signal name; Value: bit slice string.
+        :param list bit_slices: bit slices of signals in wire
         """
         self.e_connect = wire
         self.e_connect_bit_slices = bit_slices

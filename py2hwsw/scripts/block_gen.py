@@ -6,7 +6,6 @@ from latex import write_table
 
 import iob_colors
 from iob_base import fail_with_msg
-from iob_port import get_signal_name_with_dir_suffix
 from iob_signal import get_real_signal
 import param_gen
 
@@ -139,13 +138,9 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
 {iob_colors.ENDC}"""
         # Connect individual signals
         for idx, signal in enumerate(port.signals):
-            port_name = get_signal_name_with_dir_suffix(signal)
+            port_name = signal.name
             real_e_signal = get_real_signal(port.e_connect.signals[idx])
-            if real_e_signal.direction:
-                # External signal belongs to a port. Use direction suffix.
-                e_signal_name = get_signal_name_with_dir_suffix(real_e_signal)
-            else:
-                e_signal_name = real_e_signal.name
+            e_signal_name = real_e_signal.name
 
             comma = ""
             if port_idx < len(instance.ports) - 1 or idx < len(port.signals) - 1:

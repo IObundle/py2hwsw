@@ -80,19 +80,3 @@ def create_port(core, *args, signals=[], interface=None, **kwargs):
         interface_obj.file_prefix = core.name + "_"
     port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
     core.ports.append(port)
-
-
-def get_signal_name_with_dir_suffix(signal: Dict):
-    """Returns a signal name with the direction suffix appended
-    param signal: signal dictionary
-    """
-    if signal.direction == "input":
-        return f"{signal.name}_i"
-    elif signal.direction == "output":
-        return f"{signal.name}_o"
-    elif signal.direction == "inout":
-        return f"{signal.name}_io"
-    raise Exception(
-        f"{iob_colors.FAIL}Unknown direction '{signal.direction}'"
-        f" in '{signal.name}'!{iob_colors.ENDC}"
-    )

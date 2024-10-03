@@ -291,13 +291,21 @@ class iob_core(iob_module, iob_instance):
             version = attributes.get("version", "1.0")
             __class__.global_build_dir = f"../{name}_V{version}"
 
+        filtered_parent_py_params = dict(parent)
+        filtered_parent_py_params.pop("core_name", None)
+        filtered_parent_py_params.pop("py2hwsw_target", None)
+        filtered_parent_py_params.pop("build_dir", None)
+
+        # print("DEBUG1", kwargs, file=sys.stderr)
+        # print("DEBUG2", filtered_parent_py_params, file=sys.stderr)
+
         # Setup parent core
         parent_module = self.get_core_obj(
             parent["core_name"],
+            **filtered_parent_py_params,
             is_parent=True,
             name=name,
             child_attributes=attributes,
-            **kwargs,
         )
 
         # Copy parent attributes to child
@@ -627,9 +635,7 @@ class iob_core(iob_module, iob_instance):
                 os.path.join(core_dir, f"{core_name}.py"),
             )
             core_module = sys.modules[core_name]
-            instantiator = (
-                kwargs.pop("instantiator") if "instantiator" in kwargs else None
-            )
+            instantiator = kwargs.pop("instantiator", None)
             # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
             # obtain the core's py2hwsw dictionary.
             # Give it a dictionary with all arguments of this function, since the user

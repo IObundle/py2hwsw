@@ -200,8 +200,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
             "descr": "Synchronous reset interface.",
             "signals": [
                 {
-                    "name": f"{fifo_name}_rst",
-                    "direction": "input",
+                    "name": f"{fifo_name}_rst_i",
                     "width": 1,
                     "descr": "Synchronous reset input",
                 },
@@ -215,20 +214,17 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
                 "descr": "FIFO write interface.",
                 "signals": [
                     {
-                        "name": f"{fifo_name}_w_en",
-                        "direction": "input",
+                        "name": f"{fifo_name}_w_en_i",
                         "width": 1,
                         "descr": "Write enable",
                     },
                     {
-                        "name": f"{fifo_name}_w_data",
-                        "direction": "input",
+                        "name": f"{fifo_name}_w_data_i",
                         "width": f"{FIFO_NAME}_W_DATA_W",
                         "descr": "Write data",
                     },
                     {
-                        "name": f"{fifo_name}_w_full",
-                        "direction": "output",
+                        "name": f"{fifo_name}_w_full_o",
                         "width": 1,
                         "descr": "Write full signal",
                     },
@@ -239,8 +235,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
                 "descr": "Connects directly to FIFO",
                 "signals": [
                     {
-                        "name": f"{fifo_name}_interrupt",
-                        "direction": "output",
+                        "name": f"{fifo_name}_interrupt_o",
                         "width": 1,
                         "descr": "FIFO interrupt. Active when level reaches threshold.",
                     },
@@ -254,20 +249,17 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
                 "descr": "FIFO read interface.",
                 "signals": [
                     {
-                        "name": f"{fifo_name}_r_en",
-                        "direction": "input",
+                        "name": f"{fifo_name}_r_en_i",
                         "width": 1,
                         "descr": "Read enable",
                     },
                     {
-                        "name": f"{fifo_name}_r_data",
-                        "direction": "output",
+                        "name": f"{fifo_name}_r_data_o",
                         "width": f"{FIFO_NAME}_R_DATA_W",
                         "descr": "Read data",
                     },
                     {
-                        "name": f"{fifo_name}_r_empty",
-                        "direction": "output",
+                        "name": f"{fifo_name}_r_empty_o",
                         "width": 1,
                         "descr": "Read empty signal",
                     },
@@ -280,44 +272,37 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
             "descr": "FIFO external memory interface.",
             "signals": [
                 {
-                    "name": f"{fifo_name}_ext_mem_clk",
-                    "direction": "output",
+                    "name": f"{fifo_name}_ext_mem_clk_o",
                     "width": 1,
                 },
                 {
-                    "name": f"{fifo_name}_ext_mem_w_en",
-                    "direction": "output",
+                    "name": f"{fifo_name}_ext_mem_w_en_o",
                     "width": f"{FIFO_NAME}_R",
                     "descr": "Memory write enable",
                 },
                 {
-                    "name": f"{fifo_name}_ext_mem_w_addr",
-                    "direction": "output",
+                    "name": f"{fifo_name}_ext_mem_w_addr_o",
                     "width": f"{FIFO_NAME}_MINADDR_W",
                     "descr": "Memory write address",
                 },
                 {
-                    "name": f"{fifo_name}_ext_mem_w_data",
-                    "direction": "output",
+                    "name": f"{fifo_name}_ext_mem_w_data_o",
                     "width": f"{FIFO_NAME}_MAXDATA_W",
                     "descr": "Memory write data",
                 },
                 #  Read port
                 {
-                    "name": f"{fifo_name}_ext_mem_r_en",
-                    "direction": "output",
+                    "name": f"{fifo_name}_ext_mem_r_en_o",
                     "width": f"{FIFO_NAME}_R",
                     "descr": "Memory read enable",
                 },
                 {
-                    "name": f"{fifo_name}_ext_mem_r_addr",
-                    "direction": "output",
+                    "name": f"{fifo_name}_ext_mem_r_addr_o",
                     "width": f"{FIFO_NAME}_MINADDR_W",
                     "descr": "Memory read address",
                 },
                 {
-                    "name": f"{fifo_name}_ext_mem_r_data",
-                    "direction": "input",
+                    "name": f"{fifo_name}_ext_mem_r_data_i",
                     "width": f"{FIFO_NAME}_MAXDATA_W",
                     "descr": "Memory read data",
                 },
@@ -328,8 +313,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
             "descr": "Connects directly to FIFO",
             "signals": [
                 {
-                    "name": f"{fifo_name}_current_level",
-                    "direction": "output",
+                    "name": f"{fifo_name}_current_level_o",
                     "width": "ADDR_W+1",
                     "descr": "FIFO level",
                 },
@@ -505,8 +489,7 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
                 "descr": "Synchronous reset interface. Connects directly to FIFO.",
                 "signals": [
                     {
-                        "name": f"{fifo_name}_rst",
-                        "direction": "input",
+                        "name": f"{fifo_name}_rst_i",
                         "width": 1,
                         "descr": "Synchronous reset input",
                     },
@@ -517,20 +500,17 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
                 "descr": "FIFO write interface. Some signals are muxed with CSRs.",
                 "signals": [
                     {
-                        "name": f"{fifo_name}_w_en",
-                        "direction": "input",
+                        "name": f"{fifo_name}_w_en_i",
                         "width": 1,
                         "descr": "Write enable",
                     },
                     {
-                        "name": f"{fifo_name}_w_data",
-                        "direction": "input",
+                        "name": f"{fifo_name}_w_data_i",
                         "width": f"{FIFO_NAME}_W_DATA_W",
                         "descr": "Write data",
                     },
                     {
-                        "name": f"{fifo_name}_w_full",
-                        "direction": "output",
+                        "name": f"{fifo_name}_w_full_o",
                         "width": 1,
                         "descr": "Write full signal",
                     },
@@ -541,20 +521,17 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
                 "descr": "FIFO read interface. Some signals are muxed with CSRs.",
                 "signals": [
                     {
-                        "name": f"{fifo_name}_r_en",
-                        "direction": "input",
+                        "name": f"{fifo_name}_r_en_i",
                         "width": 1,
                         "descr": "Read enable",
                     },
                     {
-                        "name": f"{fifo_name}_r_data",
-                        "direction": "output",
+                        "name": f"{fifo_name}_r_data_o",
                         "width": f"{FIFO_NAME}_R_DATA_W",
                         "descr": "Read data",
                     },
                     {
-                        "name": f"{fifo_name}_r_empty",
-                        "direction": "output",
+                        "name": f"{fifo_name}_r_empty_o",
                         "width": 1,
                         "descr": "Read empty signal",
                     },
@@ -565,44 +542,37 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
                 "descr": "External memory interface. Connects directly to FIFO",
                 "signals": [
                     {
-                        "name": f"{fifo_name}_ext_mem_clk",
-                        "direction": "output",
+                        "name": f"{fifo_name}_ext_mem_clk_o",
                         "width": 1,
                     },
                     {
-                        "name": f"{fifo_name}_ext_mem_w_en",
-                        "direction": "output",
+                        "name": f"{fifo_name}_ext_mem_w_en_o",
                         "width": f"{FIFO_NAME}_R",
                         "descr": "Memory write enable",
                     },
                     {
-                        "name": f"{fifo_name}_ext_mem_w_addr",
-                        "direction": "output",
+                        "name": f"{fifo_name}_ext_mem_w_addr_o",
                         "width": f"{FIFO_NAME}_MINADDR_W",
                         "descr": "Memory write address",
                     },
                     {
-                        "name": f"{fifo_name}_ext_mem_w_data",
-                        "direction": "output",
+                        "name": f"{fifo_name}_ext_mem_w_data_o",
                         "width": f"{FIFO_NAME}_MAXDATA_W",
                         "descr": "Memory write data",
                     },
                     #  Read port
                     {
-                        "name": f"{fifo_name}_ext_mem_r_en",
-                        "direction": "output",
+                        "name": f"{fifo_name}_ext_mem_r_en_o",
                         "width": f"{FIFO_NAME}_R",
                         "descr": "Memory read enable",
                     },
                     {
-                        "name": f"{fifo_name}_ext_mem_r_addr",
-                        "direction": "output",
+                        "name": f"{fifo_name}_ext_mem_r_addr_o",
                         "width": f"{FIFO_NAME}_MINADDR_W",
                         "descr": "Memory read address",
                     },
                     {
-                        "name": f"{fifo_name}_ext_mem_r_data",
-                        "direction": "input",
+                        "name": f"{fifo_name}_ext_mem_r_data_i",
                         "width": f"{FIFO_NAME}_MAXDATA_W",
                         "descr": "Memory read data",
                     },
@@ -613,8 +583,7 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
                 "descr": "Connects directly to FIFO",
                 "signals": [
                     {
-                        "name": f"{fifo_name}_level",
-                        "direction": "output",
+                        "name": f"{fifo_name}_level_o",
                         "width": "ADDR_W+1",
                         "descr": "FIFO level",
                     },

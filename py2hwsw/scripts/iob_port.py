@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict
 
 import iob_colors
@@ -14,13 +14,21 @@ class iob_port(iob_wire):
 
     # External wire that connects this port
     e_connect: iob_wire | None = None
+    # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
+    e_connect_bit_slices: list = field(default_factory=list)
     doc_only: bool = False
 
     def __post_init__(self):
         if not self.name:
             fail_with_msg("Port name is not set", ValueError)
 
-        _sufix_dict = {"_i": "input", "_o": "output", "_io": "inout", "_s": "slave", "_m": "master"}
+        _sufix_dict = {
+            "_i": "input",
+            "_o": "output",
+            "_io": "inout",
+            "_s": "slave",
+            "_m": "master",
+        }
         _direction = None
         for sufix, d in _sufix_dict.items():
             if self.name.endswith(sufix):
@@ -53,17 +61,31 @@ class iob_port(iob_wire):
                 raise Exception(
                     "Error: Direction must be 'input', 'output', or 'inout'."
                 )
-            if _direction in ["input","output","inout"] and signal.direction != _direction:
+            if (
+                _direction in ["input", "output", "inout"]
+                and signal.direction != _direction
+            ):
                 fail_with_msg(
                     f"Signal direction '{signal.direction}' does not match port name '{self.name}'",
                     ValueError,
                 )
 
-    def connect_external(self, wire):
-        """Connects the port to an external wire"""
+    def connect_external(self, wire, bit_slices={}):
+        """Connects the port to an external wire
+        :param iob_wire wire: external wire
+        :param list bit_slices: bit slices of signals in wire
+        """
         self.e_connect = wire
+        self.e_connect_bit_slices = bit_slices
 
-attrs = ["name", ["-i", "interface", {"nargs": 2}, ["type", "subtype"]], ["-s", "signals", {"nargs": 3, "action": "append"}, ["name", "width", "direction"]]]
+
+attrs = [
+    "name",
+    ["-i", "interface", {"nargs": 2}, ["type", "subtype"]],
+    ["-s", "signals", {"nargs": 3, "action": "append"}, ["name", "width", "direction"]],
+]
+
+
 @str_to_kwargs(attrs)
 def create_port(core, *args, signals=[], interface=None, **kwargs):
     """Creates a new port object and adds it to the core's port list

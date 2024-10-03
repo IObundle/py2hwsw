@@ -3,6 +3,7 @@ import os
 import shutil
 import json
 from pathlib import Path
+import copy
 
 import iob_colors
 
@@ -49,18 +50,10 @@ class iob_core(iob_module, iob_instance):
     # Project wide special target. Used when we don't want to run normal setup (for example, when cleaning).
     global_special_target: str = ""
 
-    def __init__(
-        self,
-        *args,
-        dest_dir: str = "hardware/src",
-        attributes={},
-        connect: dict = {},
-        instantiator=None,
-        **kwargs,
-    ):
+    def __init__(self, *args, **kwargs):
         """Build a core (includes module and instance attributes)
-        param dest_dir: Destination directory, within the build directory, for the core
-        param attributes: py2hwsw dictionary describing the core
+        :param str dest_dir: Destination directory, within the build directory, for the core
+        :param dict attributes: py2hwsw dictionary describing the core
             Notes:
                 1) Each key/value pair in the dictionary describes an attribute name and
                    corresponding attribute value of the core.
@@ -74,10 +67,22 @@ class iob_core(iob_module, iob_instance):
                    'dest_dir'), and this dictionary also contains a key for the same
                    attribute (like the key 'dest_dir'), then the value given in the
                    dictionary will override the one from the constructor argument.
-        param connect: External wires to connect to ports of this instance
+        :param dict connect: External wires to connect to ports of this instance
                        Key: Port name, Value: Wire name
-        param instantiator: Module that is instantiating this instance
+        :param iob_core instantiator: Module that is instantiating this instance
+        :param bool is_parent: If this core is a parent core
         """
+        # Arguments used by this class
+        dest_dir = kwargs.get("dest_dir", "hardware/src")
+        attributes = kwargs.get("attributes", {})
+        connect = kwargs.get("connect", {})
+        instantiator = kwargs.get("instantiator", None)
+        is_parent = kwargs.get("is_parent", False)
+
+        # Create core based on 'parent' core (if applicable)
+        if self.handle_parent(*args, **kwargs):
+            return
+
         # Inherit attributes from superclasses
         iob_module.__init__(self, *args, **kwargs)
         iob_instance.__init__(self, *args, **kwargs)
@@ -149,8 +154,14 @@ class iob_core(iob_module, iob_instance):
             bool,
             descr="Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.",
         )
+        self.set_default_attribute(
+            "parent",
+            {},
+            dict,
+            descr="Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
+        )
 
-        self.attributes_dict = attributes
+        self.attributes_dict = copy.deepcopy(attributes)
 
         self.abort_reason = None
         # Don't setup this core if using a project wide special target.
@@ -234,18 +245,119 @@ class iob_core(iob_module, iob_instance):
         # TODO as well: Each module has a local `snippets` list.
         # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
-        if self.is_top_module:
-            # Replace Verilog snippet includes
-            self._replace_snippet_includes()
-            # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
-            self._remove_duplicate_sources()
-            # Generate docs
-            doc_gen.generate_docs(self)
-            # Generate ipxact file
-            # if self.generate_ipxact: #TODO: When should this be generated?
-            #    ipxact_gen.generate_ipxact_xml(self, reg_table, self.build_dir + "/ipxact")
-            # Lint and format sources
-            self.lint_and_format()
+        if self.is_top_module and not is_parent:
+            self.post_setup()
+
+    def post_setup(self):
+        """Scripts to run at the end of the top module's setup"""
+        # Replace Verilog snippet includes
+        self._replace_snippet_includes()
+        # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
+        self._remove_duplicate_sources()
+        # Generate docs
+        doc_gen.generate_docs(self)
+        # Generate ipxact file
+        # if self.generate_ipxact: #TODO: When should this be generated?
+        #    ipxact_gen.generate_ipxact_xml(self, reg_table, self.build_dir + "/ipxact")
+        # Lint and format sources
+        self.lint_and_format()
+
+    def handle_parent(self, *args, **kwargs):
+        """Create a new core based on parent core.
+        returns: True if parent core was used. False otherwise.
+        """
+        is_parent = kwargs.pop("is_parent", False)
+        attributes = kwargs.pop("attributes", {})
+        child_attributes = kwargs.pop("child_attributes", {})
+        if is_parent:
+            self.append_child_attributes(attributes, child_attributes)
+
+        # Don't setup parent core if this one does not have parent
+        parent = attributes.get("parent")
+        if not parent:
+            return False
+
+        assert parent["core_name"] != attributes["original_name"], fail_with_msg(
+            f"Parent and child cannot have the same name: '{parent['core_name']}'"
+        )
+
+        belongs_to_top_module = not __class__.global_top_module
+        # Check if this child module is the first one called (It is the leaf child of the top module. Does not have any other childs.)
+        is_first_module_called = belongs_to_top_module and not is_parent
+
+        name = attributes.get("name", attributes["original_name"])
+        # Update global build dir to match this module's name and version
+        if is_first_module_called and not __class__.global_build_dir:
+            version = attributes.get("version", "1.0")
+            __class__.global_build_dir = f"../{name}_V{version}"
+
+        filtered_parent_py_params = dict(parent)
+        filtered_parent_py_params.pop("core_name", None)
+        filtered_parent_py_params.pop("py2hwsw_target", None)
+        filtered_parent_py_params.pop("build_dir", None)
+
+        # print("DEBUG1", kwargs, file=sys.stderr)
+        # print("DEBUG2", filtered_parent_py_params, file=sys.stderr)
+
+        # Setup parent core
+        parent_module = self.get_core_obj(
+            parent["core_name"],
+            **filtered_parent_py_params,
+            is_parent=True,
+            name=name,
+            child_attributes=attributes,
+        )
+
+        # Copy parent attributes to child
+        self.__dict__.update(parent_module.__dict__)
+        self.setup_dir = find_module_setup_dir(attributes["original_name"])[0]
+
+        if self.abort_reason:
+            return True
+
+        # Copy files from the module's setup dir
+        copy_srcs.copy_rename_setup_directory(self)
+
+        # Run post setup
+        if is_first_module_called:
+            self.post_setup()
+
+        return True
+
+    @staticmethod
+    def append_child_attributes(parent_attributes, child_attributes):
+        """Appends/Overrides parent attributes with child attributes"""
+        for child_attribute_name, child_value in child_attributes.items():
+            # Don't override child-specific attributes
+            if child_attribute_name in ["original_name", "setup_dir", "parent"]:
+                continue
+
+            # Override other attributes of type string
+            if type(child_value) is str:
+                parent_attributes[child_attribute_name] = child_value
+                continue
+
+            # Override or append elements from list attributes
+            assert (
+                type(child_value) is list
+            ), f"Invalid type for attribute '{child_attribute_name}': {type(child_value)}"
+
+            # Select identifier attribute. Used to compare if should override each element.
+            identifier = "name"
+            if child_attribute_name in ["blocks", "sw_modules"]:
+                identifier = "instance_name"
+
+            # Process each object from list
+            for child_obj in child_value:
+                # Find object and override it
+                for idx, obj in enumerate(parent_attributes[child_attribute_name]):
+                    if obj[identifier] == child_obj[identifier]:
+                        debug(f"Overriding {child_obj[identifier]}", 1)
+                        parent_attributes[child_attribute_name][idx] = child_obj
+                        break
+                else:
+                    # Didn't override, so append it to list
+                    parent_attributes[child_attribute_name].append(child_obj)
 
     def update_global_top_module(self, attributes={}):
         """Update the global top module and the global build directory.
@@ -255,17 +367,9 @@ class iob_core(iob_module, iob_instance):
         super().update_global_top_module()
         # Ensure top module has a build dir (and associated attributes)
         if __class__.global_top_module == self:
-            # Attribute default values
-            original_name = self.__class__.__name__
-            name = self.original_name
-            version = "1.0"
-            # Extract values from attributes dict if available
-            if "original_name" in attributes:
-                original_name = attributes["original_name"]
-            if "name" in attributes:
-                name = attributes["name"]
-            if "version" in attributes:
-                version = attributes["version"]
+            original_name = attributes.get("original_name", self.__class__.__name__)
+            name = attributes.get("name", self.original_name)
+            version = attributes.get("version", "1.0")
             # Set attributes
             if not hasattr(self, "original_name") or not self.original_name:
                 self.original_name = original_name
@@ -277,7 +381,12 @@ class iob_core(iob_module, iob_instance):
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
-    attrs = ["core_name", "instance_name", ["-p", "parameters", {"nargs": "+"}, "pairs"], ["-c","connect", {"nargs": "+"}, "pairs"]]
+    attrs = [
+        "core_name",
+        "instance_name",
+        ["-p", "parameters", {"nargs": "+"}, "pairs"],
+        ["-c", "connect", {"nargs": "+"}, "pairs"],
+    ]
 
     @str_to_kwargs(attrs)
     def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):
@@ -317,16 +426,26 @@ class iob_core(iob_module, iob_instance):
     def connect_instance_ports(self, connect, instantiator):
         """
         param connect: External wires to connect to ports of this instance
-                       Key: Port name, Value: Wire name
+                       Key: Port name, Value: Wire name or tuple with wire name and signal bit slices
+                       Tuple has format:
+                       (wire_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
         param instantiator: Module that is instantiating this instance
         """
         # Connect instance ports to external wires
-        for port_name, wire_name in connect.items():
+        for port_name, connection_value in connect.items():
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(
                     f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!"
                 )
+
+            bit_slices = []
+            if type(connection_value) is str:
+                wire_name = connection_value
+            else:
+                wire_name = connection_value[0]
+                bit_slices = connection_value[1:]
+
             wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(
                 instantiator.ports, wire_name
             )
@@ -334,7 +453,7 @@ class iob_core(iob_module, iob_instance):
                 fail_with_msg(
                     f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
                 )
-            port.connect_external(wire)
+            port.connect_external(wire, bit_slices=bit_slices)
 
     def __create_build_dir(self):
         """Create build directory if it doesn't exist"""
@@ -478,7 +597,7 @@ class iob_core(iob_module, iob_instance):
         __class__.global_special_target = "print_core_dict"
         # Build a new module instance, to obtain its attributes
         module = __class__.get_core_obj(core_name)
-        print(json.dumps(module.attributes, indent=4))
+        print(json.dumps(module.attributes_dict, indent=4))
 
     @staticmethod
     def print_py2hwsw_attributes(core_name):
@@ -516,16 +635,14 @@ class iob_core(iob_module, iob_instance):
                 os.path.join(core_dir, f"{core_name}.py"),
             )
             core_module = sys.modules[core_name]
-            instantiator = (
-                kwargs.pop("instantiator") if "instantiator" in kwargs else None
-            )
+            instantiator = kwargs.pop("instantiator", None)
             # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
             # obtain the core's py2hwsw dictionary.
             # Give it a dictionary with all arguments of this function, since the user
             # may want to use any of them to manipulate the core attributes.
             core_dict = core_module.setup(
                 {
-                    "core_name": core_name,
+                    # "core_name": core_name,
                     "build_dir": __class__.global_build_dir,
                     "py2hwsw_target": __class__.global_special_target or "setup",
                     "instantiator": (

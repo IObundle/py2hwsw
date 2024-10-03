@@ -6,41 +6,8 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "script
 
 import reg_gen
 from iob_csr import create_csr_group
-from fifos import append_fifos_csrs, create_fifos_instances
-
-interrupt_csrs = {
-    "name": "interrupt_csrs",
-    "descr": "Interrupt control and status registers",
-    "regs": [
-        {
-            "name": "status",
-            "type": "R",
-            "n_bits": 32,
-            "rst_val": 0,
-            "log2n_items": 0,
-            "autoreg": True,
-            "descr": "Interrupts status: active (1), inactive (0).",
-        },
-        {
-            "name": "mask",
-            "type": "W",
-            "n_bits": 32,
-            "rst_val": 0,
-            "log2n_items": 0,
-            "autoreg": True,
-            "descr": "Interrupts mask: enable (0), disable (1) for each interrupt.",
-        },
-        {
-            "name": "clear",
-            "type": "W",
-            "n_bits": 32,
-            "rst_val": 0,
-            "log2n_items": 0,
-            "autoreg": True,
-            "descr": "Interrupts clear: clear (1), do not clear (0) for each interrupt.",
-        },
-    ],
-}
+from interrupts import find_and_update_interrupt_csrs
+from fifos import find_and_update_fifo_csrs
 
 
 def setup(py_params_dict):
@@ -54,11 +21,6 @@ def setup(py_params_dict):
         # Overlap Read and Write register addresses
         "rw_overlap": False,
         "build_dir": "",
-        # Auto-add interrupt csrs: status, mask, clear
-        "interrupt_csrs": False,
-        # Lists of FIFO names. Will auto-add each FIFO csrs: full, empty, level, etc
-        "fifos": [],
-        "async_fifos": [],
     }
 
     # Update params with values from py_params_dict
@@ -126,16 +88,13 @@ def setup(py_params_dict):
         "snippets": [],
     }
 
+    find_and_update_interrupt_csrs(params["csrs"])
+    find_and_update_fifo_csrs(params["csrs"], attributes_dict)
+
     # Convert csrs dictionaries to objects
     csrs_obj_list = []
     for group in params["csrs"]:
         csrs_obj_list.append(create_csr_group(**group))
-
-    # Auto-add csrs
-    if params["interrupt_csrs"]:
-        csrs_obj_list.append(interrupt_csrs)
-    append_fifos_csrs(csrs_obj_list, params["fifos"] + params["async_fifos"])
-    create_fifos_instances(attributes_dict, params["fifos"], params["async_fifos"])
 
     attributes_with_csrs = attributes_dict | {
         "csrs": csrs_obj_list,
@@ -174,8 +133,10 @@ def setup(py_params_dict):
             }
         )
 
-    # Add ports for registers
-    attributes_dict["ports"] += csr_gen_obj.gen_ports(reg_table)
+    # Add ports and internal wires for registers
+    auto_ports, auto_wires = csr_gen_obj.gen_ports_wires(reg_table)
+    attributes_dict["ports"] += auto_ports
+    attributes_dict["wires"] += auto_wires
 
     # TODO: Append csr_if to config_build.mk ?
     # file2create.write(f"CSR_IF={python_module.csr_if}\n\n")

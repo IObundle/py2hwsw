@@ -600,13 +600,11 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
                 "signals": [
                     {
                         "name": f"{fifo_name}_w_en_int",
-                        "direction": "input",
                         "width": 1,
                         "descr": "Write enable",
                     },
                     {
                         "name": f"{fifo_name}_w_data_int",
-                        "direction": "input",
                         "width": f"{FIFO_NAME}_W_DATA_W",
                         "descr": "Write data",
                     },
@@ -621,7 +619,6 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
                 "signals": [
                     {
                         "name": f"{fifo_name}_r_en_int",
-                        "direction": "input",
                         "width": 1,
                         "descr": "Read enable",
                     },

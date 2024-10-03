@@ -254,7 +254,7 @@ def remove_duplicates(ports):
     seen_dicts = []
     result = []
     for d in ports:
-        tuple_d = tuple(d.items())
+        tuple_d = d
         if tuple_d not in seen_dicts:
             seen_dicts.append(tuple_d)
             result.append(d)
@@ -925,9 +925,11 @@ def write_single_wire(fout, wire_prefix, wire, for_tb):
     if isinstance(wire, iob_signal_reference):
         return
     wire_name = wire_prefix + wire.name
+    suffix = get_suffix(wire.direction)
+    if wire_name.endswith(suffix):
+        wire_name = wire_name[:-len(suffix)]
     wtype = "wire"
     if for_tb:
-        wire_name = reverse_name_direction(wire_name)
         wtype = get_tbsignal_type(wire.direction)
     if wire.isvar or wire.isreg:
         wtype = "reg"

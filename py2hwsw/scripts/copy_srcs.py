@@ -428,7 +428,7 @@ def copy_with_rename(old_core_name, new_core_name):
                 )
             ),
         )
-        # print(f"### DEBUG: {src} {dst}")
+        # print(f"### DEBUG: {src} {dst}", file=sys.stderr)
         try:
             file_perms = os.stat(src).st_mode
             with open(src, "r") as file:

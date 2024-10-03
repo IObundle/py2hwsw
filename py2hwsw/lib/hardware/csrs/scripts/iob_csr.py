@@ -39,6 +39,8 @@ class iob_csr:
     log2n_items: int = 0
     autoreg: bool = True
     descr: str = "Default description"
+    # Select if should generate internal wires or ports for this CSR
+    internal_use: bool = False
 
     def __post_init__(self):
         if not self.name:

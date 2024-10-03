@@ -108,14 +108,6 @@ def generate_blocks_snippet(core):
         f.write(code)
 
 
-def convert_int(val):
-    """Try to convert val to int"""
-    try:
-        return int(val)
-    except ValueError:
-        return 0
-
-
 def get_instance_port_connections(instance):
     """Returns a multi-line string with all port's signals connections
     for the given Verilog instance.
@@ -125,7 +117,6 @@ def get_instance_port_connections(instance):
         assert (
             port.e_connect
         ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
-        instance_portmap += f"        // {port.name} port\n"
         newlinechar = "\n"
         assert len(port.signals) == len(
             port.e_connect.signals
@@ -136,6 +127,8 @@ Port '{port.name}' has the following signals:
 External connection '{get_real_signal(port.e_connect).name}' has the following signals:
 {newlinechar.join("- " + get_real_signal(port).name for port in port.e_connect.signals)}
 {iob_colors.ENDC}"""
+
+        instance_portmap += f"        // {port.name} port\n"
         # Connect individual signals
         for idx, signal in enumerate(port.signals):
             port_name = signal.name
@@ -146,22 +139,11 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
             if port_idx < len(instance.ports) - 1 or idx < len(port.signals) - 1:
                 comma = ","
 
-            # Auto-generate bit selection if port is smaller than external signal
-            # Most significant bits of external signal are discarded
-            # NOTE: This will suppress warnings if connection was made by mistake with wrong width.
-            #       Should we keep this functionality?
-            port_width = ""
-            signal_int = convert_int(signal.width)
-            e_signal_int = convert_int(real_e_signal.width)
-            if signal_int and e_signal_int and signal_int < e_signal_int:
-                port_width = f" [{signal_int}-1:0]"
-            if signal_int and e_signal_int and signal_int > e_signal_int:
-                fail_with_msg(
-                    f"Port '{port.name}' of instance '{instance.name}' has signal '{port_name}' with width '{signal.width}' which is greater than external signal width {real_e_signal.width}!"
-                )
+            for bit_slice in port.e_connect_bit_slices:
+                if e_signal_name in bit_slice:
+                    e_signal_name = bit_slice
+                    break
 
-            instance_portmap += (
-                f"        .{port_name}({e_signal_name}{port_width}){comma}\n"
-            )
+            instance_portmap += f"        .{port_name}({e_signal_name}){comma}\n"
 
     return instance_portmap

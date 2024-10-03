@@ -48,6 +48,9 @@ class iob_wire:
                 if isinstance(signal, iob_signal_reference):
                     continue
                 if signal.direction:
+                    suffix = if_gen.get_suffix(signal.direction)
+                    if signal.name.endswith(suffix):
+                        signal.name = signal.name[:-len(suffix)]
                     signal.direction = ""
 
 attrs = ["name", ["-i", "interface", {"nargs": 2}, ["type", "subtype"]], ["-s", "signals", {"nargs": 2, "action": "append"}, ["name", "width"]]]

@@ -1,7 +1,8 @@
-# Copyright © 2023 IObundle, Lda. All rights reserved.
+# SPDX-FileCopyrightText: 2024 IObundle
 #
+# SPDX-License-Identifier: MIT
+
 # This file is copied to the root of the build directory and becomes the top Makefile.
-#
 
 SHELL:=bash
 

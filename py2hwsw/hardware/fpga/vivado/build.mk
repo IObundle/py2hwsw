@@ -1,7 +1,8 @@
-# (c) 2022-Present IObundle, Lda, all rights reserved
+# SPDX-FileCopyrightText: 2024 IObundle
 #
+# SPDX-License-Identifier: MIT
+
 # This makefile is used at build-time
-#
 
 FPGA_SERVER=$(VIVADO_SERVER)
 FPGA_USER=$(VIVADO_USER)

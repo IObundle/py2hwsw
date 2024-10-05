@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 #grab TOP from environment variable NAME in tcl
 set TOP $env(NAME)
 set CSR_IF $env(CSR_IF)

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 LO_RUNNING = $(shell pgrep libreoffice)
 
 PDF = $(patsubst %.odg,%.pdf,$(wildcard *.odg))

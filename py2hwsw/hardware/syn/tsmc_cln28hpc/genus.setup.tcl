@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
 
 #get from command line arg
 set LIBDIR /tria/apps/libs/arm/tsmc/cln28hpc 

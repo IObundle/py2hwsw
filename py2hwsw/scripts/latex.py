@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-# Script with LaTeX related functions
 
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+# Script with LaTeX related functions
 """
 Write Latex table
 """

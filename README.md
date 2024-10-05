@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2024 IObundle
+
+SPDX-License-Identifier: MIT
+-->
+
 # py2hwsw
 
 ## A Python framework for embedded HW/SW projects

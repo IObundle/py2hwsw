@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 def setup(py_params_dict):
     """Standard py2hwsw setup method
     This method is called during the py2hwsw setup process to obtain the dictionary of

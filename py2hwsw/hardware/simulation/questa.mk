@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 SIM_SERVER=$(QUESTA_SERVER)
 SIM_USER=$(QUESTA_USER)
 SIM_SSH_FLAGS=$(QUESTA_SSH_FLAGS)

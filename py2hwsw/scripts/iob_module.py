@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 from iob_base import iob_base, process_elements_from_list
 from iob_conf import create_conf
 from iob_port import create_port

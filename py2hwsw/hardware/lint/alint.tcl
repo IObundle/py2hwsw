@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 set TOP [lindex $argv 0]
 set CSR_IF [lindex $argv 1]
 

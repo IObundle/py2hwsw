@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 VTOP?=$(NAME)
 
 VFLAGS+=--cc --exe -I. -I../src -I../common_src -Isrc --top-module $(VTOP)

@@ -1,8 +1,8 @@
-# (c) 2022-Present IObundle, Lda, all rights reserved
+# SPDX-FileCopyrightText: 2024 IObundle
 #
-# This makefile is used at build-time in $(BUILD_DIR)/software/Makefile
-#
+# SPDX-License-Identifier: MIT
 
+# This makefile is used at build-time in $(BUILD_DIR)/software/Makefile
 include ../config_build.mk
 
 #########################################

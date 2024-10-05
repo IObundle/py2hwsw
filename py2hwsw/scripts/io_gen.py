@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 #
 #    ios.py: build Verilog module IO and documentation
 #
-
 from latex import write_table
 import os
 

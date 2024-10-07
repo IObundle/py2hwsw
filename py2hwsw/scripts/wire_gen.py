@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 #
 #    wire_gen.py: build Verilog module wires
 #
-
 import if_gen
 import os
 from iob_signal import iob_signal

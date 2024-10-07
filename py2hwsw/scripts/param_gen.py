@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 from iob_base import find_obj_in_list, fail_with_msg
 
 

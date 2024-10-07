@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 from sys import argv
 import sys
 

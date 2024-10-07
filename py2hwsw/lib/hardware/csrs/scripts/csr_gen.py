@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 #
 #    csr_gen.py: build Verilog software accessible registers and software getters and setters
 #
-
 import sys
 import os
 from math import ceil, log, log2

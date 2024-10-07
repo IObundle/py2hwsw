@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 
-# importing modules
-import os, sys
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+import os
+import sys
 import signal
 import importlib.util
 import time

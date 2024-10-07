@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 IObundle
+//
+// SPDX-License-Identifier: MIT
+
 `define BAUD 115200
 `define FREQ 50000000
 `define IOB_MEM_NO_READ_ON_WRITE 1

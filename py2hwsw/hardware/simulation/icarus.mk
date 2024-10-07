@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 VFLAGS+=-W all -g2005-sv -I. -I../src -I../common_src -Isrc -Ihardware/src
 
 ifeq ($(VCD),1)

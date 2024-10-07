@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 from dataclasses import dataclass, field
 from iob_comb import iob_comb
 import re

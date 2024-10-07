@@ -1,7 +1,10 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 #
 #    doc_gen.py: generate documentation
 #
-
 import config_gen
 import io_gen
 import block_gen

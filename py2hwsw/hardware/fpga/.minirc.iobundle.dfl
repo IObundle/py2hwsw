@@ -1,4 +1,6 @@
-# IObundle's minicom configuration file
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
 
 # Serial port settings
 pu port             /dev/usb-uart

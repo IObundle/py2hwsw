@@ -1,4 +1,8 @@
- # Read the Verilog files
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+# Read the Verilog files
 yosys read_verilog -DSYNTHESIS -I./src -I../src -I../common_src ../src/*.v
 
 set top iob_soc

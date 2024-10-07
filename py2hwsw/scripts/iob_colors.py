@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 HEADER = "\033[95m"
 OKBLUE = "\033[94m"  # Blue
 INFO = "\033[96mInfo: "  # Cyan

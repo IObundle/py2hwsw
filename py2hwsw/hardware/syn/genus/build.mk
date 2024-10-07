@@ -1,8 +1,8 @@
-# (c) 2022-Present IObundle, Lda, all rights reserved
+# SPDX-FileCopyrightText: 2024 IObundle
 #
-# This makefile segment is used at build-time
-#
+# SPDX-License-Identifier: MIT
 
+# This makefile segment is used at build-time
 
 SYN_SERVER=$(CADENCE_SERVER)
 SYN_USER=$(CADENCE_USER)

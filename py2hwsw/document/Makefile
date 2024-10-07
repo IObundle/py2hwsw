@@ -1,7 +1,8 @@
-# (c) 2022-Present IObundle, Lda, all rights reserved
+# SPDX-FileCopyrightText: 2024 IObundle
 #
+# SPDX-License-Identifier: MIT
+
 # Makefile for creating documents in the build directory
-#
 
 SHELL = bash
 

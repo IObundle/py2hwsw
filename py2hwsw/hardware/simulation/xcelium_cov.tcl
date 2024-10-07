@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 load -refinement iob_cov_waiver.vRefine
 report -summary -inst -metrics all -covered -cumulative on -grading covered -out coverage_report_summary.rpt
 report -detail -inst -metrics all -source on -out coverage_report_detail.rpt

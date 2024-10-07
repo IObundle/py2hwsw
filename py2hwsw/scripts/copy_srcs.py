@@ -1,5 +1,8 @@
-# This module copies sources to the build directory
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
 
+# This module copies sources to the build directory
 import os
 import sys
 import subprocess

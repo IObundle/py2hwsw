@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 SIM_SERVER=$(CADENCE_SERVER)
 SIM_USER=$(CADENCE_USER)
 SIM_SSH_FLAGS=$(CADENCE_SSH_FLAGS)

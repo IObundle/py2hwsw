@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2024 IObundle
+//
+// SPDX-License-Identifier: MIT
 
 module BUF(A, Y);
 input A;

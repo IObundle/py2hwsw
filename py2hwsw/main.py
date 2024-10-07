@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 def main():
 	# This file is just a wrapper for py2hwsw.py
 	import os

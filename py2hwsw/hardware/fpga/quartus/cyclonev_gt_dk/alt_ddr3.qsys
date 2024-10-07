@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+SPDX-FileCopyrightText: 2024 IObundle
+
+SPDX-License-Identifier: MIT
+-->
+
 <system name="$${FILENAME}">
  <component
    name="$${FILENAME}"

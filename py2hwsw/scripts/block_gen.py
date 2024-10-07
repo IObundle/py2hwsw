@@ -1,5 +1,9 @@
+# SPDX-FileCopyrightText: 2024 IObundle
 #
-#    blocks.py: instantiate Verilog modules and generate their documentation
+# SPDX-License-Identifier: MIT
+
+#
+#    blocks_gen.py: instantiate Verilog modules and generate their documentation
 #
 
 from latex import write_table

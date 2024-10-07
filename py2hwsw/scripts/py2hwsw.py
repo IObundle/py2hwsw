@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 import sys
 import argparse
 
@@ -7,7 +11,7 @@ import iob_base
 from iob_base import fail_with_msg
 from iob_core import iob_core
 
-PY2HWSW_VERSION = "0.7.17"
+PY2HWSW_VERSION = "0.7.18"
 
 if __name__ == "__main__":
     sys.dont_write_bytecode = True

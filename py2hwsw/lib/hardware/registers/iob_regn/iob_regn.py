@@ -10,8 +10,6 @@ def setup(py_params_dict):
     if "RST_POL" in py_params_dict:
         edge = py_params_dict["RST_POL"]
     attributes_dict = {
-        "original_name": "iob_regn",
-        "name": "iob_regn",
         "version": "0.1",
         "confs": [
             {

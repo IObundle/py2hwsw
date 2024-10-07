@@ -52,7 +52,6 @@ def setup(py_params_dict):
             confs.append(conf)
 
     attributes_dict = {
-        "original_name": "csrs",
         "name": params["name"],
         "version": params["version"],
         "confs": confs,

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 def setup(py_params_dict):
     """Standard py2hwsw setup method
     This method is called during the py2hwsw setup process to obtain the dictionary of
@@ -11,8 +12,6 @@ def setup(py_params_dict):
     """
     # Dictionary that describes this core using the py2hw dictionary interface
     attributes_dict = {
-        "original_name": "iob_aoi",
-        "name": "iob_aoi",
         "version": "0.1",
         "confs": [
             """
@@ -75,7 +74,7 @@ def setup(py_params_dict):
             y_o:y_o
             'Inverter'
             """
-        ]
+        ],
     }
 
     return attributes_dict

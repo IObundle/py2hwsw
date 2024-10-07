@@ -2,10 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 def setup(py_params_dict):
     attributes_dict = {
-        "original_name": "iob_reg_e",
-        "name": "iob_reg_e",
         "version": "0.1",
         "confs": [
             {

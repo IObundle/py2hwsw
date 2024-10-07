@@ -7,8 +7,8 @@ from iob_conf import create_conf
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
-from iob_comb import *
-from iob_fsm import *
+from iob_comb import iob_comb, create_comb
+from iob_fsm import iob_fsm, create_fsm
 
 
 class iob_module(iob_base):
@@ -146,7 +146,5 @@ def get_list_attr_handler(func):
         x,
         # 'y' is a dictionary describing an object in py2hw syntax
         # '**y' is used to unpack the dictionary and pass it as arguments to 'func'
-        lambda y: (
-            func(**y) if isinstance(y, dict) else func(y)
-        ),
+        lambda y: (func(**y) if isinstance(y, dict) else func(y)),
     )

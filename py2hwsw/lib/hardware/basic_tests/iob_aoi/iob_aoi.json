@@ -1,6 +1,4 @@
 {
-    "original_name": "iob_aoi",
-    "name": "iob_aoi",
     "version": "0.1",
     "confs": [
         "\n            W -t P -v 1 -m 1 -M 32\n            'Ports width'\n            "

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 import sys
 import os
 import shutil
@@ -184,7 +188,10 @@ class iob_core(iob_module, iob_instance):
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
         self.setup_dir = find_module_setup_dir(self.original_name)[0]
-        # print(f"{self.name} {self.build_dir} {self.is_top_module}")  # DEBUG
+        # print(
+        #     f"DEBUG: {self.name} {self.original_name} {self.build_dir} {self.is_top_module}",
+        #     file=sys.stderr,
+        # )
 
         if self.abort_reason:
             # Generate instance parameters when aborted due to duplicate setup
@@ -346,6 +353,11 @@ class iob_core(iob_module, iob_instance):
             identifier = "name"
             if child_attribute_name in ["blocks", "sw_modules"]:
                 identifier = "instance_name"
+            elif child_attribute_name in ["board_list", "ignore_snippets"]:
+                # Elements in list do not have identifier, so just append them to parent list
+                for child_obj in child_value:
+                    parent_attributes[child_attribute_name].append(child_obj)
+                continue
 
             # Process each object from list
             for child_obj in child_value:
@@ -562,6 +574,11 @@ class iob_core(iob_module, iob_instance):
         """
         with open(filepath) as f:
             core_dict = json.load(f)
+
+        default_core_name = os.path.splitext(os.path.basename(filepath))[0]
+        core_dict.setdefault("original_name", default_core_name)
+        core_dict.setdefault("name", default_core_name)
+
         return cls.py2hw(core_dict, **kwargs)
 
     @staticmethod
@@ -651,6 +668,8 @@ class iob_core(iob_module, iob_instance):
                     **kwargs,
                 }
             )
+            core_dict.setdefault("original_name", core_name)
+            core_dict.setdefault("name", core_name)
             instance = __class__.py2hw(
                 core_dict,
                 instantiator=instantiator,

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 set NAME [lindex $argv 0]
 
 project_open -force $NAME -revision $NAME

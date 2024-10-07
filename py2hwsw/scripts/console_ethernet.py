@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-# importing modules
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 import os
 import sys
 

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 #----------------------------------------------------------------------
 # Copyright (c) 2017 CAST, Inc.
 # Copyright (c) 2023 IObundle, Lda.

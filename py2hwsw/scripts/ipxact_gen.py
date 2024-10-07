@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
-# TODO: account for log2n_items in the memory map
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
 
+# TODO: account for log2n_items in the memory map
 import math
 import if_gen
 import re

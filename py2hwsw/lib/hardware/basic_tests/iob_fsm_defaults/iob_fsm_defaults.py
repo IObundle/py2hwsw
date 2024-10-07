@@ -1,7 +1,10 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+
 def setup(py_params_dict):
     attributes_dict = {
-        "original_name": "iob_fsm_defaults",
-        "name": "iob_fsm_defaults",
         "version": "0.1",
         "ports": [
             {
@@ -32,7 +35,7 @@ begin
     pc_nxt = B;
 end
 """
-            }
+        },
     }
 
     return attributes_dict

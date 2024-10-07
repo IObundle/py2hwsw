@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 from dataclasses import dataclass, field
 
 FAIL = "\033[91mError: "  # Red

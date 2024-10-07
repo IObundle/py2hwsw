@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 # this script generates interfaces for Verilog modules and testbenches to add a
 # new standard interface, add the name to the interface_names list, and an
 # interface dictionary as below run this script with the -h option for help
-
 from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Dict

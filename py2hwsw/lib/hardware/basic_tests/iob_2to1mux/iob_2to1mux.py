@@ -1,7 +1,10 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+
 def setup(py_params_dict):
     attributes_dict = {
-        "original_name": "iob_2to1mux",
-        "name": "iob_2to1mux",
         "version": "0.1",
         "confs": [
             {
@@ -37,7 +40,7 @@ def setup(py_params_dict):
                 else
                     y_o = a_i;
                 """,
-            }
+        },
     }
 
     return attributes_dict

@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
-# Joins two hex files, one starting at address 0 and one starting at address TOTALSIZE/2
 
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+# Joins two hex files, one starting at address 0 and one starting at address TOTALSIZE/2
 from sys import argv
 import os
 

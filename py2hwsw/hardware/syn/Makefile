@@ -1,7 +1,8 @@
-# This file becomes the syn makefile when copied to the build
-# (c) 2022-Present IObundle, Lda, all rights reserved
+# SPDX-FileCopyrightText: 2024 IObundle
 #
-# directory
+# SPDX-License-Identifier: MIT
+
+# This file becomes the syn makefile when copied to the build directory
 
 SHELL:=bash
 

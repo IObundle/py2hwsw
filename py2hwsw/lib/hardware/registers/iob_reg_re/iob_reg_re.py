@@ -82,7 +82,7 @@ def setup(py_params_dict):
                 "name": "iob_reg_re_rst",
                 "descr": "iob_reg_re_rst wire",
                 "signals": [
-                    {"name": "rst"},
+                    {"name": "rst_i"},
                 ],
             },
         ],

@@ -423,6 +423,8 @@ def copy_with_rename(old_core_name, new_core_name):
     """
 
     def copy_func(src, dst):
+        # Add write permission due to Nix hack
+        nix_permission_hack(os.path.dirname(dst))
         dst = os.path.join(
             os.path.dirname(dst),
             os.path.basename(
@@ -444,10 +446,11 @@ def copy_with_rename(old_core_name, new_core_name):
                 )
             with open(dst, "w") as file:
                 file.writelines(lines)
-        except:
+        except Exception:
             shutil.copyfile(src, dst)
         # Set file permissions equal to source file
-        os.chmod(dst, file_perms)
+        # and add write permission due to Nix hack
+        os.chmod(dst, file_perms | 0o200)
 
     return copy_func
 
@@ -473,6 +476,7 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
                 os.path.join(core.setup_dir, f"{core.name}.v"),
                 os.path.join(core.build_dir, dst_directory, f"{core.name}.v"),
             )
+            nix_permission_hack(os.path.join(core.build_dir, dst_directory))
             return
     elif directory == "hardware/fpga":
         # Skip if board_list is empty
@@ -524,6 +528,7 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
                     f"{iob_colors.FAIL}FPGA directory {fpga} not found in {core.setup_dir}/hardware/fpga/{iob_colors.ENDC}"
                 )
 
+        nix_permission_hack(os.path.join(core.build_dir, directory))
         # No need to copy any more files in this directory
         return
 
@@ -543,6 +548,7 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
         copy_function=copy_with_rename(core.original_name, core.name),
         ignore=shutil.ignore_patterns(*exclude_file_list),
     )
+    nix_permission_hack(os.path.join(core.build_dir, dst_directory))
 
 
 def copy_rename_setup_directory(core, exclude_file_list=[]):

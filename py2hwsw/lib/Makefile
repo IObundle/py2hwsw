@@ -12,8 +12,6 @@
 LIB_DIR:=.
 export LIB_DIR
 
-PROJECT_ROOT=..
-
 # Default lib module to setup. Can be overriden by the user.
 CORE ?=iob_ctls
 
@@ -21,7 +19,7 @@ CORE ?=iob_ctls
 all: sim-test
 
 setup:
-	nix-shell --run "py2hwsw $(CORE) setup --project_root $(PROJECT_ROOT) --build_dir '$(BUILD_DIR)' --no_verilog_lint"
+	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --no_verilog_lint"
 
 sim-build:
 	nix-shell --run "scripts/test.sh build $(CORE)"

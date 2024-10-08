@@ -1,0 +1,3 @@
+[submodule "py2hwsw/lib/hardware/iob_system/submodules/VEXRISCV"]
+	path = py2hwsw/lib/hardware/iob_system/submodules/VEXRISCV
+	url = git@github.com:IObundle/iob-vexriscv.git

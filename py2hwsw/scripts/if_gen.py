@@ -933,6 +933,7 @@ def write_single_wire(fout, wire_prefix, wire, for_tb):
         wire_name = wire_name[:-len(suffix)]
     wtype = "wire"
     if for_tb:
+        wire_name = wire_name + get_suffix(reverse_direction(wire.direction))
         wtype = get_tbsignal_type(wire.direction)
     if wire.isvar or wire.isreg:
         wtype = "reg"

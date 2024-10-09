@@ -75,6 +75,21 @@ def setup(py_params_dict):
     #
     attributes_dict["wires"] = [
         {
+            "name": "ps_clk_arstn",
+            "descr": "Clock and reset",
+            "signals": [
+                {"name": "ps_clk", "width": "1"},
+                {"name": "ps_arstn", "width": "1"},
+            ],
+        },
+        {
+            "name": "ps_clk_rst",
+            "descr": "Clock and reset",
+            "interface": {
+                "type": "clk_rst",
+            },
+        },
+        {
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
             "interface": {
@@ -84,12 +99,9 @@ def setup(py_params_dict):
         {
             "name": "rs232_int",
             "descr": "iob-system uart interface",
-            "signals": [
-                {"name": "rxd"},
-                {"name": "txd"},
-                {"name": "rs232_rts", "width": "1"},
-                {"name": "high", "width": "1"},
-            ],
+            "interface": {
+                "type": "rs232",
+            },
         },
         {
             "name": "axi",
@@ -103,34 +115,15 @@ def setup(py_params_dict):
             },
         },
         {
-            "name": "intercon_clk_rst",
+            "name": "intercon_m_clk_rst",
             "descr": "AXI interconnect clock and reset inputs",
-            "signals": [
-                {
-                    "name": "ddr4_axi_clk" if params["use_extmem"] else "clk",
-                    "width": 1,
-                },
-                {"name": "intercon_rst", "width": "1"},
-            ],
+            "interface": {
+                "type": "clk_rst",
+                "wire_prefix": "intercon_m_",
+            },
         },
         {
-            "name": "intercon_s0_clk_rst",
-            "descr": "Interconnect slave 0 clock reset interface",
-            "signals": [
-                {"name": "clk"},
-                {"name": "intercon_s0_arstn", "width": "1"},
-            ],
-        },
-        {
-            "name": "intercon_m0_clk_rst",
-            "descr": "Interconnect master 0 clock and reset",
-            "signals": [
-                {"name": "ddr4_axi_clk" if params["use_extmem"] else "clk"},
-                {"name": "intercon_m0_arstn", "width": "1"},
-            ],
-        },
-        {
-            "name": "memory_axi",
+            "name": "ps_axi",
             "descr": "AXI bus to connect interconnect and memory",
             "interface": {
                 "type": "axi",
@@ -139,69 +132,15 @@ def setup(py_params_dict):
                 "LEN_W": "AXI_LEN_W",
                 "ADDR_W": "AXI_ADDR_W",
                 "DATA_W": "AXI_DATA_W",
-                "LOCK_W": 1 if params["use_extmem"] else 2,
+                "LOCK_W": 1,
             },
         },
     ]
-    if params["use_extmem"]:
-        attributes_dict["wires"] += [
-            {
-                "name": "ddr4_ui_clk_out",
-                "descr": "DDR4 user interface clock output",
-                "signals": [
-                    {"name": "clk"},
-                ],
-            },
-            {
-                "name": "ddr4_axi_clk_rst",
-                "descr": "ddr4 axi clock and resets",
-                "signals": [
-                    {"name": "ddr4_axi_clk"},
-                    {"name": "intercon_rst"},
-                    {"name": "intercon_m0_arstn"},
-                ],
-            },
-        ]
-    if not params["use_extmem"]:
-        attributes_dict["wires"] += [
-            {
-                "name": "clk_wizard_out",
-                "descr": "Connect clock wizard outputs to iob-system clock and reset",
-                "signals": [
-                    {"name": "clk"},
-                    {"name": "intercon_rst"},
-                ],
-            },
-            {
-                "name": "axi_ram_clk",
-                "descr": "AXI RAM clock input",
-                "signals": [
-                    {"name": "clk"},
-                ],
-            },
-            {
-                "name": "axi_ram_rst",
-                "descr": "AXI RAM reset input",
-                "signals": [
-                    {"name": "axi_ram_rst", "width": "1"},
-                ],
-            },
-        ]
 
     #
     # Blocks
     #
     attributes_dict["blocks"] = [
-        {
-            "core_name": "xilinx_clock_wizard",
-            "instance_name": "clk_250_to_100_MHz",
-            "instance_description": "PLL to generate system clock",
-            "parameters": {
-                "OUTPUT_PER": 10,
-                "INPUT_PER": 4,
-            },
-            "instantiate": False,
-        },
         {
             # IOb-SoC Memory Wrapper
             "core_name": "iob_system_mwrap",
@@ -232,47 +171,27 @@ def setup(py_params_dict):
                 "AXI_DATA_W": "AXI_DATA_W",
             },
             "connect": {
-                "clk_rst_s": "intercon_clk_rst",
-                "m0_clk_rst": "intercon_m0_clk_rst",
-                "m0_axi_m": "memory_axi",
-                "s0_clk_rst": "intercon_s0_clk_rst",
+                "clk_rst_s": "ps_clk_rst",
+                "m0_clk_rst": "intercon_m_clk_rst",
+                "m0_axi_m": "ps_axi",
+                "s0_clk_rst": "ps_clk_rst",
                 "s0_axi_s": "axi",
             },
             "num_slaves": 1,
         },
-        {
-            "core_name": "axi_ram",
-            "instance_name": "ddr_model_mem",
-            "instance_description": "DDR model memory",
-            "parameters": {
-                "ID_WIDTH": "AXI_ID_W",
-                "ADDR_WIDTH": "AXI_ADDR_W",
-                "DATA_WIDTH": "AXI_DATA_W",
-                "READ_ON_WRITE": "1",
-            },
-            "connect": {
-                "clk_i": "axi_ram_clk",
-                "rst_i": "axi_ram_rst",
-                "axi_s": "memory_axi",
-            },
-        },
     ]
 
-    if params["init_mem"]:
-        attributes_dict["blocks"][-1]["parameters"].update(
-            {
-                "FILE": f'"{params["name"]}_firmware"',
-            }
-        )
-
+    #
+    # Snippets
+    #
     attributes_dict["snippets"] = [
         {
             "verilog_code": """
-    // General connections
-    assign high = 1'b1;
-    assign cke = 1'b1;
-    assign arst = ~intercon_s0_arstn;
-""",
+            // General connections
+            assign cke = 1'b1;
+            assign arst = ~ps_arstn;
+            assign ps_arst = ~ps_arstn;
+            """,
         },
     ]
 

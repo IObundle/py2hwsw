@@ -8,9 +8,10 @@ let
   # Get local py2hwsw path from `PY2HWSW_PATH` env variable
   py2hwsw =
   let py2hwswPath = builtins.getEnv "PY2HWSW_PATH"; in
-  if py2hwswPath == null then
+  if py2hwswPath != "" then
   pkgs.python3.pkgs.buildPythonPackage rec {
     pname = "py2hwsw";
+    version = "";
 
     src = pkgs.lib.cleanSource py2hwswPath;
 

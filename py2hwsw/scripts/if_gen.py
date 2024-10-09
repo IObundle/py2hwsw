@@ -257,9 +257,8 @@ def remove_duplicates(ports):
     seen_dicts = []
     result = []
     for d in ports:
-        tuple_d = d
-        if tuple_d not in seen_dicts:
-            seen_dicts.append(tuple_d)
+        if d not in seen_dicts:
+            seen_dicts.append(d)
             result.append(d)
     return result
 
@@ -885,25 +884,30 @@ def write_s_port(fout, port_prefix, port_list):
 #
 
 # Generate portmap string for a single port but width and name
-def get_portmap_string(port_prefix, wire_prefix, port):
+def get_portmap_string(port_prefix, wire_prefix, port, connect_to_port):
     port_name = port_prefix + port.name
     wire_name = wire_prefix + port.name
+    if not connect_to_port:
+        suffix = get_suffix(port.direction)
+        if wire_name.endswith(suffix):
+            wire_name = wire_name[:-len(suffix)]
     return f".{port_name}({wire_name}),\n"
 
 
 # Write single port with to file
-def write_portmap(fout, port_prefix, wire_prefix, port):
+def write_portmap(fout, port_prefix, wire_prefix, port, connect_to_port):
     portmap_string = get_portmap_string(
         port_prefix,
         wire_prefix,
         port,
+        connect_to_port,
     )
     fout.write(portmap_string)
 
 
 def write_m_portmap(fout, port_prefix, wire_prefix, port_list):
     for port in port_list:
-        write_portmap(fout, port_prefix, wire_prefix, port)
+        write_portmap(fout, port_prefix, wire_prefix, port, False)
 
 
 def write_s_portmap(fout, port_prefix, wire_prefix, port_list):
@@ -912,7 +916,7 @@ def write_s_portmap(fout, port_prefix, wire_prefix, port_list):
 
 def write_m_m_portmap(fout, port_prefix, wire_prefix, port_list):
     for port in port_list:
-        write_portmap(fout, port_prefix, wire_prefix, port)
+        write_portmap(fout, port_prefix, wire_prefix, port, True)
 
 
 def write_s_s_portmap(fout, port_prefix, wire_prefix, port_list):
@@ -1048,6 +1052,7 @@ def gen_wires(interface):
 
 
 if __name__ == "__main__":
+    #for if_name in if_names:
     for if_name in if_names:
         gen_if(
             interface(

@@ -31,7 +31,7 @@ def setup(py_params_dict):
         "name": params["name"],
         "version": "0.7",
         "is_system": True,
-        "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g"],
+        "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g", "zybo_z7"],
         "confs": [
             # macros
             {  # Needed for testbench

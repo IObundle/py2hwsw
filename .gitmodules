@@ -1,0 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+[submodule "py2hwsw/lib/hardware/iob_system/submodules/VEXRISCV"]
+	path = py2hwsw/lib/hardware/iob_system/submodules/VEXRISCV
+	url = git@github.com:IObundle/iob-vexriscv.git

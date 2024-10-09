@@ -157,12 +157,13 @@ class csr_gen:
                 return f"{log2n_items}+{ceil(log(n_bytes, 2))}"
 
     def gen_regfile_read_addr_logic(self, row):
-        """ Generate regfile access logic via read address.
-        """
+        """Generate regfile access logic via read address."""
         name = row.name
         n_bits = row.n_bits
         log2n_items = row.log2n_items
-        n_items = 2**eval_param_expression_from_config(log2n_items, self.config, "max")
+        n_items = 2 ** eval_param_expression_from_config(
+            log2n_items, self.config, "max"
+        )
 
         lines = f"""
    reg {name}_rdata_reg;
@@ -171,7 +172,9 @@ class csr_gen:
       case ({name}_raddr_i)
 """
         for idx in range(n_items):
-            lines += f"         {log2n_items}'d{idx}: {name}_rdata_reg = {name}_{idx}_o;\n"
+            lines += (
+                f"         {log2n_items}'d{idx}: {name}_rdata_reg = {name}_{idx}_o;\n"
+            )
 
         lines += f"""\
          default: {name}_rdata_reg = {n_bits}'b0; // Default case to handle invalid address
@@ -210,7 +213,9 @@ class csr_gen:
             lines += f"    assign {name}_addressed_w = (waddr >= {addr}) && (waddr < ({addr}+(2**({addr_w}))));\n"
 
         if auto:  # generate register
-            n_items = 2**eval_param_expression_from_config(log2n_items, self.config, "max")
+            n_items = 2 ** eval_param_expression_from_config(
+                log2n_items, self.config, "max"
+            )
             # Create addressed signal for each reg in regfile
             if n_items > 1 and isinstance(addr, int) and isinstance(addr_w, int):
                 for idx in range(n_items):
@@ -368,8 +373,7 @@ class csr_gen:
                         )
 
     def gen_ports_wires(self, table):
-        """Generate ports and internal wires for csrs instance.
-        """
+        """Generate ports and internal wires for csrs instance."""
         ports = []
         wires = []
         for row in table:
@@ -385,7 +389,9 @@ class csr_gen:
 
             if "W" in row.type:
                 if auto:
-                    n_items = 2**eval_param_expression_from_config(log2n_items, self.config, "max")
+                    n_items = 2 ** eval_param_expression_from_config(
+                        log2n_items, self.config, "max"
+                    )
                     for idx in range(n_items):
                         name_idx = f"{name}_{idx}" if n_items > 1 else name
                         register_signals.append({
@@ -454,11 +460,13 @@ class csr_gen:
                     "signals": register_signals,
                 })
             else:
-                ports.append({
-                    "name": name,
-                    "descr": f"{name} register interface",
-                    "signals": register_signals,
-                })
+                ports.append(
+                    {
+                        "name": name,
+                        "descr": f"{name} register interface",
+                        "signals": register_signals,
+                    }
+                )
 
         return ports, wires
 
@@ -476,8 +484,7 @@ class csr_gen:
         return param_str
 
     def write_hwcode(self, table, core_attributes):
-        """ Generates and appends verilog code to core "snippets" list.
-        """
+        """Generates and appends verilog code to core "snippets" list."""
 
         ports = [
             {
@@ -645,7 +652,9 @@ class csr_gen:
 
         # compute write address
         snippet += "    wire [ADDR_W-1:0] waddr;\n"
-        snippet += "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr) + byte_offset;\n"
+        snippet += (
+            "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr) + byte_offset;\n"
+        )
 
         # insert write register logic
         for row in table:
@@ -689,14 +698,14 @@ class csr_gen:
                 "name": "rdata",
                 "descr": "",
                 "signals": [
-                    {"name": "rdata", "width": 8*self.cpu_n_bytes},
+                    {"name": "rdata", "width": 8 * self.cpu_n_bytes},
                 ],
             },
             {
                 "name": "rdata_nxt",
                 "descr": "",
                 "signals": [
-                    {"name": "rdata_nxt", "width": 8*self.cpu_n_bytes, "isreg": True},
+                    {"name": "rdata_nxt", "width": 8 * self.cpu_n_bytes, "isreg": True},
                 ],
             },
             {
@@ -756,7 +765,7 @@ class csr_gen:
                 "instance_name": "rdata_reg",
                 "instance_description": "rdata register",
                 "parameters": {
-                    "DATA_W": 8*self.cpu_n_bytes,
+                    "DATA_W": 8 * self.cpu_n_bytes,
                     "RST_VAL": "1'b0",
                 },
                 "connect": {
@@ -911,12 +920,10 @@ class csr_gen:
         core_attributes["ports"] += ports
         core_attributes["wires"] += wires
         core_attributes["blocks"] += blocks
-        core_attributes["snippets"] += [
-            {"verilog_code": snippet}
-        ]
+        core_attributes["snippets"] += [{"verilog_code": snippet}]
 
     def write_lparam_header(self, table, out_dir, top):
-        """ Generate *_csrs_lparam.vs file. Macros from this file contain the default
+        """Generate *_csrs_lparam.vs file. Macros from this file contain the default
         values of the registers. These should not be used inside the instance of
         the core/system.
         """
@@ -951,7 +958,7 @@ class csr_gen:
         f_def.close()
 
     def write_hwheader(self, table, out_dir, top):
-        """ Generate *_csrs_def.vh file. Macros from this file should only be used
+        """Generate *_csrs_def.vh file. Macros from this file should only be used
         inside the instance of the core/system since they may contain parameters which
         are only known by the instance.
         """

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 def get_fifo_csrs(csr_ref):
     fifo_csrs = []
     if csr_ref["type"].endswith("FIFO_R"):

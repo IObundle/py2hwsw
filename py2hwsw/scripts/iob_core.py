@@ -576,10 +576,10 @@ class iob_core(iob_module, iob_instance):
             core_dict = json.load(f)
 
         default_core_name = os.path.splitext(os.path.basename(filepath))[0]
-        core_dict.setdefault("original_name", default_core_name)
-        core_dict.setdefault("name", default_core_name)
+        py2_core_dict = {"original_name": default_core_name, "name": default_core_name}
+        py2_core_dict.update(core_dict)
 
-        return cls.py2hw(core_dict, **kwargs)
+        return cls.py2hw(py2_core_dict, **kwargs)
 
     @staticmethod
     def clean_build_dir(core_name):
@@ -668,13 +668,13 @@ class iob_core(iob_module, iob_instance):
                     **kwargs,
                 }
             )
-            core_dict.setdefault("original_name", core_name)
-            core_dict.setdefault("name", core_name)
+            py2_core_dict = {"original_name": core_name, "name": core_name}
+            py2_core_dict.update(core_dict)
             instance = __class__.py2hw(
-                core_dict,
+                py2_core_dict,
                 instantiator=instantiator,
                 # Note, any of the arguments below can have their values overridden by
-                # the core_dict
+                # the py2_core_dict
                 **kwargs,
             )
         elif file_ext == ".json":

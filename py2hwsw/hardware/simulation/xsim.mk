@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 SIM_SERVER=$(VIVADO_SERVER)
 SIM_USER=$(VIVADO_USER)
 SIM_SSH_FLAGS=$(VIVADO_SSH_FLAGS)

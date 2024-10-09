@@ -122,7 +122,7 @@ def setup(py_params_dict):
         ],
         "blocks": [
             {
-                "core_name": "arbiter",
+                "core_name": "iob_arbiter",
                 "instance_name": "arbiter_inst",
             },
         ],

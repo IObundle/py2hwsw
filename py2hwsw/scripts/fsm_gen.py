@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 def generate_fsm(core):
     """Generate verilog code with the fsm of this module.
     returns: Generated verilog code

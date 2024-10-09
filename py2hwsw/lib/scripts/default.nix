@@ -5,29 +5,20 @@
 { pkgs ? import <nixpkgs> {} }:
 
 let
-  py2hwsw_commit = "a1931b8146efbef6ff8e094ffe4c281f16d68cd1"; # Replace with the desired commit.
-  py2hwsw_sha256 = "sha256-E46IgfVmHdVXiKuQs/ZgmaQHxdHEYDySkGtbx2bi+hs="; # Replace with the actual SHA256 hash.
-
-  py2hwsw = pkgs.python3.pkgs.buildPythonPackage rec {
+  # Get local py2hwsw path from `PY2HWSW_PATH` env variable
+  py2hwsw =
+  let py2hwswPath = builtins.getEnv "PY2HWSW_PATH"; in
+  if py2hwswPath == null then
+  pkgs.python3.pkgs.buildPythonPackage rec {
     pname = "py2hwsw";
-    version = py2hwsw_commit;
 
-    src = let
-      # Get local py2hwsw path from `PY2HWSW_PATH` env variable
-      py2hwswPath = builtins.getEnv "PY2HWSW_PATH";
-    in if py2hwswPath != "" then
-      pkgs.lib.cleanSource py2hwswPath
-    else
-      pkgs.fetchFromGitHub {
-        owner = "IObundle";
-        repo = "py2hwsw";
-        rev = py2hwsw_commit;
-        sha256 = py2hwsw_sha256;
-      };
+    src = pkgs.lib.cleanSource py2hwswPath;
 
     # Add any necessary dependencies here.
     #propagatedBuildInputs = [ pkgs.python38Packages.someDependency ];
-  };
+  }
+  else
+  null;
 
   # Hack to make Nix libreoffice wrapper work.
   # This is because Nix wrapper breaks ghactions test by requiring the `/run/user/$(id -u)` folder to exist

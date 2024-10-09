@@ -527,9 +527,15 @@ class iob_core(iob_module, iob_instance):
             # Skip specific Verilog headers
             if path.name.endswith("version.vh") or "test_" in path.name:
                 continue
+            # Skip synthesis directory # TODO: Support this?
+            if "/syn/" in str(path):
+                continue
             verilog_headers.append(str(path))
             # print(str(path))
         for path in Path(os.path.join(self.build_dir, "hardware")).rglob("*.v"):
+            # Skip synthesis directory # TODO: Support this?
+            if "/syn/" in str(path):
+                continue
             verilog_sources.append(str(path))
             # print(str(path))
 
@@ -597,6 +603,9 @@ class iob_core(iob_module, iob_instance):
         )
         os.system(f"make -C {module.build_dir} clean")
         shutil.rmtree(module.build_dir)
+        print(
+            f"{iob_colors.INFO}Cleaning complete. Removed: {module.build_dir}{iob_colors.ENDC}"
+        )
 
     @staticmethod
     def print_build_dir(core_name):

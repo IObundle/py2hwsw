@@ -49,8 +49,32 @@ Security and privacy are more important than ever with the Internet of Things.
 
 ### Install with pip
 
-Use the following command to install the `py2hwsw` program with [pip](https://pip.pypa.io/en/stable/) globally:
-`pip install git+https://github.com/IObundle/py2hwsw#egg=py2hwsw`
+Optionally, create a python virtual environment before installing the `py2hwsw` package:
+```bash
+python -m venv py2hwsw_env
+source py2hwsw_env/bin/activate
+```
+
+Use the following command to install the `py2hwsw` program with [pip](https://pip.pypa.io/en/stable/):
+```bash
+pip install git+https://github.com/IObundle/py2hwsw#egg=py2hwsw
+```
+
+As an alternative, to install the `py2hwsw` package from the locally cloned repository:
+```bash
+pip install -e path/to/py2hwsw_directory
+```
+
+### Install with nix
+
+Use the following commands to install the `py2hwsw` program with [Nix](https://nixos.org/):
+```bash
+export PY2HWSW_PATH=path/to/py2hwsw_directory
+nix-shell path/to/py2hwsw_directory
+```
+
+If the `Py2HWSW_PATH` environment variable is not set, the nix environment will only install the project dependencies. Not the `py2hwsw` package itself.
+
 
 ### Usage examples
 

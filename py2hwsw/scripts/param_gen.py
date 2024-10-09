@@ -68,6 +68,7 @@ def generate_params_snippets(core):
     with open(f"{out_dir}/{core.instance_name}_{id(core)}_inst_params.vs", "w") as f:
         f.write(code)
 
+
 def validate_params(core):
     """Check if all parameters are within the allowed range"""
     for p_name, p_value in core.parameters.items():
@@ -87,4 +88,3 @@ def validate_params(core):
             fail_with_msg(
                 f"Parameter '{p_name}' value '{p_value}' is out of range [{min_val}, {max_val}]"
             )
-

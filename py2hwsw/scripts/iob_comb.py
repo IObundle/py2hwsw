@@ -92,7 +92,9 @@ class iob_comb(iob_snippet):
                         "data_o": f"{signal.name}",
                     }
                     if any(reg_signal == "_nxt" for reg_signal in signal.reg_signals):
-                        if not any(wire.name == f"{signal.name}_nxt" for wire in core.wires):
+                        if not any(
+                            wire.name == f"{signal.name}_nxt" for wire in core.wires
+                        ):
                             core.create_wire(
                                 name=f"{signal.name}_nxt",
                                 signals=[
@@ -123,7 +125,10 @@ class iob_comb(iob_snippet):
                             connect_key = "rst"
 
                     if reg_type != "iob_reg":
-                        if not any(wire.name == f"{signal.name}_reg_signals" for wire in core.wires):
+                        if not any(
+                            wire.name == f"{signal.name}_reg_signals"
+                            for wire in core.wires
+                        ):
                             core.create_wire(
                                 name=f"{signal.name}_reg_signals", signals=_reg_signals
                             )
@@ -136,7 +141,10 @@ class iob_comb(iob_snippet):
                             descr="Clock enable and reset signal",
                         )
 
-                    if not any(block.instance_name == f"{signal.name}_reg" for block in core.blocks):
+                    if not any(
+                        block.instance_name == f"{signal.name}_reg"
+                        for block in core.blocks
+                    ):
                         core.create_instance(
                             core_name=reg_type,
                             instance_name=f"{signal.name}_reg",
@@ -144,6 +152,7 @@ class iob_comb(iob_snippet):
                             connect=connect,
                             instance_description=f"Infered register for {signal.name}",
                         )
+
 
 def generate_direction_process_func(direction):
     """Generates a process function that returns a signal if it matches the direction"""
@@ -157,10 +166,13 @@ def generate_direction_process_func(direction):
 
     return filter_signal
 
+
 def create_comb(core, *args, **kwargs):
     """Create a Verilog combinatory circuit to insert in a given core."""
     if core.fsm != None:
-        raise ValueError("Comb circuits and FSMs are mutually exclusive. Use separate submodules.")
+        raise ValueError(
+            "Comb circuits and FSMs are mutually exclusive. Use separate submodules."
+        )
     core.set_default_attribute("comb", None)
     verilog_code = kwargs.get("verilog_code", None)
     comb = iob_comb(verilog_code=verilog_code)

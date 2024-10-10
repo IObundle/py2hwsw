@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 def generate_comb(core):
     """Generate verilog code with the comb of this module.
     returns: Generated verilog code

@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 def generate_snippets(core):
     """Generate verilog code with snippets of this module.
     returns: Generated verilog code

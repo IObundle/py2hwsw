@@ -5,6 +5,7 @@
 from dataclasses import dataclass
 from iob_base import str_to_kwargs
 
+
 @dataclass
 class iob_conf:
     name: str = ""
@@ -25,7 +26,10 @@ class iob_conf:
         elif self.type not in ["M", "P", "F"]:
             raise Exception("Conf type must be either M, P or F")
 
+
 attrs = ["name", ["-t", "type"], ["-v", "val"], ["-m", "min"], ["-M", "max"]]
+
+
 @str_to_kwargs(attrs)
 def create_conf(core, *args, **kwargs):
     """Creates a new conf object and adds it to the core's conf list

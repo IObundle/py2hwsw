@@ -196,6 +196,7 @@ def str_to_kwargs(attrs: list):
     if it is a keyword argument as a dictionary, the 4th element is a list of keys to the dictionary
     if the 4th element is "pairs", the dictionary is created from pairs of values
     """
+
     def decorator(func):
         @wraps(func)
         def wrapper(core, *args, **kwargs):
@@ -221,17 +222,24 @@ def str_to_kwargs(attrs: list):
                         if arg in dicts and kwargs[arg] is not None:
                             if isinstance(dicts[arg], str):
                                 if dicts[arg] == "pairs":
-                                    kwargs[arg] = dict(pair.split(":") for pair in kwargs[arg])
+                                    kwargs[arg] = dict(
+                                        pair.split(":") for pair in kwargs[arg]
+                                    )
                             else:
-                                kwargs[arg] = [dict(zip(dicts[arg], values)) for values in kwargs[arg]]
+                                kwargs[arg] = [
+                                    dict(zip(dicts[arg], values))
+                                    for values in kwargs[arg]
+                                ]
                     if attrs[0] == "core_name":
                         func(core, instance_description=descr.strip(), **kwargs)
                     else:
                         func(core, descr=descr.strip(), **kwargs)
-                return None 
+                return None
             else:
                 return func(core, *args, **kwargs)
+
         return wrapper
+
     return decorator
 
 

@@ -57,7 +57,14 @@ class iob_wire:
                         signal.name = signal.name[:-len(suffix)]
                     signal.direction = ""
 
-attrs = ["name", ["-i", "interface", {"nargs": 2}, ["type", "subtype"]], ["-s", "signals", {"nargs": 2, "action": "append"}, ["name", "width"]]]
+
+attrs = [
+    "name",
+    ["-i", "interface", {"nargs": 2}, ["type", "subtype"]],
+    ["-s", "signals", {"nargs": 2, "action": "append"}, ["name", "width"]],
+]
+
+
 @str_to_kwargs(attrs)
 def create_wire(core, *args, signals=[], interface=None, **kwargs):
     """Creates a new wire object and adds it to the core's wire list

@@ -798,6 +798,7 @@ def get_wb_full_ports():
 
     return ports
 
+
 #
 # Handle signal direction
 #

@@ -24,12 +24,13 @@ linters = [
 
 def lint_files(files_list):
     """Run Linter on given list of files, while grouping them according to their location in the IObundle standard directory structure."""
+    print(f"Linting files: {files_list}", file=sys.stderr)  # DEBUG
     # Group files by their directories
     dir_file_list = {}
     for file in files_list:
         file_dir = os.path.dirname(file)
 
-        if not file_dir in dir_file_list:
+        if file_dir not in dir_file_list:
             dir_file_list[file_dir] = []
 
         dir_file_list[file_dir].append(file)

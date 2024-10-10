@@ -117,14 +117,14 @@ def setup(py_params_dict):
             "name": "clk",
             "descr": "Clock signal",
             "signals": [
-                {"name": "clk"},
+                {"name": "clk_i"},
             ],
         },
         {
             "name": "rst",
             "descr": "Reset signal",
             "signals": [
-                {"name": "arst"},
+                {"name": "arst_i"},
             ],
         },
         {

@@ -63,9 +63,8 @@ def setup(py_params_dict):
                 "descr": "Clock",
                 "signals": [
                     {
-                        "name": "clk",
+                        "name": "clk_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -74,9 +73,8 @@ def setup(py_params_dict):
                 "descr": "Synchronous reset",
                 "signals": [
                     {
-                        "name": "rst",
+                        "name": "rst_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -95,9 +93,9 @@ def setup(py_params_dict):
                 },
                 "descr": "AXI slave interface",
                 "signals": [
-                    {"name": "s_axi_awuser", "width": "S_COUNT", "direction": "input"},
-                    {"name": "s_axi_wuser", "width": "S_COUNT", "direction": "input"},
-                    {"name": "s_axi_aruser", "width": "S_COUNT", "direction": "input"},
+                    {"name": "s_axi_awuser_i", "width": "S_COUNT"},
+                    {"name": "s_axi_wuser_i", "width": "S_COUNT"},
+                    {"name": "s_axi_aruser_i", "width": "S_COUNT"},
                 ],
             },
             {
@@ -115,8 +113,8 @@ def setup(py_params_dict):
                 },
                 "descr": "AXI master interface",
                 "signals": [
-                    {"name": "m_axi_buser", "width": "M_COUNT", "direction": "input"},
-                    {"name": "m_axi_ruser", "width": "M_COUNT", "direction": "input"},
+                    {"name": "m_axi_buser_i", "width": "M_COUNT"},
+                    {"name": "m_axi_ruser_i", "width": "M_COUNT"},
                 ],
             },
         ],

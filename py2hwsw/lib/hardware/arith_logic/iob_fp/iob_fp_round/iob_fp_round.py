@@ -30,9 +30,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "exponent",
+                        "name": "exponent_i",
                         "width": "EXP_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -41,9 +40,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "mantissa",
+                        "name": "mantissa_i",
                         "width": "DATA_W+3",
-                        "direction": "input",
                     },
                 ],
             },
@@ -52,9 +50,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "exponent_rnd",
+                        "name": "exponent_rnd_o",
                         "width": "EXP_W",
-                        "direction": "output",
                     },
                 ],
             },
@@ -63,9 +60,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "mantissa_rnd",
+                        "name": "mantissa_rnd_o",
                         "width": "DATA_W",
-                        "direction": "output",
                     },
                 ],
             },

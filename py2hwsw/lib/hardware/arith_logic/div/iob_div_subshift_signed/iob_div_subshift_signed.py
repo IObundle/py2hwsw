@@ -30,9 +30,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "clk",
+                        "name": "clk_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -41,9 +40,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "en",
+                        "name": "en_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -52,9 +50,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "sign",
+                        "name": "sign_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -63,9 +60,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "dividend",
+                        "name": "dividend_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -74,9 +70,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "divisor",
+                        "name": "divisor_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -85,9 +80,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "done",
+                        "name": "done_o",
                         "width": 1,
-                        "direction": "output",
                     },
                 ],
             },
@@ -96,9 +90,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "quotient",
+                        "name": "quotient_o",
                         "width": "DATA_W",
-                        "direction": "output",
                     },
                 ],
             },
@@ -107,9 +100,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "remainder",
+                        "name": "remainder_o",
                         "width": "DATA_W",
-                        "direction": "output",
                     },
                 ],
             },

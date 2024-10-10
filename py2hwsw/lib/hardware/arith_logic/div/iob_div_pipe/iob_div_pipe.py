@@ -30,8 +30,7 @@ def setup(py_params_dict):
                 "descr": "Clock",
                 "signals": [
                     {
-                        "name": "clk",
-                        "direction": "input",
+                        "name": "clk_i",
                         "width": 1,
                         "descr": "Clock",
                     },
@@ -42,26 +41,22 @@ def setup(py_params_dict):
                 "descr": "Division interface",
                 "signals": [
                     {
-                        "name": "dividend",
-                        "direction": "input",
+                        "name": "dividend_i",
                         "width": "DATA_W",
                         "descr": "",
                     },
                     {
-                        "name": "divisor",
-                        "direction": "input",
+                        "name": "divisor_i",
                         "width": "DATA_W",
                         "descr": "",
                     },
                     {
-                        "name": "quotient",
-                        "direction": "output",
+                        "name": "quotient_o",
                         "width": "DATA_W",
                         "descr": "",
                     },
                     {
-                        "name": "remainder",
-                        "direction": "output",
+                        "name": "remainder_o",
                         "width": "DATA_W",
                         "descr": "",
                     },

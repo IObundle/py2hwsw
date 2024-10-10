@@ -61,14 +61,14 @@ def setup(py_params_dict):
                 "name": "start_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "start", "width": 1, "direction": "input"},
+                    {"name": "start_i", "width": 1},
                 ],
             },
             {
                 "name": "pulse_o",
                 "descr": "Output port",
                 "signals": [
-                    {"name": "pulse", "width": 1, "direction": "output"},
+                    {"name": "pulse_o", "width": 1},
                 ],
             },
         ],
@@ -92,7 +92,7 @@ def setup(py_params_dict):
                 "descr": "iob_pulse_gen_int wire",
                 "signals": [
                     {"name": "cnt_en", "width": 1},
-                    {"name": "start"},
+                    {"name": "start_i"},
                 ],
             },
             {

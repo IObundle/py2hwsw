@@ -30,9 +30,8 @@ def setup(py_params_dict):
                 "descr": "Selector interface",
                 "signals": [
                     {
-                        "name": "sel",
+                        "name": "sel_i",
                         "width": "($clog2(N)+($clog2(N)==0))",
-                        "direction": "input",
                     },
                 ],
             },
@@ -41,9 +40,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "data",
+                        "name": "data_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -52,9 +50,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "data",
+                        "name": "data_o",
                         "width": "N*DATA_W",
-                        "direction": "output",
                     },
                 ],
             },

@@ -56,16 +56,16 @@ def setup(py_params_dict):
             "name": "clk_rst_i",
             "descr": "Clock and reset",
             "signals": [
-                {"name": "clk", "direction": "input", "width": "1"},
-                {"name": "arst", "direction": "input", "width": "1"},
+                {"name": "clk_i", "width": "1"},
+                {"name": "arst_i", "width": "1"},
             ],
         },
         {
             "name": "rs232",
             "descr": "Serial port",
             "signals": [
-                {"name": "txd", "direction": "output", "width": "1"},
-                {"name": "rxd", "direction": "input", "width": "1"},
+                {"name": "txd_o", "width": "1"},
+                {"name": "rxd_i", "width": "1"},
             ],
         },
     ]
@@ -78,8 +78,8 @@ def setup(py_params_dict):
             "name": "rs232_int",
             "descr": "iob-system uart interface",
             "signals": [
-                {"name": "rxd"},
-                {"name": "txd"},
+                {"name": "rxd_i"},
+                {"name": "txd_o"},
                 {"name": "rs232_rts", "width": "1"},
                 {"name": "high", "width": "1"},
             ],

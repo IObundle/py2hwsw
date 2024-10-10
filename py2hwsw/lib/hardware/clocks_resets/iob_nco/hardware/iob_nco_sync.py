@@ -30,8 +30,7 @@ def setup(py_params_dict):
                 "descr": "Source clock domain",
                 "signals": [
                     {
-                        "name": "clk_in",
-                        "direction": "input",
+                        "name": "clk_in_i",
                         "width": "1",
                         "descr": "Source clock input",
                     },
@@ -42,8 +41,7 @@ def setup(py_params_dict):
                 "descr": "System soft reset",
                 "signals": [
                     {
-                        "name": "soft_reset",
-                        "direction": "input",
+                        "name": "soft_reset_i",
                         "width": "1",
                         "descr": "System soft reset",
                     },
@@ -54,8 +52,7 @@ def setup(py_params_dict):
                 "descr": "System enable",
                 "signals": [
                     {
-                        "name": "enable",
-                        "direction": "input",
+                        "name": "enable_i",
                         "width": "1",
                         "descr": "System enable",
                     },
@@ -66,8 +63,7 @@ def setup(py_params_dict):
                 "descr": "System period data",
                 "signals": [
                     {
-                        "name": "period_wdata",
-                        "direction": "input",
+                        "name": "period_wdata_i",
                         "width": "PERIOD_W",
                         "descr": "System period data",
                     },
@@ -78,8 +74,7 @@ def setup(py_params_dict):
                 "descr": "System period write enable",
                 "signals": [
                     {
-                        "name": "period_wen",
-                        "direction": "input",
+                        "name": "period_wen_i",
                         "width": "1",
                         "descr": "System period write enable",
                     },
@@ -90,8 +85,7 @@ def setup(py_params_dict):
                 "descr": "Source clock domain soft reset",
                 "signals": [
                     {
-                        "name": "soft_reset",
-                        "direction": "output",
+                        "name": "soft_reset_o",
                         "width": "1",
                         "descr": "Source clock domain soft reset",
                     },
@@ -102,8 +96,7 @@ def setup(py_params_dict):
                 "descr": "Source clock domain enable",
                 "signals": [
                     {
-                        "name": "enable",
-                        "direction": "output",
+                        "name": "enable_o",
                         "width": "1",
                         "descr": "Source clock domain enable",
                     },
@@ -114,8 +107,7 @@ def setup(py_params_dict):
                 "descr": "Source clock domain period data",
                 "signals": [
                     {
-                        "name": "period_wdata",
-                        "direction": "output",
+                        "name": "period_wdata_o",
                         "width": "PERIOD_W",
                         "descr": "Source clock domain period data",
                     },
@@ -126,8 +118,7 @@ def setup(py_params_dict):
                 "descr": "Source clock domain period write enable",
                 "signals": [
                     {
-                        "name": "period_wen",
-                        "direction": "output",
+                        "name": "period_wen_o",
                         "width": "1",
                         "descr": "Source clock domain period write enable",
                     },

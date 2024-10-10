@@ -155,18 +155,15 @@ def setup(py_params_dict):
             "descr": "Ports for connection with ROM memory",
             "signals": [
                 {
-                    "name": "boot_rom_valid",
-                    "direction": "output",
+                    "name": "boot_rom_valid_o",
                     "width": "1",
                 },
                 {
-                    "name": "boot_rom_addr",
-                    "direction": "output",
+                    "name": "boot_rom_addr_o",
                     "width": params["bootrom_addr_w"] - 2,
                 },
                 {
-                    "name": "boot_rom_rdata",
-                    "direction": "input",
+                    "name": "boot_rom_rdata_i",
                     "width": params["data_w"],
                 },
             ],
@@ -200,21 +197,21 @@ def setup(py_params_dict):
             "name": "clk",
             "descr": "Clock signal",
             "signals": [
-                {"name": "clk"},
+                {"name": "clk_i"},
             ],
         },
         {
             "name": "rst",
             "descr": "Reset signal",
             "signals": [
-                {"name": "arst"},
+                {"name": "arst_i"},
             ],
         },
         {
             "name": "split_reset",
             "descr": "Reset signal for iob_split components",
             "signals": [
-                {"name": "arst"},
+                {"name": "arst_i"},
             ],
         },
         {

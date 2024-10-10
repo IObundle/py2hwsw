@@ -21,19 +21,19 @@ def setup(py_params_dict):
         ],
         "ports": [
             """
-            a_i -s a W input
+            a_i -s a_i W
             'Input port a'
 
-            b_i -s b W input
+            b_i -s b_i W
             'Input port b'
 
-            c_i -s c W input
+            c_i -s c_i W
             'Input port c'
 
-            d_i -s d W input
+            d_i -s d_i W
             'Input port d'
 
-            y_o -s y W output
+            y_o -s y_o W
             'Output port y'
             """
         ],

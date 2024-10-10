@@ -66,8 +66,7 @@ def setup(py_params_dict):
                 "descr": "Interrupt signal",
                 "signals": [
                     {
-                        "name": "interrupt",
-                        "direction": "output",
+                        "name": "interrupt_o",
                         "width": "1",
                         "descr": "FIFO threshold interrupt signal",
                     },
@@ -78,44 +77,37 @@ def setup(py_params_dict):
                 "descr": "AXI Stream interface signals",
                 "signals": [
                     {
-                        "name": "axis_clk",
-                        "direction": "input",
+                        "name": "axis_clk_i",
                         "width": "1",
                         "descr": "Clock.",
                     },
                     {
-                        "name": "axis_cke",
-                        "direction": "input",
+                        "name": "axis_cke_i",
                         "width": "1",
                         "descr": "Clock enable",
                     },
                     {
-                        "name": "axis_arst",
-                        "direction": "input",
+                        "name": "axis_arst_i",
                         "width": "1",
                         "descr": "Asynchronous and active high reset.",
                     },
                     {
-                        "name": "axis_tdata",
-                        "direction": "input",
+                        "name": "axis_tdata_i",
                         "width": "TDATA_W",
                         "descr": "Data.",
                     },
                     {
-                        "name": "axis_tvalid",
-                        "direction": "input",
+                        "name": "axis_tvalid_i",
                         "width": "1",
                         "descr": "Valid.",
                     },
                     {
-                        "name": "axis_tready",
-                        "direction": "output",
+                        "name": "axis_tready_o",
                         "width": "1",
                         "descr": "Ready.",
                     },
                     {
-                        "name": "axis_tlast",
-                        "direction": "input",
+                        "name": "axis_tlast_i",
                         "width": "1",
                         "descr": "Last word.",
                     },
@@ -126,20 +118,17 @@ def setup(py_params_dict):
                 "descr": "System AXI Stream interface.",
                 "signals": [
                     {
-                        "name": "sys_tdata",
-                        "direction": "output",
+                        "name": "sys_tdata_o",
                         "width": "DATA_W",
                         "descr": "Data.",
                     },
                     {
-                        "name": "sys_tvalid",
-                        "direction": "output",
+                        "name": "sys_tvalid_o",
                         "width": "1",
                         "descr": "Valid.",
                     },
                     {
-                        "name": "sys_tready",
-                        "direction": "input",
+                        "name": "sys_tready_i",
                         "width": "1",
                         "descr": "Ready.",
                     },

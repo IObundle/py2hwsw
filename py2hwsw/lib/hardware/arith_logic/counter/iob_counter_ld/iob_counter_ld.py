@@ -38,14 +38,12 @@ def setup(py_params_dict):
                 "descr": "Enable and Synchronous reset interface",
                 "signals": [
                     {
-                        "name": "en",
-                        "direction": "input",
+                        "name": "en_i",
                         "width": 1,
                         "descr": "Enable input",
                     },
                     {
-                        "name": "rst",
-                        "direction": "input",
+                        "name": "rst_i",
                         "width": 1,
                         "descr": "Synchronous reset input",
                     },
@@ -55,21 +53,21 @@ def setup(py_params_dict):
                 "name": "ld_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "ld", "width": 1, "direction": "input"},
+                    {"name": "ld_i", "width": 1},
                 ],
             },
             {
                 "name": "ld_val_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "ld_val", "width": "DATA_W", "direction": "input"},
+                    {"name": "ld_val_i", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "data_o",
                 "descr": "Output port",
                 "signals": [
-                    {"name": "data", "width": "DATA_W", "direction": "output"},
+                    {"name": "data_o", "width": "DATA_W"},
                 ],
             },
         ],

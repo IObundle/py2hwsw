@@ -12,9 +12,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "in",
+                        "name": "in_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -23,9 +22,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "en",
+                        "name": "en_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -34,9 +32,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "out",
+                        "name": "out_o",
                         "width": 1,
-                        "direction": "output",
                     },
                 ],
             },
@@ -45,9 +42,8 @@ def setup(py_params_dict):
                 "descr": "In/Output port",
                 "signals": [
                     {
-                        "name": "in_out",
+                        "name": "in_out_io",
                         "width": 1,
-                        "direction": "inout",
                     },
                 ],
             },

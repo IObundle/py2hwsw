@@ -22,9 +22,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "in1",
+                        "name": "in1_i",
                         "width": "W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -33,9 +32,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "in2",
+                        "name": "in2_i",
                         "width": "W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -44,9 +42,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "sum",
+                        "name": "sum_o",
                         "width": "W",
-                        "direction": "output",
                     },
                 ],
             },
@@ -55,9 +52,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "carry",
+                        "name": "carry_o",
                         "width": 1,
-                        "direction": "output",
                     },
                 ],
             },

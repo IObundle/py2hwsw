@@ -35,8 +35,7 @@ def setup(py_params_dict):
                 "descr": "Reset signal",
                 "signals": [
                     {
-                        "name": "rst",
-                        "direction": "input",
+                        "name": "rst_i",
                         "width": "1",
                     },
                 ],
@@ -76,8 +75,8 @@ def setup(py_params_dict):
             "name": "sel_reg_en_rst",
             "descr": "Enable and reset signal for sel_reg",
             "signals": [
-                {"name": "input_iob_valid"},
-                {"name": "rst"},
+                {"name": "input_iob_valid_i"},
+                {"name": "rst_i"},
             ],
         },
         {
@@ -113,7 +112,7 @@ def setup(py_params_dict):
             "name": "demux_valid_data_i",
             "descr": "Input of valid demux",
             "signals": [
-                {"name": "input_iob_valid"},
+                {"name": "input_iob_valid_i"},
             ],
         },
         {
@@ -127,7 +126,7 @@ def setup(py_params_dict):
             "name": "demux_addr_data_i",
             "descr": "Input of address demux",
             "signals": [
-                {"name": "input_iob_addr"},
+                {"name": "input_iob_addr_i"},
             ],
         },
         {
@@ -141,7 +140,7 @@ def setup(py_params_dict):
             "name": "demux_wdata_data_i",
             "descr": "Input of wdata demux",
             "signals": [
-                {"name": "input_iob_wdata"},
+                {"name": "input_iob_wdata_i"},
             ],
         },
         {
@@ -155,7 +154,7 @@ def setup(py_params_dict):
             "name": "demux_wstrb_data_i",
             "descr": "Input of wstrb demux",
             "signals": [
-                {"name": "input_iob_wstrb"},
+                {"name": "input_iob_wstrb_i"},
             ],
         },
         {
@@ -177,7 +176,7 @@ def setup(py_params_dict):
             "name": "mux_rdata_data_o",
             "descr": "Output of rdata mux",
             "signals": [
-                {"name": "input_iob_rdata"},
+                {"name": "input_iob_rdata_o"},
             ],
         },
         {
@@ -191,7 +190,7 @@ def setup(py_params_dict):
             "name": "mux_rvalid_data_o",
             "descr": "Output of rvalid mux",
             "signals": [
-                {"name": "input_iob_rvalid"},
+                {"name": "input_iob_rvalid_o"},
             ],
         },
         {
@@ -205,7 +204,7 @@ def setup(py_params_dict):
             "name": "mux_ready_data_o",
             "descr": "Output of ready mux",
             "signals": [
-                {"name": "input_iob_ready"},
+                {"name": "input_iob_ready_o"},
             ],
         },
     ]

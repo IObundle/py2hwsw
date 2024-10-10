@@ -29,17 +29,17 @@ def setup(py_params_dict):
                 "name": "clk_rst_i",
                 "descr": "clock and reset inputs",
                 "signals": [
-                    {"name": "clk_p", "direction": "input", "width": "1"},
-                    {"name": "clk_n", "direction": "input", "width": "1"},
-                    {"name": "arst", "direction": "input", "width": "1"},
+                    {"name": "clk_p_i", "width": "1"},
+                    {"name": "clk_n_i", "width": "1"},
+                    {"name": "arst_i", "width": "1"},
                 ],
             },
             {
                 "name": "clk_rst_o",
                 "descr": "clock and reset outputs",
                 "signals": [
-                    {"name": "clk_out1", "direction": "output", "width": "1"},
-                    {"name": "rst_out1", "direction": "output", "width": "1"},
+                    {"name": "clk_out1_o", "width": "1"},
+                    {"name": "rst_out1_o", "width": "1"},
                 ],
             },
         ],
@@ -48,7 +48,7 @@ def setup(py_params_dict):
                 "name": "reset_sync_clk_rst",
                 "descr": "Reset synchronizer inputs",
                 "signals": [
-                    {"name": "clk_out1"},
+                    {"name": "clk_out1_o"},
                     {"name": "arst_out", "width": "1"},
                 ],
             },
@@ -56,7 +56,7 @@ def setup(py_params_dict):
                 "name": "reset_sync_rst_out",
                 "descr": "Reset synchronizer output",
                 "signals": [
-                    {"name": "rst_out1"},
+                    {"name": "rst_out1_o"},
                 ],
             },
         ],

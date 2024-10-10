@@ -42,22 +42,21 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk",
+                "name": "clk_i",
                 "descr": "Clock",
                 "signals": [
-                    {"name": "clk", "width": 1, "direction": "input"},
+                    {"name": "clk_i", "width": 1},
                 ],
             },
             {
                 "name": "rom_if",
                 "descr": "Memory interface",
                 "signals": [
-                    {"name": "r_en", "width": 1, "direction": "input"},
-                    {"name": "addr", "width": "ADDR_W", "direction": "input"},
+                    {"name": "r_en_i", "width": 1},
+                    {"name": "addr_i", "width": "ADDR_W"},
                     {
-                        "name": "r_data",
+                        "name": "r_data_o",
                         "width": "DATA_W",
-                        "direction": "output",
                         "isvar": True,
                     },
                 ],

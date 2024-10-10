@@ -45,35 +45,35 @@ def setup(py_params_dict):
                 "name": "clk_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "clk", "width": 1, "direction": "input"},
+                    {"name": "clk_i", "width": 1},
                 ],
             },
             {
                 "name": "addr_a_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "addr_a", "width": "ADDR_W", "direction": "input"},
+                    {"name": "addr_a_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "r_en_a_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "r_en_a", "width": 1, "direction": "input"},
+                    {"name": "r_en_a_i", "width": 1},
                 ],
             },
             {
                 "name": "addr_b_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "addr_b", "width": "ADDR_W", "direction": "input"},
+                    {"name": "addr_b_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "r_en_b_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "r_en_b", "width": 1, "direction": "input"},
+                    {"name": "r_en_b_i", "width": 1},
                 ],
             },
             {
@@ -81,9 +81,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "r_data_a",
+                        "name": "r_data_a_o",
                         "width": "DATA_W",
-                        "direction": "output",
                         "isvar": True,
                     },
                 ],
@@ -93,9 +92,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "r_data_b",
+                        "name": "r_data_b_o",
                         "width": "DATA_W",
-                        "direction": "output",
                         "isvar": True,
                     },
                 ],

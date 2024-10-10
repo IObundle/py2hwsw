@@ -43,9 +43,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "iob_r_data",
+                        "name": "iob_r_data_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -54,10 +53,9 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "iob_r_data",
+                        "name": "iob_r_data_o",
                         "width": "DATA_W",
                         "isvar": True,
-                        "direction": "output",
                     },
                 ],
             },

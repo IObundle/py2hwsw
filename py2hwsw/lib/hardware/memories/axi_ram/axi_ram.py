@@ -87,9 +87,8 @@ def setup(py_params_dict):
                 "descr": "Clock",
                 "signals": [
                     {
-                        "name": "clk",
+                        "name": "clk_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -98,9 +97,8 @@ def setup(py_params_dict):
                 "descr": "Synchronous reset",
                 "signals": [
                     {
-                        "name": "rst",
+                        "name": "rst_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },

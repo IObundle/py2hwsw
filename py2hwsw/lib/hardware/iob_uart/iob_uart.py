@@ -155,8 +155,8 @@ def setup(py_params_dict):
                 "name": "clk_rst",
                 "descr": "Clock and reset",
                 "signals": [
-                    {"name": "clk"},
-                    {"name": "arst"},
+                    {"name": "clk_i"},
+                    {"name": "arst_i"},
                 ],
             },
             {

@@ -25,9 +25,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "arst",
+                        "name": "arst_o",
                         "width": 1,
-                        "direction": "output",
                     },
                 ],
             },

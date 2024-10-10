@@ -45,84 +45,84 @@ def setup(py_params_dict):
                 "name": "clkA_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "clkA", "width": 1, "direction": "input"},
+                    {"name": "clkA_i", "width": 1},
                 ],
             },
             {
                 "name": "dA_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "dA", "width": "DATA_W", "direction": "input"},
+                    {"name": "dA_i", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "addrA_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "addrA", "width": "ADDR_W", "direction": "input"},
+                    {"name": "addrA_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "enA_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "enA", "width": 1, "direction": "input"},
+                    {"name": "enA_i", "width": 1},
                 ],
             },
             {
                 "name": "weA_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "weA", "width": 1, "direction": "input"},
+                    {"name": "weA_i", "width": 1},
                 ],
             },
             {
                 "name": "dA_o",
                 "descr": "Output port",
                 "signals": [
-                    {"name": "dA", "width": "DATA_W", "direction": "output"},
+                    {"name": "dA_o", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "clkB_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "clkB", "width": 1, "direction": "input"},
+                    {"name": "clkB_i", "width": 1},
                 ],
             },
             {
                 "name": "dB_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "dB", "width": "DATA_W", "direction": "input"},
+                    {"name": "dB_i", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "addrB_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "addrB", "width": "ADDR_W", "direction": "input"},
+                    {"name": "addrB_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "enB_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "enB", "width": 1, "direction": "input"},
+                    {"name": "enB_i", "width": 1},
                 ],
             },
             {
                 "name": "weB_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "weB", "width": 1, "direction": "input"},
+                    {"name": "weB_i", "width": 1},
                 ],
             },
             {
                 "name": "dB_o",
                 "descr": "Output port",
                 "signals": [
-                    {"name": "dB", "width": "DATA_W", "direction": "output"},
+                    {"name": "dB_o", "width": "DATA_W"},
                 ],
             },
         ],

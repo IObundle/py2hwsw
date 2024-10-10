@@ -21,16 +21,16 @@ def setup(py_params_dict):
                 "name": "data_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "a", "width": "W", "direction": "input"},
-                    {"name": "b", "width": "W", "direction": "input"},
-                    {"name": "sel", "width": "1", "direction": "input"},
+                    {"name": "a_i", "width": "W"},
+                    {"name": "b_i", "width": "W"},
+                    {"name": "sel_i", "width": "1"},
                 ],
             },
             {
                 "name": "y_o",
                 "descr": "Output port",
                 "signals": [
-                    {"name": "y", "width": "W", "direction": "output"},
+                    {"name": "y_o", "width": "W"},
                 ],
             },
         ],

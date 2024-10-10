@@ -39,7 +39,10 @@ def setup(py_params_dict):
                 wire["interface"].pop("port_prefix")
             if "signals" in wire:
                 for sig in wire["signals"]:
-                    sig.pop("direction")
+                    if any(sig["name"].endswith(s) for s in ["_o", "_i", "_io"]):
+                        sig["name"] = sig["name"][:-2]
+                        if sig["name"].endswith("_"):
+                            sig["name"] = sig["name"][:-1]
             mwrap_wires.append(wire)
         else:
             mwrap_ports.append(port)
@@ -51,7 +54,7 @@ def setup(py_params_dict):
             "name": "clk",
             "descr": "Clock signal",
             "signals": [
-                {"name": "clk"},
+                {"name": "clk_i"},
             ],
         },
     ]
@@ -67,7 +70,7 @@ def setup(py_params_dict):
                 "HEXFILE": '{BOOT_HEXFILE, ".hex"}',
             },
             "connect": {
-                "clk": "clk",
+                "clk_i": "clk",
                 "rom_if": "rom_bus",
             },
         },

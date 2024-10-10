@@ -45,49 +45,49 @@ def setup(py_params_dict):
                 "name": "clk_i",
                 "descr": "Clock",
                 "signals": [
-                    {"name": "clk", "width": 1, "direction": "input"},
+                    {"name": "clk_i", "width": 1},
                 ],
             },
             {
                 "name": "w_en_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "w_en", "width": 1, "direction": "input"},
+                    {"name": "w_en_i", "width": 1},
                 ],
             },
             {
                 "name": "w_addr_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "w_addr", "width": "ADDR_W", "direction": "input"},
+                    {"name": "w_addr_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "w_data_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "w_data", "width": "DATA_W", "direction": "input"},
+                    {"name": "w_data_i", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "r_en_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "r_en", "width": 1, "direction": "input"},
+                    {"name": "r_en_i", "width": 1},
                 ],
             },
             {
                 "name": "r_addr_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "r_addr", "width": "ADDR_W", "direction": "input"},
+                    {"name": "r_addr_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "r_data_o",
                 "descr": "Output port",
                 "signals": [
-                    {"name": "r_data", "width": "DATA_W", "direction": "output"},
+                    {"name": "r_data_o", "width": "DATA_W"},
                 ],
             },
         ],

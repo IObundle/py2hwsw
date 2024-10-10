@@ -35,8 +35,7 @@ def setup(py_params_dict):
                 "descr": "Reset signal",
                 "signals": [
                     {
-                        "name": "rst",
-                        "direction": "input",
+                        "name": "rst_i",
                         "width": "1",
                     },
                 ],
@@ -76,7 +75,7 @@ def setup(py_params_dict):
             "name": "sel_reg_rst",
             "descr": "Enable and reset signal for sel_reg",
             "signals": [
-                {"name": "rst"},
+                {"name": "rst_i"},
             ],
         },
         {

@@ -11,8 +11,8 @@ def setup(py_params_dict):
                 "name": "io",
                 "descr": "IBUFG io",
                 "signals": [
-                    {"name": "i", "direction": "input", "width": "1"},
-                    {"name": "o", "direction": "output", "width": "1"},
+                    {"name": "i_i", "width": "1"},
+                    {"name": "o_o", "width": "1"},
                 ],
             },
         ],

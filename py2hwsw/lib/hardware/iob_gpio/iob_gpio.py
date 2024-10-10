@@ -76,8 +76,7 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {
-                        "name": "input_port_" + str(idx),
-                        "direction": "input",
+                        "name": "input_port_" + str(idx) + "_i",
                         "width": "INPUT_GPIO_W",
                         "descr": "Input interface " + str(idx),
                     },
@@ -91,8 +90,7 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {
-                        "name": "output_port_" + str(idx),
-                        "direction": "output",
+                        "name": "output_port_" + str(idx) + "_o",
                         "width": "OUTPUT_GPIO_W",
                         "descr": "Output interface " + str(idx),
                     },
@@ -103,7 +101,6 @@ def setup(py_params_dict):
             attributes_dict["ports"][-1]["signals"].append(
                 {
                     "name": "output_enable_" + str(idx) + "_o",
-                    "direction": "output",
                     "width": "OUTPUT_GPIO_W",
                     "descr": f"Output Enable interface bits can be used to tristate output {idx} on external module",
                 },

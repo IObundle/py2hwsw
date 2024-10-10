@@ -35,8 +35,7 @@ def setup(py_params_dict):
                 "descr": "Reset signal",
                 "signals": [
                     {
-                        "name": "rst",
-                        "direction": "input",
+                        "name": "rst_i",
                         "width": "1",
                     },
                 ],

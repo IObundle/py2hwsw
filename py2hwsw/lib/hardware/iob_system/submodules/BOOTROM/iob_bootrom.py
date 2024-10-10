@@ -94,18 +94,15 @@ def setup(py_params_dict):
                 "descr": "External ROM signals",
                 "signals": [
                     {
-                        "name": "ext_rom_en",
-                        "direction": "output",
+                        "name": "ext_rom_en_o",
                         "width": "1",
                     },
                     {
-                        "name": "ext_rom_addr",
-                        "direction": "output",
+                        "name": "ext_rom_addr_o",
                         "width": BOOTROM_ADDR_W - 2,
                     },
                     {
-                        "name": "ext_rom_rdata",
-                        "direction": "input",
+                        "name": "ext_rom_rdata_i",
                         "width": "DATA_W",
                     },
                 ],

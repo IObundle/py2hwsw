@@ -30,9 +30,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "unencoded",
+                        "name": "unencoded_i",
                         "width": "W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -41,9 +40,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "encoded",
+                        "name": "encoded_o",
                         "width": "$clog2(W)",
-                        "direction": "output",
                         "isvar": True,
                     },
                 ],

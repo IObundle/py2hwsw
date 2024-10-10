@@ -30,9 +30,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "dividend",
+                        "name": "dividend_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -41,9 +40,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "divisor",
+                        "name": "divisor_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -52,14 +50,12 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {
-                        "name": "start",
-                        "direction": "input",
+                        "name": "start_i",
                         "width": 1,
                         "descr": "Start signal",
                     },
                     {
-                        "name": "done",
-                        "direction": "output",
+                        "name": "done_o",
                         "width": 1,
                         "descr": "Done signal",
                     },
@@ -70,9 +66,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "quotient",
+                        "name": "quotient_o",
                         "width": "DATA_W",
-                        "direction": "output",
                     },
                 ],
             },
@@ -81,9 +76,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "remainder",
+                        "name": "remainder_o",
                         "width": "DATA_W",
-                        "direction": "output",
                     },
                 ],
             },

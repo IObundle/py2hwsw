@@ -46,20 +46,17 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_i",
                 "signals": [
                     {
-                        "name": "clk",
-                        "direction": "input",
+                        "name": "clk_i",
                         "width": "1",
                         "descr": "Clock input",
                     },
                     {
-                        "name": "cke",
-                        "direction": "input",
+                        "name": "cke_i",
                         "width": "1",
                         "descr": "Clock enable input",
                     },
                     {
-                        "name": "rst",
-                        "direction": "input",
+                        "name": "rst_i",
                         "width": "1",
                         "descr": "Synchronous reset input",
                     },
@@ -71,8 +68,7 @@ def setup(py_params_dict):
                 "descr": "General interface signals",
                 "signals": [
                     {
-                        "name": "trap",
-                        "direction": "output",
+                        "name": "trap_o",
                         "width": "1",
                         "descr": "CPU trap output",
                     },

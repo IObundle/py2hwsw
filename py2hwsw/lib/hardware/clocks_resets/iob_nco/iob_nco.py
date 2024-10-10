@@ -56,8 +56,7 @@ def setup(py_params_dict):
                 "descr": "Source clock interface",
                 "signals": [
                     {
-                        "name": "clk_in",
-                        "direction": "input",
+                        "name": "clk_in_i",
                         "width": "1",
                         "descr": "Source clock input",
                     },
@@ -68,8 +67,7 @@ def setup(py_params_dict):
                 "descr": "Output generated clock interface",
                 "signals": [
                     {
-                        "name": "clk_out",
-                        "direction": "output",
+                        "name": "clk_out_o",
                         "width": "1",
                         "descr": "Generated clock output",
                     },
@@ -207,9 +205,9 @@ def setup(py_params_dict):
                 "name": "acc_ld_clk_en_rst",
                 "descr": "",
                 "signals": [
-                    {"name": "clk_in"},
-                    {"name": "cke"},
-                    {"name": "arst"},
+                    {"name": "clk_in_i"},
+                    {"name": "cke_i"},
+                    {"name": "arst_i"},
                 ],
             },
             {
@@ -267,8 +265,8 @@ def setup(py_params_dict):
                 "name": "clk_rst",
                 "descr": "",
                 "signals": [
-                    {"name": "clk"},
-                    {"name": "arst"},
+                    {"name": "clk_i"},
+                    {"name": "arst_i"},
                 ],
             },
         ],

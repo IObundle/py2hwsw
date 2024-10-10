@@ -95,10 +95,10 @@ def setup(py_params_dict):
             "name": "rs232_invert",
             "descr": "Invert order of rs232 signals",
             "signals": [
-                {"name": "rs232_txd_o"},
-                {"name": "rs232_rxd_i"},
-                {"name": "rs232_cts_i"},
-                {"name": "rs232_rts_o"},
+                {"name": "rs232_txd"},
+                {"name": "rs232_rxd"},
+                {"name": "rs232_cts"},
+                {"name": "rs232_rts"},
             ],
         },
         {

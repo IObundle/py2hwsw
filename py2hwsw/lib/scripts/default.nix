@@ -2,24 +2,32 @@
 #
 # SPDX-License-Identifier: MIT
 
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> {}, py2hwsw_pkg ? "none" }:
 
 let
   # Get local py2hwsw path from `PY2HWSW_PATH` env variable
+  py2hwswPath = builtins.getEnv "PY2HWSW_PATH";
+
   py2hwsw =
-  let py2hwswPath = builtins.getEnv "PY2HWSW_PATH"; in
-  if py2hwswPath != "" then
-  pkgs.python3.pkgs.buildPythonPackage rec {
-    pname = "py2hwsw";
-    version = "";
+    if py2hwsw_pkg == "none" then
+      # Caller does not provide py2hwsw package
+      if py2hwswPath != "" then
+        # Environment variable with py2hwsw path is set
+        pkgs.python3.pkgs.buildPythonPackage rec {
+          pname = "py2hwsw";
+          version = "";
 
-    src = pkgs.lib.cleanSource py2hwswPath;
+          src = pkgs.lib.cleanSource py2hwswPath;
 
-    # Add any necessary dependencies here.
-    #propagatedBuildInputs = [ pkgs.python38Packages.someDependency ];
-  }
-  else
-  null;
+          # Add any necessary dependencies here.
+          #propagatedBuildInputs = [ pkgs.python38Packages.someDependency ];
+        }
+      else
+        # Environment variable not set. Dont build py2hwsw package (May have been build previously with pip).
+        null
+    else
+      # Caller provided py2hwsw package
+      py2hwsw_pkg;
 
   # Hack to make Nix libreoffice wrapper work.
   # This is because Nix wrapper breaks ghactions test by requiring the `/run/user/$(id -u)` folder to exist

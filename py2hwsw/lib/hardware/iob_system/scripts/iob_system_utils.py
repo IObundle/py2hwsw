@@ -33,6 +33,7 @@ def iob_system_scripts(attributes_dict, params, py_params):
     :param dict py_params: iob_system argument python parameters
     """
     handle_system_overrides(attributes_dict, py_params)
+    append_board_wrappers(attributes_dict, params)
     set_build_dir(attributes_dict, py_params)
     peripherals = get_iob_system_peripherals_list(attributes_dict)
     connect_peripherals_cbus(attributes_dict, peripherals, params)
@@ -43,6 +44,32 @@ def iob_system_scripts(attributes_dict, params, py_params):
 #
 # Local functions
 #
+
+
+def append_board_wrappers(attributes_dict, params):
+    """Append board wrappers to blocks list based on boards_list.
+    :param dict attributes_dict: iob_system attributes
+    :param dict params: iob_system python parameters
+    """
+    # FIXME: We should have a way for child cores to specify their board's tool (assuming child cores may add new unknown boards)
+    tools = {
+        "aes_ku040_db_g": "vivado",
+        "cyclonev_gt_dk": "quartus",
+        "zybo_z7": "vivado",
+        "basys3": "vivado",
+    }
+    for board in attributes_dict.get("board_list", []):
+        tool = tools[board]
+        attributes_dict["blocks"].append(
+            {
+                "core_name": board,
+                "instance_name": board,
+                "instance_description": f"FPGA wrapper for {board}",
+                "instantiate": False,
+                "dest_dir": f"hardware/fpga/{tool}/{board}",
+                "iob_system_params": params,
+            },
+        )
 
 
 def handle_system_overrides(attributes_dict, py_params):

@@ -132,8 +132,8 @@ def setup(py_params_dict):
             "name": "rs232_int",
             "descr": "iob-system uart interface",
             "signals": [
-                {"name": "rxd"},
-                {"name": "txd"},
+                {"name": "rxd_i"},
+                {"name": "txd_o"},
                 {"name": "rs232_rts", "width": "1"},
                 {"name": "high", "width": "1"},
             ],
@@ -241,7 +241,7 @@ def setup(py_params_dict):
                 "name": "rxclk_buf_io",
                 "descr": "IBUFG io",
                 "signals": [
-                    {"name": "enet_rx_clk"},
+                    {"name": "enet_rx_clk_i"},
                     {"name": "eth_clk", "width": "1"},
                 ],
             },
@@ -249,7 +249,7 @@ def setup(py_params_dict):
                 "name": "oddre1_io",
                 "descr": "ODDRE1 io",
                 "signals": [
-                    {"name": "enet_gtx_clk"},
+                    {"name": "enet_gtx_clk_o"},
                     {"name": "eth_clk"},
                     {"name": "high"},
                     {"name": "low", "width": "1"},

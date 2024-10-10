@@ -128,7 +128,7 @@ def setup(py_params_dict):
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
             "signals": [
-                {"name": "clk"},
+                {"name": "clk_i"},
                 {"name": "cke", "width": "1"},
                 {"name": "arst", "width": "1"},
             ],
@@ -158,7 +158,7 @@ def setup(py_params_dict):
             "name": "reset_sync_clk_rst",
             "descr": "Reset synchronizer inputs",
             "signals": [
-                {"name": "clk"},
+                {"name": "clk_i"},
                 {
                     "name": "rst_int" if params["use_extmem"] else "resetn_inv",
                     "width": "1",
@@ -173,10 +173,10 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "clk",
+            "name": "clk_i",
             "descr": "Clock signal",
             "signals": [
-                {"name": "clk"},
+                {"name": "clk_i"},
             ],
         },
     ]
@@ -188,7 +188,7 @@ def setup(py_params_dict):
                 "name": "ddr3_ctr_clk_rst",
                 "descr": "DDR3 controller clock and areset inputs",
                 "signals": [
-                    {"name": "clk"},
+                    {"name": "clk_i"},
                     {"name": "resetn"},
                 ],
             },
@@ -309,7 +309,7 @@ def setup(py_params_dict):
                     "AXI_DATA_W": "AXI_DATA_W",
                 },
                 "connect": {
-                    "clk_i": "clk",
+                    "clk_i": "clk_i",
                     "rst_i": "reset_sync_arst_out",
                     "s0_axi_s": "axi",
                     "m0_axi_m": "memory_axi",
@@ -327,7 +327,7 @@ def setup(py_params_dict):
                     "READ_ON_WRITE": "0",
                 },
                 "connect": {
-                    "clk_i": "clk",
+                    "clk_i": "clk_i",
                     "rst_i": "reset_sync_arst_out",
                     "axi_s": "memory_axi",
                 },

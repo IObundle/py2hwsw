@@ -48,7 +48,7 @@ def setup(py_params_dict):
                 "name": "reset_sync_clk_rst",
                 "descr": "Reset synchronizer inputs",
                 "signals": [
-                    {"name": "clk_out1"},
+                    {"name": "clk_out1_o"},
                     {"name": "arst_out", "width": "1"},
                 ],
             },
@@ -56,7 +56,7 @@ def setup(py_params_dict):
                 "name": "reset_sync_rst_out",
                 "descr": "Reset synchronizer output",
                 "signals": [
-                    {"name": "rst_out1"},
+                    {"name": "rst_out1_o"},
                 ],
             },
         ],

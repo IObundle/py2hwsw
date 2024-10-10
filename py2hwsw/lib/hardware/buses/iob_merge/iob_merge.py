@@ -118,7 +118,7 @@ def setup(py_params_dict):
             "name": "mux_valid_data_o",
             "descr": "Output of valid mux",
             "signals": [
-                {"name": "output_iob_valid"},
+                {"name": "output_iob_valid_o"},
             ],
         },
         {
@@ -132,7 +132,7 @@ def setup(py_params_dict):
             "name": "mux_addr_data_o",
             "descr": "Output of address mux",
             "signals": [
-                {"name": "output_iob_addr"},
+                {"name": "output_iob_addr_o"},
             ],
         },
         {
@@ -146,7 +146,7 @@ def setup(py_params_dict):
             "name": "mux_wdata_data_o",
             "descr": "Output of wdata mux",
             "signals": [
-                {"name": "output_iob_wdata"},
+                {"name": "output_iob_wdata_o"},
             ],
         },
         {
@@ -160,7 +160,7 @@ def setup(py_params_dict):
             "name": "mux_wstrb_data_o",
             "descr": "Output of wstrb mux",
             "signals": [
-                {"name": "output_iob_wstrb"},
+                {"name": "output_iob_wstrb_o"},
             ],
         },
         # Demux signals
@@ -168,7 +168,7 @@ def setup(py_params_dict):
             "name": "demux_rdata_data_i",
             "descr": "Input of rdata demux",
             "signals": [
-                {"name": "output_iob_rdata"},
+                {"name": "output_iob_rdata_i"},
             ],
         },
         {
@@ -182,7 +182,7 @@ def setup(py_params_dict):
             "name": "demux_rvalid_data_i",
             "descr": "Input of rvalid demux",
             "signals": [
-                {"name": "output_iob_rvalid"},
+                {"name": "output_iob_rvalid_i"},
             ],
         },
         {
@@ -196,7 +196,7 @@ def setup(py_params_dict):
             "name": "demux_ready_data_i",
             "descr": "Input of ready demux",
             "signals": [
-                {"name": "output_iob_ready"},
+                {"name": "output_iob_ready_i"},
             ],
         },
         {

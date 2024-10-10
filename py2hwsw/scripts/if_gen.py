@@ -1052,7 +1052,6 @@ def gen_wires(interface):
 
 
 if __name__ == "__main__":
-    #for if_name in if_names:
     for if_name in if_names:
         gen_if(
             interface(

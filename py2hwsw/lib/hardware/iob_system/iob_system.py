@@ -31,7 +31,7 @@ def setup(py_params_dict):
         "name": params["name"],
         "version": "0.7",
         "is_system": True,
-        "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g", "zybo_z7"],
+        "board_list": [],
         "confs": [
             # macros
             {  # Needed for testbench
@@ -468,28 +468,7 @@ def setup(py_params_dict):
             "dest_dir": "hardware/simulation/src",
             "iob_system_params": params,
         },
-        # FPGA wrappers
-        {
-            "core_name": "aes_ku040_db_g",
-            "instance_name": "aes_ku040_db_g",
-            "instantiate": False,
-            "dest_dir": "hardware/fpga/vivado/aes_ku040_db_g",
-            "iob_system_params": params,
-        },
-        {
-            "core_name": "cyclonev_gt_dk",
-            "instance_name": "cyclonev_gt_dk",
-            "instantiate": False,
-            "dest_dir": "hardware/fpga/quartus/cyclonev_gt_dk",
-            "iob_system_params": params,
-        },
-        {
-            "core_name": "zybo_z7",
-            "instance_name": "zybo_z7",
-            "instantiate": False,
-            "dest_dir": "hardware/fpga/vivado/zybo_z7",
-            "iob_system_params": params,
-        },
+        # FPGA wrappers added automatically
     ]
     attributes_dict["sw_modules"] = [
         # Software modules

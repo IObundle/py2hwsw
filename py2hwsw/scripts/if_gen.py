@@ -875,20 +875,21 @@ def get_wb_full_ports():
             descr="Retry input. Indicates interface is not ready to accept or send data, and cycle should be retried.",
         ),
         iob_signal(
-           name="wb_tga",
-           direction="output",
-           width=1,
-           descr="Address tag type. Contains information associated with address lines [adr], and is qualified by signal [stb].",
+            name="wb_tga",
+            direction="output",
+            width=1,
+            descr="Address tag type. Contains information associated with address lines [adr], and is qualified by signal [stb].",
         ),
         iob_signal(
-           name="wb_tgc",
-           direction="output",
-           width=1,
-           descr="Cycle tag type. Contains information associated with bus cycles, and is qualified by signal [cyc].",
+            name="wb_tgc",
+            direction="output",
+            width=1,
+            descr="Cycle tag type. Contains information associated with bus cycles, and is qualified by signal [cyc].",
         ),
     ]
 
     return ports
+
 
 #
 # Handle signal direction

@@ -2,32 +2,32 @@
 #
 # SPDX-License-Identifier: MIT
 
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> {}, py2hwsw_pkg ? "none" }:
 
 let
-  py2hwsw_commit = "a529836f70b1a69bf6fb4931970f3fa41acf2afb"; # Replace with the desired commit.
-  py2hwsw_sha256 = "sha256-cQ81peJBr4s4lC0FHdEjwf6yWfVF7iyo1f93wIK8ue4="; # Replace with the actual SHA256 hash.
+  # Get local py2hwsw path from `PY2HWSW_PATH` env variable
+  py2hwswPath = builtins.getEnv "PY2HWSW_PATH";
 
-  py2hwsw = pkgs.python3.pkgs.buildPythonPackage rec {
-    pname = "py2hwsw";
-    version = py2hwsw_commit;
+  py2hwsw =
+    if py2hwsw_pkg == "none" then
+      # Caller does not provide py2hwsw package
+      if py2hwswPath != "" then
+        # Environment variable with py2hwsw path is set
+        pkgs.python3.pkgs.buildPythonPackage rec {
+          pname = "py2hwsw";
+          version = "";
 
-    src = let
-      # Get local py2hwsw path from `PY2HWSW_PATH` env variable
-      py2hwswPath = builtins.getEnv "PY2HWSW_PATH";
-    in if py2hwswPath != "" then
-      pkgs.lib.cleanSource py2hwswPath
+          src = pkgs.lib.cleanSource py2hwswPath;
+
+          # Add any necessary dependencies here.
+          #propagatedBuildInputs = [ pkgs.python38Packages.someDependency ];
+        }
+      else
+        # Environment variable not set. Dont build py2hwsw package (May have been build previously with pip).
+        null
     else
-      pkgs.fetchFromGitHub {
-        owner = "IObundle";
-        repo = "py2hwsw";
-        rev = py2hwsw_commit;
-        sha256 = py2hwsw_sha256;
-      };
-
-    # Add any necessary dependencies here.
-    #propagatedBuildInputs = [ pkgs.python38Packages.someDependency ];
-  };
+      # Caller provided py2hwsw package
+      py2hwsw_pkg;
 
   # Hack to make Nix libreoffice wrapper work.
   # This is because Nix wrapper breaks ghactions test by requiring the `/run/user/$(id -u)` folder to exist
@@ -36,7 +36,7 @@ let
     exec ${pkgs.libreoffice}/bin/soffice "$@"
   '';
 
-  yosys = import scripts/yosys.nix { inherit pkgs; };
+  yosys = import ./scripts/yosys.nix { inherit pkgs; };
 in
 
 pkgs.mkShell {
@@ -57,7 +57,7 @@ pkgs.mkShell {
     python3Packages.scipy
     python3Packages.pyserial
     (texlive.combine { inherit (texlive) scheme-medium multirow lipsum catchfile nowidow enumitem placeins xltabular ltablex titlesec makecell datetime fmtcount comment textpos csquotes amsmath cancel listings hyperref biblatex; })
-    (callPackage scripts/riscv-gnu-toolchain.nix { })
+    (callPackage ./scripts/riscv-gnu-toolchain.nix { })
     verible
     black
     llvmPackages_14.clangUseLLVM

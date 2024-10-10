@@ -10,6 +10,7 @@ import re
 @dataclass
 class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
+
     type: str = "prog"
 
     def __post_init__(self):
@@ -40,21 +41,23 @@ class iob_fsm(iob_comb):
                     if self.type == "fsm":
                         raise ValueError("for loops are not suported in FSMs")
                     init, cond, update = for_loop.split(";")
-                    _for_loops[tag] = {
-                        "init": init,
-                        "cond": cond,
-                        "update": update
-                    }
+                    _for_loops[tag] = {"init": init, "cond": cond, "update": update}
                     state = re.sub(r"for\s*\([^)]+\)", "", state)
                 self.state_names[tag] = i
                 _states[i] = state.replace(f"{tag}:", "")
         for tag, loop in _for_loops.items():
-            if loop['init'] != "":
-                _states[self.state_names[tag]] = f"\n{loop['init']};\n{_states[self.state_names[tag]]}"
-            if loop['update'] != "":
-                _states[self.state_names[tag+"_endfor"]] = f"{_states[self.state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+            if loop["init"] != "":
+                _states[self.state_names[tag]] = (
+                    f"\n{loop['init']};\n{_states[self.state_names[tag]]}"
+                )
+            if loop["update"] != "":
+                _states[self.state_names[tag + "_endfor"]] = (
+                    f"{_states[self.state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+                )
             else:
-                _states[self.state_names[tag+"_endfor"]] = f"{_states[self.state_names[tag+'_endfor']]}\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+                _states[self.state_names[tag + "_endfor"]] = (
+                    f"{_states[self.state_names[tag+'_endfor']]}\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+                )
         for i, state in enumerate(_states[:-1]):
             _states[i] = f"{i}: begin\n{state}\nend"
             _states[i] = re.sub(r"\n\s*\n", "\n", _states[i])
@@ -62,7 +65,7 @@ class iob_fsm(iob_comb):
         _states[-1] = re.sub(r"\n\s*\n", "\n", _states[-1])
         localparams = ""
         for state_name, i in self.state_names.items():
-            _states[i] = _states[i].replace(f"{i}:", f"{state_name}:",1)
+            _states[i] = _states[i].replace(f"{i}:", f"{state_name}:", 1)
             if not state_name.endswith("_endfor"):
                 localparams += f"localparam {state_name} = {i};\n"
         joined_states = "\n".join(_states)
@@ -75,12 +78,14 @@ always @* begin
     endcase
 end
 """
-    
-        
+
+
 def create_fsm(core, *args, **kwargs):
     """Create a Verilog finite state machine to insert in a given core."""
     if core.comb != None:
-        raise ValueError("Combinational logic is mutually exclusive with FSMs. Create separate submodules for each.")
+        raise ValueError(
+            "Combinational logic is mutually exclusive with FSMs. Create separate submodules for each."
+        )
 
     core.set_default_attribute("fsm", None)
 
@@ -89,8 +94,8 @@ def create_fsm(core, *args, **kwargs):
     fsm = iob_fsm(verilog_code=verilog_code)
 
     core.create_wire(
-        name = fsm.state_reg_name,
-        signals = [{"name": fsm.state_reg_name, "width": fsm.state_reg_width}]
+        name=fsm.state_reg_name,
+        signals=[{"name": fsm.state_reg_name, "width": fsm.state_reg_width}],
     )
 
     fsm.set_needed_reg(core)

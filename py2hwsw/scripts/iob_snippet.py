@@ -16,6 +16,7 @@ class iob_snippet:
     # List of outputs of this snippet (use to generate global wires)
     verilog_code: str = ""
 
+
 def create_snippet(core, *args, **kwargs):
     """Create a Verilog snippet to insert in given core."""
     # Ensure 'snippets' list exists

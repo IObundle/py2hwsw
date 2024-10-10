@@ -11,6 +11,7 @@ import importlib
 import traceback
 import re
 from functools import wraps
+import inspect
 
 import iob_colors
 
@@ -307,3 +308,15 @@ def nix_permission_hack(path):
     This is a hack to prevent issues with permissions on Nix systems.
     """
     os.system("chmod -R ug+w " + path)
+
+
+def assert_attributes(
+    func, kwargs, error_msg="Function [func] does not support argument '[arg]'!"
+):
+    """Assert that given function supports the given arguments
+    :param func: function to check for compatible arguments
+    :param kwargs: arguments to check
+    """
+    for arg in kwargs:
+        if arg not in inspect.signature(func).parameters:
+            fail_with_msg(error_msg.replace("[func]", str(func)).replace("[arg]", arg))

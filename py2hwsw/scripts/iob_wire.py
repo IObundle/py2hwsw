@@ -12,6 +12,7 @@ from iob_base import (
     fail_with_msg,
     add_traceback_msg,
     str_to_kwargs,
+    assert_attributes,
 )
 from iob_signal import iob_signal, iob_signal_reference, get_real_signal
 
@@ -35,7 +36,7 @@ class iob_wire:
 
     def __post_init__(self):
         if not self.name:
-            fail_with_msg("Wire name is not set", ValueError)
+            fail_with_msg("All wires must have a name!", ValueError)
 
         if self.interface:
             self.signals += if_gen.get_signals(
@@ -78,6 +79,11 @@ def create_wire(core, *args, signals=[], interface=None, **kwargs):
         interface_obj = if_gen.dict2interface(interface)
         if interface_obj and not interface_obj.file_prefix:
             interface_obj.file_prefix = core.name + "_"
+        assert_attributes(
+            iob_wire,
+            kwargs,
+            error_msg=f"Invalid {kwargs.get("name", "")} wire attribute '[arg]'!",
+        )
         wire = iob_wire(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
         core.wires.append(wire)
     except Exception:

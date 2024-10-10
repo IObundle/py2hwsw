@@ -2,10 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
+import re
+
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
-import re
-from iob_base import fail_with_msg
+from iob_base import fail_with_msg, assert_attributes
 from iob_wire import find_signal_in_wires
 from iob_signal import get_real_signal
 
@@ -169,12 +170,17 @@ def generate_direction_process_func(direction):
 
 def create_comb(core, *args, **kwargs):
     """Create a Verilog combinatory circuit to insert in a given core."""
-    if core.fsm != None:
+    if core.fsm is not None:
         raise ValueError(
             "Comb circuits and FSMs are mutually exclusive. Use separate submodules."
         )
     core.set_default_attribute("comb", None)
     verilog_code = kwargs.get("verilog_code", None)
+    assert_attributes(
+        iob_comb,
+        kwargs,
+        error_msg=f"Invalid {kwargs.get("name", "")} comb attribute '[arg]'!",
+    )
     comb = iob_comb(verilog_code=verilog_code)
     comb.set_needed_reg(core)
     comb.infer_registers(core)

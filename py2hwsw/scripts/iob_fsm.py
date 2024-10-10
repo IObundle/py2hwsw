@@ -2,9 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass, field
-from iob_comb import iob_comb
 import re
+
+from dataclasses import dataclass
+from iob_comb import iob_comb
+from iob_base import assert_attributes
 
 
 @dataclass
@@ -28,7 +30,7 @@ class iob_fsm(iob_comb):
         tag = re.search(r"^\s*(\w+):", _states[0])
         tag = tag.group(1) if tag else None
         if tag == "default_assignments":
-            update_statement += f"{_states[0].replace(f'{tag}:','')}"
+            update_statement += f"{_states[0].replace(f'{tag}:', '')}"
             _states = _states[1:]
         self.state_reg_width = (len(_states) - 1).bit_length()
         for i, state in enumerate(_states):
@@ -82,7 +84,7 @@ end
 
 def create_fsm(core, *args, **kwargs):
     """Create a Verilog finite state machine to insert in a given core."""
-    if core.comb != None:
+    if core.comb is not None:
         raise ValueError(
             "Combinational logic is mutually exclusive with FSMs. Create separate submodules for each."
         )
@@ -91,6 +93,11 @@ def create_fsm(core, *args, **kwargs):
 
     verilog_code = kwargs.get("verilog_code", "")
 
+    assert_attributes(
+        iob_fsm,
+        kwargs,
+        error_msg=f"Invalid {kwargs.get("name", "")} fsm attribute '[arg]'!",
+    )
     fsm = iob_fsm(verilog_code=verilog_code)
 
     core.create_wire(

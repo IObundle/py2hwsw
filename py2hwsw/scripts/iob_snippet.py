@@ -3,10 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-import re
-from iob_base import fail_with_msg
-from iob_wire import find_signal_in_wires
-from iob_signal import get_real_signal
+from iob_base import assert_attributes
 
 
 @dataclass
@@ -21,5 +18,10 @@ def create_snippet(core, *args, **kwargs):
     """Create a Verilog snippet to insert in given core."""
     # Ensure 'snippets' list exists
     core.set_default_attribute("snippets", [])
+    assert_attributes(
+        iob_snippet,
+        kwargs,
+        error_msg=f"Invalid {kwargs.get("name", "")} snippet attribute '[arg]'!",
+    )
     snippet = iob_snippet(*args, **kwargs)
     core.snippets.append(snippet)

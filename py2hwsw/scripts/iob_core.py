@@ -429,11 +429,15 @@ class iob_core(iob_module, iob_instance):
         if "dest_dir" not in kwargs:
             kwargs["dest_dir"] = self.dest_dir
 
-        instance = self.get_core_obj(
-            core_name, instance_name=instance_name, instantiator=self, **kwargs
-        )
+        try:
+            instance = self.get_core_obj(
+                core_name, instance_name=instance_name, instantiator=self, **kwargs
+            )
 
-        self.blocks.append(instance)
+            self.blocks.append(instance)
+        except ModuleNotFoundError:
+            add_traceback_msg(f"Failed to create instance '{instance_name}'.")
+            raise
 
     def connect_instance_ports(self, connect, instantiator):
         """
@@ -516,7 +520,9 @@ class iob_core(iob_module, iob_instance):
             if attr_name in self.ATTRIBUTE_PROPERTIES:
                 self.ATTRIBUTE_PROPERTIES[attr_name].set_handler(attr_value),
             else:
-                fail_with_msg(f"Unknown attribute: {attr_name}")
+                fail_with_msg(
+                    f"Unknown attribute '{attr_name}' in core {attributes["original_name"]}"
+                )
 
     def lint_and_format(self):
         """Run Linters and Formatters in setup and build directories."""
@@ -729,7 +735,8 @@ def find_module_setup_dir(core_name):
     )
     if not file_path:
         fail_with_msg(
-            f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!"
+            f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!",
+            ModuleNotFoundError,
         )
 
     file_ext = os.path.splitext(file_path)[1]

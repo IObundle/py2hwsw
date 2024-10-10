@@ -112,7 +112,7 @@ def setup(py_params_dict):
                 "descr": "AXI ID bus width",
                 "type": "F",
                 "val": "0",
-                "min": "1",
+                "min": "0",
                 "max": "32",
             },
             {

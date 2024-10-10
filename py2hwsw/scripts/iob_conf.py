@@ -3,14 +3,14 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-from iob_base import str_to_kwargs
+from iob_base import str_to_kwargs, fail_with_msg, assert_attributes
 
 
 @dataclass
 class iob_conf:
     name: str = ""
     type: str = ""
-    val: str | bool = ""
+    val: str | int | bool = ""
     min: str | int = 0
     max: str | int = 1
     descr: str = "Default description"
@@ -20,11 +20,22 @@ class iob_conf:
 
     def __post_init__(self):
         if not self.name:
-            raise Exception("Conf name is required")
+            fail_with_msg("Every conf must have a name!")
         if not self.type:
-            raise Exception("Conf type is required")
+            fail_with_msg(f"Conf '{self.name}' must have a type!")
         elif self.type not in ["M", "P", "F"]:
-            raise Exception("Conf type must be either M, P or F")
+            fail_with_msg(f"Conf '{self.name}' type must be either M, P or F!")
+
+        try:
+            val = int(self.val)
+            min = int(self.min)
+            max = int(self.max)
+            if val < min or val > max:
+                fail_with_msg(
+                    f"Conf '{self.name}' value '{val}' must be between {min} and {max}!"
+                )
+        except ValueError:
+            pass
 
 
 attrs = ["name", ["-t", "type"], ["-v", "val"], ["-m", "min"], ["-M", "max"]]
@@ -37,5 +48,10 @@ def create_conf(core, *args, **kwargs):
     """
     # Ensure 'confs' list exists
     core.set_default_attribute("confs", [])
+    assert_attributes(
+        iob_conf,
+        kwargs,
+        error_msg=f"Invalid {kwargs.get("name", "")} conf attribute '[arg]'!",
+    )
     conf = iob_conf(*args, **kwargs)
     core.confs.append(conf)

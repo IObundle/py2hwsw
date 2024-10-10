@@ -123,16 +123,16 @@ def setup(py_params_dict):
                 "descr": "Division interface",
                 "signals": [
                     {
-                        "name": "dividend",
+                        "name": "dividend_i",
                     },
                     {
-                        "name": "divisor",
+                        "name": "divisor_i",
                     },
                     {
                         "name": "quotient_int",
                     },
                     {
-                        "name": "remainder",
+                        "name": "remainder_o",
                     },
                 ],
             },

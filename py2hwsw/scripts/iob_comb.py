@@ -179,7 +179,7 @@ def create_comb(core, *args, **kwargs):
     assert_attributes(
         iob_comb,
         kwargs,
-        error_msg=f"Invalid {kwargs.get("name", "")} comb attribute '[arg]'!",
+        error_msg=f"Invalid {kwargs.get('name', '')} comb attribute '[arg]'!",
     )
     comb = iob_comb(verilog_code=verilog_code)
     comb.set_needed_reg(core)

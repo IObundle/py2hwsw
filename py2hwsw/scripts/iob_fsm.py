@@ -96,7 +96,7 @@ def create_fsm(core, *args, **kwargs):
     assert_attributes(
         iob_fsm,
         kwargs,
-        error_msg=f"Invalid {kwargs.get("name", "")} fsm attribute '[arg]'!",
+        error_msg=f"Invalid {kwargs.get('name', '')} fsm attribute '[arg]'!",
     )
     fsm = iob_fsm(verilog_code=verilog_code)
 

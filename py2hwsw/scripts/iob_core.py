@@ -521,7 +521,7 @@ class iob_core(iob_module, iob_instance):
                 self.ATTRIBUTE_PROPERTIES[attr_name].set_handler(attr_value),
             else:
                 fail_with_msg(
-                    f"Unknown attribute '{attr_name}' in core {attributes["original_name"]}"
+                    f"Unknown attribute '{attr_name}' in core {attributes['original_name']}"
                 )
 
     def lint_and_format(self):

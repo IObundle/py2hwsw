@@ -82,7 +82,7 @@ def create_wire(core, *args, signals=[], interface=None, **kwargs):
         assert_attributes(
             iob_wire,
             kwargs,
-            error_msg=f"Invalid {kwargs.get("name", "")} wire attribute '[arg]'!",
+            error_msg=f"Invalid {kwargs.get('name', '')} wire attribute '[arg]'!",
         )
         wire = iob_wire(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
         core.wires.append(wire)

@@ -112,7 +112,7 @@ def create_port(core, *args, signals=[], interface=None, **kwargs):
     assert_attributes(
         iob_port,
         kwargs,
-        error_msg=f"Invalid {kwargs.get("name", "")} port attribute '[arg]'!",
+        error_msg=f"Invalid {kwargs.get('name', '')} port attribute '[arg]'!",
     )
     port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
     core.ports.append(port)

@@ -21,7 +21,7 @@ def create_snippet(core, *args, **kwargs):
     assert_attributes(
         iob_snippet,
         kwargs,
-        error_msg=f"Invalid {kwargs.get("name", "")} snippet attribute '[arg]'!",
+        error_msg=f"Invalid {kwargs.get('name', '')} snippet attribute '[arg]'!",
     )
     snippet = iob_snippet(*args, **kwargs)
     core.snippets.append(snippet)

@@ -51,7 +51,7 @@ def create_conf(core, *args, **kwargs):
     assert_attributes(
         iob_conf,
         kwargs,
-        error_msg=f"Invalid {kwargs.get("name", "")} conf attribute '[arg]'!",
+        error_msg=f"Invalid {kwargs.get('name', '')} conf attribute '[arg]'!",
     )
     conf = iob_conf(*args, **kwargs)
     core.confs.append(conf)

@@ -19,9 +19,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Python to hardware/software generator"
     )
-    parser.add_argument("core_name", type=str, help="The name of the core to use.")
+    parser.add_argument(
+        "core_name", nargs="?", type=str, help="The name of the core to use."
+    )
     parser.add_argument(
         "target",
+        nargs="?",
         type=str,
         default="setup",
         help="The target action to perform on the core.",
@@ -78,9 +81,17 @@ if __name__ == "__main__":
         help="Set the debug level (default: 0)",
     )
     parser.add_argument(
+        "-v",
         "--version",
         action="version",
         version=f"%(prog)s {PY2HWSW_VERSION}",
+    )
+
+    parser.add_argument(
+        "--py2hwsw_docs",
+        dest="py2hwsw_docs",
+        action="store_true",
+        help="Setup Py2HWSW documentation directory",
     )
     args = parser.parse_args()
 
@@ -91,6 +102,14 @@ if __name__ == "__main__":
     iob_core.global_project_vformat = args.verilog_format
     iob_core.global_project_vlint = args.verilog_lint
     iob_base.debug_level = args.debug_level
+
+    if args.py2hwsw_docs:
+        iob_core.setup_py2_docs(PY2HWSW_VERSION)
+        exit(0)
+
+    if not args.core_name:
+        parser.print_usage(sys.stderr)
+        fail_with_msg("Core name is required.")
 
     py_params = {}
     if args.py_params:

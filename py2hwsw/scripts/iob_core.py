@@ -8,6 +8,7 @@ import shutil
 import json
 from pathlib import Path
 import copy
+from types import SimpleNamespace
 
 import iob_colors
 
@@ -700,6 +701,23 @@ class iob_core(iob_module, iob_instance):
                 **kwargs,
             )
         return instance
+
+    @staticmethod
+    def setup_py2_docs(py2_version):
+        """Setup document directory for py2hwsw."""
+        # Create temporary object to represent a "py2hwsw" core
+        core = SimpleNamespace(
+            original_name="py2hwsw",
+            name="py2hwsw",
+            setup_dir=os.path.join(os.path.dirname(__file__), "../.."),
+            build_dir="py2hwsw_docs",
+        )
+        copy_srcs.doc_setup(core)
+        copy_srcs.copy_rename_setup_subdir(core, "document")
+        with open(f"{core.build_dir}/config_build.mk", "w") as f:
+            f.write("NAME=Py2HWSW\n")
+        with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
+            f.write(py2_version)
 
 
 def find_common_deep(path1, path2):

@@ -1,0 +1,52 @@
+The setup directory of a core may have the following structure:
+
+```
+.
+├── core_name.py
+├── core_name.json
+├── document
+│   ├── doc_build.mk
+│   ├── figures
+│   └── tsrc
+├── hardware
+│   ├── src
+│   ├── fpga
+│   │   ├── fpga_build.mk
+│   │   ├── src
+│   │   ├── quartus
+│   │   └── vivado
+│   ├── modules
+│   ├── simulation
+│   │   ├── sim_build.mk
+│   │   └── src
+│   └── syn
+│       ├── src
+│       └── genus
+├── software
+│   ├── sw_build.mk
+│   └── src
+├── scripts
+├── submodules
+├── Makefile
+├── README.md
+├── LICENSE
+├── CITATION.cff
+└── default.nix
+```
+
+Only the `core_name.py` or `core_name.json` file is needed to pass the core's description to Py2HWSW.
+The remaining directories and files are optional.
+
+If the `document`, `hardware`, and `software` directories exist, they will be copied to the `build` directory, overriding any files already present there, such as standard ones or files from other cores.
+
+The `*_build.mk` files allow the user to include core specific Makefile targets and variables from the build process.
+These will be copied to the `build` directory and included in the standard build process Makefiles.
+
+The `src` directories contain manually written Verilog/C/TeX sources for the core, should they be needed.
+
+
+The following directories and files do not follow a mandatory structure, but are typically used for the following purposes:
+
+The `hardware/modules` and `submodules` directories typically contain setup directories of other cores.
+
+The `scripts` directory contains scripts specific to the core, and may be called by the user or from the `core_name.py` script.

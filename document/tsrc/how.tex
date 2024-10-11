@@ -1,0 +1,7 @@
+Py2HWSW does this by:
+* Two-Step Development Process: The core development is divided into two distinct phases: the setup phase and the build phase. During the setup phase, Verilog source files are generated based on high-level descriptions provided in Python or JSON format. The build phase then utilizes these Verilog sources to produce the necessary FPGA bitstreams, netlists, and other deployment files.
+* Independent Setup Folders: Each core is organized within its own independent setup folder, containing high-level description files and, if needed, low-level files as well.
+* Core Description Input: The core's specifications are provided to Py2hwsw in the form of JSON or a Python dictionary, utilizing standard Py2hwsw attributes.
+* Flexible Attribute Handling: When generating the cores dictionary via a Python script, users can include a set of standard Py2hwsw attributes alongside their own custom-defined attributes.
+
+Learn more about [[How It Works]] and [[How To Use]].

@@ -47,11 +47,12 @@ def lint_files(files_list):
 
         # Find parents of this directory
         for directory, file_list in dir_file_list.items():
-            dir_name = (
-                os.path.dirname(directory)
-                if os.path.basename(directory) == "src"
-                else directory
-            )
+            dir_name = directory
+            if os.path.basename(directory) == "src":
+                dir_name = os.path.dirname(directory)
+            elif directory.rstrip("/").endswith("hardware/common_src"):
+                dir_name = os.path.dirname(directory)
+
             # If this directory is a parent (or equal) to the child_dir, add files to the list
             if (
                 os.path.commonprefix([dir_name, child_dir]) == dir_name

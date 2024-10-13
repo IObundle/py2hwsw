@@ -30,14 +30,12 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {
-                        "name": "start",
-                        "direction": "input",
+                        "name": "start_i",
                         "width": 1,
                         "descr": "Start signal",
                     },
                     {
-                        "name": "done",
-                        "direction": "output",
+                        "name": "done_o",
                         "width": 1,
                         "descr": "Done signal",
                     },
@@ -48,26 +46,22 @@ def setup(py_params_dict):
                 "descr": "Division interface",
                 "signals": [
                     {
-                        "name": "dividend",
-                        "direction": "input",
+                        "name": "dividend_i",
                         "width": "DATA_W",
                         "descr": "",
                     },
                     {
-                        "name": "divisor",
-                        "direction": "input",
+                        "name": "divisor_i",
                         "width": "DATA_W",
                         "descr": "",
                     },
                     {
-                        "name": "quotient",
-                        "direction": "output",
+                        "name": "quotient_o",
                         "width": "DATA_W",
                         "descr": "",
                     },
                     {
-                        "name": "remainder",
-                        "direction": "output",
+                        "name": "remainder_o",
                         "width": "DATA_W",
                         "descr": "",
                     },

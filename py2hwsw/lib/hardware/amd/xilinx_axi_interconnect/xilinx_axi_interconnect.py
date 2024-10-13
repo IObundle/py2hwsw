@@ -72,8 +72,8 @@ def setup(py_params_dict):
                 "name": f"s{i}_clk_rst",
                 "descr": f"Slave {i} clock reset interface",
                 "signals": [
-                    {"name": f"s{i}_clk", "direction": "input", "width": "1"},
-                    {"name": f"s{i}_arstn", "direction": "output", "width": "1"},
+                    {"name": f"s{i}_clk_i", "width": "1"},
+                    {"name": f"s{i}_arstn_o", "width": "1"},
                 ],
             },
             {
@@ -96,8 +96,8 @@ def setup(py_params_dict):
                 "name": f"m{i}_clk_rst",
                 "descr": f"Master {i} clock reset output interface",
                 "signals": [
-                    {"name": f"m{i}_clk", "direction": "input", "width": "1"},
-                    {"name": f"m{i}_arstn", "direction": "output", "width": "1"},
+                    {"name": f"m{i}_clk_i", "width": "1"},
+                    {"name": f"m{i}_arstn_o", "width": "1"},
                 ],
             },
             {

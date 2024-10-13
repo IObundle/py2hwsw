@@ -30,9 +30,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "ld",
+                        "name": "ld_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -41,9 +40,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "p",
+                        "name": "p_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -52,9 +50,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "s",
+                        "name": "s_o",
                         "width": 1,
-                        "direction": "output",
                     },
                 ],
             },

@@ -38,9 +38,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "clk",
+                        "name": "clk_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -49,9 +48,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "dividend",
+                        "name": "dividend_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -60,9 +58,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "divisor",
+                        "name": "divisor_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -71,9 +68,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "quotient",
+                        "name": "quotient_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -82,9 +78,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "dividend",
+                        "name": "dividend_o",
                         "width": "DATA_W",
-                        "direction": "output",
                         "isvar": True,
                     },
                 ],
@@ -94,9 +89,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "divisor",
+                        "name": "divisor_o",
                         "width": "DATA_W",
-                        "direction": "output",
                         "isvar": True,
                     },
                 ],
@@ -106,9 +100,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "quotient",
+                        "name": "quotient_o",
                         "width": "DATA_W",
-                        "direction": "output",
                         "isvar": True,
                     },
                 ],

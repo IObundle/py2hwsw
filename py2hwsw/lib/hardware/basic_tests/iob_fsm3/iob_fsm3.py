@@ -11,7 +11,7 @@ def setup(py_params_dict):
                 "name": "a_o",
                 "descr": "Output port",
                 "signals": [
-                    {"name": "a", "width": "8", "direction": "output"},
+                    {"name": "a_o", "width": "8"},
                 ],
             },
         ],

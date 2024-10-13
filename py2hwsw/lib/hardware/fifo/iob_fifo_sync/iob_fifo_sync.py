@@ -95,8 +95,7 @@ def setup(py_params_dict):
                 "descr": "Synchronous reset interface",
                 "signals": [
                     {
-                        "name": "rst",
-                        "direction": "input",
+                        "name": "rst_i",
                         "width": 1,
                         "descr": "Synchronous reset input",
                     },
@@ -107,20 +106,17 @@ def setup(py_params_dict):
                 "descr": "Write interface",
                 "signals": [
                     {
-                        "name": "w_en",
-                        "direction": "input",
+                        "name": "w_en_i",
                         "width": 1,
                         "descr": "Write enable",
                     },
                     {
-                        "name": "w_data",
-                        "direction": "input",
+                        "name": "w_data_i",
                         "width": "W_DATA_W",
                         "descr": "Write data",
                     },
                     {
-                        "name": "w_full",
-                        "direction": "output",
+                        "name": "w_full_o",
                         "width": 1,
                         "descr": "Write full signal",
                     },
@@ -131,20 +127,17 @@ def setup(py_params_dict):
                 "descr": "Read interface",
                 "signals": [
                     {
-                        "name": "r_en",
-                        "direction": "input",
+                        "name": "r_en_i",
                         "width": 1,
                         "descr": "Read enable",
                     },
                     {
-                        "name": "r_data",
-                        "direction": "output",
+                        "name": "r_data_o",
                         "width": "R_DATA_W",
                         "descr": "Read data",
                     },
                     {
-                        "name": "r_empty",
-                        "direction": "output",
+                        "name": "r_empty_o",
                         "width": 1,
                         "descr": "Read empty signal",
                     },
@@ -154,41 +147,38 @@ def setup(py_params_dict):
                 "name": "extmem",
                 "descr": "External memory interface",
                 "signals": [
-                    {"name": "ext_mem_clk", "direction": "output", "width": 1},
                     {
-                        "name": "ext_mem_w_en",
-                        "direction": "output",
+                        "name": "ext_mem_clk_o",
+                        "width": 1,
+                    },
+                    {
+                        "name": "ext_mem_w_en_o",
                         "width": "R",
                         "descr": "Memory write enable",
                     },
                     {
-                        "name": "ext_mem_w_addr",
-                        "direction": "output",
+                        "name": "ext_mem_w_addr_o",
                         "width": "MINADDR_W",
                         "descr": "Memory write address",
                     },
                     {
-                        "name": "ext_mem_w_data",
-                        "direction": "output",
+                        "name": "ext_mem_w_data_o",
                         "width": "MAXDATA_W",
                         "descr": "Memory write data",
                     },
                     #  Read port
                     {
-                        "name": "ext_mem_r_en",
-                        "direction": "output",
+                        "name": "ext_mem_r_en_o",
                         "width": "R",
                         "descr": "Memory read enable",
                     },
                     {
-                        "name": "ext_mem_r_addr",
-                        "direction": "output",
+                        "name": "ext_mem_r_addr_o",
                         "width": "MINADDR_W",
                         "descr": "Memory read address",
                     },
                     {
-                        "name": "ext_mem_r_data",
-                        "direction": "input",
+                        "name": "ext_mem_r_data_i",
                         "width": "MAXDATA_W",
                         "descr": "Memory read data",
                     },
@@ -199,8 +189,7 @@ def setup(py_params_dict):
                 "descr": "FIFO interface",
                 "signals": [
                     {
-                        "name": "level",
-                        "direction": "output",
+                        "name": "level_o",
                         "width": "ADDR_W+1",
                         "descr": "FIFO level",
                     },

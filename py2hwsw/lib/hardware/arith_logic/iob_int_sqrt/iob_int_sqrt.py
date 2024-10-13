@@ -33,9 +33,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "start",
+                        "name": "start_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -44,9 +43,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "op",
+                        "name": "op_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -55,9 +53,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "done",
+                        "name": "done_o",
                         "width": 1,
-                        "direction": "output",
                     },
                 ],
             },
@@ -66,9 +63,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "res",
+                        "name": "res_o",
                         "width": "SIZE_W",
-                        "direction": "output",
                     },
                 ],
             },

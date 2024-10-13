@@ -22,9 +22,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "clk",
+                        "name": "clk_i",
                         "width": 1,
-                        "direction": "input",
                     },
                 ],
             },
@@ -33,9 +32,8 @@ def setup(py_params_dict):
                 "descr": "Input port",
                 "signals": [
                     {
-                        "name": "data",
+                        "name": "data_i",
                         "width": "DATA_W",
-                        "direction": "input",
                     },
                 ],
             },
@@ -44,9 +42,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "data_l",
+                        "name": "data_l_o",
                         "width": "DATA_W",
-                        "direction": "output",
                     },
                 ],
             },
@@ -55,9 +52,8 @@ def setup(py_params_dict):
                 "descr": "Output port",
                 "signals": [
                     {
-                        "name": "data_h",
+                        "name": "data_h_o",
                         "width": "DATA_W",
-                        "direction": "output",
                     },
                 ],
             },

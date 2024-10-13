@@ -21,8 +21,7 @@ def setup(py_params_dict):
                 "descr": "Synchronous reset interface",
                 "signals": [
                     {
-                        "name": "rst",
-                        "direction": "input",
+                        "name": "rst_i",
                         "width": 1,
                         "descr": "Synchronous reset input",
                     },
@@ -33,26 +32,22 @@ def setup(py_params_dict):
                 "descr": "AXI Stream output configuration interface",
                 "signals": [
                     {
-                        "name": "config_out_addr",
-                        "direction": "input",
+                        "name": "config_out_addr_i",
                         "width": "AXI_ADDR_W",
                         "descr": "",
                     },
                     {
-                        "name": "config_out_length",
-                        "direction": "input",
+                        "name": "config_out_length_i",
                         "width": "AXI_ADDR_W",
                         "descr": "",
                     },
                     {
-                        "name": "config_out_valid",
-                        "direction": "input",
+                        "name": "config_out_valid_i",
                         "width": 1,
                         "descr": "",
                     },
                     {
-                        "name": "config_out_ready",
-                        "direction": "output",
+                        "name": "config_out_ready_o",
                         "width": 1,
                         "descr": "",
                     },
@@ -63,20 +58,17 @@ def setup(py_params_dict):
                 "descr": "AXI Stream output interface",
                 "signals": [
                     {
-                        "name": "axis_out_data",
-                        "direction": "output",
+                        "name": "axis_out_data_o",
                         "width": "AXI_DATA_W",
                         "descr": "",
                     },
                     {
-                        "name": "axis_out_valid",
-                        "direction": "output",
+                        "name": "axis_out_valid_o",
                         "width": 1,
                         "descr": "",
                     },
                     {
-                        "name": "axis_out_ready",
-                        "direction": "input",
+                        "name": "axis_out_ready_i",
                         "width": 1,
                         "descr": "",
                     },

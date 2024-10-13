@@ -21,7 +21,7 @@ def setup(py_params_dict):
                 "name": "clk_o",
                 "descr": "Output clock",
                 "signals": [
-                    {"name": "clk", "width": "1", "direction": "output"},
+                    {"name": "clk_o", "width": "1"},
                 ],
             },
         ],

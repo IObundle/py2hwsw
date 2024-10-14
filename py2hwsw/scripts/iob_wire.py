@@ -52,7 +52,10 @@ class iob_wire:
                 # Skip signal references
                 if isinstance(signal, iob_signal_reference):
                     continue
-                if signal.direction:
+                if hasattr(signal, "direction"):
+                    suffix = if_gen.get_suffix(signal.direction)
+                    if signal.name.endswith(suffix):
+                        signal.name = signal.name[:-len(suffix)]
                     signal.direction = ""
 
 

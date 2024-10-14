@@ -4,7 +4,7 @@
         "\n            W -t P -v 1 -m 1 -M 32\n            'Ports width'\n            "
     ],
     "ports": [
-        "\n            a_i -s a W input\n            'Input port a'\n\n            b_i -s b W input\n            'Input port b'\n\n            c_i -s c W input\n            'Input port c'\n\n            d_i -s d W input\n            'Input port d'\n\n            y_o -s y W output\n            'Output port y'\n            "
+        "\n            a_i -s a_i W\n            'Input port a'\n\n            b_i -s b_i W\n            'Input port b'\n\n            c_i -s c_i W\n            'Input port c'\n\n            d_i -s d_i W\n            'Input port d'\n\n            y_o -s y_o W\n            'Output port y'\n            "
     ],
     "wires": [
         "\n            and_ab_out -s aab W\n            'and ab output'\n\n            and_cd_out -s cad W\n            'and cd output'\n\n            or_out -s oab 1\n            'or output'\n            "

@@ -11,8 +11,8 @@ def setup(py_params_dict):
                 "name": "io",
                 "descr": "",
                 "signals": [
-                    {"name": "clkin", "direction": "input", "width": "1"},
-                    {"name": "clkout", "direction": "output", "width": "1"},
+                    {"name": "clkin_i", "width": "1"},
+                    {"name": "clkout_o", "width": "1"},
                 ],
             },
         ],

@@ -21,8 +21,7 @@ def setup(py_params_dict):
                 "descr": "Synchronous reset interface",
                 "signals": [
                     {
-                        "name": "rst",
-                        "direction": "input",
+                        "name": "rst_i",
                         "width": 1,
                         "descr": "Synchronous reset input",
                     },
@@ -33,20 +32,17 @@ def setup(py_params_dict):
                 "descr": "AXI Stream input configuration interface",
                 "signals": [
                     {
-                        "name": "config_in_addr",
-                        "direction": "input",
+                        "name": "config_in_addr_i",
                         "width": "AXI_ADDR_W",
                         "descr": "",
                     },
                     {
-                        "name": "config_in_valid",
-                        "direction": "input",
+                        "name": "config_in_valid_i",
                         "width": 1,
                         "descr": "",
                     },
                     {
-                        "name": "config_in_ready",
-                        "direction": "output",
+                        "name": "config_in_ready_o",
                         "width": 1,
                         "descr": "",
                     },
@@ -57,20 +53,17 @@ def setup(py_params_dict):
                 "descr": "AXI Stream input interface",
                 "signals": [
                     {
-                        "name": "axis_in_data",
-                        "direction": "input",
+                        "name": "axis_in_data_i",
                         "width": "AXI_DATA_W",
                         "descr": "",
                     },
                     {
-                        "name": "axis_in_valid",
-                        "direction": "input",
+                        "name": "axis_in_valid_i",
                         "width": 1,
                         "descr": "",
                     },
                     {
-                        "name": "axis_in_ready",
-                        "direction": "output",
+                        "name": "axis_in_ready_o",
                         "width": 1,
                         "descr": "",
                     },
@@ -91,38 +84,32 @@ def setup(py_params_dict):
                 "descr": "External memory interface",
                 "signals": [
                     {
-                        "name": "ext_mem_w_en",
-                        "direction": "output",
+                        "name": "ext_mem_w_en_o",
                         "width": 1,
                         "descr": "Memory write enable",
                     },
                     {
-                        "name": "ext_mem_w_addr",
-                        "direction": "output",
+                        "name": "ext_mem_w_addr_o",
                         "width": "BUFFER_W",
                         "descr": "Memory write address",
                     },
                     {
-                        "name": "ext_mem_w_data",
-                        "direction": "output",
+                        "name": "ext_mem_w_data_o",
                         "width": "AXI_DATA_W",
                         "descr": "Memory write data",
                     },
                     {
-                        "name": "ext_mem_r_en",
-                        "direction": "output",
+                        "name": "ext_mem_r_en_o",
                         "width": 1,
                         "descr": "Memory read enable",
                     },
                     {
-                        "name": "ext_mem_r_addr",
-                        "direction": "output",
+                        "name": "ext_mem_r_addr_o",
                         "width": "BUFFER_W",
                         "descr": "Memory read address",
                     },
                     {
-                        "name": "ext_mem_r_data",
-                        "direction": "input",
+                        "name": "ext_mem_r_data_i",
                         "width": "AXI_DATA_W",
                         "descr": "Memory read data",
                     },

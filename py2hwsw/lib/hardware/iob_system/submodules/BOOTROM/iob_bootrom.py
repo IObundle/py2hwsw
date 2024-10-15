@@ -74,7 +74,6 @@ def setup(py_params_dict):
                 "descr": "Clock and reset",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
             },
             {
@@ -82,7 +81,6 @@ def setup(py_params_dict):
                 "descr": "Front-end control interface",
                 "interface": {
                     "type": "axi",
-                    "subtype": "slave",
                     "port_prefix": "cbus_",
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
                     "ADDR_W": BOOTROM_ADDR_W + 1,

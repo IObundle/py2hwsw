@@ -72,7 +72,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -80,7 +79,6 @@ def setup(py_params_dict):
                 "name": "i_bus_s",
                 "interface": {
                     "type": "iob",
-                    "subtype": "slave",
                     "port_prefix": "i_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W,
@@ -91,7 +89,6 @@ def setup(py_params_dict):
                 "name": "d_bus_s",
                 "interface": {
                     "type": "iob",
-                    "subtype": "slave",
                     "port_prefix": "d_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W,
@@ -102,7 +99,6 @@ def setup(py_params_dict):
                 "name": "axi_m",
                 "interface": {
                     "type": "axi",
-                    "subtype": "master",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",

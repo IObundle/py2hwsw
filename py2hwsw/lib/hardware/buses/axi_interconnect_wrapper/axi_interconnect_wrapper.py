@@ -133,7 +133,6 @@ def setup(py_params_dict):
                 "descr": f"Slave {i} interface",
                 "interface": {
                     "type": "axi",
-                    "subtype": "slave",
                     "port_prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -161,7 +160,6 @@ def setup(py_params_dict):
                 "descr": f"Master '{name}' axi interface",
                 "interface": {
                     "type": "axi",
-                    "subtype": "master",
                     "port_prefix": f"{name}_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": f"{name.upper()}_ADDR_W",

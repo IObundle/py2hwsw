@@ -53,7 +53,6 @@ def setup(py_params_dict):
             "descr": "Clock, clock enable and reset",
             "interface": {
                 "type": "clk_en_rst",
-                "subtype": "slave",
             },
         },
         {
@@ -61,7 +60,6 @@ def setup(py_params_dict):
             "descr": "Testbench uart csrs interface",
             "interface": {
                 "type": "iob",
-                "subtype": "slave",
                 "port_prefix": "uart_",
                 "ADDR_W": 3,
             },
@@ -74,7 +72,6 @@ def setup(py_params_dict):
                 "descr": "Testbench ethernet csrs interface",
                 "interface": {
                     "type": "iob",
-                    "subtype": "slave",
                     "port_prefix": "ethernet_",
                 },
             },

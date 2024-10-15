@@ -46,7 +46,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -55,7 +54,6 @@ def setup(py_params_dict):
                 "descr": "Slave AXI interface",
                 "interface": {
                     "type": "axi",
-                    "subtype": "slave",
                     "port_prefix": "s_",
                     "ADDR_W": "ADDR_WIDTH",
                     "DATA_W": "DATA_WIDTH",
@@ -66,7 +64,6 @@ def setup(py_params_dict):
                 "descr": "Master IOb interface",
                 "interface": {
                     "type": "iob",
-                    "subtype": "master",
                     "ADDR_W": "ADDR_WIDTH",
                     "DATA_W": "DATA_WIDTH",
                 },

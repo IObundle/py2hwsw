@@ -1,0 +1,163 @@
+% SPDX-FileCopyrightText: 2024 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+\documentclass{ug}
+\usepackage{xltabular}
+
+\input{ug_title}
+\date{\today}
+\category{User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}}
+
+\input{color}
+
+\begin{document}
+
+\maketitle
+\pagenumbering{gobble}
+
+\vspace*{\fill}
+User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
+\hspace*{\fill} \includegraphics[keepaspectratio,scale=.7]{Logo.png}
+
+\cleardoublepage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\input{revhist}
+\cleardoublepage
+\tableofcontents
+\clearpage
+\listoftables
+\clearpage
+\listoffigures
+\cleardoublepage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+%
+% Introduction
+%
+\section{Introduction}
+\label{sec:intro}
+\input{intro}
+\input{symb}
+
+\subsection{What Is Py2HWSW?}
+\label{sec:whatispy2}
+\input{whatispy2}
+
+\subsection{What Is Py2HWSW For?}
+\label{sec:purpose}
+\input{purpose}
+
+\subsection{What Problem Does Py2HWSW Solve?}
+\label{sec:problem}
+\input{problem}
+
+\subsection{What Design Principles Underlie Py2HWSW?}
+\label{sec:principles}
+\input{principles}
+
+\subsection{How Does Py2HWSW Accomplish Its Goals?}
+\label{sec:how}
+\input{how}
+
+%
+% Getting Started
+%
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
+\section{Getting Started}
+\label{sec:gs}
+
+\subsection{Setup directory}
+\label{sec:setup_dir}
+\input{setup_dir}
+
+\subsection{Create an AND gate core: iob\_and}
+\label{sec:iob_and}
+\input{iob_and}
+
+\subsection{Setup and build}
+\label{sec:setup_build}
+\input{setup_build}
+
+% TODO: Subsections below
+% %
+% % How It Works
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{How It Works}
+% \label{sec:description}
+% 
+% This section gives a detailed description of the Py2HWSW framework.
+% TODO
+% 
+% \subsection{Block Diagram}
+% \label{sec:bdd}
+% \input{bdd}
+% 
+% 
+% %
+% % How To Use
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{How To Use}
+% \label{sec:usage}
+% 
+% \subsection{Setup}
+% \label{sec:setup}
+% \input{setup}
+% 
+% \subsection{Simulation}
+% \label{sec:tbbd}
+% \input{sim}
+% 
+% \ifdefined\ASICSYNTH
+% \subsection{ASIC Synthesis}
+% \label{sec:synth}
+% \input{synth}
+% \fi
+% 
+% \ifdefined\FPGACOMP
+% \subsection{FPGA Compilation}
+% \label{sec:fpga}
+% \input{fpga}
+% \fi
+% 
+% %
+% % Configuration
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{Configuration}
+% \label{sec:config}
+% \input{config}
+% 
+% %
+% % End to End Examples
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{End to End Examples}
+% \label{sec:examples}
+% \input{examples}
+% 
+% %
+% % FAQ
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{FAQ}
+% \label{sec:faq}
+% \input{faq}
+
+\end{document}

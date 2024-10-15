@@ -32,6 +32,7 @@ def iob_system_scripts(attributes_dict, params, py_params):
     :param dict params: iob_system python parameters
     :param dict py_params: iob_system argument python parameters
     """
+    assert_block_attributes(attributes_dict, py_params)
     handle_system_overrides(attributes_dict, py_params)
     append_board_wrappers(attributes_dict, params)
     set_build_dir(attributes_dict, py_params)
@@ -44,6 +45,16 @@ def iob_system_scripts(attributes_dict, params, py_params):
 #
 # Local functions
 #
+
+
+def assert_block_attributes(attributes_dict, py_params):
+    """Assert that all block attributes are valid."""
+    child_attributes = py_params.get("system_attributes", {})
+    for block in attributes_dict["blocks"] + child_attributes.get("blocks", []):
+        assert block.get("core_name", None), "All blocks must have a core name!"
+        assert block.get(
+            "instance_name", None
+        ), f"Block '{block['core_name']}' must have an instance name!"
 
 
 def append_board_wrappers(attributes_dict, params):

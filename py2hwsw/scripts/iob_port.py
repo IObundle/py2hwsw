@@ -8,7 +8,12 @@ from typing import Dict
 import iob_colors
 import if_gen
 from iob_wire import iob_wire
-from iob_base import convert_dict2obj_list, fail_with_msg, str_to_kwargs
+from iob_base import (
+    convert_dict2obj_list,
+    fail_with_msg,
+    str_to_kwargs,
+    assert_attributes,
+)
 from iob_signal import iob_signal
 
 
@@ -24,7 +29,7 @@ class iob_port(iob_wire):
 
     def __post_init__(self):
         if not self.name:
-            fail_with_msg("Port name is not set", ValueError)
+            fail_with_msg("All ports must have a name!", ValueError)
 
         _sufix_dict = {
             "_i": "input",
@@ -104,5 +109,10 @@ def create_port(core, *args, signals=[], interface=None, **kwargs):
     interface_obj = if_gen.dict2interface(interface)
     if interface_obj and not interface_obj.file_prefix:
         interface_obj.file_prefix = core.name + "_"
+    assert_attributes(
+        iob_port,
+        kwargs,
+        error_msg=f"Invalid {kwargs.get('name', '')} port attribute '[arg]'!",
+    )
     port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
     core.ports.append(port)

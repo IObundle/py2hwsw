@@ -212,7 +212,6 @@ def python_setup(build_dir):
 
 def doc_setup(python_module):
     build_dir = python_module.build_dir
-    setup_dir = python_module.setup_dir
 
     # Copy LIB tex files if not present
     os.makedirs(f"{build_dir}/document/tsrc", exist_ok=True)

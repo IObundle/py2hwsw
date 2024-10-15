@@ -75,6 +75,26 @@ nix-shell path/to/py2hwsw_directory
 
 If the `Py2HWSW_PATH` environment variable is not set, the nix environment will only install the project dependencies. Not the `py2hwsw` package itself.
 
+### Run from a local repository (without install)
+
+To use the `py2hwsw` program from a local repository without having to rebuild the package (as with nix and pip), run the `py2hwsw.py` script directly:
+
+Ensure the `~/.local/bin/` is in the `PATH` environment variable.
+Otherwise, set it by adding the following to your `.bashrc` file:
+```
+# set PATH so it includes user's private ~/.local/bin if it exists
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+```
+
+Then create a symlink to the `py2hwsw.py` script in the `~/.local/bin` directory:
+```
+ln -s path/to/py2hwsw_directory/py2hwsw/scripts/py2hwsw.py ~/.local/bin/py2hwsw
+```
+
+
+
 
 ### Usage examples
 

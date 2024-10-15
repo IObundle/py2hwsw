@@ -40,11 +40,12 @@ class iob_port(iob_wire):
                 break
 
         if self.interface:
-            if self.interface.subtype != _direction:
+            if _direction != self.interface.subtype:
                 fail_with_msg(
-                    f"Interface subtype '{self.interface.subtype}' does not match port name '{self.name}'",
+                    f"Port '{self.name}' is a '{_direction}' port but interface subtype is '{self.interface.subtype}'",
                     ValueError,
                 )
+            self.interface.subtype = _direction
             self.signals += if_gen.get_signals(
                 self.interface.type,
                 self.interface.subtype,

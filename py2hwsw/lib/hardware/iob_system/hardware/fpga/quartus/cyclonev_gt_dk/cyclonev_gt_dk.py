@@ -149,7 +149,7 @@ def setup(py_params_dict):
             "interface": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -211,7 +211,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "wire_prefix": "mem_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W",
+                    "ADDR_W": "AXI_ADDR_W - 2",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                 },
@@ -292,7 +292,11 @@ def setup(py_params_dict):
                     "clk_rst_i": "ddr3_ctr_clk_rst",
                     "general": "ddr3_ctr_general",
                     "ddr3": "ddr3",
-                    "s0_axi_s": "axi",
+                    "s0_axi_s": (
+                        "axi",
+                        "{axi_araddr, 2'b0}",
+                        "{axi_awaddr, 2'b0}",
+                    ),
                 },
             },
         ]
@@ -305,7 +309,7 @@ def setup(py_params_dict):
                 "instance_description": "Interconnect instance",
                 "parameters": {
                     "AXI_ID_W": "AXI_ID_W",
-                    "AXI_ADDR_W": "AXI_ADDR_W",
+                    "AXI_ADDR_W": "AXI_ADDR_W - 2",
                     "AXI_DATA_W": "AXI_DATA_W",
                 },
                 "connect": {
@@ -329,7 +333,11 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_i": "clk_i",
                     "rst_i": "reset_sync_arst_out",
-                    "axi_s": "memory_axi",
+                    "axi_s": (
+                        "memory_axi",
+                        "{mem_axi_araddr, 2'b0}",
+                        "{mem_axi_awaddr, 2'b0}",
+                    ),
                 },
             },
         ]

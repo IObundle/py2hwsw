@@ -50,7 +50,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": CSR_IF,
                     "subtype": "slave",
-                    "ADDR_W": "3",  # Same as `IOB_UART_CSRS_ADDR_W
+                    "ADDR_W": 3 - 2,  # Same as `IOB_UART_CSRS_ADDR_W - 2 lsbs
                     "DATA_W": "DATA_W",
                 },
                 "descr": "CPU native interface",
@@ -70,7 +70,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "wire_prefix": "csrs_",
-                    "ADDR_W": "ADDR_W",
+                    "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
                 },
             },

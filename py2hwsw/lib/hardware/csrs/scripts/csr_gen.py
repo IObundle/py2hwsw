@@ -394,10 +394,12 @@ class csr_gen:
                     )
                     for idx in range(n_items):
                         name_idx = f"{name}_{idx}" if n_items > 1 else name
-                        register_signals.append({
-                            "name": name_idx + "_o",
-                            "width": self.verilog_max(n_bits, 1),
-                        })
+                        register_signals.append(
+                            {
+                                "name": name_idx + "_o",
+                                "width": self.verilog_max(n_bits, 1),
+                            }
+                        )
                     if n_items > 1:
                         # Add interface to read registers via address
                         register_signals += [
@@ -427,10 +429,12 @@ class csr_gen:
                     ]
             if "R" in row.type:
                 if auto:
-                    register_signals.append({
-                        "name": name + "_i",
-                        "width": self.verilog_max(n_bits, 1),
-                    })
+                    register_signals.append(
+                        {
+                            "name": name + "_i",
+                            "width": self.verilog_max(n_bits, 1),
+                        }
+                    )
                 else:
                     register_signals += [
                         {
@@ -454,11 +458,13 @@ class csr_gen:
             if row.internal_use:
                 for reg in register_signals:
                     reg["name"] = reg["name"][:-2]
-                wires.append({
-                    "name": name,
-                    "descr": f"{name} register interface",
-                    "signals": register_signals,
-                })
+                wires.append(
+                    {
+                        "name": name,
+                        "descr": f"{name} register interface",
+                        "signals": register_signals,
+                    }
+                )
             else:
                 ports.append(
                     {
@@ -492,7 +498,7 @@ class csr_gen:
                 "descr": "Give user logic access to csrs internal IOb signals",
                 "signals": [
                     {"name": "csrs_iob_valid_o", "width": 1},
-                    {"name": "csrs_iob_addr_o", "width": "ADDR_W"},
+                    {"name": "csrs_iob_addr_o", "width": "ADDR_W - 2"},
                     {"name": "csrs_iob_wdata_o", "width": "DATA_W"},
                     {"name": "csrs_iob_wstrb_o", "width": "DATA_W/8"},
                     {"name": "csrs_iob_rvalid_o", "width": 1},
@@ -564,7 +570,7 @@ class csr_gen:
         # Connect internal IOb signals to output port for user logic
         snippet += """
    assign csrs_iob_valid_o = internal_iob_valid;
-   assign csrs_iob_addr_o = internal_iob_addr;
+   assign csrs_iob_addr_o = internal_iob_addr[ADDR_W-1:2];
    assign csrs_iob_wdata_o = internal_iob_wdata;
    assign csrs_iob_wstrb_o = internal_iob_wstrb;
    assign csrs_iob_rvalid_o = internal_iob_rvalid;
@@ -576,7 +582,7 @@ class csr_gen:
             # "IOb" CSR_IF
             snippet += """
    assign internal_iob_valid = iob_valid_i;
-   assign internal_iob_addr = iob_addr_i;
+   assign internal_iob_addr = {iob_addr_i, 2'b0};
    assign internal_iob_wdata = iob_wdata_i;
    assign internal_iob_wstrb = iob_wstrb_i;
    assign iob_rvalid_o = internal_iob_rvalid;
@@ -596,7 +602,10 @@ class csr_gen:
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
-                        "apb_s": "control_if_s",
+                        "apb_s": (
+                            "control_if_s",
+                            "{apb_addr_i,2'b0}",
+                        ),
                         "iob_m": "internal_iob",
                     },
                 }
@@ -614,7 +623,11 @@ class csr_gen:
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
-                        "axil_s": "control_if_s",
+                        "axil_s": (
+                            "control_if_s",
+                            "{axil_awaddr_i,2'b0}",
+                            "{axil_araddr_i,2'b0}",
+                        ),
                         "iob_m": "internal_iob",
                     },
                 }
@@ -635,6 +648,8 @@ class csr_gen:
                         "clk_en_rst_s": "clk_en_rst_s",
                         "axi_s": (
                             "control_if_s",
+                            "{axi_awaddr_i,2'b0}",
+                            "{axi_araddr_i,2'b0}",
                             "axi_awlock_i[0]",
                             "axi_arlock_i[0]",
                         ),

@@ -107,7 +107,7 @@ def setup(py_params_dict):
             "interface": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": "AXI_LEN_W",
@@ -134,7 +134,7 @@ def setup(py_params_dict):
                 "type": "axi",
                 "wire_prefix": "mem_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": "1",
@@ -207,7 +207,10 @@ def setup(py_params_dict):
             "csr_if": "iob",
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "cbus_s": "uart_s",
+                "cbus_s": (
+                    "uart_s",
+                    "uart_iob_addr_i[3-1:2]",
+                ),
                 "rs232_m": "rs232_invert",
             },
         },
@@ -218,7 +221,7 @@ def setup(py_params_dict):
             "instance_description": "Interconnect instance",
             "parameters": {
                 "AXI_ID_W": "AXI_ID_W",
-                "AXI_ADDR_W": "AXI_ADDR_W",
+                "AXI_ADDR_W": "AXI_ADDR_W-2",
                 "AXI_DATA_W": "AXI_DATA_W",
             },
             "connect": {
@@ -247,6 +250,8 @@ def setup(py_params_dict):
                 "rst_i": "rst",
                 "axi_s": (
                     "memory_axi",
+                    "{mem_axi_araddr, 2'b0}",
+                    "{mem_axi_awaddr, 2'b0}",
                     "{1'b0, mem_axi_arlock}",
                     "{1'b0, mem_axi_awlock}",
                 ),

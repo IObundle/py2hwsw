@@ -144,7 +144,7 @@ def setup(py_params_dict):
             "interface": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -184,7 +184,7 @@ def setup(py_params_dict):
                 "wire_prefix": "mem_",
                 "ID_W": "AXI_ID_W",
                 "LEN_W": "AXI_LEN_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
                 "LOCK_W": 1 if params["use_extmem"] else 2,
             },
@@ -291,7 +291,7 @@ def setup(py_params_dict):
             "parameters": {
                 "AXI_ID_W": "AXI_ID_W",
                 "AXI_LEN_W": "AXI_LEN_W",
-                "AXI_ADDR_W": "AXI_ADDR_W",
+                "AXI_ADDR_W": "AXI_ADDR_W - 2",
                 "AXI_DATA_W": "AXI_DATA_W",
             },
             "connect": {
@@ -321,7 +321,11 @@ def setup(py_params_dict):
                     "clk_rst_i": "clk_rst_i",
                     "ui_clk_o": "ddr4_ui_clk_out",
                     "axi_clk_rst": "ddr4_axi_clk_rst",
-                    "axi_s": "memory_axi",
+                    "axi_s": (
+                        "memory_axi",
+                        "{mem_axi_araddr, 2'b0}",
+                        "{mem_axi_awaddr, 2'b0}",
+                    ),
                     "ddr4": "ddr4_pins",
                 },
             },
@@ -355,7 +359,11 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_i": "axi_ram_clk",
                     "rst_i": "axi_ram_rst",
-                    "axi_s": "memory_axi",
+                    "axi_s": (
+                        "memory_axi",
+                        "{mem_axi_araddr, 2'b0}",
+                        "{mem_axi_awaddr, 2'b0}",
+                    ),
                 },
             },
         ]

@@ -81,7 +81,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "subtype": "slave",
-                    "port_prefix": "i_",
+                    "prefix": "i_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W,
                 },
@@ -92,7 +92,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "subtype": "slave",
-                    "port_prefix": "d_",
+                    "prefix": "d_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W,
                 },
@@ -124,7 +124,7 @@ def setup(py_params_dict):
             "name": "icache",
             "interface": {
                 "type": "iob",
-                "wire_prefix": "icache_be_",
+                "prefix": "icache_be_",
                 "DATA_W": DATA_W,
                 "ADDR_W": MEM_ADDR_W,
             },
@@ -134,7 +134,7 @@ def setup(py_params_dict):
             "name": "dcache",
             "interface": {
                 "type": "iob",
-                "wire_prefix": "dcache_be_",
+                "prefix": "dcache_be_",
                 "DATA_W": DATA_W,
                 "ADDR_W": MEM_ADDR_W,
             },
@@ -144,7 +144,7 @@ def setup(py_params_dict):
             "name": "l2cache",
             "interface": {
                 "type": "iob",
-                "wire_prefix": "l2cache_",
+                "prefix": "l2cache_",
                 "DATA_W": DATA_W,
                 "ADDR_W": MEM_ADDR_W,
             },

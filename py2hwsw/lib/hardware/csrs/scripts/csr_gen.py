@@ -530,7 +530,7 @@ class csr_gen:
                 "descr": "Internal iob interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "internal_",
+                    "prefix": "internal_",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },

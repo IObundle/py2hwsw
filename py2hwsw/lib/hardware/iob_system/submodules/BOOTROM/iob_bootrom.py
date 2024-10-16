@@ -81,7 +81,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "axi",
                     "subtype": "slave",
-                    "port_prefix": "cbus_",
+                    "prefix": "cbus_",
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
                     "ADDR_W": BOOTROM_ADDR_W - 2 + 1,
                     "DATA_W": "DATA_W",
@@ -115,7 +115,7 @@ def setup(py_params_dict):
                 "descr": "Internal iob interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "csrs_",
+                    "prefix": "csrs_",
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
                     "ADDR_W": BOOTROM_ADDR_W - 2 + 1,
                     "DATA_W": "DATA_W",

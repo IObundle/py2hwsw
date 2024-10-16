@@ -62,7 +62,7 @@ def setup(py_params_dict):
             "interface": {
                 "type": "iob",
                 "subtype": "slave",
-                "port_prefix": "uart_",
+                "prefix": "uart_",
                 "ADDR_W": 3,
             },
         },
@@ -75,7 +75,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "subtype": "slave",
-                    "port_prefix": "ethernet_",
+                    "prefix": "ethernet_",
                 },
             },
         ]
@@ -132,7 +132,7 @@ def setup(py_params_dict):
             "descr": "AXI bus to connect interconnect and memory",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "mem_",
+                "prefix": "mem_",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
@@ -148,7 +148,7 @@ def setup(py_params_dict):
                 "descr": "Ethernet AXI bus",
                 "interface": {
                     "type": "axi",
-                    "wire_prefix": "eth_",
+                    "prefix": "eth_",
                 },
             },
             {

@@ -219,7 +219,7 @@ def setup(py_params_dict):
             "descr": "CPU instruction bus",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "cpu_i_",
+                "prefix": "cpu_i_",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": params["addr_w"] - 2,
                 "DATA_W": params["data_w"],
@@ -232,7 +232,7 @@ def setup(py_params_dict):
             "descr": "CPU data bus",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "cpu_d_",
+                "prefix": "cpu_d_",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": params["addr_w"] - 2,
                 "DATA_W": params["data_w"],
@@ -252,7 +252,7 @@ def setup(py_params_dict):
             "descr": "iob-system boot controller data interface",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "bootrom_",
+                "prefix": "bootrom_",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": params["addr_w"] - 2 - 2,
                 "DATA_W": "AXI_DATA_W",
@@ -265,7 +265,7 @@ def setup(py_params_dict):
             "descr": "AXI bus for peripheral CSRs",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "periphs_",
+                "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": params["addr_w"] - 2 - 1,
                 "DATA_W": "AXI_DATA_W",
@@ -277,7 +277,7 @@ def setup(py_params_dict):
             "descr": "AXI-Lite bus for peripheral CSRs",
             "interface": {
                 "type": "iob",
-                "wire_prefix": "periphs_",
+                "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": params["addr_w"] - 2 - 1,
                 "DATA_W": "AXI_DATA_W",

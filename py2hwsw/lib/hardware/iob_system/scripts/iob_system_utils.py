@@ -182,7 +182,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
                 "descr": f"{peripheral_name} Control/Status Registers bus",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": f"{peripheral_name}_cbus_",
+                    "prefix": f"{peripheral_name}_cbus_",
                     "ADDR_W": peripheral_addr_w - 2,
                 },
             },
@@ -202,7 +202,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
             "descr": "CLINT Control/Status Registers bus",
             "interface": {
                 "type": "iob",
-                "wire_prefix": "clint_cbus_",
+                "prefix": "clint_cbus_",
                 "ADDR_W": peripheral_addr_w - 2,
             },
         },
@@ -211,7 +211,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
             "descr": "PLIC Control/Status Registers bus",
             "interface": {
                 "type": "iob",
-                "wire_prefix": "plic_cbus_",
+                "prefix": "plic_cbus_",
                 "ADDR_W": peripheral_addr_w - 2,
             },
         },

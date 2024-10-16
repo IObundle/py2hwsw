@@ -134,7 +134,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "axi",
                     "subtype": "slave",
-                    "port_prefix": f"s{i}_",
+                    "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -162,7 +162,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "axi",
                     "subtype": "master",
-                    "port_prefix": f"{name}_",
+                    "prefix": f"{name}_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": f"{name.upper()}_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -188,7 +188,7 @@ def setup(py_params_dict):
             "descr": "AXI slave bus for interconnect",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "intercon_s_",
+                "prefix": "intercon_s_",
                 "mult": N_SLAVES,
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W",
@@ -206,7 +206,7 @@ def setup(py_params_dict):
             "descr": "AXI master bus for interconnect",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "intercon_m_",
+                "prefix": "intercon_m_",
                 "mult": len(MASTERS),
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W",
@@ -250,8 +250,8 @@ def setup(py_params_dict):
         assign_str = ""
         for port in slave_axi_ports:
             prefix = ""
-            if "port_prefix" in port["interface"]:
-                prefix = port["interface"]["port_prefix"]
+            if "prefix" in port["interface"]:
+                prefix = port["interface"]["prefix"]
             assign_str = f"{prefix}axi_{sig_name}_i, " + assign_str
         assign_str = assign_str[:-2]
         verilog_code += (
@@ -261,8 +261,8 @@ def setup(py_params_dict):
     for sig_name, sig_size in AXI_OUT_SIGNAL_NAMES:
         for idx, port in enumerate(slave_axi_ports):
             prefix = ""
-            if "port_prefix" in port["interface"]:
-                prefix = port["interface"]["port_prefix"]
+            if "prefix" in port["interface"]:
+                prefix = port["interface"]["prefix"]
             bit_select = ""
             if type(sig_size) is not int or sig_size > 1:
                 bit_select = f"[{idx}*{sig_size}+:{sig_size}]"

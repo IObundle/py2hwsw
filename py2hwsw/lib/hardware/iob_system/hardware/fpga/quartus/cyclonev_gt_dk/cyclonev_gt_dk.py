@@ -209,7 +209,7 @@ def setup(py_params_dict):
                 "descr": "AXI bus to connect interconnect and memory",
                 "interface": {
                     "type": "axi",
-                    "wire_prefix": "mem_",
+                    "prefix": "mem_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W - 2",
                     "DATA_W": "AXI_DATA_W",

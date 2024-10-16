@@ -21,16 +21,14 @@ foreach file [split $VSRC \ ] {
     }
 }
 
+
 #read board propreties
 source vivado/$BOARD/board.tcl
 
-#set FPGA device
-set_property part $PART [current_project]
-
 
 #set pre-map custom assignments
-if {[file exists "vivado/vivado_premap.tcl"]} {
-    source "vivado/vivado_premap.tcl"
+if {[file exists "vivado/premap.tcl"]} {
+    source "vivado/premap.tcl"
 }
 
 
@@ -60,8 +58,8 @@ if { $IS_FPGA == "1" } {
 }
 
 #set post-map custom assignments
-if {[file exists "vivado/vivado_postmap.tcl"]} {
-    source "vivado/vivado_postmap.tcl"
+if {[file exists "vivado/postmap.tcl"]} {
+    source "vivado/postmap.tcl"
 }
 
 opt_design

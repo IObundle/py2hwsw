@@ -284,29 +284,29 @@ def setup(py_params_dict):
             "dest_dir": "hardware/common_src",
             "iob_system_params": params,
         },
-        {
-            "core_name": "xilinx_axi_interconnect",
-            "instance_name": "axi_async_bridge",
-            "instance_description": "Interconnect instance",
-            "parameters": {
-                "AXI_ID_W": "AXI_ID_W",
-                "AXI_LEN_W": "AXI_LEN_W",
-                "AXI_ADDR_W": "AXI_ADDR_W",
-                "AXI_DATA_W": "AXI_DATA_W",
-            },
-            "connect": {
-                "clk_rst_s": "intercon_clk_rst",
-                "m0_clk_rst": "intercon_m0_clk_rst",
-                "m0_axi_m": "memory_axi",
-                "s0_clk_rst": "intercon_s0_clk_rst",
-                "s0_axi_s": "axi",
-            },
-            "num_slaves": 1,
-        },
     ]
     if params["use_extmem"]:
         # DDR4 controller
         attributes_dict["blocks"] += [
+            {
+                "core_name": "xilinx_axi_interconnect",
+                "instance_name": "axi_async_bridge",
+                "instance_description": "Interconnect instance",
+                "parameters": {
+                    "AXI_ID_W": "AXI_ID_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
+                    "AXI_ADDR_W": "AXI_ADDR_W",
+                    "AXI_DATA_W": "AXI_DATA_W",
+                },
+                "connect": {
+                    "clk_rst_s": "intercon_clk_rst",
+                    "m0_clk_rst": "intercon_m0_clk_rst",
+                    "m0_axi_m": "memory_axi",
+                    "s0_clk_rst": "intercon_s0_clk_rst",
+                    "s0_axi_s": "axi",
+                },
+                "num_slaves": 1,
+            },
             {
                 "core_name": "xilinx_ddr4_ctrl",
                 "instance_name": "ddr4_ctrl",

@@ -15,11 +15,15 @@ export LIB_DIR
 # Default lib module to setup. Can be overriden by the user.
 CORE ?=iob_ctls
 
+BUILD_DIR ?=build
+INIT_MEM ?= 1
+USE_EXTMEM ?= 0
+BOARD ?= aes_ku040_db_g
 
 all: sim-test
 
 setup:
-	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --no_verilog_lint"
+	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --no_verilog_lint --py_params 'init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM)' $(EXTRA_ARGS)"
 
 sim-build:
 	nix-shell --run "scripts/test.sh build $(CORE)"
@@ -32,6 +36,12 @@ sim-test:
 
 sim-clean:
 	nix-shell --run "scripts/test.sh clean"
+
+
+fpga-build:
+	nix-shell --run "make clean setup CORE=$(CORE) INIT_MEM=$(INIT_MEM) USE_EXTMEM=$(USE_EXTMEM) && make -C $(BUILD_DIR) fpga-fw-build BOARD=$(BOARD)"
+	make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
+
 
 print-attr:
 	nix-shell --run "VCD=$(VCD) SETUP_ARGS='print_attr' scripts/test.sh $(CORE)"

@@ -394,10 +394,12 @@ class csr_gen:
                     )
                     for idx in range(n_items):
                         name_idx = f"{name}_{idx}" if n_items > 1 else name
-                        register_signals.append({
-                            "name": name_idx + "_o",
-                            "width": self.verilog_max(n_bits, 1),
-                        })
+                        register_signals.append(
+                            {
+                                "name": name_idx + "_o",
+                                "width": self.verilog_max(n_bits, 1),
+                            }
+                        )
                     if n_items > 1:
                         # Add interface to read registers via address
                         register_signals += [
@@ -427,10 +429,12 @@ class csr_gen:
                     ]
             if "R" in row.type:
                 if auto:
-                    register_signals.append({
-                        "name": name + "_i",
-                        "width": self.verilog_max(n_bits, 1),
-                    })
+                    register_signals.append(
+                        {
+                            "name": name + "_i",
+                            "width": self.verilog_max(n_bits, 1),
+                        }
+                    )
                 else:
                     register_signals += [
                         {
@@ -454,11 +458,13 @@ class csr_gen:
             if row.internal_use:
                 for reg in register_signals:
                     reg["name"] = reg["name"][:-2]
-                wires.append({
-                    "name": name,
-                    "descr": f"{name} register interface",
-                    "signals": register_signals,
-                })
+                wires.append(
+                    {
+                        "name": name,
+                        "descr": f"{name} register interface",
+                        "signals": register_signals,
+                    }
+                )
             else:
                 ports.append(
                     {

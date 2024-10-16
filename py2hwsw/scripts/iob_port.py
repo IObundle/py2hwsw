@@ -47,7 +47,7 @@ class iob_port(iob_wire):
         if self.interface:
             self.signals += if_gen.get_signals(
                 self.interface.type,
-                _direction
+                _direction,
                 self.interface.mult,
                 self.interface.widths,
                 self.interface.port_prefix,

@@ -92,7 +92,6 @@ def setup(py_params_dict):
                 "name": f"s{i}_axi_s",
                 "interface": {
                     "type": "axi",
-                    "subtype": "slave",
                     "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",
                     "LEN_W": "AXI_LEN_W",

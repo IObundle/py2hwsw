@@ -37,7 +37,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -45,7 +44,6 @@ def setup(py_params_dict):
                 "name": "cbus_s",
                 "interface": {
                     "type": "iob",
-                    "subtype": "slave",
                     "ADDR_W": 4 - 2,  # Same as `IOB_TIMER_CSRS_ADDR_W -2 lsbs
                     "DATA_W": "DATA_W",
                 },

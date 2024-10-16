@@ -137,7 +137,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -145,7 +144,6 @@ def setup(py_params_dict):
                 "name": "internal_control_if_s",
                 "interface": {
                     "type": params["internal_csr_if"],
-                    "subtype": "slave",
                     **params["internal_csr_if_widths"],
                 },
                 "descr": "Internal CPU native interface. Registers have their direction inverted from this CPU's perspective.",
@@ -154,7 +152,6 @@ def setup(py_params_dict):
                 "name": "external_control_if_s",
                 "interface": {
                     "type": params["external_csr_if"],
-                    "subtype": "slave",
                     "prefix": "external_",
                     **params["external_csr_if_widths"],
                 },

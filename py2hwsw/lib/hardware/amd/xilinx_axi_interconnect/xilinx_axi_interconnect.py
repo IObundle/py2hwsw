@@ -61,7 +61,6 @@ def setup(py_params_dict):
                 "descr": "Clock and reset inputs",
                 "interface": {
                     "type": "clk_rst",
-                    "subtype": "slave",
                 },
             },
         ],
@@ -80,7 +79,6 @@ def setup(py_params_dict):
                 "name": f"s{i}_axi_s",
                 "interface": {
                     "type": "axi",
-                    "subtype": "slave",
                     "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",
                     "LEN_W": "AXI_LEN_W",
@@ -104,7 +102,6 @@ def setup(py_params_dict):
                 "name": f"m{i}_axi_m",
                 "interface": {
                     "type": "axi",
-                    "subtype": "master",
                     "prefix": f"m{i}_",
                     "ID_W": "AXI_ID_W",
                     "LEN_W": "AXI_LEN_W",

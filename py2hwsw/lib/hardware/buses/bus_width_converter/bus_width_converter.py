@@ -142,20 +142,18 @@ def setup(py_params_dict):
         "confs": verilog_parameters,
         "ports": [
             {
-                "name": "slave",
+                "name": "slave_s",
                 "descr": "Slave interface (connects to master)",
                 "interface": {
                     "type": INTERFACE,
-                    "subtype": "slave",
                     **slave_interface_parameters,
                 },
             },
             {
-                "name": "master",
+                "name": "master_m",
                 "descr": "Master interface (connects to slave)",
                 "interface": {
                     "type": INTERFACE,
-                    "subtype": "master",
                     **master_interface_parameters,
                 },
             },

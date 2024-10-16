@@ -57,7 +57,6 @@ class interface:
     mult: str | int = 1
     widths: Dict[str, str] = field(default_factory=dict)
     # For ports only:
-    subtype: str = "master"
     # For portmaps .vs only:
     portmap_port_prefix: str = ""
 

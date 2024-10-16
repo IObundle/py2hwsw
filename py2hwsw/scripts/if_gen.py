@@ -57,7 +57,6 @@ class interface:
     mult: str | int = 1
     widths: Dict[str, str] = field(default_factory=dict)
     # For ports only:
-    subtype: str = "master"
     port_prefix: str = ""
 
     def __post_init__(self):

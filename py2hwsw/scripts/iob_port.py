@@ -45,10 +45,9 @@ class iob_port(iob_wire):
                 break
 
         if self.interface:
-            self.interface.subtype = _direction
             self.signals += if_gen.get_signals(
                 self.interface.type,
-                self.interface.subtype,
+                _direction
                 self.interface.mult,
                 self.interface.widths,
                 self.interface.port_prefix,

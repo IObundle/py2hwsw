@@ -8,6 +8,7 @@ import shutil
 import json
 from pathlib import Path
 import copy
+from types import SimpleNamespace
 
 import iob_colors
 
@@ -429,11 +430,15 @@ class iob_core(iob_module, iob_instance):
         if "dest_dir" not in kwargs:
             kwargs["dest_dir"] = self.dest_dir
 
-        instance = self.get_core_obj(
-            core_name, instance_name=instance_name, instantiator=self, **kwargs
-        )
+        try:
+            instance = self.get_core_obj(
+                core_name, instance_name=instance_name, instantiator=self, **kwargs
+            )
 
-        self.blocks.append(instance)
+            self.blocks.append(instance)
+        except ModuleNotFoundError:
+            add_traceback_msg(f"Failed to create instance '{instance_name}'.")
+            raise
 
     def connect_instance_ports(self, connect, instantiator):
         """
@@ -516,7 +521,9 @@ class iob_core(iob_module, iob_instance):
             if attr_name in self.ATTRIBUTE_PROPERTIES:
                 self.ATTRIBUTE_PROPERTIES[attr_name].set_handler(attr_value),
             else:
-                fail_with_msg(f"Unknown attribute: {attr_name}")
+                fail_with_msg(
+                    f"Unknown attribute '{attr_name}' in core {attributes['original_name']}"
+                )
 
     def lint_and_format(self):
         """Run Linters and Formatters in setup and build directories."""
@@ -695,6 +702,23 @@ class iob_core(iob_module, iob_instance):
             )
         return instance
 
+    @staticmethod
+    def setup_py2_docs(py2_version):
+        """Setup document directory for py2hwsw."""
+        # Create temporary object to represent a "py2hwsw" core
+        core = SimpleNamespace(
+            original_name="py2hwsw",
+            name="py2hwsw",
+            setup_dir=os.path.join(os.path.dirname(__file__), "../.."),
+            build_dir="py2hwsw_docs",
+        )
+        copy_srcs.doc_setup(core)
+        copy_srcs.copy_rename_setup_subdir(core, "document")
+        with open(f"{core.build_dir}/config_build.mk", "w") as f:
+            f.write("NAME=Py2HWSW\n")
+        with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
+            f.write(py2_version)
+
 
 def find_common_deep(path1, path2):
     """Find common files (recursively) inside two given directories
@@ -729,7 +753,8 @@ def find_module_setup_dir(core_name):
     )
     if not file_path:
         fail_with_msg(
-            f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!"
+            f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!",
+            ModuleNotFoundError,
         )
 
     file_ext = os.path.splitext(file_path)[1]

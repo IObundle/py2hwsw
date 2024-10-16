@@ -37,7 +37,7 @@ def setup(py_params_dict):
                 "descr": "AXI ID bus width",
                 "type": "P",
                 "val": "0",
-                "min": "1",
+                "min": "0",
                 "max": "32",
             },
             {
@@ -45,7 +45,7 @@ def setup(py_params_dict):
                 "descr": "AXI address bus width",
                 "type": "P",
                 "val": "0",
-                "min": "1",
+                "min": "0",
                 "max": "32",
             },
             {
@@ -53,7 +53,7 @@ def setup(py_params_dict):
                 "descr": "AXI data bus width",
                 "type": "P",
                 "val": "0",
-                "min": "1",
+                "min": "0",
                 "max": "32",
             },
             {
@@ -61,7 +61,7 @@ def setup(py_params_dict):
                 "descr": "AXI burst length width",
                 "type": "P",
                 "val": "0",
-                "min": "1",
+                "min": "0",
                 "max": "4",
             },
         ],

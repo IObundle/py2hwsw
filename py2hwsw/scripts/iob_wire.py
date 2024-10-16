@@ -44,7 +44,7 @@ class iob_wire:
                 "",
                 self.interface.mult,
                 self.interface.widths,
-                self.interface.wire_prefix,
+                self.interface.prefix,
             )
 
             # Remove signal direction information
@@ -55,7 +55,7 @@ class iob_wire:
                 if hasattr(signal, "direction"):
                     suffix = if_gen.get_suffix(signal.direction)
                     if signal.name.endswith(suffix):
-                        signal.name = signal.name[:-len(suffix)]
+                        signal.name = signal.name[: -len(suffix)]
                     signal.direction = ""
 
 

@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import os
-import sys
-import shutil
 
 
 def setup(py_params_dict):
@@ -83,9 +81,9 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "axi",
                     "subtype": "slave",
-                    "port_prefix": "cbus_",
+                    "prefix": "cbus_",
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
-                    "ADDR_W": BOOTROM_ADDR_W + 1,
+                    "ADDR_W": BOOTROM_ADDR_W - 2 + 1,
                     "DATA_W": "DATA_W",
                 },
             },
@@ -117,9 +115,9 @@ def setup(py_params_dict):
                 "descr": "Internal iob interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "csrs_",
+                    "prefix": "csrs_",
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
-                    "ADDR_W": BOOTROM_ADDR_W + 1,
+                    "ADDR_W": BOOTROM_ADDR_W - 2 + 1,
                     "DATA_W": "DATA_W",
                 },
             },
@@ -203,9 +201,9 @@ def setup(py_params_dict):
         #
         "snippets": [
             {
-                "verilog_code": f"""
+                "verilog_code": """
    assign ext_rom_en_o   = rom_ren_rd;
-   assign ext_rom_addr_o = csrs_iob_addr[{BOOTROM_ADDR_W}-1:2];
+   assign ext_rom_addr_o = csrs_iob_addr;
    assign rom_rdata_rd   = ext_rom_rdata_i;
    assign rom_rready_rd  = 1'b1;  // ROM is always ready
 """,

@@ -34,9 +34,6 @@ def setup(py_params_dict):
     for port in iob_system_attr["ports"]:
         if port["name"] == "rom_bus":
             wire = copy.deepcopy(port)
-            if "interface" in wire and "port_prefix" in wire["interface"]:
-                wire["interface"]["wire_prefix"] = wire["interface"]["port_prefix"]
-                wire["interface"].pop("port_prefix")
             if "signals" in wire:
                 for sig in wire["signals"]:
                     if any(sig["name"].endswith(s) for s in ["_o", "_i", "_io"]):

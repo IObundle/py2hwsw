@@ -155,7 +155,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": params["external_csr_if"],
                     "subtype": "slave",
-                    "port_prefix": "external_",
+                    "prefix": "external_",
                     **params["external_csr_if_widths"],
                 },
                 "descr": "External CPU native interface.",
@@ -168,7 +168,7 @@ def setup(py_params_dict):
                 "descr": "Internal CSRs iob interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "csrs_",
+                    "prefix": "csrs_",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
@@ -178,7 +178,7 @@ def setup(py_params_dict):
                 "descr": "Internal iob interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "internal2_",
+                    "prefix": "internal2_",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },

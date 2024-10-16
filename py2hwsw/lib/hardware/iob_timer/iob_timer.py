@@ -46,7 +46,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "subtype": "slave",
-                    "ADDR_W": "4",  # Same as `IOB_TIMER_CSRS_ADDR_W
+                    "ADDR_W": 4 - 2,  # Same as `IOB_TIMER_CSRS_ADDR_W -2 lsbs
                     "DATA_W": "DATA_W",
                 },
                 "descr": "CPU native interface",
@@ -58,8 +58,8 @@ def setup(py_params_dict):
                 "descr": "Internal CSRs IOb interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "csrs_",
-                    "ADDR_W": "ADDR_W",
+                    "prefix": "csrs_",
+                    "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
                 },
             },

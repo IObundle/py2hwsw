@@ -109,7 +109,7 @@ def setup(py_params_dict):
             "interface": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -119,7 +119,7 @@ def setup(py_params_dict):
             "descr": "AXI interconnect clock and reset inputs",
             "interface": {
                 "type": "clk_rst",
-                "wire_prefix": "intercon_m_",
+                "prefix": "intercon_m_",
             },
         },
         {
@@ -127,10 +127,10 @@ def setup(py_params_dict):
             "descr": "AXI bus to connect interconnect and memory",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "mem_",
+                "prefix": "mem_",
                 "ID_W": "AXI_ID_W",
                 "LEN_W": "AXI_LEN_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
                 "LOCK_W": 1,
             },
@@ -167,7 +167,7 @@ def setup(py_params_dict):
             "parameters": {
                 "AXI_ID_W": "AXI_ID_W",
                 "AXI_LEN_W": "AXI_LEN_W",
-                "AXI_ADDR_W": "AXI_ADDR_W",
+                "AXI_ADDR_W": "AXI_ADDR_W - 2",
                 "AXI_DATA_W": "AXI_DATA_W",
             },
             "connect": {

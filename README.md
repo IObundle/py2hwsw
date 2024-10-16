@@ -28,6 +28,8 @@ portable to both FPGAs and ASICs. The result is a very tedious and error-prone
 hardware design process. So, we'd like to propose a tool to generate portable Verilog
 code using a Python API.
 
+Py2HWSW aims to develop a Python generator of portable Verilog code. Py2HW is not a High-Level Synthesis (HLS) language. It is instead a tool to help hardware designers produce readable, lint-clean, and portable Verilog code that can be used seamlessly in any FPGA or ASIC. 
+
 This project will benefit from a significant body of work constructed over the years, which is described in the following links.
 
 
@@ -37,15 +39,8 @@ This project will benefit from a significant body of work constructed over the y
 IOb-SoC is the departing repository; it already uses a collection of Python scripts to create a build directory for compiling and running various tools.
 
 
-[IOb-Lib](https://github.com/IObundle/iob-lib.git) contains a set of Python scripts, Verilog, and C sources to simplify the development of subsystem IP cores.
-It is used as a submodule in the IOb-SoC repository and associated projects.
-
-
 [IOb-SoC-OpenCryptoHW](https://github.com/IObundle/iob-soc-opencryptohw.git) is a reconfigurable cryptographic hardware IP core for Next Generation Internet.
 Security and privacy are more important than ever with the Internet of Things.
-
-
-[IOb-Py2HW](https://github.com/IObundle/iob-py2hw.git) aims to develop a Python generator of portable Verilog code. Py2HW is not a High-Level Synthesis (HLS) language. It is instead a tool to help hardware designers produce readable, lint-clean, and portable Verilog code that can be used seamlessly in any FPGA or ASIC. 
 
 ### Install with pip
 
@@ -75,6 +70,23 @@ nix-shell path/to/py2hwsw_directory
 
 If the `Py2HWSW_PATH` environment variable is not set, the nix environment will only install the project dependencies. Not the `py2hwsw` package itself.
 
+### Run from a local repository (without install)
+
+To use the `py2hwsw` program from a local repository without having to rebuild the package (as with nix and pip), run the `py2hwsw.py` script directly:
+
+Ensure the `~/.local/bin/` is in the `PATH` environment variable.
+Otherwise, set it by adding the following to your `.bashrc` file:
+```
+# set PATH so it includes user's private ~/.local/bin if it exists
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+```
+
+Then create a symlink to the `py2hwsw.py` script in the `~/.local/bin` directory:
+```
+ln -s path/to/py2hwsw_directory/py2hwsw/scripts/py2hwsw.py ~/.local/bin/py2hwsw
+```
 
 ### Usage examples
 

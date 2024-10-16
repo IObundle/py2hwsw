@@ -69,7 +69,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": params["csr_if"],
                     "subtype": "slave",
-                    "ADDR_W": "ADDR_W",
+                    "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
                 },
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",

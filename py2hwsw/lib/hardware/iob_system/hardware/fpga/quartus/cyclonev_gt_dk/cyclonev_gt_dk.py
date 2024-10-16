@@ -137,8 +137,8 @@ def setup(py_params_dict):
             "name": "rs232_int",
             "descr": "iob-system uart interface",
             "signals": [
-                {"name": "rxd"},
-                {"name": "txd"},
+                {"name": "rxd_i"},
+                {"name": "txd_o"},
                 {"name": "rs232_rts", "width": "1"},
                 {"name": "high", "width": "1"},
             ],

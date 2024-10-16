@@ -173,7 +173,7 @@ def setup(py_params_dict):
             "interface": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W-2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": "AXI_LEN_W",
@@ -217,9 +217,9 @@ def setup(py_params_dict):
             "descr": "CPU instruction bus",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "cpu_i_",
+                "prefix": "cpu_i_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"],
+                "ADDR_W": params["addr_w"] - 2,
                 "DATA_W": params["data_w"],
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": "1",
@@ -230,9 +230,9 @@ def setup(py_params_dict):
             "descr": "CPU data bus",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "cpu_d_",
+                "prefix": "cpu_d_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"],
+                "ADDR_W": params["addr_w"] - 2,
                 "DATA_W": params["data_w"],
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": "1",
@@ -250,9 +250,9 @@ def setup(py_params_dict):
             "descr": "iob-system boot controller data interface",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "bootrom_",
+                "prefix": "bootrom_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 2,
+                "ADDR_W": params["addr_w"] - 2 - 2,
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": "1",
@@ -263,9 +263,9 @@ def setup(py_params_dict):
             "descr": "AXI bus for peripheral CSRs",
             "interface": {
                 "type": "axi",
-                "wire_prefix": "periphs_",
+                "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 1,
+                "ADDR_W": params["addr_w"] - 2 - 1,
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -275,9 +275,9 @@ def setup(py_params_dict):
             "descr": "AXI-Lite bus for peripheral CSRs",
             "interface": {
                 "type": "iob",
-                "wire_prefix": "periphs_",
+                "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 1,
+                "ADDR_W": params["addr_w"] - 2 - 1,
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -316,11 +316,11 @@ def setup(py_params_dict):
                 "plic_interrupts_i": "interrupts",
                 "plic_cbus_s": (
                     "plic_cbus",
-                    "plic_cbus_iob_addr[22-1:0]",
+                    "plic_cbus_iob_addr[22-2-1:0]",
                 ),
                 "clint_cbus_s": (
                     "clint_cbus",
-                    "clint_cbus_iob_addr[16-1:0]",
+                    "clint_cbus_iob_addr[16-2-1:0]",
                 ),
             },
         },
@@ -331,9 +331,9 @@ def setup(py_params_dict):
             "instance_description": "Interconnect instance",
             "parameters": {
                 "AXI_ID_W": "AXI_ID_W",
-                "AXI_ADDR_W": params["addr_w"],
+                "AXI_ADDR_W": params["addr_w"] - 2,
                 "AXI_DATA_W": "AXI_DATA_W",
-                "MEM_ADDR_W": "AXI_ADDR_W",
+                "MEM_ADDR_W": "AXI_ADDR_W - 2",
             },
             "connect": {
                 "clk_i": "clk",
@@ -354,9 +354,9 @@ def setup(py_params_dict):
             },
             "num_slaves": 2,
             "masters": {
-                "mem": params["addr_w"] - 2,
-                "bootrom": params["addr_w"] - 2,
-                "peripherals": params["addr_w"] - 1,
+                "mem": params["addr_w"] - 2 - 2,
+                "bootrom": params["addr_w"] - 2 - 2,
+                "peripherals": params["addr_w"] - 2 - 1,
             },
         },
         {
@@ -373,11 +373,11 @@ def setup(py_params_dict):
                 "clk_en_rst_s": "clk_en_rst_s",
                 "cbus_s": (
                     "bootrom_cbus",
-                    "bootrom_axi_araddr[13-1:0]",
+                    "bootrom_axi_araddr[13-2-1:0]",
                     "bootrom_axi_arid[0]",
                     "bootrom_axi_rid[0]",
                     "{1'b0, bootrom_axi_arlock}",
-                    "bootrom_axi_awaddr[13-1:0]",
+                    "bootrom_axi_awaddr[13-2-1:0]",
                     "bootrom_axi_awid[0]",
                     "bootrom_axi_bid[0]",
                     "{1'b0, bootrom_axi_awlock}",
@@ -393,7 +393,7 @@ def setup(py_params_dict):
             "instance_description": "Convert AXI to AXI lite for CLINT",
             "parameters": {
                 "AXI_ID_WIDTH": "AXI_ID_W",
-                "ADDR_WIDTH": params["addr_w"] - 1,
+                "ADDR_WIDTH": params["addr_w"] - 2 - 1,
                 "DATA_WIDTH": "AXI_DATA_W",
             },
             "connect": {
@@ -418,7 +418,7 @@ def setup(py_params_dict):
                 # Peripherals cbus connections added automatically
             },
             "num_outputs": 0,  # Num outputs configured automatically
-            "addr_w": params["addr_w"] - 1,
+            "addr_w": params["addr_w"] - 2 - 1,
         },
         # Peripherals
         {

@@ -78,7 +78,7 @@ def setup(py_params_dict):
                 "descr": "Internal CSRs IOb interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "csrs_",
+                    "prefix": "csrs_",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },

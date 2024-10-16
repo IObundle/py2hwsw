@@ -79,8 +79,8 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "file_prefix": "iob_picorv32_ibus_",
-                    "port_prefix": "ibus_",
-                    "wire_prefix": "ibus_",
+                    "prefix": "ibus_",
+                    "prefix": "ibus_",
                     "DATA_W": "DATA_W",
                     "ADDR_W": "ADDR_W",
                 },
@@ -91,8 +91,8 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "file_prefix": "iob_picorv32_dbus_",
-                    "port_prefix": "dbus_",
-                    "wire_prefix": "dbus_",
+                    "prefix": "dbus_",
+                    "prefix": "dbus_",
                     "DATA_W": "DATA_W",
                     "ADDR_W": "ADDR_W",
                 },

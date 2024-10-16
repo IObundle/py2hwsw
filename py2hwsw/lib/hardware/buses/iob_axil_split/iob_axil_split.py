@@ -73,7 +73,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "axil",
                     "file_prefix": py_params_dict["name"] + "_input_",
-                    "port_prefix": "input_",
+                    "prefix": "input_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W,
                 },
@@ -88,7 +88,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "axil",
                     "file_prefix": f"{py_params_dict['name']}_output{port_idx}_",
-                    "port_prefix": f"output{port_idx}_",
+                    "prefix": f"output{port_idx}_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W - NBITS,
                 },

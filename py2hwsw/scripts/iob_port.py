@@ -50,7 +50,7 @@ class iob_port(iob_wire):
                 _direction,
                 self.interface.mult,
                 self.interface.widths,
-                self.interface.port_prefix,
+                self.interface.prefix,
             )
         elif _direction in ["slave", "master"]:
             fail_with_msg(

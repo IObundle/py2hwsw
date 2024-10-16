@@ -54,7 +54,7 @@ def setup(py_params_dict):
                 "descr": "Slave AXI interface",
                 "interface": {
                     "type": "axi",
-                    "port_prefix": "s_",
+                    "prefix": "s_",
                     "ADDR_W": "ADDR_WIDTH",
                     "DATA_W": "DATA_WIDTH",
                 },

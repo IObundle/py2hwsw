@@ -53,15 +53,16 @@ class interface:
 
     type: str = ""
     file_prefix: str = ""
-    wire_prefix: str = ""
+    prefix: str = ""
     mult: str | int = 1
     widths: Dict[str, str] = field(default_factory=dict)
     # For ports only:
-    port_prefix: str = ""
+    # For portmaps .vs only:
+    portmap_port_prefix: str = ""
 
     def __post_init__(self):
         if not self.file_prefix:
-            self.file_prefix = self.port_prefix + self.wire_prefix
+            self.file_prefix = self.portmap_port_prefix + self.prefix
 
 
 def dict2interface(interface_dict):
@@ -784,14 +785,14 @@ def get_wb_full_ports():
             descr="Retry input. Indicates interface is not ready to accept or send data, and cycle should be retried.",
         ),
         iob_signal(
-           name="wb_tga_o",
-           width=1,
-           descr="Address tag type. Contains information associated with address lines [adr], and is qualified by signal [stb].",
+            name="wb_tga_o",
+            width=1,
+            descr="Address tag type. Contains information associated with address lines [adr], and is qualified by signal [stb].",
         ),
         iob_signal(
-           name="wb_tgc_o",
-           width=1,
-           descr="Cycle tag type. Contains information associated with bus cycles, and is qualified by signal [cyc].",
+            name="wb_tgc_o",
+            width=1,
+            descr="Cycle tag type. Contains information associated with bus cycles, and is qualified by signal [cyc].",
         ),
     ]
 
@@ -801,6 +802,7 @@ def get_wb_full_ports():
 #
 # Handle signal direction
 #
+
 
 # reverse direction in name's suffix
 def reverse_name_direction(name):
@@ -813,6 +815,7 @@ def reverse_name_direction(name):
     else:
         print(f"ERROR: reverse_name_direction: invalid argument {name}.")
         exit(1)
+
 
 # reverse module signal direction
 def reverse_direction(direction):
@@ -863,25 +866,26 @@ def get_suffix(direction):
 
 
 # Write single port with given bus width, and name to file
-def write_port(fout, port_prefix, port):
+def write_port(fout, prefix, port):
     direction = port.direction
-    name = port_prefix + port.name
+    name = prefix + port.name
     width_str = f" [{port.width}-1:0] "
     fout.write(direction + width_str + name + "," + "\n")
 
 
-def write_m_port(fout, port_prefix, port_list):
+def write_m_port(fout, prefix, port_list):
     for port in port_list:
-        write_port(fout, port_prefix, port)
+        write_port(fout, prefix, port)
 
 
-def write_s_port(fout, port_prefix, port_list):
-    write_m_port(fout, port_prefix, port_list)
+def write_s_port(fout, prefix, port_list):
+    write_m_port(fout, prefix, port_list)
 
 
 #
 # Portmap
 #
+
 
 # Generate portmap string for a single port but width and name
 def get_portmap_string(port_prefix, wire_prefix, port, connect_to_port):
@@ -890,7 +894,7 @@ def get_portmap_string(port_prefix, wire_prefix, port, connect_to_port):
     if not connect_to_port:
         suffix = get_suffix(port.direction)
         if wire_name.endswith(suffix):
-            wire_name = wire_name[:-len(suffix)]
+            wire_name = wire_name[: -len(suffix)]
     return f".{port_name}({wire_name}),\n"
 
 
@@ -927,14 +931,15 @@ def write_s_s_portmap(fout, port_prefix, wire_prefix, port_list):
 # Wire
 #
 
+
 # Write wire with given name, bus size, width to file
-def write_single_wire(fout, wire_prefix, wire, for_tb):
+def write_single_wire(fout, prefix, wire, for_tb):
     if isinstance(wire, iob_signal_reference):
         return
-    wire_name = wire_prefix + wire.name
+    wire_name = prefix + wire.name
     suffix = get_suffix(wire.direction)
     if wire_name.endswith(suffix):
-        wire_name = wire_name[:-len(suffix)]
+        wire_name = wire_name[: -len(suffix)]
     wtype = "wire"
     if for_tb:
         wire_name = wire_name + get_suffix(reverse_direction(wire.direction))
@@ -945,22 +950,22 @@ def write_single_wire(fout, wire_prefix, wire, for_tb):
     fout.write(wtype + width_str + wire_name + ";\n")
 
 
-def write_wire(fout, wire_prefix, wires):
+def write_wire(fout, prefix, wires):
     for wire in wires:
-        write_single_wire(fout, wire_prefix, wire, False)
+        write_single_wire(fout, prefix, wire, False)
 
 
-def write_tb_wire(fout, wire_prefix, wires):
+def write_tb_wire(fout, prefix, wires):
     for wire in wires:
-        write_single_wire(fout, wire_prefix, wire, True)
+        write_single_wire(fout, prefix, wire, True)
 
 
-def write_m_tb_wire(fout, wire_prefix, wires):
-    write_tb_wire(fout, wire_prefix, wires)
+def write_m_tb_wire(fout, prefix, wires):
+    write_tb_wire(fout, prefix, wires)
 
 
-def write_s_tb_wire(fout, wire_prefix, wires):
-    write_m_tb_wire(fout, wire_prefix, wires)
+def write_s_tb_wire(fout, prefix, wires):
+    write_m_tb_wire(fout, prefix, wires)
 
 
 #
@@ -999,8 +1004,8 @@ def gen_if(interface):
     """Generate verilog snippets for all possible subtypes of a given interface"""
     name = interface.type
     file_prefix = interface.file_prefix
-    port_prefix = interface.port_prefix
-    wire_prefix = interface.wire_prefix
+    portmap_port_prefix = interface.portmap_port_prefix
+    prefix = interface.prefix
     mult = interface.mult
     widths = interface.widths
 
@@ -1011,13 +1016,11 @@ def gen_if(interface):
         fout = open(file_prefix + name + "_" + if_type + ".vs", "w")
 
         # get prefixes
+        prefix1 = prefix
         prefix2_str = ""
         if "portmap" in if_type:
-            prefix2_str = " wire_prefix,"
-        elif "wire" in if_type:
-            prefix1 = wire_prefix
-        else:  # "port"
-            prefix1 = port_prefix
+            prefix1 = portmap_port_prefix
+            prefix2_str = " prefix,"
 
         # get ports
         if if_type.startswith("s"):
@@ -1035,14 +1038,14 @@ def gen_wires(interface):
     """Generate wires snippet for given interface"""
     name = interface.type
     file_prefix = interface.file_prefix
-    wire_prefix = interface.wire_prefix
+    prefix = interface.prefix
     mult = interface.mult
     widths = interface.widths
 
     signals = get_signals(name, "", mult, widths)
 
     fout = open(file_prefix + name + "_wire.vs", "w")
-    write_wire(fout, wire_prefix, signals)
+    write_wire(fout, prefix, signals)
     fout.close()
 
 
@@ -1057,8 +1060,8 @@ if __name__ == "__main__":
             interface(
                 type=if_name,
                 file_prefix="bla_",
-                port_prefix="di_",
-                wire_prefix="da_",
+                prefix="di_",
+                portmap_port_prefix="da_",
                 widths={},
             )
         )

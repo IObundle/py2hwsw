@@ -44,7 +44,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "file_prefix": py_params_dict["name"] + "_output_",
-                    "port_prefix": "output_",
+                    "prefix": "output_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W,
                 },
@@ -59,7 +59,7 @@ def setup(py_params_dict):
                 "interface": {
                     "type": "iob",
                     "file_prefix": f"{py_params_dict['name']}_input{port_idx}_",
-                    "port_prefix": f"input{port_idx}_",
+                    "prefix": f"input{port_idx}_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W - NBITS,
                 },

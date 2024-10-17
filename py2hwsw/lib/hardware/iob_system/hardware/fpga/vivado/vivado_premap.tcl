@@ -30,7 +30,7 @@ if { [file isdirectory "./ip/axi_interconnect_0"] } {
     create_ip -name axi_interconnect -vendor xilinx.com -library ip -version 1.7 -module_name axi_interconnect_0 -dir ./ip -force
 
     set_property CONFIG.NUM_SLAVE_PORTS $N_INTERCONNECT_SLAVES [get_ips axi_interconnect_0]
-    set_property CONFIG.AXI_ADDR_WIDTH 30 [get_ips axi_interconnect_0]
+    set_property CONFIG.AXI_ADDR_WIDTH 28 [get_ips axi_interconnect_0]
     set_property CONFIG.ACLK_PERIOD 5000 [get_ips axi_interconnect_0]
     set_property CONFIG.INTERCONNECT_DATA_WIDTH 32 [get_ips axi_interconnect_0]
     set_property CONFIG.M00_AXI_IS_ACLK_ASYNC 1 [get_ips axi_interconnect_0]

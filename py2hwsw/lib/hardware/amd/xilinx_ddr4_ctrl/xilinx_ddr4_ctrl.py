@@ -74,7 +74,6 @@ def setup(py_params_dict):
                 "name": "axi_s",
                 "interface": {
                     "type": "axi",
-                    "subtype": "slave",
                     "ID_W": "AXI_ID_W",
                     "LEN_W": "AXI_LEN_W",
                     "ADDR_W": "AXI_ADDR_W",

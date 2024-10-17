@@ -147,7 +147,6 @@ def setup(py_params_dict):
             "descr": "Clock, clock enable and reset",
             "interface": {
                 "type": "clk_en_rst",
-                "subtype": "slave",
             },
         },
         {
@@ -173,7 +172,6 @@ def setup(py_params_dict):
             "descr": "AXI master interface for memory",
             "interface": {
                 "type": "axi",
-                "subtype": "master",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W-2",
                 "DATA_W": "AXI_DATA_W",

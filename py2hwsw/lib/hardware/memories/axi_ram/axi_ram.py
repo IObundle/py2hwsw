@@ -106,7 +106,6 @@ def setup(py_params_dict):
                 "name": "axi_s",
                 "interface": {
                     "type": "axi",
-                    "subtype": "slave",
                     "ID_W": "ID_WIDTH",
                     "ADDR_W": "ADDR_WIDTH",
                     "DATA_W": "DATA_WIDTH",

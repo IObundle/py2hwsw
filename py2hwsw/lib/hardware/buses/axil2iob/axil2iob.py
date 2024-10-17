@@ -12,7 +12,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -20,7 +19,6 @@ def setup(py_params_dict):
                 "name": "axil_s",
                 "interface": {
                     "type": "axil",
-                    "subtype": "slave",
                     "ADDR_W": "AXIL_ADDR_W",
                     "DATA_W": "AXIL_DATA_W",
                 },
@@ -30,7 +28,6 @@ def setup(py_params_dict):
                 "name": "iob_m",
                 "interface": {
                     "type": "iob",
-                    "subtype": "master",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },

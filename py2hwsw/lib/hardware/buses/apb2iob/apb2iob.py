@@ -12,7 +12,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -20,7 +19,6 @@ def setup(py_params_dict):
                 "name": "apb_s",
                 "interface": {
                     "type": "apb",
-                    "subtype": "slave",
                 },
                 "descr": "APB interface",
             },
@@ -28,7 +26,6 @@ def setup(py_params_dict):
                 "name": "iob_m",
                 "interface": {
                     "type": "iob",
-                    "subtype": "master",
                 },
                 "descr": "CPU native interface",
             },

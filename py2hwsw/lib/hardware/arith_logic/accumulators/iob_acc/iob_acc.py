@@ -29,7 +29,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "clock, clock enable and reset",
             },

@@ -55,7 +55,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and async reset",
             },
@@ -73,7 +72,6 @@ def setup(py_params_dict):
                 "name": "input_s",
                 "interface": {
                     "type": "axil",
-                    "subtype": "slave",
                     "file_prefix": py_params_dict["name"] + "_input_",
                     "prefix": "input_",
                     "DATA_W": DATA_W,
@@ -89,7 +87,6 @@ def setup(py_params_dict):
                 "name": f"output_{port_idx}_m",
                 "interface": {
                     "type": "axil",
-                    "subtype": "master",
                     "file_prefix": f"{py_params_dict['name']}_output{port_idx}_",
                     "prefix": f"output{port_idx}_",
                     "DATA_W": DATA_W,

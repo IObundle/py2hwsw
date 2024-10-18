@@ -10,10 +10,18 @@ def setup(py_params_dict):
             {
                 "name": "ADDR_W",
                 "type": "P",
-                "val": 4,  # Same as CSRS_ADDR_W
+                "val": 5,  # Same as CSRS_ADDR_W
                 "min": 0,
                 "max": 32,
                 "descr": "Address bus width",
+            },
+            {
+                "name": "DATA_W",
+                "type": "P",
+                "val": 32,
+                "min": 0,
+                "max": 32,
+                "descr": "Data bus width",
             },
         ],
         "ports": [
@@ -69,16 +77,16 @@ def setup(py_params_dict):
                     {"name": "regfile_write_1_wr", "width": 8},
                     {"name": "regfile_write_2_wr", "width": 8},
                     {"name": "regfile_write_3_wr", "width": 8},
+                    {"name": "regfile_write_raddr_wr", "width": 2},
+                    {"name": "regfile_write_rdata_wr", "width": 8},
                 ],
             },
             {
                 "name": "regfile_read",
                 "descr": "",
                 "signals": [
-                    {"name": "regfile_read_0_rd", "width": 8},
-                    {"name": "regfile_read_1_rd", "width": 8},
-                    {"name": "regfile_read_2_rd", "width": 8},
-                    {"name": "regfile_read_3_rd", "width": 8},
+                    # Use 'csrs_iob' to find out which register to read
+                    {"name": "regfile_read", "width": 8},
                 ],
             },
             {
@@ -93,8 +101,8 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "fifo_write_w_en", "width": 1},
-                    {"name": "fifo_write_w_full", "width": 1},
                     {"name": "fifo_write_w_data", "width": 8},
+                    {"name": "fifo_write_w_empty", "width": 1},
                 ],
             },
             {
@@ -102,6 +110,54 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "fifo_write_interrupt", "width": 1},
+                ],
+            },
+            {
+                "name": "fifo_write_extmem",
+                "descr": "",
+                "signals": [
+                    {
+                        "name": "fifo_write_ext_mem_clk_o",
+                        "width": 1,
+                    },
+                    {
+                        "name": "fifo_write_ext_mem_w_en_o",
+                        "width": 4,
+                        "descr": "Memory write enable",
+                    },
+                    {
+                        "name": "fifo_write_ext_mem_w_addr_o",
+                        "width": 2,
+                        "descr": "Memory write address",
+                    },
+                    {
+                        "name": "fifo_write_ext_mem_w_data_o",
+                        "width": 32,
+                        "descr": "Memory write data",
+                    },
+                    #  Read port
+                    {
+                        "name": "fifo_write_ext_mem_r_en_o",
+                        "width": 4,
+                        "descr": "Memory read enable",
+                    },
+                    {
+                        "name": "fifo_write_ext_mem_r_addr_o",
+                        "width": 2,
+                        "descr": "Memory read address",
+                    },
+                    {
+                        "name": "fifo_write_ext_mem_r_data_i",
+                        "width": 32,
+                        "descr": "Memory read data",
+                    },
+                ],
+            },
+            {
+                "name": "fifo_write_current_level",
+                "descr": "",
+                "signals": [
+                    {"name": "fifo_write_current_level", "width": 5},
                 ],
             },
         ],
@@ -174,7 +230,7 @@ def setup(py_params_dict):
                                 "type": "FIFO_W",
                                 "n_bits": 8,
                                 "rst_val": 0,
-                                "log2n_items": 2,
+                                "log2n_items": 4,
                                 "autoreg": True,
                                 "descr": "Write FIFO",
                             },
@@ -189,7 +245,7 @@ def setup(py_params_dict):
                     #             "type": "FIFO_R",
                     #             "n_bits": 8,
                     #             "rst_val": 0,
-                    #             "log2n_items": 2,
+                    #             "log2n_items": 4,
                     #             "autoreg": True,
                     #             "descr": "Read FIFO",
                     #         },
@@ -204,7 +260,7 @@ def setup(py_params_dict):
                     #             "type": "AFIFO_R",
                     #             "n_bits": 8,
                     #             "rst_val": 0,
-                    #             "log2n_items": 2,
+                    #             "log2n_items": 4,
                     #             "autoreg": True,
                     #             "descr": "Asymmetric read FIFO",
                     #         },
@@ -219,7 +275,7 @@ def setup(py_params_dict):
                     #             "type": "AFIFO_W",
                     #             "n_bits": 8,
                     #             "rst_val": 0,
-                    #             "log2n_items": 2,
+                    #             "log2n_items": 4,
                     #             "autoreg": True,
                     #             "descr": "Asymmetric write FIFO",
                     #         },
@@ -231,8 +287,20 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",
                     "csrs_iob_o": "csrs_iob",
+                    #
                     # Register interfaces
-                    "reset": "reset",
+                    #
+                    # Single registers
+                    "single_write": "single_write",
+                    "single_read": "single_read",
+                    # Regfile
+                    "regfile_write": "regfile_write",
+                    "regfile_read": "regfile_read",
+                    # FIFO
+                    "fifo_write_rst_i": "fifo_write_rst",
+                    "fifo_write_read": "fifo_write_read",
+                    "fifo_write_extmem": "fifo_write_extmem",
+                    "fifo_write_current_level_o": "fifo_write_current_level",
                 },
             },
         ],

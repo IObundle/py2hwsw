@@ -184,6 +184,7 @@ class csr_gen:
         return lines
 
     def gen_wr_reg(self, row):
+        wires = []
         name = row.name
         rst_val = int(row.rst_val)
         n_bits = row.n_bits
@@ -200,7 +201,15 @@ class csr_gen:
         lines += f"\n\n//NAME: {name};\n//TYPE: {row.type}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); AUTO: {auto}\n\n"
 
         # compute wdata with only the needed bits
-        lines += f"    wire [{self.verilog_max(n_bits, 1)}-1:0] {name}_wdata; \n"
+        wires.append(
+            {
+                "name": f"{name}_wdata",
+                "descr": "",
+                "signals": [
+                    {"name": f"{name}_wdata", "width": self.verilog_max(n_bits, 1)},
+                ],
+            },
+        )
         lines += f"    assign {name}_wdata = internal_iob_wdata[{self.boffset(addr,self.cpu_n_bytes)}+:{self.verilog_max(n_bits,1)}];\n"
 
         # signal to indicate if the register is addressed
@@ -249,7 +258,15 @@ class csr_gen:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
             for idx in range(n_items):
                 name_idx = f"{name}_{idx}" if n_items > 1 else name
-                lines += f"    wire {name_idx}_wen;\n"
+                wires.append(
+                    {
+                        "name": f"{name_idx}_wen",
+                        "descr": "",
+                        "signals": [
+                            {"name": f"{name_idx}_wen", "width": 1},
+                        ],
+                    },
+                )
                 lines += f"    assign {name_idx}_wen = (internal_iob_valid & internal_iob_ready) & ((|internal_iob_wstrb) & {name_idx}_addressed_w);\n"
                 lines += "    iob_reg_e #(\n"
                 lines += f"      .DATA_W({n_bits}),\n"
@@ -266,9 +283,10 @@ class csr_gen:
                 lines += self.gen_regfile_read_addr_logic(row)
         else:  # compute wen
             lines += f"    assign {name}_wen{suffix} = ({name}_addressed_w & (internal_iob_valid & internal_iob_ready))? |internal_iob_wstrb: 1'b0;\n"
-            lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
+            if suffix:
+                lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
 
-        return lines
+        return lines, wires
 
     def gen_rd_reg(self, row):
         name = row.name
@@ -674,7 +692,9 @@ class csr_gen:
         # insert write register logic
         for row in table:
             if "W" in row.type:
-                snippet += self.gen_wr_reg(row)
+                _snippet, _wires = self.gen_wr_reg(row)
+                snippet += _snippet
+                wires += _wires
 
         # insert read register logic
         for row in table:

@@ -7,6 +7,8 @@
 
 module iob_csrs_demo_tb;
 
+   localparam PER = 10;
+
    integer fd;
 
    reg     clk;
@@ -30,7 +32,7 @@ module iob_csrs_demo_tb;
       $dumpvars();
 `endif
 
-      if (1) begin
+      if (1) begin  // TODO: Check if passed
          $display("%c[1;34m", 27);
          $display("Test completed successfully.");
          $display("%c[0m", 27);
@@ -56,12 +58,12 @@ module iob_csrs_demo_tb;
       .arst_i      (rst),
       // cbus_s port
       .iob_valid_i (iob_valid_i),
-      .iob_addr_i  (iob_addr_i),
+      .iob_addr_i  (iob_addr_i[`IOB_CSRS_DEMO_CSRS_ADDR_W-1:2]),
       .iob_wdata_i (iob_wdata_i),
       .iob_wstrb_i (iob_wstrb_i),
       .iob_rvalid_o(iob_rvalid_o),
       .iob_rdata_o (iob_rdata_o),
-      .iob_ready_o (iob_ready_o),
+      .iob_ready_o (iob_ready_o)
    );
 
 endmodule

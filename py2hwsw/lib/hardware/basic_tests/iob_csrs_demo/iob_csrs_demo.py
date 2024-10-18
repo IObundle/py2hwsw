@@ -89,6 +89,7 @@ def setup(py_params_dict):
                     {"name": "regfile_read", "width": 8},
                 ],
             },
+            # FIFO write wires
             {
                 "name": "fifo_write_rst",
                 "descr": "",
@@ -103,13 +104,6 @@ def setup(py_params_dict):
                     {"name": "fifo_write_w_en", "width": 1},
                     {"name": "fifo_write_w_data", "width": 8},
                     {"name": "fifo_write_w_empty", "width": 1},
-                ],
-            },
-            {
-                "name": "fifo_write_interrupt",
-                "descr": "",
-                "signals": [
-                    {"name": "fifo_write_interrupt", "width": 1},
                 ],
             },
             {
@@ -158,6 +152,78 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "fifo_write_current_level", "width": 5},
+                ],
+            },
+            # FIFO read wires
+            {
+                "name": "fifo_read_rst",
+                "descr": "",
+                "signals": [
+                    {"name": "fifo_read_rst", "width": 1},
+                ],
+            },
+            {
+                "name": "fifo_read_write",
+                "descr": "",
+                "signals": [
+                    {"name": "fifo_read_r_en", "width": 1},
+                    {"name": "fifo_read_r_data", "width": 8},
+                    {"name": "fifo_read_r_full", "width": 1},
+                ],
+            },
+            {
+                "name": "fifo_read_interrupt",
+                "descr": "",
+                "signals": [
+                    {"name": "fifo_read_interrupt", "width": 1},
+                ],
+            },
+            {
+                "name": "fifo_read_extmem",
+                "descr": "",
+                "signals": [
+                    {
+                        "name": "fifo_read_ext_mem_clk_o",
+                        "width": 1,
+                    },
+                    {
+                        "name": "fifo_read_ext_mem_w_en_o",
+                        "width": 4,
+                        "descr": "Memory read enable",
+                    },
+                    {
+                        "name": "fifo_read_ext_mem_w_addr_o",
+                        "width": 2,
+                        "descr": "Memory read address",
+                    },
+                    {
+                        "name": "fifo_read_ext_mem_w_data_o",
+                        "width": 32,
+                        "descr": "Memory read data",
+                    },
+                    #  Read port
+                    {
+                        "name": "fifo_read_ext_mem_r_en_o",
+                        "width": 4,
+                        "descr": "Memory read enable",
+                    },
+                    {
+                        "name": "fifo_read_ext_mem_r_addr_o",
+                        "width": 2,
+                        "descr": "Memory read address",
+                    },
+                    {
+                        "name": "fifo_read_ext_mem_r_data_i",
+                        "width": 32,
+                        "descr": "Memory read data",
+                    },
+                ],
+            },
+            {
+                "name": "fifo_read_current_level",
+                "descr": "",
+                "signals": [
+                    {"name": "fifo_read_current_level", "width": 5},
                 ],
             },
         ],
@@ -236,21 +302,21 @@ def setup(py_params_dict):
                             },
                         ],
                     },
-                    # {
-                    #     "name": "demo_fifo_read",
-                    #     "descr": "demo software accessible registers.",
-                    #     "regs": [
-                    #         {
-                    #             "name": "fifo_read",
-                    #             "type": "FIFO_R",
-                    #             "n_bits": 8,
-                    #             "rst_val": 0,
-                    #             "log2n_items": 4,
-                    #             "autoreg": True,
-                    #             "descr": "Read FIFO",
-                    #         },
-                    #     ],
-                    # },
+                    {
+                        "name": "demo_fifo_read",
+                        "descr": "demo software accessible registers.",
+                        "regs": [
+                            {
+                                "name": "fifo_read",
+                                "type": "FIFO_R",
+                                "n_bits": 8,
+                                "rst_val": 0,
+                                "log2n_items": 4,
+                                "autoreg": True,
+                                "descr": "Read FIFO",
+                            },
+                        ],
+                    },
                     # {
                     #     "name": "demo_afifo_read",
                     #     "descr": "demo software accessible registers.",
@@ -296,11 +362,17 @@ def setup(py_params_dict):
                     # Regfile
                     "regfile_write": "regfile_write",
                     "regfile_read": "regfile_read",
-                    # FIFO
+                    # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
                     "fifo_write_read": "fifo_write_read",
                     "fifo_write_extmem": "fifo_write_extmem",
                     "fifo_write_current_level_o": "fifo_write_current_level",
+                    # FIFO read
+                    "fifo_read_rst_i": "fifo_read_rst",
+                    "fifo_read_write": "fifo_read_write",
+                    "fifo_read_interrupt_o": "fifo_read_interrupt",
+                    "fifo_read_extmem": "fifo_read_extmem",
+                    "fifo_read_current_level_o": "fifo_read_current_level",
                 },
             },
         ],

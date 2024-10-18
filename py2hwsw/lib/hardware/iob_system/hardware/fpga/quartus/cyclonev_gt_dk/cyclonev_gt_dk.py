@@ -189,14 +189,14 @@ def setup(py_params_dict):
                 "descr": "DDR3 controller clock and areset inputs",
                 "signals": [
                     {"name": "clk_i"},
-                    {"name": "resetn"},
+                    {"name": "resetn_i"},
                 ],
             },
             {
                 "name": "ddr3_ctr_general",
                 "descr": "DDR3 controller general signals",
                 "signals": [
-                    {"name": "rzqin"},
+                    {"name": "rzqin_i"},
                     {"name": "pll_locked"},
                     {"name": "init_done"},
                 ],
@@ -232,10 +232,7 @@ def setup(py_params_dict):
                 "name": "ddio_out_clkbuf_io",
                 "descr": "DDIO clock buffer io",
                 "signals": [
-                    {
-                        "name": "enet_resetn_inv",
-                        "width": "1",
-                    },  # TODO: Connect and invert enet_resetn
+                    {"name": "enet_resetn_inv", "width": "1"},
                     {"name": "low", "width": "1"},
                     {"name": "high"},
                     {"name": "eth_clk"},
@@ -402,6 +399,7 @@ def setup(py_params_dict):
                 "verilog_code": """
     // Ethernet connections
     assign low = 1'b0;
+    assign enet_resetn_inv = ~enet_resetn_o;
 """,
             },
         ]

@@ -46,7 +46,7 @@ def get_fifo_csrs(csr_ref):
                 "n_bits": 32,
                 "rst_val": 0,
                 "log2n_items": 0,
-                "autoreg": True,
+                "autoreg": False,
                 "descr": "Write data to FIFO.",
                 "internal_use": True,
             },
@@ -319,7 +319,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
             "signals": [
                 {
                     "name": f"{fifo_name}_current_level_o",
-                    "width": "ADDR_W+1",
+                    "width": "ADDR_W",
                     "descr": "FIFO level",
                 },
             ],
@@ -336,7 +336,7 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
                 "descr": "FIFO write interface.",
                 "signals": [
                     {"name": f"{fifo_name}_data_wen", "width": 1},
-                    {"name": f"{fifo_name}_data", "width": 32},
+                    {"name": f"{fifo_name}_wdata", "width": 32},
                     {"name": f"{fifo_name}_full", "width": 1},
                 ],
             }
@@ -368,11 +368,11 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": f"{fifo_name}_rst",
+                "rst_i": f"{fifo_name}_rst_i",
                 "write": f"{fifo_name}_write",
                 "read": f"{fifo_name}_read",
                 "extmem": f"{fifo_name}_extmem",
-                "fifo": f"{fifo_name}_current_level",
+                "fifo_o": f"{fifo_name}_current_level_o",
             },
         },
         {
@@ -392,14 +392,21 @@ def create_sync_fifo_instance(attributes_dict, csr_ref):
 
    // Connect FIFO level status to CSRs
    assign {fifo_name}_level = {fifo_name}_current_level_o;
-   // Generate interrupt signal
-   assign {fifo_name}_interrupt_o ={fifo_name}_current_level_o >= {fifo_name}_thresh;
 
-   assign {fifo_name}_data_rvalid = 1'b1;
-   assign {fifo_name}_data_rready = 1'b1;
 """,
+            # assign {fifo_name}_data_rvalid = 1'b1;
+            # assign {fifo_name}_data_rready = 1'b1;
         }
     )
+    if fifo_type == "R":
+        attributes_dict["snippets"].append(
+            {
+                "verilog_code": f"""
+   // Generate interrupt signal
+   assign {fifo_name}_interrupt_o ={fifo_name}_current_level_o >= {fifo_name}_thresh;
+""",
+            }
+        )
 
 
 def create_async_fifo_instance(attributes_dict, async_fifos):
@@ -645,11 +652,11 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
                 "instance_name": fifo_name,
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "rst_i": f"{fifo_name}_rst",
+                    "rst_i": f"{fifo_name}_rst_i",
                     "write": f"{fifo_name}_write_int",
                     "read": f"{fifo_name}_read_int",
                     "extmem": f"{fifo_name}_extmem",
-                    "fifo": f"{fifo_name}_level",
+                    "fifo_o": f"{fifo_name}_level_o",
                 },
             }
         )
@@ -670,7 +677,7 @@ def create_async_fifo_instance(attributes_dict, async_fifos):
     // Connect FIFO status outputs to CSRs
     assign {fifo_name}_full_rd = {fifo_name}_w_full;
     assign {fifo_name}_empty_rd = {fifo_name}_r_empty;
-    assign {fifo_name}_level_rd = {fifo_name}_level;
+    assign {fifo_name}_level_rd = {fifo_name}_level_o;
 """,
             }
         )

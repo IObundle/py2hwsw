@@ -66,7 +66,7 @@ endif
 endif
 
 #console start command
-CONSOLE_CMD ?=$(PYTHON_DIR)/console.py -s /dev/usb-uart
+CONSOLE_CMD ?=$(PYTHON_DIR)/console.py -s $(BOARD_SERIAL_PORT)
 
 #board client command
 GRAB_TIMEOUT ?= 300

@@ -315,7 +315,7 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
         if params["use_ethernet"]:
             # Set custom ethernet CONSOLE_CMD
             file.write(
-                'CONSOLE_CMD=$(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -s /dev/usb-uart -c $(PYTHON_DIR)/console.py -m "$(RMAC_ADDR)" -i "$(ETH_IF)"\n',
+                'CONSOLE_CMD=$(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -s $(BOARD_SERIAL_PORT) -c $(PYTHON_DIR)/console.py -m "$(RMAC_ADDR)" -i "$(ETH_IF)"\n',
             )
 
     #

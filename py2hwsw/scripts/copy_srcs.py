@@ -347,44 +347,6 @@ def copy_files(src_dir, dest_dir, sources=[], pattern="*", copy_all=False):
     return files_copied
 
 
-# Create verilog headers for the interfaces in Vheaders list, using if_gen.py
-# This function will remove all if_gen entries from the Vheaders list. It will leave the .vh files in that list.
-def create_if_gen_headers(dest_dir, Vheaders):
-    non_if_gen_interfaces = []
-    for vh_name in Vheaders:
-        if type(vh_name) == str and vh_name.endswith(".vh"):
-            # Save this entry as a .vh file.
-            non_if_gen_interfaces.append(vh_name)
-            continue  # Skip if_gen for this entry
-        elif (type(vh_name) is str) and (vh_name in if_gen.interfaces):
-            if "iob_" in vh_name:
-                file_prefix = ""
-            else:
-                file_prefix = "iob_"
-            f_out = open(f"{dest_dir}/{file_prefix}{vh_name}.vh", "w")
-            if_gen.create_signal_table(vh_name)
-            if_gen.write_vh_contents(vh_name, "", "", f_out)
-        elif (type(vh_name) is dict) and (vh_name["interface"] in if_gen.interfaces):
-            f_out = open(
-                f"{dest_dir}/{vh_name['file_prefix']}{vh_name['interface']}.vh", "w"
-            )
-            if_gen.create_signal_table(vh_name["interface"])
-            if_gen.write_vh_contents(
-                vh_name["interface"],
-                vh_name["port_prefix"],
-                vh_name["wire_prefix"],
-                f_out,
-                bus_size=vh_name["bus_size"] if "bus_size" in vh_name.keys() else 1,
-                bus_start=vh_name["bus_start"] if "bus_start" in vh_name.keys() else 0,
-            )
-        else:
-            sys.exit(
-                f"{iob_colors.FAIL} {vh_name} is not an available header.{iob_colors.ENDC}"
-            )
-    # Save the list of non if_gen interfaces (will only contain .vh files)
-    Vheaders = non_if_gen_interfaces
-
-
 # Create TeX and optionally Verilog header files with the version of the system
 def version_file(
     python_module,

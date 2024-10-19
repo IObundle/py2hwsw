@@ -273,8 +273,8 @@ def gen_ports_list(core):
         if if_name:
             # Generate the ports list for the interface
             if_gen.create_signal_table(if_name)
-            port_prefix = f"{if_name+'_'}{if_prefix}"
-            param_prefix = port_prefix.upper()
+            prefix = f"{if_name+'_'}{if_prefix}"
+            param_prefix = prefix.upper()
             if_ports_list += if_gen.generate_interface(if_name, "", param_prefix)
         else:  # Interface is not standard, simply add the ports list
             if_ports_list += interface["ports"]

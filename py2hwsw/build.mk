@@ -43,7 +43,7 @@ fw-build: $(BSP_H)
 	make -C $(SW_DIR) build
 
 fw-clean:
-	make -C $(SW_DIR) clean
+	if [ -f "$(SW_DIR)/Makefile" ]; then make -C $(SW_DIR) clean; fi
 
 #this target is not the same as fw-build because bsp.h is build for FPGA when fw-build is called
 #see $(BSP_H) target that uses $(MAKECMDGOALS) to check if fw-build is called for FPGA or simulation
@@ -62,7 +62,7 @@ pc-emul-test: $(BSP_H)
 	make -C $(SW_DIR) test_emul
 
 pc-emul-clean:
-	make -C $(SW_DIR) clean
+	if [ -f "$(SW_DIR)/Makefile" ]; then make -C $(SW_DIR) clean; fi
 
 
 #
@@ -75,7 +75,7 @@ lint-run:
 	make -C $(LINT_DIR) run
 
 lint-clean:
-	make -C $(LINT_DIR) clean
+	if [ -f "$(LINT_DIR)/Makefile" ]; then make -C $(LINT_DIR) clean; fi
 
 lint-test:
 	make lint-run LINTER=spyglass
@@ -101,7 +101,7 @@ sim-debug:
 	make -C $(SIM_DIR) debug
 
 sim-clean:
-	make -C $(SIM_DIR) clean
+	if [ -f "$(SIM_DIR)/Makefile" ]; then make -C $(SIM_DIR) clean; fi
 
 sim-cov: sim-clean
 	make -C $(SIM_DIR) -j1 run COV=1
@@ -126,7 +126,7 @@ fpga-debug:
 	make -C $(FPGA_DIR) debug
 
 fpga-clean:
-	make -C $(FPGA_DIR) clean
+	if [ -f "$(FPGA_DIR)/Makefile" ]; then make -C $(FPGA_DIR) clean; fi
 
 #
 # SYN
@@ -136,7 +136,7 @@ syn-build:
 	make -C $(SYN_DIR) build
 
 syn-clean:
-	make -C $(SYN_DIR) clean
+	if [ -f "$(SYN_DIR)/Makefile" ]; then make -C $(SYN_DIR) clean; fi
 
 syn-test: syn-clean syn-build
 
@@ -154,9 +154,7 @@ doc-debug:
 	make -C $(DOC_DIR) debug
 
 doc-clean:
-ifneq ($(wildcard $(DOC_DIR)/Makefile),)
-	make -C $(DOC_DIR) clean
-endif
+	if [ -f "$(DOC_DIR)/Makefile" ]; then make -C $(DOC_DIR) clean; fi
 
 ifneq ($(wildcard document/tsrc),)
 doc-test: doc-clean
@@ -181,7 +179,7 @@ dtest: test syn-test
 # CLEAN
 #
 
-clean: fw-clean pc-emul-clean lint-clean sim-clean fpga-clean doc-clean
+clean: fw-clean pc-emul-clean lint-clean sim-clean fpga-clean syn-clean doc-clean
 	rm -f $(BSP_H)
 
 

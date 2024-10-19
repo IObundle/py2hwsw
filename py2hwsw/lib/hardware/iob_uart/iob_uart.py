@@ -41,7 +41,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -49,8 +48,7 @@ def setup(py_params_dict):
                 "name": "cbus_s",
                 "interface": {
                     "type": CSR_IF,
-                    "subtype": "slave",
-                    "ADDR_W": "3",  # Same as `IOB_UART_CSRS_ADDR_W
+                    "ADDR_W": 3 - 2,  # Same as `IOB_UART_CSRS_ADDR_W - 2 lsbs
                     "DATA_W": "DATA_W",
                 },
                 "descr": "CPU native interface",
@@ -69,8 +67,8 @@ def setup(py_params_dict):
                 "descr": "Internal iob interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "csrs_",
-                    "ADDR_W": "ADDR_W",
+                    "prefix": "csrs_",
+                    "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
                 },
             },

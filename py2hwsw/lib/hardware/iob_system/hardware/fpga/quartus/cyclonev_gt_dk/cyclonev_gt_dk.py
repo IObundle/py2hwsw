@@ -76,13 +76,13 @@ def setup(py_params_dict):
                     {"name": "ddr3b_casn_o", "width": "1"},
                     {"name": "ddr3b_wen_o", "width": "1"},
                     {"name": "ddr3b_dm_o", "width": "2"},
-                    {"name": "ddr3b_dq_i", "width": "16"},
+                    {"name": "ddr3b_dq_io", "width": "16"},
                     {"name": "ddr3b_clk_n_o", "width": "1"},
                     {"name": "ddr3b_clk_p_o", "width": "1"},
                     {"name": "ddr3b_cke_o", "width": "1"},
                     {"name": "ddr3b_csn_o", "width": "1"},
-                    {"name": "ddr3b_dqs_n_i", "width": "2"},
-                    {"name": "ddr3b_dqs_p_i", "width": "2"},
+                    {"name": "ddr3b_dqs_n_io", "width": "2"},
+                    {"name": "ddr3b_dqs_p_io", "width": "2"},
                     {"name": "ddr3b_odt_o", "width": "1"},
                     {"name": "ddr3b_resetn_o", "width": "1"},
                 ],
@@ -137,8 +137,8 @@ def setup(py_params_dict):
             "name": "rs232_int",
             "descr": "iob-system uart interface",
             "signals": [
-                {"name": "rxd"},
-                {"name": "txd"},
+                {"name": "rxd_i"},
+                {"name": "txd_o"},
                 {"name": "rs232_rts", "width": "1"},
                 {"name": "high", "width": "1"},
             ],
@@ -149,7 +149,7 @@ def setup(py_params_dict):
             "interface": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W",
+                "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -189,14 +189,14 @@ def setup(py_params_dict):
                 "descr": "DDR3 controller clock and areset inputs",
                 "signals": [
                     {"name": "clk_i"},
-                    {"name": "resetn"},
+                    {"name": "resetn_i"},
                 ],
             },
             {
                 "name": "ddr3_ctr_general",
                 "descr": "DDR3 controller general signals",
                 "signals": [
-                    {"name": "rzqin"},
+                    {"name": "rzqin_i"},
                     {"name": "pll_locked"},
                     {"name": "init_done"},
                 ],
@@ -209,9 +209,9 @@ def setup(py_params_dict):
                 "descr": "AXI bus to connect interconnect and memory",
                 "interface": {
                     "type": "axi",
-                    "wire_prefix": "mem_",
+                    "prefix": "mem_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W",
+                    "ADDR_W": "AXI_ADDR_W - 2",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                 },
@@ -232,10 +232,7 @@ def setup(py_params_dict):
                 "name": "ddio_out_clkbuf_io",
                 "descr": "DDIO clock buffer io",
                 "signals": [
-                    {
-                        "name": "enet_resetn_inv",
-                        "width": "1",
-                    },  # TODO: Connect and invert enet_resetn
+                    {"name": "enet_resetn_inv", "width": "1"},
                     {"name": "low", "width": "1"},
                     {"name": "high"},
                     {"name": "eth_clk"},
@@ -292,7 +289,11 @@ def setup(py_params_dict):
                     "clk_rst_i": "ddr3_ctr_clk_rst",
                     "general": "ddr3_ctr_general",
                     "ddr3": "ddr3",
-                    "s0_axi_s": "axi",
+                    "s0_axi_s": (
+                        "axi",
+                        "{axi_araddr, 2'b0}",
+                        "{axi_awaddr, 2'b0}",
+                    ),
                 },
             },
         ]
@@ -305,7 +306,7 @@ def setup(py_params_dict):
                 "instance_description": "Interconnect instance",
                 "parameters": {
                     "AXI_ID_W": "AXI_ID_W",
-                    "AXI_ADDR_W": "AXI_ADDR_W",
+                    "AXI_ADDR_W": "AXI_ADDR_W - 2",
                     "AXI_DATA_W": "AXI_DATA_W",
                 },
                 "connect": {
@@ -329,7 +330,11 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_i": "clk_i",
                     "rst_i": "reset_sync_arst_out",
-                    "axi_s": "memory_axi",
+                    "axi_s": (
+                        "memory_axi",
+                        "{mem_axi_araddr, 2'b0}",
+                        "{mem_axi_awaddr, 2'b0}",
+                    ),
                 },
             },
         ]
@@ -394,6 +399,7 @@ def setup(py_params_dict):
                 "verilog_code": """
     // Ethernet connections
     assign low = 1'b0;
+    assign enet_resetn_inv = ~enet_resetn_o;
 """,
             },
         ]

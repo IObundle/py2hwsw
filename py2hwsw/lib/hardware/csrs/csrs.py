@@ -60,7 +60,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -68,8 +67,7 @@ def setup(py_params_dict):
                 "name": "control_if_s",
                 "interface": {
                     "type": params["csr_if"],
-                    "subtype": "slave",
-                    "ADDR_W": "ADDR_W",
+                    "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
                 },
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",

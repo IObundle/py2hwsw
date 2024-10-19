@@ -37,7 +37,6 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "interface": {
                     "type": "clk_en_rst",
-                    "subtype": "slave",
                 },
                 "descr": "clock, clock enable and reset",
             },
@@ -45,7 +44,6 @@ def setup(py_params_dict):
                 "name": "iob_s",
                 "interface": {
                     "type": "iob",
-                    "subtype": "slave",
                     "ADDR_W": "4",  # Same as `IOB_NCO_CSRS_ADDR_W
                     "DATA_W": "DATA_W",
                 },
@@ -80,7 +78,7 @@ def setup(py_params_dict):
                 "descr": "Internal CSRs IOb interface",
                 "interface": {
                     "type": "iob",
-                    "wire_prefix": "csrs_",
+                    "prefix": "csrs_",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },

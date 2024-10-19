@@ -82,8 +82,7 @@ def setup(py_params_dict):
                 "name": "s_axi_s",
                 "interface": {
                     "type": "axi",
-                    "subtype": "slave",
-                    "port_prefix": "s_",
+                    "prefix": "s_",
                     "mult": "S_COUNT",
                     "ID_W": "ID_WIDTH",
                     "ADDR_W": "ADDR_WIDTH",
@@ -102,8 +101,7 @@ def setup(py_params_dict):
                 "name": "m_axi_m",
                 "interface": {
                     "type": "axi",
-                    "subtype": "master",
-                    "port_prefix": "m_",
+                    "prefix": "m_",
                     "mult": "M_COUNT",
                     "ID_W": "ID_WIDTH",
                     "ADDR_W": "ADDR_WIDTH",

@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+set PART xcku040-fbva676-1-c
+
 if {$N_INTERCONNECT_SLAVES eq ""} {
     set N_INTERCONNECT_SLAVES 1 ; # Default value when not provided
 }

@@ -7,7 +7,11 @@
 # This makefile simulates the hardware modules in this repo
 #
 
-
+BUILD_DIR ?=build
+INIT_MEM ?= 1
+USE_EXTMEM ?= 0
+BOARD ?= aes_ku040_db_g
+ 
 # Used by test.sh
 LIB_DIR:=.
 export LIB_DIR
@@ -36,8 +40,12 @@ sim-clean:
 print-attr:
 	nix-shell --run "VCD=$(VCD) SETUP_ARGS='print_attr' scripts/test.sh $(CORE)"
 
+fpga-build:
+	nix-shell --run "make clean setup CORE=$(CORE) INIT_MEM=$(INIT_MEM) USE_EXTMEM=$(USE_EXTMEM) && make -C $(BUILD_DIR) fpga-fw-build BOARD=$(BOARD)"
+	make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean
+
+.PHONY: all setup sim-build sim-run sim-test sim-clean print-attr fpga-build fpga-clean
 
 
 # Install board server and client

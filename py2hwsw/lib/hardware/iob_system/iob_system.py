@@ -31,7 +31,7 @@ def setup(py_params_dict):
         "name": params["name"],
         "version": "0.7",
         "is_system": True,
-        "board_list": [],
+        "board_list": ["aes_ku040_db_g"],
         "confs": [
             # macros
             {  # Needed for testbench

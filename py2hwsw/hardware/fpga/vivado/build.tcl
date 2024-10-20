@@ -21,11 +21,8 @@ foreach file [split $VSRC \ ] {
     }
 }
 
-#read board propreties
+#read board properties
 source vivado/$BOARD/board.tcl
-
-#set FPGA device
-set_property part $PART [current_project]
 
 
 #set pre-map custom assignments

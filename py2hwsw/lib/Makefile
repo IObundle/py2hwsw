@@ -23,7 +23,7 @@ CORE ?=iob_ctls
 all: sim-test
 
 setup:
-	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --no_verilog_lint"
+	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --no_verilog_lint --py_params 'init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM)'"
 
 sim-build:
 	nix-shell --run "scripts/test.sh build $(CORE)"

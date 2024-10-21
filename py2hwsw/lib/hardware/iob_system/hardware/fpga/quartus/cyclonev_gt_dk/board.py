@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+# Copied from py2 'board.py'
 bsp = [
     {"name": "BAUD", "type": "M", "val": "115200"},
     {"name": "FREQ", "type": "M", "val": "50000000"},
@@ -50,7 +51,8 @@ def setup(py_params_dict):
                 "min": "1",
                 "max": "32",
             },
-        ],
+        ]
+        + bsp,
     }
     #
     # Ports

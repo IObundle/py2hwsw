@@ -107,8 +107,8 @@ if {$IS_FPGA != "1"} {
 }
 
 #read post-synthesis script
-if {[file exists "quartus/quartus\_postmap.tcl"]} {
-    source quartus/quartus\_postmap.tcl
+if {[file exists "quartus/postmap.tcl"]} {
+    source quartus/postmap.tcl
 }
 
 #read implementation design constraints

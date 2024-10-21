@@ -57,8 +57,8 @@ if { $IS_FPGA == "1" } {
 }
 
 #set post-map custom assignments
-if {[file exists "vivado/vivado_postmap.tcl"]} {
-    source "vivado/vivado_postmap.tcl"
+if {[file exists "vivado/postmap.tcl"]} {
+    source "vivado/postmap.tcl"
 }
 
 opt_design

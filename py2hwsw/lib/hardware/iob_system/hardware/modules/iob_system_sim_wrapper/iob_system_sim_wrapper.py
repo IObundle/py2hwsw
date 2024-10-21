@@ -51,14 +51,14 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "interface": {
+            "signals": {
                 "type": "clk_en_rst",
             },
         },
         {
             "name": "uart_s",
             "descr": "Testbench uart csrs interface",
-            "interface": {
+            "signals": {
                 "type": "iob",
                 "prefix": "uart_",
                 "ADDR_W": 3,
@@ -70,7 +70,7 @@ def setup(py_params_dict):
             {
                 "name": "ethernet_s",
                 "descr": "Testbench ethernet csrs interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "ethernet_",
                 },
@@ -84,7 +84,7 @@ def setup(py_params_dict):
         {
             "name": "rs232",
             "descr": "rs232 bus",
-            "interface": {
+            "signals": {
                 "type": "rs232",
             },
         },
@@ -101,7 +101,7 @@ def setup(py_params_dict):
         {
             "name": "axi",
             "descr": "AXI bus to connect SoC to interconnect",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W - 2",
@@ -127,7 +127,7 @@ def setup(py_params_dict):
         {
             "name": "memory_axi",
             "descr": "AXI bus to connect interconnect and memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "mem_",
                 "ID_W": "AXI_ID_W",
@@ -143,7 +143,7 @@ def setup(py_params_dict):
             {
                 "name": "eth_axi",
                 "descr": "Ethernet AXI bus",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": "eth_",
                 },

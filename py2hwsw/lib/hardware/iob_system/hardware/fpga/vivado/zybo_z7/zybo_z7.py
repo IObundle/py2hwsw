@@ -85,28 +85,28 @@ def setup(py_params_dict):
         {
             "name": "ps_clk_rst",
             "descr": "Clock and reset",
-            "interface": {
+            "signals": {
                 "type": "clk_rst",
             },
         },
         {
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
-            "interface": {
+            "signals": {
                 "type": "clk_en_rst",
             },
         },
         {
             "name": "rs232_int",
             "descr": "iob-system uart interface",
-            "interface": {
+            "signals": {
                 "type": "rs232",
             },
         },
         {
             "name": "axi",
             "descr": "AXI interface to connect SoC to memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W - 2",
@@ -117,7 +117,7 @@ def setup(py_params_dict):
         {
             "name": "intercon_m_clk_rst",
             "descr": "AXI interconnect clock and reset inputs",
-            "interface": {
+            "signals": {
                 "type": "clk_rst",
                 "prefix": "intercon_m_",
             },
@@ -125,7 +125,7 @@ def setup(py_params_dict):
         {
             "name": "ps_axi",
             "descr": "AXI bus to connect interconnect and memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "mem_",
                 "ID_W": "AXI_ID_W",

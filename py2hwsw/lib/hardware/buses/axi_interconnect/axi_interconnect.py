@@ -80,7 +80,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "s_axi_s",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": "s_",
                     "mult": "S_COUNT",
@@ -91,15 +91,10 @@ def setup(py_params_dict):
                     "LOCK_W": 1,
                 },
                 "descr": "AXI slave interface",
-                "signals": [
-                    {"name": "s_axi_awuser_i", "width": "S_COUNT"},
-                    {"name": "s_axi_wuser_i", "width": "S_COUNT"},
-                    {"name": "s_axi_aruser_i", "width": "S_COUNT"},
-                ],
             },
             {
                 "name": "m_axi_m",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": "m_",
                     "mult": "M_COUNT",
@@ -110,10 +105,6 @@ def setup(py_params_dict):
                     "LOCK_W": 1,
                 },
                 "descr": "AXI master interface",
-                "signals": [
-                    {"name": "m_axi_buser_i", "width": "M_COUNT"},
-                    {"name": "m_axi_ruser_i", "width": "M_COUNT"},
-                ],
             },
         ],
         "blocks": [

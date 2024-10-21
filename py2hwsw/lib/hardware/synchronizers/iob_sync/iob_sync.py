@@ -27,7 +27,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_rst",
                 },
                 "descr": "Clock and reset",

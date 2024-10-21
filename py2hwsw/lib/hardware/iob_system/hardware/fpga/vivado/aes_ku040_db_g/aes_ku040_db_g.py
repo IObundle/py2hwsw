@@ -124,7 +124,7 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
-            "interface": {
+            "signals": {
                 "type": "clk_en_rst",
             },
         },
@@ -141,7 +141,7 @@ def setup(py_params_dict):
         {
             "name": "axi",
             "descr": "AXI interface to connect SoC to memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W - 2",
@@ -179,7 +179,7 @@ def setup(py_params_dict):
         {
             "name": "memory_axi",
             "descr": "AXI bus to connect interconnect and memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "mem_",
                 "ID_W": "AXI_ID_W",

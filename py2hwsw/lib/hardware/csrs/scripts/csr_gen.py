@@ -546,7 +546,7 @@ class csr_gen:
             {
                 "name": "internal_iob",
                 "descr": "Internal iob interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "internal_",
                     "ADDR_W": "ADDR_W",

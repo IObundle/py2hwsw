@@ -10,7 +10,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_rst",
                 },
                 "descr": "Clock and reset",
@@ -36,7 +36,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "rs232_m",
-                "interface": {
+                "signals": {
                     "type": "rs232",
                 },
                 "descr": "RS232 interface",

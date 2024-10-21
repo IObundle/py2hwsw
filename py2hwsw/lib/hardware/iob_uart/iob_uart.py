@@ -39,14 +39,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "cbus_s",
-                "interface": {
+                "signals": {
                     "type": CSR_IF,
                     "ADDR_W": 3 - 2,  # Same as `IOB_UART_CSRS_ADDR_W - 2 lsbs
                     "DATA_W": "DATA_W",
@@ -55,7 +55,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "rs232_m",
-                "interface": {
+                "signals": {
                     "type": "rs232",
                 },
                 "descr": "RS232 interface",
@@ -65,7 +65,7 @@ def setup(py_params_dict):
             {
                 "name": "csrs_iob",
                 "descr": "Internal iob interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "csrs_",
                     "ADDR_W": "ADDR_W - 2",

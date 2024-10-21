@@ -145,7 +145,7 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "interface": {
+            "signals": {
                 "type": "clk_en_rst",
             },
         },
@@ -170,7 +170,7 @@ def setup(py_params_dict):
         {
             "name": "axi_m",
             "descr": "AXI master interface for memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W-2",
@@ -183,7 +183,7 @@ def setup(py_params_dict):
         {
             "name": "rs232_m",
             "descr": "iob-system uart interface",
-            "interface": {
+            "signals": {
                 "type": "rs232",
             },
         },
@@ -215,7 +215,7 @@ def setup(py_params_dict):
         {
             "name": "cpu_ibus",
             "descr": "CPU instruction bus",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "cpu_i_",
                 "ID_W": "AXI_ID_W",
@@ -228,7 +228,7 @@ def setup(py_params_dict):
         {
             "name": "cpu_dbus",
             "descr": "CPU data bus",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "cpu_d_",
                 "ID_W": "AXI_ID_W",
@@ -248,7 +248,7 @@ def setup(py_params_dict):
         {
             "name": "bootrom_cbus",
             "descr": "iob-system boot controller data interface",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "bootrom_",
                 "ID_W": "AXI_ID_W",
@@ -261,7 +261,7 @@ def setup(py_params_dict):
         {
             "name": "axi_periphs_cbus",
             "descr": "AXI bus for peripheral CSRs",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
@@ -273,7 +273,7 @@ def setup(py_params_dict):
         {
             "name": "iob_periphs_cbus",
             "descr": "AXI-Lite bus for peripheral CSRs",
-            "interface": {
+            "signals": {
                 "type": "iob",
                 "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",

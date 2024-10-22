@@ -291,8 +291,10 @@ def setup(py_params_dict):
                     "ddr3": "ddr3",
                     "s0_axi_s": (
                         "axi",
-                        "{axi_araddr, 2'b0}",
-                        "{axi_awaddr, 2'b0}",
+                        [
+                            "{axi_araddr, 2'b0}",
+                            "{axi_awaddr, 2'b0}",
+                        ],
                     ),
                 },
             },
@@ -332,8 +334,10 @@ def setup(py_params_dict):
                     "rst_i": "reset_sync_arst_out",
                     "axi_s": (
                         "memory_axi",
-                        "{mem_axi_araddr, 2'b0}",
-                        "{mem_axi_awaddr, 2'b0}",
+                        [
+                            "{mem_axi_araddr, 2'b0}",
+                            "{mem_axi_awaddr, 2'b0}",
+                        ],
                     ),
                 },
             },

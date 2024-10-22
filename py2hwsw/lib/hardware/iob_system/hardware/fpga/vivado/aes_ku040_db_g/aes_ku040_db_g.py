@@ -323,8 +323,10 @@ def setup(py_params_dict):
                     "axi_clk_rst": "ddr4_axi_clk_rst",
                     "axi_s": (
                         "memory_axi",
-                        "{mem_axi_araddr, 2'b0}",
-                        "{mem_axi_awaddr, 2'b0}",
+                        [
+                            "{mem_axi_araddr, 2'b0}",
+                            "{mem_axi_awaddr, 2'b0}",
+                        ],
                     ),
                     "ddr4": "ddr4_pins",
                 },
@@ -361,8 +363,10 @@ def setup(py_params_dict):
                     "rst_i": "axi_ram_rst",
                     "axi_s": (
                         "memory_axi",
-                        "{mem_axi_araddr, 2'b0}",
-                        "{mem_axi_awaddr, 2'b0}",
+                        [
+                            "{mem_axi_araddr, 2'b0}",
+                            "{mem_axi_awaddr, 2'b0}",
+                        ],
                     ),
                 },
             },

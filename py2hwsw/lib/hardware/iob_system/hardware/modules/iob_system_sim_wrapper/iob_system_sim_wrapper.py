@@ -206,7 +206,9 @@ def setup(py_params_dict):
                 "clk_en_rst_s": "clk_en_rst_s",
                 "cbus_s": (
                     "uart_s",
-                    "uart_iob_addr_i[3-1:2]",
+                    [
+                        "uart_iob_addr_i[3-1:2]",
+                    ],
                 ),
                 "rs232_m": "rs232_invert",
             },
@@ -226,8 +228,10 @@ def setup(py_params_dict):
                 "rst_i": "rst",
                 "s0_axi_s": (
                     "axi",
-                    "axi_awlock[0]",
-                    "axi_arlock[0]",
+                    [
+                        "axi_awlock[0]",
+                        "axi_arlock[0]",
+                    ],
                 ),
                 "m0_axi_m": "memory_axi",
             },
@@ -247,10 +251,12 @@ def setup(py_params_dict):
                 "rst_i": "rst",
                 "axi_s": (
                     "memory_axi",
-                    "{mem_axi_araddr, 2'b0}",
-                    "{mem_axi_awaddr, 2'b0}",
-                    "{1'b0, mem_axi_arlock}",
-                    "{1'b0, mem_axi_awlock}",
+                    [
+                        "{mem_axi_araddr, 2'b0}",
+                        "{mem_axi_awaddr, 2'b0}",
+                        "{1'b0, mem_axi_arlock}",
+                        "{1'b0, mem_axi_awlock}",
+                    ],
                 ),
             },
         },

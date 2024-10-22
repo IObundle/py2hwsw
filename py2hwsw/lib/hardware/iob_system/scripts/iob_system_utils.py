@@ -192,7 +192,9 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
         # Connect cbus to peripheral
         peripheral["ref"]["connect"]["cbus_s"] = (
             f"{peripheral_name}_cbus",
-            f"{peripheral_name}_cbus_iob_addr[{peripheral['addr_w']-2}-1:0]",
+            [
+                f"{peripheral_name}_cbus_iob_addr[{peripheral['addr_w']-2}-1:0]",
+            ],
         )
 
     # Add CLINT and PLIC wires (they are not in peripherals list)

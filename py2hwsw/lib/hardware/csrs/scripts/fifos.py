@@ -579,11 +579,15 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 "connect": {
                     "write": (
                         f"{fifo_name}_write",
-                        f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
+                        [
+                            f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
+                        ],
                     ),
                     "read": (
                         f"{fifo_name}_read",
-                        f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
+                        [
+                            f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
+                        ],
                     ),
                     "extmem": f"{fifo_name}_extmem",
                 },

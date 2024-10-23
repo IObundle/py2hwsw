@@ -83,10 +83,12 @@ def setup(py_params_dict):
             "core_name": "axi_ram",
             "instance_name": "internal_memory",
             "instance_description": "Internal memory",
+            "if_defined": "IOB_MEM_NO_READ_ON_WRITE",
             "parameters": {
                 "ID_WIDTH": "AXI_ID_W",
-                "ADDR_WIDTH": "AXI_ADDR_W",
+                "ADDR_WIDTH": params["fw_addr_w"],
                 "DATA_WIDTH": "AXI_DATA_W",
+                "READ_ON_WRITE": 0,
             },
             "connect": {
                 "clk_i": "clk",
@@ -109,6 +111,17 @@ def setup(py_params_dict):
                 "FILE": f'"{params["name"]}_firmware"',
             }
         )
+
+    # Copy axi_ram block, but with READ_ON_WRITE=1
+    attributes_dict["blocks"].append(copy.deepcopy(attributes_dict["blocks"][-1]))
+    attributes_dict["blocks"][-1].pop("if_defined")
+    attributes_dict["blocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"
+    attributes_dict["blocks"][-1]["parameters"].update(
+        {
+            "READ_ON_WRITE": 1,
+        }
+    )
+
     attributes_dict["blocks"].append(
         # IOb-System
         {

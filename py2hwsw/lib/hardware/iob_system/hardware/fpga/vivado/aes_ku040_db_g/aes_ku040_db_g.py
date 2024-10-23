@@ -33,7 +33,7 @@ def setup(py_params_dict):
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
                 "type": "F",
-                "val": "`DDR_ADDR_W" if params["use_extmem"] else "20",
+                "val": "`DDR_ADDR_W",
                 "min": "1",
                 "max": "32",
             },

@@ -174,7 +174,7 @@ def setup(py_params_dict):
                 "type": "axi",
                 "prefix": "int_mem_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W-2",
+                "ADDR_W": f"{params['fw_addr_w']}-2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": 1,
@@ -355,7 +355,7 @@ def setup(py_params_dict):
                 "AXI_ID_W": "AXI_ID_W",
                 "AXI_ADDR_W": params["addr_w"] - 2,
                 "AXI_DATA_W": "AXI_DATA_W",
-                "INT_MEM_ADDR_W": "AXI_ADDR_W - 2",
+                "INT_MEM_ADDR_W": f"{params['fw_addr_w']} - 2",
             },
             "connect": {
                 "clk_i": "clk",

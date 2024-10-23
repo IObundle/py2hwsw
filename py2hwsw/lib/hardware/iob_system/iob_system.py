@@ -168,17 +168,35 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "axi_m",
-            "descr": "AXI master interface for memory",
+            "name": "int_mem_axi_m",
+            "descr": "AXI master interface for internal memory",
             "signals": {
                 "type": "axi",
+                "prefix": "int_mem_",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W-2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
-                "LOCK_W": "AXI_LEN_W",
+                "LOCK_W": 1,
             },
         },
+    ]
+    if params["use_extmem"]:
+        attributes_dict["ports"] += [
+            {
+                "name": "axi_m",
+                "descr": "AXI master interface for DDR memory",
+                "signals": {
+                    "type": "axi",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": "AXI_ADDR_W-2",
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                    "LOCK_W": "AXI_LEN_W",
+                },
+            },
+        ]
+    attributes_dict["ports"] += [
         # Peripheral IO ports
         {
             "name": "rs232_m",
@@ -337,20 +355,14 @@ def setup(py_params_dict):
                 "AXI_ID_W": "AXI_ID_W",
                 "AXI_ADDR_W": params["addr_w"] - 2,
                 "AXI_DATA_W": "AXI_DATA_W",
-                "MEM_ADDR_W": "AXI_ADDR_W - 2",
+                "INT_MEM_ADDR_W": "AXI_ADDR_W - 2",
             },
             "connect": {
                 "clk_i": "clk",
                 "rst_i": "rst",
                 "s0_axi_s": "cpu_ibus",
                 "s1_axi_s": "cpu_dbus",
-                "mem_axi_m": (
-                    "axi_m",
-                    [
-                        "axi_arlock_o[0]",
-                        "axi_awlock_o[0]",
-                    ],
-                ),
+                "int_mem_axi_m": "int_mem_axi_m",
                 "bootrom_axi_m": "bootrom_cbus",
                 "peripherals_axi_m": (
                     "axi_periphs_cbus",
@@ -362,11 +374,35 @@ def setup(py_params_dict):
             },
             "num_slaves": 2,
             "masters": {
-                "mem": params["addr_w"] - 2 - 2,
+                "int_mem": params["addr_w"] - 2 - 2,
                 "bootrom": params["addr_w"] - 2 - 2,
                 "peripherals": params["addr_w"] - 2 - 1,
             },
         },
+    ]
+    if params["use_extmem"]:
+        attributes_dict["blocks"][-1]["parameters"].update(
+            {
+                "MEM_ADDR_W": "AXI_ADDR_W - 2",
+            }
+        )
+        attributes_dict["blocks"][-1]["connect"].update(
+            {
+                "mem_axi_m": (
+                    "axi_m",
+                    [
+                        "axi_arlock_o[0]",
+                        "axi_awlock_o[0]",
+                    ],
+                ),
+            }
+        )
+        attributes_dict["blocks"][-1]["masters"].pop("int_mem")
+        attributes_dict["blocks"][-1]["masters"] = {
+            "int_mem": params["addr_w"] - 2 - 3,
+            "mem": params["addr_w"] - 2 - 3,
+        } | attributes_dict["blocks"][-1]["masters"]
+    attributes_dict["blocks"] += [
         {
             "core_name": "iob_bootrom",
             "instance_name": "bootrom",

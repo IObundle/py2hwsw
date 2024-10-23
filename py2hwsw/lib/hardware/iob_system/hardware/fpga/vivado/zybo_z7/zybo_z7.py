@@ -104,17 +104,6 @@ def setup(py_params_dict):
             },
         },
         {
-            "name": "axi",
-            "descr": "AXI interface to connect SoC to memory",
-            "signals": {
-                "type": "axi",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W - 2",
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-            },
-        },
-        {
             "name": "intercon_m_clk_rst",
             "descr": "AXI interconnect clock and reset inputs",
             "signals": {
@@ -136,6 +125,20 @@ def setup(py_params_dict):
             },
         },
     ]
+    if params["use_extmem"]:
+        attributes_dict["wires"] += [
+            {
+                "name": "axi",
+                "descr": "AXI interface to connect SoC to memory",
+                "signals": {
+                    "type": "axi",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                },
+            },
+        ]
 
     #
     # Blocks
@@ -155,31 +158,34 @@ def setup(py_params_dict):
             "connect": {
                 "clk_en_rst_s": "clk_en_rst",
                 "rs232_m": "rs232_int",
-                "axi_m": "axi",
             },
             "dest_dir": "hardware/common_src",
             "iob_system_params": params,
         },
-        {
-            "core_name": "xilinx_axi_interconnect",
-            "instance_name": "axi_async_bridge",
-            "instance_description": "Interconnect instance",
-            "parameters": {
-                "AXI_ID_W": "AXI_ID_W",
-                "AXI_LEN_W": "AXI_LEN_W",
-                "AXI_ADDR_W": "AXI_ADDR_W - 2",
-                "AXI_DATA_W": "AXI_DATA_W",
-            },
-            "connect": {
-                "clk_rst_s": "ps_clk_rst",
-                "m0_clk_rst": "intercon_m_clk_rst",
-                "m0_axi_m": "ps_axi",
-                "s0_clk_rst": "ps_clk_rst",
-                "s0_axi_s": "axi",
-            },
-            "num_slaves": 1,
-        },
     ]
+    if params["use_extmem"]:
+        attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
+        attributes_dict["blocks"] += [
+            {
+                "core_name": "xilinx_axi_interconnect",
+                "instance_name": "axi_async_bridge",
+                "instance_description": "Interconnect instance",
+                "parameters": {
+                    "AXI_ID_W": "AXI_ID_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
+                    "AXI_ADDR_W": "AXI_ADDR_W - 2",
+                    "AXI_DATA_W": "AXI_DATA_W",
+                },
+                "connect": {
+                    "clk_rst_s": "ps_clk_rst",
+                    "m0_clk_rst": "intercon_m_clk_rst",
+                    "m0_axi_m": "ps_axi",
+                    "s0_clk_rst": "ps_clk_rst",
+                    "s0_axi_s": "axi",
+                },
+                "num_slaves": 1,
+            },
+        ]
 
     #
     # Snippets

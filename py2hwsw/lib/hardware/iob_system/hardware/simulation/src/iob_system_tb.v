@@ -37,9 +37,9 @@ module iob_system_tb;
    //IOb-SoC uart
    reg                              iob_valid_i;
    reg  [`IOB_UART_CSRS_ADDR_W-1:0] iob_addr_i;
-   reg  [      `IOB_SYSTEM_DATA_W-1:0] iob_wdata_i;
+   reg  [   `IOB_SYSTEM_DATA_W-1:0] iob_wdata_i;
    reg  [                      3:0] iob_wstrb_i;
-   wire [      `IOB_SYSTEM_DATA_W-1:0] iob_rdata_o;
+   wire [   `IOB_SYSTEM_DATA_W-1:0] iob_rdata_o;
    wire                             iob_ready_o;
    wire                             iob_rvalid_o;
 
@@ -121,9 +121,9 @@ module iob_system_tb;
    //IOb-SoC ethernet
    wire                            ethernet_iob_valid;
    wire [`IOB_ETH_CSRS_ADDR_W-1:0] ethernet_iob_addr;
-   wire [     `IOB_SYSTEM_DATA_W-1:0] ethernet_iob_wdata;
+   wire [  `IOB_SYSTEM_DATA_W-1:0] ethernet_iob_wdata;
    wire [                     3:0] ethernet_iob_wstrb;
-   wire [     `IOB_SYSTEM_DATA_W-1:0] ethernet_iob_rdata;
+   wire [  `IOB_SYSTEM_DATA_W-1:0] ethernet_iob_rdata;
    wire                            ethernet_iob_ready;
    wire                            ethernet_iob_rvalid;
 
@@ -141,7 +141,7 @@ module iob_system_tb;
 `endif
 
 
-   iob_system_sim_wrapper iob_system_sim_wrapper (
+   iob_sim iob_system_sim_wrapper (
       .clk_i (clk),
       .cke_i (1'b1),
       .arst_i(arst),

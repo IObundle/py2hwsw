@@ -5,3 +5,11 @@ bsp = [
     {"name": "DDR_ADDR_W", "type": "M", "val": "24"},
     {"name": "SIMULATION", "type": "M", "val": "1"},
 ]
+
+
+def setup(py_params_dict):
+    attributes_dict = {
+        "confs": bsp,
+    }
+
+    return attributes_dict

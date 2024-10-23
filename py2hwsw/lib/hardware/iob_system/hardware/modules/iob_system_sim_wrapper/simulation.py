@@ -50,7 +50,8 @@ def setup(py_params_dict):
                 "min": "1",
                 "max": "32",
             },
-        ],
+        ]
+        + bsp,
     }
     #
     # Ports

@@ -131,7 +131,7 @@ def setup(py_params_dict):
             {
                 "name": f"s{i}_axi_s",
                 "descr": f"Slave {i} interface",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",
@@ -158,7 +158,7 @@ def setup(py_params_dict):
             {
                 "name": f"{name}_axi_m",
                 "descr": f"Master '{name}' axi interface",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": f"{name}_",
                     "ID_W": "AXI_ID_W",
@@ -184,7 +184,7 @@ def setup(py_params_dict):
         {
             "name": "interconnect_s_axi",
             "descr": "AXI slave bus for interconnect",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "intercon_s_",
                 "mult": N_SLAVES,
@@ -193,16 +193,11 @@ def setup(py_params_dict):
                 "DATA_W": "AXI_DATA_W",
                 "LOCK_W": 1,
             },
-            "signals": [
-                {"name": "intercon_s_axi_awuser", "width": N_SLAVES},
-                {"name": "intercon_s_axi_wuser", "width": N_SLAVES},
-                {"name": "intercon_s_axi_aruser", "width": N_SLAVES},
-            ],
         },
         {
             "name": "interconnect_m_axi",
             "descr": "AXI master bus for interconnect",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "intercon_m_",
                 "mult": len(MASTERS),
@@ -211,10 +206,6 @@ def setup(py_params_dict):
                 "DATA_W": "AXI_DATA_W",
                 "LOCK_W": 1,
             },
-            "signals": [
-                {"name": "intercon_m_axi_buser", "width": len(MASTERS)},
-                {"name": "intercon_m_axi_ruser", "width": len(MASTERS)},
-            ],
         },
     ]
     #
@@ -248,8 +239,8 @@ def setup(py_params_dict):
         assign_str = ""
         for port in slave_axi_ports:
             prefix = ""
-            if "prefix" in port["interface"]:
-                prefix = port["interface"]["prefix"]
+            if "prefix" in port["signals"]:
+                prefix = port["signals"]["prefix"]
             assign_str = f"{prefix}axi_{sig_name}_i, " + assign_str
         assign_str = assign_str[:-2]
         verilog_code += (
@@ -259,8 +250,8 @@ def setup(py_params_dict):
     for sig_name, sig_size in AXI_OUT_SIGNAL_NAMES:
         for idx, port in enumerate(slave_axi_ports):
             prefix = ""
-            if "prefix" in port["interface"]:
-                prefix = port["interface"]["prefix"]
+            if "prefix" in port["signals"]:
+                prefix = port["signals"]["prefix"]
             bit_select = ""
             if type(sig_size) is not int or sig_size > 1:
                 bit_select = f"[{idx}*{sig_size}+:{sig_size}]"

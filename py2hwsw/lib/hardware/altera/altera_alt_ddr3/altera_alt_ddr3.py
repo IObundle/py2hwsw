@@ -90,7 +90,7 @@ def setup(py_params_dict):
         attributes_dict["ports"] += [
             {
                 "name": f"s{i}_axi_s",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",

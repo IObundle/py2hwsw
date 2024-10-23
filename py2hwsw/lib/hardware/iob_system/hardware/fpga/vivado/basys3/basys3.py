@@ -95,7 +95,7 @@ def setup(py_params_dict):
         {
             "name": "axi",
             "descr": "AXI interface to connect SoC to memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W - 2",
@@ -106,7 +106,7 @@ def setup(py_params_dict):
         {
             "name": "memory_axi",
             "descr": "AXI bus to connect interconnect and memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "mem_",
                 "ID_W": "AXI_ID_W",

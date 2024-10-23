@@ -39,7 +39,7 @@ def setup(py_params_dict):
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
                 "type": "F",
-                "val": "`DDR_ADDR_W" if params["use_extmem"] else "15",
+                "val": "`DDR_ADDR_W",
                 "min": "1",
                 "max": "32",
             },
@@ -155,17 +155,6 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "axi",
-            "descr": "AXI interface to connect SoC to memory",
-            "interface": {
-                "type": "axi",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W - 2",
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-            },
-        },
-        {
             "name": "reset_sync_clk_rst",
             "descr": "Reset synchronizer inputs",
             "signals": [
@@ -194,6 +183,17 @@ def setup(py_params_dict):
 
     if params["use_extmem"]:
         attributes_dict["wires"] += [
+            {
+                "name": "axi",
+                "descr": "AXI interface to connect SoC to memory",
+                "signals": {
+                    "type": "axi",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                },
+            },
             # DDR3 ctrl
             {
                 "name": "ddr3_ctr_clk_rst",
@@ -211,21 +211,6 @@ def setup(py_params_dict):
                     {"name": "pll_locked"},
                     {"name": "init_done"},
                 ],
-            },
-        ]
-    if not params["use_extmem"]:
-        attributes_dict["wires"] += [
-            {
-                "name": "memory_axi",
-                "descr": "AXI bus to connect interconnect and memory",
-                "interface": {
-                    "type": "axi",
-                    "prefix": "mem_",
-                    "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W - 2",
-                    "DATA_W": "AXI_DATA_W",
-                    "LEN_W": "AXI_LEN_W",
-                },
             },
         ]
     if params["use_ethernet"]:
@@ -268,11 +253,14 @@ def setup(py_params_dict):
             "connect": {
                 "clk_en_rst_s": "clk_en_rst",
                 "rs232_m": "rs232_int",
-                "axi_m": "axi",
             },
             "dest_dir": "hardware/common_src",
             "iob_system_params": params,
         },
+    ]
+    if params["use_extmem"]:
+        attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
+    attributes_dict["blocks"] += [
         {
             "core_name": "iob_reset_sync",
             "instance_name": "rst_sync",
@@ -302,59 +290,14 @@ def setup(py_params_dict):
                     "ddr3": "ddr3",
                     "s0_axi_s": (
                         "axi",
-                        "{axi_araddr, 2'b0}",
-                        "{axi_awaddr, 2'b0}",
+                        [
+                            "{axi_araddr, 2'b0}",
+                            "{axi_awaddr, 2'b0}",
+                        ],
                     ),
                 },
             },
         ]
-    if not params["use_extmem"]:
-        attributes_dict["blocks"] += [
-            {
-                "core_name": "axi_interconnect_wrapper",
-                "name": "fpga_axi_interconnect_wrapper",
-                "instance_name": "axi_interconnect",
-                "instance_description": "Interconnect instance",
-                "parameters": {
-                    "AXI_ID_W": "AXI_ID_W",
-                    "AXI_ADDR_W": "AXI_ADDR_W - 2",
-                    "AXI_DATA_W": "AXI_DATA_W",
-                },
-                "connect": {
-                    "clk_i": "clk_i",
-                    "rst_i": "reset_sync_arst_out",
-                    "s0_axi_s": "axi",
-                    "m0_axi_m": "memory_axi",
-                },
-                "num_slaves": 1,
-            },
-            {
-                "core_name": "axi_ram",
-                "instance_name": "ddr_model_mem",
-                "instance_description": "DDR model memory",
-                "parameters": {
-                    "ID_WIDTH": "AXI_ID_W",
-                    "ADDR_WIDTH": "AXI_ADDR_W",
-                    "DATA_WIDTH": "AXI_DATA_W",
-                    "READ_ON_WRITE": "0",
-                },
-                "connect": {
-                    "clk_i": "clk_i",
-                    "rst_i": "reset_sync_arst_out",
-                    "axi_s": (
-                        "memory_axi",
-                        "{mem_axi_araddr, 2'b0}",
-                        "{mem_axi_awaddr, 2'b0}",
-                    ),
-                },
-            },
-        ]
-        if params["init_mem"]:
-            attributes_dict["blocks"][-1]["parameters"].update(
-                {
-                    "FILE": f'"{params["name"]}_firmware"',
-                }
-            )
     if params["use_ethernet"]:
         # Eth clock
         attributes_dict["blocks"] += [
@@ -416,149 +359,3 @@ def setup(py_params_dict):
         ]
 
     return attributes_dict
-
-
-# TODO: Add slave ports to alt_ddr3.qsys, based on number of extmem connections
-#
-# def modify_alt_ddr3_qsys(qsys_path, num_extmem_connections):
-#     with open(qsys_path, "r") as f:
-#         lines = f.readlines()
-#     new_lines = []
-#
-#     for line in lines:
-#         new_lines.append(line)
-#         if "element clk_0" in line:
-#             for i in range(1, num_extmem_connections):
-#                 new_lines.insert(
-#                     -1,
-#                     f"""
-#        element axi_bridge_{i}
-#        {{
-#           datum _sortIndex
-#           {{
-#              value = "{i+2}";
-#              type = "int";
-#           }}
-#        }}
-#                              \n""",
-#                 )
-#         elif 'interface name="clk"' in line:
-#             for i in range(1, num_extmem_connections):
-#                 new_lines.insert(
-#                     -1,
-#                     f"""
-#  <interface
-#    name="axi_bridge_{i}_s0"
-#    internal="axi_bridge_{i}.s0"
-#    type="axi4"
-#    dir="end" />
-#                              \n""",
-#                 )
-#         elif 'module name="clk_0"' in line:
-#             for i in range(1, num_extmem_connections):
-#                 new_lines.insert(
-#                     -1,
-#                     f"""
-#  <module
-#    name="axi_bridge_{i}"
-#    kind="altera_axi_bridge"
-#    version="20.1"
-#    enabled="1">
-#   <parameter name="ADDR_WIDTH" value="28" />
-#   <parameter name="AXI_VERSION" value="AXI4" />
-#   <parameter name="COMBINED_ACCEPTANCE_CAPABILITY" value="16" />
-#   <parameter name="COMBINED_ISSUING_CAPABILITY" value="16" />
-#   <parameter name="DATA_WIDTH" value="32" />
-#   <parameter name="M0_ID_WIDTH" value="1" />
-#   <parameter name="READ_ACCEPTANCE_CAPABILITY" value="16" />
-#   <parameter name="READ_ADDR_USER_WIDTH" value="64" />
-#   <parameter name="READ_DATA_REORDERING_DEPTH" value="1" />
-#   <parameter name="READ_DATA_USER_WIDTH" value="64" />
-#   <parameter name="READ_ISSUING_CAPABILITY" value="16" />
-#   <parameter name="S0_ID_WIDTH" value="1" />
-#   <parameter name="USE_M0_ARBURST" value="1" />
-#   <parameter name="USE_M0_ARCACHE" value="1" />
-#   <parameter name="USE_M0_ARID" value="1" />
-#   <parameter name="USE_M0_ARLEN" value="1" />
-#   <parameter name="USE_M0_ARLOCK" value="1" />
-#   <parameter name="USE_M0_ARQOS" value="0" />
-#   <parameter name="USE_M0_ARREGION" value="0" />
-#   <parameter name="USE_M0_ARSIZE" value="1" />
-#   <parameter name="USE_M0_ARUSER" value="0" />
-#   <parameter name="USE_M0_AWBURST" value="1" />
-#   <parameter name="USE_M0_AWCACHE" value="1" />
-#   <parameter name="USE_M0_AWID" value="1" />
-#   <parameter name="USE_M0_AWLEN" value="1" />
-#   <parameter name="USE_M0_AWLOCK" value="1" />
-#   <parameter name="USE_M0_AWQOS" value="0" />
-#   <parameter name="USE_M0_AWREGION" value="0" />
-#   <parameter name="USE_M0_AWSIZE" value="1" />
-#   <parameter name="USE_M0_AWUSER" value="0" />
-#   <parameter name="USE_M0_BID" value="1" />
-#   <parameter name="USE_M0_BRESP" value="1" />
-#   <parameter name="USE_M0_BUSER" value="0" />
-#   <parameter name="USE_M0_RID" value="1" />
-#   <parameter name="USE_M0_RLAST" value="1" />
-#   <parameter name="USE_M0_RRESP" value="1" />
-#   <parameter name="USE_M0_RUSER" value="0" />
-#   <parameter name="USE_M0_WSTRB" value="1" />
-#   <parameter name="USE_M0_WUSER" value="0" />
-#   <parameter name="USE_PIPELINE" value="1" />
-#   <parameter name="USE_S0_ARCACHE" value="1" />
-#   <parameter name="USE_S0_ARLOCK" value="1" />
-#   <parameter name="USE_S0_ARPROT" value="1" />
-#   <parameter name="USE_S0_ARQOS" value="0" />
-#   <parameter name="USE_S0_ARREGION" value="0" />
-#   <parameter name="USE_S0_ARUSER" value="0" />
-#   <parameter name="USE_S0_AWCACHE" value="1" />
-#   <parameter name="USE_S0_AWLOCK" value="1" />
-#   <parameter name="USE_S0_AWPROT" value="1" />
-#   <parameter name="USE_S0_AWQOS" value="0" />
-#   <parameter name="USE_S0_AWREGION" value="0" />
-#   <parameter name="USE_S0_AWUSER" value="0" />
-#   <parameter name="USE_S0_BRESP" value="1" />
-#   <parameter name="USE_S0_BUSER" value="0" />
-#   <parameter name="USE_S0_RRESP" value="1" />
-#   <parameter name="USE_S0_RUSER" value="0" />
-#   <parameter name="USE_S0_WLAST" value="1" />
-#   <parameter name="USE_S0_WUSER" value="0" />
-#   <parameter name="WRITE_ACCEPTANCE_CAPABILITY" value="16" />
-#   <parameter name="WRITE_ADDR_USER_WIDTH" value="64" />
-#   <parameter name="WRITE_DATA_USER_WIDTH" value="64" />
-#   <parameter name="WRITE_ISSUING_CAPABILITY" value="16" />
-#   <parameter name="WRITE_RESP_USER_WIDTH" value="64" />
-#  </module>
-#                              \n""",
-#                 )
-#         elif 'end="axi_bridge_0.clk"' in line:
-#             for i in range(1, num_extmem_connections):
-#                 new_lines.insert(
-#                     -1,
-#                     f"""
-#  <connection
-#    kind="avalon"
-#    version="20.1"
-#    start="axi_bridge_{i}.m0"
-#    end="mem_if_ddr3_emif_0.avl">
-#   <parameter name="arbitrationPriority" value="1" />
-#   <parameter name="baseAddress" value="0x0000" />
-#   <parameter name="defaultConnection" value="false" />
-#  </connection>
-#  <connection kind="clock" version="20.1" start="clk_0.clk" end="axi_bridge_{i}.clk" />
-#                              \n""",
-#                 )
-#         elif 'name="qsys_mm.clockCrossingAdapter"' in line:
-#             for i in range(1, num_extmem_connections):
-#                 new_lines.insert(
-#                     -1,
-#                     f"""
-#  <connection
-#    kind="reset"
-#    version="20.1"
-#    start="clk_0.clk_reset"
-#    end="axi_bridge_{i}.clk_reset" />
-#                              \n""",
-#                 )
-#
-#     with open(qsys_path, "w") as f:
-#         f.writelines(new_lines)

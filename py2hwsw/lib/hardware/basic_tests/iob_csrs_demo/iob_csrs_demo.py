@@ -27,14 +27,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "cbus_s",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
@@ -46,7 +46,7 @@ def setup(py_params_dict):
             {
                 "name": "csrs_iob",
                 "descr": "Internal CSRs IOb interface. Signals used to handle CSRs with 'autoreg=False'.",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "csrs_",
                     "ADDR_W": "ADDR_W - 2",

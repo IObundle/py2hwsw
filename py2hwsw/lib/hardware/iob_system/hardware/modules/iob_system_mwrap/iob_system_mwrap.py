@@ -32,9 +32,9 @@ def setup(py_params_dict):
     mwrap_wires = []
     mwrap_ports = []
     for port in iob_system_attr["ports"]:
-        if port["name"] == "rom_bus":
+        if port["name"] in ["rom_bus", "int_mem_axi_m"]:
             wire = copy.deepcopy(port)
-            if "signals" in wire:
+            if type(wire["signals"]) is list:
                 for sig in wire["signals"]:
                     if any(sig["name"].endswith(s) for s in ["_o", "_i", "_io"]):
                         sig["name"] = sig["name"][:-2]
@@ -54,6 +54,13 @@ def setup(py_params_dict):
                 {"name": "clk_i"},
             ],
         },
+        {
+            "name": "rst",
+            "descr": "Reset signal",
+            "signals": [
+                {"name": "arst_i"},
+            ],
+        },
     ]
     attributes_dict["blocks"] = [
         # ROM
@@ -71,7 +78,52 @@ def setup(py_params_dict):
                 "rom_if": "rom_bus",
             },
         },
-        # IOb-SoC
+        # Internal memory
+        {
+            "core_name": "axi_ram",
+            "instance_name": "internal_memory",
+            "instance_description": "Internal memory",
+            "if_defined": "IOB_MEM_NO_READ_ON_WRITE",
+            "parameters": {
+                "ID_WIDTH": "AXI_ID_W",
+                "ADDR_WIDTH": params["fw_addr_w"],
+                "DATA_WIDTH": "AXI_DATA_W",
+                "READ_ON_WRITE": 0,
+            },
+            "connect": {
+                "clk_i": "clk",
+                "rst_i": "rst",
+                "axi_s": (
+                    "int_mem_axi_m",
+                    [
+                        "{int_mem_axi_araddr, 2'b0}",
+                        "{int_mem_axi_awaddr, 2'b0}",
+                        "{1'b0, int_mem_axi_arlock}",
+                        "{1'b0, int_mem_axi_awlock}",
+                    ],
+                ),
+            },
+        },
+    ]
+    if params["init_mem"]:
+        attributes_dict["blocks"][-1]["parameters"].update(
+            {
+                "FILE": f'"{params["name"]}_firmware"',
+            }
+        )
+
+    # Copy axi_ram block, but with READ_ON_WRITE=1
+    attributes_dict["blocks"].append(copy.deepcopy(attributes_dict["blocks"][-1]))
+    attributes_dict["blocks"][-1].pop("if_defined")
+    attributes_dict["blocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"
+    attributes_dict["blocks"][-1]["parameters"].update(
+        {
+            "READ_ON_WRITE": 1,
+        }
+    )
+
+    attributes_dict["blocks"].append(
+        # IOb-System
         {
             "core_name": "iob_system",
             "instance_name": "iob_system",
@@ -83,7 +135,7 @@ def setup(py_params_dict):
             },
             "connect": {i["name"]: i["name"] for i in iob_system_attr["ports"]},
             **params,
-        },
-    ]
+        }
+    )
 
     return attributes_dict

@@ -48,7 +48,7 @@ def setup(py_params_dict):
             {
                 "name": "axi_s",
                 "descr": "AXI slave interface to connect to external master",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -59,7 +59,7 @@ def setup(py_params_dict):
             {
                 "name": "axil_m",
                 "descr": "AXI Lite master interface to connect to external slave",
-                "interface": {
+                "signals": {
                     "type": "axil",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",

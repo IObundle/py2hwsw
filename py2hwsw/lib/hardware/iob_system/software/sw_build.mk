@@ -22,7 +22,7 @@ iob_system_bootrom.hex: ../../software/iob_system_preboot.bin ../../software/iob
 	../../scripts/makehex.py $^ 00000080 $(call GET_IOB_SYSTEM_CONF_MACRO,BOOTROM_ADDR_W) > $@
 
 iob_system_firmware.hex: iob_system_firmware.bin
-	../../scripts/makehex.py $< $(call GET_IOB_SYSTEM_CONF_MACRO,MEM_ADDR_W) > $@
+	../../scripts/makehex.py $< $(call GET_IOB_SYSTEM_CONF_MACRO,FW_ADDR_W) > $@
 	../../scripts/hex_split.py iob_system_firmware .
 
 iob_system_firmware.bin: ../../software/iob_system_firmware.bin

@@ -60,14 +60,14 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "interface": {
+            "signals": {
                 "type": "clk_en_rst",
             },
         },
         {
             "name": "uart_s",
             "descr": "Testbench uart csrs interface",
-            "interface": {
+            "signals": {
                 "type": "iob",
                 "prefix": "uart_",
                 "ADDR_W": 3,
@@ -79,7 +79,7 @@ def setup(py_params_dict):
             {
                 "name": "ethernet_s",
                 "descr": "Testbench ethernet csrs interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "ethernet_",
                 },
@@ -93,7 +93,7 @@ def setup(py_params_dict):
         {
             "name": "rs232",
             "descr": "rs232 bus",
-            "interface": {
+            "signals": {
                 "type": "rs232",
             },
         },
@@ -107,52 +107,28 @@ def setup(py_params_dict):
                 {"name": "rs232_rts"},
             ],
         },
-        {
-            "name": "axi",
-            "descr": "AXI bus to connect SoC to interconnect",
-            "interface": {
-                "type": "axi",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W - 2",
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-                "LOCK_W": "AXI_LEN_W",
-            },
-        },
-        {
-            "name": "clk",
-            "descr": "Clock signal",
-            "signals": [
-                {"name": "clk_i"},
-            ],
-        },
-        {
-            "name": "rst",
-            "descr": "Reset signal",
-            "signals": [
-                {"name": "arst_i"},
-            ],
-        },
-        {
-            "name": "memory_axi",
-            "descr": "AXI bus to connect interconnect and memory",
-            "interface": {
-                "type": "axi",
-                "prefix": "mem_",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W - 2",
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-                "LOCK_W": "1",
-            },
-        },
     ]
+    if params["use_extmem"]:
+        attributes_dict["wires"] += [
+            {
+                "name": "axi",
+                "descr": "AXI bus to connect SoC to interconnect",
+                "signals": {
+                    "type": "axi",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                    "LOCK_W": "AXI_LEN_W",
+                },
+            },
+        ]
     if params["use_ethernet"]:
         attributes_dict["wires"] += [
             {
                 "name": "eth_axi",
                 "descr": "Ethernet AXI bus",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": "eth_",
                 },
@@ -200,11 +176,14 @@ def setup(py_params_dict):
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "rs232_m": "rs232",
-                "axi_m": "axi",
             },
             "dest_dir": "hardware/common_src",
             "iob_system_params": params,
         },
+    ]
+    if params["use_extmem"]:
+        attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
+    attributes_dict["blocks"] += [
         {
             "core_name": "iob_uart",
             "name": "iob_uart_iob",
@@ -215,61 +194,14 @@ def setup(py_params_dict):
                 "clk_en_rst_s": "clk_en_rst_s",
                 "cbus_s": (
                     "uart_s",
-                    "uart_iob_addr_i[3-1:2]",
+                    [
+                        "uart_iob_addr_i[3-1:2]",
+                    ],
                 ),
                 "rs232_m": "rs232_invert",
             },
         },
-        {
-            "core_name": "axi_interconnect_wrapper",
-            "name": "sim_axi_interconnect_wrapper",
-            "instance_name": "axi_interconnect",
-            "instance_description": "Interconnect instance",
-            "parameters": {
-                "AXI_ID_W": "AXI_ID_W",
-                "AXI_ADDR_W": "AXI_ADDR_W-2",
-                "AXI_DATA_W": "AXI_DATA_W",
-            },
-            "connect": {
-                "clk_i": "clk",
-                "rst_i": "rst",
-                "s0_axi_s": (
-                    "axi",
-                    "axi_awlock[0]",
-                    "axi_arlock[0]",
-                ),
-                "m0_axi_m": "memory_axi",
-            },
-            "num_slaves": 1,
-        },
-        {
-            "core_name": "axi_ram",
-            "instance_name": "ddr_model_mem",
-            "instance_description": "Internal/DDR model memory",
-            "parameters": {
-                "ID_WIDTH": "AXI_ID_W",
-                "ADDR_WIDTH": "AXI_ADDR_W",
-                "DATA_WIDTH": "AXI_DATA_W",
-            },
-            "connect": {
-                "clk_i": "clk",
-                "rst_i": "rst",
-                "axi_s": (
-                    "memory_axi",
-                    "{mem_axi_araddr, 2'b0}",
-                    "{mem_axi_awaddr, 2'b0}",
-                    "{1'b0, mem_axi_arlock}",
-                    "{1'b0, mem_axi_awlock}",
-                ),
-            },
-        },
     ]
-    if params["init_mem"]:
-        attributes_dict["blocks"][-1]["parameters"].update(
-            {
-                "FILE": f'"{params["name"]}_firmware"',
-            }
-        )
     if params["use_ethernet"]:
         attributes_dict["blocks"] += [
             {

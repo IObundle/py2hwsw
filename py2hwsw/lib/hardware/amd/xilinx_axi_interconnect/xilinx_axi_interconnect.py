@@ -59,7 +59,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_rst_s",
                 "descr": "Clock and reset inputs",
-                "interface": {
+                "signals": {
                     "type": "clk_rst",
                 },
             },
@@ -77,7 +77,7 @@ def setup(py_params_dict):
             },
             {
                 "name": f"s{i}_axi_s",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",
@@ -100,7 +100,7 @@ def setup(py_params_dict):
             },
             {
                 "name": f"m{i}_axi_m",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": f"m{i}_",
                     "ID_W": "AXI_ID_W",

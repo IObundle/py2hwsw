@@ -35,14 +35,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "clock, clock enable and reset",
             },
             {
                 "name": "iob_s",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "ADDR_W": "4",  # Same as `IOB_NCO_CSRS_ADDR_W
                     "DATA_W": "DATA_W",
@@ -76,7 +76,7 @@ def setup(py_params_dict):
             {
                 "name": "csrs_iob",
                 "descr": "Internal CSRs IOb interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "csrs_",
                     "ADDR_W": "ADDR_W",

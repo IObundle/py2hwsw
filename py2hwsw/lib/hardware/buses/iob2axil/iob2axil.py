@@ -45,7 +45,7 @@ def setup(py_params_dict):
             {
                 "name": "iob_s",
                 "descr": "Slave IOb interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -54,7 +54,7 @@ def setup(py_params_dict):
             {
                 "name": "axil_m",
                 "descr": "Master AXI Lite interface",
-                "interface": {
+                "signals": {
                     "type": "axil",
                     "ADDR_W": "AXIL_ADDR_W",
                     "DATA_W": "AXIL_DATA_W",

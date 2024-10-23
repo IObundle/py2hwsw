@@ -144,7 +144,7 @@ def setup(py_params_dict):
             {
                 "name": "slave_s",
                 "descr": "Slave interface (connects to master)",
-                "interface": {
+                "signals": {
                     "type": INTERFACE,
                     **slave_interface_parameters,
                 },
@@ -152,7 +152,7 @@ def setup(py_params_dict):
             {
                 "name": "master_m",
                 "descr": "Master interface (connects to slave)",
-                "interface": {
+                "signals": {
                     "type": INTERFACE,
                     **master_interface_parameters,
                 },

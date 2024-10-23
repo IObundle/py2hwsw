@@ -2,10 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-if {$N_INTERCONNECT_SLAVES eq ""} {
-    set N_INTERCONNECT_SLAVES 1 ; # Default value when not provided
-}
-
 proc generate_slave_config_lines {num_slaves} {
     for {set i 0} {$i < $num_slaves} {incr i} {
         set slave_number [format "%02d" $i]
@@ -29,7 +25,7 @@ if { [file isdirectory "./ip/axi_interconnect_0"] } {
 
     create_ip -name axi_interconnect -vendor xilinx.com -library ip -version 1.7 -module_name axi_interconnect_0 -dir ./ip -force
 
-    set_property CONFIG.NUM_SLAVE_PORTS $N_INTERCONNECT_SLAVES [get_ips axi_interconnect_0]
+    set_property CONFIG.NUM_SLAVE_PORTS 1 [get_ips axi_interconnect_0]
     set_property CONFIG.AXI_ADDR_WIDTH 28 [get_ips axi_interconnect_0]
     set_property CONFIG.ACLK_PERIOD 5000 [get_ips axi_interconnect_0]
     set_property CONFIG.INTERCONNECT_DATA_WIDTH 32 [get_ips axi_interconnect_0]
@@ -37,7 +33,7 @@ if { [file isdirectory "./ip/axi_interconnect_0"] } {
     set_property CONFIG.M00_AXI_WRITE_FIFO_DEPTH 32 [get_ips axi_interconnect_0]
     set_property CONFIG.M00_AXI_READ_FIFO_DEPTH 32 [get_ips axi_interconnect_0]
 
-    generate_slave_config_lines $N_INTERCONNECT_SLAVES
+    generate_slave_config_lines 1
 
     generate_target all [get_files ./ip/axi_interconnect_0/axi_interconnect_0.xci]
 

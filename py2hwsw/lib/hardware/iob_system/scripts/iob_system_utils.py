@@ -310,10 +310,7 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
         # Set USE_EXTMEM variable
         file.write(f"USE_EXTMEM:={int(params['use_extmem'])}\n")
         # Set INIT_MEM variable
-        if params["use_extmem"]:
-            file.write("INIT_MEM:=0\n")
-        else:
-            file.write(f"INIT_MEM:={int(params['init_mem'])}\n")
+        file.write(f"INIT_MEM:={int(params['init_mem'])}\n")
         if params["use_ethernet"]:
             # Set custom ethernet CONSOLE_CMD
             file.write(

@@ -2,16 +2,20 @@
 #
 # SPDX-License-Identifier: MIT
 
-proc generate_slave_config_lines {num_slaves} {
-    for {set i 0} {$i < $num_slaves} {incr i} {
-        set slave_number [format "%02d" $i]
-        set_property "CONFIG.S${slave_number}_AXI_IS_ACLK_ASYNC" 1 [get_ips axi_interconnect_0]
-        set_property "CONFIG.S${slave_number}_AXI_READ_FIFO_DEPTH" 32 [get_ips axi_interconnect_0]
-        set_property "CONFIG.S${slave_number}_AXI_WRITE_FIFO_DEPTH" 32 [get_ips axi_interconnect_0]
-    }
-}
+set PART xcku040-fbva676-1-c
+set_property part $PART [current_project]
 
 if { $USE_EXTMEM > 0 } {
+
+    proc generate_slave_config_lines {num_slaves} {
+        for {set i 0} {$i < $num_slaves} {incr i} {
+            set slave_number [format "%02d" $i]
+            set_property "CONFIG.S${slave_number}_AXI_IS_ACLK_ASYNC" 1 [get_ips axi_interconnect_0]
+            set_property "CONFIG.S${slave_number}_AXI_READ_FIFO_DEPTH" 32 [get_ips axi_interconnect_0]
+            set_property "CONFIG.S${slave_number}_AXI_WRITE_FIFO_DEPTH" 32 [get_ips axi_interconnect_0]
+        }
+    }
+
     read_verilog vivado/$BOARD/xilinx_axi_interconnect.v
 
     if { ![file isdirectory "./ip"]} {
@@ -85,10 +89,8 @@ if { $USE_EXTMEM > 0 } {
     read_verilog vivado/$BOARD/clock_wizard.v
     read_verilog vivado/$BOARD/iob_reset_sync.v
     read_verilog vivado/$BOARD/iob_r.v
-
 }
 
-#execute board specific script
-if {[file exists "vivado/$BOARD/$BOARD.tcl"]} {
-    source "vivado/$BOARD/$BOARD.tcl"
+if {[file exists "vivado/$BOARD/auto_board.sdc"]} {
+    read_xdc vivado/$BOARD/auto_board.sdc
 }

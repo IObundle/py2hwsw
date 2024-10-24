@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 bsp = [
     {"name": "BAUD", "type": "M", "val": "115200"},
     {"name": "FREQ", "type": "M", "val": "100000000"},

@@ -387,6 +387,14 @@ def setup(py_params_dict):
 """,
             },
         ]
+    if params["use_extmem"]:
+        attributes_dict["snippets"] += [
+            {
+                "verilog_code": """
+    assign arst = ~intercon_s0_arstn;
+""",
+            },
+        ]
 
     # Create system clock constraint
     if not params["use_extmem"]:

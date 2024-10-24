@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 ## System Clock 
-create_clock -name "clk" -period 4.0 [get_ports {c0_sys_clk_clk_p_i}]
+# System clock already created in aes_ku040_db_g.tcl
+#create_clock -name "clk" -period 4.0 [get_ports {c0_sys_clk_clk_p_i}]
 
 # LVDS Programmable Clock Generator (CDCM61002)
 #set_property  PACKAGE_PIN M5   [get_ports LVDS_CLK0_N]

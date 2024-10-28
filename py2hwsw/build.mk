@@ -15,6 +15,7 @@ include config_build.mk
 BSP_H ?= software/src/bsp.h
 SIM_DIR := hardware/simulation
 BOARD_DIR := $(shell find -name $(BOARD) -type d -print -quit)
+SYN_DIR=hardware/syn
 
 #
 # Create bsp.h from bsp.vh
@@ -43,6 +44,13 @@ else
 	cp $(SIM_DIR)/src/$(NAME)_sim_conf.vh $@;
 	sed -i 's/ $(NAME_UPPER)_SIM_/ /g' $@;
 endif
+
+SYN_BSP_VH = $(SYN_DIR)/src/bsp.vh
+$(SYN_BSP_VH):
+	@echo "Creating $@ for synthesis"
+	cp $(SYN_DIR)/src/$(NAME)_syn_conf.vh $@;
+	sed -i 's/ $(NAME_UPPER)_SYN_/ /g' $@;
+
 
 $(BSP_H): $(BSP_VH)
 	cp $(BSP_VH) $@;
@@ -146,8 +154,7 @@ fpga-clean:
 #
 # SYN
 #
-SYN_DIR=hardware/syn
-syn-build:
+syn-build: $(SYN_BSP_VH)
 	make -C $(SYN_DIR) build
 
 syn-clean:

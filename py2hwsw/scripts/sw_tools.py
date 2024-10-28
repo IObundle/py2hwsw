@@ -72,7 +72,7 @@ def run_tool(tool, path="."):
             file_extentions = "*.py"
         case "clang":
             cmd = "clang-format"
-            flags = f"-i -style=file:{os.path.join(os.path.dirname(__file__), "clang-format.rules")} -fallback-style=none -Werror"
+            flags = f"-i -style=file:{os.path.join(os.path.dirname(__file__), 'clang-format.rules')} -fallback-style=none -Werror"
             file_extentions = "*.c *.h *.cpp *.hpp"
         case "mypy":
             cmd = "mypy"

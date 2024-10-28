@@ -2,6 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
+# Copied from py2 'board.py'
+bsp = [
+    {"name": "BAUD", "type": "M", "val": "115200"},
+    {"name": "FREQ", "type": "M", "val": "100000000"},
+    {"name": "XILINX", "type": "M", "val": "1"},
+]
+
 
 def setup(py_params_dict):
     # user-passed parameters
@@ -45,7 +52,8 @@ def setup(py_params_dict):
                 "min": "1",
                 "max": "32",
             },
-        ],
+        ]
+        + bsp,
     }
 
     #
@@ -75,38 +83,19 @@ def setup(py_params_dict):
     #
     attributes_dict["wires"] = [
         {
-            "name": "ps_clk_arstn",
-            "descr": "Clock and reset",
-            "signals": [
-                {"name": "ps_clk", "width": "1"},
-                {"name": "ps_arstn", "width": "1"},
-            ],
-        },
-        {
-            "name": "ps_clk_rst",
-            "descr": "Clock and reset",
-            "interface": {
-                "type": "clk_rst",
-            },
-        },
-        {
-            "name": "clk_en_rst",
-            "descr": "Clock, clock enable and reset",
-            "interface": {
-                "type": "clk_en_rst",
-            },
-        },
-        {
             "name": "rs232_int",
             "descr": "iob-system uart interface",
-            "interface": {
-                "type": "rs232",
-            },
+            "signals": [
+                {"name": "rxd_i"},
+                {"name": "txd_o"},
+                {"name": "rs232_rts", "width": "1"},
+                {"name": "high", "width": "1"},
+            ],
         },
         {
             "name": "axi",
             "descr": "AXI interface to connect SoC to memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W - 2",
@@ -115,24 +104,16 @@ def setup(py_params_dict):
             },
         },
         {
-            "name": "intercon_m_clk_rst",
-            "descr": "AXI interconnect clock and reset inputs",
-            "interface": {
-                "type": "clk_rst",
-                "prefix": "intercon_m_",
-            },
-        },
-        {
-            "name": "ps_axi",
+            "name": "memory_axi",
             "descr": "AXI bus to connect interconnect and memory",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "mem_",
                 "ID_W": "AXI_ID_W",
                 "LEN_W": "AXI_LEN_W",
                 "ADDR_W": "AXI_ADDR_W - 2",
                 "DATA_W": "AXI_DATA_W",
-                "LOCK_W": 1,
+                "LOCK_W": 1 if params["use_extmem"] else 2,
             },
         },
     ]
@@ -171,28 +152,41 @@ def setup(py_params_dict):
                 "AXI_DATA_W": "AXI_DATA_W",
             },
             "connect": {
-                "clk_rst_s": "ps_clk_rst",
-                "m0_clk_rst": "intercon_m_clk_rst",
-                "m0_axi_m": "ps_axi",
-                "s0_clk_rst": "ps_clk_rst",
+                "clk_rst_s": "intercon_clk_rst",
+                "m0_clk_rst": "intercon_m0_clk_rst",
+                "m0_axi_m": "memory_axi",
+                "s0_clk_rst": "intercon_s0_clk_rst",
                 "s0_axi_s": "axi",
             },
             "num_slaves": 1,
         },
-    ]
-
-    #
-    # Snippets
-    #
-    attributes_dict["snippets"] = [
         {
-            "verilog_code": """
-            // General connections
-            assign cke = 1'b1;
-            assign arst = ~ps_arstn;
-            assign ps_arst = ~ps_arstn;
-            """,
+            "core_name": "axi_ram",
+            "instance_name": "ddr_model_mem",
+            "instance_description": "DDR model memory",
+            "parameters": {
+                "ID_WIDTH": "AXI_ID_W",
+                "ADDR_WIDTH": "AXI_ADDR_W",
+                "DATA_WIDTH": "AXI_DATA_W",
+                "READ_ON_WRITE": "1",
+            },
+            "connect": {
+                "clk_i": "clk",
+                "rst_i": "arst",
+                "axi_s": (
+                    "memory_axi",
+                    "{mem_axi_araddr, 2'b0}",
+                    "{mem_axi_awaddr, 2'b0}",
+                ),
+            },
         },
     ]
+
+    if params["init_mem"]:
+        attributes_dict["blocks"][-1]["parameters"].update(
+            {
+                "FILE": f'"{params["name"]}_firmware"',
+            }
+        )
 
     return attributes_dict

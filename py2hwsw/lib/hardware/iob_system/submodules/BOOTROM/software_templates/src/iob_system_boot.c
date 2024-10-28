@@ -29,7 +29,7 @@ int main() {
 
 #ifdef IOB_SYSTEM_USE_EXTMEM
   uart_puts(PROGNAME);
-  uart_puts(": DDR in use and program runs from DDR\n");
+  uart_puts(": DDR in use. Program runs from internal memory.\n");
 #endif
 
   // address to copy firmware to

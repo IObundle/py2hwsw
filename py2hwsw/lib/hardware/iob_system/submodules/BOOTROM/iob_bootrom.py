@@ -70,14 +70,14 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "descr": "Clock and reset",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
             },
             {
                 "name": "cbus_s",
                 "descr": "Front-end control interface",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": "cbus_",
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
@@ -111,7 +111,7 @@ def setup(py_params_dict):
             {
                 "name": "csrs_iob",
                 "descr": "Internal iob interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "csrs_",
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)

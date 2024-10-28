@@ -11,8 +11,8 @@ class iob_conf:
     name: str = ""
     type: str = ""
     val: str | int | bool = ""
-    min: str | int = 0
-    max: str | int = 1
+    min: str | int = "NA"
+    max: str | int = "NA"
     descr: str = "Default description"
     # Only set this macro if the Verilog macro specified here is defined
     if_defined: str = ""

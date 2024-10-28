@@ -85,25 +85,31 @@ class iob_port(iob_wire):
 
 attrs = [
     "name",
-    ["-i", "interface", {"nargs": 2}, ["type", "subtype"]],
+    ["-i", "signals", {"nargs": 2}, ["type", "subtype"]],
     ["-s", "signals", {"nargs": 2, "action": "append"}, ["name", "width"]],
 ]
 
 
 @str_to_kwargs(attrs)
-def create_port(core, *args, signals=[], interface=None, **kwargs):
+def create_port(core, *args, signals=[], **kwargs):
     """Creates a new port object and adds it to the core's port list
     Also creates a new internal module wire to connect to the new port
     param core: core object
     """
     # Ensure 'ports' list exists
     core.set_default_attribute("ports", [])
-    # Convert user signal dictionaries into 'iob_signal' objects
-    sig_obj_list = convert_dict2obj_list(signals, iob_signal)
-    # Convert user interface dictionary into 'if_gen.interface' object
-    interface_obj = if_gen.dict2interface(interface)
-    if interface_obj and not interface_obj.file_prefix:
-        interface_obj.file_prefix = core.name + "_"
+    sig_obj_list = []
+    interface_obj = None
+    if type(signals) is list:
+        # Convert user signal dictionaries into 'iob_signal' objects
+        sig_obj_list = convert_dict2obj_list(signals, iob_signal)
+    elif type(signals) is dict:
+        # Convert user interface dictionary into 'if_gen.interface' object
+        interface_obj = if_gen.dict2interface(signals)
+        if interface_obj and not interface_obj.file_prefix:
+            interface_obj.file_prefix = core.name + "_"
+    else:
+        fail_with_msg(f"Invalid signal type! {signals}", TypeError)
     assert_attributes(
         iob_port,
         kwargs,

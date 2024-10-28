@@ -70,14 +70,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "i_bus_s",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "i_",
                     "DATA_W": DATA_W,
@@ -87,7 +87,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "d_bus_s",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "d_",
                     "DATA_W": DATA_W,
@@ -97,7 +97,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_m",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -118,7 +118,7 @@ def setup(py_params_dict):
         },
         {
             "name": "icache",
-            "interface": {
+            "signals": {
                 "type": "iob",
                 "prefix": "icache_be_",
                 "DATA_W": DATA_W,
@@ -128,7 +128,7 @@ def setup(py_params_dict):
         },
         {
             "name": "dcache",
-            "interface": {
+            "signals": {
                 "type": "iob",
                 "prefix": "dcache_be_",
                 "DATA_W": DATA_W,
@@ -138,7 +138,7 @@ def setup(py_params_dict):
         },
         {
             "name": "l2cache",
-            "interface": {
+            "signals": {
                 "type": "iob",
                 "prefix": "l2cache_",
                 "DATA_W": DATA_W,

@@ -145,7 +145,7 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "interface": {
+            "signals": {
                 "type": "clk_en_rst",
             },
         },
@@ -168,22 +168,40 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "axi_m",
-            "descr": "AXI master interface for memory",
-            "interface": {
+            "name": "int_mem_axi_m",
+            "descr": "AXI master interface for internal memory",
+            "signals": {
                 "type": "axi",
+                "prefix": "int_mem_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W-2",
+                "ADDR_W": f"{params['fw_addr_w']}-2",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
-                "LOCK_W": "AXI_LEN_W",
+                "LOCK_W": 1,
             },
         },
+    ]
+    if params["use_extmem"]:
+        attributes_dict["ports"] += [
+            {
+                "name": "axi_m",
+                "descr": "AXI master interface for DDR memory",
+                "signals": {
+                    "type": "axi",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": "AXI_ADDR_W-2",
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                    "LOCK_W": "AXI_LEN_W",
+                },
+            },
+        ]
+    attributes_dict["ports"] += [
         # Peripheral IO ports
         {
             "name": "rs232_m",
             "descr": "iob-system uart interface",
-            "interface": {
+            "signals": {
                 "type": "rs232",
             },
         },
@@ -215,7 +233,7 @@ def setup(py_params_dict):
         {
             "name": "cpu_ibus",
             "descr": "CPU instruction bus",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "cpu_i_",
                 "ID_W": "AXI_ID_W",
@@ -228,7 +246,7 @@ def setup(py_params_dict):
         {
             "name": "cpu_dbus",
             "descr": "CPU data bus",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "cpu_d_",
                 "ID_W": "AXI_ID_W",
@@ -248,7 +266,7 @@ def setup(py_params_dict):
         {
             "name": "bootrom_cbus",
             "descr": "iob-system boot controller data interface",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "bootrom_",
                 "ID_W": "AXI_ID_W",
@@ -261,7 +279,7 @@ def setup(py_params_dict):
         {
             "name": "axi_periphs_cbus",
             "descr": "AXI bus for peripheral CSRs",
-            "interface": {
+            "signals": {
                 "type": "axi",
                 "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
@@ -273,7 +291,7 @@ def setup(py_params_dict):
         {
             "name": "iob_periphs_cbus",
             "descr": "AXI-Lite bus for peripheral CSRs",
-            "interface": {
+            "signals": {
                 "type": "iob",
                 "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
@@ -301,26 +319,30 @@ def setup(py_params_dict):
                 "rst_i": "rst",
                 "i_bus_m": (
                     "cpu_ibus",
-                    "cpu_i_axi_arid[0]",
-                    "cpu_i_axi_rid[0]",
-                    "cpu_i_axi_awid[0]",
-                    "cpu_i_axi_bid[0]",
+                    [
+                        "cpu_i_axi_arid[0]",
+                        "cpu_i_axi_rid[0]",
+                        "cpu_i_axi_awid[0]",
+                        "cpu_i_axi_bid[0]",
+                    ],
                 ),
                 "d_bus_m": (
                     "cpu_dbus",
-                    "cpu_d_axi_arid[0]",
-                    "cpu_d_axi_rid[0]",
-                    "cpu_d_axi_awid[0]",
-                    "cpu_d_axi_bid[0]",
+                    [
+                        "cpu_d_axi_arid[0]",
+                        "cpu_d_axi_rid[0]",
+                        "cpu_d_axi_awid[0]",
+                        "cpu_d_axi_bid[0]",
+                    ],
                 ),
                 "plic_interrupts_i": "interrupts",
                 "plic_cbus_s": (
                     "plic_cbus",
-                    "plic_cbus_iob_addr[22-2-1:0]",
+                    ["plic_cbus_iob_addr[22-2-1:0]"],
                 ),
                 "clint_cbus_s": (
                     "clint_cbus",
-                    "clint_cbus_iob_addr[16-2-1:0]",
+                    ["clint_cbus_iob_addr[16-2-1:0]"],
                 ),
             },
         },
@@ -333,32 +355,54 @@ def setup(py_params_dict):
                 "AXI_ID_W": "AXI_ID_W",
                 "AXI_ADDR_W": params["addr_w"] - 2,
                 "AXI_DATA_W": "AXI_DATA_W",
-                "MEM_ADDR_W": "AXI_ADDR_W - 2",
+                "INT_MEM_ADDR_W": f"{params['fw_addr_w']} - 2",
             },
             "connect": {
                 "clk_i": "clk",
                 "rst_i": "rst",
                 "s0_axi_s": "cpu_ibus",
                 "s1_axi_s": "cpu_dbus",
-                "mem_axi_m": (
-                    "axi_m",
-                    "axi_arlock_o[0]",
-                    "axi_awlock_o[0]",
-                ),
+                "int_mem_axi_m": "int_mem_axi_m",
                 "bootrom_axi_m": "bootrom_cbus",
                 "peripherals_axi_m": (
                     "axi_periphs_cbus",
-                    "periphs_axi_awlock[0]",
-                    "periphs_axi_arlock[0]",
+                    [
+                        "periphs_axi_awlock[0]",
+                        "periphs_axi_arlock[0]",
+                    ],
                 ),
             },
             "num_slaves": 2,
             "masters": {
-                "mem": params["addr_w"] - 2 - 2,
+                "int_mem": params["addr_w"] - 2 - 2,
                 "bootrom": params["addr_w"] - 2 - 2,
                 "peripherals": params["addr_w"] - 2 - 1,
             },
         },
+    ]
+    if params["use_extmem"]:
+        attributes_dict["blocks"][-1]["parameters"].update(
+            {
+                "MEM_ADDR_W": "AXI_ADDR_W - 2",
+            }
+        )
+        attributes_dict["blocks"][-1]["connect"].update(
+            {
+                "mem_axi_m": (
+                    "axi_m",
+                    [
+                        "axi_arlock_o[0]",
+                        "axi_awlock_o[0]",
+                    ],
+                ),
+            }
+        )
+        attributes_dict["blocks"][-1]["masters"].pop("int_mem")
+        attributes_dict["blocks"][-1]["masters"] = {
+            "int_mem": params["addr_w"] - 2 - 3,
+            "mem": params["addr_w"] - 2 - 3,
+        } | attributes_dict["blocks"][-1]["masters"]
+    attributes_dict["blocks"] += [
         {
             "core_name": "iob_bootrom",
             "instance_name": "bootrom",
@@ -373,14 +417,16 @@ def setup(py_params_dict):
                 "clk_en_rst_s": "clk_en_rst_s",
                 "cbus_s": (
                     "bootrom_cbus",
-                    "bootrom_axi_araddr[13-2-1:0]",
-                    "bootrom_axi_arid[0]",
-                    "bootrom_axi_rid[0]",
-                    "{1'b0, bootrom_axi_arlock}",
-                    "bootrom_axi_awaddr[13-2-1:0]",
-                    "bootrom_axi_awid[0]",
-                    "bootrom_axi_bid[0]",
-                    "{1'b0, bootrom_axi_awlock}",
+                    [
+                        "bootrom_axi_araddr[13-2-1:0]",
+                        "bootrom_axi_arid[0]",
+                        "bootrom_axi_rid[0]",
+                        "{1'b0, bootrom_axi_arlock}",
+                        "bootrom_axi_awaddr[13-2-1:0]",
+                        "bootrom_axi_awid[0]",
+                        "bootrom_axi_bid[0]",
+                        "{1'b0, bootrom_axi_awlock}",
+                    ],
                 ),
                 "ext_rom_bus": "rom_bus",
             },
@@ -400,8 +446,10 @@ def setup(py_params_dict):
                 "clk_en_rst_s": "clk_en_rst_s",
                 "axi_s": (
                     "axi_periphs_cbus",
-                    "periphs_axi_arlock[0]",
-                    "periphs_axi_awlock[0]",
+                    [
+                        "periphs_axi_arlock[0]",
+                        "periphs_axi_awlock[0]",
+                    ],
                 ),
                 "iob_m": "iob_periphs_cbus",
             },
@@ -457,8 +505,8 @@ def setup(py_params_dict):
         },
         # Simulation wrapper
         {
-            "core_name": "iob_system_sim_wrapper",
-            "instance_name": "iob_system_sim_wrapper",
+            "core_name": "iob_system_sim",
+            "instance_name": "iob_system_sim",
             "instantiate": False,
             "dest_dir": "hardware/simulation/src",
             "iob_system_params": params,

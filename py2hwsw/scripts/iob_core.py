@@ -459,9 +459,16 @@ class iob_core(iob_module, iob_instance):
             bit_slices = []
             if type(connection_value) is str:
                 wire_name = connection_value
-            else:
+            elif type(connection_value) is tuple:
                 wire_name = connection_value[0]
-                bit_slices = connection_value[1:]
+                bit_slices = connection_value[1]
+            else:
+                fail_with_msg(f"Invalid connection value: {connection_value}")
+
+            if type(bit_slices) is not list:
+                fail_with_msg(
+                    f"Second element of tuple must be a list of bit slices/connections: {connection_value}"
+                )
 
             wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(
                 instantiator.ports, wire_name
@@ -747,7 +754,7 @@ def find_module_setup_dir(core_name):
     file_path = find_file(
         iob_core.global_project_root, core_name, [".py", ".json"]
     ) or find_file(
-        os.path.join(os.path.dirname(__file__), "../lib"),
+        os.path.join(os.path.dirname(__file__), ".."),
         core_name,
         [".py", ".json"],
     )

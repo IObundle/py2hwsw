@@ -76,7 +76,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "i_bus_m",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "file_prefix": "iob_picorv32_ibus_",
                     "prefix": "ibus_",
@@ -88,7 +88,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "d_bus_m",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "file_prefix": "iob_picorv32_dbus_",
                     "prefix": "dbus_",

@@ -31,8 +31,6 @@ ifeq ($(FPGA_TOOL),)
 $(error Cannot find FPGA toolchain for board $(BOARD). Please make sure that the board name is correct and that the board is supported by the FPGA toolchain)
 endif
 
-N_INTERCONNECT_SLAVES ?=1
-
 include $(FPGA_TOOL)/$(BOARD)/board.mk
 include $(FPGA_TOOL)/build.mk
 
@@ -66,7 +64,7 @@ endif
 endif
 
 #console start command
-CONSOLE_CMD ?=$(PYTHON_DIR)/console.py -s /dev/usb-uart
+CONSOLE_CMD ?=$(PYTHON_DIR)/console.py -s $(BOARD_SERIAL_PORT)
 
 #board client command
 GRAB_TIMEOUT ?= 300

@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 from iob_base import find_obj_in_list, fail_with_msg
 
 
@@ -60,6 +62,7 @@ def generate_params_snippets(core):
     """
     code = generate_params(core)
     out_dir = core.build_dir + "/hardware/src"
+    os.makedirs(out_dir, exist_ok=True)
     with open(f"{out_dir}/{core.name}_params.vs", "w") as f:
         f.write(code)
 

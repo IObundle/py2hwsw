@@ -10,7 +10,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -70,7 +70,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_write_m",
-                "interface": {
+                "signals": {
                     "type": "axi_write",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",

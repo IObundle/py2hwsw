@@ -51,7 +51,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -148,6 +148,13 @@ def setup(py_params_dict):
                     "data_i": "pulse_nxt",
                     "data_o": "pulse_o",
                 },
+            },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
             },
         ],
         "snippets": [

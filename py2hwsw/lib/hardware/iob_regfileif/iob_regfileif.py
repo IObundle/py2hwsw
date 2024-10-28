@@ -135,14 +135,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "internal_control_if_s",
-                "interface": {
+                "signals": {
                     "type": params["internal_csr_if"],
                     **params["internal_csr_if_widths"],
                 },
@@ -150,7 +150,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "external_control_if_s",
-                "interface": {
+                "signals": {
                     "type": params["external_csr_if"],
                     "prefix": "external_",
                     **params["external_csr_if_widths"],
@@ -163,7 +163,7 @@ def setup(py_params_dict):
             {
                 "name": "csrs_iob",
                 "descr": "Internal CSRs iob interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "csrs_",
                     "ADDR_W": "ADDR_W",
@@ -173,7 +173,7 @@ def setup(py_params_dict):
             {
                 "name": "internal_iob2",
                 "descr": "Internal iob interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "internal2_",
                     "ADDR_W": "ADDR_W",

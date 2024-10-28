@@ -72,7 +72,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_s",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "LEN_W": "AXI_LEN_W",

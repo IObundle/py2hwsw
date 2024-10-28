@@ -19,11 +19,11 @@ GET_MACRO = $(shell grep "define $(1)" $(2) | rev | cut -d" " -f1 | rev)
 GET_IOB_SYSTEM_CONF_MACRO = $(call GET_MACRO,IOB_SYSTEM_$(1),../src/iob_system_conf.vh)
 
 iob_system_bootrom.hex: ../../software/iob_system_preboot.bin ../../software/iob_system_boot.bin
-	../../scripts/makehex.py $^ 00000080 $(call GET_IOB_SYSTEM_CONF_MACRO,BOOTROM_ADDR_W) > $@
+	../../scripts/makehex.py $^ 00000080 $(call GET_IOB_SYSTEM_CONF_MACRO,BOOTROM_ADDR_W) $@
 
 iob_system_firmware.hex: iob_system_firmware.bin
-	../../scripts/makehex.py $< $(call GET_IOB_SYSTEM_CONF_MACRO,FW_ADDR_W) > $@
-	../../scripts/hex_split.py iob_system_firmware .
+	../../scripts/makehex.py $< $(call GET_IOB_SYSTEM_CONF_MACRO,FW_ADDR_W) $@
+	../../scripts/makehex.py --split $< $(call GET_IOB_SYSTEM_CONF_MACRO,FW_ADDR_W) $@
 
 iob_system_firmware.bin: ../../software/iob_system_firmware.bin
 	cp $< $@

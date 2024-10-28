@@ -31,16 +31,17 @@ BSP_VH = $(SIM_DIR)/src/bsp.vh
 endif
 
 BOARD_UPPER=$(shell echo $(BOARD) | tr '[:lower:]' '[:upper:]')
+NAME_UPPER=$(shell echo $(NAME) | tr '[:lower:]' '[:upper:]')
 
 $(BSP_VH):
 ifeq ($(USE_FPGA),1)
 	@echo "Creating $(BSP_VH) for FPGA"
-	cp $(BOARD_DIR)/$(BOARD)_conf.vh $@;
-	sed -i 's/ $(BOARD_UPPER)_/ /g' $@;
+	cp $(BOARD_DIR)/$(NAME)_$(BOARD)_conf.vh $@;
+	sed -i 's/ $(NAME_UPPER)_$(BOARD_UPPER)_/ /g' $@;
 else
 	@echo "Creating $(BSP_VH) for simulation"
-	cp $(SIM_DIR)/src/iob_sim_conf.vh $@;
-	sed -i 's/ IOB_SIM_/ /g' $@;
+	cp $(SIM_DIR)/src/$(NAME)_sim_conf.vh $@;
+	sed -i 's/ $(NAME_UPPER)_SIM_/ /g' $@;
 endif
 
 $(BSP_H): $(BSP_VH)

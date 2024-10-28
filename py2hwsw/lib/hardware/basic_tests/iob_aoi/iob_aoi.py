@@ -73,7 +73,14 @@ def setup(py_params_dict):
             a_i:or_out
             y_o:y_o
             'Inverter'
-            """
+            """,
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
     }
 

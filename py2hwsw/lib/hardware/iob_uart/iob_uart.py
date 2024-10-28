@@ -311,6 +311,13 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
         "snippets": [
             {

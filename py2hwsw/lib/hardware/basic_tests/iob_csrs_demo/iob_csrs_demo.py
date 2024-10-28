@@ -575,6 +575,13 @@ def setup(py_params_dict):
                     "async_fifo_read_extmem": "async_fifo_read_extmem",
                 },
             },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
     }
 

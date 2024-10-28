@@ -141,7 +141,7 @@ module iob_system_tb;
 `endif
 
 
-   iob_sim iob_system_sim_wrapper (
+   iob_system_sim iob_system_sim_wrapper (
       .clk_i (clk),
       .cke_i (1'b1),
       .arst_i(arst),

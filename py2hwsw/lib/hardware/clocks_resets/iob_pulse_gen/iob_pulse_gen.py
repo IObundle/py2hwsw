@@ -149,6 +149,13 @@ def setup(py_params_dict):
                     "data_o": "pulse_o",
                 },
             },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
         "snippets": [
             {

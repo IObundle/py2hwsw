@@ -206,6 +206,13 @@ def setup(py_params_dict):
                 "core_name": "axis2axi_out",
                 "instance_name": "axis2axi_out_inst",
             },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
     }
 

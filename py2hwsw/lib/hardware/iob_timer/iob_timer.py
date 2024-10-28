@@ -197,6 +197,13 @@ def setup(py_params_dict):
                     "reg_interface": "timer_core_reg_interface",
                 },
             },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
         "snippets": [
             {

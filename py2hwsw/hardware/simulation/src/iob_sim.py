@@ -13,6 +13,7 @@ bsp = [
 
 def setup(py_params_dict):
     attributes_dict = {
+        "name": py_params_dict["instantiator"]["name"] + "_sim",
         "confs": bsp,
     }
 

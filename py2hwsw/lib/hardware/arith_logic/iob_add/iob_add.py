@@ -12,6 +12,13 @@ def setup(py_params_dict):
                 "core_name": "iob_add2",
                 "instance_name": "iob_add2_inst",
             },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
     }
 

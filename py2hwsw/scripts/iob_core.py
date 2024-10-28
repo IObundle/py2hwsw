@@ -754,7 +754,7 @@ def find_module_setup_dir(core_name):
     file_path = find_file(
         iob_core.global_project_root, core_name, [".py", ".json"]
     ) or find_file(
-        os.path.join(os.path.dirname(__file__), "../lib"),
+        os.path.join(os.path.dirname(__file__), ".."),
         core_name,
         [".py", ".json"],
     )

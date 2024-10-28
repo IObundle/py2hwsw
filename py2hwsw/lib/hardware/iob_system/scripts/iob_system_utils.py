@@ -73,8 +73,8 @@ def append_board_wrappers(attributes_dict, params):
         tool = tools[board]
         attributes_dict["blocks"].append(
             {
-                "core_name": board,
-                "instance_name": board,
+                "core_name": "iob_system_" + board,
+                "instance_name": "iob_system_" + board,
                 "instance_description": f"FPGA wrapper for {board}",
                 "instantiate": False,
                 "dest_dir": f"hardware/fpga/{tool}/{board}",

@@ -505,8 +505,8 @@ def setup(py_params_dict):
         },
         # Simulation wrapper
         {
-            "core_name": "iob_sim",
-            "instance_name": "iob_sim",
+            "core_name": "iob_system_sim",
+            "instance_name": "iob_system_sim",
             "instantiate": False,
             "dest_dir": "hardware/simulation/src",
             "iob_system_params": params,

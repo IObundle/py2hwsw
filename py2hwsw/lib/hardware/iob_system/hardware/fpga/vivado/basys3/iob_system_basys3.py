@@ -15,6 +15,7 @@ def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
 
     attributes_dict = {
+        "name": params["name"] + "_basys3",
         "version": "0.1",
         #
         # Configuration

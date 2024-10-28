@@ -17,6 +17,7 @@ def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
 
     attributes_dict = {
+        "name": params["name"] + "_cyclonev_gt_dk",
         "version": "0.1",
         "confs": [
             {

@@ -158,7 +158,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "uart_core_reg_interface",
+                "name": "iob_uart_core_reg_interface",
                 "descr": "",
                 "signals": [
                     {"name": "softreset_wr"},
@@ -176,7 +176,7 @@ def setup(py_params_dict):
         ],
         "blocks": [
             {
-                "core_name": "csrs",
+                "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
                 "instance_description": "Control/Status Registers",
                 "autoaddr": False,
@@ -302,12 +302,12 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "uart_core",
-                "instance_name": "uart_core_inst",
+                "core_name": "iob_uart_core",
+                "instance_name": "iob_uart_core_inst",
                 "instance_description": "UART core driver",
                 "connect": {
                     "clk_rst_s": "clk_rst",
-                    "reg_interface": "uart_core_reg_interface",
+                    "reg_interface": "iob_uart_core_reg_interface",
                     "rs232_m": "rs232_m",
                 },
             },

@@ -178,7 +178,7 @@ def setup(py_params_dict):
         attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
         attributes_dict["blocks"] += [
             {
-                "core_name": "xilinx_axi_interconnect",
+                "core_name": "iob_xilinx_axi_interconnect",
                 "instance_name": "axi_async_bridge",
                 "instance_description": "Interconnect instance",
                 "parameters": {

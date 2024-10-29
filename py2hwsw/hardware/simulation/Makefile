@@ -111,7 +111,7 @@ fix-vcd:
 
 gen-clean:
 	@rm -f *.hex
-	@find . -maxdepth 1 -name "*.vh" -not \( -name "bsp.vh" -o -name "uut_build.mk" \) -delete
+	@find . -maxdepth 1 -name "*.vh" -not \( -name "iob_bsp.vh" -o -name "uut_build.mk" \) -delete
 ifneq ($(SIM_SERVER),)
 	ssh -t $(SIM_SSH_FLAGS) $(SIM_USER)@$(SIM_SERVER) 'if [ -f $(REMOTE_SIM_DIR)/Makefile ]; then make -C $(REMOTE_SIM_DIR) $@; fi'
 endif

@@ -149,7 +149,7 @@ def setup(py_params_dict):
         #
         "blocks": [
             {
-                "core_name": "csrs",
+                "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
                 "version": VERSION,
                 "csrs": [

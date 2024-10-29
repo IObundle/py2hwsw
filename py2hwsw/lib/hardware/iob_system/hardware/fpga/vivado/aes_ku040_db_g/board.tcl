@@ -16,7 +16,7 @@ if { $USE_EXTMEM > 0 } {
         }
     }
 
-    read_verilog vivado/$BOARD/xilinx_axi_interconnect.v
+    read_verilog vivado/$BOARD/iob_xilinx_axi_interconnect.v
 
     if { ![file isdirectory "./ip"]} {
         file mkdir ./ip
@@ -49,7 +49,7 @@ if { $USE_EXTMEM > 0 } {
 
     }
 
-    read_verilog vivado/$BOARD/xilinx_ddr4_ctrl.v
+    read_verilog vivado/$BOARD/iob_xilinx_ddr4_ctrl.v
 
 
     if { [file isdirectory "./ip/ddr4_0"] } {
@@ -85,7 +85,7 @@ if { $USE_EXTMEM > 0 } {
     read_xdc vivado/$BOARD/ddr.xdc
 
 } else { # USE_EXTMEM == 0
-    read_verilog vivado/$BOARD/xilinx_clock_wizard.v
+    read_verilog vivado/$BOARD/iob_xilinx_clock_wizard.v
     read_verilog vivado/$BOARD/clock_wizard.v
     read_verilog vivado/$BOARD/iob_reset_sync.v
     read_verilog vivado/$BOARD/iob_r.v

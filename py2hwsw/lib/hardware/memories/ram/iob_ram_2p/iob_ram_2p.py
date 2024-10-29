@@ -111,7 +111,7 @@ def setup(py_params_dict):
                 "name": "en_int",
                 "descr": "en wire",
                 "signals": [
-                    {"name": "en_in", "width": 1},
+                    {"name": "en_int", "width": 1},
                 ],
             },
             {

@@ -80,7 +80,7 @@ def setup(py_params_dict):
         },
         # Internal memory
         {
-            "core_name": "axi_ram",
+            "core_name": "iob_axi_ram",
             "instance_name": "internal_memory",
             "instance_description": "Internal memory",
             "if_defined": "IOB_MEM_NO_READ_ON_WRITE",
@@ -112,7 +112,7 @@ def setup(py_params_dict):
             }
         )
 
-    # Copy axi_ram block, but with READ_ON_WRITE=1
+    # Copy iob_axi_ram block, but with READ_ON_WRITE=1
     attributes_dict["blocks"].append(copy.deepcopy(attributes_dict["blocks"][-1]))
     attributes_dict["blocks"][-1].pop("if_defined")
     attributes_dict["blocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"

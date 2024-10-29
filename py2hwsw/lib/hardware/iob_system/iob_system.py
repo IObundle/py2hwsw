@@ -347,9 +347,9 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "axi_interconnect_wrapper",
-            "name": "soc_axi_interconnect_wrapper",
-            "instance_name": "axi_interconnect",
+            "core_name": "iob_axi_interconnect_wrapper",
+            "name": "iob_soc_axi_interconnect_wrapper",
+            "instance_name": "iob_axi_interconnect",
             "instance_description": "Interconnect instance",
             "parameters": {
                 "AXI_ID_W": "AXI_ID_W",
@@ -434,7 +434,7 @@ def setup(py_params_dict):
             "soc_name": params["name"],
         },
         {
-            "core_name": "axi2iob",
+            "core_name": "iob_axi2iob",
             "instance_name": "periphs_axi2iob",
             "instance_description": "Convert AXI to AXI lite for CLINT",
             "parameters": {
@@ -503,6 +503,14 @@ def setup(py_params_dict):
             "instantiate": False,
             "dest_dir": "hardware/simulation/src",
         },
+        # Synthesis module (needed for macros)
+        {
+            "core_name": "iob_system_syn",
+            "instance_name": "iob_system_syn",
+            "instantiate": False,
+            "dest_dir": "hardware/syn/src",
+            "iob_system_params": params,
+        },
         # Simulation wrapper
         {
             "core_name": "iob_system_sim",
@@ -516,8 +524,8 @@ def setup(py_params_dict):
     attributes_dict["sw_modules"] = [
         # Software modules
         {
-            "core_name": "printf",
-            "instance_name": "printf_inst",
+            "core_name": "iob_printf",
+            "instance_name": "iob_printf_inst",
         },
     ]
     attributes_dict["snippets"] = [

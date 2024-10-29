@@ -107,7 +107,7 @@ def setup(py_params_dict):
             },
             # Timer core
             {
-                "name": "timer_core_reg_interface",
+                "name": "iob_timer_core_reg_interface",
                 "descr": "",
                 "signals": [
                     {"name": "enable_wr"},
@@ -119,7 +119,7 @@ def setup(py_params_dict):
         ],
         "blocks": [
             {
-                "core_name": "csrs",
+                "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
@@ -189,12 +189,12 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "timer_core",
-                "instance_name": "timer_core_inst",
+                "core_name": "iob_timer_core",
+                "instance_name": "iob_timer_core_inst",
                 "instance_description": "Timer core driver",
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "reg_interface": "timer_core_reg_interface",
+                    "reg_interface": "iob_timer_core_reg_interface",
                 },
             },
             # Simulation wrapper

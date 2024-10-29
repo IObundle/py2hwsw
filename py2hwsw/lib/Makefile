@@ -10,7 +10,7 @@
 BUILD_DIR ?=build
 INIT_MEM ?= 1
 USE_EXTMEM ?= 0
-BOARD ?= aes_ku040_db_g
+BOARD ?= iob_aes_ku040_db_g
  
 # Used by test.sh
 LIB_DIR:=.

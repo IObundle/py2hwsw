@@ -186,7 +186,7 @@ def setup(py_params_dict):
 
     attributes_dict["blocks"] = [
         {
-            "core_name": "csrs",
+            "core_name": "iob_csrs",
             "instance_name": "csrs_inst",
             "instance_description": "Control/Status Registers",
             "csrs": [

@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ps
 
-`include "bsp.vh"
+`include "iob_bsp.vh"
 `include "iob_system_conf.vh"
 `include "iob_uart_conf.vh"
 `include "iob_uart_csrs_def.vh"

@@ -7,7 +7,7 @@
 #include <verilated.h>
 
 #include "Viob_sim.h"
-#include "bsp.h"
+#include "iob_bsp.h"
 #include "iob_system_conf.h"
 #include "iob_uart_csrs.h"
 

@@ -15,6 +15,7 @@ def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
 
     attributes_dict = {
+        "name": params["name"] + "_basys3",
         "version": "0.1",
         #
         # Configuration
@@ -142,7 +143,7 @@ def setup(py_params_dict):
             "iob_system_params": params,
         },
         {
-            "core_name": "xilinx_axi_interconnect",
+            "core_name": "iob_xilinx_axi_interconnect",
             "instance_name": "axi_async_bridge",
             "instance_description": "Interconnect instance",
             "parameters": {
@@ -161,7 +162,7 @@ def setup(py_params_dict):
             "num_slaves": 1,
         },
         {
-            "core_name": "axi_ram",
+            "core_name": "iob_axi_ram",
             "instance_name": "ddr_model_mem",
             "instance_description": "DDR model memory",
             "parameters": {

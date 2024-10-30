@@ -21,76 +21,84 @@
 
 module iob_nco_tb;
 
-  integer fd;
+   integer fd;
 
-  localparam CLK_PER = 10;
-  localparam ADDR_W = `IOB_NCO_CSRS_ADDR_W;
-  localparam DATA_W = 32;
-
-
-  reg clk = 1;
-
-  // Drive clock
-  always #(CLK_PER / 2) clk = ~clk;
-
-  reg                             cke = 1'b1;
-  reg                             arst;
+   localparam CLK_PER = 10;
+   localparam ADDR_W = `IOB_NCO_CSRS_ADDR_W;
+   localparam DATA_W = 32;
 
 
-  wire                            clk_out;
+   reg clk = 1;
 
-  //IOb-Native interface
-  reg                             iob_valid_i;
-  reg  [`IOB_NCO_CSRS_ADDR_W-1:0] iob_addr_i;
-  reg  [     `IOB_NCO_DATA_W-1:0] iob_wdata_i;
-  reg  [                     3:0] iob_wstrb_i;
-  wire [     `IOB_NCO_DATA_W-1:0] iob_rdata_o;
-  wire                            iob_ready_o;
-  wire                            iob_rvalid_o;
+   // Drive clock
+   always #(CLK_PER / 2) clk = ~clk;
 
-  initial begin
+   reg                             cke = 1'b1;
+   reg                             arst;
+
+
+   wire                            clk_out;
+
+   //IOb-Native interface
+   reg                             iob_valid_i;
+   reg  [`IOB_NCO_CSRS_ADDR_W-1:0] iob_addr_i;
+   reg  [     `IOB_NCO_DATA_W-1:0] iob_wdata_i;
+   reg  [                     3:0] iob_wstrb_i;
+   wire [     `IOB_NCO_DATA_W-1:0] iob_rdata_o;
+   wire                            iob_ready_o;
+   wire                            iob_rvalid_o;
+
+   initial begin
 
 `ifdef VCD
-    $dumpfile("uut.vcd");
-    $dumpvars();
+      $dumpfile("uut.vcd");
+      $dumpvars();
 `endif
 
-    //init cpu bus signals
-    iob_valid_i = 0;
-    iob_wstrb_i = 0;
+      //init cpu bus signals
+      iob_valid_i = 0;
+      iob_wstrb_i = 0;
 
-    // Reset signal
-    arst = 0;
-    #100 arst = 1;
-    #1_000 arst = 0;
-    #100;
-    @(posedge clk) #1;
+      // Reset signal
+      arst        = 0;
+      #100 arst = 1;
+      #1_000 arst = 0;
+      #100;
+      @(posedge clk) #1;
 
-    IOB_NCO_SET_SOFTRESET(1'b1);
-    IOB_NCO_SET_SOFTRESET(1'b0);
+      IOB_NCO_SET_SOFT_RESET(1'b1);
+      IOB_NCO_SET_SOFT_RESET(1'b0);
 
-    IOB_NCO_SET_PERIOD(16'h1280);
-    IOB_NCO_SET_ENABLE(1'b1);
+      IOB_NCO_SET_PERIOD(16'h1280);
+      IOB_NCO_SET_ENABLE(1'b1);
 
-    $display("%c[1;34m", 27);
-    $display("Test completed successfully.");
-    $display("%c[0m", 27);
-    fd = $fopen("test.log", "w");
-    $fdisplay(fd, "Test passed!");
-    $fclose(fd);
-    #1000 $finish();
+      $display("%c[1;34m", 27);
+      $display("Test completed successfully.");
+      $display("%c[0m", 27);
+      fd = $fopen("test.log", "w");
+      $fdisplay(fd, "Test passed!");
+      $fclose(fd);
+      #1000 $finish();
 
-  end
+   end
 
-  iob_nco nco (
+   iob_nco nco (
       `include "iob_nco_clk_en_rst_s_portmap.vs"
-      `include "iob_nco_iob_s_s_portmap.vs"
-      .clk_in_i(clk),
-      .clk_out_o(clk_out)
-  );
+      .iob_valid_i  (iob_valid_i),
+      .iob_addr_i   (iob_addr_i[`IOB_NCO_CSRS_ADDR_W-1:2]),
+      .iob_wdata_i  (iob_wdata_i),
+      .iob_wstrb_i  (iob_wstrb_i),
+      .iob_rdata_o  (iob_rdata_o),
+      .iob_ready_o  (iob_ready_o),
+      .iob_rvalid_o (iob_rvalid_o),
+      .clk_in_i     (clk),
+      .clk_in_arst_i(arst),
+      .clk_in_cke_i (1'b1),
+      .clk_out_o    (clk_out)
+   );
 
-  `include "iob_nco_csrs_emb_tb.vs"
+   `include "iob_nco_csrs_emb_tb.vs"
 
-  `include "iob_tasks.vs"
+   `include "iob_tasks.vs"
 
 endmodule

@@ -60,13 +60,13 @@ module iob_axistream_out #(
    assign interrupt_o = fifo_level_rd <= fifo_threshold_wr;
 
    //DMA data ready
-   assign sys_tready_o = ~fifo_full_rd & axis_sw_enable & (mode_wr == 1'b1);
+   assign sys_tready_o = ~fifo_full_rd & enable_wr & (mode_wr == 1'b1);
 
    //FIFO write
    assign fifo_write     = ((data_wen_wr & (mode_wr == 1'b0)) |
                            (sys_tvalid_i & (mode_wr == 1'b1))) &
-                           axis_sw_enable;
-   assign fifo_wdata = sys_tvalid_i == 1'b1 ? sys_tdata_i : data_wdata_wr;
+                           enable_wr;
+   assign fifo_wdata = (sys_tvalid_i == 1'b1) ? sys_tdata_i : data_wdata_wr;
 
    //FIFO read
    always @* begin
@@ -225,5 +225,3 @@ module iob_axistream_out #(
    );
 
 endmodule
-
-

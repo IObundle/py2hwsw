@@ -54,7 +54,7 @@ def setup(py_params_dict):
                 "name": "iob_s",
                 "signals": {
                     "type": "iob",
-                    "ADDR_W": "ADDR_W",
+                    "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
                 },
                 "descr": "CPU native interface",
@@ -140,7 +140,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob",
                     "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W",
+                    "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
                 },
             },
@@ -350,34 +350,39 @@ def setup(py_params_dict):
             },
             # TODO: Connect remaining blocks
             {
+                "core_name": "iob_fifo2axis",
+                "instantiate": False,
+            },
+            {
                 "core_name": "iob_fifo_async",
-                "instance_name": "iob_fifo_async_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_reg_re",
-                "instance_name": "iob_reg_re_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_ram_at2p",
-                "instance_name": "iob_ram_at2p_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_sync",
-                "instance_name": "iob_sync_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_counter",
-                "instance_name": "iob_counter_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_edge_detect",
-                "instance_name": "iob_edge_detect_inst",
                 "instantiate": False,
+            },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
             },
         ],
     }

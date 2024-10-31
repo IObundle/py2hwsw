@@ -329,7 +329,7 @@ def setup(py_params_dict):
     assign rxdata_rready_rd = 1'b1;
 
     // rxdata rvalid is iob_valid registered
-    assign rxdata_rvalid_nxt = csrs_iob_valid & rxdata_ren_rd;
+    assign rxdata_rvalid_nxt = rxdata_ren_rd;
 """,
             },
         ],

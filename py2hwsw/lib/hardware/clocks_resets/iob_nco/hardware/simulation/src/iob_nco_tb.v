@@ -24,14 +24,17 @@ module iob_nco_tb;
    integer fd;
 
    localparam CLK_PER = 10;
+   localparam CLK2_PER = 12;
    localparam ADDR_W = `IOB_NCO_CSRS_ADDR_W;
    localparam DATA_W = 32;
 
 
    reg clk = 1;
+   reg clk_in = 1;
 
    // Drive clock
    always #(CLK_PER / 2) clk = ~clk;
+   always #(CLK2_PER / 2) clk_in = ~clk_in;
 
    reg                             cke = 1'b1;
    reg                             arst;
@@ -69,7 +72,8 @@ module iob_nco_tb;
       IOB_NCO_SET_SOFT_RESET(1'b1);
       IOB_NCO_SET_SOFT_RESET(1'b0);
 
-      IOB_NCO_SET_PERIOD(16'h1280);
+      IOB_NCO_SET_PERIOD_INT(32'h12);
+      IOB_NCO_SET_PERIOD_FRAC(32'h80000000);
       IOB_NCO_SET_ENABLE(1'b1);
 
       $display("%c[1;34m", 27);
@@ -84,6 +88,9 @@ module iob_nco_tb;
 
    iob_nco nco (
       `include "iob_nco_clk_en_rst_s_portmap.vs"
+      .clk_in_i     (clk_in),
+      .clk_in_arst_i(arst),
+      .clk_in_cke_i (1'b1),
       .iob_valid_i  (iob_valid_i),
       .iob_addr_i   (iob_addr_i[`IOB_NCO_CSRS_ADDR_W-1:2]),
       .iob_wdata_i  (iob_wdata_i),
@@ -91,9 +98,6 @@ module iob_nco_tb;
       .iob_rdata_o  (iob_rdata_o),
       .iob_ready_o  (iob_ready_o),
       .iob_rvalid_o (iob_rvalid_o),
-      .clk_in_i     (clk),
-      .clk_in_arst_i(arst),
-      .clk_in_cke_i (1'b1),
       .clk_out_o    (clk_out)
    );
 

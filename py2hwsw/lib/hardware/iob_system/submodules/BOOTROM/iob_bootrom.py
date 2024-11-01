@@ -109,17 +109,6 @@ def setup(py_params_dict):
         #
         "wires": [
             {
-                "name": "csrs_iob",
-                "descr": "Internal iob interface",
-                "signals": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
-                    "ADDR_W": BOOTROM_ADDR_W - 2 + 1,
-                    "DATA_W": "DATA_W",
-                },
-            },
-            {
                 "name": "rom",
                 "descr": "'rom' register interface",
                 "signals": [
@@ -174,7 +163,6 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",
-                    "csrs_iob_o": "csrs_iob",
                     # Register interfaces
                     "rom": "rom",
                 },
@@ -201,7 +189,7 @@ def setup(py_params_dict):
             {
                 "verilog_code": """
    assign ext_rom_en_o   = rom_ren_rd;
-   assign ext_rom_addr_o = csrs_iob_addr;
+   assign ext_rom_addr_o = csrs_iob_addr; // FIXME: Find alternative to old `csrs_iob`
    assign rom_rdata_rd   = ext_rom_rdata_i;
    assign rom_rready_rd  = 1'b1;  // ROM is always ready
 """,

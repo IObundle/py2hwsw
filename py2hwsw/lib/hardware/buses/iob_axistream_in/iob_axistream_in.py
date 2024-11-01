@@ -135,16 +135,6 @@ def setup(py_params_dict):
         ],
         "wires": [
             {
-                "name": "csrs_iob",
-                "descr": "Internal CSRs IOb interface",
-                "signals": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W - 2",
-                    "DATA_W": "DATA_W",
-                },
-            },
-            {
                 "name": "soft_reset",
                 "descr": "",
                 "signals": [
@@ -334,7 +324,6 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "iob_s",
-                    "csrs_iob_o": "csrs_iob",
                     # Register interfaces
                     "soft_reset": "soft_reset",
                     "enable": "enable",

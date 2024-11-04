@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024 IObundle
+//
+// SPDX-License-Identifier: MIT
+
 `timescale 1ns / 1ps
 `include "iob_nco_sync_conf.vh"
 `include "iob_nco_csrs_def.vh"

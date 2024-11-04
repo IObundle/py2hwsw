@@ -175,7 +175,7 @@ def setup(py_params_dict):
             },
         ],
         "blocks": [
-            f"""csrs csrs_inst 
+            f"""iob_csrs csrs_inst 
 				-d 'Control/Status Registers' 
                 --no_autoaddr 
                 --rw_overlap 

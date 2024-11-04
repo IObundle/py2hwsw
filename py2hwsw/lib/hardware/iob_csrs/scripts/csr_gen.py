@@ -398,6 +398,7 @@ class csr_gen:
         for row in table:
             name = row.name
             auto = row.autoreg
+            addr = row.addr
             n_bits = row.n_bits
             log2n_items = row.log2n_items
             n_items = 2 ** eval_param_expression_from_config(
@@ -440,7 +441,7 @@ class csr_gen:
                             },
                         ]
                         snippet += f"""
-   assign {name}_waddr_o = internal_iob_addr[{log2n_items}-1:2];
+   assign {name}_waddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
 """
                     register_signals += [
                         {
@@ -465,7 +466,7 @@ class csr_gen:
                         },
                     ]
                     snippet += f"""
-   assign {name}_raddr_o = internal_iob_addr[{log2n_items}-1:2];
+   assign {name}_raddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
 """
                 if auto:
                     register_signals.append(

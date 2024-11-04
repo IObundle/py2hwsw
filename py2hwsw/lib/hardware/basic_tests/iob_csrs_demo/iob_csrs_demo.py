@@ -75,7 +75,7 @@ def setup(py_params_dict):
                 "name": "regfile_read",
                 "descr": "",
                 "signals": [
-                    {"name": "regfile_read_raddr", "width": 32},
+                    {"name": "regfile_read_raddr", "width": 2},
                     {"name": "regfile_read", "width": 8},
                 ],
             },

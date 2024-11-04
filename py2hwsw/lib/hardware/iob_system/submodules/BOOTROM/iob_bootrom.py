@@ -112,7 +112,7 @@ def setup(py_params_dict):
                 "name": "rom",
                 "descr": "'rom' register interface",
                 "signals": [
-                    {"name": "rom_raddr_rd", "width": 32},
+                    {"name": "rom_raddr_rd", "width": BOOTROM_ADDR_W - 2},
                     {"name": "rom_rdata_rd", "width": "DATA_W"},
                     {"name": "rom_rvalid_rd", "width": 1},
                     {"name": "rom_ren_rd", "width": 1},

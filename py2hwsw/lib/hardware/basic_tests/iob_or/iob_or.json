@@ -11,7 +11,7 @@
         }
     ],
     "ports": [
-        "\n            a_i -s a_i W\n            'Input port'\n\n            b_i -s b_i W\n            'Input port'\n\n            y_o -s y_o W\n            'Output port'\n            "
+        "\n            a_i -s a_i W\n            -d 'Input port'\n\n            b_i -s b_i W\n            -d 'Input port'\n\n            y_o -s y_o W\n            -d 'Output port'\n            "
     ],
     "snippets": [
         {

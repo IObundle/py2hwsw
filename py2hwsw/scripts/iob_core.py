@@ -396,9 +396,27 @@ class iob_core(iob_module, iob_instance):
 
     attrs = [
         "core_name",
-        "instance_name",
-        ["-p", "parameters", {"nargs": "+"}, "pairs"],
-        ["-c", "connect", {"nargs": "+"}, "pairs"],
+		"instance_name",
+		["-p", "parameters", {"nargs": "+"}, "pairs"],
+		["-c", "connect", {"nargs": "+"}, "pairs"],
+		["--no_autoaddr", "autoaddr", {"action": "store_false"}],
+		["--rw_overlap", "rw_overlap", {"action": "store_true"}],
+		["--csr_if", "csr_if"],
+		{
+		    "csrs": [
+		        "name",
+		        {
+		            "regs:list": [
+		                ["-n", "name:n_bits", {"action": "append"}],
+                        ["-t", "type", {"action": "append"}],
+		                ["--rst_val", "rst_val", {"action": "append"}],
+                        ["--addr", "addr", {"type":int,"action": "append"}],
+		                ["--log2n_items", "log2n_items", {"action": "append"}],
+		                ["--noauto", "autoreg", {"action": "store_false"}],
+		            ],
+		        },
+		    ]
+		},
     ]
 
     @str_to_kwargs(attrs)

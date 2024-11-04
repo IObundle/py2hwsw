@@ -80,9 +80,9 @@ module iob_nco #(
       .cke_i (cke_i),
       .arst_i(arst_i),
 
-      .clk_in_i     (clk_in_i),
-      .clk_in_arst_i(clk_in_arst_i),
-      .clk_in_cke_i (clk_in_cke_i),
+      .in_clk_i (clk_in_i),
+      .in_arst_i(clk_in_arst_i),
+      .in_cke_i (clk_in_cke_i),
 
       .soft_reset_i  (soft_reset_wr),
       .enable_i      (enable_wr),
@@ -142,16 +142,15 @@ module iob_nco #(
    iob_acc_ld #(
       .DATA_W(PERIOD_W)
    ) acc_ld (
-      .clk_i     (clk_in_i),
-      .cke_i     (clk_in_cke_i),
-      .arst_i    (clk_in_arst_i),
-      .rst_i     (soft_reset),
-      .en_i      (enable),
-      .ld_i      (period_wen),
-      .ld_val_i  (period_wdata),
-      .incr_i    (diff),
-      .data_o    (acc_out),
-      .data_nxt_o()
+      .clk_i   (clk_in_i),
+      .cke_i   (clk_in_cke_i),
+      .arst_i  (clk_in_arst_i),
+      .rst_i   (soft_reset),
+      .en_i    (enable),
+      .ld_i    (period_wen),
+      .ld_val_i(period_wdata),
+      .incr_i  (diff),
+      .data_o  (acc_out)
    );
 
    //output period counter

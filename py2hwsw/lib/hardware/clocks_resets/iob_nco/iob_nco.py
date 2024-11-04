@@ -101,12 +101,21 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "period",
+                "name": "period_int",
                 "descr": "",
                 "signals": [
-                    {"name": "period_wdata_wr", "width": 32},
-                    {"name": "period_wen_wr", "width": 1},
-                    {"name": "period_wready_wr", "width": 1},
+                    {"name": "period_int_wdata_wr", "width": 32},
+                    {"name": "period_int_wen_wr", "width": 1},
+                    {"name": "period_int_wready_wr", "width": 1},
+                ],
+            },
+            {
+                "name": "period_frac",
+                "descr": "",
+                "signals": [
+                    {"name": "period_frac_wdata_wr", "width": 32},
+                    {"name": "period_frac_wen_wr", "width": 1},
+                    {"name": "period_frac_wready_wr", "width": 1},
                 ],
             },
         ],
@@ -165,7 +174,8 @@ def setup(py_params_dict):
                     # Register interfaces
                     "soft_reset": "soft_reset",
                     "enable": "enable",
-                    "period": "period",
+                    "period_int": "period_int",
+                    "period_frac": "period_frac",
                 },
             },
             # For simulation

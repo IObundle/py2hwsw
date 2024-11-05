@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "PERIOD_W",
                 "type": "P",
-                "val": "32",
+                "val": "0",
                 "min": "0",
                 "max": "32",
                 "descr": "Period width",
@@ -18,23 +18,21 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_rst_s",
+                "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_rst",
+                    "type": "clk_en_rst",
                 },
-                "descr": "Clock and reset",
+                "descr": "Clock, clock enable, and reset",
             },
             {
-                "name": "clk_i",
-                "descr": "Source clock domain",
-                "signals": [
-                    {
-                        "name": "clk_in_i",
-                        "width": "1",
-                        "descr": "Source clock input",
-                    },
-                ],
+                "name": "in_clk_en_rst_s",
+                "signals": {
+                    "type": "clk_en_rst",
+                    "prefix": "in_",
+                },
+                "descr": "Clock, clock enable, and reset for inputs",
             },
+            # Inputs
             {
                 "name": "soft_reset_i",
                 "descr": "System soft reset",
@@ -79,6 +77,7 @@ def setup(py_params_dict):
                     },
                 ],
             },
+            # Outputs
             {
                 "name": "soft_reset_o",
                 "descr": "Source clock domain soft reset",
@@ -124,75 +123,9 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
-            # Period wires
-            {
-                "name": "period_int",
-                "descr": "",
-                "signals": [
-                    {"name": "period_int", "width": "PERIOD_W+1"},
-                ],
-            },
-            {
-                "name": "period_out",
-                "descr": "",
-                "signals": [
-                    {"name": "period_out", "width": "PERIOD_W+1"},
-                ],
-            },
-        ],
-        "blocks": [
-            {
-                "core_name": "iob_sync",
-                "instance_name": "soft_reset_sync",
-                "instance_description": "Syncronize soft reset to clk_in domain",
-                "parameters": {
-                    "DATA_W": "1",
-                },
-                "connect": {
-                    "clk_rst_s": "clk_rst_s",
-                    "signal_i": "soft_reset_i",
-                    "signal_o": "soft_reset_o",
-                },
-            },
-            {
-                "core_name": "iob_sync",
-                "instance_name": "enable_sync",
-                "instance_description": "Syncronize enable to clk_in domain",
-                "parameters": {
-                    "DATA_W": "1",
-                },
-                "connect": {
-                    "clk_rst_s": "clk_rst_s",
-                    "signal_i": "enable_i",
-                    "signal_o": "enable_o",
-                },
-            },
-            {
-                "core_name": "iob_sync",
-                "instance_name": "period_sync",
-                "instance_description": "Syncronize period to clk_in domain",
-                "parameters": {
-                    "DATA_W": "PERIOD_W+1",
-                },
-                "connect": {
-                    "clk_rst_s": "clk_rst_s",
-                    "signal_i": "period_int",
-                    "signal_o": "period_out",
-                },
-            },
-        ],
-        "snippets": [
-            {
-                "verilog_code": """
-    // Period pack/unpack
-    assign period_int = {period_wdata_i, period_wen_i};
-
-    assign period_wdata_o = period_out[1+:PERIOD_W];
-    assign period_wen_o = period_out[0];
-""",
-            },
-        ],
+        "wires": [],
+        "blocks": [],
+        "snippets": [],
     }
 
     return attributes_dict

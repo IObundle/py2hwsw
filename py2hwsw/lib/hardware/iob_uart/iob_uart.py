@@ -63,16 +63,6 @@ def setup(py_params_dict):
         ],
         "wires": [
             {
-                "name": "csrs_iob",
-                "descr": "Internal iob interface",
-                "signals": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W - 2",
-                    "DATA_W": "DATA_W",
-                },
-            },
-            {
                 "name": "softreset",
                 "descr": "",
                 "signals": [
@@ -182,7 +172,6 @@ def setup(py_params_dict):
                 -c 
                     "clk_en_rst_s":"clk_en_rst_s"
                     "control_if_s":"cbus_s"
-                    "csrs_iob_o":"csrs_iob"
                     "softreset":"softreset"
                     "div":"div"
                     "txdata":"txdata"
@@ -247,7 +236,7 @@ def setup(py_params_dict):
     assign rxdata_rready_rd = 1'b1;
 
     // rxdata rvalid is iob_valid registered
-    assign rxdata_rvalid_nxt = csrs_iob_valid & rxdata_ren_rd;
+    assign rxdata_rvalid_nxt = rxdata_ren_rd;
 """,
             },
         ],

@@ -161,16 +161,6 @@ def setup(py_params_dict):
         "wires": reg_wires
         + [
             {
-                "name": "csrs_iob",
-                "descr": "Internal CSRs iob interface",
-                "signals": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
-            },
-            {
                 "name": "internal_iob2",
                 "descr": "Internal iob interface",
                 "signals": {
@@ -190,7 +180,6 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "external_control_if_s",
-                    "csrs_iob_o": "csrs_iob",
                     **external_reg_connections,
                 },
                 "csr_if": params["external_csr_if"],
@@ -207,7 +196,6 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "internal_control_if_s",
-                    "csrs_iob_o": "internal_iob2",
                     **internal_reg_connections,
                 },
                 "csr_if": params["internal_csr_if"],

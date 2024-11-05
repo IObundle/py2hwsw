@@ -24,9 +24,17 @@ def setup(py_params_dict):
                 "descr": "Address bus width",
             },
             {
+                "name": "PERIOD_W",
+                "type": "F",
+                "val": "2*DATA_W",
+                "min": "0",
+                "max": "32",
+                "descr": "Period bus width",
+            },
+            {
                 "name": "FRAC_W",
-                "type": "P",
-                "val": "8",
+                "type": "F",
+                "val": "DATA_W",
                 "min": "0",
                 "max": "32",
                 "descr": "Bit-width of the fractional part of the period value. Used to differentiate between the integer and fractional parts of the period. ",
@@ -44,26 +52,30 @@ def setup(py_params_dict):
                 "name": "iob_s",
                 "signals": {
                     "type": "iob",
-                    "ADDR_W": "4",  # Same as `IOB_NCO_CSRS_ADDR_W
+                    "ADDR_W": 4 - 2,  # Same as `IOB_NCO_CSRS_ADDR_W - 2
                     "DATA_W": "DATA_W",
                 },
                 "descr": "CPU native interface",
             },
             {
-                "name": "clk_src_i",
-                "descr": "Source clock interface",
+                "name": "clk_gen",
+                "descr": "Generated clock interface",
                 "signals": [
                     {
                         "name": "clk_in_i",
                         "width": "1",
-                        "descr": "Source clock input",
+                        "descr": "Clock input",
                     },
-                ],
-            },
-            {
-                "name": "clk_gen_o",
-                "descr": "Output generated clock interface",
-                "signals": [
+                    {
+                        "name": "clk_in_arst_i",
+                        "width": "1",
+                        "descr": "Clock input asynchronous reset",
+                    },
+                    {
+                        "name": "clk_in_cke_i",
+                        "width": "1",
+                        "descr": "Clock input enable",
+                    },
                     {
                         "name": "clk_out_o",
                         "width": "1",
@@ -73,22 +85,12 @@ def setup(py_params_dict):
             },
         ],
         "wires": [
-            {
-                "name": "csrs_iob",
-                "descr": "Internal CSRs IOb interface",
-                "signals": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
-            },
             # Register wires
             {
-                "name": "softreset",
+                "name": "soft_reset",
                 "descr": "",
                 "signals": [
-                    {"name": "softreset_wr", "width": 1},
+                    {"name": "soft_reset_wr", "width": 1},
                 ],
             },
             {
@@ -99,172 +101,21 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "period",
+                "name": "period_int",
                 "descr": "",
                 "signals": [
-                    {"name": "period_wdata_wr", "width": 32},
-                    {"name": "period_wen_wr", "width": 1},
-                    {"name": "period_wready_wr", "width": 1},
-                ],
-            },
-            # nco sync wires
-            {
-                "name": "period_wdata_sync_in",
-                "descr": "",
-                "signals": [
-                    {"name": "period_wdata_wr"},
+                    {"name": "period_int_wdata_wr", "width": 32},
+                    {"name": "period_int_wen_wr", "width": 1},
+                    {"name": "period_int_wready_wr", "width": 1},
                 ],
             },
             {
-                "name": "period_wen_sync_in",
+                "name": "period_frac",
                 "descr": "",
                 "signals": [
-                    {"name": "period_wen_wr"},
-                ],
-            },
-            {
-                "name": "period_wdata_sync_out",
-                "descr": "",
-                "signals": [
-                    {"name": "period_wdata_wr"},
-                ],
-            },
-            {
-                "name": "period_wen_sync_out",
-                "descr": "",
-                "signals": [
-                    {"name": "period_wen_wr"},
-                ],
-            },
-            # clk src domain wires
-            {
-                "name": "softreset_clk_src",
-                "descr": "",
-                "signals": [
-                    {"name": "softreset_clk_src", "width": 1},
-                ],
-            },
-            {
-                "name": "enable_clk_src",
-                "descr": "",
-                "signals": [
-                    {"name": "enable_clk_src", "width": 1},
-                ],
-            },
-            {
-                "name": "period_clk_src",
-                "descr": "",
-                "signals": [
-                    {"name": "period_wdata_clk_src", "width": 32},
-                    {"name": "period_wen_clk_src", "width": 1},
-                ],
-            },
-            # per_reg
-            {
-                "name": "per_reg_en_rst",
-                "descr": "",
-                "signals": [
-                    {"name": "period_wen_clk_src"},
-                    {"name": "softreset_clk_src"},
-                ],
-            },
-            {
-                "name": "per_reg_data_i",
-                "descr": "",
-                "signals": [
-                    {"name": "period_wdata_clk_src"},
-                ],
-            },
-            {
-                "name": "per_reg_data_o",
-                "descr": "",
-                "signals": [
-                    {"name": "period_r", "width": "DATA_W"},
-                ],
-            },
-            # clk_out_reg
-            {
-                "name": "clk_out_reg_en_rst",
-                "descr": "",
-                "signals": [
-                    {"name": "enable_clk_src"},
-                    {"name": "softreset_clk_src"},
-                ],
-            },
-            {
-                "name": "clk_out_reg_data_i",
-                "descr": "",
-                "signals": [
-                    {"name": "clk_int", "width": "1"},
-                ],
-            },
-            # acc_ld
-            {
-                "name": "acc_ld_clk_en_rst",
-                "descr": "",
-                "signals": [
-                    {"name": "clk_in_i"},
-                    {"name": "cke_i"},
-                    {"name": "arst_i"},
-                ],
-            },
-            {
-                "name": "acc_ld_ld",
-                "descr": "",
-                "signals": [
-                    {"name": "period_wen_clk_src"},
-                ],
-            },
-            {
-                "name": "acc_ld_ld_val",
-                "descr": "",
-                "signals": [
-                    {"name": "period_wdata_clk_src"},
-                ],
-            },
-            {
-                "name": "acc_ld_incr",
-                "descr": "",
-                "signals": [
-                    {"name": "diff", "width": "DATA_W"},
-                ],
-            },
-            {
-                "name": "acc_ld_data",
-                "descr": "",
-                "signals": [
-                    {"name": "acc_out", "width": "DATA_W"},
-                ],
-            },
-            # modcnt
-            {
-                "name": "modcnt_en_rst",
-                "descr": "",
-                "signals": [
-                    {"name": "enable_clk_src"},
-                    {"name": "period_wen_clk_src"},
-                ],
-            },
-            {
-                "name": "modcnt_mod",
-                "descr": "",
-                "signals": [
-                    {"name": "quant", "width": "DATA_W-FRAC_W", "isvar": True},
-                ],
-            },
-            {
-                "name": "modcnt_data",
-                "descr": "",
-                "signals": [
-                    {"name": "cnt", "width": "DATA_W-FRAC_W"},
-                ],
-            },
-            {
-                "name": "clk_rst",
-                "descr": "",
-                "signals": [
-                    {"name": "clk_i"},
-                    {"name": "arst_i"},
+                    {"name": "period_frac_wdata_wr", "width": 32},
+                    {"name": "period_frac_wen_wr", "width": 1},
+                    {"name": "period_frac_wready_wr", "width": 1},
                 ],
             },
         ],
@@ -279,7 +130,7 @@ def setup(py_params_dict):
                         "descr": "NCO software accessible registers.",
                         "regs": [
                             {
-                                "name": "softreset",
+                                "name": "soft_reset",
                                 "type": "W",
                                 "n_bits": 1,
                                 "rst_val": 0,
@@ -297,13 +148,22 @@ def setup(py_params_dict):
                                 "descr": "NCO enable",
                             },
                             {
-                                "name": "period",
+                                "name": "period_int",
                                 "type": "W",
                                 "n_bits": 32,
                                 "rst_val": 5,
                                 "log2n_items": 0,
                                 "autoreg": False,
-                                "descr": "Period of the generated clock in terms of the number of system clock cycles + 1 implicit clock cycle. The period value is divided into integer and fractional parts where the lower FRAC_W bits represent the fractional part, and the remaining upper bits represent the integer part.",
+                                "descr": "Integer part of the generated period. Period of the generated clock in terms of the number of system clock cycles + 1 implicit clock cycle. NOTE: need to write to both PERIOD_INT, PERIOD_FRAC registers to set internal period.",
+                            },
+                            {
+                                "name": "period_frac",
+                                "type": "W",
+                                "n_bits": 32,
+                                "rst_val": 0,
+                                "log2n_items": 0,
+                                "autoreg": False,
+                                "descr": "Fractional part of the generated period. NOTE: need to write to both PERIOD_INT, PERIOD_FRAC registers to set internal period.",
                             },
                         ],
                     }
@@ -311,89 +171,11 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "iob_s",
-                    "csrs_iob_o": "csrs_iob",
                     # Register interfaces
-                    "softreset": "softreset",
+                    "soft_reset": "soft_reset",
                     "enable": "enable",
-                    "period": "period",
-                },
-            },
-            {
-                "core_name": "iob_reg_re",
-                "instance_name": "per_reg",
-                "instance_description": "Fractional period value register",
-                "parameters": {
-                    "DATA_W": "DATA_W",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "per_reg_en_rst",
-                    "data_i": "per_reg_data_i",
-                    "data_o": "per_reg_data_o",
-                },
-            },
-            {
-                "core_name": "iob_reg_re",
-                "instance_name": "clk_out_reg",
-                "instance_description": "Output clock register",
-                "parameters": {
-                    "DATA_W": "1",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "clk_out_reg_en_rst",
-                    "data_i": "clk_out_reg_data_i",
-                    "data_o": "clk_gen_o",
-                },
-            },
-            {
-                "core_name": "iob_acc_ld",
-                "instance_name": "acc_ld",
-                "instance_description": "Modulator accumulator",
-                "parameters": {
-                    "DATA_W": "DATA_W",
-                },
-                "connect": {
-                    "clk_en_rst_s": "acc_ld_clk_en_rst",
-                    "en_rst_i": "clk_out_reg_en_rst",
-                    "ld_i": "acc_ld_ld",
-                    "ld_val_i": "acc_ld_ld_val",
-                    "incr_i": "acc_ld_incr",
-                    "data_o": "acc_ld_data",
-                },
-            },
-            {
-                "core_name": "iob_modcnt",
-                "instance_name": "modcnt",
-                "instance_description": "Output period counter",
-                "parameters": {
-                    "DATA_W": "DATA_W - FRAC_W",
-                },
-                "connect": {
-                    "clk_en_rst_s": "acc_ld_clk_en_rst",
-                    "en_rst_i": "modcnt_en_rst",
-                    "mod_i": "modcnt_mod",
-                    "data_o": "modcnt_data",
-                },
-            },
-            {
-                "core_name": "iob_nco_sync",
-                "instance_name": "nco_sync_inst",
-                "instance_description": "Syncronize from CSR domain to clk_src domain",
-                "parameters": {
-                    "PERIOD_W": "DATA_W",
-                },
-                "connect": {
-                    "clk_rst_s": "clk_rst",
-                    "clk_i": "clk_src_i",
-                    "soft_reset_i": "softreset",
-                    "enable_i": "enable",
-                    "period_wdata_i": "period_wdata_sync_in",
-                    "period_wen_i": "period_wen_sync_in",
-                    "soft_reset_o": "softreset_clk_src",
-                    "enable_o": "enable_clk_src",
-                    "period_wdata_o": "period_wdata_sync_out",
-                    "period_wen_o": "period_wen_sync_out",
+                    "period_int": "period_int",
+                    "period_frac": "period_frac",
                 },
             },
             # For simulation
@@ -410,25 +192,36 @@ def setup(py_params_dict):
                 "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
-        ],
-        "snippets": [
             {
-                "verilog_code": """
-    // PERIOD Manual logic
-    assign period_wready_wr = 1'b1;
-
-    assign diff    = period_r - {quant, {FRAC_W{1'b0}}};
-    assign clk_int = (cnt > (quant / 2));
-
-    always @* begin
-        if (acc_out[FRAC_W-1:0] == {1'b1, {FRAC_W - 1{1'b0}}})
-            quant = acc_out[DATA_W-1:FRAC_W] + ^acc_out[DATA_W-1:FRAC_W];
-        else if (acc_out[FRAC_W-1]) quant = acc_out[DATA_W-1:FRAC_W] + 1'b1;
-        else quant = acc_out[DATA_W-1:FRAC_W];
-    end
-""",
+                "core_name": "iob_acc_ld",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_modcnt",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_nco_sync",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_reg_re",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_sync",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_fifo_async",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_regfile_at2p",
+                "instantiate": False,
             },
         ],
+        "snippets": [],
     }
 
     return attributes_dict

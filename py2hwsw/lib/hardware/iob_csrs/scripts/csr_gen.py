@@ -394,11 +394,16 @@ class csr_gen:
         """Generate ports and internal wires for csrs instance."""
         ports = []
         wires = []
+        snippet = ""
         for row in table:
             name = row.name
             auto = row.autoreg
+            addr = row.addr
             n_bits = row.n_bits
             log2n_items = row.log2n_items
+            n_items = 2 ** eval_param_expression_from_config(
+                log2n_items, self.config, "max"
+            )
             register_signals = []
 
             # version is not a register, it is an internal constant
@@ -407,9 +412,6 @@ class csr_gen:
 
             if "W" in row.type:
                 if auto:
-                    n_items = 2 ** eval_param_expression_from_config(
-                        log2n_items, self.config, "max"
-                    )
                     for idx in range(n_items):
                         name_idx = f"{name}_{idx}" if n_items > 1 else name
                         register_signals.append(
@@ -430,7 +432,17 @@ class csr_gen:
                                 "width": self.verilog_max(n_bits, 1),
                             },
                         ]
-                else:
+                else:  # Not auto
+                    if n_items > 1:
+                        register_signals += [
+                            {
+                                "name": f"{name}_waddr_o",
+                                "width": log2n_items,
+                            },
+                        ]
+                        snippet += f"""
+   assign {name}_waddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
+"""
                     register_signals += [
                         {
                             "name": f"{name}_wdata_o",
@@ -446,6 +458,16 @@ class csr_gen:
                         },
                     ]
             if "R" in row.type:
+                if n_items > 1:
+                    register_signals += [
+                        {
+                            "name": f"{name}_raddr_o",
+                            "width": log2n_items,
+                        },
+                    ]
+                    snippet += f"""
+   assign {name}_raddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
+"""
                 if auto:
                     register_signals.append(
                         {
@@ -492,7 +514,7 @@ class csr_gen:
                     }
                 )
 
-        return ports, wires
+        return ports, wires, snippet
 
     def get_csrs_inst_params(self, core_confs):
         """Return multi-line string with parameters for csrs instance"""
@@ -510,21 +532,7 @@ class csr_gen:
     def write_hwcode(self, table, core_attributes):
         """Generates and appends verilog code to core "snippets" list."""
 
-        ports = [
-            {
-                "name": "csrs_iob_o",
-                "descr": "Give user logic access to csrs internal IOb signals",
-                "signals": [
-                    {"name": "csrs_iob_valid_o", "width": 1},
-                    {"name": "csrs_iob_addr_o", "width": "ADDR_W - 2"},
-                    {"name": "csrs_iob_wdata_o", "width": "DATA_W"},
-                    {"name": "csrs_iob_wstrb_o", "width": "DATA_W/8"},
-                    {"name": "csrs_iob_rvalid_o", "width": 1},
-                    {"name": "csrs_iob_rdata_o", "width": "DATA_W"},
-                    {"name": "csrs_iob_ready_o", "width": 1},
-                ],
-            }
-        ]
+        ports = []
         wires = []
         blocks = []
         snippet = ""
@@ -584,17 +592,6 @@ class csr_gen:
                 },
             }
         )
-
-        # Connect internal IOb signals to output port for user logic
-        snippet += """
-   assign csrs_iob_valid_o = internal_iob_valid;
-   assign csrs_iob_addr_o = internal_iob_addr[ADDR_W-1:2];
-   assign csrs_iob_wdata_o = internal_iob_wdata;
-   assign csrs_iob_wstrb_o = internal_iob_wstrb;
-   assign csrs_iob_rvalid_o = internal_iob_rvalid;
-   assign csrs_iob_rdata_o = internal_iob_rdata;
-   assign csrs_iob_ready_o = internal_iob_ready;
-"""
 
         if core_attributes["csr_if"] == "iob":
             # "IOb" CSR_IF

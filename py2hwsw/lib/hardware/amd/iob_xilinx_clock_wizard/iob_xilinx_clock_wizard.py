@@ -74,7 +74,7 @@ def setup(py_params_dict):
     attributes_dict["snippets"] = [
         {
             "verilog_code": """
-    clock_wizard #(
+    iob_clock_wizard #(
         .OUTPUT_PER(OUTPUT_PER),
         .INPUT_PER (INPUT_PER)
     ) clock_wizard_inst (

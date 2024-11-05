@@ -43,16 +43,6 @@ def setup(py_params_dict):
             },
         ],
         "wires": [
-            {
-                "name": "csrs_iob",
-                "descr": "Internal CSRs IOb interface. Signals used to handle CSRs with 'autoreg=False'.",
-                "signals": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W - 2",
-                    "DATA_W": "DATA_W",
-                },
-            },
             # Register wires
             {
                 "name": "single_write",
@@ -85,7 +75,7 @@ def setup(py_params_dict):
                 "name": "regfile_read",
                 "descr": "",
                 "signals": [
-                    # Use 'csrs_iob' to find out which register to read
+                    {"name": "regfile_read_raddr", "width": 2},
                     {"name": "regfile_read", "width": 8},
                 ],
             },
@@ -546,7 +536,6 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",
-                    "csrs_iob_o": "csrs_iob",
                     #
                     # Register interfaces
                     #

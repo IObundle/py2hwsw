@@ -27,7 +27,7 @@ iob_uart_csrs.h: ../../software/src/iob_uart_csrs.h
 	cp $< $@
 
 # verilator top module
-VTOP:=iob_sim
+VTOP:=iob_system_sim
 
 endif
 

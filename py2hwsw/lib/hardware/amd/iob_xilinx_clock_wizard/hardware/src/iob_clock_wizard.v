@@ -4,7 +4,7 @@
 
 `timescale 1ps / 1ps
 
-module clock_wizard #(
+module iob_clock_wizard #(
    parameter OUTPUT_PER = 10,
    parameter INPUT_PER  = 4
 ) (  // Clock in ports

@@ -135,9 +135,10 @@ def setup(py_params_dict):
         )
 
     # Add ports and internal wires for registers
-    auto_ports, auto_wires = csr_gen_obj.gen_ports_wires(reg_table)
+    auto_ports, auto_wires, auto_snippet = csr_gen_obj.gen_ports_wires(reg_table)
     attributes_dict["ports"] += auto_ports
     attributes_dict["wires"] += auto_wires
+    attributes_dict["snippets"].append({"verilog_code": auto_snippet})
 
     # TODO: Append csr_if to config_build.mk ?
     # file2create.write(f"CSR_IF={python_module.csr_if}\n\n")

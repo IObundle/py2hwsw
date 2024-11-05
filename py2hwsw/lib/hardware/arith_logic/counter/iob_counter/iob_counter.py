@@ -25,10 +25,13 @@ def setup(py_params_dict):
             },
         ],
         "ports": [
-            """
-            clk_en_rst_s -i clk_en_rst
-            -d 'Clock, clock enable and reset'
-            """,
+            {
+                "name": "clk_en_rst_s",
+                "signals": {
+                    "type": "clk_en_rst",
+                },
+                "descr": "Clock, clock enable and reset",
+            },
             {
                 "name": "en_rst_i",
                 "descr": "Enable and Synchronous reset interface",

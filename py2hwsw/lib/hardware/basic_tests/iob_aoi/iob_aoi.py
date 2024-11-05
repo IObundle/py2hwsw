@@ -21,31 +21,31 @@ def setup(py_params_dict):
         ],
         "ports": [
             """
-            a_i -s a_i W
+            a_i -s a_i:W
             -d 'Input port a'
 
-            b_i -s b_i W
+            b_i -s b_i:W
             -d 'Input port b'
 
-            c_i -s c_i W
+            c_i -s c_i:W
             -d 'Input port c'
 
-            d_i -s d_i W
+            d_i -s d_i:W
             -d 'Input port d'
 
-            y_o -s y_o W
+            y_o -s y_o:W
             -d 'Output port y'
             """
         ],
         "wires": [
             """
-            and_ab_out -s aab W
+            and_ab_out -s aab:W
             -d 'and ab output'
 
-            and_cd_out -s cad W
+            and_cd_out -s cad:W
             -d 'and cd output'
 
-            or_out -s oab 1
+            or_out -s oab:1
             -d 'or output'
             """,
         ],

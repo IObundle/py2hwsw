@@ -85,7 +85,7 @@ class iob_port(iob_wire):
 
 attrs = [
     "name",
-    ["-i", "signals", {"nargs": 2}, ["type", "subtype"]],
+    ["-i", "signals", {"nargs": 1}, ("type",)],
     ["-s", "signals", {"nargs": 2, "action": "append"}, ["name", "width"]],
 ]
 

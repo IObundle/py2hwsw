@@ -453,7 +453,8 @@ class iob_core(iob_module, iob_instance):
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(
-                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!"
+                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!\n"
+                    f"Available ports:\n- {'\n- '.join([port.name for port in self.ports])}"
                 )
 
             bit_slices = []

@@ -409,6 +409,8 @@ class csr_gen:
                 log2n_items, self.config, "max"
             )
             register_signals = []
+            port_has_inputs = False
+            port_has_outputs = False
 
             # version is not a register, it is an internal constant
             if name == "version":
@@ -424,6 +426,7 @@ class csr_gen:
                                 "width": self.verilog_max(n_bits, 1),
                             }
                         )
+                        port_has_outputs = True
                     if n_items > 1:
                         # Add interface to read registers via address
                         register_signals += [
@@ -436,6 +439,8 @@ class csr_gen:
                                 "width": self.verilog_max(n_bits, 1),
                             },
                         ]
+                        port_has_inputs = True
+                        port_has_outputs = True
                 else:  # Not auto
                     if n_items > 1:
                         register_signals += [
@@ -444,6 +449,7 @@ class csr_gen:
                                 "width": log2n_items,
                             },
                         ]
+                        port_has_outputs = True
                         snippet += f"""
    assign {name}_waddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
 """
@@ -461,6 +467,8 @@ class csr_gen:
                             "width": 1,
                         },
                     ]
+                    port_has_inputs = True
+                    port_has_outputs = True
             if "R" in row.type:
                 if n_items > 1:
                     register_signals += [
@@ -469,6 +477,7 @@ class csr_gen:
                             "width": log2n_items,
                         },
                     ]
+                    port_has_outputs = True
                     snippet += f"""
    assign {name}_raddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
 """
@@ -479,6 +488,7 @@ class csr_gen:
                             "width": self.verilog_max(n_bits, 1),
                         }
                     )
+                    port_has_inputs = True
                 else:
                     register_signals += [
                         {
@@ -498,6 +508,8 @@ class csr_gen:
                             "width": 1,
                         },
                     ]
+                    port_has_inputs = True
+                    port_has_outputs = True
 
             if row.internal_use:
                 for reg in register_signals:
@@ -510,9 +522,15 @@ class csr_gen:
                     }
                 )
             else:
+                if port_has_inputs and port_has_outputs:
+                    direction = "_io"
+                elif port_has_inputs:
+                    direction = "_i"
+                else:
+                    direction = "_o"
                 ports.append(
                     {
-                        "name": name,
+                        "name": name + direction,
                         "descr": f"{name} register interface",
                         "signals": register_signals,
                     }

@@ -65,7 +65,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "port_a",
+                "name": "port_a_io",
                 "descr": "Memory interface A",
                 "signals": [
                     {"name": "enA_i", "width": 1},
@@ -76,7 +76,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "port_b",
+                "name": "port_b_io",
                 "descr": "Memory interface B",
                 "signals": [
                     {"name": "enB_i", "width": 1},

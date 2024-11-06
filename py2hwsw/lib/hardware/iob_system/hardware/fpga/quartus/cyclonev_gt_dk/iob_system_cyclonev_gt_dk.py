@@ -68,7 +68,7 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "rs232",
+            "name": "rs232_io",
             "descr": "Serial port",
             "signals": [
                 {"name": "txd_o", "width": "1"},

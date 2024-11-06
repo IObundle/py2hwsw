@@ -9,8 +9,21 @@ set -e
 #find directories containing testbenches
 TBS=`find ${LIB_DIR}/hardware | grep _tb.v | grep -v include`
 
+#for debug
+FILTER_OUT_TBS=""
+#FILTER_OUT_TBS="iob_system_tb.v iob_uart_tb.v"
+
+TBS_FILTERED=""
+for i in $TBS; do
+    if ! echo $FILTER_OUT_TBS | grep -q `basename $i` ; then
+        TBS_FILTERED+=" $i";
+    fi
+done
+
+echo $TBS_FILTERED
+
 #extract respective directories
-for i in $TBS; do TB_DIRS+=" `dirname $i`" ; done
+for i in $TBS_FILTERED; do TB_DIRS+=" `dirname $i`" ; done
 
 #extract respective modules - go back from MODULE/hardware/simulation/src
 for i in $TB_DIRS; do MODULES+=" `basename $(builtin cd $i/../../..; pwd)`" ; done

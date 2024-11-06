@@ -273,7 +273,7 @@ def gen_ports_list(core):
 
     for interface in core.ports:
         # Skip doc_only interfaces
-        if "doc_only" in interface.keys() and interface["doc_only"]:
+        if interface.doc_only:
             continue
 
         # Check if this interface is a standard interface (from if_gen.py)
@@ -407,6 +407,9 @@ def gen_parameters_list(core):
 
     parameters_list = []
     for conf in core.confs:
+        # Skip doc_only confs
+        if conf.doc_only:
+            continue
         if conf["type"] != "M":
             parameters_list.append(
                 Parameter(
@@ -531,7 +534,7 @@ def generate_ipxact_xml(core, sw_regs, dest_dir):
 
     # try to open file document/tsrc/intro.tex and read it into self.description
     try:
-        with open(f"document/tsrc/intro.tex", "r") as file:
+        with open("document/tsrc/intro.tex", "r") as file:
             core.description = file.read()
     except:
         print("ERROR: Could not open document/tsrc/intro.tex")

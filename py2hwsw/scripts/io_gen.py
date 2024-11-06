@@ -24,7 +24,7 @@ def generate_ports(core):
     """Generate verilog code with ports of this module.
     returns: Generated verilog code
     """
-    code = ""
+    lines = []
     for port_idx, port in enumerate(core.ports):
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
@@ -32,23 +32,27 @@ def generate_ports(core):
 
         # Open ifdef if conditional interface
         if port.if_defined:
-            code += f"`ifdef {port.if_defined}\n"
+            lines.append(f"`ifdef {port.if_defined}\n")
         if port.if_not_defined:
-            code += f"`ifndef {port.if_not_defined}\n"
+            lines.append(f"`ifndef {port.if_not_defined}\n")
 
-        code += f"    // {port.name}\n"
+        lines.append(f"    // {port.name}\n")
 
         for signal_idx, signal in enumerate(port.signals):
-            is_last_signal = (
-                port_idx == len(core.ports) - 1 and signal_idx == len(port.signals) - 1
-            )
-            code += "    " + signal.get_verilog_port(comma=not is_last_signal)
+            lines.append("    " + signal.get_verilog_port())
 
         # Close ifdef if conditional interface
         if port.if_defined or port.if_not_defined:
-            code += "`endif\n"
+            lines.append("`endif\n")
 
-    return code
+    # Remove comma from last port line
+    if lines:
+        i = -1
+        while lines[i].startswith("`endif"):
+            i -= 1
+        lines[i] = lines[i].replace(",", "", 1)
+
+    return "".join(lines)
 
 
 def generate_ports_snippet(core):

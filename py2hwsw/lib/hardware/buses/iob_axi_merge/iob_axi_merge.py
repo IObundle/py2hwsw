@@ -26,50 +26,102 @@ def setup(py_params_dict):
     QOS_W = int(py_params_dict["qos_w"]) if "qos_w" in py_params_dict else 4
     RESP_W = int(py_params_dict["resp_w"]) if "resp_w" in py_params_dict else 2
     LEN_W = int(py_params_dict["len_w"]) if "len_w" in py_params_dict else 8
+    DATA_SECTION_W = (
+        int(py_params_dict["data_section_w"])
+        if "data_section_w" in py_params_dict
+        else 8
+    )
+
+    axi_signals = [
+        # AXI-Lite Write
+        ("axi_awaddr", "output", ADDR_W),
+        ("axi_awprot", "output", PROT_W),
+        ("axi_awvalid", "output", 1),
+        ("axi_awready", "input", 1),
+        ("axi_wdata", "output", DATA_W),
+        ("axi_wstrb", "output", int(DATA_W / DATA_SECTION_W)),
+        ("axi_wvalid", "output", 1),
+        ("axi_wready", "input", 1),
+        ("axi_bresp", "input", RESP_W),
+        ("axi_bvalid", "input", 1),
+        ("axi_bready", "output", 1),
+        # AXI specific write
+        ("axi_awid", "output", ID_W),
+        ("axi_awlen", "output", LEN_W),
+        ("axi_awsize", "output", SIZE_W),
+        ("axi_awburst", "output", BURST_W),
+        ("axi_awlock", "output", LOCK_W),
+        ("axi_awcache", "output", CACHE_W),
+        ("axi_awqos", "output", QOS_W),
+        ("axi_wlast", "output", 1),
+        ("axi_bid", "input", ID_W),
+        # AXI-Lite Read
+        ("axi_araddr", "output", ADDR_W),
+        ("axi_arprot", "output", PROT_W),
+        ("axi_arvalid", "output", 1),
+        ("axi_arready", "input", 1),
+        ("axi_rdata", "input", DATA_W),
+        ("axi_rresp", "input", RESP_W),
+        ("axi_rvalid", "input", 1),
+        ("axi_rready", "output", 1),
+        # AXI specific read
+        ("axi_arid", "output", ID_W),
+        ("axi_arlen", "output", LEN_W),
+        ("axi_arsize", "output", SIZE_W),
+        ("axi_arburst", "output", BURST_W),
+        ("axi_arlock", "output", LOCK_W),
+        ("axi_arcache", "output", CACHE_W),
+        ("axi_arqos", "output", QOS_W),
+        ("axi_rid", "input", ID_W),
+        ("axi_rlast", "input", 1),
+    ]
 
     attributes_dict = {
         "name": py_params_dict["name"],
         "version": "0.1",
-        "ports": [
-            {
-                "name": "clk_en_rst_s",
-                "signals": {
-                    "type": "clk_en_rst",
-                },
-                "descr": "Clock, clock enable and async reset",
-            },
-            {
-                "name": "reset_i",
-                "descr": "Reset signal",
-                "signals": [
-                    {
-                        "name": "rst_i",
-                        "width": "1",
-                    },
-                ],
-            },
-            {
-                "name": "output_m",
-                "signals": {
-                    "type": "axi",
-                    "file_prefix": py_params_dict["name"] + "_output_",
-                    "prefix": "output_",
-                    "DATA_W": DATA_W,
-                    "ADDR_W": ADDR_W,
-                    "ID_W": ID_W,
-                    "SIZE_W": SIZE_W,
-                    "BURST_W": BURST_W,
-                    "LOCK_W": LOCK_W,
-                    "CACHE_W": CACHE_W,
-                    "PROT_W": PROT_W,
-                    "QOS_W": QOS_W,
-                    "RESP_W": RESP_W,
-                    "LEN_W": LEN_W,
-                },
-                "descr": "Merge output",
-            },
-        ],
     }
+    #
+    # Ports
+    #
+    attributes_dict["ports"] = [
+        {
+            "name": "clk_en_rst_s",
+            "signals": {
+                "type": "clk_en_rst",
+            },
+            "descr": "Clock, clock enable and async reset",
+        },
+        {
+            "name": "reset_i",
+            "descr": "Reset signal",
+            "signals": [
+                {
+                    "name": "rst_i",
+                    "width": "1",
+                },
+            ],
+        },
+        {
+            "name": "output_m",
+            "signals": {
+                "type": "axi",
+                "file_prefix": py_params_dict["name"] + "_output_",
+                "prefix": "output_",
+                "DATA_W": DATA_W,
+                "ADDR_W": ADDR_W,
+                "ID_W": ID_W,
+                "SIZE_W": SIZE_W,
+                "BURST_W": BURST_W,
+                "LOCK_W": LOCK_W,
+                "CACHE_W": CACHE_W,
+                "PROT_W": PROT_W,
+                "QOS_W": QOS_W,
+                "RESP_W": RESP_W,
+                "LEN_W": LEN_W,
+            },
+            "descr": "Merge output",
+        },
+    ]
     for port_idx in range(NUM_INPUTS):
         attributes_dict["ports"].append(
             {
@@ -93,310 +145,9 @@ def setup(py_params_dict):
                 "descr": "Merge input interfaces",
             },
         )
-    attributes_dict["wires"] = [
-        # Output selection signals
-        {
-            "name": "sel_reg_rst",
-            "descr": "Enable and reset signal for sel_reg",
-            "signals": [
-                {"name": "rst_i"},
-            ],
-        },
-        {
-            "name": "sel_reg_data_i",
-            "descr": "Input of sel_reg",
-            "signals": [
-                {"name": "sel", "width": NBITS},
-            ],
-        },
-        {
-            "name": "sel_reg_data_o",
-            "descr": "Output of sel_reg",
-            "signals": [
-                {"name": "sel_reg", "width": NBITS},
-            ],
-        },
-        {
-            "name": "input_sel",
-            "descr": "Select output interface",
-            "signals": [
-                {"name": "sel"},
-            ],
-        },
-        {
-            "name": "input_sel_reg",
-            "descr": "Registered select output interface",
-            "signals": [
-                {"name": "sel_reg"},
-            ],
-        },
-        # Mux signals
-        {
-            "name": "mux_valid_data_i",
-            "descr": "Input of valid mux",
-            "signals": [
-                {"name": "mux_valid_input", "width": NUM_INPUTS},
-            ],
-        },
-        {
-            "name": "mux_valid_data_o",
-            "descr": "Output of valid mux",
-            "signals": [
-                {"name": "output_axi_valid_o"},
-            ],
-        },
-        {
-            "name": "mux_addr_data_i",
-            "descr": "Input of address mux",
-            "signals": [
-                {"name": "mux_addr_input", "width": NUM_INPUTS * ADDR_W},
-            ],
-        },
-        {
-            "name": "mux_addr_data_o",
-            "descr": "Output of address mux",
-            "signals": [
-                {"name": "output_axi_addr_o"},
-            ],
-        },
-        {
-            "name": "mux_wdata_data_i",
-            "descr": "Input of wdata mux",
-            "signals": [
-                {"name": "mux_wdata_input", "width": NUM_INPUTS * DATA_W},
-            ],
-        },
-        {
-            "name": "mux_wdata_data_o",
-            "descr": "Output of wdata mux",
-            "signals": [
-                {"name": "output_axi_wdata_o"},
-            ],
-        },
-        {
-            "name": "mux_wstrb_data_i",
-            "descr": "Input of wstrb mux",
-            "signals": [
-                {"name": "mux_wstrb_input", "width": NUM_INPUTS * int(DATA_W / 8)},
-            ],
-        },
-        {
-            "name": "mux_wstrb_data_o",
-            "descr": "Output of wstrb mux",
-            "signals": [
-                {"name": "output_axi_wstrb_o"},
-            ],
-        },
-        # Demux signals
-        {
-            "name": "demux_rdata_data_i",
-            "descr": "Input of rdata demux",
-            "signals": [
-                {"name": "output_axi_rdata_i"},
-            ],
-        },
-        {
-            "name": "demux_rdata_data_o",
-            "descr": "Output of rdata demux",
-            "signals": [
-                {"name": "demux_rdata_output", "width": NUM_INPUTS * DATA_W},
-            ],
-        },
-        {
-            "name": "demux_rvalid_data_i",
-            "descr": "Input of rvalid demux",
-            "signals": [
-                {"name": "output_axi_rvalid_i"},
-            ],
-        },
-        {
-            "name": "demux_rvalid_data_o",
-            "descr": "Output of rvalid demux",
-            "signals": [
-                {"name": "demux_rvalid_output", "width": NUM_INPUTS},
-            ],
-        },
-        {
-            "name": "demux_ready_data_i",
-            "descr": "Input of ready demux",
-            "signals": [
-                {"name": "output_axi_ready_i"},
-            ],
-        },
-        {
-            "name": "demux_ready_data_o",
-            "descr": "Output of ready demux",
-            "signals": [
-                {"name": "demux_ready_output", "width": NUM_INPUTS},
-            ],
-        },
-        # Priority encoder signals
-        {
-            "name": "prio_enc_i",
-            "descr": "Input of priority encoder",
-            "signals": [
-                {"name": "mux_valid_input"},
-            ],
-        },
-        {
-            "name": "prio_enc_o",
-            "descr": "Output of priority encoder",
-            "signals": [
-                {"name": "sel"},
-            ],
-        },
-    ]
-    attributes_dict["blocks"] = [
-        {
-            "core_name": "iob_reg_r",
-            "instance_name": "sel_reg_r",
-            "parameters": {
-                "DATA_W": NBITS,
-                "RST_VAL": f"{NBITS}'b0",
-            },
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": "sel_reg_rst",
-                "data_i": "sel_reg_data_i",
-                "data_o": "sel_reg_data_o",
-            },
-        },
-        # muxers
-        {
-            "core_name": "iob_mux",
-            "instance_name": "iob_mux_valid",
-            "parameters": {
-                "DATA_W": 1,
-                "N": NUM_INPUTS,
-            },
-            "connect": {
-                "sel_i": "input_sel",
-                "data_i": "mux_valid_data_i",
-                "data_o": "mux_valid_data_o",
-            },
-        },
-        {
-            "core_name": "iob_mux",
-            "instance_name": "iob_mux_addr",
-            "parameters": {
-                "DATA_W": ADDR_W,
-                "N": NUM_INPUTS,
-            },
-            "connect": {
-                "sel_i": "input_sel",
-                "data_i": "mux_addr_data_i",
-                "data_o": "mux_addr_data_o",
-            },
-        },
-        {
-            "core_name": "iob_mux",
-            "instance_name": "iob_mux_wdata",
-            "parameters": {
-                "DATA_W": DATA_W,
-                "N": NUM_INPUTS,
-            },
-            "connect": {
-                "sel_i": "input_sel",
-                "data_i": "mux_wdata_data_i",
-                "data_o": "mux_wdata_data_o",
-            },
-        },
-        {
-            "core_name": "iob_mux",
-            "instance_name": "iob_mux_wstrb",
-            "parameters": {
-                "DATA_W": int(DATA_W / 8),
-                "N": NUM_INPUTS,
-            },
-            "connect": {
-                "sel_i": "input_sel",
-                "data_i": "mux_wstrb_data_i",
-                "data_o": "mux_wstrb_data_o",
-            },
-        },
-        {
-            "core_name": "iob_demux",
-            "instance_name": "iob_demux_rdata",
-            "parameters": {
-                "DATA_W": DATA_W,
-                "N": NUM_INPUTS,
-            },
-            "connect": {
-                "sel_i": "input_sel_reg",
-                "data_i": "demux_rdata_data_i",
-                "data_o": "demux_rdata_data_o",
-            },
-        },
-        # demuxers
-        {
-            "core_name": "iob_demux",
-            "instance_name": "iob_demux_rvalid",
-            "parameters": {
-                "DATA_W": 1,
-                "N": NUM_INPUTS,
-            },
-            "connect": {
-                "sel_i": "input_sel_reg",
-                "data_i": "demux_rvalid_data_i",
-                "data_o": "demux_rvalid_data_o",
-            },
-        },
-        {
-            "core_name": "iob_demux",
-            "instance_name": "iob_demux_ready",
-            "parameters": {
-                "DATA_W": 1,
-                "N": NUM_INPUTS,
-            },
-            "connect": {
-                "sel_i": "input_sel",
-                "data_i": "demux_ready_data_i",
-                "data_o": "demux_ready_data_o",
-            },
-        },
-        # priority encoder
-        {
-            "core_name": "iob_prio_enc",
-            "instance_name": "sel_enc",
-            "parameters": {
-                "W": NUM_INPUTS,
-                "MODE": '"HIGH"',
-            },
-            "connect": {
-                "unencoded_i": "prio_enc_i",
-                "encoded_o": "prio_enc_o",
-            },
-        },
-    ]
-
-    # Connect demuxer outputs
-    verilog_code = ""
-    verilog_outputs = []
-    for port_idx in range(NUM_INPUTS):
-        verilog_code += f"""
-    assign input{port_idx}_iob_rdata_o = demux_rdata_output[{port_idx*DATA_W}+:{DATA_W}];
-    assign input{port_idx}_iob_rvalid_o = demux_rvalid_output[{port_idx}+:1];
-    assign input{port_idx}_iob_ready_o = demux_ready_output[{port_idx}+:1];
-"""
-        verilog_outputs.append(f"input{port_idx}_iob_rdata")
-        verilog_outputs.append(f"input{port_idx}_iob_rvalid")
-        verilog_outputs.append(f"input{port_idx}_iob_ready")
-    verilog_code += "\n"
-    # Connect muxer inputs
-    for signal in ["valid", "addr", "wdata", "wstrb"]:
-        verilog_code += f"    assign mux_{signal}_input = {{"
-        for port_idx in range(NUM_INPUTS - 1, -1, -1):
-            # Include padding bits for address
-            if signal == "addr":
-                verilog_code += f"{{{NBITS}{{1'b0}}}}, "
-            verilog_code += f"input{port_idx}_iob_{signal}_i, "
-        verilog_code = verilog_code[:-2] + "};\n"
-        verilog_outputs.append(f"mux_{signal}_input")
-    # Create snippet with demuxer and muxer connections
-    attributes_dict["snippets"] = [
-        {
-            "verilog_code": verilog_code,
-        },
-    ]
+    #
+    # Wires
+    #
+    # TODO: Fix below #######################
 
     return attributes_dict

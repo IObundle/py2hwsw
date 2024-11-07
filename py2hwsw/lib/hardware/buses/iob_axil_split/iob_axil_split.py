@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+# FIXME: According to AXI-Lite, this core should support simultaneous read and write transactions
+
 
 def setup(py_params_dict):
     assert "name" in py_params_dict, print(

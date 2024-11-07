@@ -111,7 +111,7 @@ def handle_system_overrides(attributes_dict, py_params):
         identifier = "name"
         if child_attribute_name in ["blocks", "sw_modules"]:
             identifier = "instance_name"
-        elif child_attribute_name in ["board_list", "ignore_snippets"]:
+        elif child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
             # Elements in list do not have identifier, so just append them to parent list
             for child_obj in child_value:
                 attributes_dict[child_attribute_name].append(child_obj)

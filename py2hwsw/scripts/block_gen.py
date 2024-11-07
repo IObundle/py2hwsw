@@ -118,6 +118,10 @@ def get_instance_port_connections(instance):
     """
     instance_portmap = ""
     for port_idx, port in enumerate(instance.ports):
+        # If port has 'doc_only' attribute set to True, skip it
+        if port.doc_only:
+            continue
+
         assert (
             port.e_connect
         ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"

@@ -62,7 +62,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "axi_clk_rst",
+                "name": "axi_clk_rst_io",
                 "descr": "",
                 "signals": [
                     {"name": "axi_clk_o", "width": "1"},
@@ -83,7 +83,7 @@ def setup(py_params_dict):
                 "descr": "AXI interface",
             },
             {
-                "name": "ddr4",
+                "name": "ddr4_io",
                 "descr": "DDR4 interface",
                 "signals": [
                     {"name": "ddr4_act_n_o", "width": "1"},

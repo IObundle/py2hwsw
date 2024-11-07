@@ -37,7 +37,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "div",
+                "name": "div_io",
                 "descr": "Division interface",
                 "signals": [
                     {

@@ -150,7 +150,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "name": "rom_bus",
+            "name": "rom_bus_io",
             "descr": "Ports for connection with ROM memory",
             "signals": [
                 {
@@ -428,7 +428,7 @@ def setup(py_params_dict):
                         "{1'b0, bootrom_axi_awlock}",
                     ],
                 ),
-                "ext_rom_bus": "rom_bus",
+                "ext_rom_bus_io": "rom_bus_io",
             },
             "bootrom_addr_w": params["bootrom_addr_w"],
             "soc_name": params["name"],

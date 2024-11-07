@@ -172,14 +172,14 @@ def setup(py_params_dict):
                 -c 
                     "clk_en_rst_s":"clk_en_rst_s"
                     "control_if_s":"cbus_s"
-                    "softreset":"softreset"
-                    "div":"div"
-                    "txdata":"txdata"
-                    "txen":"txen"
-                    "txready":"txready"
-                    "rxen":"rxen"
-                    "rxready":"rxready"
-                    "rxdata":"rxdata"
+                    "softreset_o":"softreset"
+                    "div_o":"div"
+                    "txdata_io":"txdata"
+                    "txen_o":"txen"
+                    "txready_i":"txready"
+                    "rxen_o":"rxen"
+                    "rxready_i":"rxready"
+                    "rxdata_io":"rxdata"
                 --csr_if {CSR_IF}
                 csrs 
 				    uart 
@@ -214,7 +214,7 @@ def setup(py_params_dict):
                 "instance_description": "UART core driver",
                 "connect": {
                     "clk_rst_s": "clk_rst",
-                    "reg_interface": "iob_uart_core_reg_interface",
+                    "reg_interface_io": "iob_uart_core_reg_interface",
                     "rs232_m": "rs232_m",
                 },
             },

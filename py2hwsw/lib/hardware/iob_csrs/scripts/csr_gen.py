@@ -115,11 +115,15 @@ class csr_gen:
             # a or b is a string
             return f"(({a} > {b}) ? {a} : {b})"
 
-    def get_reg_table(self, regs, rw_overlap, autoaddr):
+    def get_reg_table(self, csrs, rw_overlap, autoaddr):
         # Create reg table
         reg_table = []
-        for i_regs in regs:
-            reg_table += i_regs.regs
+        for csr_group in csrs:
+            # If csr_group has 'doc_only' attribute set to True, skip it
+            if csr_group.doc_only:
+                continue
+
+            reg_table += csr_group.regs
 
         return self.compute_addr(reg_table, rw_overlap, autoaddr)
 
@@ -405,6 +409,8 @@ class csr_gen:
                 log2n_items, self.config, "max"
             )
             register_signals = []
+            port_has_inputs = False
+            port_has_outputs = False
 
             # version is not a register, it is an internal constant
             if name == "version":
@@ -420,6 +426,7 @@ class csr_gen:
                                 "width": self.verilog_max(n_bits, 1),
                             }
                         )
+                        port_has_outputs = True
                     if n_items > 1:
                         # Add interface to read registers via address
                         register_signals += [
@@ -432,6 +439,8 @@ class csr_gen:
                                 "width": self.verilog_max(n_bits, 1),
                             },
                         ]
+                        port_has_inputs = True
+                        port_has_outputs = True
                 else:  # Not auto
                     if n_items > 1:
                         register_signals += [
@@ -440,6 +449,7 @@ class csr_gen:
                                 "width": log2n_items,
                             },
                         ]
+                        port_has_outputs = True
                         snippet += f"""
    assign {name}_waddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
 """
@@ -457,6 +467,8 @@ class csr_gen:
                             "width": 1,
                         },
                     ]
+                    port_has_inputs = True
+                    port_has_outputs = True
             if "R" in row.type:
                 if n_items > 1:
                     register_signals += [
@@ -465,6 +477,7 @@ class csr_gen:
                             "width": log2n_items,
                         },
                     ]
+                    port_has_outputs = True
                     snippet += f"""
    assign {name}_raddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
 """
@@ -475,6 +488,7 @@ class csr_gen:
                             "width": self.verilog_max(n_bits, 1),
                         }
                     )
+                    port_has_inputs = True
                 else:
                     register_signals += [
                         {
@@ -494,6 +508,8 @@ class csr_gen:
                             "width": 1,
                         },
                     ]
+                    port_has_inputs = True
+                    port_has_outputs = True
 
             if row.internal_use:
                 for reg in register_signals:
@@ -506,9 +522,15 @@ class csr_gen:
                     }
                 )
             else:
+                if port_has_inputs and port_has_outputs:
+                    direction = "_io"
+                elif port_has_inputs:
+                    direction = "_i"
+                else:
+                    direction = "_o"
                 ports.append(
                     {
-                        "name": name,
+                        "name": name + direction,
                         "descr": f"{name} register interface",
                         "signals": register_signals,
                     }
@@ -1458,24 +1480,25 @@ class csr_gen:
         csrs_file.close()
 
     # Generate TeX tables of registers
-    # regs: list of tables containing registers, as defined in <corename>_setup.py
+    # csrs: list of tables containing registers, as defined in <corename>_setup.py
     # regs_with_addr: list of all registers, where 'addr' field has already been computed
     # out_dir: output directory
     @classmethod
-    def generate_regs_tex(self, regs, regs_with_addr, out_dir):
+    def generate_regs_tex(self, csrs, regs_with_addr, out_dir):
         os.makedirs(out_dir, exist_ok=True)
         # Create csrs.tex file
-        self.generate_csrs_tex(regs, out_dir)
+        self.generate_csrs_tex(csrs, out_dir)
 
-        for table in regs:
+        for csr_group in csrs:
             tex_table = []
-            for reg in table.regs:
+            for reg in csr_group.regs:
+                addr = "None"
                 # Find address of matching register in regs_with_addr list
-                addr = next(
-                    register.addr
-                    for register in regs_with_addr
-                    if register.name == reg.name
-                )
+                for reg_with_addr in regs_with_addr:
+                    if reg_with_addr.name == reg.name:
+                        addr = reg_with_addr.addr
+                        break
+
                 tex_table.append(
                     [
                         reg.name,
@@ -1487,4 +1510,4 @@ class csr_gen:
                     ]
                 )
 
-            write_table(f"{out_dir}/{table.name}_csrs", tex_table)
+            write_table(f"{out_dir}/{csr_group.name}_csrs", tex_table)

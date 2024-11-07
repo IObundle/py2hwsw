@@ -432,7 +432,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "single_read",
-                                "type": "W",
+                                "type": "R",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -540,28 +540,28 @@ def setup(py_params_dict):
                     # Register interfaces
                     #
                     # Single registers
-                    "single_write": "single_write",
-                    "single_read": "single_read",
+                    "single_write_o": "single_write",
+                    "single_read_i": "single_read",
                     # Regfile
-                    "regfile_write": "regfile_write",
-                    "regfile_read": "regfile_read",
+                    "regfile_write_io": "regfile_write",
+                    "regfile_read_io": "regfile_read",
                     # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
-                    "fifo_write_read": "fifo_write_read",
-                    "fifo_write_extmem": "fifo_write_extmem",
+                    "fifo_write_read_io": "fifo_write_read",
+                    "fifo_write_extmem_io": "fifo_write_extmem",
                     "fifo_write_current_level_o": "fifo_write_current_level",
                     # FIFO read
                     "fifo_read_rst_i": "fifo_read_rst",
-                    "fifo_read_write": "fifo_read_write",
+                    "fifo_read_write_io": "fifo_read_write",
                     "fifo_read_interrupt_o": "fifo_read_interrupt",
-                    "fifo_read_extmem": "fifo_read_extmem",
+                    "fifo_read_extmem_io": "fifo_read_extmem",
                     "fifo_read_current_level_o": "fifo_read_current_level",
                     # Async FIFO write
-                    "async_fifo_write_read": "async_fifo_write_read",
-                    "async_fifo_write_extmem": "async_fifo_write_extmem",
+                    "async_fifo_write_read_io": "async_fifo_write_read",
+                    "async_fifo_write_extmem_io": "async_fifo_write_extmem",
                     # Async FIFO read
-                    "async_fifo_read_write": "async_fifo_read_write",
-                    "async_fifo_read_extmem": "async_fifo_read_extmem",
+                    "async_fifo_read_write_io": "async_fifo_read_write",
+                    "async_fifo_read_extmem_io": "async_fifo_read_extmem",
                 },
             },
             # Simulation wrapper

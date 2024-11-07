@@ -22,6 +22,9 @@ def conf_vh(macros, top_module, out_dir):
     # file2create.write(f"`ifndef VH_{fname}_VH\n")
     # file2create.write(f"`define VH_{fname}_VH\n\n")
     for macro in macros:
+        # If macro has 'doc_only' attribute set to True, skip it
+        if macro.doc_only:
+            continue
         if macro.if_defined:
             file2create.write(f"`ifdef {macro.if_defined}\n")
         if macro.if_not_defined:
@@ -49,6 +52,9 @@ def conf_h(macros, top_module, out_dir):
     file2create.write(f"#ifndef H_{fname}_H\n")
     file2create.write(f"#define H_{fname}_H\n\n")
     for macro in macros:
+        # If macro has 'doc_only' attribute set to True, skip it
+        if macro.doc_only:
+            continue
         # Only insert macro if its is not a bool define, and if so only insert it if it is true
         if type(macro.val) is not bool:
             m_name = macro.name.upper()

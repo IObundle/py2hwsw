@@ -74,7 +74,7 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "rs232",
+            "name": "rs232_io",
             "descr": "Serial port",
             "signals": [
                 {"name": "txd_o", "width": "1"},
@@ -85,7 +85,7 @@ def setup(py_params_dict):
     if params["use_extmem"]:
         attributes_dict["ports"] += [
             {
-                "name": "ddr4_pins",
+                "name": "ddr4_pins_io",
                 "descr": "External DDR4 memory interface",
                 "signals": [
                     {"name": "c0_ddr4_act_n_o", "width": "1"},
@@ -108,7 +108,7 @@ def setup(py_params_dict):
     if params["use_ethernet"]:
         attributes_dict["ports"] += [
             {
-                "name": "mii",
+                "name": "mii_io",
                 "descr": "MII ethernet interface",
                 "signals": [
                     {"name": "enet_resetn_o", "width": "1"},
@@ -299,9 +299,9 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_rst_s": "intercon_clk_rst",
-                    "m0_clk_rst": "intercon_m0_clk_rst",
+                    "m0_clk_rst_io": "intercon_m0_clk_rst",
                     "m0_axi_m": "memory_axi",
-                    "s0_clk_rst": "intercon_s0_clk_rst",
+                    "s0_clk_rst_io": "intercon_s0_clk_rst",
                     "s0_axi_s": "axi",
                 },
                 "num_slaves": 1,
@@ -319,7 +319,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_rst_i": "clk_rst_i",
                     "ui_clk_o": "ddr4_ui_clk_out",
-                    "axi_clk_rst": "ddr4_axi_clk_rst",
+                    "axi_clk_rst_io": "ddr4_axi_clk_rst",
                     "axi_s": (
                         "memory_axi",
                         [
@@ -327,7 +327,7 @@ def setup(py_params_dict):
                             "{mem_axi_awaddr, 2'b0}",
                         ],
                     ),
-                    "ddr4": "ddr4_pins",
+                    "ddr4_io": "ddr4_pins_io",
                 },
             },
         ]
@@ -355,14 +355,14 @@ def setup(py_params_dict):
                 "core_name": "iob_xilinx_ibufg",
                 "instance_name": "rxclk_buf",
                 "connect": {
-                    "io": "rxclk_buf_io",
+                    "io_io": "rxclk_buf_io",
                 },
             },
             {
                 "core_name": "iob_xilinx_oddre1",
                 "instance_name": "oddre1_inst",
                 "connect": {
-                    "io": "oddre1_io",
+                    "io_io": "oddre1_io",
                 },
             },
         ]

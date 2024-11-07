@@ -16,7 +16,7 @@ def setup(py_params_dict):
                 "descr": "Clock and reset",
             },
             {
-                "name": "reg_interface",
+                "name": "reg_interface_io",
                 "descr": "",
                 "signals": [
                     {"name": "rst_soft_i", "width": "1"},

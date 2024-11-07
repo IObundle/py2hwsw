@@ -27,7 +27,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "config_in",
+                "name": "config_in_io",
                 "descr": "AXI Stream input configuration interface",
                 "signals": [
                     {
@@ -48,7 +48,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "axis_in",
+                "name": "axis_in_io",
                 "descr": "AXI Stream input interface",
                 "signals": [
                     {
@@ -78,7 +78,7 @@ def setup(py_params_dict):
                 "descr": "AXI write interface",
             },
             {
-                "name": "extmem",
+                "name": "extmem_io",
                 "descr": "External memory interface",
                 "signals": [
                     {

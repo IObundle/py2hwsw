@@ -50,14 +50,14 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk",
+                "name": "clk_i",
                 "descr": "Clock",
                 "signals": [
                     {"name": "clk_i", "width": 1},
                 ],
             },
             {
-                "name": "mem_if",
+                "name": "mem_if_io",
                 "descr": "Memory interface",
                 "signals": [
                     {"name": "en_i", "width": 1},

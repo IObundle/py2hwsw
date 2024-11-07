@@ -199,7 +199,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         if fifo_type == "R":
             attributes_dict["ports"].append(
                 {
-                    "name": f"{fifo_name}_write",
+                    "name": f"{fifo_name}_write_io",
                     "descr": "Write interface",
                     "signals": [
                         {
@@ -253,7 +253,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         else:  # fifo_type == "W":
             attributes_dict["ports"].append(
                 {
-                    "name": f"{fifo_name}_read",
+                    "name": f"{fifo_name}_read_io",
                     "descr": "Read interface",
                     "signals": [
                         {
@@ -306,7 +306,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             )
         attributes_dict["ports"].append(
             {
-                "name": f"{fifo_name}_extmem",
+                "name": f"{fifo_name}_extmem_io",
                 "descr": "External memory interface",
                 "signals": [
                     #  Write port
@@ -375,7 +375,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         if fifo_type == "R":
             attributes_dict["ports"] += [
                 {
-                    "name": f"{fifo_name}_write",
+                    "name": f"{fifo_name}_write_io",
                     "descr": "FIFO write interface.",
                     "signals": [
                         {
@@ -410,7 +410,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         else:  # fifo_type == "W"
             attributes_dict["ports"].append(
                 {
-                    "name": f"{fifo_name}_read",
+                    "name": f"{fifo_name}_read_io",
                     "descr": "FIFO read interface.",
                     "signals": [
                         {
@@ -433,7 +433,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             )
         attributes_dict["ports"] += [
             {
-                "name": f"{fifo_name}_extmem",
+                "name": f"{fifo_name}_extmem_io",
                 "descr": "FIFO external memory interface.",
                 "signals": [
                     {
@@ -497,7 +497,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 '{fifo_name} empty output'
                 """,
                 {
-                    "name": f"{fifo_name}_write",
+                    "name": f"{fifo_name}_write_io",
                     "descr": "FIFO write interface.",
                     "signals": [
                         {"name": "clk_i"},
@@ -519,7 +519,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 '{fifo_name} full output'
                 """,
                 {
-                    "name": f"{fifo_name}_read",
+                    "name": f"{fifo_name}_read_io",
                     "descr": "FIFO read interface.",
                     "signals": [
                         {"name": "clk_i"},
@@ -541,7 +541,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         if fifo_type == "W":
             attributes_dict["wires"].append(
                 {
-                    "name": f"{fifo_name}_write",
+                    "name": f"{fifo_name}_write_io",
                     "descr": "FIFO write interface.",
                     "signals": [
                         {"name": f"{fifo_name}_data_wen", "width": 1},
@@ -553,7 +553,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         else:  # fifo_type == "R"
             attributes_dict["wires"].append(
                 {
-                    "name": f"{fifo_name}_read",
+                    "name": f"{fifo_name}_read_io",
                     "descr": "FIFO read interface.",
                     "signals": [
                         {"name": f"{fifo_name}_data_ren", "width": 1},
@@ -577,19 +577,19 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     "ADDR_W": f"{FIFO_NAME}_ADDR_W",
                 },
                 "connect": {
-                    "write": (
-                        f"{fifo_name}_write",
+                    "write_io": (
+                        f"{fifo_name}_write_io",
                         [
                             f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
                         ],
                     ),
-                    "read": (
-                        f"{fifo_name}_read",
+                    "read_io": (
+                        f"{fifo_name}_read_io",
                         [
                             f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
                         ],
                     ),
-                    "extmem": f"{fifo_name}_extmem",
+                    "extmem_io": f"{fifo_name}_extmem_io",
                 },
             }
         )
@@ -607,9 +607,9 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "rst_i": f"{fifo_name}_rst_i",
-                    "write": f"{fifo_name}_write",
-                    "read": f"{fifo_name}_read",
-                    "extmem": f"{fifo_name}_extmem",
+                    "write_io": f"{fifo_name}_write_io",
+                    "read_io": f"{fifo_name}_read_io",
+                    "extmem_io": f"{fifo_name}_extmem_io",
                     "fifo_o": f"{fifo_name}_current_level_o",
                 },
             }

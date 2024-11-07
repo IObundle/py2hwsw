@@ -8,7 +8,7 @@ def setup(py_params_dict):
         "version": "0.1",
         "ports": [
             {
-                "name": "io",
+                "name": "io_io",
                 "descr": "ODDRE1 io",
                 "signals": [
                     {"name": "q_o", "width": "1"},

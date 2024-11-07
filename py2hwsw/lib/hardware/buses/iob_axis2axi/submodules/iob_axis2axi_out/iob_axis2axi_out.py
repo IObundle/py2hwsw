@@ -27,7 +27,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "config_out",
+                "name": "config_out_io",
                 "descr": "AXI Stream output configuration interface",
                 "signals": [
                     {
@@ -53,7 +53,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "axis_out",
+                "name": "axis_out_io",
                 "descr": "AXI Stream output interface",
                 "signals": [
                     {

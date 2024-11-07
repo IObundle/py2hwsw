@@ -170,11 +170,11 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",
                     # Register interfaces
-                    "reset": "reset",
-                    "enable": "enable",
-                    "sample": "sample",
-                    "data_low": "data_low",
-                    "data_high": "data_high",
+                    "reset_o": "reset",
+                    "enable_o": "enable",
+                    "sample_o": "sample",
+                    "data_low_i": "data_low",
+                    "data_high_i": "data_high",
                 },
             },
             {
@@ -183,7 +183,7 @@ def setup(py_params_dict):
                 "instance_description": "Timer core driver",
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "reg_interface": "iob_timer_core_reg_interface",
+                    "reg_interface_io": "iob_timer_core_reg_interface",
                 },
             },
             # Simulation wrapper

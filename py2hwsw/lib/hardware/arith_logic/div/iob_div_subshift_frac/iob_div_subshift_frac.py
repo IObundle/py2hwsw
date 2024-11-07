@@ -45,7 +45,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "status",
+                "name": "status_io",
                 "descr": "",
                 "signals": [
                     {
@@ -158,8 +158,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "status": "status",
-                    "div": "div_frac",
+                    "status_io": "status_io",
+                    "div_io": "div_frac",
                 },
             },
             # Simulation wrapper

@@ -86,7 +86,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "ext_rom_bus",
+                "name": "ext_rom_bus_io",
                 "descr": "External ROM signals",
                 "signals": [
                     {
@@ -165,7 +165,7 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",
                     # Register interfaces
-                    "rom": "rom",
+                    "rom_io": "rom",
                 },
             },
             {

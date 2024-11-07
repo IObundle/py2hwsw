@@ -55,7 +55,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "general",
+                "name": "general_io",
                 "descr": "",
                 "signals": [
                     {"name": "rzqin_i", "width": "1"},
@@ -64,7 +64,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "ddr3",
+                "name": "ddr3_io",
                 "descr": "External DDR3 memory interface",
                 "signals": [
                     {"name": "ddr3b_a_o", "width": "14"},

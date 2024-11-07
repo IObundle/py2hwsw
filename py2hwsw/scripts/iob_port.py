@@ -43,6 +43,12 @@ class iob_port(iob_wire):
             if self.name.endswith(sufix):
                 _direction = d
                 break
+        else:
+            fail_with_msg(
+                f"Port name '{self.name}' does not end with a valid direction suffix!\n"
+                f"Must have one of the following suffixes: {', '.join(_sufix_dict.keys())}.",
+                ValueError,
+            )
 
         if self.interface:
             self.signals += if_gen.get_signals(
@@ -58,6 +64,8 @@ class iob_port(iob_wire):
                 ValueError,
             )
 
+        port_has_inputs = False
+        port_has_outputs = False
         for signal in self.signals:
             if not signal.direction:
                 raise Exception("Port direction is required")
@@ -65,14 +73,31 @@ class iob_port(iob_wire):
                 raise Exception(
                     "Error: Direction must be 'input', 'output', or 'inout'."
                 )
-            if (
-                _direction in ["input", "output", "inout"]
-                and signal.direction != _direction
-            ):
+
+            if _direction in ["input", "output"] and signal.direction != _direction:
                 fail_with_msg(
                     f"Signal direction '{signal.direction}' does not match port name '{self.name}'",
                     ValueError,
                 )
+
+            if signal.direction == "input":
+                port_has_inputs = True
+            elif signal.direction == "output":
+                port_has_outputs = True
+            elif signal.direction == "inout":
+                port_has_inputs = True
+                port_has_outputs = True
+
+        if _direction == "inout" and not port_has_inputs:
+            fail_with_msg(
+                f"Port '{self.name}' has 'inout' direction but no inputs defined",
+                ValueError,
+            )
+        elif _direction == "inout" and not port_has_outputs:
+            fail_with_msg(
+                f"Port '{self.name}' has 'inout' direction but no outputs defined",
+                ValueError,
+            )
 
     def connect_external(self, wire, bit_slices={}):
         """Connects the port to an external wire

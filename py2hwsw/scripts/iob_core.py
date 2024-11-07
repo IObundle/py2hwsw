@@ -354,7 +354,7 @@ class iob_core(iob_module, iob_instance):
             identifier = "name"
             if child_attribute_name in ["blocks", "sw_modules"]:
                 identifier = "instance_name"
-            elif child_attribute_name in ["board_list", "ignore_snippets"]:
+            elif child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
                 # Elements in list do not have identifier, so just append them to parent list
                 for child_obj in child_value:
                     parent_attributes[child_attribute_name].append(child_obj)
@@ -453,7 +453,9 @@ class iob_core(iob_module, iob_instance):
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(
-                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!"
+                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!\n"
+                    f"Available ports:\n- "
+                    + "\n- ".join([port.name for port in self.ports])
                 )
 
             bit_slices = []

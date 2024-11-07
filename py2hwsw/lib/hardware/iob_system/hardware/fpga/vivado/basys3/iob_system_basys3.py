@@ -154,9 +154,9 @@ def setup(py_params_dict):
             },
             "connect": {
                 "clk_rst_s": "intercon_clk_rst",
-                "m0_clk_rst": "intercon_m0_clk_rst",
+                "m0_clk_rst_io": "intercon_m0_clk_rst",
                 "m0_axi_m": "memory_axi",
-                "s0_clk_rst": "intercon_s0_clk_rst",
+                "s0_clk_rst_io": "intercon_s0_clk_rst",
                 "s0_axi_s": "axi",
             },
             "num_slaves": 1,

@@ -214,11 +214,11 @@ def setup(py_params_dict):
                     "AXI_DATA_W": "AXI_DATA_W",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst_s",
-                    "iob": "ethernet",
-                    "axi": "eth_axi",
-                    "mii": "eth_mii_invert",
-                    "interrupt": "eth_int",
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "iob_s": "ethernet",
+                    "axi_s": "eth_axi",
+                    "mii_io": "eth_mii_invert",
+                    "interrupt_o": "eth_int",
                 },
             },
         ]

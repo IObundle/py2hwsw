@@ -8,7 +8,7 @@ def setup(py_params_dict):
         "version": "0.1",
         "ports": [
             {
-                "name": "io",
+                "name": "io_io",
                 "descr": "",
                 "signals": [
                     {"name": "clkin_i", "width": "1"},

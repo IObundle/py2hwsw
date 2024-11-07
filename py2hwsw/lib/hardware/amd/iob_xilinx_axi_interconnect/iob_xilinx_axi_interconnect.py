@@ -68,7 +68,7 @@ def setup(py_params_dict):
     for i in range(N_SLAVES):
         attributes_dict["ports"] += [
             {
-                "name": f"s{i}_clk_rst",
+                "name": f"s{i}_clk_rst_io",
                 "descr": f"Slave {i} clock reset interface",
                 "signals": [
                     {"name": f"s{i}_clk_i", "width": "1"},
@@ -91,7 +91,7 @@ def setup(py_params_dict):
     for i in range(N_MASTERS):
         attributes_dict["ports"] += [
             {
-                "name": f"m{i}_clk_rst",
+                "name": f"m{i}_clk_rst_io",
                 "descr": f"Master {i} clock reset output interface",
                 "signals": [
                     {"name": f"m{i}_clk_i", "width": "1"},

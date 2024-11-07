@@ -17,6 +17,7 @@ class iob_conf:
     # Only set this macro if the Verilog macro specified here is defined
     if_defined: str = ""
     if_not_defined: str = ""
+    doc_only: bool = False
 
     def __post_init__(self):
         if not self.name:

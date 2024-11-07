@@ -86,7 +86,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "ext_rom_bus",
+                "name": "ext_rom_bus_io",
                 "descr": "External ROM signals",
                 "signals": [
                     {
@@ -112,7 +112,7 @@ def setup(py_params_dict):
                 "name": "rom",
                 "descr": "'rom' register interface",
                 "signals": [
-                    {"name": "rom_raddr_rd", "width": 32},
+                    {"name": "rom_raddr_rd", "width": BOOTROM_ADDR_W - 2},
                     {"name": "rom_rdata_rd", "width": "DATA_W"},
                     {"name": "rom_rvalid_rd", "width": 1},
                     {"name": "rom_ren_rd", "width": 1},
@@ -165,7 +165,7 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",
                     # Register interfaces
-                    "rom": "rom",
+                    "rom_io": "rom",
                 },
             },
             {

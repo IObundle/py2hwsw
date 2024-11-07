@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <verilated.h>
 
-#include "Viob_sim.h"
+#include "Viob_system_sim.h"
 #include "iob_bsp.h"
 #include "iob_system_conf.h"
 #include "iob_uart_csrs.h"
@@ -29,7 +29,7 @@ extern timer_settings_t task_timer_settings;
 
 void cpu_inituart(iob_native_t *uart_if);
 
-Viob_sim *dut = new Viob_sim;
+Viob_system_sim *dut = new Viob_system_sim;
 
 void call_eval() { dut->eval(); }
 

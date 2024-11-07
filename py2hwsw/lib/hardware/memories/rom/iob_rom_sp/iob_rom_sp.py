@@ -49,7 +49,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "rom_if",
+                "name": "rom_if_io",
                 "descr": "Memory interface",
                 "signals": [
                     {"name": "r_en_i", "width": 1},

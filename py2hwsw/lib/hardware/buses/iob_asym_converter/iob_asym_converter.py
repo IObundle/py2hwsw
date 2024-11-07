@@ -48,7 +48,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "read",
+                "name": "read_io",
                 "descr": "Read interface",
                 "signals": [
                     {
@@ -69,7 +69,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "extmem",
+                "name": "extmem_io",
                 "descr": "External memory interface",
                 "signals": [
                     #  Write port

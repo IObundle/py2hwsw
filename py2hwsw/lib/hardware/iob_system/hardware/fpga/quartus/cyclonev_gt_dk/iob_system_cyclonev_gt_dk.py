@@ -68,7 +68,7 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "rs232",
+            "name": "rs232_io",
             "descr": "Serial port",
             "signals": [
                 {"name": "txd_o", "width": "1"},
@@ -79,7 +79,7 @@ def setup(py_params_dict):
     if params["use_extmem"]:
         attributes_dict["ports"] += [
             {
-                "name": "ddr3",
+                "name": "ddr3_io",
                 "descr": "External DDR3 memory interface",
                 "signals": [
                     {"name": "ddr3b_a_o", "width": "14"},
@@ -110,7 +110,7 @@ def setup(py_params_dict):
     if params["use_ethernet"]:
         attributes_dict["ports"] += [
             {
-                "name": "mii",
+                "name": "mii_io",
                 "descr": "MII ethernet interface",
                 "signals": [
                     {"name": "enet_resetn_o", "width": "1"},
@@ -287,8 +287,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_rst_i": "ddr3_ctr_clk_rst",
-                    "general": "ddr3_ctr_general",
-                    "ddr3": "ddr3",
+                    "general_io": "ddr3_ctr_general",
+                    "ddr3_io": "ddr3_io",
                     "s0_axi_s": (
                         "axi",
                         [
@@ -307,7 +307,7 @@ def setup(py_params_dict):
                 "instance_name": "rxclk_buf",
                 "instance_description": "RX clock buffer",
                 "connect": {
-                    "io": "rxclk_buf_io",
+                    "io_io": "rxclk_buf_io",
                 },
             },
             {
@@ -315,7 +315,7 @@ def setup(py_params_dict):
                 "instance_name": "ddio_out_clkbuf_inst",
                 "instance_description": "DDIO out clock buffer",
                 "connect": {
-                    "io": "ddio_out_clkbuf_io",
+                    "io_io": "ddio_out_clkbuf_io",
                 },
             },
         ]

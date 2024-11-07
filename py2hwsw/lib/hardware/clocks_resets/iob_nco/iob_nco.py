@@ -58,7 +58,7 @@ def setup(py_params_dict):
                 "descr": "CPU native interface",
             },
             {
-                "name": "clk_gen",
+                "name": "clk_gen_io",
                 "descr": "Generated clock interface",
                 "signals": [
                     {
@@ -101,12 +101,21 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "period",
+                "name": "period_int",
                 "descr": "",
                 "signals": [
-                    {"name": "period_wdata_wr", "width": 32},
-                    {"name": "period_wen_wr", "width": 1},
-                    {"name": "period_wready_wr", "width": 1},
+                    {"name": "period_int_wdata_wr", "width": 32},
+                    {"name": "period_int_wen_wr", "width": 1},
+                    {"name": "period_int_wready_wr", "width": 1},
+                ],
+            },
+            {
+                "name": "period_frac",
+                "descr": "",
+                "signals": [
+                    {"name": "period_frac_wdata_wr", "width": 32},
+                    {"name": "period_frac_wen_wr", "width": 1},
+                    {"name": "period_frac_wready_wr", "width": 1},
                 ],
             },
         ],
@@ -163,9 +172,10 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "iob_s",
                     # Register interfaces
-                    "soft_reset": "soft_reset",
-                    "enable": "enable",
-                    "period": "period",
+                    "soft_reset_o": "soft_reset",
+                    "enable_o": "enable",
+                    "period_int_io": "period_int",
+                    "period_frac_io": "period_frac",
                 },
             },
             # For simulation

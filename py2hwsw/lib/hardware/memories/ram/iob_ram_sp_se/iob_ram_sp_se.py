@@ -57,7 +57,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "mem_if",
+                "name": "mem_if_io",
                 "descr": "Memory interface",
                 "signals": [
                     {"name": "en_i", "width": 1},

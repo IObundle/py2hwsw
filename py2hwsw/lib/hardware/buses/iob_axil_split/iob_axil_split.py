@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-# FIXME: According to AXI-Lite, this core should support simultaneous read and write transactions
-
 
 def setup(py_params_dict):
     assert "name" in py_params_dict, print(
@@ -28,25 +26,25 @@ def setup(py_params_dict):
     RESP_W = int(py_params_dict["resp_w"]) if "resp_w" in py_params_dict else 2
 
     axil_signals = [
-        ("axil_araddr", "input", ADDR_W),
-        ("axil_arprot", "input", PROT_W),
-        ("axil_arvalid", "input", 1),
-        ("axil_arready", "output", 1),
-        ("axil_rdata", "output", DATA_W),
-        ("axil_rresp", "output", RESP_W),
-        ("axil_rvalid", "output", 1),
-        ("axil_rready", "input", 1),
-        ("axil_awaddr", "input", ADDR_W),
-        ("axil_awprot", "input", PROT_W),
-        ("axil_awvalid", "input", 1),
-        ("axil_awready", "output", 1),
-        ("axil_wdata", "input", DATA_W),
-        ("axil_wstrb", "input", int(DATA_W / DATA_SECTION_W)),
-        ("axil_wvalid", "input", 1),
-        ("axil_wready", "output", 1),
-        ("axil_bresp", "output", RESP_W),
-        ("axil_bvalid", "output", 1),
-        ("axil_bready", "input", 1),
+        ("axil_araddr", "input", ADDR_W, "read"),
+        ("axil_arprot", "input", PROT_W, "read"),
+        ("axil_arvalid", "input", 1, "read"),
+        ("axil_arready", "output", 1, "read"),
+        ("axil_rdata", "output", DATA_W, "read"),
+        ("axil_rresp", "output", RESP_W, "read"),
+        ("axil_rvalid", "output", 1, "read"),
+        ("axil_rready", "input", 1, "read"),
+        ("axil_awaddr", "input", ADDR_W, "write"),
+        ("axil_awprot", "input", PROT_W, "write"),
+        ("axil_awvalid", "input", 1, "write"),
+        ("axil_awready", "output", 1, "write"),
+        ("axil_wdata", "input", DATA_W, "write"),
+        ("axil_wstrb", "input", int(DATA_W / DATA_SECTION_W, "write")),
+        ("axil_wvalid", "input", 1, "write"),
+        ("axil_wready", "output", 1, "write"),
+        ("axil_bresp", "output", RESP_W, "write"),
+        ("axil_bvalid", "output", 1, "write"),
+        ("axil_bready", "input", 1, "write"),
     ]
 
     attributes_dict = {
@@ -59,30 +57,35 @@ def setup(py_params_dict):
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and async reset",
-            },
-            {
-                "name": "reset_i",
-                "descr": "Reset signal",
-                "signals": [
-                    {
-                        "name": "rst_i",
-                        "width": "1",
-                    },
-                ],
-            },
-            {
-                "name": "input_s",
-                "signals": {
-                    "type": "axil",
-                    "file_prefix": py_params_dict["name"] + "_input_",
-                    "prefix": "input_",
-                    "DATA_W": DATA_W,
-                    "ADDR_W": ADDR_W,
-                },
-                "descr": "Split input",
-            },
+            }
         ],
     }
+    #
+    # Ports
+    #
+    attributes_dict["ports"] = [
+        {
+            "name": "reset_i",
+            "descr": "Reset signal",
+            "signals": [
+                {
+                    "name": "rst_i",
+                    "width": "1",
+                },
+            ],
+        },
+        {
+            "name": "input_s",
+            "signals": {
+                "type": "axil",
+                "file_prefix": py_params_dict["name"] + "_input_",
+                "prefix": "input_",
+                "DATA_W": DATA_W,
+                "ADDR_W": ADDR_W,
+            },
+            "descr": "Split input",
+        },
+    ]
     for port_idx in range(NUM_OUTPUTS):
         attributes_dict["ports"].append(
             {
@@ -97,42 +100,82 @@ def setup(py_params_dict):
                 "descr": "Split output interface",
             },
         )
+    #
+    # Wires
+    #
     attributes_dict["wires"] = [
-        # Output selection signals
+        # Read selection register signals
         {
-            "name": "sel_reg_en_rst",
-            "descr": "Enable and reset signal for sel_reg",
+            "name": "read_sel_reg_en_rst",
+            "descr": "Enable and reset signal for read_sel_reg",
             "signals": [
-                {"name": "sel_reg_en", "width": 1},
+                {"name": "read_sel_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
         {
-            "name": "sel_reg_data_i",
-            "descr": "Input of sel_reg",
+            "name": "read_sel_reg_data_i",
+            "descr": "Input of read_sel_reg",
             "signals": [
-                {"name": "sel", "width": NBITS},
+                {"name": "read_sel", "width": NBITS},
             ],
         },
         {
-            "name": "sel_reg_data_o",
-            "descr": "Output of sel_reg",
+            "name": "read_sel_reg_data_o",
+            "descr": "Output of read_sel_reg",
             "signals": [
-                {"name": "sel_reg", "width": NBITS},
+                {"name": "read_sel_reg", "width": NBITS},
             ],
         },
         {
-            "name": "output_sel",
+            "name": "output_read_sel",
             "descr": "Select output interface",
             "signals": [
-                {"name": "sel"},
+                {"name": "read_sel"},
             ],
         },
         {
-            "name": "output_sel_reg",
+            "name": "output_read_sel_reg",
             "descr": "Registered select output interface",
             "signals": [
-                {"name": "sel_reg"},
+                {"name": "read_sel_reg"},
+            ],
+        },
+        # Write selection register signals
+        {
+            "name": "write_sel_reg_en_rst",
+            "descr": "Enable and reset signal for write_sel_reg",
+            "signals": [
+                {"name": "write_sel_reg_en", "width": 1},
+                {"name": "rst_i"},
+            ],
+        },
+        {
+            "name": "write_sel_reg_data_i",
+            "descr": "Input of write_sel_reg",
+            "signals": [
+                {"name": "write_sel", "width": NBITS},
+            ],
+        },
+        {
+            "name": "write_sel_reg_data_o",
+            "descr": "Output of write_sel_reg",
+            "signals": [
+                {"name": "write_sel_reg", "width": NBITS},
+            ],
+        },
+        {
+            "name": "output_write_sel",
+            "descr": "Select output interface",
+            "signals": [
+                {"name": "write_sel"},
+            ],
+        },
+        {
+            "name": "output_write_sel_reg",
+            "descr": "Registered select output interface",
+            "signals": [
+                {"name": "write_sel_reg"},
             ],
         },
     ]
@@ -183,23 +226,40 @@ def setup(py_params_dict):
                     ],
                 },
             ]
+    #
+    # Blocks
+    #
     attributes_dict["blocks"] = [
         {
             "core_name": "iob_reg_re",
-            "instance_name": "sel_reg_re",
+            "instance_name": "read_sel_reg_re",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "sel_reg_en_rst",
-                "data_i": "sel_reg_data_i",
-                "data_o": "sel_reg_data_o",
+                "en_rst_i": "read_sel_reg_en_rst",
+                "data_i": "read_sel_reg_data_i",
+                "data_o": "read_sel_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_re",
+            "instance_name": "write_sel_reg_re",
+            "parameters": {
+                "DATA_W": NBITS,
+                "RST_VAL": f"{NBITS}'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "write_sel_reg_en_rst",
+                "data_i": "write_sel_reg_data_i",
+                "data_o": "write_sel_reg_data_o",
             },
         },
     ]
-    for signal, direction, width in axil_signals:
+    for signal, direction, width, sig_type in axil_signals:
         if direction == "input":
             # Demuxers
             attributes_dict["blocks"].append(
@@ -211,7 +271,11 @@ def setup(py_params_dict):
                         "N": NUM_OUTPUTS,
                     },
                     "connect": {
-                        "sel_i": "output_sel",
+                        "sel_i": (
+                            "output_read_sel"
+                            if sig_type == "read"
+                            else "output_write_sel"
+                        ),
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
@@ -228,19 +292,27 @@ def setup(py_params_dict):
                         "N": NUM_OUTPUTS,
                     },
                     "connect": {
-                        "sel_i": "output_sel_reg",
+                        "sel_i": (
+                            "output_read_sel_reg"
+                            if sig_type == "read"
+                            else "output_write_sel_reg"
+                        ),
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },
                 },
             )
-
+    #
+    # Snippets
+    #
     attributes_dict["snippets"] = [
         {
             # Extract output selection bits from address
             "verilog_code": f"""
-   assign sel = input_axil_arvalid_i ? input_axil_araddr_i[{ADDR_W-1}-:{NBITS}] : input_axil_awaddr_i[{ADDR_W-1}-:{NBITS}];
-   assign sel_reg_en = input_axil_arvalid_i | input_axil_awvalid_i;
+   assign read_sel = input_axil_araddr_i[{ADDR_W-1}-:{NBITS}];
+   assign write_sel = input_axil_awaddr_i[{ADDR_W-1}-:{NBITS}];
+   assign read_sel_reg_en = input_axil_arvalid_i;
+   assign write_sel_reg_en = input_axil_awvalid_i;
 """,
         },
     ]

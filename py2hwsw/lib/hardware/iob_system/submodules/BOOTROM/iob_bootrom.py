@@ -30,38 +30,6 @@ def setup(py_params_dict):
                 "min": "0",
                 "max": "32",
             },
-            {
-                "name": "AXI_ID_W",
-                "descr": "AXI ID bus width",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "32",
-            },
-            {
-                "name": "AXI_ADDR_W",
-                "descr": "AXI address bus width",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "32",
-            },
-            {
-                "name": "AXI_DATA_W",
-                "descr": "AXI data bus width",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "32",
-            },
-            {
-                "name": "AXI_LEN_W",
-                "descr": "AXI burst length width",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "4",
-            },
         ],
         #
         # Ports

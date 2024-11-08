@@ -407,12 +407,6 @@ def setup(py_params_dict):
             "core_name": "iob_bootrom",
             "instance_name": "bootrom",
             "instance_description": "Boot ROM peripheral",
-            "parameters": {
-                "AXI_ID_W": "AXI_ID_W",
-                "AXI_ADDR_W": "AXI_ADDR_W",
-                "AXI_DATA_W": "AXI_DATA_W",
-                "AXI_LEN_W": "AXI_LEN_W",
-            },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "cbus_s": (

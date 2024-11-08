@@ -179,7 +179,7 @@ def setup(py_params_dict):
             ],
         },
     ]
-    for signal, direction, width in axil_signals:
+    for signal, direction, width, _ in axil_signals:
         if direction == "input":
             # Demux signals
             attributes_dict["wires"] += [
@@ -325,7 +325,7 @@ def setup(py_params_dict):
    assign output{port_idx}_axil_awaddr_o = demux_axil_awaddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
 """
     # Connect other signals
-    for signal, direction, width in axil_signals:
+    for signal, direction, width, _ in axil_signals:
         if signal in ["axil_araddr", "axil_awaddr"]:
             continue
 

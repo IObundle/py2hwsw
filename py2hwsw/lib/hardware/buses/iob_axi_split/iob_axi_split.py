@@ -34,46 +34,46 @@ def setup(py_params_dict):
 
     axi_signals = [
         # AXI-Lite Write
-        ("axi_awaddr", "output", ADDR_W, "write"),
-        ("axi_awprot", "output", PROT_W, "write"),
-        ("axi_awvalid", "output", 1, "write"),
-        ("axi_awready", "input", 1, "write"),
-        ("axi_wdata", "output", DATA_W, "write"),
-        ("axi_wstrb", "output", int(DATA_W / DATA_SECTION_W), "write"),
-        ("axi_wvalid", "output", 1, "write"),
-        ("axi_wready", "input", 1, "write"),
-        ("axi_bresp", "input", RESP_W, "write"),
-        ("axi_bvalid", "input", 1, "write"),
-        ("axi_bready", "output", 1, "write"),
+        ("axi_awaddr", "input", ADDR_W, "write"),
+        ("axi_awprot", "input", PROT_W, "write"),
+        ("axi_awvalid", "input", 1, "write"),
+        ("axi_awready", "output", 1, "write"),
+        ("axi_wdata", "input", DATA_W, "write"),
+        ("axi_wstrb", "input", int(DATA_W / DATA_SECTION_W), "write"),
+        ("axi_wvalid", "input", 1, "write"),
+        ("axi_wready", "output", 1, "write"),
+        ("axi_bresp", "output", RESP_W, "write"),
+        ("axi_bvalid", "output", 1, "write"),
+        ("axi_bready", "input", 1, "write"),
         # AXI specific write
-        ("axi_awid", "output", ID_W, "write"),
-        ("axi_awlen", "output", LEN_W, "write"),
-        ("axi_awsize", "output", SIZE_W, "write"),
-        ("axi_awburst", "output", BURST_W, "write"),
-        ("axi_awlock", "output", LOCK_W, "write"),
-        ("axi_awcache", "output", CACHE_W, "write"),
-        ("axi_awqos", "output", QOS_W, "write"),
-        ("axi_wlast", "output", 1, "write"),
-        ("axi_bid", "input", ID_W, "write"),
+        ("axi_awid", "input", ID_W, "write"),
+        ("axi_awlen", "input", LEN_W, "write"),
+        ("axi_awsize", "input", SIZE_W, "write"),
+        ("axi_awburst", "input", BURST_W, "write"),
+        ("axi_awlock", "input", LOCK_W, "write"),
+        ("axi_awcache", "input", CACHE_W, "write"),
+        ("axi_awqos", "input", QOS_W, "write"),
+        ("axi_wlast", "input", 1, "write"),
+        ("axi_bid", "output", ID_W, "write"),
         # AXI-Lite Read
-        ("axi_araddr", "output", ADDR_W, "read"),
-        ("axi_arprot", "output", PROT_W, "read"),
-        ("axi_arvalid", "output", 1, "read"),
-        ("axi_arready", "input", 1, "read"),
-        ("axi_rdata", "input", DATA_W, "read"),
-        ("axi_rresp", "input", RESP_W, "read"),
-        ("axi_rvalid", "input", 1, "read"),
-        ("axi_rready", "output", 1, "read"),
+        ("axi_araddr", "input", ADDR_W, "read"),
+        ("axi_arprot", "input", PROT_W, "read"),
+        ("axi_arvalid", "input", 1, "read"),
+        ("axi_arready", "output", 1, "read"),
+        ("axi_rdata", "output", DATA_W, "read"),
+        ("axi_rresp", "output", RESP_W, "read"),
+        ("axi_rvalid", "output", 1, "read"),
+        ("axi_rready", "input", 1, "read"),
         # AXI specific read
-        ("axi_arid", "output", ID_W, "read"),
-        ("axi_arlen", "output", LEN_W, "read"),
-        ("axi_arsize", "output", SIZE_W, "read"),
-        ("axi_arburst", "output", BURST_W, "read"),
-        ("axi_arlock", "output", LOCK_W, "read"),
-        ("axi_arcache", "output", CACHE_W, "read"),
-        ("axi_arqos", "output", QOS_W, "read"),
-        ("axi_rid", "input", ID_W, "read"),
-        ("axi_rlast", "input", 1, "read"),
+        ("axi_arid", "input", ID_W, "read"),
+        ("axi_arlen", "input", LEN_W, "read"),
+        ("axi_arsize", "input", SIZE_W, "read"),
+        ("axi_arburst", "input", BURST_W, "read"),
+        ("axi_arlock", "input", LOCK_W, "read"),
+        ("axi_arcache", "input", CACHE_W, "read"),
+        ("axi_arqos", "input", QOS_W, "read"),
+        ("axi_rid", "output", ID_W, "read"),
+        ("axi_rlast", "output", 1, "read"),
     ]
 
     attributes_dict = {
@@ -225,7 +225,7 @@ def setup(py_params_dict):
         },
     ]
     # Generate wires for muxers and demuxers
-    for signal, direction, width in axi_signals:
+    for signal, direction, width, _ in axi_signals:
         if direction == "input":
             # Demux signals
             attributes_dict["wires"] += [
@@ -372,7 +372,7 @@ def setup(py_params_dict):
    assign output{port_idx}_axi_awaddr_o = demux_axi_awaddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
 """
     # Connect other signals
-    for signal, direction, width in axi_signals:
+    for signal, direction, width, _ in axi_signals:
         if signal in ["axi_araddr", "axi_awaddr"]:
             continue
 

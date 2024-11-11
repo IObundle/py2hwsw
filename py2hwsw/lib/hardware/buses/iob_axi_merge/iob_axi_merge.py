@@ -190,7 +190,7 @@ def setup(py_params_dict):
             "name": "read_prio_enc_i",
             "descr": "Input of read priority encoder",
             "signals": [
-                {"name": "mux_rvalid_input"},
+                {"name": "mux_axi_arvalid", "width": NUM_INPUTS},
             ],
         },
         {
@@ -241,7 +241,7 @@ def setup(py_params_dict):
             "name": "write_prio_enc_i",
             "descr": "Input of write priority encoder",
             "signals": [
-                {"name": "mux_wvalid_input"},
+                {"name": "mux_axi_awvalid", "width": NUM_INPUTS},
             ],
         },
         {

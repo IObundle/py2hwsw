@@ -148,6 +148,307 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    # TODO: Fix below #######################
+    attributes_dict["wires"] = [
+        # Read selection register signals
+        {
+            "name": "read_sel_reg_rst",
+            "descr": "Reset signal for read_sel_reg",
+            "signals": [
+                {"name": "rst_i"},
+            ],
+        },
+        {
+            "name": "read_sel_reg_data_i",
+            "descr": "Input of read_sel_reg",
+            "signals": [
+                {"name": "read_sel", "width": NBITS},
+            ],
+        },
+        {
+            "name": "read_sel_reg_data_o",
+            "descr": "Output of read_sel_reg",
+            "signals": [
+                {"name": "read_sel_reg", "width": NBITS},
+            ],
+        },
+        {
+            "name": "output_read_sel",
+            "descr": "Select output interface",
+            "signals": [
+                {"name": "read_sel"},
+            ],
+        },
+        {
+            "name": "output_read_sel_reg",
+            "descr": "Registered select output interface",
+            "signals": [
+                {"name": "read_sel_reg"},
+            ],
+        },
+        # Read priority encoder signals
+        {
+            "name": "read_prio_enc_i",
+            "descr": "Input of read priority encoder",
+            "signals": [
+                {"name": "read_mux_valid_input"},
+            ],
+        },
+        {
+            "name": "read_prio_enc_o",
+            "descr": "Output of read priority encoder",
+            "signals": [
+                {"name": "read_sel"},
+            ],
+        },
+        # Write selection register signals
+        {
+            "name": "write_sel_reg_rst",
+            "descr": "Reset signal for write_sel_reg",
+            "signals": [
+                {"name": "rst_i"},
+            ],
+        },
+        {
+            "name": "write_sel_reg_data_i",
+            "descr": "Input of write_sel_reg",
+            "signals": [
+                {"name": "write_sel", "width": NBITS},
+            ],
+        },
+        {
+            "name": "write_sel_reg_data_o",
+            "descr": "Output of write_sel_reg",
+            "signals": [
+                {"name": "write_sel_reg", "width": NBITS},
+            ],
+        },
+        {
+            "name": "output_write_sel",
+            "descr": "Select output interface",
+            "signals": [
+                {"name": "write_sel"},
+            ],
+        },
+        {
+            "name": "output_write_sel_reg",
+            "descr": "Registered select output interface",
+            "signals": [
+                {"name": "write_sel_reg"},
+            ],
+        },
+        # Write priority encoder signals
+        {
+            "name": "write_prio_enc_i",
+            "descr": "Input of write priority encoder",
+            "signals": [
+                {"name": "write_mux_valid_input"},
+            ],
+        },
+        {
+            "name": "write_prio_enc_o",
+            "descr": "Output of write priority encoder",
+            "signals": [
+                {"name": "write_sel"},
+            ],
+        },
+    ]
+    # FIXME: update for merge
+    # Generate wires for muxers and demuxers
+    for signal, direction, width, _ in axi_signals:
+        if direction == "input":
+            # Demux signals
+            attributes_dict["wires"] += [
+                {
+                    "name": "demux_" + signal + "_i",
+                    "descr": f"Input of {signal} demux",
+                    "signals": [
+                        {
+                            "name": "input_" + signal + "_i",
+                        },
+                    ],
+                },
+                {
+                    "name": "demux_" + signal + "_o",
+                    "descr": f"Output of {signal} demux",
+                    "signals": [
+                        {
+                            "name": "demux_" + signal,
+                            "width": NUM_OUTPUTS * width,
+                        },
+                    ],
+                },
+            ]
+        else:  # output direction
+            # Mux signals
+            attributes_dict["wires"] += [
+                {
+                    "name": "mux_" + signal + "_i",
+                    "descr": f"Input of {signal} demux",
+                    "signals": [
+                        {
+                            "name": "mux_" + signal,
+                            "width": NUM_OUTPUTS * width,
+                        },
+                    ],
+                },
+                {
+                    "name": "mux_" + signal + "_o",
+                    "descr": f"Output of {signal} demux",
+                    "signals": [
+                        {
+                            "name": "input_" + signal + "_o",
+                        },
+                    ],
+                },
+            ]
+
+    #
+    # Blocks
+    #
+    attributes_dict["blocks"] = [
+        {
+            "core_name": "iob_reg_r",
+            "instance_name": "read_sel_reg_r",
+            "parameters": {
+                "DATA_W": NBITS,
+                "RST_VAL": f"{NBITS}'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "rst_i": "read_sel_reg_rst",
+                "data_i": "read_sel_reg_data_i",
+                "data_o": "read_sel_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_prio_enc",
+            "instance_name": "read_sel_enc",
+            "parameters": {
+                "W": NUM_INPUTS,
+                "MODE": '"HIGH"',
+            },
+            "connect": {
+                "unencoded_i": "read_prio_enc_i",
+                "encoded_o": "read_prio_enc_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_r",
+            "instance_name": "write_sel_reg_r",
+            "parameters": {
+                "DATA_W": NBITS,
+                "RST_VAL": f"{NBITS}'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "rst_i": "write_sel_reg_rst",
+                "data_i": "write_sel_reg_data_i",
+                "data_o": "write_sel_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_prio_enc",
+            "instance_name": "write_sel_enc",
+            "parameters": {
+                "W": NUM_INPUTS,
+                "MODE": '"HIGH"',
+            },
+            "connect": {
+                "unencoded_i": "write_prio_enc_i",
+                "encoded_o": "write_prio_enc_o",
+            },
+        },
+    ]
+    # FIXME: Update for merge
+    # Generate muxers and demuxers
+    for signal, direction, width, sig_type in axi_signals:
+        if direction == "input":
+            # Demuxers
+            attributes_dict["blocks"].append(
+                {
+                    "core_name": "iob_demux",
+                    "instance_name": "iob_demux_" + signal,
+                    "parameters": {
+                        "DATA_W": width,
+                        "N": NUM_OUTPUTS,
+                    },
+                    "connect": {
+                        "sel_i": (
+                            "output_read_sel"
+                            if sig_type == "read"
+                            else "output_write_sel"
+                        ),
+                        "data_i": "demux_" + signal + "_i",
+                        "data_o": "demux_" + signal + "_o",
+                    },
+                },
+            )
+        else:  # output direction
+            # Muxers
+            attributes_dict["blocks"].append(
+                {
+                    "core_name": "iob_mux",
+                    "instance_name": "iob_mux_" + signal,
+                    "parameters": {
+                        "DATA_W": width,
+                        "N": NUM_OUTPUTS,
+                    },
+                    "connect": {
+                        "sel_i": (
+                            "output_read_sel_reg"
+                            if sig_type == "read"
+                            else "output_write_sel_reg"
+                        ),
+                        "data_i": "mux_" + signal + "_i",
+                        "data_o": "mux_" + signal + "_o",
+                    },
+                },
+            )
+    # FIXME: Update for merge
+    #
+    # Snippets
+    #
+    attributes_dict["snippets"] = [
+        {
+            # Extract output selection bits from address
+            "verilog_code": f"""
+   assign read_sel = input_axi_araddr_i[{ADDR_W-1}-:{NBITS}];
+   assign write_sel = input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}];
+   assign read_sel_reg_en = input_axi_arvalid_i;
+   assign write_sel_reg_en = input_axi_awvalid_i;
+""",
+        },
+    ]
+
+    verilog_code = ""
+    # Connect address signal
+    for port_idx in range(NUM_OUTPUTS):
+        verilog_code += f"""
+   assign output{port_idx}_axi_araddr_o = demux_axi_araddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
+   assign output{port_idx}_axi_awaddr_o = demux_axi_awaddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
+"""
+    # Connect other signals
+    for signal, direction, width, _ in axi_signals:
+        if signal in ["axi_araddr", "axi_awaddr"]:
+            continue
+
+        if direction == "input":
+            # Connect demuxers outputs
+            for port_idx in range(NUM_OUTPUTS):
+                verilog_code += f"""
+   assign output{port_idx}_{signal}_o = demux_{signal}[{port_idx*width}+:{width}];
+"""
+        else:  # Output direction
+            # Connect muxer inputs
+            verilog_code += f"    assign mux_{signal} = {{"
+            for port_idx in range(NUM_OUTPUTS - 1, -1, -1):
+                verilog_code += f"output{port_idx}_{signal}_i, "
+            verilog_code = verilog_code[:-2] + "};\n"
+    # Create snippet with muxer and demuxer connections
+    attributes_dict["snippets"] += [
+        {
+            "verilog_code": verilog_code,
+        },
+    ]
 
     return attributes_dict

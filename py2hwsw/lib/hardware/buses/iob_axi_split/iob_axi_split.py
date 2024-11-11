@@ -234,7 +234,7 @@ def setup(py_params_dict):
                     "descr": f"Input of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal,
+                            "name": "input_" + signal + "_i",
                         },
                     ],
                 },
@@ -267,7 +267,7 @@ def setup(py_params_dict):
                     "descr": f"Output of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal,
+                            "name": "input_" + signal + "_o",
                         },
                     ],
                 },

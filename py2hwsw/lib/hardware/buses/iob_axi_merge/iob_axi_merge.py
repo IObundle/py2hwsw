@@ -172,15 +172,15 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "output_read_sel",
-            "descr": "Select output interface",
+            "name": "input_read_sel",
+            "descr": "Select input interface",
             "signals": [
                 {"name": "read_sel"},
             ],
         },
         {
-            "name": "output_read_sel_reg",
-            "descr": "Registered select output interface",
+            "name": "input_read_sel_reg",
+            "descr": "Registered select input interface",
             "signals": [
                 {"name": "read_sel_reg"},
             ],
@@ -190,7 +190,7 @@ def setup(py_params_dict):
             "name": "read_prio_enc_i",
             "descr": "Input of read priority encoder",
             "signals": [
-                {"name": "read_mux_valid_input"},
+                {"name": "mux_rvalid_input"},
             ],
         },
         {
@@ -223,15 +223,15 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "output_write_sel",
-            "descr": "Select output interface",
+            "name": "input_write_sel",
+            "descr": "Select input interface",
             "signals": [
                 {"name": "write_sel"},
             ],
         },
         {
-            "name": "output_write_sel_reg",
-            "descr": "Registered select output interface",
+            "name": "input_write_sel_reg",
+            "descr": "Registered select input interface",
             "signals": [
                 {"name": "write_sel_reg"},
             ],
@@ -241,7 +241,7 @@ def setup(py_params_dict):
             "name": "write_prio_enc_i",
             "descr": "Input of write priority encoder",
             "signals": [
-                {"name": "write_mux_valid_input"},
+                {"name": "mux_wvalid_input"},
             ],
         },
         {
@@ -252,10 +252,9 @@ def setup(py_params_dict):
             ],
         },
     ]
-    # FIXME: update for merge
     # Generate wires for muxers and demuxers
     for signal, direction, width, _ in axi_signals:
-        if direction == "input":
+        if direction == "output":
             # Demux signals
             attributes_dict["wires"] += [
                 {
@@ -263,7 +262,7 @@ def setup(py_params_dict):
                     "descr": f"Input of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal + "_i",
+                            "name": "output_" + signal + "_i",
                         },
                     ],
                 },
@@ -273,12 +272,12 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "demux_" + signal,
-                            "width": NUM_OUTPUTS * width,
+                            "width": NUM_INPUTS * width,
                         },
                     ],
                 },
             ]
-        else:  # output direction
+        else:  # input direction
             # Mux signals
             attributes_dict["wires"] += [
                 {
@@ -287,7 +286,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "mux_" + signal,
-                            "width": NUM_OUTPUTS * width,
+                            "width": NUM_INPUTS * width,
                         },
                     ],
                 },
@@ -296,7 +295,7 @@ def setup(py_params_dict):
                     "descr": f"Output of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal + "_o",
+                            "name": "output_" + signal + "_o",
                         },
                     ],
                 },
@@ -359,10 +358,9 @@ def setup(py_params_dict):
             },
         },
     ]
-    # FIXME: Update for merge
     # Generate muxers and demuxers
     for signal, direction, width, sig_type in axi_signals:
-        if direction == "input":
+        if direction == "output":
             # Demuxers
             attributes_dict["blocks"].append(
                 {
@@ -370,20 +368,20 @@ def setup(py_params_dict):
                     "instance_name": "iob_demux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_OUTPUTS,
+                        "N": NUM_INPUTS,
                     },
                     "connect": {
                         "sel_i": (
-                            "output_read_sel"
+                            "input_read_sel"
                             if sig_type == "read"
-                            else "output_write_sel"
+                            else "input_write_sel"
                         ),
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
                 },
             )
-        else:  # output direction
+        else:  # input direction
             # Muxers
             attributes_dict["blocks"].append(
                 {
@@ -391,58 +389,38 @@ def setup(py_params_dict):
                     "instance_name": "iob_mux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_OUTPUTS,
+                        "N": NUM_INPUTS,
                     },
                     "connect": {
                         "sel_i": (
-                            "output_read_sel_reg"
+                            "input_read_sel_reg"
                             if sig_type == "read"
-                            else "output_write_sel_reg"
+                            else "input_write_sel_reg"
                         ),
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },
                 },
             )
-    # FIXME: Update for merge
     #
     # Snippets
     #
-    attributes_dict["snippets"] = [
-        {
-            # Extract output selection bits from address
-            "verilog_code": f"""
-   assign read_sel = input_axi_araddr_i[{ADDR_W-1}-:{NBITS}];
-   assign write_sel = input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}];
-   assign read_sel_reg_en = input_axi_arvalid_i;
-   assign write_sel_reg_en = input_axi_awvalid_i;
-""",
-        },
-    ]
+    attributes_dict["snippets"] = []
 
     verilog_code = ""
-    # Connect address signal
-    for port_idx in range(NUM_OUTPUTS):
-        verilog_code += f"""
-   assign output{port_idx}_axi_araddr_o = demux_axi_araddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
-   assign output{port_idx}_axi_awaddr_o = demux_axi_awaddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
-"""
     # Connect other signals
     for signal, direction, width, _ in axi_signals:
-        if signal in ["axi_araddr", "axi_awaddr"]:
-            continue
-
-        if direction == "input":
+        if direction == "output":
             # Connect demuxers outputs
-            for port_idx in range(NUM_OUTPUTS):
+            for port_idx in range(NUM_INPUTS):
                 verilog_code += f"""
-   assign output{port_idx}_{signal}_o = demux_{signal}[{port_idx*width}+:{width}];
+   assign input{port_idx}_{signal}_o = demux_{signal}[{port_idx*width}+:{width}];
 """
-        else:  # Output direction
+        else:  # Input direction
             # Connect muxer inputs
             verilog_code += f"    assign mux_{signal} = {{"
-            for port_idx in range(NUM_OUTPUTS - 1, -1, -1):
-                verilog_code += f"output{port_idx}_{signal}_i, "
+            for port_idx in range(NUM_INPUTS - 1, -1, -1):
+                verilog_code += f"input{port_idx}_{signal}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
     # Create snippet with muxer and demuxer connections
     attributes_dict["snippets"] += [

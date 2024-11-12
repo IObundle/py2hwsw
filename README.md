@@ -70,6 +70,20 @@ nix-shell path/to/py2hwsw_directory
 
 If the `Py2HWSW_PATH` environment variable is not set, the nix environment will only install the project dependencies. Not the `py2hwsw` package itself.
 
+### Build user guide
+
+The `py2hwsw` program can generate a user guide with LaTeX using the `--py2hwsw_docs` argument.
+
+To generate a documentation directory with the user guide sources, run:
+```bash
+py2hwsw --py2hwsw_docs
+```
+
+To build the user guide, run:
+```bash
+make -C py2hwsw_docs/document/ build
+```
+
 ### Run from a local repository (without install)
 
 To use the `py2hwsw` program from a local repository without having to rebuild the package (as with nix and pip), run the `py2hwsw.py` script directly:

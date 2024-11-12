@@ -93,8 +93,8 @@ def setup(py_params_dict):
             iob_reg_re reg0 -p DATA_W:DATA_W RST_VAL:RST_VAL -c
             clk_en_rst_s:clk_en_rst_s 
             en_rst_i:en_rst_i
-            data_i_i:data_int
-            data_o_o:data_o
+            data_i:data_int
+            data_o:data_o
             'Accomulator register with synchronous reset and enable'
             """
         ],

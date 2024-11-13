@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
+# The following installs py2hwsw in nix
+# py2hwsw can also be installed with pip using the following command:
+# > pip install -e path/to/py2hwsw_directory
+
+
 { pkgs ? import <nixpkgs> {}, py2hwsw_pkg ? "none" }:
 
 let

@@ -39,7 +39,6 @@ jobs:
         run: git clean -ffdx
       - name: run LIB test
         run: |
-          export PY2HWSW_PATH=$(pwd);\
           cd py2hwsw/lib;\
           nix-shell --run "make sim-test"
 

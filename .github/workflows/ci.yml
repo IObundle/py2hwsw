@@ -40,7 +40,8 @@ jobs:
       - name: run LIB test
         run: |
           export PY2HWSW_PATH=$(pwd);\
-          nix-shell --run "make -C py2hwsw/lib sim-test"
+          cd py2hwsw/lib;\
+          nix-shell --run "make sim-test"
 
   reuse:
     runs-on: self-hosted
@@ -55,4 +56,4 @@ jobs:
       - name: Clean untracked files and directories (like old submodules)
         run: git clean -ffdx
       - name: Check compliance with REUSE specification
-        run: nix-shell --run "reuse lint"
+        run: nix-shell py2hwsw/lib --run "reuse lint"

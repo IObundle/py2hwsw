@@ -191,177 +191,148 @@ def debug(msg, level=0):
 
 def str_to_kwargs(attrs: list):
     """Decorator to convert a string to keyword arguments """
-    subcommand_list = []
-    subcommand_action = {}
-
-    def create_hyerarchy(kwargs: dict) -> dict:
-        for subcommand in subcommand_list:
-            subcommand_dict = {k[len(subcommand):]: v for k, v in kwargs.items() if k.startswith(subcommand)}
-            if subcommand_dict:
-                for key in list(kwargs.keys()):
-                    if key.startswith(subcommand):
-                        kwargs.pop(key)
-                if any(key.startswith(subcom) for key in subcommand_dict.keys() for subcom in subcommand_list):
-                    kwargs[subcommand[:-1]] = [create_hyerarchy(subcommand_dict)]
-                else:
-                    kwargs[subcommand[:-1]] = [subcommand_dict]
-        return kwargs
-
-    def preprocess_string(line: str) -> str:
-        new_line = line
-        for key, value in subcommand_action.items():
-            if key.split(':')[0] in line:
-                line_parts = line.split(value[0][0] + ' ')
-                new_line = line_parts[0]
-                for i in range(1, len(line_parts)):
-                    for item in value[1:]:
-                        if item[0] not in line_parts[i]:
-                            if item[2] == {'action': 'store_false'} or item[2] == {'action': 'store_true'}:
-                                line_parts[i] = line_parts[i] + ' --' + item[1] + " TOKEN "
-                            else:
-                                line_parts[i] = line_parts[i] + ' ' + item[0] + " TOKEN "
-                        elif item[2] == {'action': 'store_false'} or item[2] == {'action': 'store_true'}:
-                            val = 0 if item[2] == {'action': 'store_false'} else 1
-                            line_parts[i] = line_parts[i].replace(item[0], f" --{item[1]} {val}")
-                    new_line += value[0][0] + ' ' + line_parts[i]
-        return new_line
-
-    def aply_subcommand_action(kwargs: dict) -> dict:
-        for key, value in subcommand_action.items():
-            if key.split(':')[0] in kwargs:
-                new_list = []
-                new_len = len(list(kwargs[key.split(':')[0]][0].values())[0])
-                for i in range(new_len):
-                    new_dict = {}
-                    for k in kwargs[key.split(':')[0]][0].keys():
-                        if kwargs[key.split(':')[0]][0][k][i] != 'TOKEN':
-                            new_dict[k] = kwargs[key.split(':')[0]][0][k][i]
-                            if any((k in v[1]) and (v[2] == {'action':'store_true'} or v[2] == {'action':'store_false'}) for v in value):
-                                new_dict[k] = bool(int(kwargs[key.split(':')[0]][0][k][i]))
-                    new_list.append(new_dict)
-                kwargs[key.split(':')[0]] = new_list
-            else:
-                for k, v in kwargs.items():
-                    if isinstance(v, list):
-                        kwargs[k] = [aply_subcommand_action(v[0])]
-        return kwargs            
-
-                    
-    def create_parser(attrs: list) -> argparse.ArgumentParser:
+    def create_parsers(attrs: list, parser_name: str = "main") -> dict:
         parser = argparse.ArgumentParser()
         dicts = {}
-        add_arguments(parser, attrs, dicts)
-        return parser, dicts
-              
-    def add_arguments(parser: argparse.ArgumentParser, attrs: list, dicts: dict, subcommand: str = ''):
-        subparsers = None
+        parser_dest = parser_name
+        if '&' in parser_name:
+            parser_name, parser_dest = parser_name.split('&')
+        parser_dict = {parser_name: {'parser':parser, 'dicts': dicts, 'vars': {}, 'dest':parser_dest}}
+        if (d := ["-d", "descr"]) not in attrs:
+            attrs.append(d)
         for attr in attrs:
-            action = None
             if isinstance(attr, str):
-                parser.add_argument(subcommand + attr)
-            elif isinstance(attr, dict):
-                for subparser_name, subparser_attrs in attr.items():
-                    if ':' in subparser_name:
-                        attr_list = [lst[0] for lst in subparser_attrs]
-                        if subparser_name not in subcommand_action:
-                            subcommand_action.update({subparser_name:list(subparser_attrs)})
-                        subparser_name, action = subparser_name.split(":")
-                    subcommand_list.append(subparser_name+'_')
-                    if (d := ["-d", "descr"]) not in subparser_attrs:
-                        if action == 'list':
-                            if ["-d", "descr", {"action": "append"}] not in subparser_attrs:
-                                d = ["-d", "descr", {"action": "append"}]
-                                subparser_attrs.append(d)
-                            for subparser_attr in subparser_attrs:
-                                if subparser_attr[2] == {'action': 'store_false'} or subparser_attr[2] == {'action': 'store_true'}:
-                                    new_attr = [f"--{subparser_attr[1]}", subparser_attr[1], {'action': 'append'}]
-                                    subparser_attrs.remove(subparser_attr)
-                                    subparser_attrs.append(new_attr)
-                        else:
-                            subparser_attrs.append(d)
-                    if subparsers is None:
-                        subparsers = parser.add_subparsers()
-                    subparser = subparsers.add_parser(subparser_name)
-                    add_arguments(subparser, subparser_attrs, dicts, subcommand+subparser_name+'_')
+                parser.add_argument(attr)
             elif isinstance(attr, list):
+                args = None
                 if len(attr) >= 3:
-                    parser.add_argument(attr[0], dest=subcommand+attr[1], **attr[2])
                     if len(attr) == 4:
-                        dicts[subcommand+attr[1]] = attr[3]
+                        dicts[attr[1]] = attr[3]
+                    parser.add_argument(attr[0], dest=attr[1], **attr[2])
                 else:
-                    parser.add_argument(attr[0], dest=subcommand+attr[1])
-              
+                    parser.add_argument(attr[0], dest=attr[1])
+            elif isinstance(attr, dict):
+                for key, value in attr.items():
+                    new_dict = create_parsers(value, key)
+                    parser_dict[parser_name]['vars'].update({key.split('&')[0]:[]})
+                    parser_dict.update(new_dict)
+        return parser_dict
+
+    def parse_args(parser_dict: dict, args: list) -> dict:
+        key = args[0]
+        parser = parser_dict[key]['parser']
+        dicts = parser_dict[key]['dicts']
+        args = args[1:]
+        args = parser.parse_args(args)
+        kwargs = vars(args)
+        for arg in kwargs:
+            if arg in dicts and kwargs[arg] is not None:
+                if isinstance(dicts[arg], str):
+                    if dicts[arg] == "pairs":
+                        kwargs[arg] = dict(
+                                pair.split(":") for pair in kwargs[arg]
+                                )
+                elif isinstance(dicts[arg], list):
+                    _keys = [
+                            key
+                            for item in dicts[arg]
+                            for key in item.split(":")
+                            ]
+                    _values = [
+                            value
+                            for item in kwargs[arg]
+                            for value in item.split(":")
+                            ]
+                    kwargs[arg] = [
+                            dict(zip(_keys, _values[i:]))
+                            for i in range(0, len(_values), len(_keys))
+                            ]
+                elif isinstance(dicts[arg], tuple):
+                    kwargs[arg] = dict(zip(dicts[arg], kwargs[arg]))
+        for key, value in list(kwargs.items()):
+            if ':' in key:
+                kwargs.pop(key)
+                keys = key.split(":")
+                if isinstance(value, list):
+                    values = [pair.split(":") for pair in value]
+                    for i in range(len(keys)):
+                        kwargs[keys[i]] = [v[i] for v in values]
+                else:
+                    values = value.split(":")
+                    for i in range(len(keys)):
+                        kwargs[keys[i]] = values[i]
+        return {k: v for k, v in kwargs.items() if v is not None}
+
+    def organize_kwargs(parser_dict: dict, string: str) -> dict:
+        """ Create a dictionary of arguments by infering the hyerarchy of the arguments 
+            The arguments that correspond to parsers must remain as list
+            Only then the arguments are parsed in the correct place"""
+        args = ['main'] + shlex.split(string)
+        lists = []
+        while args:
+            key = args.pop(0)
+            if key in parser_dict:
+                lists.append([key])
+            else:
+                lists[-1].append(key)
+
+
+        def make_hierarchy(sub_lists: list, parser: str) -> dict:
+            if parser_dict[parser]['vars'] != {}:
+                output = {}
+                output[parser_dict[parser]['dest']] = []
+                sub_kwargs = {}
+                sub_kwargs[parser] = []
+                last_key = None
+                for key in parser_dict[parser]['vars']:
+                    output[parser_dict[key]['dest']] = []
+                    sub_kwargs[key] = []
+                while sub_lists:
+                    element = sub_lists.pop(0)
+                    if element[0] in parser_dict[parser]['vars'] or element[0] == parser:
+                        key = element[0]
+                        sub_kwargs[key].append(element)
+                        last_key = key
+                    else:
+                        sub_kwargs[last_key][-1].append(element)
+                for key in sub_kwargs.keys():
+                    if parser_dict[key]['vars'] != {} and key != parser:
+                        output[parser][-1].update(make_hierarchy(sub_kwargs[key], key))
+                    else:
+                        for sub_list in sub_kwargs[key]:
+                            extracted = [item for item in sub_list if isinstance(item, list)]
+                            not_extracted = [item for item in sub_list if not isinstance(item, list)]
+                            output[parser_dict[key]['dest']].append(parse_args(parser_dict, not_extracted))
+                            if extracted:
+                                output[parser_dict[key]['dest']][-1].update(make_hierarchy(extracted, key))
+            else:
+                if isinstance(sub_lists, list):
+                    sub_lists = sub_lists[0]
+                output = parse_args(parser_dict, sub_lists)
+            for key in output.keys():
+                for i in range(len(output[key])):
+                    if 'core_name' in output[key][i]:
+                        output[key][i]['instance_description'] = output[key][i].pop('descr')
+            return {k: v for k, v in output.items() if v != []}
+
+        kwargs = make_hierarchy(lists, 'main')
+        if 'main' in kwargs:
+            return kwargs['main'][0]
+        return kwargs
+
     def decorator(func):
         @wraps(func)
         def wrapper(core, *args, **kwargs):
             if len(args) == 1 and isinstance(args[0], str):
-                if (d := ["-d", "descr"]) not in attrs:
-                    attrs.append(d)
-                parser, dicts = create_parser(attrs)
+                parser_dict = create_parsers(attrs)
                 lines = [line.strip() for line in args[0].split("\n\n") if line.strip()]
                 for line in lines:
-                    new_line = line
-                    if subcommand_action:
-                        new_line = preprocess_string(new_line)
-                    parts = shlex.split(new_line)
-                    args = parser.parse_args(parts)
-                    kwargs = vars(args)
-                    for arg in kwargs:
-                        if arg in dicts and kwargs[arg] is not None:
-                            if isinstance(dicts[arg], str):
-                                if dicts[arg] == "pairs":
-                                    kwargs[arg] = dict(
-                                        pair.split(":") for pair in kwargs[arg]
-                                    )
-                            elif isinstance(dicts[arg], list):
-                                _keys = [
-                                    key
-                                    for item in dicts[arg]
-                                    for key in item.split(":")
-                                ]
-                                _values = [
-                                    value
-                                    for item in kwargs[arg]
-                                    for value in item.split(":")
-                                ]
-                                kwargs[arg] = [
-                                    dict(zip(_keys, _values[i:]))
-                                    for i in range(0, len(_values), len(_keys))
-                                ]
-                            elif isinstance(dicts[arg], tuple):
-                                kwargs[arg] = dict(zip(dicts[arg], kwargs[arg]))
-                    kwargs = {k: v for k, v in kwargs.items() if v is not None}
-                    for key, value in list(kwargs.items()):
-                        if ":" in key:
-                            kwargs.pop(key)
-                            if isinstance(value, list):
-                                values = [pair.split(":") for pair in value]
-                            else:
-                                values = value.split(":")
-                            keys = key.split(":")
-                            prefix = ""
-                            for subocmmand in subcommand_list:
-                                if keys[0].startswith(subocmmand):
-                                    prefix += subocmmand
-                                    keys[0] = keys[0][len(subocmmand):]
-                            for i in range(len(keys)):
-                                kwargs[prefix+keys[i]] = []
-                            for i in range(len(values)):
-                                for j in range(len(keys)):
-                                    kwargs[prefix+keys[j]].append(values[i][j])
-                    kwargs = create_hyerarchy(kwargs)
-                    if subcommand_action:
-                        kwargs = aply_subcommand_action(kwargs)
-
-                    if attrs[0] == "core_name":
-                        kwargs["instance_description"] = kwargs.pop("descr")
+                    kwargs = organize_kwargs(parser_dict, line)
                     func(core, **kwargs)
                 return None
             else:
                 return func(core, *args, **kwargs)
-              
         return wrapper
-              
     return decorator
 
 

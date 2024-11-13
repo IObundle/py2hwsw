@@ -181,18 +181,17 @@ def setup(py_params_dict):
                     "rxready_i":"rxready"
                     "rxdata_io":"rxdata"
                 --csr_if {CSR_IF}
-                csrs 
+                --csr-group 
 				    uart 
                     -d 'UART software accessible registers' 
-				    regs 
-                        -n softreset:1 -t W -d 'Soft reset'  --rst_val 0 --addr 0 --log2n_items 0
-                        -n div:16 -t W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
-                        -n txdata:8 -t W -d 'TX data.' --rst_val 0 --addr 4 --log2n_items 0 --noauto
-                        -n txen:1 -t W -d 'TX enable.' --rst_val 0 --addr 5 --log2n_items 0
-				        -n rxen:1 -t W -d 'RX enable.' --rst_val 0 --addr 6 --log2n_items 0
-                        -n txready:1 -t R -d 'TX ready to receive data.' --rst_val 0 --addr 0 --log2n_items 0
-                        -n rxready:1 -t R -d 'RX ready to be read.' --rst_val 0 --addr 1 --log2n_items 0
-                        -n rxdata:8 -t R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0 --noauto
+                        -r softreset:1 -t W -d 'Soft reset'  --rst_val 0 --addr 0 --log2n_items 0
+                        -r div:16 -t W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
+                        -r txdata:8 -t W -d 'TX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
+                        -r txen:1 -t W -d 'TX enable.' --rst_val 0 --addr 5 --log2n_items 0
+				        -r rxen:1 -t W -d 'RX enable.' --rst_val 0 --addr 6 --log2n_items 0
+                        -r txready:1 -t R -d 'TX ready to receive data.' --rst_val 0 --addr 0 --log2n_items 0
+                        -r rxready:1 -t R -d 'RX ready to be read.' --rst_val 0 --addr 1 --log2n_items 0
+                        -r rxdata:8 -t R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
             """,
             {
                 "core_name": "iob_reg",

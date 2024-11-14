@@ -10,19 +10,19 @@
 { pkgs ? import <nixpkgs> {}, py2hwsw_pkg ? "none" }:
 
 let
-  # Get local py2hwsw path from `PY2HWSW_PATH` env variable
-  py2hwswPath = builtins.getEnv "PY2HWSW_PATH";
+  # For debug
+  disable_py2_build = 0;
 
   py2hwsw =
     if py2hwsw_pkg == "none" then
       # Caller does not provide py2hwsw package
-      if py2hwswPath != "" then
+      if disable_py2_build == 0 then
         # Environment variable with py2hwsw path is set
         pkgs.python3.pkgs.buildPythonPackage rec {
           pname = "py2hwsw";
           version = "";
 
-          src = pkgs.lib.cleanSource py2hwswPath;
+          src = pkgs.lib.cleanSource ./../..;
 
           # Add any necessary dependencies here.
           #propagatedBuildInputs = [ pkgs.python38Packages.someDependency ];

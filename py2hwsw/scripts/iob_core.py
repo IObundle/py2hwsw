@@ -304,6 +304,8 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
         filtered_parent_py_params.pop("instantiator", None)
+        if "name" not in filtered_parent_py_params:
+            filtered_parent_py_params["name"] = name
 
         # print("DEBUG1", kwargs, file=sys.stderr)
         # print("DEBUG2", filtered_parent_py_params, file=sys.stderr)
@@ -313,7 +315,6 @@ class iob_core(iob_module, iob_instance):
             parent["core_name"],
             **filtered_parent_py_params,
             is_parent=True,
-            name=name,
             child_attributes=attributes,
             instantiator=kwargs.get("instantiator", None),
         )

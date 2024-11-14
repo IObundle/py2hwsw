@@ -45,6 +45,16 @@ The Py2HWSW framework main usage example is
 [IOb-SoC](https://github.com/IObundle/iob-soc), a System-on-Chip (SoC) template
 comprising an open-source RISC-V processor, a memory subsystem, and a UART.
 
+### Build user guide
+
+Py2HWSW can generate a user guide with LaTeX using the `--py2hwsw_docs` argument.
+
+To generate a documentation directory with the user guide sources and build it, run:
+```bash
+py2hwsw --py2hwsw_docs
+make -C py2hwsw_docs/document/ build
+```
+
 ## Funding
 
 This project is funded through [NGI Zero Core](https://nlnet.nl/core), a fund established by [NLnet](https://nlnet.nl) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu) program. Learn more at the [NLnet project page](https://nlnet.nl/project/Py2HWSW).

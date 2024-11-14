@@ -190,8 +190,24 @@ def debug(msg, level=0):
 
 
 def str_to_kwargs(attrs: list):
-    """Decorator to convert a string to keyword arguments """
+    """ Decorator to convert a string to keyword arguments.
+        @param attrs: list of attributes to parse
+            for a positional argument, its element should be a string
+            for a keyword argument, its element should be a list with the following format:
+                [flag, dest, kwargs, case]
+                flag: str, the flag to use in the command line
+                dest: str, the name of the argument
+                kwargs: dict, the keyword arguments to pass to the add_argument method
+                case: str, a keyword to describe a special case
+            for a parser, its element should be a dictionary with the following format:
+                {parser_name: list}
+                parser_name: str, the name of the parser
+                list: list, the list of attributes to parse
+                parser_name can have the following format:
+                    parser_name or parser_name&dest if the name in the string and the name in the parser are different
+    """
     def create_parsers(attrs: list, parser_name: str = "main") -> dict:
+        """ Create a dictionary of parsers and other usefull information """
         parser = argparse.ArgumentParser()
         dicts = {}
         parser_dest = parser_name
@@ -219,6 +235,9 @@ def str_to_kwargs(attrs: list):
         return parser_dict
 
     def parse_args(parser_dict: dict, args: list) -> dict:
+        """ Parse the arguments of a list given a dictionary of parsers 
+            The first element of the list must be the key of the parser
+        """
         key = args[0]
         parser = parser_dict[key]['parser']
         dicts = parser_dict[key]['dicts']
@@ -264,9 +283,10 @@ def str_to_kwargs(attrs: list):
         return {k: v for k, v in kwargs.items() if v is not None}
 
     def organize_kwargs(parser_dict: dict, string: str) -> dict:
-        """ Create a dictionary of arguments by infering the hyerarchy of the arguments 
-            The arguments that correspond to parsers must remain as list
-            Only then the arguments are parsed in the correct place"""
+        """ Splits the strint into a list of lists and parse each list with the correct parser
+            The first element of the list must be the key of the parser
+            The hyerarchy of the parsers is defined by the order of the elements in the list and the parser_dict
+        """
         args = ['main'] + shlex.split(string)
         lists = []
         while args:
@@ -275,7 +295,6 @@ def str_to_kwargs(attrs: list):
                 lists.append([key])
             else:
                 lists[-1].append(key)
-
 
         def make_hierarchy(sub_lists: list, parser: str) -> dict:
             if parser_dict[parser]['vars'] != {}:

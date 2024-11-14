@@ -149,12 +149,34 @@ def setup(py_params_dict):
     # Wires
     #
     attributes_dict["wires"] = [
+        # Active read transfer reg
+        {
+            "name": "active_read_transaction_reg_en_rst",
+            "descr": "Enable and reset signal for active_read_transaction_reg",
+            "signals": [
+                {"name": "active_read_transaction_reg_en", "width": 1},
+                {"name": "rst_i"},
+            ],
+        },
+        {
+            "name": "active_read_transaction_reg_data_i",
+            "descr": "Input of active_read_transaction_reg",
+            "signals": [
+                {"name": "active_read_transaction", "width": 1},
+            ],
+        },
+        {
+            "name": "active_read_transaction_reg_data_o",
+            "descr": "Output of active_read_transaction_reg",
+            "signals": [
+                {"name": "active_read_transaction_reg", "width": 1},
+            ],
+        },
         # Read selection register signals
         {
-            "name": "read_sel_reg_en_rst",
+            "name": "read_sel_reg_rst",
             "descr": "Enable and reset signal for read_sel_reg",
             "signals": [
-                {"name": "read_sel_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
@@ -186,12 +208,34 @@ def setup(py_params_dict):
                 {"name": "read_sel_reg"},
             ],
         },
+        # Active write transfer reg
+        {
+            "name": "active_write_transaction_reg_en_rst",
+            "descr": "Enable and reset signal for active_write_transaction_reg",
+            "signals": [
+                {"name": "active_write_transaction_reg_en", "width": 1},
+                {"name": "rst_i"},
+            ],
+        },
+        {
+            "name": "active_write_transaction_reg_data_i",
+            "descr": "Input of active_write_transaction_reg",
+            "signals": [
+                {"name": "active_write_transaction", "width": 1},
+            ],
+        },
+        {
+            "name": "active_write_transaction_reg_data_o",
+            "descr": "Output of active_write_transaction_reg",
+            "signals": [
+                {"name": "active_write_transaction_reg", "width": 1},
+            ],
+        },
         # Write selection register signals
         {
-            "name": "write_sel_reg_en_rst",
+            "name": "write_sel_reg_rst",
             "descr": "Enable and reset signal for write_sel_reg",
             "signals": [
-                {"name": "write_sel_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
@@ -278,28 +322,56 @@ def setup(py_params_dict):
     attributes_dict["blocks"] = [
         {
             "core_name": "iob_reg_re",
-            "instance_name": "read_sel_reg_re",
+            "instance_name": "active_read_transaction_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_read_transaction_reg_en_rst",
+                "data_i": "active_read_transaction_reg_data_i",
+                "data_o": "active_read_transaction_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_r",
+            "instance_name": "read_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "read_sel_reg_en_rst",
+                "rst_i": "read_sel_reg_rst",
                 "data_i": "read_sel_reg_data_i",
                 "data_o": "read_sel_reg_data_o",
             },
         },
         {
             "core_name": "iob_reg_re",
-            "instance_name": "write_sel_reg_re",
+            "instance_name": "active_write_transaction_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_write_transaction_reg_en_rst",
+                "data_i": "active_write_transaction_reg_data_i",
+                "data_o": "active_write_transaction_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_r",
+            "instance_name": "write_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "write_sel_reg_en_rst",
+                "rst_i": "write_sel_reg_rst",
                 "data_i": "write_sel_reg_data_i",
                 "data_o": "write_sel_reg_data_o",
             },
@@ -356,10 +428,15 @@ def setup(py_params_dict):
         {
             # Extract output selection bits from address
             "verilog_code": f"""
-   assign read_sel = input_axi_araddr_i[{ADDR_W-1}-:{NBITS}];
-   assign write_sel = input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}];
-   assign read_sel_reg_en = input_axi_arvalid_i;
-   assign write_sel_reg_en = input_axi_awvalid_i;
+   // Only switch slaves when there is no current active transaction
+   assign read_sel = active_read_transaction_reg ? read_sel_reg : input_axi_araddr_i[{ADDR_W-1}-:{NBITS}];
+   assign active_read_transaction_reg_en = (input_axi_arvalid_i & !active_read_transaction_reg) | (input_axi_rlast_o & input_axi_rready_i);
+   assign active_read_transaction = input_axi_arvalid_i & !active_read_transaction_reg;
+
+   // Only switch slaves when there is no current active transaction
+   assign write_sel = active_write_transaction_reg ? write_sel_reg : input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}];
+   assign active_write_transaction_reg_en = (input_axi_awvalid_i & !active_write_transaction_reg) | (input_axi_bvalid_o & input_axi_bready_i);
+   assign active_write_transaction = input_axi_awvalid_i & !active_write_transaction_reg;
 """,
         },
     ]

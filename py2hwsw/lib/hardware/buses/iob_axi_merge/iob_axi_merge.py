@@ -17,7 +17,7 @@ def setup(py_params_dict):
 
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
-    ID_W = int(py_params_dict["id_w"]) if "id_w" in py_params_dict else 1
+    # ID_W = int(py_params_dict["id_w"]) if "id_w" in py_params_dict else 1
     SIZE_W = int(py_params_dict["size_w"]) if "size_w" in py_params_dict else 3
     BURST_W = int(py_params_dict["burst_w"]) if "burst_w" in py_params_dict else 2
     LOCK_W = int(py_params_dict["lock_w"]) if "lock_w" in py_params_dict else 2
@@ -25,7 +25,7 @@ def setup(py_params_dict):
     PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
     QOS_W = int(py_params_dict["qos_w"]) if "qos_w" in py_params_dict else 4
     RESP_W = int(py_params_dict["resp_w"]) if "resp_w" in py_params_dict else 2
-    LEN_W = int(py_params_dict["len_w"]) if "len_w" in py_params_dict else 8
+    # LEN_W = int(py_params_dict["len_w"]) if "len_w" in py_params_dict else 8
     DATA_SECTION_W = (
         int(py_params_dict["data_section_w"])
         if "data_section_w" in py_params_dict
@@ -46,15 +46,15 @@ def setup(py_params_dict):
         ("axi_bvalid", "output", 1, "write"),
         ("axi_bready", "input", 1, "write"),
         # AXI specific write
-        ("axi_awid", "input", ID_W, "write"),
-        ("axi_awlen", "input", LEN_W, "write"),
+        ("axi_awid", "input", "ID_W", "write"),
+        ("axi_awlen", "input", "LEN_W", "write"),
         ("axi_awsize", "input", SIZE_W, "write"),
         ("axi_awburst", "input", BURST_W, "write"),
         ("axi_awlock", "input", LOCK_W, "write"),
         ("axi_awcache", "input", CACHE_W, "write"),
         ("axi_awqos", "input", QOS_W, "write"),
         ("axi_wlast", "input", 1, "write"),
-        ("axi_bid", "output", ID_W, "write"),
+        ("axi_bid", "output", "ID_W", "write"),
         # AXI-Lite Read
         ("axi_araddr", "input", ADDR_W, "read"),
         ("axi_arprot", "input", PROT_W, "read"),
@@ -65,20 +65,41 @@ def setup(py_params_dict):
         ("axi_rvalid", "output", 1, "read"),
         ("axi_rready", "input", 1, "read"),
         # AXI specific read
-        ("axi_arid", "input", ID_W, "read"),
-        ("axi_arlen", "input", LEN_W, "read"),
+        ("axi_arid", "input", "ID_W", "read"),
+        ("axi_arlen", "input", "LEN_W", "read"),
         ("axi_arsize", "input", SIZE_W, "read"),
         ("axi_arburst", "input", BURST_W, "read"),
         ("axi_arlock", "input", LOCK_W, "read"),
         ("axi_arcache", "input", CACHE_W, "read"),
         ("axi_arqos", "input", QOS_W, "read"),
-        ("axi_rid", "output", ID_W, "read"),
+        ("axi_rid", "output", "ID_W", "read"),
         ("axi_rlast", "output", 1, "read"),
     ]
 
     attributes_dict = {
         "name": py_params_dict["name"],
         "version": "0.1",
+        #
+        # AXI Parameters
+        #
+        "confs": [
+            {
+                "name": "ID_W",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "32",
+                "descr": "AXI ID bus width",
+            },
+            {
+                "name": "LEN_W",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "32",
+                "descr": "AXI LEN bus width",
+            },
+        ],
     }
     #
     # Ports
@@ -109,7 +130,7 @@ def setup(py_params_dict):
                 "prefix": "output_",
                 "DATA_W": DATA_W,
                 "ADDR_W": ADDR_W,
-                "ID_W": ID_W,
+                "ID_W": "ID_W",
                 "SIZE_W": SIZE_W,
                 "BURST_W": BURST_W,
                 "LOCK_W": LOCK_W,
@@ -117,7 +138,7 @@ def setup(py_params_dict):
                 "PROT_W": PROT_W,
                 "QOS_W": QOS_W,
                 "RESP_W": RESP_W,
-                "LEN_W": LEN_W,
+                "LEN_W": "LEN_W",
             },
             "descr": "Merge output",
         },
@@ -132,7 +153,7 @@ def setup(py_params_dict):
                     "prefix": f"input{port_idx}_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W - NBITS,
-                    "ID_W": ID_W,
+                    "ID_W": "ID_W",
                     "SIZE_W": SIZE_W,
                     "BURST_W": BURST_W,
                     "LOCK_W": LOCK_W,
@@ -140,7 +161,7 @@ def setup(py_params_dict):
                     "PROT_W": PROT_W,
                     "QOS_W": QOS_W,
                     "RESP_W": RESP_W,
-                    "LEN_W": LEN_W,
+                    "LEN_W": "LEN_W",
                 },
                 "descr": "Merge input interfaces",
             },

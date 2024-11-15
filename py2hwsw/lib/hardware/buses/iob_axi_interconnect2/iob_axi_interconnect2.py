@@ -17,6 +17,11 @@ def setup(py_params_dict):
         int(py_params_dict["num_slaves"]) if "num_slaves" in py_params_dict else 1
     )
 
+    # Number of bits required for master interface selection (each output of split)
+    M_SELECT_NBITS = (N_MASTERS - 1).bit_length()
+    # Number of bits required for slave interface selection (each input of merge)
+    S_SELECT_NBITS = (N_SLAVES - 1).bit_length()
+
     axi_python_params = {
         "addr_w": 32,
         "data_w": 32,
@@ -44,6 +49,59 @@ def setup(py_params_dict):
     }
     # Dictionary maps verilog paramters to ones with same name of interconnect
     AXI_VERILOG_PARAMS_MAP = {i: i for i in axi_verilog_params}
+
+    # Address width for merge output
+    # This width is equal to width of internal wires plus the merge input selection bits (that will be later ignored)
+    MERGE_OUTPUT_WIDTH = axi_python_params["addr_w"] - M_SELECT_NBITS + S_SELECT_NBITS
+
+    axi_signals = [
+        # AXI-Lite Write
+        ("axi_awaddr", "input", axi_python_params["addr_w"], "write"),
+        ("axi_awprot", "input", axi_python_params["prot_w"], "write"),
+        ("axi_awvalid", "input", 1, "write"),
+        ("axi_awready", "output", 1, "write"),
+        ("axi_wdata", "input", axi_python_params["data_w"], "write"),
+        (
+            "axi_wstrb",
+            "input",
+            int(axi_python_params["data_w"] / axi_python_params["data_selection_w"]),
+            "write",
+        ),
+        ("axi_wvalid", "input", 1, "write"),
+        ("axi_wready", "output", 1, "write"),
+        ("axi_bresp", "output", axi_python_params["resp_w"], "write"),
+        ("axi_bvalid", "output", 1, "write"),
+        ("axi_bready", "input", 1, "write"),
+        # AXI specific write
+        ("axi_awid", "input", "ID_W", "write"),
+        ("axi_awlen", "input", "LEN_W", "write"),
+        ("axi_awsize", "input", axi_python_params["size_w"], "write"),
+        ("axi_awburst", "input", axi_python_params["burst_w"], "write"),
+        ("axi_awlock", "input", axi_python_params["lock_w"], "write"),
+        ("axi_awcache", "input", axi_python_params["cache_w"], "write"),
+        ("axi_awqos", "input", axi_python_params["qos_w"], "write"),
+        ("axi_wlast", "input", 1, "write"),
+        ("axi_bid", "output", "ID_W", "write"),
+        # AXI-Lite Read
+        ("axi_araddr", "input", axi_python_params["addr_w"], "read"),
+        ("axi_arprot", "input", axi_python_params["prot_w"], "read"),
+        ("axi_arvalid", "input", 1, "read"),
+        ("axi_arready", "output", 1, "read"),
+        ("axi_rdata", "output", axi_python_params["data_w"], "read"),
+        ("axi_rresp", "output", axi_python_params["resp_w"], "read"),
+        ("axi_rvalid", "output", 1, "read"),
+        ("axi_rready", "input", 1, "read"),
+        # AXI specific read
+        ("axi_arid", "input", "ID_W", "read"),
+        ("axi_arlen", "input", "LEN_W", "read"),
+        ("axi_arsize", "input", axi_python_params["size_w"], "read"),
+        ("axi_arburst", "input", axi_python_params["burst_w"], "read"),
+        ("axi_arlock", "input", axi_python_params["lock_w"], "read"),
+        ("axi_arcache", "input", axi_python_params["cache_w"], "read"),
+        ("axi_arqos", "input", axi_python_params["qos_w"], "read"),
+        ("axi_rid", "output", "ID_W", "read"),
+        ("axi_rlast", "output", 1, "read"),
+    ]
 
     attributes_dict = {
         "name": py_params_dict["name"],
@@ -130,9 +188,25 @@ def setup(py_params_dict):
                         "prefix": f"s{i}_m{j}_",
                         **AXI_VERILOG_PARAMS_MAP,
                         **AXI_PYTHON_PARAMS,
-                    },
+                    }
+                    | {"ADDR_W": axi_python_params["addr_w"] - M_SELECT_NBITS},
                 }
             )
+    # Wires for output fo merges
+    for i in range(N_MASTERS):
+        attributes_dict["wires"].append(
+            {
+                "name": f"merge_{i}_output",
+                "descr": f"Output of merge {i}",
+                "signals": {
+                    "type": "axi",
+                    "prefix": f"merge_{i}_",
+                    **AXI_VERILOG_PARAMS_MAP,
+                    **AXI_PYTHON_PARAMS,
+                }
+                | {"ADDR_W": MERGE_OUTPUT_WIDTH},
+            }
+        )
     #
     # Blocks
     #
@@ -178,10 +252,30 @@ def setup(py_params_dict):
                     "clk_i": "clk_i",
                     "reset_i": "rst_i",
                     **merge_slave_port_connections,
-                    "output_m": f"m{i}_axi_m",
+                    "output_m": f"merge_{i}_output",
                 },
                 **axi_python_params,
             }
+            | {"addr_w": MERGE_OUTPUT_WIDTH},
         )
+    #
+    # Snippets
+    #
+    snippet_code = ""
+    # Connect merge outputs to master interfaces
+    for i in range(N_MASTERS):
+        # Connect all signals except for address ones
+        for signal, direction, _, _ in axi_signals:
+            if signal in ["axi_awaddr", "axi_araddr"]:
+                continue
+            suffix = "_o" if direction == "input" else "_i"
+            snippet_code += f"""\
+   assign m{i}_{signal}{suffix} = merge_{i}_{signal};
+"""
+        # Connect address signals, ignoring most significant bits
+        snippet_code += f"""\
+   assign m{i}_axi_awaddr_o = {{ {{{M_SELECT_NBITS}{{1'b0}}}}, merge_{i}_axi_awaddr[{axi_python_params["addr_w"] - M_SELECT_NBITS}-1:0]}};
+   assign m{i}_axi_araddr_o = {{ {{{M_SELECT_NBITS}{{1'b0}}}}, merge_{i}_axi_araddr[{axi_python_params["addr_w"] - M_SELECT_NBITS}-1:0]}};
+"""
 
     return attributes_dict

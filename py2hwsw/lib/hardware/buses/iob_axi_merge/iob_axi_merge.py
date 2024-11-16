@@ -293,7 +293,7 @@ def setup(py_params_dict):
             "name": "read_prio_enc_i",
             "descr": "Input of read priority encoder",
             "signals": [
-                {"name": "mux_axi_arvalid", "width": NUM_INPUTS},
+                {"name": "mux_axi_arvalid", "width": f"{NUM_INPUTS} * 1"},
             ],
         },
         {
@@ -308,7 +308,7 @@ def setup(py_params_dict):
             "name": "write_prio_enc_i",
             "descr": "Input of write priority encoder",
             "signals": [
-                {"name": "mux_axi_awvalid", "width": NUM_INPUTS},
+                {"name": "mux_axi_awvalid", "width": f"{NUM_INPUTS} * 1"},
             ],
         },
         {
@@ -339,7 +339,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "demux_" + signal,
-                            "width": NUM_INPUTS * width,
+                            "width": f"{NUM_INPUTS} * {width}",
                         },
                     ],
                 },
@@ -353,7 +353,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "mux_" + signal,
-                            "width": NUM_INPUTS * width,
+                            "width": f"{NUM_INPUTS} * {width}",
                         },
                     ],
                 },
@@ -517,17 +517,23 @@ def setup(py_params_dict):
     ]
 
     verilog_code = ""
-    # Connect other signals
+    # Connect muxer/demuxer inputs/outputs
     for signal, direction, width, _ in axi_signals:
         if direction == "output":
             # Connect demuxers outputs
             for port_idx in range(NUM_INPUTS):
                 verilog_code += f"""
-   assign input{port_idx}_{signal}_o = demux_{signal}[{port_idx*width}+:{width}];
+   assign input{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
 """
+        elif signal in ["axi_araddr", "axi_awaddr"]:
+            # Connect address muxer inputs
+            verilog_code += f"   assign mux_{signal} = {{"
+            for port_idx in range(NUM_INPUTS - 1, -1, -1):
+                verilog_code += f"{{{NBITS}'d{port_idx}}}, input{port_idx}_{signal}_i, "
+            verilog_code = verilog_code[:-2] + "};\n"
         else:  # Input direction
             # Connect muxer inputs
-            verilog_code += f"    assign mux_{signal} = {{"
+            verilog_code += f"   assign mux_{signal} = {{"
             for port_idx in range(NUM_INPUTS - 1, -1, -1):
                 verilog_code += f"input{port_idx}_{signal}_i, "
             verilog_code = verilog_code[:-2] + "};\n"

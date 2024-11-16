@@ -309,7 +309,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "demux_" + signal,
-                            "width": NUM_OUTPUTS * width,
+                            "width": f"{NUM_OUTPUTS} * {width}",
                         },
                     ],
                 },
@@ -323,7 +323,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "mux_" + signal,
-                            "width": NUM_OUTPUTS * width,
+                            "width": f"{NUM_OUTPUTS} * {width}",
                         },
                     ],
                 },
@@ -478,7 +478,7 @@ def setup(py_params_dict):
             # Connect demuxers outputs
             for port_idx in range(NUM_OUTPUTS):
                 verilog_code += f"""
-   assign output{port_idx}_{signal}_o = demux_{signal}[{port_idx*width}+:{width}];
+   assign output{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
 """
         else:  # Output direction
             # Connect muxer inputs

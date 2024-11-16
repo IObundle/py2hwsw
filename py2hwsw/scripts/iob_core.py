@@ -398,11 +398,29 @@ class iob_core(iob_module, iob_instance):
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
     attrs = [
-        "core_name",
-        "instance_name",
-        ["-p", "parameters", {"nargs": "+"}, "pairs"],
-        ["-c", "connect", {"nargs": "+"}, "pairs"],
-    ]
+            "core_name",
+		    "instance_name",
+		    ["-p", "parameters", {"nargs": "+"}, "pairs"],
+		    ["-c", "connect", {"nargs": "+"}, "pairs"],
+		    ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
+		    ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
+		    ["--csr_if", "csr_if"],
+		    {
+		        "--csr-group&csrs": [
+		            "name",
+		            {
+		                "-r&regs": [
+		                    "name:n_bits",
+                            ["-t", "type"],
+		                    ["--rst_val", "rst_val"],
+                            ["--addr", "addr", {"type":int}],
+		                    ["--log2n_items", "log2n_items"],
+		                    ["--no_autoreg", "autoreg", {"action": "store_false"}],
+		                ],
+		            },
+		        ]
+		    },
+        ]
 
     @str_to_kwargs(attrs)
     def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):

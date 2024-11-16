@@ -16,37 +16,37 @@ def setup(py_params_dict):
         "confs": [
             """
             W -t P -v 1 -m 1 -M 32
-            'Ports width'
+            -d 'Ports width'
             """
         ],
         "ports": [
             """
-            a_i -s a_i W
-            'Input port a'
+            a_i -s a_i:W
+            -d 'Input port a'
 
-            b_i -s b_i W
-            'Input port b'
+            b_i -s b_i:W
+            -d 'Input port b'
 
-            c_i -s c_i W
-            'Input port c'
+            c_i -s c_i:W
+            -d 'Input port c'
 
-            d_i -s d_i W
-            'Input port d'
+            d_i -s d_i:W
+            -d 'Input port d'
 
-            y_o -s y_o W
-            'Output port y'
+            y_o -s y_o:W
+            -d 'Output port y'
             """
         ],
         "wires": [
             """
-            and_ab_out -s aab W
-            'and ab output'
+            and_ab_out -s aab:W
+            -d 'and ab output'
 
-            and_cd_out -s cad W
-            'and cd output'
+            and_cd_out -s cad:W
+            -d 'and cd output'
 
-            or_out -s oab 1
-            'or output'
+            or_out -s oab:1
+            -d 'or output'
             """,
         ],
         "blocks": [
@@ -55,24 +55,24 @@ def setup(py_params_dict):
             a_i:a_i
             b_i:b_i
             y_o:and_ab_out
-            'First and gate'
+            -d 'First and gate'
 
             iob_and io_and_cd -p W:W -c 
             a_i:c_i 
             b_i:d_i 
             y_o:and_cd_out
-            'Second and gate'
+            -d 'Second and gate'
 
             iob_or iob_or_abcd -p W:W -c
             a_i:and_ab_out
             b_i:and_cd_out
             y_o:or_out
-            'Or gate'
+            -d 'Or gate'
 
             iob_inv iob_inv_out -p W:W -c
             a_i:or_out
             y_o:y_o
-            'Inverter'
+            -d 'Inverter'
             """,
             # Simulation wrapper
             {

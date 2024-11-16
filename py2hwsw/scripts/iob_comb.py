@@ -138,7 +138,7 @@ class iob_comb(iob_snippet):
                     if not any(port.name == "clk_en_rst_s" for port in core.ports):
                         core.create_port(
                             name="clk_en_rst_s",
-                            interface={"type": "clk_en_rst", "subtype": "slave"},
+                            signals={"type": "clk_en_rst"},
                             descr="Clock enable and reset signal",
                         )
 

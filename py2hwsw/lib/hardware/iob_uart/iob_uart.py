@@ -165,117 +165,34 @@ def setup(py_params_dict):
             },
         ],
         "blocks": [
-            {
-                "core_name": "iob_csrs",
-                "instance_name": "csrs_inst",
-                "instance_description": "Control/Status Registers",
-                "autoaddr": False,
-                "rw_overlap": True,
-                "csrs": [
-                    {
-                        "name": "uart",
-                        "descr": "UART software accessible registers.",
-                        "regs": [
-                            {
-                                "name": "softreset",
-                                "type": "W",
-                                "n_bits": 1,
-                                "rst_val": 0,
-                                "addr": 0,
-                                "log2n_items": 0,
-                                "autoreg": True,
-                                "descr": "Soft reset.",
-                            },
-                            {
-                                "name": "div",
-                                "type": "W",
-                                "n_bits": 16,
-                                "rst_val": 0,
-                                "addr": 2,
-                                "log2n_items": 0,
-                                "autoreg": True,
-                                "descr": "Bit duration in system clock cycles.",
-                            },
-                            {
-                                "name": "txdata",
-                                "type": "W",
-                                "n_bits": 8,
-                                "rst_val": 0,
-                                "addr": 4,
-                                "log2n_items": 0,
-                                "autoreg": False,
-                                "descr": "TX data.",
-                            },
-                            {
-                                "name": "txen",
-                                "type": "W",
-                                "n_bits": 1,
-                                "rst_val": 0,
-                                "addr": 5,
-                                "log2n_items": 0,
-                                "autoreg": True,
-                                "descr": "TX enable.",
-                            },
-                            {
-                                "name": "rxen",
-                                "type": "W",
-                                "n_bits": 1,
-                                "rst_val": 0,
-                                "addr": 6,
-                                "log2n_items": 0,
-                                "autoreg": True,
-                                "descr": "RX enable.",
-                            },
-                            {
-                                "name": "txready",
-                                "type": "R",
-                                "n_bits": 1,
-                                "rst_val": 0,
-                                "addr": 0,
-                                "log2n_items": 0,
-                                "autoreg": True,
-                                "descr": "TX ready to receive data.",
-                            },
-                            {
-                                "name": "rxready",
-                                "type": "R",
-                                "n_bits": 1,
-                                "rst_val": 0,
-                                "addr": 1,
-                                "log2n_items": 0,
-                                "autoreg": True,
-                                "descr": "RX data is ready to be read.",
-                            },
-                            # NOTE: RXDATA needs to be the only Read register in a CPU Word
-                            # RXDATA_ren access is used to change UART state machine
-                            {
-                                "name": "rxdata",
-                                "type": "R",
-                                "n_bits": 8,
-                                "rst_val": 0,
-                                "addr": 4,
-                                "log2n_items": 0,
-                                "autoreg": False,
-                                "descr": "RX data.",
-                            },
-                        ],
-                    }
-                ],
-                "csr_if": CSR_IF,
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "control_if_s": "cbus_s",
-                    # Register interfaces
-                    "softreset_o": "softreset",
-                    "div_o": "div",
-                    "txdata_io": "txdata",
-                    "txen_o": "txen",
-                    "rxen_o": "rxen",
-                    "txready_i": "txready",
-                    "rxready_i": "rxready",
-                    "rxdata_io": "rxdata",
-                },
-            },
+            f"""iob_csrs csrs_inst 
+				-d 'Control/Status Registers' 
+                --no_autoaddr 
+                --rw_overlap 
+                -c 
+                    "clk_en_rst_s":"clk_en_rst_s"
+                    "control_if_s":"cbus_s"
+                    "softreset_o":"softreset"
+                    "div_o":"div"
+                    "txdata_io":"txdata"
+                    "txen_o":"txen"
+                    "txready_i":"txready"
+                    "rxen_o":"rxen"
+                    "rxready_i":"rxready"
+                    "rxdata_io":"rxdata"
+                --csr_if {CSR_IF}
+                --csr-group 
+				    uart 
+                    -d 'UART software accessible registers' 
+                        -r softreset:1 -t W -d 'Soft reset'  --rst_val 0 --addr 0 --log2n_items 0
+                        -r div:16 -t W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
+                        -r txdata:8 -t W -d 'TX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
+                        -r txen:1 -t W -d 'TX enable.' --rst_val 0 --addr 5 --log2n_items 0
+				        -r rxen:1 -t W -d 'RX enable.' --rst_val 0 --addr 6 --log2n_items 0
+                        -r txready:1 -t R -d 'TX ready to receive data.' --rst_val 0 --addr 0 --log2n_items 0
+                        -r rxready:1 -t R -d 'RX ready to be read.' --rst_val 0 --addr 1 --log2n_items 0
+                        -r rxdata:8 -t R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
+            """,
             {
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_rvalid",

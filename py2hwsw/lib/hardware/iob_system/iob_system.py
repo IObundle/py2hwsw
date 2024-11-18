@@ -276,6 +276,31 @@ def setup(py_params_dict):
                 "LOCK_W": "1",
             },
         },
+        # TODO: Remove these
+        {
+            "name": "axi_periphs_cbus1",
+            "descr": "AXI bus for peripheral CSRs",
+            "signals": {
+                "type": "axi",
+                "prefix": "periphs1_",
+                "ID_W": "AXI_ID_W",
+                "ADDR_W": params["addr_w"] - 2 - 1,
+                "DATA_W": "AXI_DATA_W",
+                "LEN_W": "AXI_LEN_W",
+            },
+        },
+        {
+            "name": "axi_periphs_cbus2",
+            "descr": "AXI bus for peripheral CSRs",
+            "signals": {
+                "type": "axi",
+                "prefix": "periphs2_",
+                "ID_W": "AXI_ID_W",
+                "ADDR_W": params["addr_w"] - 2 - 1,
+                "DATA_W": "AXI_DATA_W",
+                "LEN_W": "AXI_LEN_W",
+            },
+        },
         {
             "name": "axi_periphs_cbus",
             "descr": "AXI bus for peripheral CSRs",
@@ -283,7 +308,8 @@ def setup(py_params_dict):
                 "type": "axi",
                 "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 2 - 1,
+                # "ADDR_W": params["addr_w"] - 2 - 1,
+                "ADDR_W": params["addr_w"] - 2,
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -347,40 +373,68 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_axi_interconnect_wrapper",
-            "name": "iob_soc_axi_interconnect_wrapper",
+            "core_name": "iob_axi_interconnect2",
+            "name": "iob_soc_axi_interconnect",
             "instance_name": "iob_axi_interconnect",
-            "instance_description": "Interconnect instance",
+            "instance_description": "AXI interconnect instance",
             "parameters": {
-                "AXI_ID_W": "AXI_ID_W",
-                "AXI_ADDR_W": params["addr_w"] - 2,
-                "AXI_DATA_W": "AXI_DATA_W",
-                "INT_MEM_ADDR_W": f"{params['fw_addr_w']} - 2",
+                "ID_W": "AXI_ID_W",
+                "LEN_W": "AXI_LEN_W",
+                # "INT_MEM_ADDR_W": f"{params['fw_addr_w']} - 2",
             },
             "connect": {
                 "clk_i": "clk",
                 "rst_i": "rst",
                 "s0_axi_s": "cpu_ibus",
                 "s1_axi_s": "cpu_dbus",
-                "int_mem_axi_m": "int_mem_axi_m",
-                "bootrom_axi_m": "bootrom_cbus",
-                "peripherals_axi_m": (
-                    "axi_periphs_cbus",
+                "m0_axi_m": "int_mem_axi_m",
+                "m1_axi_m": "bootrom_cbus",
+                "m2_axi_m": (
+                    "axi_periphs_cbus1",
+                    [
+                        "periphs_axi_awlock[0]",
+                        "periphs_axi_arlock[0]",
+                    ],
+                ),
+                "m3_axi_m": (
+                    "axi_periphs_cbus2",
                     [
                         "periphs_axi_awlock[0]",
                         "periphs_axi_arlock[0]",
                     ],
                 ),
             },
+            "addr_w": params["addr_w"] - 2,
+            "data_w": params["data_w"],
+            "lock_w": 1,
             "num_slaves": 2,
-            "masters": {
-                "int_mem": params["addr_w"] - 2 - 2,
-                "bootrom": params["addr_w"] - 2 - 2,
-                "peripherals": params["addr_w"] - 2 - 1,
+            "num_masters": 4,
+            # TODO: Use syntax below instead of master interfaces with equal width
+            # "masters": {
+            #    "int_mem": params["addr_w"] - 2 - 2,
+            #    "bootrom": params["addr_w"] - 2 - 2,
+            #    "peripherals": params["addr_w"] - 2 - 1,
+            # },
+        },
+        # TODO: Update axi_interconnect to already include this merge
+        {
+            "core_name": "iob_axi_merge",
+            "name": "iob_pbus_merge_temporary",
+            "instance_name": "iob_pbus_merge_temporary",
+            "instance_description": "Merge two axi peripheral buses from interconnect",
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "reset_i": "split_reset",
+                "input_0_s": "axi_periphs_cbus1",
+                "input_1_s": "axi_periphs_cbus2",
+                "output_0_m": "axi_periphs_cbus",
             },
+            "num_inputs": 2,
+            "addr_w": params["addr_w"] - 2,
         },
     ]
     if params["use_extmem"]:
+        # FIXME: Update interconnect to support this
         attributes_dict["blocks"][-1]["parameters"].update(
             {
                 "MEM_ADDR_W": "AXI_ADDR_W - 2",
@@ -441,6 +495,8 @@ def setup(py_params_dict):
                 "axi_s": (
                     "axi_periphs_cbus",
                     [
+                        f"periphs_axi_araddr[{params["addr_w"] - 2 - 1}:0]",
+                        f"periphs_axi_awaddr[{params["addr_w"] - 2 - 1}:0]",
                         "periphs_axi_arlock[0]",
                         "periphs_axi_awlock[0]",
                     ],

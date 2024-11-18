@@ -100,9 +100,12 @@ def parse_widths(func):
 
     def inner(widths={}):
         vars_backup = {}
+        interface_name = func.__name__[4:-6]
         # Backup global variables
         for k, v in widths.items():
-            assert k in globals(), f"Width variable '{k}' does not exist!"
+            assert (
+                k in globals()
+            ), f"The provided width variable '{k}' does not exist for interface '{interface_name}'!"
             vars_backup[k] = globals()[k]
             globals()[k] = v
         # Call the function

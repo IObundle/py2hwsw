@@ -34,7 +34,7 @@ def setup(py_params_dict):
         "qos_w": 4,
         "resp_w": 2,
         # "len_w": 8,
-        "data_selection_w": 8,
+        "data_section_w": 8,
     }
     for param in axi_python_params:
         if param in py_params_dict:
@@ -64,7 +64,7 @@ def setup(py_params_dict):
         (
             "axi_wstrb",
             "input",
-            int(axi_python_params["data_w"] / axi_python_params["data_selection_w"]),
+            int(axi_python_params["data_w"] / axi_python_params["data_section_w"]),
             "write",
         ),
         ("axi_wvalid", "input", 1, "write"),
@@ -127,14 +127,11 @@ def setup(py_params_dict):
     #
     attributes_dict["ports"] = [
         {
-            "name": "clk_i",
-            "descr": "Clock",
-            "signals": [
-                {
-                    "name": "clk_i",
-                    "width": 1,
-                },
-            ],
+            "name": "clk_en_rst_s",
+            "signals": {
+                "type": "clk_en_rst",
+            },
+            "descr": "Clock, clock enable and async reset",
         },
         {
             "name": "rst_i",
@@ -226,7 +223,7 @@ def setup(py_params_dict):
                 "parameters": AXI_VERILOG_PARAMS_MAP,
                 "num_outputs": N_MASTERS,
                 "connect": {
-                    "clk_i": "clk_i",
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "rst_i",
                     "input_s": f"s{i}_axi_s",
                     **split_master_port_connections,
@@ -249,7 +246,7 @@ def setup(py_params_dict):
                 "parameters": AXI_VERILOG_PARAMS_MAP,
                 "num_inputs": N_SLAVES,
                 "connect": {
-                    "clk_i": "clk_i",
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "rst_i",
                     **merge_slave_port_connections,
                     "output_m": f"merge_{i}_output",
@@ -268,14 +265,24 @@ def setup(py_params_dict):
         for signal, direction, _, _ in axi_signals:
             if signal in ["axi_awaddr", "axi_araddr"]:
                 continue
-            suffix = "_o" if direction == "input" else "_i"
-            snippet_code += f"""\
-   assign m{i}_{signal}{suffix} = merge_{i}_{signal};
+            if direction == "input":
+                snippet_code += f"""\
+   assign m{i}_{signal}_o = merge_{i}_{signal};
+"""
+            else:  # Direction is output
+                snippet_code += f"""\
+   assign merge_{i}_{signal} = m{i}_{signal}_i;
 """
         # Connect address signals, ignoring most significant bits
         snippet_code += f"""\
    assign m{i}_axi_awaddr_o = {{ {{{M_SELECT_NBITS}{{1'b0}}}}, merge_{i}_axi_awaddr[{axi_python_params["addr_w"] - M_SELECT_NBITS}-1:0]}};
    assign m{i}_axi_araddr_o = {{ {{{M_SELECT_NBITS}{{1'b0}}}}, merge_{i}_axi_araddr[{axi_python_params["addr_w"] - M_SELECT_NBITS}-1:0]}};
 """
+
+    attributes_dict["snippets"] = [
+        {
+            "verilog_code": snippet_code,
+        },
+    ]
 
     return attributes_dict

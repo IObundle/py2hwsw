@@ -383,7 +383,7 @@ def setup(py_params_dict):
                 # "INT_MEM_ADDR_W": f"{params['fw_addr_w']} - 2",
             },
             "connect": {
-                "clk_i": "clk",
+                "clk_en_rst_s": "clk_en_rst_s",
                 "rst_i": "rst",
                 "s0_axi_s": "cpu_ibus",
                 "s1_axi_s": "cpu_dbus",
@@ -392,15 +392,15 @@ def setup(py_params_dict):
                 "m2_axi_m": (
                     "axi_periphs_cbus1",
                     [
-                        "periphs_axi_awlock[0]",
-                        "periphs_axi_arlock[0]",
+                        "periphs1_axi_awlock[0]",
+                        "periphs1_axi_arlock[0]",
                     ],
                 ),
                 "m3_axi_m": (
                     "axi_periphs_cbus2",
                     [
-                        "periphs_axi_awlock[0]",
-                        "periphs_axi_arlock[0]",
+                        "periphs2_axi_awlock[0]",
+                        "periphs2_axi_arlock[0]",
                     ],
                 ),
             },
@@ -422,12 +422,16 @@ def setup(py_params_dict):
             "name": "iob_pbus_merge_temporary",
             "instance_name": "iob_pbus_merge_temporary",
             "instance_description": "Merge two axi peripheral buses from interconnect",
+            "parameters": {
+                "ID_W": "AXI_ID_W",
+                "LEN_W": "AXI_LEN_W",
+            },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "reset_i": "split_reset",
                 "input_0_s": "axi_periphs_cbus1",
                 "input_1_s": "axi_periphs_cbus2",
-                "output_0_m": "axi_periphs_cbus",
+                "output_m": "axi_periphs_cbus",
             },
             "num_inputs": 2,
             "addr_w": params["addr_w"] - 2,

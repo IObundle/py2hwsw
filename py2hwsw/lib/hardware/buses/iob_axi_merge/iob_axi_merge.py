@@ -505,7 +505,7 @@ def setup(py_params_dict):
             "verilog_code": """
    // Only switch masters when there is no current active transaction
    assign read_sel = active_read_transaction_reg ? read_sel_reg : read_prio_enc_o;
-   assign active_read_transaction_reg_en = (output_axi_arvalid_o & !active_read_transaction_reg) | (output_axi_rlast_i & output_axi_rready_o);
+   assign active_read_transaction_reg_en = (output_axi_arvalid_o & !active_read_transaction_reg) | (output_axi_rlast_i & output_axi_rvalid_i & output_axi_rready_o);
    assign active_read_transaction = output_axi_arvalid_o & !active_read_transaction_reg;
 
    // Only switch masters when there is no current active transaction

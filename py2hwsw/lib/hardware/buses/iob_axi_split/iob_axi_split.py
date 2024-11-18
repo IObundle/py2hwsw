@@ -451,7 +451,7 @@ def setup(py_params_dict):
             "verilog_code": f"""
    // Only switch slaves when there is no current active transaction
    assign read_sel = active_read_transaction_reg ? read_sel_reg : input_axi_araddr_i[{ADDR_W-1}-:{NBITS}];
-   assign active_read_transaction_reg_en = (input_axi_arvalid_i & !active_read_transaction_reg) | (input_axi_rlast_o & input_axi_rready_i);
+   assign active_read_transaction_reg_en = (input_axi_arvalid_i & !active_read_transaction_reg) | (input_axi_rlast_o & input_axi_rvalid_o & input_axi_rready_i);
    assign active_read_transaction = input_axi_arvalid_i & !active_read_transaction_reg;
 
    // Only switch slaves when there is no current active transaction

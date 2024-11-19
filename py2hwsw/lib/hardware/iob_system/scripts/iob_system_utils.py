@@ -168,7 +168,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
 
     # Number of peripherals = peripherals + CLINT + PLIC
     num_peripherals = len(peripherals) + 2
-    peripheral_addr_w = params["addr_w"] - 1 - (num_peripherals - 1).bit_length()
+    peripheral_addr_w = params["addr_w"] - 2 - (num_peripherals - 1).bit_length()
 
     # Configure number of connections to pbus_split
     pbus_split["num_outputs"] = num_peripherals

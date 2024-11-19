@@ -276,31 +276,6 @@ def setup(py_params_dict):
                 "LOCK_W": "1",
             },
         },
-        # TODO: Remove these
-        {
-            "name": "axi_periphs_cbus1",
-            "descr": "AXI bus for peripheral CSRs",
-            "signals": {
-                "type": "axi",
-                "prefix": "periphs1_",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 2 - 1,
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-            },
-        },
-        {
-            "name": "axi_periphs_cbus2",
-            "descr": "AXI bus for peripheral CSRs",
-            "signals": {
-                "type": "axi",
-                "prefix": "periphs2_",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 2 - 1,
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-            },
-        },
         {
             "name": "axi_periphs_cbus",
             "descr": "AXI bus for peripheral CSRs",
@@ -308,8 +283,7 @@ def setup(py_params_dict):
                 "type": "axi",
                 "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
-                # "ADDR_W": params["addr_w"] - 2 - 1,
-                "ADDR_W": params["addr_w"] - 2,
+                "ADDR_W": params["addr_w"] - 2 - 2,
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -321,7 +295,7 @@ def setup(py_params_dict):
                 "type": "iob",
                 "prefix": "periphs_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 2 - 1,
+                "ADDR_W": params["addr_w"] - 2 - 2,
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -329,6 +303,21 @@ def setup(py_params_dict):
         # Peripheral cbus wires added automatically
         # NOTE: Add other peripheral wires here
     ]
+    if not params["use_extmem"]:
+        attributes_dict["wires"] += [
+            {
+                "name": "axi_m",
+                "descr": "Unused AXI master interface (for use_extmem=0)",
+                "signals": {
+                    "type": "axi",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": "AXI_ADDR_W-2",
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                    "LOCK_W": 1,
+                },
+            },
+        ]
     attributes_dict["blocks"] = [
         {
             "core_name": "iob_vexriscv",
@@ -381,6 +370,7 @@ def setup(py_params_dict):
                 "ID_W": "AXI_ID_W",
                 "LEN_W": "AXI_LEN_W",
                 # "INT_MEM_ADDR_W": f"{params['fw_addr_w']} - 2",
+                # "MEM_ADDR_W": "AXI_ADDR_W - 2",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
@@ -388,19 +378,23 @@ def setup(py_params_dict):
                 "s0_axi_s": "cpu_ibus",
                 "s1_axi_s": "cpu_dbus",
                 "m0_axi_m": "int_mem_axi_m",
-                "m1_axi_m": "bootrom_cbus",
-                "m2_axi_m": (
-                    "axi_periphs_cbus1",
-                    [
-                        "periphs1_axi_awlock[0]",
-                        "periphs1_axi_arlock[0]",
-                    ],
+                "m1_axi_m": (
+                    "axi_m",
+                    (
+                        [
+                            "axi_arlock_o[0]",
+                            "axi_awlock_o[0]",
+                        ]
+                        if params["use_extmem"]
+                        else []
+                    ),
                 ),
+                "m2_axi_m": "bootrom_cbus",
                 "m3_axi_m": (
-                    "axi_periphs_cbus2",
+                    "axi_periphs_cbus",
                     [
-                        "periphs2_axi_awlock[0]",
-                        "periphs2_axi_arlock[0]",
+                        "periphs_axi_awlock[0]",
+                        "periphs_axi_arlock[0]",
                     ],
                 ),
             },
@@ -409,57 +403,8 @@ def setup(py_params_dict):
             "lock_w": 1,
             "num_slaves": 2,
             "num_masters": 4,
-            # TODO: Use syntax below instead of master interfaces with equal width
-            # "masters": {
-            #    "int_mem": params["addr_w"] - 2 - 2,
-            #    "bootrom": params["addr_w"] - 2 - 2,
-            #    "peripherals": params["addr_w"] - 2 - 1,
-            # },
-        },
-        # TODO: Update axi_interconnect to already include this merge
-        {
-            "core_name": "iob_axi_merge",
-            "name": "iob_pbus_merge_temporary",
-            "instance_name": "iob_pbus_merge_temporary",
-            "instance_description": "Merge two axi peripheral buses from interconnect",
-            "parameters": {
-                "ID_W": "AXI_ID_W",
-                "LEN_W": "AXI_LEN_W",
-            },
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "reset_i": "split_reset",
-                "input_0_s": "axi_periphs_cbus1",
-                "input_1_s": "axi_periphs_cbus2",
-                "output_m": "axi_periphs_cbus",
-            },
-            "num_inputs": 2,
-            "addr_w": params["addr_w"] - 2,
         },
     ]
-    if params["use_extmem"]:
-        # FIXME: Update interconnect to support this
-        attributes_dict["blocks"][-1]["parameters"].update(
-            {
-                "MEM_ADDR_W": "AXI_ADDR_W - 2",
-            }
-        )
-        attributes_dict["blocks"][-1]["connect"].update(
-            {
-                "mem_axi_m": (
-                    "axi_m",
-                    [
-                        "axi_arlock_o[0]",
-                        "axi_awlock_o[0]",
-                    ],
-                ),
-            }
-        )
-        attributes_dict["blocks"][-1]["masters"].pop("int_mem")
-        attributes_dict["blocks"][-1]["masters"] = {
-            "int_mem": params["addr_w"] - 2 - 3,
-            "mem": params["addr_w"] - 2 - 3,
-        } | attributes_dict["blocks"][-1]["masters"]
     attributes_dict["blocks"] += [
         {
             "core_name": "iob_bootrom",
@@ -491,7 +436,7 @@ def setup(py_params_dict):
             "instance_description": "Convert AXI to AXI lite for CLINT",
             "parameters": {
                 "AXI_ID_WIDTH": "AXI_ID_W",
-                "ADDR_WIDTH": params["addr_w"] - 2 - 1,
+                "ADDR_WIDTH": params["addr_w"] - 2 - 2,
                 "DATA_WIDTH": "AXI_DATA_W",
             },
             "connect": {
@@ -499,8 +444,6 @@ def setup(py_params_dict):
                 "axi_s": (
                     "axi_periphs_cbus",
                     [
-                        f"periphs_axi_araddr[{params["addr_w"] - 2 - 1}:0]",
-                        f"periphs_axi_awaddr[{params["addr_w"] - 2 - 1}:0]",
                         "periphs_axi_arlock[0]",
                         "periphs_axi_awlock[0]",
                     ],
@@ -520,7 +463,7 @@ def setup(py_params_dict):
                 # Peripherals cbus connections added automatically
             },
             "num_outputs": 0,  # Num outputs configured automatically
-            "addr_w": params["addr_w"] - 2 - 1,
+            "addr_w": params["addr_w"] - 2 - 2,
         },
         # Peripherals
         {
@@ -590,6 +533,25 @@ def setup(py_params_dict):
 """
         }
     ]
+    if not params["use_extmem"]:
+        attributes_dict["snippets"] += [
+            {
+                "verilog_code": """
+   // Connect inputs of unused external memory AXI interface to zero
+   assign axi_arready = 'b0;
+   assign axi_rdata = 'b0;
+   assign axi_rresp = 'b0;
+   assign axi_rvalid = 'b0;
+   assign axi_rid = 'b0;
+   assign axi_rlast = 'b0;
+   assign axi_awready = 'b0;
+   assign axi_wready = 'b0;
+   assign axi_bresp = 'b0;
+   assign axi_bvalid = 'b0;
+   assign axi_bid = 'b0;
+"""
+            }
+        ]
 
     iob_system_scripts(attributes_dict, params, py_params_dict)
 

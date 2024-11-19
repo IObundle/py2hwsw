@@ -488,9 +488,9 @@ def setup(py_params_dict):
                     },
                     "connect": {
                         "sel_i": (
-                            "input_read_sel_reg"
+                            "input_read_sel"
                             if sig_type == "read"
-                            else "input_write_sel_reg"
+                            else "input_write_sel"
                         ),
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",

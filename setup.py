@@ -3,10 +3,11 @@
 # SPDX-License-Identifier: MIT
 
 from setuptools import setup
+from py2hwsw.scripts.py2hwsw_version import PY2HWSW_VERSION
 
 setup(
     name="py2hwsw",
-    version="0.1",
+    version=PY2HWSW_VERSION,
     description="A Python framework for managing embedded HW/SW projects",
     url="https://github.com/IObundle/py2hwsw",
     author="IObundle",

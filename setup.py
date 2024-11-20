@@ -15,7 +15,7 @@ setup(
     license="Some license",
     packages=["py2hwsw"],
     entry_points={"console_scripts": ["py2hwsw = py2hwsw.main:main"]},
-    package_data={"py2hwsw": ["**", ".*"]},
+    package_data={"py2hwsw": ["**/*", ".*"]},
     include_package_data=True,
     zip_safe=False,
 )

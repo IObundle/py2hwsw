@@ -72,13 +72,12 @@ def tb_read_file(number_of_bytes):
 
 
 def serial_read(number_of_bytes):
-    data = b""
+    data_bytes = []
     i = 0
     while i < number_of_bytes:
-        byte = ser.read(1)
-        data += byte
+        data_bytes.append(ser.read(1))
         i = i + 1
-    return data
+    return b"".join(data_bytes)
 
 
 # Print ERROR

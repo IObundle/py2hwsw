@@ -461,6 +461,20 @@ class iob_core(iob_module, iob_instance):
             add_traceback_msg(f"Failed to create instance '{instance_name}'.")
             raise
 
+    def connect_memory(self, port, instantiator):
+        """ Create memory port in instantiatior and connect it to self"""
+        _name = f"{self.instance_name}_{port.interface.type}_s"
+        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
+        _signals.update(port.interface.widths)
+        _signals.update({"prefix": f"{self.instance_name}_{port.interface.type}_"})
+        instantiator.create_port(
+            name=_name,
+            signals = _signals,
+            descr=port.descr
+        )
+        _port = find_obj_in_list(instantiator.ports, _name)
+        port.connect_external(_port, bit_slices=[])
+
     def connect_instance_ports(self, connect, instantiator):
         """
         param connect: External wires to connect to ports of this instance
@@ -501,6 +515,11 @@ class iob_core(iob_module, iob_instance):
                     f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
                 )
             port.connect_external(wire, bit_slices=bit_slices)
+        # find unconnected ports
+        for port in self.ports:
+            if not port.e_connect and port.interface:
+                if port.interface.type in ["rom_sp", "rom_tdp", "ram_sp", "ram_tdp", "ram_2p"] and instantiator:
+                    self.connect_memory(port, instantiator)
 
     def __create_build_dir(self):
         """Create build directory if it doesn't exist"""

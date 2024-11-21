@@ -2,8 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass
-from iob_base import str_to_kwargs, fail_with_msg, assert_attributes
+from dataclasses import dataclass, field
+from iob_base import (
+    convert_dict2obj_list,
+    fail_with_msg,
+    add_traceback_msg,
+    str_to_kwargs,
+    assert_attributes,
+)
 
 
 @dataclass
@@ -39,20 +45,51 @@ class iob_conf:
             pass
 
 
+@dataclass
+class iob_conf_group:
+    """Class to represent a group of confs."""
+
+    name: str = ""
+    descr: str = "Default description"
+    confs: list = field(default_factory=list)
+    doc_only: bool = False
+    doc_clearpage: bool = False
+
+    def __post_init__(self):
+        if not self.name:
+            fail_with_msg("Conf group name is not set", ValueError)
+
+
 attrs = ["name", ["-t", "type"], ["-v", "val"], ["-m", "min"], ["-M", "max"]]
 
 
 @str_to_kwargs(attrs)
-def create_conf(core, *args, **kwargs):
-    """Creates a new conf object and adds it to the core's conf list
+def create_conf_group(core, *args, confs=[], **kwargs):
+    """Creates a new conf group object and adds it to the core's conf list
     param core: core object
     """
-    # Ensure 'confs' list exists
-    core.set_default_attribute("confs", [])
-    assert_attributes(
-        iob_conf,
-        kwargs,
-        error_msg=f"Invalid {kwargs.get('name', '')} conf attribute '[arg]'!",
-    )
-    conf = iob_conf(*args, **kwargs)
-    core.confs.append(conf)
+    try:
+        # Ensure 'confs' list exists
+        core.set_default_attribute("confs", [])
+
+        conf_obj_list = []
+        if type(confs) is list:
+            # Convert user confs dictionaries into 'iob_conf' objects
+            conf_obj_list = convert_dict2obj_list(confs, iob_conf)
+        else:
+            fail_with_msg(
+                f"Confs attribute must be a list. Error at conf group \"{kwargs.get('name', '')}\".\n{confs}",
+                TypeError,
+            )
+
+        assert_attributes(
+            iob_conf_group,
+            kwargs,
+            error_msg=f"Invalid {kwargs.get('name', '')} conf group attribute '[arg]'!",
+        )
+
+        conf_group = iob_conf_group(*args, confs=conf_obj_list, **kwargs)
+        core.confs.append(conf_group)
+    except Exception:
+        add_traceback_msg(f"Failed to create conf_group '{kwargs['name']}'.")
+        raise

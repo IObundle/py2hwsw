@@ -8,12 +8,18 @@ def setup(py_params_dict):
         "version": "0.1",
         "confs": [
             {
-                "name": "W",
-                "type": "P",
-                "val": "21",
-                "min": "1",
-                "max": "32",
-                "descr": "IO width",
+                "name": "general",
+                "descr": "General group of confs",
+                "confs": [
+                    {
+                        "name": "W",
+                        "type": "P",
+                        "val": "21",
+                        "min": "1",
+                        "max": "32",
+                        "descr": "IO width",
+                    },
+                ],
             },
         ],
         "ports": [

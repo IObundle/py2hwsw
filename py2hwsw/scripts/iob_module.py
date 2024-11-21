@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from iob_base import iob_base, process_elements_from_list
-from iob_conf import create_conf
+from iob_conf import create_conf_group
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
@@ -40,7 +40,7 @@ class iob_module(iob_base):
             "confs",
             [],
             list,
-            get_list_attr_handler(self.create_conf),
+            get_list_attr_handler(self.create_conf_group),
             "List of module macros and Verilog (false-)parameters.",
         )
         self.set_default_attribute(
@@ -98,8 +98,8 @@ class iob_module(iob_base):
             "List of software modules required by this core.",
         )
 
-    def create_conf(self, *args, **kwargs):
-        create_conf(self, *args, **kwargs)
+    def create_conf_group(self, *args, **kwargs):
+        create_conf_group(self, *args, **kwargs)
 
     def create_port(self, *args, **kwargs):
         create_port(self, *args, **kwargs)

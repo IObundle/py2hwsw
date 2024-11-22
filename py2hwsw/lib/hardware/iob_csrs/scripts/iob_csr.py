@@ -62,6 +62,7 @@ class iob_csr_group:
     descr: str = "Default description"
     regs: list = field(default_factory=list)
     doc_only: bool = False
+    doc_clearpage: bool = False
 
     def __post_init__(self):
         if not self.name:

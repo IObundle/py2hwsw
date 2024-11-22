@@ -83,6 +83,7 @@ class iob_core(iob_module, iob_instance):
         connect = kwargs.get("connect", {})
         instantiator = kwargs.get("instantiator", None)
         is_parent = kwargs.get("is_parent", False)
+        setup = kwargs.get("setup", True)
 
         # Create core based on 'parent' core (if applicable)
         if self.handle_parent(*args, **kwargs):
@@ -165,6 +166,12 @@ class iob_core(iob_module, iob_instance):
             dict,
             descr="Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
         )
+        self.set_default_attribute(
+            "setup",
+            setup,
+            bool,
+            descr="Select if should setup the core. We may not want to setup some cores to prevent circular dependencies. For example, the top-core wrappers typically dont want to start the setup for the top-core again.",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 
@@ -172,13 +179,8 @@ class iob_core(iob_module, iob_instance):
         # Don't setup this core if using a project wide special target.
         if __class__.global_special_target:
             self.abort_reason = "special_target"
-        # Don't setup this core if it is the same as the top module.
-        # May happen if the top module is listed in 'blocks' of a submodule (likely wrapper).
-        if (
-            attributes["original_name"] == __class__.global_top_module.original_name
-            and not self.is_top_module
-        ):
-            self.abort_reason = "duplicate_setup"
+        if not self.setup:
+            self.abort_reason = "no_setup"
 
         # Read 'attributes' dictionary and set corresponding core attributes
         self.parse_attributes_dict(attributes)
@@ -195,8 +197,8 @@ class iob_core(iob_module, iob_instance):
         # )
 
         if self.abort_reason:
-            # Generate instance parameters when aborted due to duplicate setup
-            if self.abort_reason == "duplicate_setup":
+            # Generate instance parameters when aborted due to 'no_setup' so that modules above it (like wrappers) can still instantiate it.
+            if self.abort_reason == "no_setup":
                 param_gen.generate_inst_params(self)
             return
 
@@ -398,29 +400,29 @@ class iob_core(iob_module, iob_instance):
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
     attrs = [
-            "core_name",
-		    "instance_name",
-		    ["-p", "parameters", {"nargs": "+"}, "pairs"],
-		    ["-c", "connect", {"nargs": "+"}, "pairs"],
-		    ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
-		    ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
-		    ["--csr_if", "csr_if"],
-		    {
-		        "--csr-group&csrs": [
-		            "name",
-		            {
-		                "-r&regs": [
-		                    "name:n_bits",
-                            ["-t", "type"],
-		                    ["--rst_val", "rst_val"],
-                            ["--addr", "addr", {"type":int}],
-		                    ["--log2n_items", "log2n_items"],
-		                    ["--no_autoreg", "autoreg", {"action": "store_false"}],
-		                ],
-		            },
-		        ]
-		    },
-        ]
+        "core_name",
+        "instance_name",
+        ["-p", "parameters", {"nargs": "+"}, "pairs"],
+        ["-c", "connect", {"nargs": "+"}, "pairs"],
+        ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
+        ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
+        ["--csr_if", "csr_if"],
+        {
+            "--csr-group&csrs": [
+                "name",
+                {
+                    "-r&regs": [
+                        "name:n_bits",
+                        ["-t", "type"],
+                        ["--rst_val", "rst_val"],
+                        ["--addr", "addr", {"type": int}],
+                        ["--log2n_items", "log2n_items"],
+                        ["--no_autoreg", "autoreg", {"action": "store_false"}],
+                    ],
+                },
+            ]
+        },
+    ]
 
     @str_to_kwargs(attrs)
     def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):
@@ -739,7 +741,7 @@ class iob_core(iob_module, iob_instance):
         core = SimpleNamespace(
             original_name="py2hwsw",
             name="py2hwsw",
-            setup_dir=os.path.join(os.path.dirname(__file__), "../.."),
+            setup_dir=os.path.join(os.path.dirname(__file__), "../py2hwsw_document"),
             build_dir="py2hwsw_docs",
         )
         copy_srcs.doc_setup(core)

@@ -60,7 +60,11 @@ class iob_conf_group:
             fail_with_msg("Conf group name is not set", ValueError)
 
 
-attrs = ["name", ["-t", "type"], ["-v", "val"], ["-m", "min"], ["-M", "max"]]
+# attrs = ["name", ["-t", "type"], ["-v", "val"], ["-m", "min"], ["-M", "max"]]
+attrs = [
+    "name",
+    ["-c", "confs", {"nargs": "+"}, ["name:width"]],  # FIXME: According to above
+]
 
 
 @str_to_kwargs(attrs)

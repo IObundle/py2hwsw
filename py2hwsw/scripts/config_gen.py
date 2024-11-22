@@ -115,11 +115,11 @@ The following tables describe the IP core configuration. The core may be configu
             """
 \\begin{table}[H]
   \\centering
-  \\begin{tabularx}{\\textwidth}{|l|l|r|X|}
+  \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
 
     \\hline
     \\rowcolor{iob-green}
-    {\\bf Name} & {\\bf Direction} & {\\bf Width} & {\\bf Description}  \\\\ \\hline \\hline
+    {\\bf Configuration} & {\\bf Type} & {\\bf Min} & {\\bf Typical} & {\\bf Max} & {\\bf Description} \\\\ \\hline \\hline
 
     \\input """
             + group.name

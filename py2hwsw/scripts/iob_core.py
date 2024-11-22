@@ -303,6 +303,9 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("core_name", None)
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
+        filtered_parent_py_params.pop("instantiator", None)
+        if "name" not in filtered_parent_py_params:
+            filtered_parent_py_params["name"] = name
 
         # print("DEBUG1", kwargs, file=sys.stderr)
         # print("DEBUG2", filtered_parent_py_params, file=sys.stderr)
@@ -312,8 +315,8 @@ class iob_core(iob_module, iob_instance):
             parent["core_name"],
             **filtered_parent_py_params,
             is_parent=True,
-            name=name,
             child_attributes=attributes,
+            instantiator=kwargs.get("instantiator", None),
         )
 
         # Copy parent attributes to child
@@ -354,7 +357,7 @@ class iob_core(iob_module, iob_instance):
             identifier = "name"
             if child_attribute_name in ["blocks", "sw_modules"]:
                 identifier = "instance_name"
-            elif child_attribute_name in ["board_list", "ignore_snippets"]:
+            elif child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
                 # Elements in list do not have identifier, so just append them to parent list
                 for child_obj in child_value:
                     parent_attributes[child_attribute_name].append(child_obj)
@@ -395,11 +398,29 @@ class iob_core(iob_module, iob_instance):
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
     attrs = [
-        "core_name",
-        "instance_name",
-        ["-p", "parameters", {"nargs": "+"}, "pairs"],
-        ["-c", "connect", {"nargs": "+"}, "pairs"],
-    ]
+            "core_name",
+		    "instance_name",
+		    ["-p", "parameters", {"nargs": "+"}, "pairs"],
+		    ["-c", "connect", {"nargs": "+"}, "pairs"],
+		    ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
+		    ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
+		    ["--csr_if", "csr_if"],
+		    {
+		        "--csr-group&csrs": [
+		            "name",
+		            {
+		                "-r&regs": [
+		                    "name:n_bits",
+                            ["-t", "type"],
+		                    ["--rst_val", "rst_val"],
+                            ["--addr", "addr", {"type":int}],
+		                    ["--log2n_items", "log2n_items"],
+		                    ["--no_autoreg", "autoreg", {"action": "store_false"}],
+		                ],
+		            },
+		        ]
+		    },
+        ]
 
     @str_to_kwargs(attrs)
     def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):
@@ -453,15 +474,24 @@ class iob_core(iob_module, iob_instance):
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(
-                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!"
+                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!\n"
+                    f"Available ports:\n- "
+                    + "\n- ".join([port.name for port in self.ports])
                 )
 
             bit_slices = []
             if type(connection_value) is str:
                 wire_name = connection_value
-            else:
+            elif type(connection_value) is tuple:
                 wire_name = connection_value[0]
-                bit_slices = connection_value[1:]
+                bit_slices = connection_value[1]
+            else:
+                fail_with_msg(f"Invalid connection value: {connection_value}")
+
+            if type(bit_slices) is not list:
+                fail_with_msg(
+                    f"Second element of tuple must be a list of bit slices/connections: {connection_value}"
+                )
 
             wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(
                 instantiator.ports, wire_name
@@ -747,7 +777,7 @@ def find_module_setup_dir(core_name):
     file_path = find_file(
         iob_core.global_project_root, core_name, [".py", ".json"]
     ) or find_file(
-        os.path.join(os.path.dirname(__file__), "../lib"),
+        os.path.join(os.path.dirname(__file__), ".."),
         core_name,
         [".py", ".json"],
     )

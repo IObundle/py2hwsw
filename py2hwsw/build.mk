@@ -12,27 +12,50 @@ export BOARD ?= cyclonev_gt_dk
 
 include config_build.mk
 
-BSP_H ?= software/src/bsp.h
+BSP_H ?= software/src/iob_bsp.h
 SIM_DIR := hardware/simulation
 BOARD_DIR := $(shell find -name $(BOARD) -type d -print -quit)
+SYN_DIR=hardware/syn
 
 #
-# Create bsp.h from bsp.vh
+# Create iob_bsp.h from iob_bsp.vh
 #
 
 ifeq (fpga,$(findstring fpga,$(MAKECMDGOALS)))
   USE_FPGA = 1
 endif
 
-$(BSP_H):
 ifeq ($(USE_FPGA),1)
-	@echo "Creating $(BSP_H) for FPGA"
-	cp $(BOARD_DIR)/bsp.vh $@;	
+BSP_VH = $(BOARD_DIR)/iob_bsp.vh
 else
-	@echo "Creating $(BSP_H) for simulation"
-	cp $(SIM_DIR)/src/bsp.vh $@;
+BSP_VH = $(SIM_DIR)/src/iob_bsp.vh
 endif
-	sed -i 's/`/#/g' $@;
+
+BOARD_UPPER=$(shell echo $(BOARD) | tr '[:lower:]' '[:upper:]')
+NAME_UPPER=$(shell echo $(NAME) | tr '[:lower:]' '[:upper:]')
+
+$(BSP_VH):
+ifeq ($(USE_FPGA),1)
+	@echo "Creating $(BSP_VH) for FPGA"
+	cp $(BOARD_DIR)/$(NAME)_$(BOARD)_conf.vh $@;
+	sed -i 's/ $(NAME_UPPER)_$(BOARD_UPPER)_/ /g' $@;
+else
+	@echo "Creating $(BSP_VH) for simulation"
+	cp $(SIM_DIR)/src/$(NAME)_sim_conf.vh $@;
+	sed -i 's/ $(NAME_UPPER)_SIM_/ /g' $@;
+endif
+
+SYN_BSP_VH = $(SYN_DIR)/src/iob_bsp.vh
+$(SYN_BSP_VH):
+	@echo "Creating $@ for synthesis"
+	cp $(SYN_DIR)/src/$(NAME)_syn_conf.vh $@;
+	sed -i 's/ $(NAME_UPPER)_SYN_/ /g' $@;
+
+
+$(BSP_H): $(BSP_VH)
+	cp $(BSP_VH) $@;
+	sed -i 's/`/#/' $@;
+	sed -i 's/`//g' $@;
 
 
 # 
@@ -45,7 +68,7 @@ fw-build: $(BSP_H)
 fw-clean:
 	if [ -f "$(SW_DIR)/Makefile" ]; then make -C $(SW_DIR) clean; fi
 
-#this target is not the same as fw-build because bsp.h is build for FPGA when fw-build is called
+#this target is not the same as fw-build because iob_bsp.h is build for FPGA when fw-build is called
 #see $(BSP_H) target that uses $(MAKECMDGOALS) to check if fw-build is called for FPGA or simulation
 fpga-fw-build: fw-build
 
@@ -131,8 +154,7 @@ fpga-clean:
 #
 # SYN
 #
-SYN_DIR=hardware/syn
-syn-build:
+syn-build: $(SYN_BSP_VH)
 	make -C $(SYN_DIR) build
 
 syn-clean:

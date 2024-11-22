@@ -57,7 +57,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "mem_if",
+                "name": "mem_if_io",
                 "descr": "Memory interface",
                 "signals": [
                     {"name": "en_i", "width": 1},
@@ -72,6 +72,13 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_ram_sp",
                 "instantiate": False,
+            },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
             },
         ],
         "snippets": [

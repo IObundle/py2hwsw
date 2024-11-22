@@ -17,37 +17,42 @@ module iob_axistream_in #(
    localparam RAM_ADDR_W = FIFO_ADDR_W - $clog2(R);
 
    //rst and enable synced to axis_clk
-   wire                  axis_sw_rst;
-   wire                  axis_sw_enable;
+   wire                                                 axis_sw_rst;
+   wire                                                 axis_sw_enable;
+   wire                                                 axis_sw_mode;
 
    //fifo write
-   wire                  axis_fifo_write;
-   wire                  axis_fifo_full;
+   wire                                                 axis_fifo_write;
+   wire                                                 axis_fifo_full;
 
    //tlast detected
-   wire                  axis_tlast;
-   wire                  axis_tlast_detected;
+   wire                                                 axis_tlast;
+   wire                                                 axis_tlast_detected;
 
    //word counter
-   wire [    DATA_W-1:0] axis_word_count;
-   wire                  axis_word_count_en;
+   wire [                                   DATA_W-1:0] axis_word_count;
+   wire                                                 axis_word_count_en;
 
 
    //fifo read
-   reg                   fifo_read;
-   wire [    DATA_W-1:0] fifo_data;
+   wire                                                 fifo_read;
+   wire [                                   DATA_W-1:0] fifo_data;
+   wire                                                 fifo_empty;
+   wire [((FIFO_ADDR_W+1 > 1) ? FIFO_ADDR_W+1 : 1)-1:0] fifo_level;
 
    //fifo RAM
-   wire                  ext_mem_w_clk;
-   wire [         R-1:0] ext_mem_w_en;
-   wire [RAM_ADDR_W-1:0] ext_mem_w_addr;
-   wire [    DATA_W-1:0] ext_mem_w_data;
-   wire                  ext_mem_r_clk;
-   wire [         R-1:0] ext_mem_r_en;
-   wire [RAM_ADDR_W-1:0] ext_mem_r_addr;
-   wire [    DATA_W-1:0] ext_mem_r_data;
+   wire                                                 ext_mem_w_clk;
+   wire [                                        R-1:0] ext_mem_w_en;
+   wire [                               RAM_ADDR_W-1:0] ext_mem_w_addr;
+   wire [                                   DATA_W-1:0] ext_mem_w_data;
+   wire                                                 ext_mem_r_clk;
+   wire [                                        R-1:0] ext_mem_r_en;
+   wire [                               RAM_ADDR_W-1:0] ext_mem_r_addr;
+   wire [                                   DATA_W-1:0] ext_mem_r_data;
 
-   reg                   sys_tvalid;
+   wire                                                 int_tvalid;
+   wire [                                   DATA_W-1:0] int_tdata;
+   wire                                                 int_tready;
 
    `include "iob_axistream_in_wires.vs"
 
@@ -57,52 +62,26 @@ module iob_axistream_in #(
    wire tlast_detected_reg;
 
    //CPU INTERFACE
-   assign data_rready_rd = ~fifo_empty_rd | sys_tvalid;
+   assign data_rready_rd = int_tvalid;
    assign interrupt_o    = fifo_level_rd >= fifo_threshold_wr;
-   assign data_rvalid_rd = sys_tvalid & (~mode_wr);
-   assign data_rdata_rd  = fifo_data;
+   assign data_rvalid_rd = int_tvalid & (~mode_wr);
+   assign data_rdata_rd  = int_tdata;
 
    //System Stream output interface
    // System output valid only if in system stream mode
-   assign sys_tvalid_o   = sys_tvalid & mode_wr;
-   assign sys_tdata_o    = fifo_data;
+   assign sys_tvalid_o   = int_tvalid & mode_wr;
+   assign sys_tdata_o    = int_tdata;
 
-   //FIFO read
-   wire fifo_read_pc;
-   reg  fifo_read_pc_nxt;
-   always @* begin
-      //FIFO read FSM
-      fifo_read_pc_nxt = fifo_read_pc + 1'b1;
-      fifo_read        = 1'b0;
-      sys_tvalid       = 1'b0;
+   assign int_tready     = (mode_wr) ? sys_tready_i : data_ren_rd;
 
-      case (fifo_read_pc)
-         0: begin
-            if (fifo_empty_rd) begin
-               fifo_read_pc_nxt = fifo_read_pc;
-            end else if ((sys_tready_i && mode_wr) || (data_ren_rd && !mode_wr)) begin
-               fifo_read        = 1'b1;
-               fifo_read_pc_nxt = 1'b1;
-            end else begin
-               fifo_read_pc_nxt = fifo_read_pc;
-            end
-         end
-         default: begin
-            sys_tvalid       = 1'b1;
-            fifo_read_pc_nxt = 1'b0;
-            if ((sys_tready_i && mode_wr) || (data_ren_rd && !mode_wr)) begin
-               if (~fifo_empty_rd) begin
-                  fifo_read        = 1'b1;
-                  fifo_read_pc_nxt = fifo_read_pc;
-               end
-            end
-         end
-      endcase
-   end
+   // empty = fifo empty + no data in fifo2axis
+   assign fifo_empty_rd  = fifo_empty & (~int_tvalid);
+   // level = fifo level + data in fifo2axis
+   assign fifo_level_rd  = fifo_level + int_tvalid;
 
    wire ready_int;
    // Ready if not full and, if in CSR mode, tlast not detected
-   assign ready_int          = ~axis_fifo_full & axis_sw_enable & ~(~mode_wr & tlast_detected_reg);
+   assign ready_int = ~axis_fifo_full & axis_sw_enable & ~(~axis_sw_mode & tlast_detected_reg);
 
    //word count enable
    assign axis_word_count_en = axis_fifo_write & ~tlast_detected_reg;
@@ -158,20 +137,6 @@ module iob_axistream_in #(
    //tlast
    assign axis_tlast = axis_tlast_i & axis_fifo_write;
 
-   //FIFO read program counter
-   iob_reg_re #(
-      .DATA_W (1),
-      .RST_VAL(1'd0)
-   ) fifo_read_pc_reg (
-      .clk_i (clk_i),
-      .cke_i (cke_i),
-      .arst_i(arst_i),
-      .rst_i (axis_sw_rst),
-      .en_i  (axis_sw_enable),
-      .data_i(fifo_read_pc_nxt),
-      .data_o(fifo_read_pc)
-   );
-
    // received words counter
    iob_counter #(
       .DATA_W (DATA_W),
@@ -206,6 +171,17 @@ module iob_axistream_in #(
       .signal_i(enable_wr),
       .signal_o(axis_sw_enable)
    );
+
+   iob_sync #(
+      .DATA_W (1),
+      .RST_VAL(1'd0)
+   ) sw_mode (
+      .clk_i   (axis_clk_i),
+      .arst_i  (axis_arst_i),
+      .signal_i(mode_wr),
+      .signal_o(axis_sw_mode)
+   );
+
 
    //Synchronizers from axis to clk domain (sw_regs)
    iob_sync #(
@@ -245,9 +221,9 @@ module iob_axistream_in #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) tlast_detect_reg (
-      .clk_i (clk_i),
-      .cke_i (cke_i),
-      .arst_i(arst_i),
+      .clk_i (axis_clk_i),
+      .cke_i (axis_cke_i),
+      .arst_i(axis_arst_i),
       .data_i(axis_tlast_detected),
       .data_o(tlast_detected_reg)
    );
@@ -273,6 +249,25 @@ module iob_axistream_in #(
       end
    endgenerate
 
+   iob_fifo2axis #(
+      .DATA_W    (DATA_W),
+      .AXIS_LEN_W(1)
+   ) fifo2axis_inst (
+      `include "iob_axistream_in_clk_en_rst_s_s_portmap.vs"
+      .rst_i        (soft_reset_wr),
+      .en_i         (1'b1),
+      .len_i        (1'b1),
+      // FIFO I/F
+      .fifo_empty_i (fifo_empty),
+      .fifo_read_o  (fifo_read),
+      .fifo_rdata_i (fifo_data),
+      // AXIS I/F
+      .axis_tvalid_o(int_tvalid),
+      .axis_tdata_o (int_tdata),
+      .axis_tready_i(int_tready),
+      .axis_tlast_o ()
+   );
+
    //async fifo
    iob_fifo_async #(
       .W_DATA_W(TDATA_W),
@@ -294,9 +289,9 @@ module iob_axistream_in #(
       .r_rst_i         (soft_reset_wr),
       .r_en_i          (fifo_read),
       .r_data_o        (fifo_data),
-      .r_empty_o       (fifo_empty_rd),
+      .r_empty_o       (fifo_empty),
       .r_full_o        (fifo_full_rd),
-      .r_level_o       (fifo_level_rd),
+      .r_level_o       (fifo_level),
       //write port (axis clk domain)
       .w_clk_i         (axis_clk_i),
       .w_cke_i         (axis_cke_i),
@@ -310,6 +305,3 @@ module iob_axistream_in #(
    );
 
 endmodule
-
-
-

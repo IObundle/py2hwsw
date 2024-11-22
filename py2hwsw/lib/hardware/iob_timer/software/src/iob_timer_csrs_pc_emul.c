@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "bsp.h"
+#include "iob_bsp.h"
 #include "iob_timer_csrs.h"
 
 /* convert clock values from PC CLOCK FREQ to EMBEDDED FREQ */

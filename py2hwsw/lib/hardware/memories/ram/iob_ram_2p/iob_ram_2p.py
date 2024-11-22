@@ -111,7 +111,7 @@ def setup(py_params_dict):
                 "name": "en_int",
                 "descr": "en wire",
                 "signals": [
-                    {"name": "en_in", "width": 1},
+                    {"name": "en_int", "width": 1},
                 ],
             },
             {
@@ -146,6 +146,13 @@ def setup(py_params_dict):
                     "d_i": "w_data_i",
                     "d_o": "r_data_o",
                 },
+            },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
             },
         ],
         "snippets": [

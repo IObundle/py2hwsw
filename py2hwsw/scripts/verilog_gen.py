@@ -214,7 +214,7 @@ def generate_verilog(core):
 
     f_module.write(
         f"""`timescale 1ns / 1ps
-`include "bsp.vh"
+`include "iob_bsp.vh"
 `include "{core.name}_conf.vh"
 
 module {core.name} {params_line}

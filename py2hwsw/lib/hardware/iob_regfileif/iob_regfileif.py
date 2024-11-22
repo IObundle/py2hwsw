@@ -135,14 +135,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "internal_control_if_s",
-                "interface": {
+                "signals": {
                     "type": params["internal_csr_if"],
                     **params["internal_csr_if_widths"],
                 },
@@ -150,7 +150,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "external_control_if_s",
-                "interface": {
+                "signals": {
                     "type": params["external_csr_if"],
                     "prefix": "external_",
                     **params["external_csr_if_widths"],
@@ -161,19 +161,9 @@ def setup(py_params_dict):
         "wires": reg_wires
         + [
             {
-                "name": "csrs_iob",
-                "descr": "Internal CSRs iob interface",
-                "interface": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
-            },
-            {
                 "name": "internal_iob2",
                 "descr": "Internal iob interface",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "prefix": "internal2_",
                     "ADDR_W": "ADDR_W",
@@ -183,14 +173,13 @@ def setup(py_params_dict):
         ],
         "blocks": [
             {
-                "core_name": "csrs",
+                "core_name": "iob_csrs",
                 "instance_name": "csrs_external",
                 "instance_description": "Control/Status Registers for external CPU",
                 "csrs": params["csrs"],
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "external_control_if_s",
-                    "csrs_iob_o": "csrs_iob",
                     **external_reg_connections,
                 },
                 "csr_if": params["external_csr_if"],
@@ -199,7 +188,7 @@ def setup(py_params_dict):
                 "autoaddr": params["autoaddr"],
             },
             {
-                "core_name": "csrs",
+                "core_name": "iob_csrs",
                 "name": attributes_dict["name"] + "_inverted_csrs",
                 "instance_name": "csrs_internal_inverted",
                 "instance_description": "Control/Status Registers for internal CPU (inverted registers)",
@@ -207,7 +196,6 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "internal_control_if_s",
-                    "csrs_iob_o": "internal_iob2",
                     **internal_reg_connections,
                 },
                 "csr_if": params["internal_csr_if"],

@@ -70,7 +70,7 @@ def dict2interface(interface_dict):
     Example interface dict:
     {
         "name": "cpu_i",
-        "interface": {
+        "signals": {
             "type": "iob",
             "subtype": "master",
             # Widths/Other parameters

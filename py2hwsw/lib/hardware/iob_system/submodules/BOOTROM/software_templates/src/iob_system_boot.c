@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "bsp.h"
+#include "iob_bsp.h"
 #include "iob_system_conf.h"
 #include "iob_system_periphs.h"
 #include "iob_system_system.h"
@@ -29,7 +29,7 @@ int main() {
 
 #ifdef IOB_SYSTEM_USE_EXTMEM
   uart_puts(PROGNAME);
-  uart_puts(": DDR in use and program runs from DDR\n");
+  uart_puts(": DDR in use. Program runs from internal memory.\n");
 #endif
 
   // address to copy firmware to

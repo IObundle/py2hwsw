@@ -45,16 +45,16 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "iob_s",
-                "interface": {
+                "signals": {
                     "type": "iob",
-                    "ADDR_W": "ADDR_W",
+                    "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
                 },
                 "descr": "CPU native interface",
@@ -135,16 +135,6 @@ def setup(py_params_dict):
         ],
         "wires": [
             {
-                "name": "csrs_iob",
-                "descr": "Internal CSRs IOb interface",
-                "interface": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
-            },
-            {
                 "name": "soft_reset",
                 "descr": "",
                 "signals": [
@@ -212,7 +202,7 @@ def setup(py_params_dict):
         ],
         "blocks": [
             {
-                "core_name": "csrs",
+                "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
@@ -313,7 +303,6 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "iob_s",
-                    "csrs_iob_o": "csrs_iob",
                     # Register interfaces
                     "soft_reset": "soft_reset",
                     "enable": "enable",
@@ -329,28 +318,30 @@ def setup(py_params_dict):
             # TODO: Connect remaining blocks
             {
                 "core_name": "iob_fifo_async",
-                "instance_name": "iob_fifo_async_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_sync",
-                "instance_name": "iob_sync_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_reg_re",
-                "instance_name": "iob_reg_re_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_ram_at2p",
-                "instance_name": "iob_ram_at2p_inst",
                 "instantiate": False,
             },
             {
                 "core_name": "iob_counter",
-                "instance_name": "iob_counter_inst",
                 "instantiate": False,
+            },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
             },
         ],
     }

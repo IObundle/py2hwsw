@@ -83,7 +83,7 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "write",
+                "name": "write_io",
                 "descr": "Write interface",
                 "signals": [
                     {
@@ -134,7 +134,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "read",
+                "name": "read_io",
                 "descr": "Read interface",
                 "signals": [
                     {
@@ -185,7 +185,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "extmem",
+                "name": "extmem_io",
                 "descr": "External memory interface",
                 "signals": [
                     #  Write port
@@ -262,6 +262,13 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_clock",
                 "instance_name": "iob_clock_inst",
+            },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
             },
         ],
     }

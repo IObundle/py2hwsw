@@ -24,7 +24,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and async reset",
@@ -41,7 +41,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "input_s",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "file_prefix": py_params_dict["name"] + "_input_",
                     "prefix": "input_",
@@ -56,7 +56,7 @@ def setup(py_params_dict):
         attributes_dict["ports"].append(
             {
                 "name": f"output_{port_idx}_m",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "file_prefix": f"{py_params_dict['name']}_output{port_idx}_",
                     "prefix": f"output{port_idx}_",

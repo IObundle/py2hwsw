@@ -35,14 +35,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "cbus_s",
-                "interface": {
+                "signals": {
                     "type": "iob",
                     "ADDR_W": 4 - 2,  # Same as `IOB_TIMER_CSRS_ADDR_W -2 lsbs
                     "DATA_W": "DATA_W",
@@ -51,16 +51,6 @@ def setup(py_params_dict):
             },
         ],
         "wires": [
-            {
-                "name": "csrs_iob",
-                "descr": "Internal CSRs IOb interface",
-                "interface": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    "ADDR_W": "ADDR_W - 2",
-                    "DATA_W": "DATA_W",
-                },
-            },
             # Register wires
             {
                 "name": "reset",
@@ -107,7 +97,7 @@ def setup(py_params_dict):
             },
             # Timer core
             {
-                "name": "timer_core_reg_interface",
+                "name": "iob_timer_core_reg_interface",
                 "descr": "",
                 "signals": [
                     {"name": "enable_wr"},
@@ -119,7 +109,7 @@ def setup(py_params_dict):
         ],
         "blocks": [
             {
-                "core_name": "csrs",
+                "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
@@ -179,23 +169,29 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",
-                    "csrs_iob_o": "csrs_iob",
                     # Register interfaces
-                    "reset": "reset",
-                    "enable": "enable",
-                    "sample": "sample",
-                    "data_low": "data_low",
-                    "data_high": "data_high",
+                    "reset_o": "reset",
+                    "enable_o": "enable",
+                    "sample_o": "sample",
+                    "data_low_i": "data_low",
+                    "data_high_i": "data_high",
                 },
             },
             {
-                "core_name": "timer_core",
-                "instance_name": "timer_core_inst",
+                "core_name": "iob_timer_core",
+                "instance_name": "iob_timer_core_inst",
                 "instance_description": "Timer core driver",
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "reg_interface": "timer_core_reg_interface",
+                    "reg_interface_io": "iob_timer_core_reg_interface",
                 },
+            },
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
             },
         ],
         "snippets": [

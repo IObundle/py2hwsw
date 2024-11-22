@@ -42,6 +42,14 @@
             ]
         }
     ],
+    "blocks": [
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "instantiate": false,
+                "dest_dir": "hardware/simulation/src"
+            }
+    ],
     "snippets": [
         {
             "verilog_code": "   assign y_o = a_i & b_i;"

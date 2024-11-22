@@ -9,7 +9,6 @@ set BOARD [lindex $argv 2]
 set VSRC [lindex $argv 3]
 set IS_FPGA [lindex $argv 4]
 set USE_EXTMEM [lindex $argv 5]
-set N_INTERCONNECT_SLAVES [lindex $argv 6]
 
 #verilog sources, vivado IPs, use file extension
 foreach file [split $VSRC \ ] {
@@ -21,8 +20,7 @@ foreach file [split $VSRC \ ] {
     }
 }
 
-
-#read board propreties
+#read board properties
 source vivado/$BOARD/board.tcl
 
 
@@ -35,24 +33,24 @@ if {[file exists "vivado/premap.tcl"]} {
 #read design constraints and synthesize design
 if { $IS_FPGA == "1" } {
     puts "Synthesizing for FPGA"
-    read_xdc vivado/$BOARD/$BOARD.sdc
+    read_xdc vivado/$BOARD/board.sdc
     if {[file exists "src/fpga.sdc"]} {
         read_xdc src/fpga.sdc
     }
     if {[file exists "src/fpga\_$CSR_IF.sdc"]} {
         read_xdc src/fpga\_$CSR_IF.sdc
     }
-    if {[file exists "vivado/vivado.sdc"]} {
-        read_xdc vivado/vivado.sdc
+    if {[file exists "vivado/tool.sdc"]} {
+        read_xdc vivado/tool.sdc
     }
     synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD -part $PART -top $NAME -verbose
 } else {
     #read design constraints
     puts "Out of context synthesis"
-    read_xdc -mode out_of_context vivado/$BOARD/$BOARD.sdc
+    read_xdc -mode out_of_context vivado/$BOARD/board.sdc
     read_xdc -mode out_of_context src/fpga.sdc
-    if {[file exists "vivado/vivado.sdc"]} {
-        read_xdc -mode out_of_context vivado/vivado.sdc
+    if {[file exists "vivado/tool.sdc"]} {
+        read_xdc -mode out_of_context vivado/tool.sdc
     }
     synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD -part $PART -top $NAME -mode out_of_context -flatten_hierarchy full -verbose
 }

@@ -122,9 +122,17 @@ class SwRegister:
         if isinstance(max_size, str):
             # transform the string into a mathemathical expression and retrieve the maximum value
             max_size = max_size.replace(" ", "")
-            for param in parameters_list:
-                max_size = max_size.replace(param.name, param.max_value)
-            max_size = eval(max_size)
+            while True:
+                for param in parameters_list:
+                    # only replace complete words
+                    max_size = re.sub(
+                        r"\b" + param.name + r"\b", param.max_value, max_size
+                    )
+
+                # if the string only contains numbers or operators, evaluate it and break the loop
+                if re.match(r"^[0-9\+\-\*\/\(\)]+$", max_size):
+                    max_size = eval(max_size)
+                    break
 
         # Compute the the size of the register in steps of 8 bits, rounding up
         self.sw_size = 8 * math.ceil(max_size / 8)
@@ -265,7 +273,7 @@ def gen_ports_list(core):
 
     for interface in core.ports:
         # Skip doc_only interfaces
-        if "doc_only" in interface.keys() and interface["doc_only"]:
+        if interface.doc_only:
             continue
 
         # Check if this interface is a standard interface (from if_gen.py)
@@ -399,6 +407,9 @@ def gen_parameters_list(core):
 
     parameters_list = []
     for conf in core.confs:
+        # Skip doc_only confs
+        if conf.doc_only:
+            continue
         if conf["type"] != "M":
             parameters_list.append(
                 Parameter(
@@ -523,7 +534,7 @@ def generate_ipxact_xml(core, sw_regs, dest_dir):
 
     # try to open file document/tsrc/intro.tex and read it into self.description
     try:
-        with open(f"document/tsrc/intro.tex", "r") as file:
+        with open("document/tsrc/intro.tex", "r") as file:
             core.description = file.read()
     except:
         print("ERROR: Could not open document/tsrc/intro.tex")
@@ -531,7 +542,7 @@ def generate_ipxact_xml(core, sw_regs, dest_dir):
 
     # Add the CSR IF,
     # TODO: Core no longer has csrs. Now csrs have their own lib module (csrs.py)
-    core_name = core.name + "_" + core.csr_if
+    core_name = core.name + "_" + core.csr_if + "_" + core.data_if
 
     # Core name to be displayed in the xml file
     # Change "_" to "-" and capitalize all the letters

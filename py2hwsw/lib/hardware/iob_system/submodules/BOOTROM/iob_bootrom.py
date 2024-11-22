@@ -30,38 +30,6 @@ def setup(py_params_dict):
                 "min": "0",
                 "max": "32",
             },
-            {
-                "name": "AXI_ID_W",
-                "descr": "AXI ID bus width",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "32",
-            },
-            {
-                "name": "AXI_ADDR_W",
-                "descr": "AXI address bus width",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "32",
-            },
-            {
-                "name": "AXI_DATA_W",
-                "descr": "AXI data bus width",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "32",
-            },
-            {
-                "name": "AXI_LEN_W",
-                "descr": "AXI burst length width",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "4",
-            },
         ],
         #
         # Ports
@@ -70,14 +38,14 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "descr": "Clock and reset",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
             },
             {
                 "name": "cbus_s",
                 "descr": "Front-end control interface",
-                "interface": {
+                "signals": {
                     "type": "axi",
                     "prefix": "cbus_",
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
@@ -86,7 +54,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "ext_rom_bus",
+                "name": "ext_rom_bus_io",
                 "descr": "External ROM signals",
                 "signals": [
                     {
@@ -109,20 +77,10 @@ def setup(py_params_dict):
         #
         "wires": [
             {
-                "name": "csrs_iob",
-                "descr": "Internal iob interface",
-                "interface": {
-                    "type": "iob",
-                    "prefix": "csrs_",
-                    # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
-                    "ADDR_W": BOOTROM_ADDR_W - 2 + 1,
-                    "DATA_W": "DATA_W",
-                },
-            },
-            {
                 "name": "rom",
                 "descr": "'rom' register interface",
                 "signals": [
+                    {"name": "rom_raddr_rd", "width": BOOTROM_ADDR_W - 2},
                     {"name": "rom_rdata_rd", "width": "DATA_W"},
                     {"name": "rom_rvalid_rd", "width": 1},
                     {"name": "rom_ren_rd", "width": 1},
@@ -149,7 +107,7 @@ def setup(py_params_dict):
         #
         "blocks": [
             {
-                "core_name": "csrs",
+                "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
                 "version": VERSION,
                 "csrs": [
@@ -174,9 +132,8 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",
-                    "csrs_iob_o": "csrs_iob",
                     # Register interfaces
-                    "rom": "rom",
+                    "rom_io": "rom",
                 },
             },
             {
@@ -201,7 +158,7 @@ def setup(py_params_dict):
             {
                 "verilog_code": """
    assign ext_rom_en_o   = rom_ren_rd;
-   assign ext_rom_addr_o = csrs_iob_addr;
+   assign ext_rom_addr_o = rom_raddr_rd;
    assign rom_rdata_rd   = ext_rom_rdata_i;
    assign rom_rready_rd  = 1'b1;  // ROM is always ready
 """,

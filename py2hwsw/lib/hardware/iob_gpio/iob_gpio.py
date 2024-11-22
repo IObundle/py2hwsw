@@ -53,14 +53,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "interface": {
+                "signals": {
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "iob_s",
-                "interface": {
+                "signals": {
                     "type": "iob",
                 },
                 "descr": "CPU native interface",
@@ -103,18 +103,6 @@ def setup(py_params_dict):
                     "descr": f"Output Enable interface bits can be used to tristate output {idx} on external module",
                 },
             )
-    attributes_dict["wires"] = [
-        {
-            "name": "csrs_iob",
-            "descr": "Internal iob interface",
-            "interface": {
-                "type": "iob",
-                "prefix": "csrs_",
-                "ADDR_W": "ADDR_W",
-                "DATA_W": "DATA_W",
-            },
-        },
-    ]
     regs = []
     reg_connections = {}
     # Create regs and reg connections for each input
@@ -186,7 +174,7 @@ def setup(py_params_dict):
 
     attributes_dict["blocks"] = [
         {
-            "core_name": "csrs",
+            "core_name": "iob_csrs",
             "instance_name": "csrs_inst",
             "instance_description": "Control/Status Registers",
             "csrs": [
@@ -199,7 +187,6 @@ def setup(py_params_dict):
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "control_if_s": "iob_s",
-                "csrs_iob_o": "csrs_iob",
                 **reg_connections,
             },
         },

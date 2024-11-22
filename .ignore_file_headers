@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+./py2hwsw/lib/hardware/buses/axi_interconnect/hardware/src/axi_interconnect.v
+./py2hwsw/lib/hardware/buses/iob_arbiter/hardware/src/iob_arbiter.v
+./py2hwsw/lib/hardware/buses/iob_arbiter/hardware/src/iob_priority_encoder.v
+./py2hwsw/lib/hardware/iob_picorv32/hardware/src/picorv32.v
+./py2hwsw/lib/hardware/memories/axi_ram/hardware/src/axi_ram.v
+./py2hwsw/lib/scripts/yosys-abc.nix
+

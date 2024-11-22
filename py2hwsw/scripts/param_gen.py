@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 from iob_base import find_obj_in_list, fail_with_msg
 
 
@@ -27,14 +29,19 @@ def generate_params(core):
     lines = []
     core_prefix = f"{core.name}_".upper()
     for idx, parameter in enumerate(module_parameters):
+        # If parameter has 'doc_only' attribute set to True, skip it
+        if parameter.doc_only:
+            continue
+
         p_name = parameter.name.upper()
         p_comment = ""
-        comma = "," if idx < len(module_parameters) - 1 else ""
         if parameter.type == "F":
             p_comment = "  // Don't change this parameter value!"
-        lines.append(
-            f"    parameter {p_name} = `{core_prefix}{p_name}{comma}{p_comment}\n"
-        )
+        lines.append(f"    parameter {p_name} = `{core_prefix}{p_name},{p_comment}\n")
+
+    # Remove comma from last line
+    if lines:
+        lines[-1] = lines[-1].replace(",", "", 1)
 
     return "".join(lines)
 
@@ -60,6 +67,7 @@ def generate_params_snippets(core):
     """
     code = generate_params(core)
     out_dir = core.build_dir + "/hardware/src"
+    os.makedirs(out_dir, exist_ok=True)
     with open(f"{out_dir}/{core.name}_params.vs", "w") as f:
         f.write(code)
 

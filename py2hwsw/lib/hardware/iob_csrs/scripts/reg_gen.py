@@ -61,7 +61,7 @@ def build_regs_table(core):
     general_regs_table = find_obj_in_list(core["csrs"], "general")
     if not general_regs_table:
         general_regs_table = iob_csr_group(
-            name="general",
+            name="general_operation",
             descr="General Registers.",
             regs=[],
         )

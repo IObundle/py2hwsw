@@ -28,52 +28,6 @@ class iob_block_group:
 
 
 attrs = [
-    "name",
-    [
-        "-c",
-        "blocks",
-        {"nargs": "+"},
-        ["name:width"],
-    ],  # FIXME: According to block parameters
-]
-
-
-@str_to_kwargs(attrs)
-def create_block_group(core, *args, blocks=[], **kwargs):
-    """Creates a new block group object and adds it to the core's block list
-    param core: core object
-    """
-    if core.abort_reason:
-        return
-    try:
-        # Ensure 'blocks' list exists
-        core.set_default_attribute("blocks", [])
-
-        block_obj_list = []
-        if type(blocks) is list:
-            # Convert user blocks dictionaries into 'iob_block' objects
-            for block in blocks:
-                block_obj_list.append(create_block(core, **block))
-        else:
-            fail_with_msg(
-                f"blocks attribute must be a list. Error at block group \"{kwargs.get('name', '')}\".\n{blocks}",
-                TypeError,
-            )
-
-        assert_attributes(
-            iob_block_group,
-            kwargs,
-            error_msg=f"Invalid {kwargs.get('name', '')} block group attribute '[arg]'!",
-        )
-
-        block_group = iob_block_group(*args, blocks=block_obj_list, **kwargs)
-        core.blocks.append(block_group)
-    except Exception:
-        add_traceback_msg(f"Failed to create block_group '{kwargs['name']}'.")
-        raise
-
-
-attrs = [
     "core_name",
     "instance_name",
     ["-p", "parameters", {"nargs": "+"}, "pairs"],
@@ -96,10 +50,57 @@ attrs = [
             },
         ]
     },
+    ["-b", "blocks", {"nargs": "+"}],
 ]
 
 
 @str_to_kwargs(attrs)
+def create_block_group(core, *args, **kwargs):
+    """Creates a new block group object and adds it to the core's block list
+    param core: core object
+    """
+    if core.abort_reason:
+        return
+    try:
+        # Ensure 'blocks' list exists
+        core.set_default_attribute("blocks", [])
+
+        group_kwargs = kwargs
+        blocks = kwargs.pop("blocks", None)
+        # If kwargs provided a single block instead of a group, then create a general group for it.
+        if blocks is None:
+            blocks = [kwargs]
+            group_kwargs = {
+                "name": "general_operation",
+                "descr": "General operation group",
+            }
+
+        block_obj_list = []
+        if type(blocks) is list:
+            # Convert user blocks dictionaries into 'iob_block' objects
+            for block in blocks:
+                block_obj = create_block(core, **block)
+                if block_obj:
+                    block_obj_list.append(block_obj)
+        else:
+            fail_with_msg(
+                f"blocks attribute must be a list. Error at block group \"{group_kwargs.get('name', '')}\".\n{blocks}",
+                TypeError,
+            )
+
+        assert_attributes(
+            iob_block_group,
+            group_kwargs,
+            error_msg=f"Invalid {group_kwargs.get('name', '')} block group attribute '[arg]'!",
+        )
+
+        block_group = iob_block_group(blocks=block_obj_list, **group_kwargs)
+        core.blocks.append(block_group)
+    except Exception:
+        add_traceback_msg(f"Failed to create block/group '{kwargs['name']}'.")
+        raise
+
+
 def create_block(core, core_name: str = "", instance_name: str = "", **kwargs):
     """Create an instante of a module, but only if we are not using a
     project wide special target (like clean)

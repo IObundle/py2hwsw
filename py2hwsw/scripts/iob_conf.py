@@ -60,15 +60,18 @@ class iob_conf_group:
             fail_with_msg("Conf group name is not set", ValueError)
 
 
-# attrs = ["name", ["-t", "type"], ["-v", "val"], ["-m", "min"], ["-M", "max"]]
 attrs = [
     "name",
-    ["-c", "confs", {"nargs": "+"}, ["name:width"]],  # FIXME: According to above
+    ["-t", "type"],
+    ["-v", "val"],
+    ["-m", "min"],
+    ["-M", "max"],
+    ["-c", "confs", {"nargs": "+"}],
 ]
 
 
 @str_to_kwargs(attrs)
-def create_conf_group(core, *args, confs=[], **kwargs):
+def create_conf_group(core, *args, **kwargs):
     """Creates a new conf group object and adds it to the core's conf list
     param core: core object
     """
@@ -76,24 +79,34 @@ def create_conf_group(core, *args, confs=[], **kwargs):
         # Ensure 'confs' list exists
         core.set_default_attribute("confs", [])
 
+        group_kwargs = kwargs
+        confs = kwargs.pop("confs", None)
+        # If kwargs provided a single conf instead of a group, then create a general group for it.
+        if confs is None:
+            confs = [kwargs]
+            group_kwargs = {
+                "name": "general_operation",
+                "descr": "General operation group",
+            }
+
         conf_obj_list = []
         if type(confs) is list:
             # Convert user confs dictionaries into 'iob_conf' objects
             conf_obj_list = convert_dict2obj_list(confs, iob_conf)
         else:
             fail_with_msg(
-                f"Confs attribute must be a list. Error at conf group \"{kwargs.get('name', '')}\".\n{confs}",
+                f"Confs attribute must be a list. Error at conf group \"{group_kwargs.get('name', '')}\".\n{confs}",
                 TypeError,
             )
 
         assert_attributes(
             iob_conf_group,
-            kwargs,
-            error_msg=f"Invalid {kwargs.get('name', '')} conf group attribute '[arg]'!",
+            group_kwargs,
+            error_msg=f"Invalid {group_kwargs.get('name', '')} conf group attribute '[arg]'!",
         )
 
-        conf_group = iob_conf_group(*args, confs=conf_obj_list, **kwargs)
+        conf_group = iob_conf_group(confs=conf_obj_list, **group_kwargs)
         core.confs.append(conf_group)
     except Exception:
-        add_traceback_msg(f"Failed to create conf_group '{kwargs['name']}'.")
+        add_traceback_msg(f"Failed to create conf/group '{kwargs['name']}'.")
         raise

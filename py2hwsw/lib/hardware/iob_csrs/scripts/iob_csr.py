@@ -69,9 +69,20 @@ class iob_csr_group:
             fail_with_msg("CSR group name is not set", ValueError)
 
 
-def create_csr_group(*args, regs=[], **kwargs):
+def create_csr_group(*args, **kwargs):
     """Creates a new csr group object"""
+
+    group_kwargs = kwargs
+    regs = kwargs.pop("regs", None)
+    # If kwargs provided a single reg instead of a group, then create a general group for it.
+    if regs is None:
+        regs = [kwargs]
+        group_kwargs = {
+            "name": "general_operation",
+            "descr": "General operation group",
+        }
+
     # Convert user reg dictionaries into 'iob_csr' objects
     csr_obj_list = convert_dict2obj_list(regs, iob_csr)
-    csr_group = iob_csr_group(*args, regs=csr_obj_list, **kwargs)
+    csr_group = iob_csr_group(regs=csr_obj_list, **group_kwargs)
     return csr_group

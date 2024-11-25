@@ -97,7 +97,9 @@ def create_block_group(core, *args, **kwargs):
         block_group = iob_block_group(blocks=block_obj_list, **group_kwargs)
         core.blocks.append(block_group)
     except Exception:
-        add_traceback_msg(f"Failed to create block/group '{kwargs['name']}'.")
+        add_traceback_msg(
+            f"Failed to create block/group '{kwargs.get('name',None) or kwargs.get('core_name',None)}'."
+        )
         raise
 
 

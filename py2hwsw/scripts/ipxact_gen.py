@@ -406,21 +406,25 @@ def gen_parameters_list(core):
     """
 
     parameters_list = []
-    for conf in core.confs:
-        # Skip doc_only confs
-        if conf.doc_only:
+    for group in core.confs:
+        # Skip doc_only groups
+        if group.doc_only:
             continue
-        if conf["type"] != "M":
-            parameters_list.append(
-                Parameter(
-                    conf["name"],
-                    conf["type"],
-                    conf["val"],
-                    conf["min"],
-                    conf["max"],
-                    conf["descr"],
+        for conf in group:
+            # Skip doc_only confs
+            if conf.doc_only:
+                continue
+            if conf["type"] != "M":
+                parameters_list.append(
+                    Parameter(
+                        conf["name"],
+                        conf["type"],
+                        conf["val"],
+                        conf["min"],
+                        conf["max"],
+                        conf["descr"],
+                    )
                 )
-            )
 
     return parameters_list
 

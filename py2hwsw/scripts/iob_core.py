@@ -357,9 +357,7 @@ class iob_core(iob_module, iob_instance):
 
             # Select identifier attribute. Used to compare if should override each element.
             identifier = "name"
-            if child_attribute_name in ["blocks", "sw_modules"]:
-                identifier = "instance_name"
-            elif child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
+            if child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
                 # Elements in list do not have identifier, so just append them to parent list
                 for child_obj in child_value:
                     parent_attributes[child_attribute_name].append(child_obj)
@@ -398,70 +396,6 @@ class iob_core(iob_module, iob_instance):
             if not __class__.global_build_dir:
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
             self.set_default_attribute("build_dir", __class__.global_build_dir)
-
-    attrs = [
-        "core_name",
-        "instance_name",
-        ["-p", "parameters", {"nargs": "+"}, "pairs"],
-        ["-c", "connect", {"nargs": "+"}, "pairs"],
-        ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
-        ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
-        ["--csr_if", "csr_if"],
-        {
-            "--csr-group&csrs": [
-                "name",
-                {
-                    "-r&regs": [
-                        "name:n_bits",
-                        ["-t", "type"],
-                        ["--rst_val", "rst_val"],
-                        ["--addr", "addr", {"type": int}],
-                        ["--log2n_items", "log2n_items"],
-                        ["--no_autoreg", "autoreg", {"action": "store_false"}],
-                    ],
-                },
-            ]
-        },
-    ]
-
-    @str_to_kwargs(attrs)
-    def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):
-        """Create an instante of a module, but only if we are not using a
-        project wide special target (like clean)
-        param core_name: Name of the core
-        param instance_name: Verilog instance name
-        """
-        if self.abort_reason:
-            return
-        # Don't setup other destinations (like simulation) if this is a submodule and
-        # the sub-submodule (we are trying to setup) is not for hardware/src/
-        if not self.is_top_module and (
-            self.dest_dir == "hardware/src"
-            and "dest_dir" in kwargs
-            and kwargs["dest_dir"] != "hardware/src"
-        ):
-            debug(f"Not setting up submodule '{core_name}' of '{self.name}' core!", 1)
-            return
-
-        assert core_name, fail_with_msg("Missing core_name argument", ValueError)
-        # Ensure 'blocks' list exists
-        self.set_default_attribute("blocks", [])
-        # Ensure global top module is set
-        self.update_global_top_module()
-
-        # Set submodule destination dir equal to current module
-        if "dest_dir" not in kwargs:
-            kwargs["dest_dir"] = self.dest_dir
-
-        try:
-            instance = self.get_core_obj(
-                core_name, instance_name=instance_name, instantiator=self, **kwargs
-            )
-
-            self.blocks.append(instance)
-        except ModuleNotFoundError:
-            add_traceback_msg(f"Failed to create instance '{instance_name}'.")
-            raise
 
     def connect_instance_ports(self, connect, instantiator):
         """

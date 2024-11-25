@@ -159,7 +159,7 @@ def create_group_for_ungrouped_csrs(csrs):
     grouped_csrs = []
     for csr in csrs:
         # Check if csr is already a group
-        if "csrs" in csr:
+        if "regs" in csr:
             grouped_csrs.append(csr)
             continue
 

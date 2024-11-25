@@ -10,6 +10,7 @@ from iob_base import (
     assert_attributes,
     add_traceback_msg,
     debug,
+    find_obj_in_list,
 )
 
 
@@ -65,15 +66,18 @@ def create_block_group(core, *args, **kwargs):
         # Ensure 'blocks' list exists
         core.set_default_attribute("blocks", [])
 
+        general_group_ref = None
         group_kwargs = kwargs
         blocks = kwargs.pop("blocks", None)
-        # If kwargs provided a single block instead of a group, then create a general group for it.
+        # If kwargs provided a single block instead of a group, then create a general group for it or use existing one.
         if blocks is None:
             blocks = [kwargs]
             group_kwargs = {
                 "name": "general_operation",
                 "descr": "General operation group",
             }
+            # Try to use existing "general_operation" group if was previously created
+            general_group_ref = find_obj_in_list(core.blocks, "general_operation")
 
         block_obj_list = []
         if type(blocks) is list:
@@ -94,8 +98,12 @@ def create_block_group(core, *args, **kwargs):
             error_msg=f"Invalid {group_kwargs.get('name', '')} block group attribute '[arg]'!",
         )
 
-        block_group = iob_block_group(blocks=block_obj_list, **group_kwargs)
-        core.blocks.append(block_group)
+        # Use existing "general_operation" group if possible
+        if general_group_ref:
+            general_group_ref.blocks += block_obj_list
+        else:
+            block_group = iob_block_group(blocks=block_obj_list, **group_kwargs)
+            core.blocks.append(block_group)
     except Exception:
         add_traceback_msg(
             f"Failed to create block/group '{kwargs.get('name',None) or kwargs.get('core_name',None)}'."

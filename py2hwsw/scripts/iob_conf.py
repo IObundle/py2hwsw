@@ -9,6 +9,7 @@ from iob_base import (
     add_traceback_msg,
     str_to_kwargs,
     assert_attributes,
+    find_obj_in_list,
 )
 
 
@@ -79,6 +80,7 @@ def create_conf_group(core, *args, **kwargs):
         # Ensure 'confs' list exists
         core.set_default_attribute("confs", [])
 
+        general_group_ref = None
         group_kwargs = kwargs
         confs = kwargs.pop("confs", None)
         # If kwargs provided a single conf instead of a group, then create a general group for it.
@@ -88,6 +90,8 @@ def create_conf_group(core, *args, **kwargs):
                 "name": "general_operation",
                 "descr": "General operation group",
             }
+            # Try to use existing "general_operation" group if was previously created
+            general_group_ref = find_obj_in_list(core.confs, "general_operation")
 
         conf_obj_list = []
         if type(confs) is list:
@@ -105,8 +109,12 @@ def create_conf_group(core, *args, **kwargs):
             error_msg=f"Invalid {group_kwargs.get('name', '')} conf group attribute '[arg]'!",
         )
 
-        conf_group = iob_conf_group(confs=conf_obj_list, **group_kwargs)
-        core.confs.append(conf_group)
+        # Use existing "general_operation" group if possible
+        if general_group_ref:
+            general_group_ref.confs += conf_obj_list
+        else:
+            conf_group = iob_conf_group(confs=conf_obj_list, **group_kwargs)
+            core.confs.append(conf_group)
     except Exception:
         add_traceback_msg(f"Failed to create conf/group '{kwargs['name']}'.")
         raise

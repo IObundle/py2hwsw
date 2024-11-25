@@ -465,10 +465,11 @@ class iob_core(iob_module, iob_instance):
 
     def connect_memory(self, port, instantiator):
         """ Create memory port in instantiatior and connect it to self"""
-        _name = f"{self.instance_name}_{port.interface.type}_s"
+        _name = f"{port.name}"
         _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
         _signals.update(port.interface.widths)
-        _signals.update({"prefix": f"{self.instance_name}_{port.interface.type}_"})
+        if _signals["prefix"] == "":
+            _signals.update({"prefix": f"{_name}_"})
         instantiator.create_port(
             name=_name,
             signals = _signals,

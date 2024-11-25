@@ -7,7 +7,37 @@
 # > pip install -e path/to/py2hwsw_directory
 
 
-{ pkgs ? import <nixpkgs> {}, py2hwsw_pkg ? "none" }:
+{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/24.05.tar.gz") {}, py2hwsw_pkg ? "none" }:
+# Py2HWSW uses the following dependencies from nixpkgs version 24.05:
+# bash-5.2p26
+# gnumake-4.4.1
+# iverilog-12.0
+# verilator-5.022
+# gtkwave-3.3.119
+# python3-3.11.9
+# python3.11-black-24.4.0
+# python3.11-mypy-1.9.0
+# python3.11-parse-1.20.1
+# python3.11-numpy-1.26.4
+# python3.11-wavedrom-2.0.3.post3
+# python3.11-matplotlib-3.8.4
+# python3.11-scipy-1.13.0
+# python3.11-pyserial-3.5
+# texlive-combined-2023
+# riscv-gnu-toolchain (tag 2022.06.10)
+# verible-0.0.3515
+# black-24.4.0
+# clang-wrapper-14.0.6
+# librsvg-2.58.0
+# libreoffice-7.6.7.2
+# minicom-2.9
+# lrzsz-0.12.20
+# python3.11-volare (commit 47325949b87e857d75f81d306f02ebccf952cb15)
+# yosys (commit 543faed9c8cd7c33bbb407577d56e4b7444ba61c)
+# gcc-wrapper-13.2.0
+# libcap-2.69
+# reuse-3.0.2
+
 
 let
   # For debug
@@ -42,11 +72,8 @@ let
   '';
 
   yosys = import ./scripts/yosys.nix { inherit pkgs; };
-in
 
-pkgs.mkShell {
-  name = "iob-shell";
-  buildInputs = with pkgs; [
+  py2hwsw_dependencies = with pkgs; [
     bash
     gnumake
     verilog
@@ -87,4 +114,20 @@ pkgs.mkShell {
     reuse
     py2hwsw
   ];
+
+  get_name = pkg:
+    if pkg == null then
+      ""
+    else
+      pkg.name;
+  list_of_pkg_names = builtins.filter (x: x != null) (map get_name py2hwsw_dependencies);
+
+in
+
+# Uncomment line below to print the Py2HWSW dependency names and versions
+#builtins.trace ("Nix dependency versions:\n" + (builtins.concatStringsSep "\n" list_of_pkg_names))
+
+pkgs.mkShell {
+  name = "iob-shell";
+  buildInputs = py2hwsw_dependencies;
 }

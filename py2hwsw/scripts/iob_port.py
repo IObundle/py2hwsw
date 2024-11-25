@@ -26,6 +26,7 @@ class iob_port(iob_wire):
     # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
     e_connect_bit_slices: list = field(default_factory=list)
     doc_only: bool = False
+    doc_clearpage: bool = False
 
     def __post_init__(self):
         if not self.name:

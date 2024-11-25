@@ -128,6 +128,7 @@ def setup(py_params_dict):
             "core_name": "iob_system",
             "instance_name": "iob_system",
             "instance_description": "IOb-SoC core",
+            "setup": False,
             "parameters": {
                 i["name"]: i["name"]
                 for i in iob_system_attr["confs"]

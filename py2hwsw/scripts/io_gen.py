@@ -113,6 +113,8 @@ def generate_if_tex(ports, out_dir):
 \\end{table}
 """
         )
+        if port.doc_clearpage:
+            if_file.write("\\clearpage")
 
     if_file.write("\\clearpage")
     if_file.close()

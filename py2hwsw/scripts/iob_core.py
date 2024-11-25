@@ -470,12 +470,21 @@ class iob_core(iob_module, iob_instance):
         _signals.update(port.interface.widths)
         if _signals["prefix"] == "":
             _signals.update({"prefix": f"{_name}_"})
-        instantiator.create_port(
-            name=_name,
-            signals = _signals,
-            descr=port.descr
-        )
-        _port = find_obj_in_list(instantiator.ports, _name)
+        if instantiator.is_top_module:
+            _name = _name[:-2]
+            _signals.update({"prefix": f"{_name}_"})
+            instantiator.create_wire(
+                name=_name,
+                signals=_signals,
+                descr=port.descr
+            )
+        else:
+            instantiator.create_port(
+                name=_name,
+                signals = _signals,
+                descr=port.descr
+            )
+        _port = find_obj_in_list(instantiator.ports + instantiator.wires, _name)
         port.connect_external(_port, bit_slices=[])
 
     def connect_instance_ports(self, connect, instantiator):

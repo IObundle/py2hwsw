@@ -310,7 +310,7 @@ class csr_gen:
 
         if not auto:  # output read enable
             lines += f"    wire {name}_addressed_r;\n"
-            lines += f"    assign {name}_addressed_r = (internal_iob_addr >= {addr}) && (internal_iob_addr < ({addr}+(2**({addr_w}))));\n"
+            lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable >= {addr}) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
             lines += f"    assign {name}_ren{suffix} = {name}_addressed_r & (internal_iob_valid & internal_iob_ready) & (~|internal_iob_wstrb);\n"
 
         return lines
@@ -451,7 +451,7 @@ class csr_gen:
                         ]
                         port_has_outputs = True
                         snippet += f"""
-   assign {name}_waddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
+   assign {name}_waddr_o = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
 """
                     register_signals += [
                         {
@@ -479,7 +479,7 @@ class csr_gen:
                     ]
                     port_has_outputs = True
                     snippet += f"""
-   assign {name}_raddr_o = internal_iob_addr[ADDR_W-1:2]-{addr>>2};
+   assign {name}_raddr_o = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
 """
                 if auto:
                     register_signals.append(
@@ -597,7 +597,56 @@ class csr_gen:
                     {"name": "state_nxt", "width": 1, "isreg": True},
                 ],
             },
+            {
+                "name": "internal_iob_addr",
+                "descr": "",
+                "signals": [
+                    {"name": "internal_iob_addr"},
+                ],
+            },
+            {
+                "name": "internal_iob_addr_stable",
+                "descr": "",
+                "signals": [
+                    {"name": "internal_iob_addr_stable", "width": "ADDR_W"},
+                ],
+            },
+            {
+                "name": "internal_iob_addr_reg",
+                "descr": "",
+                "signals": [
+                    {"name": "internal_iob_addr_reg", "width": "ADDR_W"},
+                ],
+            },
+            {
+                "name": "internal_iob_addr_reg_en",
+                "descr": "",
+                "signals": [
+                    {"name": "internal_iob_addr_reg_en", "width": 1},
+                ],
+            },
         ]
+        snippet += """
+    assign internal_iob_addr_reg_en = (state == WAIT_REQ);
+    assign internal_iob_addr_stable = (state == WAIT_RVALID) ? internal_iob_addr_reg : internal_iob_addr;
+"""
+        blocks.append(
+            {
+                "core_name": "iob_reg_e",
+                "instance_name": "internal_addr_reg",
+                "instance_description": "store iob addr",
+                "parameters": {
+                    "DATA_W": "ADDR_W",
+                    "RST_VAL": "'b0",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "data_i": "internal_iob_addr",
+                    "data_o": "internal_iob_addr_reg",
+                    "en_i": "internal_iob_addr_reg_en",
+                },
+            }
+        )
         blocks.append(
             {
                 "core_name": "iob_reg",
@@ -711,7 +760,7 @@ class csr_gen:
         # compute write address
         snippet += "    wire [ADDR_W-1:0] waddr;\n"
         snippet += (
-            "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr) + byte_offset;\n"
+            "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr_stable) + byte_offset;\n"
         )
 
         # insert write register logic
@@ -906,10 +955,10 @@ class csr_gen:
                 if self.bfloor(addr, addr_w_base) == self.bfloor(
                     addr_last, addr_w_base
                 ):
-                    snippet += f"        {aux_read_reg} = (`IOB_WORD_ADDR(internal_iob_addr) == {self.bfloor(addr, addr_w_base)});\n"
+                    snippet += f"        {aux_read_reg} = (`IOB_WORD_ADDR(internal_iob_addr_stable) == {self.bfloor(addr, addr_w_base)});\n"
                     snippet += f"        if({aux_read_reg}) "
                 else:
-                    snippet += f"            {aux_read_reg} = ((`IOB_WORD_ADDR(internal_iob_addr) >= {self.bfloor(addr, addr_w_base)}) && (`IOB_WORD_ADDR(internal_iob_addr) < {self.bfloor(addr_last, addr_w_base)}));\n"
+                    snippet += f"            {aux_read_reg} = ((`IOB_WORD_ADDR(internal_iob_addr_stable) >= {self.bfloor(addr, addr_w_base)}) && (`IOB_WORD_ADDR(internal_iob_addr_stable) < {self.bfloor(addr_last, addr_w_base)}));\n"
                     snippet += f"        if({aux_read_reg}) "
                 snippet += f"begin\n"
                 if name == "version":
@@ -1227,7 +1276,7 @@ class csr_gen:
         os.makedirs(out_dir, exist_ok=True)
         fsw = open(f"{out_dir}/{top}_csrs_emb_verilator.c", "w")
         core_prefix = f"{top}_".upper()
-        fsw.write(f'#include "{top}_verilator.h"\n\n')
+        fsw.write(f'#include "{top}_csrs_verilator.h"\n\n')
 
         fsw.write("\n// Core Setters and Getters\n")
 

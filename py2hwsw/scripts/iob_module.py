@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: MIT
 
 from iob_base import iob_base, process_elements_from_list
-from iob_conf import create_conf
+from iob_conf import create_conf_group
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
 from iob_comb import iob_comb, create_comb
 from iob_fsm import iob_fsm, create_fsm
+from iob_block import create_block_group
 
 
 class iob_module(iob_base):
@@ -40,7 +41,7 @@ class iob_module(iob_base):
             "confs",
             [],
             list,
-            get_list_attr_handler(self.create_conf),
+            get_list_attr_handler(self.create_conf_group),
             "List of module macros and Verilog (false-)parameters.",
         )
         self.set_default_attribute(
@@ -86,7 +87,7 @@ class iob_module(iob_base):
             "blocks",
             [],
             list,
-            get_list_attr_handler(self.create_instance),
+            get_list_attr_handler(self.create_block_group),
             "List of instances of other cores inside this core.",
         )
         # List of software modules required by this core
@@ -94,12 +95,12 @@ class iob_module(iob_base):
             "sw_modules",
             [],
             list,
-            get_list_attr_handler(self.create_sw_instance),
+            get_list_attr_handler(self.create_sw_instance_group),
             "List of software modules required by this core.",
         )
 
-    def create_conf(self, *args, **kwargs):
-        create_conf(self, *args, **kwargs)
+    def create_conf_group(self, *args, **kwargs):
+        create_conf_group(self, *args, **kwargs)
 
     def create_port(self, *args, **kwargs):
         create_port(self, *args, **kwargs)
@@ -119,14 +120,14 @@ class iob_module(iob_base):
     def create_fsm(self, *args, **kwargs):
         create_fsm(self, *args, **kwargs)
 
-    def create_instance(self, **kwargs):
+    def create_block_group(self, *args, **kwargs):
         """Import core and create an instance of it inside this module"""
-        # Method body implemented in subclass
+        create_block_group(self, *args, **kwargs)
 
-    def create_sw_instance(self, **kwargs):
+    def create_sw_instance_group(self, *args, **kwargs):
         """Import core and run its setup process"""
         # Setup process is equal to normal core, but should not be instantiated in Verilog
-        self.create_instance(instantiate=False, **kwargs)
+        self.create_block_group(*args, instantiate=False, **kwargs)
 
     def update_global_top_module(self):
         """Update global top module if it has not been set before.

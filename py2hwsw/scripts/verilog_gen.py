@@ -191,8 +191,9 @@ def generate_verilog(core):
 
     f_module = open(file_path, "w+")
 
-    if param_gen.has_params(core.confs):
-        params_line = f"#(\n{param_gen.generate_params(core)}) ("
+    params = param_gen.generate_params(core)
+    if params:
+        params_line = f"#(\n{params}) ("
     else:
         params_line = "("
 

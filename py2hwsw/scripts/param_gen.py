@@ -9,26 +9,27 @@ import os
 from iob_base import find_obj_in_list, fail_with_msg
 
 
-def has_params(confs):
-    """Check if given 'confs' list has any parameters"""
-    for conf in confs:
-        if conf.type in ["P", "F"]:
-            return True
-    return False
+def get_core_params(confs):
+    core_parameters = []
+    for group in confs:
+        for conf in group.confs:
+            if conf.type in ["P", "F"]:
+                core_parameters.append(conf)
+    return core_parameters
 
 
 def generate_params(core):
     """Generate verilog code with verilog parameters of this module.
     returns: Generated verilog code
     """
-    module_parameters = [p for p in core.confs if p.type in ["P", "F"]]
+    core_parameters = get_core_params(core.confs)
 
-    if not has_params(core.confs):
+    if not core_parameters:
         return ""
 
     lines = []
     core_prefix = f"{core.name}_".upper()
-    for idx, parameter in enumerate(module_parameters):
+    for idx, parameter in enumerate(core_parameters):
         # If parameter has 'doc_only' attribute set to True, skip it
         if parameter.doc_only:
             continue
@@ -79,18 +80,19 @@ def generate_params_snippets(core):
 
 def validate_params(core):
     """Check if all parameters are within the allowed range"""
+    core_parameters = get_core_params(core.confs)
     for p_name, p_value in core.parameters.items():
         if isinstance(p_value, str):
             continue
-        conf = find_obj_in_list(core.confs, p_name)
+        conf = find_obj_in_list(core_parameters, p_name)
 
         try:
             min_val = int(conf.min)
-        except:
+        except Exception:
             min_val = 0
         try:
             max_val = int(conf.max)
-        except:
+        except Exception:
             max_val = 2**31 - 1
         if p_value < min_val or p_value > max_val:
             fail_with_msg(

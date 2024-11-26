@@ -15,17 +15,18 @@ import param_gen
 
 
 # Generate blocks.tex file with TeX table of blocks (Verilog modules instances)
-def generate_blocks_table_tex(out_dir):
+def generate_blocks_table_tex(blocks, out_dir):
     blocks_file = open(f"{out_dir}/blocks.tex", "w")
 
     blocks_file.write(
         "The Verilog modules in the top-level entity of the core are \
-        described in the following table. The table elements represent \
+        described in the following tables. The table elements represent \
         the blocks in the Block Diagram.\n"
     )
 
-    blocks_file.write(
-        """
+    for group in blocks:
+        blocks_file.write(
+            """
 \\begin{table}[H]
   \\centering
   \\begin{tabularx}{\\textwidth}{|l|l|X|}
@@ -34,14 +35,22 @@ def generate_blocks_table_tex(out_dir):
     \\rowcolor{iob-green}
     {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
 
-    \\input blocks_module_tab
+    \\input """
+            + group.name
+            + """_blocks_tab
 
   \\end{tabularx}
-  \\caption{Verilog modules in the top-level entity of the core}
-  \\label{blocks_module_tab:is}
+  \\caption{"""
+            + group.descr.replace("_", "\\_")
+            + """}
+  \\label{"""
+            + group.name
+            + """_blocks_tab:is}
 \\end{table}
 """
-    )
+        )
+        if group.doc_clearpage:
+            blocks_file.write("\\clearpage")
 
     blocks_file.write("\\clearpage")
     blocks_file.close()
@@ -50,21 +59,23 @@ def generate_blocks_table_tex(out_dir):
 # Generate TeX table of blocks
 def generate_blocks_tex(blocks, out_dir):
     # Create blocks.tex file
-    generate_blocks_table_tex(out_dir)
+    generate_blocks_table_tex(blocks, out_dir)
 
-    tex_table = []
-    for block in blocks:
-        if not block.instantiate:
-            continue
-        tex_table.append(
-            [
-                block.name,
-                block.instance_name,
-                block.instance_description,
-            ]
-        )
+    # Create table for each group
+    for group in blocks:
+        tex_table = []
+        for block in group.blocks:
+            if not block.instantiate:
+                continue
+            tex_table.append(
+                [
+                    block.name,
+                    block.instance_name,
+                    block.instance_description,
+                ]
+            )
 
-    write_table(f"{out_dir}/blocks_module", tex_table)
+        write_table(f"{out_dir}/{group.name}_blocks", tex_table)
 
 
 def generate_blocks(core):
@@ -72,32 +83,32 @@ def generate_blocks(core):
     returns: Generated verilog code
     """
     code = ""
-    for instance in core.blocks:
-        if not instance.instantiate:
-            continue
-        # Open ifdef if conditional interface
-        if instance.if_defined:
-            code += f"`ifdef {instance.if_defined}\n"
-        if instance.if_not_defined:
-            code += f"`ifndef {instance.if_not_defined}\n"
+    for group in core.blocks:
+        for instance in group.blocks:
+            if not instance.instantiate:
+                continue
+            # Open ifdef if conditional interface
+            if instance.if_defined:
+                code += f"`ifdef {instance.if_defined}\n"
+            if instance.if_not_defined:
+                code += f"`ifndef {instance.if_not_defined}\n"
 
-        params_str = ""
-        if instance.parameters:
-            params_str = f"""#(
+            params_str = ""
+            if instance.parameters:
+                params_str = f"""#(
 {param_gen.generate_inst_params(instance)}\
     ) """
 
-        code += f"""\
-    // {instance.instance_description}
-    {instance.name} {params_str}{instance.instance_name} (
-{get_instance_port_connections(instance)}\
-    );
+            code += f"""\
+        // {instance.instance_description}
+        {instance.name} {params_str}{instance.instance_name} (
+    {get_instance_port_connections(instance)}\
+        );
 
-"""
-
-        # Close ifdef if conditional interface
-        if instance.if_defined or instance.if_not_defined:
-            code += "`endif\n"
+    """
+            # Close ifdef if conditional interface
+            if instance.if_defined or instance.if_not_defined:
+                code += "`endif\n"
 
     return code
 

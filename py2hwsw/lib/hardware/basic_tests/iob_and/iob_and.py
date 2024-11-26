@@ -8,12 +8,18 @@ def setup(py_params_dict):
         "version": "0.1",
         "confs": [
             {
-                "name": "W",
-                "type": "P",
-                "val": "21",
-                "min": "1",
-                "max": "32",
-                "descr": "IO width",
+                "name": "general",
+                "descr": "General group of confs",
+                "confs": [
+                    {
+                        "name": "W",
+                        "type": "P",
+                        "val": "21",
+                        "min": "1",
+                        "max": "32",
+                        "descr": "IO width",
+                    },
+                ],
             },
         ],
         "ports": [
@@ -40,12 +46,18 @@ def setup(py_params_dict):
             },
         ],
         "blocks": [
-            # Simulation wrapper
             {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "instantiate": False,
-                "dest_dir": "hardware/simulation/src",
+                "name": "simulation",
+                "descr": "Blocks for simulation",
+                "blocks": [
+                    # Simulation wrapper
+                    {
+                        "core_name": "iob_sim",
+                        "instance_name": "iob_sim",
+                        "instantiate": False,
+                        "dest_dir": "hardware/simulation/src",
+                    },
+                ],
             },
         ],
         "snippets": [{"verilog_code": "   assign y_o = a_i & b_i;"}],

@@ -89,6 +89,7 @@ def setup(py_params_dict):
         "snippets": [],
     }
 
+    params["csrs"] = create_group_for_ungrouped_csrs(params["csrs"])
     find_and_update_interrupt_csrs(params["csrs"])
     find_and_update_fifo_csrs(params["csrs"], attributes_dict)
 
@@ -147,3 +148,26 @@ def setup(py_params_dict):
     attributes_dict["confs"][0]["val"] = csr_gen_obj.core_addr_w
 
     return attributes_dict
+
+
+def create_group_for_ungrouped_csrs(csrs):
+    general_group = {
+        "name": "general_operation",
+        "descr": "General Registers.",
+        "regs": [],
+    }
+    grouped_csrs = []
+    for csr in csrs:
+        # Check if csr is already a group
+        if "regs" in csr:
+            grouped_csrs.append(csr)
+            continue
+
+        # Append csr to general group
+        general_group["regs"].append(csr)
+
+    # Append general group if it has any registers
+    if general_group["regs"]:
+        grouped_csrs.append(general_group)
+
+    return grouped_csrs

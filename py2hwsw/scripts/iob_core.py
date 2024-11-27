@@ -177,6 +177,7 @@ class iob_core(iob_module, iob_instance):
         if (
             attributes["original_name"] == __class__.global_top_module.original_name
             and not self.is_top_module
+            and attributes["name"] != "iob_aac_d" # FIXME temporary fix
         ):
             self.abort_reason = "duplicate_setup"
 
@@ -627,25 +628,25 @@ class iob_core(iob_module, iob_instance):
         )
 
     @staticmethod
-    def print_build_dir(core_name):
+    def print_build_dir(core_name, **kwargs):
         """Print build directory."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_build_dir"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name)
+        module = __class__.get_core_obj(core_name, **kwargs)
         print(module.build_dir)
 
     @staticmethod
-    def print_core_dict(core_name):
+    def print_core_dict(core_name, **kwargs):
         """Print core attributes dictionary."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_core_dict"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name)
+        module = __class__.get_core_obj(core_name, **kwargs)
         print(json.dumps(module.attributes_dict, indent=4))
 
     @staticmethod
-    def print_py2hwsw_attributes(core_name):
+    def print_py2hwsw_attributes(core_name, **kwargs):
         """Print the supported py2hw attributes of this core.
         The attributes listed can be used in the 'attributes' dictionary of the
         constructor. This defines the information supported by the py2hw interface.
@@ -653,7 +654,7 @@ class iob_core(iob_module, iob_instance):
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_attributes"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name)
+        module = __class__.get_core_obj(core_name, **kwargs)
         print(
             f"Attributes supported by the '{module.name}' core's 'py2hwsw' interface:"
         )

@@ -548,3 +548,10 @@ def copy_rename_setup_directory(core, exclude_file_list=[]):
     # Copy sources
     for directory in dir_list:
         copy_rename_setup_subdir(core, directory, exclude_file_list)
+
+    # Copy custom_config_build.mk file if it exists
+    if os.path.isfile(os.path.join(core.setup_dir, "custom_config_build.mk")):
+        shutil.copyfile(
+            os.path.join(core.setup_dir, "custom_config_build.mk"),
+            os.path.join(core.build_dir, "custom_config_build.mk"),
+        )

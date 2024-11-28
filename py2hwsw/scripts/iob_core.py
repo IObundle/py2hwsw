@@ -321,6 +321,7 @@ class iob_core(iob_module, iob_instance):
             is_parent=True,
             child_attributes=attributes,
             instantiator=kwargs.get("instantiator", None),
+            setup=kwargs.get("setup", True),
         )
 
         # Copy parent attributes to child

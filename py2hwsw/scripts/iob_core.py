@@ -54,6 +54,8 @@ class iob_core(iob_module, iob_instance):
     global_project_vlint: bool = True
     # Project wide special target. Used when we don't want to run normal setup (for example, when cleaning).
     global_special_target: str = ""
+    # Clang format rules
+    global_clang_format_rules_filepath: str = None
 
     def __init__(self, *args, **kwargs):
         """Build a core (includes module and instance attributes)
@@ -528,8 +530,14 @@ class iob_core(iob_module, iob_instance):
         sw_tools.run_tool("black", self.build_dir)
 
         # Run C formatter
-        sw_tools.run_tool("clang")
-        sw_tools.run_tool("clang", self.build_dir)
+        sw_tools.run_tool(
+            "clang", rules_file_path=__class__.global_clang_format_rules_filepath
+        )
+        sw_tools.run_tool(
+            "clang",
+            self.build_dir,
+            rules_file_path=__class__.global_clang_format_rules_filepath,
+        )
 
     @classmethod
     def py2hw(cls, core_dict, **kwargs):

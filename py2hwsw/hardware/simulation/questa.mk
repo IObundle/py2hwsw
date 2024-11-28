@@ -22,7 +22,7 @@ comp: $(VHDR) $(VSRC) $(HEX)
 exec: comp
 	vsim $(SFLAGS) $(NAME)_tb -do "run -all;quit"
 
-clean:
+clean: gen-clean
 	@rm -f *.raw
 
 very-clean:

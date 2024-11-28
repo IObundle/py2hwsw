@@ -308,6 +308,7 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
         filtered_parent_py_params.pop("instantiator", None)
+        filtered_parent_py_params.pop("connect", None)
         if "name" not in filtered_parent_py_params:
             filtered_parent_py_params["name"] = name
 
@@ -321,6 +322,7 @@ class iob_core(iob_module, iob_instance):
             is_parent=True,
             child_attributes=attributes,
             instantiator=kwargs.get("instantiator", None),
+            connect=kwargs.get("connect", {}),
             setup=kwargs.get("setup", True),
         )
 

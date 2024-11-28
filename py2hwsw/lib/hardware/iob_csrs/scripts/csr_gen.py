@@ -1522,8 +1522,10 @@ class csr_gen:
                 + table.name
                 + """_csrs_tab:is}
     \\end{table}
-    """
+"""
             )
+            if table.doc_clearpage:
+                csrs_file.write("\\clearpage")
 
         csrs_file.write("\\clearpage")
         csrs_file.close()

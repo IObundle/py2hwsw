@@ -239,6 +239,17 @@ def doc_setup(python_module):
 
 def write_git_revision_short_hash(dst_dir):
     file_name = "shortHash.tex"
+    setup_dir_file = os.path.join(os.path.dirname(__file__), "..", file_name)
+    # Use the shortHash.tex from the setup directory if it exists
+    # This file is present in pip installations (cannot use git rev-parse in pip installations)
+    if os.path.isfile(setup_dir_file):
+        shutil.copy2(
+            setup_dir_file,
+            f"{dst_dir}/{file_name}",
+        )
+        return
+
+    # Alternatively generate short hash based on git command
     text = (
         subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
         .decode("ascii")
@@ -247,8 +258,8 @@ def write_git_revision_short_hash(dst_dir):
 
     if not (os.path.exists(dst_dir)):
         os.makedirs(dst_dir)
-    file = open(f"{dst_dir}/{file_name}", "w")
-    file.write(text)
+    with open(f"{dst_dir}/{file_name}", "w") as file:
+        file.write(text)
 
 
 # Include headers and srcs from given python module (module_name)

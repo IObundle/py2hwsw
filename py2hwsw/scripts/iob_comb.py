@@ -138,15 +138,16 @@ class iob_comb(iob_snippet):
                     if not any(port.name == "clk_en_rst_s" for port in core.ports):
                         core.create_port(
                             name="clk_en_rst_s",
-                            interface={"type": "clk_en_rst", "subtype": "slave"},
+                            signals={"type": "clk_en_rst"},
                             descr="Clock enable and reset signal",
                         )
 
                     if not any(
                         block.instance_name == f"{signal.name}_reg"
-                        for block in core.blocks
+                        for group in core.blocks
+                        for block in group.blocks
                     ):
-                        core.create_instance(
+                        core.create_block_group(
                             core_name=reg_type,
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},

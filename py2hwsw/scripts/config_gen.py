@@ -13,7 +13,6 @@ from latex import write_table
 def conf_vh(macros, top_module, out_dir):
     file2create = open(f"{out_dir}/{top_module}_conf.vh", "w")
     core_prefix = f"{top_module}_".upper()
-    fname = f"{core_prefix}CONF"
     # These ifndefs cause issues when this file is included in multiple files and it contains other ifdefs inside this block.
     # For example, assume this file is included in another one that does not have `MACRO1` defined. Now assume that inside this block there is an `ifdef MACRO1` block.
     # Since `MACRO1` is not defined in the file that is including this, the `ifdef MACRO1` wont be executed.
@@ -21,24 +20,28 @@ def conf_vh(macros, top_module, out_dir):
     # wont execute because of the `ifndef` added here, therefore the `ifdef MACRO1` block will also not execute when it should have.
     # file2create.write(f"`ifndef VH_{fname}_VH\n")
     # file2create.write(f"`define VH_{fname}_VH\n\n")
-    for macro in macros:
-        # If macro has 'doc_only' attribute set to True, skip it
-        if macro.doc_only:
+    for group in macros:
+        # If group has 'doc_only' attribute set to True, skip it
+        if group.doc_only:
             continue
-        if macro.if_defined:
-            file2create.write(f"`ifdef {macro.if_defined}\n")
-        if macro.if_not_defined:
-            file2create.write(f"`ifndef {macro.if_not_defined}\n")
-        # Only insert macro if its is not a bool define, and if so only insert it if it is true
-        if type(macro.val) is not bool:
-            m_name = macro.name.upper()
-            m_default_val = macro.val
-            file2create.write(f"`define {core_prefix}{m_name} {m_default_val}\n")
-        elif macro.val:
-            m_name = macro.name.upper()
-            file2create.write(f"`define {core_prefix}{m_name} 1\n")
-        if macro.if_defined or macro.if_not_defined:
-            file2create.write("`endif\n")
+        for macro in group.confs:
+            # If macro has 'doc_only' attribute set to True, skip it
+            if macro.doc_only:
+                continue
+            if macro.if_defined:
+                file2create.write(f"`ifdef {macro.if_defined}\n")
+            if macro.if_not_defined:
+                file2create.write(f"`ifndef {macro.if_not_defined}\n")
+            # Only insert macro if its is not a bool define, and if so only insert it if it is true
+            if type(macro.val) is not bool:
+                m_name = macro.name.upper()
+                m_default_val = macro.val
+                file2create.write(f"`define {core_prefix}{m_name} {m_default_val}\n")
+            elif macro.val:
+                m_name = macro.name.upper()
+                file2create.write(f"`define {core_prefix}{m_name} 1\n")
+            if macro.if_defined or macro.if_not_defined:
+                file2create.write("`endif\n")
     # file2create.write(f"\n`endif // VH_{fname}_VH\n")
 
 
@@ -51,29 +54,26 @@ def conf_h(macros, top_module, out_dir):
     fname = f"{core_prefix}CONF"
     file2create.write(f"#ifndef H_{fname}_H\n")
     file2create.write(f"#define H_{fname}_H\n\n")
-    for macro in macros:
-        # If macro has 'doc_only' attribute set to True, skip it
-        if macro.doc_only:
+    for group in macros:
+        # If group has 'doc_only' attribute set to True, skip it
+        if group.doc_only:
             continue
-        # Only insert macro if its is not a bool define, and if so only insert it if it is true
-        if type(macro.val) is not bool:
-            m_name = macro.name.upper()
-            # Replace any Verilog specific syntax by equivalent C syntax
-            m_default_val = re.sub("\\d+'h", "0x", str(macro.val))
-            m_min_val = re.sub("\\d+'h", "0x", str(macro.min))
-            m_max_val = re.sub("\\d+'h", "0x", str(macro.max))
-            file2create.write(
-                f"#define {core_prefix}{m_name} {str(m_default_val).replace('`', '')}\n"
-            )  # Remove Verilog macros ('`')
-            file2create.write(
-                f"#define {core_prefix}{m_name}_MIN {str(m_min_val).replace('`', '')}\n"
-            )  # Remove Verilog macros ('`')
-            file2create.write(
-                f"#define {core_prefix}{m_name}_MAX {str(m_max_val).replace('`', '')}\n"
-            )  # Remove Verilog macros ('`')
-        elif macro.val:
-            m_name = macro.name.upper()
-            file2create.write(f"#define {core_prefix}{m_name} 1\n")
+        for macro in group.confs:
+            # If macro has 'doc_only' attribute set to True, skip it
+            if macro.doc_only:
+                continue
+            # Only insert macro if its is not a bool define, and if so only insert it if it is true
+            if type(macro.val) is not bool:
+                m_name = macro.name.upper()
+                # Replace any Verilog specific syntax by equivalent C syntax
+                m_default_val = re.sub("\\d+'h", "0x", str(macro.val))
+                # Remove Verilog macros ('`')
+                file2create.write(
+                    f"#define {core_prefix}{m_name} {str(m_default_val).replace('`', '')}\n"
+                )
+            elif macro.val:
+                m_name = macro.name.upper()
+                file2create.write(f"#define {core_prefix}{m_name} 1\n")
     file2create.write(f"\n#endif // H_{fname}_H\n")
 
     file2create.close()
@@ -102,62 +102,86 @@ def append_str_config_build_mk(str_2_append, build_dir):
     file.close()
 
 
+def generate_config_tex(confs, out_dir):
+    confs_file = open(f"{out_dir}/config.tex", "w")
+
+    confs_file.write(
+        """
+The following tables describe the IP core configuration. The core may be configured using macros or parameters:
+
+\\begin{description}
+\\item \\textbf{'M'} Macro: a Verilog macro or ``\\`define'' directive is used to include or exclude code segments, to create core configurations that are valid for all instances of the core.
+\\item \\textbf{'P'} Parameter: a Verilog parameter is passed to each instance of the core and defines the configuration of that particular instance.
+\\end{description}
+"""
+    )
+
+    for group in confs:
+        confs_file.write(
+            """
+\\begin{table}[H]
+  \\centering
+  \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
+
+    \\hline
+    \\rowcolor{iob-green}
+    {\\bf Configuration} & {\\bf Type} & {\\bf Min} & {\\bf Typical} & {\\bf Max} & {\\bf Description} \\\\ \\hline \\hline
+
+    \\input """
+            + group.name
+            + """_confs_tab
+
+  \\end{tabularx}
+  \\caption{"""
+            + group.descr.replace("_", "\\_")
+            + """}
+  \\label{"""
+            + group.name
+            + """_confs_tab:is}
+\\end{table}
+"""
+        )
+        if group.doc_clearpage:
+            confs_file.write("\\clearpage")
+
+    confs_file.write("\\clearpage")
+    confs_file.close()
+
+
 # Generate TeX table of confs
 def generate_confs_tex(confs, out_dir):
-    tex_table = []
-    derv_params = []
-    for conf in confs:
-        conf_val = conf.val if type(conf.val) is not bool else "1"
-        # False parameters are not included in the table
-        if conf.type != "F":
-            tex_table.append(
-                [
-                    conf.name,
-                    conf.type,
-                    conf.min,
-                    conf_val,
-                    conf.max,
-                    conf.descr,
-                ]
-            )
-        else:
-            derv_params.append(
-                [
-                    conf.name,
-                    conf_val,
-                    conf.descr,
-                ]
-            )
+    # Create config.tex file
+    generate_config_tex(confs, out_dir)
 
-    # Write table with true parameters and macros
-    write_table(f"{out_dir}/confs", tex_table)
-
-
-# Select if a define from the confs dictionary is set or not
-# define_name: name of the macro in confs (its called define because it is unvalued, it is either set or unset)
-# should_set: Select if define should be set or not
-def update_define(confs, define_name, should_set):
-    for macro in confs:
-        if macro.name == define_name:
-            # Found macro. Unset it if not 'should_set'
-            if should_set:
-                macro.val = True
+    # Create table for each group
+    for group in confs:
+        tex_table = []
+        derv_params = []  # Unused?
+        for conf in group.confs:
+            conf_val = conf.val if type(conf.val) is not bool else "1"
+            # False parameters are not included in the table
+            if conf.type != "F":
+                tex_table.append(
+                    [
+                        conf.name,
+                        conf.type,
+                        conf.min,
+                        conf_val,
+                        conf.max,
+                        conf.descr,
+                    ]
+                )
             else:
-                macro.val = False
-            break
-    else:
-        # Did not find define. Set it if should_set.
-        if should_set:
-            confs.append(
-                {
-                    "name": define_name,
-                    "type": "M",
-                    "val": True,
-                    "min": "NA",
-                    "max": "NA",
-                    "descr": "Define",
-                }
-            )
+                derv_params.append(
+                    [
+                        conf.name,
+                        conf_val,
+                        conf.descr,
+                    ]
+                )
+
+        # Write table with true parameters and macros
+        write_table(f"{out_dir}/{group.name}_confs", tex_table)
 
 
 def generate_confs(core):

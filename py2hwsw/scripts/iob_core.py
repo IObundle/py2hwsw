@@ -54,6 +54,8 @@ class iob_core(iob_module, iob_instance):
     global_project_vlint: bool = True
     # Project wide special target. Used when we don't want to run normal setup (for example, when cleaning).
     global_special_target: str = ""
+    # Clang format rules
+    global_clang_format_rules_filepath: str = None
 
     def __init__(self, *args, **kwargs):
         """Build a core (includes module and instance attributes)
@@ -83,6 +85,7 @@ class iob_core(iob_module, iob_instance):
         connect = kwargs.get("connect", {})
         instantiator = kwargs.get("instantiator", None)
         is_parent = kwargs.get("is_parent", False)
+        setup = kwargs.get("setup", True)
 
         # Create core based on 'parent' core (if applicable)
         if self.handle_parent(*args, **kwargs):
@@ -165,6 +168,12 @@ class iob_core(iob_module, iob_instance):
             dict,
             descr="Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
         )
+        self.set_default_attribute(
+            "setup",
+            setup,
+            bool,
+            descr="Select if should setup the core. We may not want to setup some cores to prevent circular dependencies. For example, the top-core wrappers typically dont want to start the setup for the top-core again.",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 
@@ -172,14 +181,8 @@ class iob_core(iob_module, iob_instance):
         # Don't setup this core if using a project wide special target.
         if __class__.global_special_target:
             self.abort_reason = "special_target"
-        # Don't setup this core if it is the same as the top module.
-        # May happen if the top module is listed in 'blocks' of a submodule (likely wrapper).
-        if (
-            attributes["original_name"] == __class__.global_top_module.original_name
-            and not self.is_top_module
-            and attributes["name"] != "iob_aac_d" # FIXME temporary fix
-        ):
-            self.abort_reason = "duplicate_setup"
+        if not self.setup:
+            self.abort_reason = "no_setup"
 
         # Read 'attributes' dictionary and set corresponding core attributes
         self.parse_attributes_dict(attributes)
@@ -196,8 +199,8 @@ class iob_core(iob_module, iob_instance):
         # )
 
         if self.abort_reason:
-            # Generate instance parameters when aborted due to duplicate setup
-            if self.abort_reason == "duplicate_setup":
+            # Generate instance parameters when aborted due to 'no_setup' so that modules above it (like wrappers) can still instantiate it.
+            if self.abort_reason == "no_setup":
                 param_gen.generate_inst_params(self)
             return
 
@@ -356,9 +359,7 @@ class iob_core(iob_module, iob_instance):
 
             # Select identifier attribute. Used to compare if should override each element.
             identifier = "name"
-            if child_attribute_name in ["blocks", "sw_modules"]:
-                identifier = "instance_name"
-            elif child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
+            if child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
                 # Elements in list do not have identifier, so just append them to parent list
                 for child_obj in child_value:
                     parent_attributes[child_attribute_name].append(child_obj)
@@ -397,52 +398,6 @@ class iob_core(iob_module, iob_instance):
             if not __class__.global_build_dir:
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
             self.set_default_attribute("build_dir", __class__.global_build_dir)
-
-    attrs = [
-        "core_name",
-        "instance_name",
-        ["-p", "parameters", {"nargs": "+"}, "pairs"],
-        ["-c", "connect", {"nargs": "+"}, "pairs"],
-    ]
-
-    @str_to_kwargs(attrs)
-    def create_instance(self, core_name: str = "", instance_name: str = "", **kwargs):
-        """Create an instante of a module, but only if we are not using a
-        project wide special target (like clean)
-        param core_name: Name of the core
-        param instance_name: Verilog instance name
-        """
-        if self.abort_reason:
-            return
-        # Don't setup other destinations (like simulation) if this is a submodule and
-        # the sub-submodule (we are trying to setup) is not for hardware/src/
-        if not self.is_top_module and (
-            self.dest_dir == "hardware/src"
-            and "dest_dir" in kwargs
-            and kwargs["dest_dir"] != "hardware/src"
-        ):
-            debug(f"Not setting up submodule '{core_name}' of '{self.name}' core!", 1)
-            return
-
-        assert core_name, fail_with_msg("Missing core_name argument", ValueError)
-        # Ensure 'blocks' list exists
-        self.set_default_attribute("blocks", [])
-        # Ensure global top module is set
-        self.update_global_top_module()
-
-        # Set submodule destination dir equal to current module
-        if "dest_dir" not in kwargs:
-            kwargs["dest_dir"] = self.dest_dir
-
-        try:
-            instance = self.get_core_obj(
-                core_name, instance_name=instance_name, instantiator=self, **kwargs
-            )
-
-            self.blocks.append(instance)
-        except ModuleNotFoundError:
-            add_traceback_msg(f"Failed to create instance '{instance_name}'.")
-            raise
 
     def connect_instance_ports(self, connect, instantiator):
         """
@@ -575,8 +530,14 @@ class iob_core(iob_module, iob_instance):
         sw_tools.run_tool("black", self.build_dir)
 
         # Run C formatter
-        sw_tools.run_tool("clang")
-        sw_tools.run_tool("clang", self.build_dir)
+        sw_tools.run_tool(
+            "clang", rules_file_path=__class__.global_clang_format_rules_filepath
+        )
+        sw_tools.run_tool(
+            "clang",
+            self.build_dir,
+            rules_file_path=__class__.global_clang_format_rules_filepath,
+        )
 
     @classmethod
     def py2hw(cls, core_dict, **kwargs):
@@ -722,7 +683,7 @@ class iob_core(iob_module, iob_instance):
         core = SimpleNamespace(
             original_name="py2hwsw",
             name="py2hwsw",
-            setup_dir=os.path.join(os.path.dirname(__file__), "../.."),
+            setup_dir=os.path.join(os.path.dirname(__file__), "../py2hwsw_document"),
             build_dir="py2hwsw_docs",
         )
         copy_srcs.doc_setup(core)

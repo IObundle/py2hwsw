@@ -251,7 +251,9 @@ def write_git_revision_short_hash(dst_dir):
 
     # Alternatively generate short hash based on git command
     text = (
-        subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+        subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"], cwd=os.path.dirname(__file__)
+        )
         .decode("ascii")
         .strip()
     )

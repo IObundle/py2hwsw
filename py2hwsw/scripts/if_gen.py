@@ -283,7 +283,7 @@ def remove_duplicates(ports):
 
 @parse_widths
 def get_rom_sp_ports():
-    ports = get_mem_read_ports("") + get_mem_write_ports("")
+    ports = get_mem_read_ports("")
     return remove_duplicates(ports)
 
 

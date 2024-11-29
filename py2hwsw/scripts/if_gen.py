@@ -13,10 +13,10 @@ from typing import Dict
 from iob_signal import iob_signal, iob_signal_reference
 
 mem_if_names = [
-    "rom_2p",
-    "rom_atdp",
-    "rom_sp",
-    "rom_tdp",
+    "rom_2p", # x
+    "rom_atdp", # x
+    "rom_sp", # x
+    "rom_tdp", # x
     "ram_2p",
     "ram_at2p",
     "ram_atdp",
@@ -221,32 +221,39 @@ def get_clk_en_rst_ports():
         clk_rst_ports[1],
     ]
 
-
-def get_mem_ports(suffix):
+def get_mem_ports(suffix: str, async_clk: bool = False, ready: bool = False):
+    suffix = f"_{suffix}" if suffix else ""
+    clk_suffix = suffix if async_clk else ""
+    ready_signal = [
+        iob_signal(
+            name="ready" + suffix + "_i",
+            width=1,
+            descr="Ready signal",
+        ),
+    ] if ready else []
     return [
         iob_signal(
-            name="clk" + "_" + suffix + "_o",
+            name="clk" + clk_suffix + "_o",
             width=1,
-            descr=f"Clock port {suffix}",
+            descr=f"Clock port {clk_suffix}",
         ),
         iob_signal(
-            name="en" + "_" + suffix + "_o",
+            name="en" + suffix + "_o",
             width=1,
             descr=f"Enable port {suffix}",
         ),
         iob_signal(
-            name="addr" + "_" + suffix + "_o",
+            name="addr" + suffix + "_o",
             width=ADDR_W,
             descr="Address port {suffix}",
         ),
-    ]
+    ] + ready_signal
 
-
-def get_mem_read_ports(suffix):
-    mem_ports = get_mem_ports(suffix)
-    mem_read_ports = mem_ports + [
+def get_mem_read_ports(suffix: str):
+    suffix = f"_{suffix}" if suffix else ""
+    mem_read_ports = [
         iob_signal(
-            name="rdata" + "_" + suffix + "_i",
+            name="rdata" + suffix + "_i",
             width=DATA_W,
             descr="Data port {suffix}",
         ),
@@ -254,16 +261,16 @@ def get_mem_read_ports(suffix):
     return mem_read_ports
 
 
-def get_mem_write_ports(suffix):
-    mem_ports = get_mem_ports(suffix)
-    mem_write_ports = mem_ports + [
+def get_mem_write_ports(suffix: str):
+    suffix = f"_{suffix}" if suffix else ""
+    mem_write_ports = [
         iob_signal(
-            name="wdata" + "_" + suffix + "_o",
+            name="wdata" + suffix + "_o",
             width=DATA_W,
             descr="Data port {suffix}",
         ),
         iob_signal(
-            name="wstrb" + "_" + suffix + "_o",
+            name="wstrb" + suffix + "_o",
             width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
             descr="Write strobe port {suffix}",
         ),
@@ -280,16 +287,24 @@ def remove_duplicates(ports):
             result.append(d)
     return result
 
+@parse_widths
+def get_rom_2p_ports():
+    ports = get_mem_ports("a",ready=True) + get_mem_ports("b",ready=True) + get_mem_read_ports("")
+    return remove_duplicates(ports)
 
 @parse_widths
 def get_rom_sp_ports():
-    ports = get_mem_read_ports("")
+    ports = get_mem_ports("") + get_mem_read_ports("")
     return remove_duplicates(ports)
-
 
 @parse_widths
 def get_rom_tdp_ports():
-    ports = get_mem_read_ports("a") + get_mem_read_ports("b")
+    ports = get_mem_ports("a") + get_mem_ports("b") + get_mem_read_ports("a") + get_mem_read_ports("b")
+    return remove_duplicates(ports)
+
+@parse_widths
+def get_rom_atdp_ports():
+    ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a") + get_mem_read_ports("b")
     return remove_duplicates(ports)
 
 

@@ -3,7 +3,53 @@
 % SPDX-License-Identifier: MIT
 
 \documentclass{ug}
+
+%
+% Packages and configuration
+%
+
 \usepackage{xltabular}
+
+
+\usepackage{hyperref}
+% Set up hyperlink colors
+\hypersetup{
+    colorlinks=true, % false: boxed links; true: colored links
+    linkcolor=blue, % color of internal links
+    citecolor=blue, % color of citations
+    urlcolor=blue   % color of external links
+}
+
+
+\usepackage{listings}
+\usepackage{xcolor}
+% Define colors
+\definecolor{keywordcolor}{RGB}{0, 0, 255} % Blue for keywords
+\definecolor{commentcolor}{RGB}{0, 128, 0} % Green for comments
+\definecolor{stringcolor}{RGB}{255, 0, 0} % Red for strings
+\definecolor{backgroundcolor}{RGB}{245, 245, 245} % Light gray background
+
+% Set up listings
+\lstdefinestyle{Python}{
+    backgroundcolor=\color{backgroundcolor},
+    basicstyle=\ttfamily,
+    keywordstyle=\color{keywordcolor},
+    commentstyle=\color{commentcolor},
+    stringstyle=\color{stringcolor},
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    tabsize=4,
+    breaklines=true
+}
+% Set the default style for all lstlisting environments
+\lstset{style=Python}
+
+%
+% Document content
+%
 
 \input{ug_title}
 \date{\today}
@@ -40,7 +86,7 @@ User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
 \section{Introduction}
 \label{sec:intro}
 \input{intro}
-\input{symb}
+%\input{symb}
 
 \subsection{What Is Py2HWSW?}
 \label{sec:whatispy2}
@@ -91,7 +137,7 @@ User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
 % \clearpage
 % \fi
 % \section{How It Works}
-% \label{sec:description}
+% \label{sec:how_it_works}
 % 
 % This section gives a detailed description of the Py2HWSW framework.
 % TODO

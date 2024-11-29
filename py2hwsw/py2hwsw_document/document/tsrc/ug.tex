@@ -47,6 +47,9 @@
 % Set the default style for all lstlisting environments
 \lstset{style=Python}
 
+% Support unicode chars for drawing directory trees (├ ─ └)
+\usepackage{pmboxdraw}
+
 %
 % Document content
 %
@@ -117,15 +120,15 @@ User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
 \section{Getting Started}
 \label{sec:gs}
 
-\subsection{Setup directory}
+\subsection{Setup Directory}
 \label{sec:setup_dir}
 \input{setup_dir}
 
-\subsection{Create an AND gate core: iob\_and}
+\subsection{Create An AND Gate Core: iob\_and}
 \label{sec:iob_and}
 \input{iob_and}
 
-\subsection{Setup and build}
+\subsection{Setup And Build}
 \label{sec:setup_build}
 \input{setup_build}
 

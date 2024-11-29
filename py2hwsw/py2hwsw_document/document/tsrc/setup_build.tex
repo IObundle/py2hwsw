@@ -8,14 +8,14 @@ To checkout the source and setup the core:
 $ git clone --recursive git@github.com:IObundle/iob-soc.git
 $ cd iob-soc
 $ nix-shell  # Optional step to install environment with necessary dependencies
-$ py2hwsw iob_soc setup
+$ py2hwsw iob_soc setup --no_verilog_lint --py_params 'init_mem=1:use_extmem=0'
 \end{verbatim}
 
 To do a clean setup:
 
 \begin{verbatim}
 $ py2hwsw iob_soc clean
-$ py2hwsw iob_soc setup
+$ py2hwsw iob_soc setup --no_verilog_lint --py_params 'init_mem=1:use_extmem=0'
 \end{verbatim}
 
 The setup process will generate a build directory containing the core's verilog sources and build files.

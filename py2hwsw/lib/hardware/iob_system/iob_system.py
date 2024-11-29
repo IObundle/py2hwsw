@@ -66,6 +66,14 @@ def setup(py_params_dict):
                 "min": "0",
                 "max": "1",
             },
+            {  # Needed for testbench
+                "name": "USE_ETHERNET",
+                "descr": "Enable ethernet connections",
+                "type": "M",
+                "val": params["use_ethernet"],
+                "min": "0",
+                "max": "1",
+            },
             {  # Needed for software
                 "name": "MEM_ADDR_W",
                 "descr": "Memory bus address width",

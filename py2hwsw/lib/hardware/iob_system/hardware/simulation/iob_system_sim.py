@@ -82,6 +82,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob",
                     "prefix": "ethernet_",
+                    "ADDR_W": 12,
                 },
             },
         ]
@@ -201,6 +202,8 @@ def setup(py_params_dict):
             "iob_system_params": params,
         },
     ]
+    if params["use_ethernet"]:
+        attributes_dict["blocks"][-1]["connect"].update({"phy_io": "phy"})
     if params["use_extmem"]:
         attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
     attributes_dict["blocks"] += [
@@ -234,7 +237,12 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "cbus_s": "ethernet_s",
+                    "cbus_s": (
+                    "ethernet_s",
+                    [
+                        "ethernet_iob_addr_i[12-1:2]",
+                    ],
+                ),
                     "axi_m": "eth_axi",
                     "inta_o": "eth_int",
                     "phy_io": "eth_phy_invert",

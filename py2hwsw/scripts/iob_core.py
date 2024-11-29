@@ -26,6 +26,7 @@ import doc_gen
 import verilog_gen
 import ipxact_gen
 
+from if_gen import mem_if_names
 from iob_module import iob_module
 from iob_instance import iob_instance
 from iob_base import (
@@ -464,7 +465,7 @@ class iob_core(iob_module, iob_instance):
         # find unconnected ports
         for port in self.ports:
             if not port.e_connect and port.interface:
-                if port.interface.type in ["rom_sp", "rom_tdp", "ram_sp", "ram_tdp", "ram_2p"] and instantiator:
+                if port.interface.type in mem_if_names and instantiator:
                     self.connect_memory(port, instantiator)
 
     def __create_build_dir(self):

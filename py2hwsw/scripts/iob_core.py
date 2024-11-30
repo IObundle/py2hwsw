@@ -54,6 +54,8 @@ class iob_core(iob_module, iob_instance):
     global_project_vlint: bool = True
     # Project wide special target. Used when we don't want to run normal setup (for example, when cleaning).
     global_special_target: str = ""
+    # Clang format rules
+    global_clang_format_rules_filepath: str = None
 
     def __init__(self, *args, **kwargs):
         """Build a core (includes module and instance attributes)
@@ -306,6 +308,8 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
         filtered_parent_py_params.pop("instantiator", None)
+        filtered_parent_py_params.pop("connect", None)
+        filtered_parent_py_params.pop("parameters", None)
         if "name" not in filtered_parent_py_params:
             filtered_parent_py_params["name"] = name
 
@@ -319,6 +323,9 @@ class iob_core(iob_module, iob_instance):
             is_parent=True,
             child_attributes=attributes,
             instantiator=kwargs.get("instantiator", None),
+            connect=kwargs.get("connect", {}),
+            parameters=kwargs.get("parameters", {}),
+            setup=kwargs.get("setup", True),
         )
 
         # Copy parent attributes to child
@@ -528,8 +535,14 @@ class iob_core(iob_module, iob_instance):
         sw_tools.run_tool("black", self.build_dir)
 
         # Run C formatter
-        sw_tools.run_tool("clang")
-        sw_tools.run_tool("clang", self.build_dir)
+        sw_tools.run_tool(
+            "clang", rules_file_path=__class__.global_clang_format_rules_filepath
+        )
+        sw_tools.run_tool(
+            "clang",
+            self.build_dir,
+            rules_file_path=__class__.global_clang_format_rules_filepath,
+        )
 
     @classmethod
     def py2hw(cls, core_dict, **kwargs):
@@ -581,25 +594,25 @@ class iob_core(iob_module, iob_instance):
         )
 
     @staticmethod
-    def print_build_dir(core_name):
+    def print_build_dir(core_name, **kwargs):
         """Print build directory."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_build_dir"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name)
+        module = __class__.get_core_obj(core_name, **kwargs)
         print(module.build_dir)
 
     @staticmethod
-    def print_core_dict(core_name):
+    def print_core_dict(core_name, **kwargs):
         """Print core attributes dictionary."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_core_dict"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name)
+        module = __class__.get_core_obj(core_name, **kwargs)
         print(json.dumps(module.attributes_dict, indent=4))
 
     @staticmethod
-    def print_py2hwsw_attributes(core_name):
+    def print_py2hwsw_attributes(core_name, **kwargs):
         """Print the supported py2hw attributes of this core.
         The attributes listed can be used in the 'attributes' dictionary of the
         constructor. This defines the information supported by the py2hw interface.
@@ -607,7 +620,7 @@ class iob_core(iob_module, iob_instance):
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_attributes"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name)
+        module = __class__.get_core_obj(core_name, **kwargs)
         print(
             f"Attributes supported by the '{module.name}' core's 'py2hwsw' interface:"
         )

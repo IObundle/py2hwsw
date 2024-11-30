@@ -85,6 +85,12 @@ def config_build_mk(python_module):
     file2create.write("CSR_IF ?=iob\n")
     file2create.write(f"BUILD_DIR_NAME={python_module.build_dir.split('/')[-1]}\n")
     file2create.write(f"IS_FPGA={int(python_module.is_system)}\n")
+    file2create.write("""
+CONFIG_BUILD_DIR = $(dir $(lastword $(MAKEFILE_LIST)))
+ifneq ($(wildcard $(CONFIG_BUILD_DIR)/custom_config_build.mk),)
+include $(CONFIG_BUILD_DIR)/custom_config_build.mk
+endif
+""")
 
     file2create.close()
 

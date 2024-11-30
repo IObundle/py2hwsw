@@ -82,6 +82,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob",
                     "prefix": "ethernet_",
+                    "ADDR_W": 12,
                 },
             },
         ]
@@ -134,21 +135,41 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "eth_mii_invert",
-                "descr": "Invert order of signals in ethernet MII bus",
+                "name": "phy",
+                "descr": "PHY Interface Ports",
                 "signals": [
                     {"name": "eth_MTxClk", "width": "1"},
+                    {"name": "MTxEn", "width": "1"},
+                    {"name": "MTxD", "width": "4"},
+                    {"name": "MTxErr", "width": "1"},
+                    {"name": "eth_MRxClk", "width": "1"},
+                    {"name": "MRxDv", "width": "1"},
+                    {"name": "MRxD", "width": "4"},
+                    {"name": "MRxErr", "width": "1"},
+                    {"name": "eth_MColl", "width": "1"},
+                    {"name": "eth_MCrS", "width": "1"},
+                    {"name": "MDC", "width": "1"},
+                    {"name": "MDIO", "width": "1"},
+                    {"name": "phy_rstn", "width": "1"},
+                ],
+            },
+            {
+                "name": "eth_phy_invert",
+                "descr": "Invert order of signals in ethernet MII bus",
+                "signals": [
+                    {"name": "eth_MTxClk"},
                     {"name": "MRxDv"},
                     {"name": "MRxD"},
                     {"name": "MRxErr"},
-                    {"name": "eth_MRxClk", "width": "1"},
+                    {"name": "eth_MRxClk"},
                     {"name": "MTxEn"},
                     {"name": "MTxD"},
                     {"name": "MTxErr"},
-                    {"name": "eth_MColl", "width": "1"},
-                    {"name": "eth_MCrS", "width": "1"},
+                    {"name": "eth_MColl"},
+                    {"name": "eth_MCrS"},
                     {"name": "eth_MDC", "width": "1"},
                     {"name": "eth_MDIO", "width": "1"},
+                    {"name": "eth_phy", "width": "1"},
                 ],
             },
             {
@@ -181,12 +202,13 @@ def setup(py_params_dict):
             "iob_system_params": params,
         },
     ]
+    if params["use_ethernet"]:
+        attributes_dict["blocks"][-1]["connect"].update({"phy_io": "phy"})
     if params["use_extmem"]:
         attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
     attributes_dict["blocks"] += [
         {
             "core_name": "iob_uart",
-            "name": "iob_uart_iob",
             "instance_name": "uart_tb",
             "instance_description": "Testbench uart core",
             "csr_if": "iob",
@@ -215,10 +237,15 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_s": "ethernet",
-                    "axi_s": "eth_axi",
-                    "mii_io": "eth_mii_invert",
-                    "interrupt_o": "eth_int",
+                    "cbus_s": (
+                    "ethernet_s",
+                    [
+                        "ethernet_iob_addr_i[12-1:2]",
+                    ],
+                ),
+                    "axi_m": "eth_axi",
+                    "inta_o": "eth_int",
+                    "phy_io": "eth_phy_invert",
                 },
             },
         ]
@@ -240,17 +267,17 @@ def setup(py_params_dict):
     end
 
     // Set ethernet AXI inputs to low
-    assign eth_axi_awready_i = 1'b0;
-    assign eth_axi_wready_i  = 1'b0;
-    assign eth_axi_bid_i     = {AXI_ID_W{1'b0}};
-    assign eth_axi_bresp_i   = 2'b0;
-    assign eth_axi_bvalid_i  = 1'b0;
-    assign eth_axi_arready_i = 1'b0;
-    assign eth_axi_rid_i     = {AXI_ID_W{1'b0}};
-    assign eth_axi_rdata_i   = {AXI_DATA_W{1'b0}};
-    assign eth_axi_rresp_i   = 2'b0;
-    assign eth_axi_rlast_i   = 1'b0;
-    assign eth_axi_rvalid_i  = 1'b0;
+    assign eth_axi_awready = 1'b0;
+    assign eth_axi_wready  = 1'b0;
+    assign eth_axi_bid     = {AXI_ID_W{1'b0}};
+    assign eth_axi_bresp   = 2'b0;
+    assign eth_axi_bvalid  = 1'b0;
+    assign eth_axi_arready = 1'b0;
+    assign eth_axi_rid     = {AXI_ID_W{1'b0}};
+    assign eth_axi_rdata   = {AXI_DATA_W{1'b0}};
+    assign eth_axi_rresp   = 2'b0;
+    assign eth_axi_rlast   = 1'b0;
+    assign eth_axi_rvalid  = 1'b0;
 
     // Connect ethernet MII signals
     assign eth_MTxClk       = eth_clk;

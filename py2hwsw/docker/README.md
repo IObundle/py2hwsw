@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2024 IObundle
+
+SPDX-License-Identifier: MIT
+-->
+
 # Py2HWSW Docker Images
 Build a clean environment to test the Py2HWSW project.
 

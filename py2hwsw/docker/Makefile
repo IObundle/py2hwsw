@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 DOCKERFILE = Dockerfile
 DOCKER_IMAGE = iob-py2
 CONTAINER = iob-py2-container

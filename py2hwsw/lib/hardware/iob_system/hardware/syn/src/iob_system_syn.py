@@ -12,7 +12,13 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": params["name"] + "_syn",
-        "confs": bsp,
+        "confs": [
+            {
+                "name": "bsp",
+                "descr": "Board Support Package confs",
+                "confs": bsp,
+            },
+        ],
     }
 
     return attributes_dict

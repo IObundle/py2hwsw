@@ -2,26 +2,26 @@
 %
 % SPDX-License-Identifier: MIT
 
-To checkout the source and setup the core:
+To checkout the source and setup the example \href{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/basic_tests/iob_and}{iob\_and} core:
 
-\begin{verbatim}
-$ git clone --recursive git@github.com:IObundle/iob-soc.git
-$ cd iob-soc
-$ nix-shell  # Optional step to install environment with necessary dependencies
-$ py2hwsw iob_soc setup
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+$ git clone --recursive git@github.com:IObundle/py2hwsw.git
+$ cd py2hwsw/
+$ nix-shell py2hwsw/lib/ # Optional step to install environment with necessary dependencies
+$ py2hwsw iob_and setup --no_verilog_lint
+\end{lstlisting}
 
 To do a clean setup:
 
-\begin{verbatim}
-$ py2hwsw iob_soc clean
-$ py2hwsw iob_soc setup
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+$ py2hwsw iob_and clean
+$ py2hwsw iob_and setup --no_verilog_lint
+\end{lstlisting}
 
 The setup process will generate a build directory containing the core's verilog sources and build files.
 By default, the build directory is `../[core\_name]\_V[core\_version]`.
 
 To build and run the core in simulation:
-\begin{verbatim}
-$ make -C ../iob_soc_V0.7 sim-run
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+$ make -C ../iob_and_V* sim-run
+\end{lstlisting}

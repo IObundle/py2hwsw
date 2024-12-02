@@ -66,6 +66,14 @@ def setup(py_params_dict):
                 "min": "0",
                 "max": "1",
             },
+            {  # Needed for testbench
+                "name": "USE_ETHERNET",
+                "descr": "Enable ethernet connections",
+                "type": "M",
+                "val": params["use_ethernet"],
+                "min": "0",
+                "max": "1",
+            },
             {  # Needed for software
                 "name": "MEM_ADDR_W",
                 "descr": "Memory bus address width",
@@ -348,7 +356,7 @@ def setup(py_params_dict):
         },
         {
             "core_name": "iob_axi_interconnect_wrapper",
-            "name": "iob_soc_axi_interconnect_wrapper",
+            "name": params["name"]+"_axi_interconnect_wrapper",
             "instance_name": "iob_axi_interconnect",
             "instance_description": "Interconnect instance",
             "parameters": {
@@ -412,11 +420,11 @@ def setup(py_params_dict):
                 "cbus_s": (
                     "bootrom_cbus",
                     [
-                        "bootrom_axi_araddr[13-2-1:0]",
+                        f"bootrom_axi_araddr[{params['bootrom_addr_w']+1}-2-1:0]",
                         "bootrom_axi_arid[0]",
                         "bootrom_axi_rid[0]",
                         "{1'b0, bootrom_axi_arlock}",
-                        "bootrom_axi_awaddr[13-2-1:0]",
+                        f"bootrom_axi_awaddr[{params['bootrom_addr_w']+1}-2-1:0]",
                         "bootrom_axi_awid[0]",
                         "bootrom_axi_bid[0]",
                         "{1'b0, bootrom_axi_awlock}",
@@ -450,7 +458,7 @@ def setup(py_params_dict):
         },
         {
             "core_name": "iob_split",
-            "name": "iob_pbus_split",
+            "name": params["name"]+"_pbus_split",
             "instance_name": "iob_pbus_split",
             "instance_description": "Split between peripherals",
             "connect": {

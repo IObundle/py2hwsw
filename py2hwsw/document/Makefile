@@ -22,6 +22,8 @@ TSRC = $(patsubst tsrc/%, ./%, $(wildcard tsrc/*))
 	cp $< $@
 %.cls: tsrc/%.cls
 	cp $< $@
+%.py: tsrc/%.py
+	cp $< $@
 
 TSRC+=signature.tex
 signature.tex:

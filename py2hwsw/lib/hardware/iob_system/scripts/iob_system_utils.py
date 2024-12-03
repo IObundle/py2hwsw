@@ -291,12 +291,14 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
             file.write(
                 'CONSOLE_CMD ?=rm -f soc2cnsl cnsl2soc; $(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -L -c $(PYTHON_DIR)/console.py -m "$(RMAC_ADDR)" -i "$(ETH_IF)"\n',
             )
-            file.write("""
+            file.write(
+                """
 UTARGETS+=iob_eth_rmac.h
 EMUL_HDR+=iob_eth_rmac.h
 iob_eth_rmac.h:
 	echo "#define ETH_RMAC_ADDR 0x$(RMAC_ADDR)" > $@\n
-""",)
+""",
+            )
 
     #
     # Create auto_fpga_build.mk

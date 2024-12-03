@@ -356,7 +356,7 @@ def setup(py_params_dict):
         },
         {
             "core_name": "iob_axi_interconnect_wrapper",
-            "name": params["name"]+"_axi_interconnect_wrapper",
+            "name": params["name"] + "_axi_interconnect_wrapper",
             "instance_name": "iob_axi_interconnect",
             "instance_description": "Interconnect instance",
             "parameters": {
@@ -458,7 +458,7 @@ def setup(py_params_dict):
         },
         {
             "core_name": "iob_split",
-            "name": params["name"]+"_pbus_split",
+            "name": params["name"] + "_pbus_split",
             "instance_name": "iob_pbus_split",
             "instance_description": "Split between peripherals",
             "connect": {

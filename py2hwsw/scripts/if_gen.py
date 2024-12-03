@@ -19,17 +19,17 @@ mem_if_names = [
     "rom_tdp", # x
     "ram_2p",
     "ram_at2p",
-    "ram_atdp",
-    "ram_atdp_be",
+    "ram_atdp", # x
+    "ram_atdp_be", # x
     "ram_sp", # x
-    "ram_sp_be",
-    "ram_sp_se",
+    "ram_sp_be", # x
+    "ram_sp_se", # x
     "ram_t2p",
     "ram_t2p_be",
     "ram_t2p_tiled",
-    "ram_tdp",
-    "ram_tdp_be",
-    "ram_tdp_be_xil",
+    "ram_tdp", # x
+    "ram_tdp_be", # x
+    "ram_tdp_be_xil", # x
     "regfile_2p",
     "regfile_at2p",
     "regfile_sp",
@@ -317,11 +317,12 @@ def get_ram_at2p_ports():
 
 @parse_widths
 def get_ram_atdp_ports():
-    raise NotImplementedError("RAM ATDP not implemented")
+    ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a") + get_mem_read_ports("b") + get_mem_write_ports("a") + get_mem_write_ports("b")
+    return remove_duplicates(ports)
 
 @parse_widths
 def get_ram_atdp_be_ports():
-    raise NotImplementedError("RAM ATDP BE not implemented")
+    return get_ram_atdp_ports()
 
 @parse_widths
 def get_ram_sp_ports():
@@ -330,11 +331,11 @@ def get_ram_sp_ports():
 
 @parse_widths
 def get_ram_sp_be_ports():
-    raise NotImplementedError("RAM SP BE not implemented")
+    return get_ram_sp_ports()
 
 @parse_widths
 def get_ram_sp_se_ports():
-    raise NotImplementedError("RAM SP SE not implemented")
+    return get_ram_sp_ports()
 
 @parse_widths
 def get_ram_t2p_ports():
@@ -350,22 +351,16 @@ def get_ram_t2p_tiled_ports():
 
 @parse_widths
 def get_ram_tdp_ports():
-    raise NotImplementedError("RAM TDP not implemented")
-    ports = (
-        get_mem_read_ports("a")
-        + get_mem_read_ports("b")
-        + get_mem_write_ports("a")
-        + get_mem_write_ports("b")
-    )
+    ports = get_mem_ports("a") + get_mem_ports("b") + get_mem_read_ports("a") + get_mem_read_ports("b") + get_mem_write_ports("a") + get_mem_write_ports("b")
     return remove_duplicates(ports)
 
 @parse_widths
 def get_ram_tdp_be_ports():
-    raise NotImplementedError("RAM TDP BE not implemented")
+    return get_ram_tdp_ports()
 
 @parse_widths
 def get_ram_tdp_be_xil_ports():
-    raise NotImplementedError("RAM TDP BE XIL not implemented")
+    return get_ram_tdp_ports()
 
 @parse_widths
 def get_regfile_2p_ports():

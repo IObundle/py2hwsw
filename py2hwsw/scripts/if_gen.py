@@ -21,7 +21,7 @@ mem_if_names = [
     "ram_at2p",
     "ram_atdp",
     "ram_atdp_be",
-    "ram_sp",
+    "ram_sp", # x
     "ram_sp_be",
     "ram_sp_se",
     "ram_t2p",
@@ -307,15 +307,50 @@ def get_rom_atdp_ports():
     ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a") + get_mem_read_ports("b")
     return remove_duplicates(ports)
 
+@parse_widths
+def get_ram_2p_ports():
+    raise NotImplementedError("RAM 2p not implemented")
+
+@parse_widths
+def get_ram_at2p_ports():
+    raise NotImplementedError("RAM AT2P not implemented")
+
+@parse_widths
+def get_ram_atdp_ports():
+    raise NotImplementedError("RAM ATDP not implemented")
+
+@parse_widths
+def get_ram_atdp_be_ports():
+    raise NotImplementedError("RAM ATDP BE not implemented")
 
 @parse_widths
 def get_ram_sp_ports():
-    ports = get_mem_read_ports("") + get_mem_write_ports("")
+    ports = get_mem_ports("") + get_mem_read_ports("") + get_mem_write_ports("")
     return remove_duplicates(ports)
 
+@parse_widths
+def get_ram_sp_be_ports():
+    raise NotImplementedError("RAM SP BE not implemented")
+
+@parse_widths
+def get_ram_sp_se_ports():
+    raise NotImplementedError("RAM SP SE not implemented")
+
+@parse_widths
+def get_ram_t2p_ports():
+    raise NotImplementedError("RAM T2P not implemented")
+
+@parse_widths
+def get_ram_t2p_be_ports():
+    raise NotImplementedError("RAM T2P BE not implemented")
+
+@parse_widths
+def get_ram_t2p_tiled_ports():
+    raise NotImplementedError("RAM T2P TILED not implemented")
 
 @parse_widths
 def get_ram_tdp_ports():
+    raise NotImplementedError("RAM TDP not implemented")
     ports = (
         get_mem_read_ports("a")
         + get_mem_read_ports("b")
@@ -324,12 +359,25 @@ def get_ram_tdp_ports():
     )
     return remove_duplicates(ports)
 
+@parse_widths
+def get_ram_tdp_be_ports():
+    raise NotImplementedError("RAM TDP BE not implemented")
 
 @parse_widths
-def get_ram_2p_ports():
-    ports = get_mem_read_ports("b") + get_mem_write_ports("a")
-    return remove_duplicates(ports)
+def get_ram_tdp_be_xil_ports():
+    raise NotImplementedError("RAM TDP BE XIL not implemented")
 
+@parse_widths
+def get_regfile_2p_ports():
+    raise NotImplementedError("REGFILE 2P not implemented")
+
+@parse_widths
+def get_regfile_at2p_ports():
+    raise NotImplementedError("REGFILE AT2P not implemented")
+
+@parse_widths
+def get_regfile_sp_ports():
+    raise NotImplementedError("REGFILE SP not implemented")
 
 #
 # AXI4

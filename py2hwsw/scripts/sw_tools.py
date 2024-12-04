@@ -64,7 +64,7 @@ def build_find_cmd(path, file_extentions):
     return find_cmd
 
 
-def run_tool(tool, path="."):
+def run_tool(tool, path=".", rules_file_path=None):
     match tool:
         case "black":
             cmd = "black"
@@ -72,7 +72,11 @@ def run_tool(tool, path="."):
             file_extentions = "*.py"
         case "clang":
             cmd = "clang-format"
-            flags = f"-i -style=file:{os.path.join(os.path.dirname(__file__), 'clang-format.rules')} -fallback-style=none -Werror"
+            if not rules_file_path:
+                rules_file_path = os.path.join(
+                    os.path.dirname(__file__), "clang-format.rules"
+                )
+            flags = f"-i -style=file:{rules_file_path} -fallback-style=none -Werror"
             file_extentions = "*.c *.h *.cpp *.hpp"
         case "mypy":
             cmd = "mypy"

@@ -74,6 +74,12 @@ if __name__ == "__main__":
         help="Disable verilog linter",
     )
     parser.add_argument(
+        "--clang_rules",
+        dest="clang_rules",
+        type=str,
+        help="Path to custom clang-format rules file.",
+    )
+    parser.add_argument(
         "--debug_level",
         dest="debug_level",
         type=int,
@@ -101,6 +107,7 @@ if __name__ == "__main__":
     iob_core.global_project_root = args.project_root
     iob_core.global_project_vformat = args.verilog_format
     iob_core.global_project_vlint = args.verilog_lint
+    iob_core.global_clang_format_rules_filepath = args.clang_rules
     iob_base.debug_level = args.debug_level
 
     if args.py2hwsw_docs:
@@ -122,10 +129,10 @@ if __name__ == "__main__":
     elif args.target == "clean":
         iob_core.clean_build_dir(args.core_name)
     elif args.target == "print_build_dir":
-        iob_core.print_build_dir(args.core_name)
+        iob_core.print_build_dir(args.core_name, **py_params)
     elif args.target == "print_core_dict":
-        iob_core.print_core_dict(args.core_name)
+        iob_core.print_core_dict(args.core_name, **py_params)
     elif args.target == "print_py2hwsw_attributes":
-        iob_core.print_py2hwsw_attributes(args.core_name)
+        iob_core.print_py2hwsw_attributes(args.core_name, **py_params)
     else:
         fail_with_msg(f"Unknown target: {args.target}")

@@ -147,13 +147,13 @@ module iob_system_tb;
       .arst_i(arst),
 
 `ifdef IOB_SYSTEM_USE_ETHERNET
-      .ethernet_iob_valid_i (ethernet_valid),
-      .ethernet_iob_addr_i  (ethernet_addr),
-      .ethernet_iob_wdata_i (ethernet_wdata),
-      .ethernet_iob_wstrb_i (ethernet_wstrb),
-      .ethernet_iob_rdata_o (ethernet_rdata),
-      .ethernet_iob_ready_o (ethernet_ready),
-      .ethernet_iob_rvalid_o(ethernet_rvalid),
+      .ethernet_iob_valid_i (ethernet_iob_valid),
+      .ethernet_iob_addr_i  (ethernet_iob_addr),
+      .ethernet_iob_wdata_i (ethernet_iob_wdata),
+      .ethernet_iob_wstrb_i (ethernet_iob_wstrb),
+      .ethernet_iob_rdata_o (ethernet_iob_rdata),
+      .ethernet_iob_ready_o (ethernet_iob_ready),
+      .ethernet_iob_rvalid_o(ethernet_iob_rvalid),
 `endif
 
       .uart_iob_valid_i (iob_valid_i),

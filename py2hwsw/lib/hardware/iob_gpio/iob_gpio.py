@@ -172,7 +172,7 @@ def setup(py_params_dict):
         if TRISTATE:
             reg_connections[f"output_enable_{idx}"] = f"output_enable_{idx}"
 
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_csrs",
             "instance_name": "csrs_inst",

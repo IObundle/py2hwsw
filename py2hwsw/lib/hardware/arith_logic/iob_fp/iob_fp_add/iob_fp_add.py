@@ -108,7 +108,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_fp_special",
                 "instance_name": "iob_fp_special_inst",

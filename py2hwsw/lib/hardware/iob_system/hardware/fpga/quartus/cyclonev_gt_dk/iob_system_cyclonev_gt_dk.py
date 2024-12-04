@@ -240,7 +240,7 @@ def setup(py_params_dict):
     #
     # Blocks
     #
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_system_mwrap",
             "instance_name": "iob_system_mwrap",
@@ -260,8 +260,8 @@ def setup(py_params_dict):
         },
     ]
     if params["use_extmem"]:
-        attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
-    attributes_dict["blocks"] += [
+        attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
+    attributes_dict["subblocks"] += [
         {
             "core_name": "iob_reset_sync",
             "instance_name": "rst_sync",
@@ -274,7 +274,7 @@ def setup(py_params_dict):
     ]
     if params["use_extmem"]:
         # DDR3 controller
-        attributes_dict["blocks"] += [
+        attributes_dict["subblocks"] += [
             {
                 "core_name": "iob_altera_alt_ddr3",
                 "instance_name": "ddr3_ctrl",
@@ -301,7 +301,7 @@ def setup(py_params_dict):
         ]
     if params["use_ethernet"]:
         # Eth clock
-        attributes_dict["blocks"] += [
+        attributes_dict["subblocks"] += [
             {
                 "core_name": "iob_altera_clk_buf_altclkctrl",
                 "instance_name": "rxclk_buf",

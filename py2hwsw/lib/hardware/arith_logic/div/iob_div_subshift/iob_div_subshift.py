@@ -139,7 +139,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

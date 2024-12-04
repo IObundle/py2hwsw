@@ -122,7 +122,7 @@ def setup(py_params_dict):
     #
     # Blocks
     #
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             # IOb-SoC Memory Wrapper
             "core_name": "iob_system_mwrap",
@@ -184,7 +184,7 @@ def setup(py_params_dict):
     ]
 
     if params["init_mem"]:
-        attributes_dict["blocks"][-1]["parameters"].update(
+        attributes_dict["subblocks"][-1]["parameters"].update(
             {
                 "FILE": f'"{params["name"]}_firmware"',
             }

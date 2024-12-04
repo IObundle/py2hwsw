@@ -58,15 +58,15 @@ The `iob_soc_sut_setup.py` script uses the following tuple to pass the module pa
 ('REGFILEIF',regfileif_options)
 ```
 
-To instantiate the peripheral, add a dictionary describing the peripheral in the `peripherals` list of the `blocks` dictionary in the setup python module of the system.
+To instantiate the peripheral, add a dictionary describing the peripheral in the `peripherals` list of the `subblocks` dictionary in the setup python module of the system.
 
 The `iob_soc_sut_setup.py` script uses the following dictionary to instantiate a REGFILEIF peripheral with the instance name `REGFILEIF0`:
 ```Python
-blocks = \
+subblocks = \
 [
-    # Other blocks here...
+    # Other subblocks here...
 
-    {'name':'peripherals', 'descr':'peripheral modules', 'blocks': [
+    {'name':'peripherals', 'descr':'peripheral modules', 'subblocks': [
         {'name':'REGFILEIF0', 'type':'REGFILEIF', 'descr':'Register file interface', 'params':{}},
 
         # Other peripheral instances here...
@@ -89,7 +89,7 @@ The IOBNATIVEBRIDGEIF, allows the peripheral bus signals of the system to be acc
 
 We use the IOBNATIVEBRIDGEIF as a peripheral of the Tester to allow its peripheral bus signals to be accessed externally, and therefore be port mapped.
 
-To instantiate the IOBNATIVEBRIDGEIF peripheral we add a new dictionary to the `peripherals` list of the `blocks` dictionary, similar to the REGFILEIF instantiation.
+To instantiate the IOBNATIVEBRIDGEIF peripheral we add a new dictionary to the `peripherals` list of the `subblocks` dictionary, similar to the REGFILEIF instantiation.
 
 In the `iob_soc_sut_setup.py` script, the IOBNATIVEBRIDGEIF is a peripheral of the Tester, therefore it is instantiated in the `extra_peripherals` list of the Tester module parameters:
 ```Python

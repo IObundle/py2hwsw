@@ -208,7 +208,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
@@ -337,7 +337,7 @@ def setup(py_params_dict):
                     "fifo_level": "fifo_level",
                 },
             },
-            # TODO: Connect remaining blocks
+            # TODO: Connect remaining subblocks
             {
                 "core_name": "iob_fifo2axis",
                 "instantiate": False,

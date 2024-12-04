@@ -26,7 +26,7 @@ module iob_nco #(
    `include "iob_nco_wires.vs"
 
    // configuration control and status register file.
-   `include "iob_nco_blocks.vs"
+   `include "iob_nco_subblocks.vs"
 
    // Concatenate Integer and fractional Period registers
    wire [(2*DATA_W)-1:0] period_full_wdata;

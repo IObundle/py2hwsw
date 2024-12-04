@@ -183,7 +183,7 @@ def setup(py_params_dict):
     #
     # Blocks
     #
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_system_mwrap",
             "instance_name": "iob_system_mwrap",
@@ -203,10 +203,10 @@ def setup(py_params_dict):
         },
     ]
     if params["use_ethernet"]:
-        attributes_dict["blocks"][-1]["connect"].update({"phy_io": "phy"})
+        attributes_dict["subblocks"][-1]["connect"].update({"phy_io": "phy"})
     if params["use_extmem"]:
-        attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
-    attributes_dict["blocks"] += [
+        attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
+    attributes_dict["subblocks"] += [
         {
             "core_name": "iob_uart",
             "instance_name": "uart_tb",
@@ -225,7 +225,7 @@ def setup(py_params_dict):
         },
     ]
     if params["use_ethernet"]:
-        attributes_dict["blocks"] += [
+        attributes_dict["subblocks"] += [
             {
                 "core_name": "iob_eth",
                 "instance_name": "eth_tb",

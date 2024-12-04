@@ -233,7 +233,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_gray_counter",
                 "instance_name": "iob_gray_counter_inst",

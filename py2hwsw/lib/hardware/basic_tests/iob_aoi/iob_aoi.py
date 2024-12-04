@@ -49,7 +49,7 @@ def setup(py_params_dict):
             -d 'or output'
             """,
         ],
-        "blocks": [
+        "subblocks": [
             """
             iob_and iob_and_ab -p W:W -c
             a_i:a_i

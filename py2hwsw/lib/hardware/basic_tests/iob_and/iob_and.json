@@ -42,7 +42,7 @@
             ]
         }
     ],
-    "blocks": [
+    "subblocks": [
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",

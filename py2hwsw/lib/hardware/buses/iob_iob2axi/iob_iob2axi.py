@@ -7,7 +7,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "version": "0.1",
         "generate_hw": False,
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "m_axi_m_port",
                 "instance_name": "m_axi_m_port_inst",

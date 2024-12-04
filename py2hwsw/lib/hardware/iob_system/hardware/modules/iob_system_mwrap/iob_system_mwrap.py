@@ -62,7 +62,7 @@ def setup(py_params_dict):
             ],
         },
     ]
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         # ROM
         {
             "core_name": "iob_rom_sp",
@@ -106,23 +106,23 @@ def setup(py_params_dict):
         },
     ]
     if params["init_mem"]:
-        attributes_dict["blocks"][-1]["parameters"].update(
+        attributes_dict["subblocks"][-1]["parameters"].update(
             {
                 "FILE": f'"{params["name"]}_firmware"',
             }
         )
 
     # Copy iob_axi_ram block, but with READ_ON_WRITE=1
-    attributes_dict["blocks"].append(copy.deepcopy(attributes_dict["blocks"][-1]))
-    attributes_dict["blocks"][-1].pop("if_defined")
-    attributes_dict["blocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"
-    attributes_dict["blocks"][-1]["parameters"].update(
+    attributes_dict["subblocks"].append(copy.deepcopy(attributes_dict["subblocks"][-1]))
+    attributes_dict["subblocks"][-1].pop("if_defined")
+    attributes_dict["subblocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"
+    attributes_dict["subblocks"][-1]["parameters"].update(
         {
             "READ_ON_WRITE": 1,
         }
     )
 
-    attributes_dict["blocks"].append(
+    attributes_dict["subblocks"].append(
         # IOb-System
         {
             "core_name": "iob_system",

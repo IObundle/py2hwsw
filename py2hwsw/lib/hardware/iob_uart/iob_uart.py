@@ -164,7 +164,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             f"""iob_csrs csrs_inst 
 				-d 'Control/Status Registers' 
                 --no_autoaddr 

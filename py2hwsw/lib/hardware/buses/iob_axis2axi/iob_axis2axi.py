@@ -172,7 +172,7 @@ def setup(py_params_dict):
             #     "signals": [],
             # },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_fifo_sync",
                 "instance_name": "iob_fifo_sync_inst",

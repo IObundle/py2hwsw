@@ -64,15 +64,15 @@ This peripheral has a set of driver functions, declared in the `software/src/iob
 These functions allow the primary system to control this peripheral to receive and send UART messages.
 The `iob_soc_firmware.c` file of the [IOb-SoC](https://github.com/IObundle/iob-soc) provides an example on how to use these functions.
 
-To instantiate the peripheral, add a dictionary describing the peripheral in the `peripherals` list of the `blocks` dictionary in the setup Python module of the system.
+To instantiate the peripheral, add a dictionary describing the peripheral in the `peripherals` list of the `subblocks` dictionary in the setup Python module of the system.
 
 The `iob_soc_setup.py` script of the [IOb-SoC](https://github.com/IObundle/iob-soc) system, uses the following dictionary to instantiate a UART peripheral with the instance name `UART0`:
 ```Python
-blocks = \
+subblocks = \
 [
-    # Other blocks here...
+    # Other subblocks here...
 
-    {'name':'peripherals', 'descr':'peripheral modules', 'blocks': [
+    {'name':'peripherals', 'descr':'peripheral modules', 'subblocks': [
         {'name':'UART0', 'type':'UART', 'descr':'Default UART interface', 'params':{}},
 
         # Other peripheral instances here...

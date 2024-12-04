@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 #
-#    blocks_gen.py: instantiate Verilog modules and generate their documentation
+#    subblocks_gen.py: instantiate Verilog modules and generate their documentation
 #
 
 from latex import write_table
@@ -14,18 +14,18 @@ from iob_signal import get_real_signal
 import param_gen
 
 
-# Generate blocks.tex file with TeX table of blocks (Verilog modules instances)
-def generate_blocks_table_tex(blocks, out_dir):
-    blocks_file = open(f"{out_dir}/blocks.tex", "w")
+# Generate subblocks.tex file with TeX table of subblocks (Verilog modules instances)
+def generate_subblocks_table_tex(subblocks, out_dir):
+    subblocks_file = open(f"{out_dir}/subblocks.tex", "w")
 
-    blocks_file.write(
+    subblocks_file.write(
         "The Verilog modules in the top-level entity of the core are \
         described in the following tables. The table elements represent \
-        the blocks in the Block Diagram.\n"
+        the subblocks in the Block Diagram.\n"
     )
 
-    for group in blocks:
-        blocks_file.write(
+    for group in subblocks:
+        subblocks_file.write(
             """
 \\begin{table}[H]
   \\centering
@@ -37,7 +37,7 @@ def generate_blocks_table_tex(blocks, out_dir):
 
     \\input """
             + group.name
-            + """_blocks_tab
+            + """_subblocks_tab
 
   \\end{tabularx}
   \\caption{"""
@@ -45,26 +45,26 @@ def generate_blocks_table_tex(blocks, out_dir):
             + """}
   \\label{"""
             + group.name
-            + """_blocks_tab:is}
+            + """_subblocks_tab:is}
 \\end{table}
 """
         )
         if group.doc_clearpage:
-            blocks_file.write("\\clearpage")
+            subblocks_file.write("\\clearpage")
 
-    blocks_file.write("\\clearpage")
-    blocks_file.close()
+    subblocks_file.write("\\clearpage")
+    subblocks_file.close()
 
 
-# Generate TeX table of blocks
-def generate_blocks_tex(blocks, out_dir):
-    # Create blocks.tex file
-    generate_blocks_table_tex(blocks, out_dir)
+# Generate TeX table of subblocks
+def generate_subblocks_tex(subblocks, out_dir):
+    # Create subblocks.tex file
+    generate_subblocks_table_tex(subblocks, out_dir)
 
     # Create table for each group
-    for group in blocks:
+    for group in subblocks:
         tex_table = []
-        for block in group.blocks:
+        for block in group.subblocks:
             if not block.instantiate:
                 continue
             tex_table.append(
@@ -75,16 +75,16 @@ def generate_blocks_tex(blocks, out_dir):
                 ]
             )
 
-        write_table(f"{out_dir}/{group.name}_blocks", tex_table)
+        write_table(f"{out_dir}/{group.name}_subblocks", tex_table)
 
 
-def generate_blocks(core):
+def generate_subblocks(core):
     """Generate verilog code with verilog instances of this module.
     returns: Generated verilog code
     """
     code = ""
-    for group in core.blocks:
-        for instance in group.blocks:
+    for group in core.subblocks:
+        for instance in group.subblocks:
             if not instance.instantiate:
                 continue
             # Open ifdef if conditional interface
@@ -113,13 +113,13 @@ def generate_blocks(core):
     return code
 
 
-def generate_blocks_snippet(core):
-    """Write verilog snippet ('.vs' file) with blocks of this core.
+def generate_subblocks_snippet(core):
+    """Write verilog snippet ('.vs' file) with subblocks of this core.
     This snippet may be included manually in verilog modules if needed.
     """
-    code = generate_blocks(core)
+    code = generate_subblocks(core)
     out_dir = core.build_dir + "/hardware/src"
-    with open(f"{out_dir}/{core.name}_blocks.vs", "w+") as f:
+    with open(f"{out_dir}/{core.name}_subblocks.vs", "w+") as f:
         f.write(code)
 
 

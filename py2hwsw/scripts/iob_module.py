@@ -84,7 +84,7 @@ class iob_module(iob_base):
         )
         # List of instances of other cores inside this core
         self.set_default_attribute(
-            "blocks",
+            "subblocks",
             [],
             list,
             get_list_attr_handler(self.create_block_group),

@@ -109,7 +109,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg",
                 "instance_name": "start_detected_inst",

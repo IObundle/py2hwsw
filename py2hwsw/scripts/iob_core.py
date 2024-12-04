@@ -232,7 +232,7 @@ class iob_core(iob_module, iob_instance):
 
         # Generate instances
         if self.generate_hw:
-            block_gen.generate_blocks_snippet(self)
+            block_gen.generate_subblocks_snippet(self)
 
         # Generate comb
         comb_gen.generate_comb_snippet(self)

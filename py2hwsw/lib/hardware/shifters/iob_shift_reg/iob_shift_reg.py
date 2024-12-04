@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             # TODO: Remaining ports
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_inst",

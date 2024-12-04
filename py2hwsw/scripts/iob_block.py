@@ -16,11 +16,11 @@ from iob_base import (
 
 @dataclass
 class iob_block_group:
-    """Class to represent a group of blocks."""
+    """Class to represent a group of subblocks."""
 
     name: str = ""
     descr: str = "Default description"
-    blocks: list = field(default_factory=list)
+    subblocks: list = field(default_factory=list)
     doc_clearpage: bool = False
 
     def __post_init__(self):
@@ -51,7 +51,7 @@ attrs = [
             },
         ]
     },
-    ["-b", "blocks", {"nargs": "+"}],
+    ["-b", "subblocks", {"nargs": "+"}],
 ]
 
 
@@ -63,32 +63,32 @@ def create_block_group(core, *args, **kwargs):
     if core.abort_reason:
         return
     try:
-        # Ensure 'blocks' list exists
-        core.set_default_attribute("blocks", [])
+        # Ensure 'subblocks' list exists
+        core.set_default_attribute("subblocks", [])
 
         general_group_ref = None
         group_kwargs = kwargs
-        blocks = kwargs.pop("blocks", None)
+        subblocks = kwargs.pop("subblocks", None)
         # If kwargs provided a single block instead of a group, then create a general group for it or use existing one.
-        if blocks is None:
-            blocks = [kwargs]
+        if subblocks is None:
+            subblocks = [kwargs]
             group_kwargs = {
                 "name": "general_operation",
                 "descr": "General operation group",
             }
             # Try to use existing "general_operation" group if was previously created
-            general_group_ref = find_obj_in_list(core.blocks, "general_operation")
+            general_group_ref = find_obj_in_list(core.subblocks, "general_operation")
 
         block_obj_list = []
-        if type(blocks) is list:
-            # Convert user blocks dictionaries into 'iob_block' objects
-            for block in blocks:
+        if type(subblocks) is list:
+            # Convert user subblocks dictionaries into 'iob_block' objects
+            for block in subblocks:
                 block_obj = create_block(core, **block)
                 if block_obj:
                     block_obj_list.append(block_obj)
         else:
             fail_with_msg(
-                f"blocks attribute must be a list. Error at block group \"{group_kwargs.get('name', '')}\".\n{blocks}",
+                f"subblocks attribute must be a list. Error at block group \"{group_kwargs.get('name', '')}\".\n{subblocks}",
                 TypeError,
             )
 
@@ -100,10 +100,10 @@ def create_block_group(core, *args, **kwargs):
 
         # Use existing "general_operation" group if possible
         if general_group_ref:
-            general_group_ref.blocks += block_obj_list
+            general_group_ref.subblocks += block_obj_list
         else:
-            block_group = iob_block_group(blocks=block_obj_list, **group_kwargs)
-            core.blocks.append(block_group)
+            block_group = iob_block_group(subblocks=block_obj_list, **group_kwargs)
+            core.subblocks.append(block_group)
     except Exception:
         add_traceback_msg(
             f"Failed to create block/group '{kwargs.get('name',None) or kwargs.get('core_name',None)}'."
@@ -128,7 +128,7 @@ def create_block(core, core_name: str = "", instance_name: str = "", **kwargs):
         return
 
     assert core_name, fail_with_msg("Missing core_name argument", ValueError)
-    # Ensure 'blocks' list exists
+    # Ensure 'subblocks' list exists
 
     # Ensure global top module is set
     core.update_global_top_module()

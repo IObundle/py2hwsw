@@ -154,7 +154,7 @@ def setup(py_params_dict):
     #
     # Blocks
     #
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             # IOb-SoC Memory Wrapper
             "core_name": "iob_system_mwrap",
@@ -175,8 +175,8 @@ def setup(py_params_dict):
         },
     ]
     if params["use_extmem"]:
-        attributes_dict["blocks"][-1]["connect"].update({"axi_m": "axi"})
-        attributes_dict["blocks"] += [
+        attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
+        attributes_dict["subblocks"] += [
             {
                 "core_name": "iob_xilinx_axi_interconnect",
                 "instance_name": "axi_async_bridge",

@@ -57,7 +57,7 @@ module iob_axistream_in #(
    `include "iob_axistream_in_wires.vs"
 
    // configuration control and status register file.
-   `include "iob_axistream_in_blocks.vs"
+   `include "iob_axistream_in_subblocks.vs"
 
    wire tlast_detected_reg;
 

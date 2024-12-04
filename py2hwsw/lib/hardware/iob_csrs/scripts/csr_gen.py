@@ -556,7 +556,7 @@ class csr_gen:
 
         ports = []
         wires = []
-        blocks = []
+        subblocks = []
         snippet = ""
         # macros
         snippet += """
@@ -630,7 +630,7 @@ class csr_gen:
     assign internal_iob_addr_reg_en = (state == WAIT_REQ);
     assign internal_iob_addr_stable = (state == WAIT_RVALID) ? internal_iob_addr_reg : internal_iob_addr;
 """
-        blocks.append(
+        subblocks.append(
             {
                 "core_name": "iob_reg_e",
                 "instance_name": "internal_addr_reg",
@@ -647,7 +647,7 @@ class csr_gen:
                 },
             }
         )
-        blocks.append(
+        subblocks.append(
             {
                 "core_name": "iob_reg",
                 "instance_name": "state_reg",
@@ -677,7 +677,7 @@ class csr_gen:
 """
         elif core_attributes["csr_if"] == "apb":
             # "APB" CSR_IF
-            blocks.append(
+            subblocks.append(
                 {
                     "core_name": "iob_apb2iob",
                     "instance_name": "iob_apb2iob_coverter",
@@ -700,7 +700,7 @@ class csr_gen:
             )
         elif core_attributes["csr_if"] == "axil":
             # "AXI_Lite" CSR_IF
-            blocks.append(
+            subblocks.append(
                 {
                     "core_name": "iob_axil2iob",
                     "instance_name": "iob_axil2iob_coverter",
@@ -724,7 +724,7 @@ class csr_gen:
             )
         elif core_attributes["csr_if"] == "axi":
             # "AXI" CSR_IF
-            blocks.append(
+            subblocks.append(
                 {
                     "core_name": "iob_axi2iob",
                     "instance_name": "iob_axi2iob_coverter",
@@ -852,7 +852,7 @@ class csr_gen:
                 ],
             },
         ]
-        blocks += [
+        subblocks += [
             {
                 "core_name": "iob_reg",
                 "instance_name": "rvalid_reg",
@@ -1026,7 +1026,7 @@ class csr_gen:
 
         core_attributes["ports"] += ports
         core_attributes["wires"] += wires
-        core_attributes["blocks"] += blocks
+        core_attributes["subblocks"] += subblocks
         core_attributes["snippets"] += [{"verilog_code": snippet}]
 
     def write_lparam_header(self, table, out_dir, top):

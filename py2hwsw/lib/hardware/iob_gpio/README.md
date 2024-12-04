@@ -33,15 +33,15 @@ The `output_enable` interface is used to trigger external tri-state buffers for 
 The number of ports is configurable via the `GPIO_W` Verilog parameter. If the `GPIO_W` parameter is less than 32, the most significant bits of the functions above will be ignored, as they will not match an existing port.
 
 
-To instantiate the peripheral, add a dictionary describing the peripheral in the `peripherals` list of the `blocks` dictionary in the setup Python module of the system.
+To instantiate the peripheral, add a dictionary describing the peripheral in the `peripherals` list of the `subblocks` dictionary in the setup Python module of the system.
 
 The `iob_soc_sut_setup.py` script of the [IOb-SoC-SUT](https://github.com/IObundle/iob-soc-sut) system, uses the following dictionary to instantiate a GPIO peripheral with the instance name `GPIO0`:
 ```Python
-blocks = \
+subblocks = \
 [
-    # Other blocks here...
+    # Other subblocks here...
 
-    {'name':'peripherals', 'descr':'peripheral modules', 'blocks': [
+    {'name':'peripherals', 'descr':'peripheral modules', 'subblocks': [
         {'name':'GPIO0', 'type':'GPIO', 'descr':'GPIO interface', 'params':{}},
 
         # Other peripheral instances here...

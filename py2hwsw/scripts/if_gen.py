@@ -344,12 +344,12 @@ def get_rom_sp_ports():
 
 @parse_widths
 def get_rom_tdp_ports():
-    ports = get_mem_ports("a") + get_mem_ports("b") + get_mem_read_ports("a") + get_mem_read_ports("b")
+    ports = get_mem_ports("", enable=False, addr=False) + get_mem_read_ports("a", enable=True, addr=True, true=True) + get_mem_read_ports("b", enable=True, addr=True, true=True)
     return remove_duplicates(ports)
 
 @parse_widths
 def get_rom_atdp_ports():
-    ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a") + get_mem_read_ports("b")
+    ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a", true=True) + get_mem_read_ports("b", true=True)
     return remove_duplicates(ports)
 
 @parse_widths

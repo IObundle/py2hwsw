@@ -34,7 +34,7 @@ module iob_rom_2p #(
       .ADDR_W (ADDR_W)
    ) iob_rom_sp_inst (
       .clk_i   (clk_i),
-      .r_en_i  (en_int),
+      .en_i  (en_int),
       .addr_i  (addr_int),
       .r_data_o(r_data_o)
    );

@@ -759,9 +759,7 @@ class csr_gen:
 
         # compute write address
         snippet += "    wire [ADDR_W-1:0] waddr;\n"
-        snippet += (
-            "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr_stable) + byte_offset;\n"
-        )
+        snippet += "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr_stable) + byte_offset;\n"
 
         # insert write register logic
         for row in table:

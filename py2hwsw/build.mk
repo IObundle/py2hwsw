@@ -135,13 +135,13 @@ sim-cov: sim-clean
 # FPGA
 #
 FPGA_DIR=hardware/fpga
-fpga-build:
+fpga-build: $(BSP_VH)
 	make -C $(FPGA_DIR) -j1 build
 
-fpga-run:
+fpga-run: $(BSP_VH)
 	make -C $(FPGA_DIR) -j1 run
 
-fpga-test:
+fpga-test: $(BSP_VH)
 	make -C $(FPGA_DIR) test
 
 fpga-debug:

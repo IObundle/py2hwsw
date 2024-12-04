@@ -32,7 +32,7 @@ def setup(py_params_dict):
     mwrap_wires = []
     mwrap_ports = []
     for port in iob_system_attr["ports"]:
-        if port["name"] in ["rom_bus_io", "int_mem_axi_m"]:
+        if port["name"] in ["rom_bus_m", "int_mem_axi_m"]:
             wire = copy.deepcopy(port)
             if type(wire["signals"]) is list:
                 for sig in wire["signals"]:

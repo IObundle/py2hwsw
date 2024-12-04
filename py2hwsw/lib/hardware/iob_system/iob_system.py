@@ -158,22 +158,9 @@ def setup(py_params_dict):
             },
         },
         {
-            "name": "rom_bus_io",
+            "name": "rom_bus_m",
             "descr": "Ports for connection with ROM memory",
-            "signals": [
-                {
-                    "name": "boot_rom_valid_o",
-                    "width": "1",
-                },
-                {
-                    "name": "boot_rom_addr_o",
-                    "width": params["bootrom_addr_w"] - 2,
-                },
-                {
-                    "name": "boot_rom_rdata_i",
-                    "width": params["data_w"],
-                },
-            ],
+            "signals": {"type": "rom_sp"},
         },
         {
             "name": "int_mem_axi_m",

@@ -12,6 +12,29 @@ from dataclasses import dataclass, field
 from typing import Dict
 from iob_signal import iob_signal, iob_signal_reference
 
+mem_if_names = [
+    "rom_2p", # x
+    "rom_atdp", # x
+    "rom_sp", # x
+    "rom_tdp", # x
+    "ram_2p", # x 
+    "ram_at2p", # x 
+    "ram_atdp", # x
+    "ram_atdp_be", # x
+    "ram_sp", # x
+    "ram_sp_be", # x
+    "ram_sp_se", # x
+    "ram_t2p",
+    "ram_t2p_be",
+    "ram_t2p_tiled",
+    "ram_tdp", # x
+    "ram_tdp_be", # x
+    "ram_tdp_be_xil", # x
+    "regfile_2p",
+    "regfile_at2p",
+    "regfile_sp",
+]
+
 if_names = [
     "clk_en_rst",
     "clk_rst",
@@ -24,15 +47,10 @@ if_names = [
     "axi",
     "apb",
     "axis",
-    "rom_sp",
-    "rom_tdp",
-    "ram_sp",
-    "ram_tdp",
-    "ram_2p",
     "rs232",
     "wb",
     "wb_full",
-]
+] + mem_if_names
 
 if_types = [
     "m_port",
@@ -203,53 +221,105 @@ def get_clk_en_rst_ports():
         clk_rst_ports[1],
     ]
 
-
-def get_mem_ports(suffix):
+def get_mem_ports(suffix: str, async_clk: bool = False, addr: bool = True, enable: bool = True):
+    suffix = f"_{suffix}" if suffix else ""
+    clk_suffix = suffix if async_clk else ""
+    extra_signals = []
+    if addr:
+        extra_signals.append(
+            iob_signal(
+                name="addr" + suffix + "_o",
+                width=ADDR_W,
+                descr="Address port {suffix}",
+            )
+        )
+    if enable:
+        extra_signals.append(
+            iob_signal(
+                name="en" + suffix + "_o",
+                width=1,
+                descr="Enable port {suffix}",
+            )
+        )
     return [
         iob_signal(
-            name="clk" + "_" + suffix + "_o",
+            name="clk" + clk_suffix + "_o",
             width=1,
-            descr=f"Clock port {suffix}",
+            descr=f"Clock port {clk_suffix}",
         ),
-        iob_signal(
-            name="en" + "_" + suffix + "_o",
-            width=1,
-            descr=f"Enable port {suffix}",
-        ),
-        iob_signal(
-            name="addr" + "_" + suffix + "_o",
-            width=ADDR_W,
-            descr="Address port {suffix}",
-        ),
-    ]
+    ] + extra_signals
 
-
-def get_mem_read_ports(suffix):
-    mem_ports = get_mem_ports(suffix)
-    mem_read_ports = mem_ports + [
+def get_mem_read_ports(suffix: str, enable: bool = False, ready: bool = False, addr: bool = False, true: bool = False):
+    suffix = f"_{suffix}" if suffix else ""
+    rd_suffix = suffix if true else ""
+    extra_signals = []
+    if enable:
+        extra_signals.append(
+            iob_signal(
+                name="r_en" + suffix + "_o",
+                width=1,
+                descr=f"Read enable port {suffix}",
+            )
+        )
+    if ready:
+        extra_signals.append(
+            iob_signal(
+                name="r_ready" + suffix + "_i",
+                width=1,
+                descr=f"Read ready port {suffix}",
+            )
+        )
+    if addr:
+        extra_signals.append(
+            iob_signal(
+                name="r_addr" + suffix + "_o",
+                width=ADDR_W,
+                descr=f"Read address port {suffix}",
+            )
+        )
+    mem_read_ports = [
         iob_signal(
-            name="rdata" + "_" + suffix + "_i",
+            name="r_data" + rd_suffix + "_i",
             width=DATA_W,
             descr="Data port {suffix}",
+            isvar=True,
         ),
-    ]
+    ] + extra_signals
     return mem_read_ports
 
 
-def get_mem_write_ports(suffix):
-    mem_ports = get_mem_ports(suffix)
-    mem_write_ports = mem_ports + [
+def get_mem_write_ports(suffix: str, ready: bool = False, addr: bool = False, true: bool = False):
+    suffix = f"_{suffix}" if suffix else ""
+    wr_suffix = suffix if true else ""
+    extra_signals = []
+    if ready:
+        extra_signals.append(
+            iob_signal(
+                name="w_ready" + suffix + "_i",
+                width=1,
+                descr=f"Write ready port {suffix}",
+            )
+        )
+    if addr:
+        extra_signals.append(
+            iob_signal(
+                name="w_addr" + suffix + "_o",
+                width=ADDR_W,
+                descr=f"Write address port {suffix}",
+            )
+        )
+    mem_write_ports = [
         iob_signal(
-            name="wdata" + "_" + suffix + "_o",
+            name="w_data" + wr_suffix + "_o",
             width=DATA_W,
             descr="Data port {suffix}",
         ),
         iob_signal(
-            name="wstrb" + "_" + suffix + "_o",
+            name="w_strb" + suffix + "_o",
             width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
             descr="Write strobe port {suffix}",
         ),
-    ]
+    ] + extra_signals
     return mem_write_ports
 
 
@@ -262,41 +332,96 @@ def remove_duplicates(ports):
             result.append(d)
     return result
 
+@parse_widths
+def get_rom_2p_ports():
+    ports = get_mem_ports("", addr=False, enable=False) + get_mem_read_ports("a", enable=True, ready=True, addr=True) + get_mem_read_ports("b", enable=True, ready=True, addr=True)
+    return remove_duplicates(ports)
 
 @parse_widths
 def get_rom_sp_ports():
-    ports = get_mem_read_ports("") + get_mem_write_ports("")
+    ports = get_mem_ports("") + get_mem_read_ports("")
     return remove_duplicates(ports)
-
 
 @parse_widths
 def get_rom_tdp_ports():
-    ports = get_mem_read_ports("a") + get_mem_read_ports("b")
+    ports = get_mem_ports("a") + get_mem_ports("b") + get_mem_read_ports("a") + get_mem_read_ports("b")
     return remove_duplicates(ports)
-
 
 @parse_widths
-def get_ram_sp_ports():
-    ports = get_mem_read_ports("") + get_mem_write_ports("")
+def get_rom_atdp_ports():
+    ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a") + get_mem_read_ports("b")
     return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_tdp_ports():
-    ports = (
-        get_mem_read_ports("a")
-        + get_mem_read_ports("b")
-        + get_mem_write_ports("a")
-        + get_mem_write_ports("b")
-    )
-    return remove_duplicates(ports)
-
 
 @parse_widths
 def get_ram_2p_ports():
-    ports = get_mem_read_ports("b") + get_mem_write_ports("a")
+    ports = get_mem_ports("", addr=False, enable=False) + get_mem_read_ports("", enable=True, ready=True, addr=True) + get_mem_write_ports("", ready=True, addr=True)
     return remove_duplicates(ports)
 
+@parse_widths
+def get_ram_at2p_ports():
+    ports = get_mem_ports("r", async_clk=True, addr=False, enable=False) + get_mem_ports("w", async_clk=True, addr=False, enable=False) + get_mem_read_ports("", enable=True, addr=True) + get_mem_write_ports("", addr=True)
+    return remove_duplicates(ports)
+
+@parse_widths
+def get_ram_atdp_ports():
+    ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a", true=True) + get_mem_read_ports("b", true=True) + get_mem_write_ports("a", true=True) + get_mem_write_ports("b", true=True)
+    return remove_duplicates(ports)
+
+@parse_widths
+def get_ram_atdp_be_ports():
+    return get_ram_atdp_ports()
+
+@parse_widths
+def get_ram_sp_ports():
+    ports = get_mem_ports("") + get_mem_read_ports("") + get_mem_write_ports("")
+    return remove_duplicates(ports)
+
+@parse_widths
+def get_ram_sp_be_ports():
+    return get_ram_sp_ports()
+
+@parse_widths
+def get_ram_sp_se_ports():
+    return get_ram_sp_ports()
+
+@parse_widths
+def get_ram_t2p_ports():
+    ports = get_mem_ports("", addr=False, enable=False) + get_mem_read_ports("", enable=True, addr=True) + get_mem_write_ports("", addr=True)
+    return remove_duplicates(ports)
+
+@parse_widths
+def get_ram_t2p_be_ports():
+    return get_ram_t2p_ports()
+
+@parse_widths
+def get_ram_t2p_tiled_ports():
+    ports = get_mem_ports("", enable=False) + get_mem_read_ports("", enable=True) + get_mem_write_ports("")
+    return remove_duplicates(ports)
+
+@parse_widths
+def get_ram_tdp_ports():
+    ports = get_mem_ports("a") + get_mem_ports("b") + get_mem_read_ports("a") + get_mem_read_ports("b") + get_mem_write_ports("a") + get_mem_write_ports("b")
+    return remove_duplicates(ports)
+
+@parse_widths
+def get_ram_tdp_be_ports():
+    return get_ram_tdp_ports()
+
+@parse_widths
+def get_ram_tdp_be_xil_ports():
+    return get_ram_tdp_ports()
+
+@parse_widths
+def get_regfile_2p_ports():
+    raise NotImplementedError("REGFILE 2P not interface implemented")
+
+@parse_widths
+def get_regfile_at2p_ports():
+    raise NotImplementedError("REGFILE AT2P not interface implemented")
+
+@parse_widths
+def get_regfile_sp_ports():
+    raise NotImplementedError("REGFILE SP not interface implemented")
 
 #
 # AXI4

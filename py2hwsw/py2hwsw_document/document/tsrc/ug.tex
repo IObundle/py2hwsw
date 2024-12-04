@@ -3,7 +3,55 @@
 % SPDX-License-Identifier: MIT
 
 \documentclass{ug}
+
+%
+% Packages and configuration
+%
+
 \usepackage{xltabular}
+
+\usepackage{hyperref}
+% Set up hyperlink colors
+\hypersetup{
+    colorlinks=true, % false: boxed links; true: colored links
+    linkcolor=blue, % color of internal links
+    citecolor=blue, % color of citations
+    urlcolor=blue   % color of external links
+}
+
+
+\usepackage{listings}
+\usepackage{xcolor}
+% Define colors
+\definecolor{keywordcolor}{RGB}{0, 0, 255} % Blue for keywords
+\definecolor{commentcolor}{RGB}{0, 128, 0} % Green for comments
+\definecolor{stringcolor}{RGB}{255, 0, 0} % Red for strings
+\definecolor{backgroundcolor}{RGB}{245, 245, 245} % Light gray background
+
+% Set up listings
+\lstdefinestyle{Python}{
+    backgroundcolor=\color{backgroundcolor},
+    basicstyle=\ttfamily,
+    keywordstyle=\color{keywordcolor},
+    commentstyle=\color{commentcolor},
+    stringstyle=\color{stringcolor},
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    tabsize=4,
+    breaklines=true
+}
+% Set the default style for all lstlisting environments
+\lstset{style=Python}
+
+% Support unicode chars for drawing directory trees (├ ─ └)
+\usepackage{pmboxdraw}
+
+%
+% Document content
+%
 
 \input{ug_title}
 \date{\today}
@@ -40,7 +88,7 @@ User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
 \section{Introduction}
 \label{sec:intro}
 \input{intro}
-\input{symb}
+%\input{symb}
 
 \subsection{What Is Py2HWSW?}
 \label{sec:whatispy2}
@@ -71,36 +119,50 @@ User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
 \section{Getting Started}
 \label{sec:gs}
 
-\subsection{Setup directory}
+\subsection{Setup Directory}
 \label{sec:setup_dir}
 \input{setup_dir}
 
-\subsection{Create an AND gate core: iob\_and}
+\subsection{Create An AND Gate Core: iob\_and}
 \label{sec:iob_and}
 \input{iob_and}
 
-\subsection{Setup and build}
+\subsection{Setup And Build}
 \label{sec:setup_build}
 \input{setup_build}
 
+%
+% How It Works
+%
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
+\section{How It Works}
+\label{sec:how_it_works}
+
+This section gives a detailed description of the Py2HWSW framework.
+
+\subsection{Setup Flow Chart}
+\label{sec:py2_flow_chart}
+
+Figure~\ref{fig:py2_flow_chart} presents a high-level flow chart of the Py2HWSW setup procedure.
+
+\begin{figure}[H]
+  \centering {\includegraphics[width=\columnwidth]{py2_flow_chart.pdf}}
+  \vspace{-0.7cm}
+  \caption{High-Level Flow Chart of Py2HWSW Setup Procedure}
+  \label{fig:py2_flow_chart}
+\end{figure}
+
+\subsection{Main launch script: py2hwsw.py}
+\label{sec:launch_script}
+\input{launch_script}
+
+\subsection{Main class for core representation: iob\_core.py}
+\label{sec:iob_core}
+\input{iob_core}
+
 % TODO: Subsections below
-% %
-% % How It Works
-% %
-% \ifdefined\SECTIONCLEARPAGE
-% \clearpage
-% \fi
-% \section{How It Works}
-% \label{sec:description}
-% 
-% This section gives a detailed description of the Py2HWSW framework.
-% TODO
-% 
-% \subsection{Block Diagram}
-% \label{sec:bdd}
-% \input{bdd}
-% 
-% 
 % %
 % % How To Use
 % %

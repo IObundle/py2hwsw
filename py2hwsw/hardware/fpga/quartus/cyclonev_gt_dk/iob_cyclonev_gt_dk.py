@@ -14,7 +14,14 @@ bsp = [
 
 def setup(py_params_dict):
     attributes_dict = {
-        "confs": bsp,
+        "name": py_params_dict["instantiator"]["name"] + "_cyclonev_gt_dk",
+        "confs": [
+            {
+                "name": "bsp",
+                "descr": "Board Support Package confs",
+                "confs": bsp,
+            },
+        ],
     }
 
     return attributes_dict

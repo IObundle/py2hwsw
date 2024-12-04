@@ -251,7 +251,9 @@ def write_git_revision_short_hash(dst_dir):
 
     # Alternatively generate short hash based on git command
     text = (
-        subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+        subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"], cwd=os.path.dirname(__file__)
+        )
         .decode("ascii")
         .strip()
     )
@@ -559,3 +561,10 @@ def copy_rename_setup_directory(core, exclude_file_list=[]):
     # Copy sources
     for directory in dir_list:
         copy_rename_setup_subdir(core, directory, exclude_file_list)
+
+    # Copy custom_config_build.mk file if it exists
+    if os.path.isfile(os.path.join(core.setup_dir, "custom_config_build.mk")):
+        shutil.copyfile(
+            os.path.join(core.setup_dir, "custom_config_build.mk"),
+            os.path.join(core.build_dir, "custom_config_build.mk"),
+        )

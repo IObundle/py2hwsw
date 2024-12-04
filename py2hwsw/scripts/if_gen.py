@@ -282,6 +282,7 @@ def get_mem_read_ports(suffix: str, enable: bool = False, ready: bool = False, a
             name="r_data" + rd_suffix + "_i",
             width=DATA_W,
             descr="Data port {suffix}",
+            isvar=True,
         ),
     ] + extra_signals
     return mem_read_ports

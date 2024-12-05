@@ -11,8 +11,10 @@ Build a clean environment to test the Py2HWSW project.
 - Install [Docker](https://docs.docker.com/engine/install/)
 
 ## Build image
-Currently, the `Dockerfile` builds a docker image based on Ubuntu 22.04 and
-installs the nix package manager.
+Currently, the `Dockerfile` builds:
+- a docker image based on Ubuntu 22.04 
+- installs the nix package manager
+- install py2hwsw depencencies in `py2hwsw/py2hwsw/lib/default.nix`
 The default user is `iobdev` with sudo permissions.
 
 Build the image with:
@@ -33,13 +35,17 @@ make sim-run
 # NOTE: dependencies take some time to install the 1st time
 ```
 
+## Images in Github Container Registry
+- The `docker-image.yml` workflow builds and publishes the docker image on each
+  release
+- To pull and run the docker image:
+```bash
+# pull latest version
+docker run ghcr.io/iobundle/py2hwsw:latest
+# pull specific <tag>
+docker run ghcr.io/iobundle/py2hwsw:<tag>
+```
+
 ## Other usefull commands
 - Cleanup old docker images: `docker image prune`
 - Check existing images: `docker images`
-
-## TODO
-- build and store images
-    - Seems to be possible to store and manage Docker Images with [Github's
-      Container
-      registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
-- image with pre-installed nix dependencies?

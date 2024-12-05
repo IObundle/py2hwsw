@@ -139,6 +139,8 @@ def setup(py_params_dict):
                 "core_name": "iob_ram_atdp",
                 "instantiate": False,
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

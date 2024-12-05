@@ -74,6 +74,8 @@ def setup(py_params_dict):
             y_o:y_o
             -d 'Inverter'
             """,
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

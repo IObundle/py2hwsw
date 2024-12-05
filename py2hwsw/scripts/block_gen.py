@@ -64,7 +64,7 @@ def generate_subblocks_tex(subblocks, out_dir):
     # Create table for each group
     for group in subblocks:
         tex_table = []
-        for block in group.subblocks:
+        for block in group.blocks:
             if not block.instantiate:
                 continue
             tex_table.append(
@@ -84,7 +84,7 @@ def generate_subblocks(core):
     """
     code = ""
     for group in core.subblocks:
-        for instance in group.subblocks:
+        for instance in group.blocks:
             if not instance.instantiate:
                 continue
             # Open ifdef if conditional interface

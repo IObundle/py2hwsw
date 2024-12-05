@@ -162,6 +162,8 @@ def setup(py_params_dict):
                     "div_io": "div_frac",
                 },
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

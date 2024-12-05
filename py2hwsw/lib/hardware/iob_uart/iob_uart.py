@@ -217,6 +217,8 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

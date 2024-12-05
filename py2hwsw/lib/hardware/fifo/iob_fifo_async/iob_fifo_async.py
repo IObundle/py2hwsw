@@ -263,6 +263,8 @@ def setup(py_params_dict):
                 "core_name": "iob_clock",
                 "instance_name": "iob_clock_inst",
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

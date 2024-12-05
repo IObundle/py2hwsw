@@ -149,6 +149,8 @@ def setup(py_params_dict):
                     "data_o": "pulse_o",
                 },
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

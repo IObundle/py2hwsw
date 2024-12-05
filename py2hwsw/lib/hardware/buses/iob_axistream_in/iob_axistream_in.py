@@ -366,6 +366,8 @@ def setup(py_params_dict):
                 "core_name": "iob_edge_detect",
                 "instantiate": False,
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

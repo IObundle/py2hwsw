@@ -12,6 +12,8 @@ def setup(py_params_dict):
                 "core_name": "iob_add2",
                 "instance_name": "iob_add2_inst",
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

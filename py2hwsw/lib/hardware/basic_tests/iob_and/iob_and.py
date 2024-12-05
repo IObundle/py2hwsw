@@ -45,11 +45,11 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "subblocks": [
+        "superblocks": [
             {
                 "name": "simulation",
                 "descr": "Blocks for simulation",
-                "subblocks": [
+                "blocks": [
                     # Simulation wrapper
                     {
                         "core_name": "iob_sim",

@@ -364,7 +364,9 @@ class iob_core(iob_module, iob_instance):
 
             # Select identifier attribute. Used to compare if should override each element.
             identifier = "name"
-            if child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
+            if child_attribute_name in ["subblocks", "superblocks", "sw_modules"]:
+                identifier = "instance_name"
+            elif child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
                 # Elements in list do not have identifier, so just append them to parent list
                 for child_obj in child_value:
                     parent_attributes[child_attribute_name].append(child_obj)

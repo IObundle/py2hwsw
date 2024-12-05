@@ -50,15 +50,18 @@ def iob_system_scripts(attributes_dict, params, py_params):
 def assert_block_attributes(attributes_dict, py_params):
     """Assert that all block attributes are valid."""
     child_attributes = py_params.get("system_attributes", {})
-    for block in attributes_dict["subblocks"] + child_attributes.get("subblocks", []):
-        assert block.get("core_name", None), "All subblocks must have a core name!"
-        assert block.get(
-            "instance_name", None
-        ), f"Block '{block['core_name']}' must have an instance name!"
+    for attribute in ["subblocks", "superblocks"]:
+        for block in attributes_dict.get(attribute, []) + child_attributes.get(
+            attribute, []
+        ):
+            assert block.get("core_name", None), "All subblocks must have a core name!"
+            assert block.get(
+                "instance_name", None
+            ), f"Block '{block['core_name']}' must have an instance name!"
 
 
 def append_board_wrappers(attributes_dict, params):
-    """Append board wrappers to subblocks list based on boards_list.
+    """Append board wrappers to superblocks list based on boards_list.
     :param dict attributes_dict: iob_system attributes
     :param dict params: iob_system python parameters
     """
@@ -71,7 +74,7 @@ def append_board_wrappers(attributes_dict, params):
     }
     for board in attributes_dict.get("board_list", []):
         tool = tools[board]
-        attributes_dict["subblocks"].append(
+        attributes_dict["superblocks"].append(
             {
                 "core_name": "iob_system_" + board,
                 "instance_name": "iob_system_" + board,
@@ -109,7 +112,7 @@ def handle_system_overrides(attributes_dict, py_params):
 
         # Select identifier attribute. Used to compare if should override each element.
         identifier = "name"
-        if child_attribute_name in ["subblocks", "sw_modules"]:
+        if child_attribute_name in ["subblocks", "superblocks", "sw_modules"]:
             identifier = "instance_name"
         elif child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
             # Elements in list do not have identifier, so just append them to parent list

@@ -180,6 +180,8 @@ def setup(py_params_dict):
                     "reg_interface_io": "iob_timer_core_reg_interface",
                 },
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",

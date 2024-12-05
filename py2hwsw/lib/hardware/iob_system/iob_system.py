@@ -505,6 +505,8 @@ def setup(py_params_dict):
             "instantiate": False,
             "dest_dir": "hardware/simulation/src",
         },
+    ]
+    attributes_dict["superblocks"] = [
         # Synthesis module (needed for macros)
         {
             "core_name": "iob_system_syn",

@@ -68,7 +68,7 @@ def create_block_group(core, *args, blocks_attribute_name="subblocks", **kwargs)
 
         general_group_ref = None
         group_kwargs = kwargs
-        blocks = kwargs.pop(blocks_attribute_name, None)
+        blocks = kwargs.pop("blocks", None)
         # If kwargs provided a single block instead of a group, then create a general group for it or use existing one.
         if blocks is None:
             blocks = [kwargs]

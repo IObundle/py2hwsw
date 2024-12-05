@@ -129,16 +129,20 @@ class iob_module(iob_base):
         create_fsm(self, *args, **kwargs)
 
     def create_superblock_group(self, *args, **kwargs):
-        """Import core and create an instance of it inside this module"""
-        create_block_group(self, *args, blocks_attribute_name="superblocks", **kwargs)
+        kwargs.pop("instantiate", None)
+        create_block_group(
+            self,
+            *args,
+            instantiate=False,
+            blocks_attribute_name="superblocks",
+            **kwargs
+        )
 
     def create_subblock_group(self, *args, **kwargs):
-        """Import core and create an instance of it inside this module"""
         create_block_group(self, *args, **kwargs)
 
     def create_sw_instance_group(self, *args, **kwargs):
-        """Import core and run its setup process"""
-        # Setup process is equal to normal core, but should not be instantiated in Verilog
+        kwargs.pop("instantiate", None)
         self.create_subblock_group(*args, instantiate=False, **kwargs)
 
     def update_global_top_module(self):

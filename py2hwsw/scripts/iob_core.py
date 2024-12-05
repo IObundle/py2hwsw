@@ -185,7 +185,10 @@ class iob_core(iob_module, iob_instance):
             self.abort_reason = "no_setup"
 
         # Read 'attributes' dictionary and set corresponding core attributes
+        superblocks = attributes.pop("superblocks", [])
         self.parse_attributes_dict(attributes)
+        # Ensure superblocks are set up last
+        self.parse_attributes_dict({"superblocks": superblocks})
 
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, instantiator)

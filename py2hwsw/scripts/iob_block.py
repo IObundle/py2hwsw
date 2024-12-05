@@ -85,6 +85,9 @@ def create_block_group(core, *args, blocks_attribute_name="subblocks", **kwargs)
         if type(blocks) is list:
             # Convert user blocks dictionaries into 'iob_block' objects
             for block in blocks:
+                # Copy "instantiate" attribute from group to all of its blocks
+                if "instantiate" in group_kwargs:
+                    block["instantiate"] = group_kwargs["instantiate"]
                 block_obj = create_block(core, **block)
                 if block_obj:
                     block_obj_list.append(block_obj)

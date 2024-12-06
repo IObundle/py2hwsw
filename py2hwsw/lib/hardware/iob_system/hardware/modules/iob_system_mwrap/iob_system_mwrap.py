@@ -74,8 +74,7 @@ def setup(py_params_dict):
                 "HEXFILE": '{BOOT_HEXFILE, ".hex"}',
             },
             "connect": {
-                "clk_i": "clk",
-                "rom_if_io": "rom_bus_io",
+                "rom_sp_s": "rom_bus_m",
             },
         },
         # Internal memory

@@ -36,7 +36,10 @@ RUN set -o pipefail && curl -L https://nixos.org/nix/install | bash
 RUN echo "source $HOME/.nix-profile/etc/profile.d/nix.sh" >> "$HOME/.bashrc"
 
 #
-# TODO: Install Py2HWSW Dependencies?
+# Install Py2HWSW Dependencies
 #
-# RUN git clone https://github.com/IObundle/py2hwsw.git
-# RUN cd pyhwsw/py2hwsw/lib && nix-shell --run "echo 'Dependencies Installed'"
+RUN git clone https://github.com/IObundle/py2hwsw.git
+RUN cd py2hwsw/py2hwsw/lib && \ 
+    source $HOME/.nix-profile/etc/profile.d/nix.sh && \ 
+    nix-shell --run "echo 'Dependencies Installed'"
+RUN rm -rf py2hwsw

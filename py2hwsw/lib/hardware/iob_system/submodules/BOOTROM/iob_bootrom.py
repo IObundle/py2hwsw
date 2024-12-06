@@ -56,7 +56,7 @@ def setup(py_params_dict):
             {
                 "name": "ext_rom_bus_m",
                 "descr": "External ROM signals",
-                "signals": {"type": "rom_sp"}
+                "signals": {"type": "rom_sp","prefix": "ext_rom_"},
             },
         ],
         #

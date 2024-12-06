@@ -54,22 +54,9 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "ext_rom_bus_io",
+                "name": "ext_rom_bus_m",
                 "descr": "External ROM signals",
-                "signals": [
-                    {
-                        "name": "ext_rom_en_o",
-                        "width": "1",
-                    },
-                    {
-                        "name": "ext_rom_addr_o",
-                        "width": BOOTROM_ADDR_W - 2,
-                    },
-                    {
-                        "name": "ext_rom_rdata_i",
-                        "width": "DATA_W",
-                    },
-                ],
+                "signals": {"type": "rom_sp"}
             },
         ],
         #

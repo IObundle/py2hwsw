@@ -146,7 +146,7 @@ def setup(py_params_dict):
                 "verilog_code": """
    assign ext_rom_en_o   = rom_ren_rd;
    assign ext_rom_addr_o = rom_raddr_rd;
-   assign rom_rdata_rd   = ext_rom_rdata_i;
+   assign rom_rdata_rd   = ext_rom_r_data_i;
    assign rom_rready_rd  = 1'b1;  // ROM is always ready
 """,
             },

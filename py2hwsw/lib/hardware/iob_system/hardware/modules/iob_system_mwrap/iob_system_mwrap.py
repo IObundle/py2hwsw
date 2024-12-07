@@ -128,14 +128,14 @@ def setup(py_params_dict):
             "core_name": "iob_system",
             "instance_name": "iob_system",
             "instance_description": "IOb-SoC core",
-            "setup": False,
+            "setup": False,  # FIXME: Remove this
             "parameters": {
                 i["name"]: i["name"]
                 for i in iob_system_attr["confs"]
                 if i["type"] in ["P", "F"]
             },
             "connect": {i["name"]: i["name"] for i in iob_system_attr["ports"]},
-            **params,
+            **params,  # FIXME: Remove this
         }
     )
 

@@ -127,12 +127,6 @@ class iob_core(iob_module, iob_instance):
             descr="Copy `<SETUP_DIR>/CORE.v` netlist instead of `<SETUP_DIR>/hardware/src/*`",
         )
         self.set_default_attribute(
-            "is_top_module",
-            __class__.global_top_module == self,
-            bool,
-            descr="Selects if core is top module. Auto-filled. DO NOT CHANGE.",
-        )
-        self.set_default_attribute(
             "is_system",
             False,
             bool,
@@ -174,6 +168,18 @@ class iob_core(iob_module, iob_instance):
             bool,
             descr="Select if should setup the core. We may not want to setup some cores to prevent circular dependencies. For example, the top-core wrappers typically dont want to start the setup for the top-core again.",
         )
+        self.set_default_attribute(
+            "is_top_module",
+            __class__.global_top_module == self,
+            bool,
+            descr="Selects if core is top module. Auto-filled. DO NOT CHANGE.",
+        )
+        self.set_default_attribute(
+            "is_superblock",
+            kwargs.get("is_superblock", False),
+            bool,
+            descr="Selects if core is superblock of another. Auto-filled. DO NOT CHANGE.",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 
@@ -188,7 +194,12 @@ class iob_core(iob_module, iob_instance):
         superblocks = attributes.pop("superblocks", [])
         self.parse_attributes_dict(attributes)
         # Ensure superblocks are set up last
-        self.parse_attributes_dict({"superblocks": superblocks})
+        # and only for top module (or wrappers of it)
+        if self.is_top_module or self.is_superblock:
+            self.parse_attributes_dict({"superblocks": superblocks})
+        # if self.is_superblock:
+        #     # TODO: Create instance of instantiator subblock. Maybe do this below?
+        #     pass
 
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, instantiator)

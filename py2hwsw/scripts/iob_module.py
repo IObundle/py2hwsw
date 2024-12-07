@@ -9,7 +9,7 @@ from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
 from iob_comb import iob_comb, create_comb
 from iob_fsm import iob_fsm, create_fsm
-from iob_block import create_block_group
+from iob_block import create_block_group, iob_block_group
 
 
 class iob_module(iob_base):
@@ -134,11 +134,16 @@ class iob_module(iob_base):
             self,
             *args,
             instantiate=False,
+            is_superblock=True,
             blocks_attribute_name="superblocks",
             **kwargs
         )
 
     def create_subblock_group(self, *args, **kwargs):
+        if self.is_superblock:
+            # Remove instantiator subblock from the group to ensure that it is not setup again
+            if self.handle_instantiator_subblock(*args, **kwargs):
+                return
         create_block_group(self, *args, **kwargs)
 
     def create_sw_instance_group(self, *args, **kwargs):
@@ -151,6 +156,35 @@ class iob_module(iob_base):
         """
         if not __class__.global_top_module:
             __class__.global_top_module = self
+
+    def handle_instantiator_subblock(self, *args, **kwargs):
+        """If given kwargs describes the instantiator subblock, return True. Otherwise return False.
+        If given kwargs describes a group of blocks that contains the instantiator subblock, then remove it from that list.
+        Also append instantiator object found to the core's 'subblocks' list.
+        """
+        blocks = kwargs.pop("blocks", None)
+        instantiator = kwargs.get("instantiator", None)
+        if blocks is None and kwargs.get("core_name") == instantiator.original_name:
+            self.append_instantiator_subblock_to_list(kwargs)
+            return True
+
+        for idx, block in blocks:
+            if block["core_name"] == instantiator.original_name:
+                self.append_instantiator_subblock_to_list(block)
+                del blocks[idx]
+                break
+
+        return False
+
+    def append_instantiator_subblock_to_list(self, instantiator_subblock):
+        """Create a block group for instantiator subblock, and append it to the subblocks list"""
+        self.subblocks.append(
+            iob_block_group(
+                name="instantiator_subblock",
+                descr="Block group for instantiator subblock (the subblock that uses this one as a superblock)",
+                blocks=instantiator_subblock,
+            )
+        )
 
 
 def get_list_attr_handler(func):

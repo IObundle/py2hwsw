@@ -36,7 +36,6 @@ from iob_base import (
     nix_permission_hack,
     add_traceback_msg,
     debug,
-    str_to_kwargs,
 )
 import sw_tools
 import verilog_format
@@ -83,7 +82,7 @@ class iob_core(iob_module, iob_instance):
         dest_dir = kwargs.get("dest_dir", "hardware/src")
         attributes = kwargs.get("attributes", {})
         connect = kwargs.get("connect", {})
-        instantiator = kwargs.get("instantiator", None)
+        self.instantiator = kwargs.get("instantiator", None)
         is_parent = kwargs.get("is_parent", False)
         setup = kwargs.get("setup", True)
 
@@ -197,12 +196,12 @@ class iob_core(iob_module, iob_instance):
         # and only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
             self.parse_attributes_dict({"superblocks": superblocks})
-        # if self.is_superblock:
-        #     # TODO: Create instance of instantiator subblock. Maybe do this below?
-        #     pass
-
-        # Connect ports of this instance to external wires (wires of the instantiator)
-        self.connect_instance_ports(connect, instantiator)
+        if self.is_superblock:
+            # Connect ports of instantiator to external wires (wires of this superblock)
+            self.instantiator.connect_instance_ports(connect, self)
+        else:
+            # Connect ports of this instance to external wires (wires of the instantiator)
+            self.connect_instance_ports(connect, self.instantiator)
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir

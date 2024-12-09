@@ -163,16 +163,17 @@ class iob_module(iob_base):
         Also append instantiator object found to the core's 'subblocks' list.
         """
         blocks = kwargs.pop("blocks", None)
-        instantiator = kwargs.get("instantiator", None)
+        instantiator = self.instantiator
         if blocks is None and kwargs.get("core_name") == instantiator.original_name:
             self.append_instantiator_subblock_to_list(kwargs)
             return True
 
-        for idx, block in blocks:
-            if block["core_name"] == instantiator.original_name:
-                self.append_instantiator_subblock_to_list(block)
-                del blocks[idx]
-                break
+        if blocks:
+            for idx, block in blocks:
+                if block["core_name"] == instantiator.original_name:
+                    self.append_instantiator_subblock_to_list(block)
+                    del blocks[idx]
+                    break
 
         return False
 

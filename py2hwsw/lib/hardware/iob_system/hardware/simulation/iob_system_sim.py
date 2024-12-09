@@ -238,11 +238,11 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "cbus_s": (
-                    "ethernet_s",
-                    [
-                        "ethernet_iob_addr_i[12-1:2]",
-                    ],
-                ),
+                        "ethernet_s",
+                        [
+                            "ethernet_iob_addr_i[12-1:2]",
+                        ],
+                    ),
                     "axi_m": "eth_axi",
                     "inta_o": "eth_int",
                     "phy_io": "eth_phy_invert",

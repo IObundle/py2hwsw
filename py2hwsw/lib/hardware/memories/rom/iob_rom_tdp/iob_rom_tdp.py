@@ -42,61 +42,9 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "clk_i", "width": 1},
-                ],
-            },
-            {
-                "name": "addr_a_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "addr_a_i", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "r_en_a_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_en_a_i", "width": 1},
-                ],
-            },
-            {
-                "name": "addr_b_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "addr_b_i", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "r_en_b_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_en_b_i", "width": 1},
-                ],
-            },
-            {
-                "name": "r_data_a_o",
-                "descr": "Output port",
-                "signals": [
-                    {
-                        "name": "r_data_a_o",
-                        "width": "DATA_W",
-                        "isvar": True,
-                    },
-                ],
-            },
-            {
-                "name": "r_data_b_o",
-                "descr": "Output port",
-                "signals": [
-                    {
-                        "name": "r_data_b_o",
-                        "width": "DATA_W",
-                        "isvar": True,
-                    },
-                ],
+                "name": "rom_tdp_s",
+                "descr": "ROM TDP",
+                "signals": {"type": "rom_tdp"},
             },
         ],
         "blocks": [
@@ -123,13 +71,13 @@ def setup(py_params_dict):
 
    always @(posedge clk_i) begin  // Port A
       if (r_en_a_i) begin
-         r_data_a_o <= rom[addr_a_i];
+         r_data_a_o <= rom[r_addr_a_i];
       end
    end
 
    always @(posedge clk_i) begin  // Port B
       if (r_en_b_i) begin
-         r_data_b_o <= rom[addr_b_i];
+         r_data_b_o <= rom[r_addr_b_i];
       end
    end
             """,

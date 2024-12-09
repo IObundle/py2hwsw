@@ -75,7 +75,7 @@ module iob_rom_sp_tb;
       .ADDR_W(`ADDR_W)
    ) uut (
       .clk_i   (clk),
-      .r_en_i  (r_en),
+      .en_i  (r_en),
       .addr_i  (addr),
       .r_data_o(r_data)
    );

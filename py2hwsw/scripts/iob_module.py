@@ -183,6 +183,7 @@ class iob_module(iob_base):
         :param instantiator_obj: Instantiator object
         :param instance_dict: Dictionary describing verilog instance. Includes port connections and verilog parameter values.
         """
+        instantiator_obj.instantiate = True
         # Set values to pass via verilog parameters
         instantiator_obj.parameters = instance_dict.get("parameters", {})
         # Connect ports of instantiator to external wires (wires of this superblock)

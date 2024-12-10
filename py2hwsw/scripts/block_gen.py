@@ -83,7 +83,6 @@ def generate_subblocks(core):
     """Generate verilog code with verilog instances of this module.
     returns: Generated verilog code
     """
-    # print("DEBUG", core.name, core.subblocks, file=sys.stderr)
     code = ""
     for group in core.subblocks:
         for instance in group.blocks:

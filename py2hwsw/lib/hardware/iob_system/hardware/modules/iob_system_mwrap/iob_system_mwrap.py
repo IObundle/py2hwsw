@@ -125,17 +125,17 @@ def setup(py_params_dict):
     attributes_dict["subblocks"].append(
         # IOb-System
         {
-            "core_name": "iob_system",
-            "instance_name": "iob_system",
+            "core_name": py_params_dict["instantiator"]["original_name"],
+            "instance_name": py_params_dict["instantiator"]["original_name"],
             "instance_description": "IOb-SoC core",
-            "setup": False,  # FIXME: Remove this
+            # "setup": False,  # FIXME: Remove this
             "parameters": {
                 i["name"]: i["name"]
                 for i in iob_system_attr["confs"]
                 if i["type"] in ["P", "F"]
             },
             "connect": {i["name"]: i["name"] for i in iob_system_attr["ports"]},
-            **params,  # FIXME: Remove this
+            # **params,  # FIXME: Remove this
         }
     )
 

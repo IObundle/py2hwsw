@@ -165,25 +165,34 @@ class iob_module(iob_base):
         blocks = kwargs.pop("blocks", None)
         instantiator = self.instantiator
         if blocks is None and kwargs.get("core_name") == instantiator.original_name:
-            self.append_instantiator_subblock_to_list(kwargs)
+            self.update_instantiator_obj(instantiator, kwargs)
             return True
 
         if blocks:
             for idx, block in blocks:
                 if block["core_name"] == instantiator.original_name:
-                    self.append_instantiator_subblock_to_list(block)
+                    self.update_instantiator_obj(instantiator, block)
                     del blocks[idx]
                     break
 
         return False
 
-    def append_instantiator_subblock_to_list(self, instantiator_subblock):
-        """Create a block group for instantiator subblock, and append it to the subblocks list"""
+    def update_instantiator_obj(self, instantiator_obj, instance_dict):
+        """Update given instantiator object with values for verilog parameters and external port connections.
+        Also, add instantiator object to the 'subblocks' list of this superblock.
+        :param instantiator_obj: Instantiator object
+        :param instance_dict: Dictionary describing verilog instance. Includes port connections and verilog parameter values.
+        """
+        # Set values to pass via verilog parameters
+        instantiator_obj.parameters = instance_dict.get("parameters", {})
+        # Connect ports of instantiator to external wires (wires of this superblock)
+        instantiator_obj.connect_instance_ports(instance_dict.get("connect", {}), self)
+        # Create a block group dedicated for instantiator subblock, and add it to the 'subblocks' list of current superblock
         self.subblocks.append(
             iob_block_group(
                 name="instantiator_subblock",
                 descr="Block group for instantiator subblock (the subblock that uses this one as a superblock)",
-                blocks=instantiator_subblock,
+                blocks=[instantiator_obj],
             )
         )
 

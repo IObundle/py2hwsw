@@ -197,11 +197,11 @@ class iob_core(iob_module, iob_instance):
         if self.is_top_module or self.is_superblock:
             self.parse_attributes_dict({"superblocks": superblocks})
         if self.is_superblock:
-            # Connect ports of instantiator to external wires (wires of this superblock)
-            self.instantiator.connect_instance_ports(connect, self)
-        else:
-            # Connect ports of this instance to external wires (wires of the instantiator)
-            self.connect_instance_ports(connect, self.instantiator)
+            # Generate verilog parameters of instantiator subblock
+            param_gen.generate_inst_params(self.instantiator)
+
+        # Connect ports of this instance to external wires (wires of the instantiator)
+        self.connect_instance_ports(connect, self.instantiator)
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir

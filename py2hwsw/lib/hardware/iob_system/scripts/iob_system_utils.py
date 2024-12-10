@@ -34,7 +34,7 @@ def iob_system_scripts(attributes_dict, params, py_params):
     """
     assert_block_attributes(attributes_dict, py_params)
     handle_system_overrides(attributes_dict, py_params)
-    append_board_wrappers(attributes_dict, params)
+    # append_board_wrappers(attributes_dict, params) # TODO: Move this to memory wrapper
     set_build_dir(attributes_dict, py_params)
     peripherals = get_iob_system_peripherals_list(attributes_dict)
     connect_peripherals_cbus(attributes_dict, peripherals, params)

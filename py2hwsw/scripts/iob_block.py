@@ -128,10 +128,14 @@ def create_block(core, core_name: str = "", instance_name: str = "", **kwargs):
     """
     # Don't setup other destinations (like simulation) if this is a submodule and
     # the sub-submodule (we are trying to setup) is not for hardware/src/
-    if not core.is_top_module and (
-        core.dest_dir == "hardware/src"
-        and "dest_dir" in kwargs
-        and kwargs["dest_dir"] != "hardware/src"
+    if (
+        not core.is_top_module
+        and not core.is_superblock
+        and (
+            core.dest_dir == "hardware/src"
+            and "dest_dir" in kwargs
+            and kwargs["dest_dir"] != "hardware/src"
+        )
     ):
         debug(f"Not setting up submodule '{core_name}' of '{core.name}' core!", 1)
         return

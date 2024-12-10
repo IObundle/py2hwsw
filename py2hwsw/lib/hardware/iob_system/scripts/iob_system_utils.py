@@ -34,7 +34,7 @@ def iob_system_scripts(attributes_dict, params, py_params):
     """
     assert_block_attributes(attributes_dict, py_params)
     handle_system_overrides(attributes_dict, py_params)
-    # append_board_wrappers(attributes_dict, params) # TODO: Move this to memory wrapper
+    append_board_wrappers(attributes_dict, params)
     set_build_dir(attributes_dict, py_params)
     peripherals = get_iob_system_peripherals_list(attributes_dict)
     connect_peripherals_cbus(attributes_dict, peripherals, params)
@@ -66,6 +66,14 @@ def append_board_wrappers(attributes_dict, params):
     :param dict params: iob_system python parameters
     """
     # FIXME: We should have a way for child cores to specify their board's tool (assuming child cores may add new unknown boards)
+
+    # Find memory wrapper dictionary
+    mwrap_dict = None
+    for block in attributes_dict["superblocks"]:
+        if block["core_name"] == "iob_system_mwrap":
+            mwrap_dict = block
+            break
+
     tools = {
         "aes_ku040_db_g": "vivado",
         "cyclonev_gt_dk": "quartus",
@@ -74,7 +82,7 @@ def append_board_wrappers(attributes_dict, params):
     }
     for board in attributes_dict.get("board_list", []):
         tool = tools[board]
-        attributes_dict["superblocks"].append(
+        mwrap_dict["superblocks"].append(
             {
                 "core_name": "iob_system_" + board,
                 "instance_name": "iob_system_" + board,

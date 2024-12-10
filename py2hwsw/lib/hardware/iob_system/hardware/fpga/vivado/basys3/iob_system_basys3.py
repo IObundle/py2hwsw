@@ -140,7 +140,6 @@ def setup(py_params_dict):
                 "axi_m": "axi",
             },
             "dest_dir": "hardware/common_src",
-            "iob_system_params": params,
         },
         {
             "core_name": "iob_xilinx_axi_interconnect",

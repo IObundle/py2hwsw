@@ -199,7 +199,6 @@ def setup(py_params_dict):
                 "rs232_m": "rs232",
             },
             "dest_dir": "hardware/common_src",
-            "iob_system_params": params,
         },
     ]
     if params["use_ethernet"]:

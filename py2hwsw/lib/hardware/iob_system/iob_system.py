@@ -512,22 +512,24 @@ def setup(py_params_dict):
             "core_name": "iob_system_mwrap",
             "instance_name": "iob_system_mwrap",
             "iob_system_params": params,
+            "superblocks": [
+                # Synthesis module (needed for macros)
+                {
+                    "core_name": "iob_system_syn",
+                    "instance_name": "iob_system_syn",
+                    "dest_dir": "hardware/syn/src",
+                    "iob_system_params": params,
+                },
+                # Simulation wrapper
+                {
+                    "core_name": "iob_system_sim",
+                    "instance_name": "iob_system_sim",
+                    "dest_dir": "hardware/simulation/src",
+                    "iob_system_params": params,
+                },
+                # FPGA wrappers added automatically
+            ],
         },
-        # # Synthesis module (needed for macros)
-        # {
-        #     "core_name": "iob_system_syn",
-        #     "instance_name": "iob_system_syn",
-        #     "dest_dir": "hardware/syn/src",
-        #     "iob_system_params": params,
-        # },
-        # # Simulation wrapper
-        # {
-        #     "core_name": "iob_system_sim",
-        #     "instance_name": "iob_system_sim",
-        #     "dest_dir": "hardware/simulation/src",
-        #     "iob_system_params": params,
-        # },
-        # # FPGA wrappers added automatically
     ]
     attributes_dict["sw_modules"] = [
         # Software modules

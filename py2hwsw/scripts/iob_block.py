@@ -95,6 +95,8 @@ def create_block_group(core, *args, blocks_attribute_name="subblocks", **kwargs)
                 block_obj = create_block(core, **block)
                 if block_obj:
                     block_obj_list.append(block_obj)
+            group_kwargs.pop("instantiate", None)
+            group_kwargs.pop("is_superblock", None)
         else:
             fail_with_msg(
                 f"{blocks_attribute_name} attribute must be a list. Error at block group \"{group_kwargs.get('name', '')}\".\n{blocks}",

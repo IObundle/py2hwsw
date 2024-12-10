@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             # TODO: Remaining ports
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_inst",
@@ -31,11 +31,12 @@ def setup(py_params_dict):
                 "core_name": "iob_ram_t2p",
                 "instance_name": "iob_ram_t2p_inst",
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
         ],

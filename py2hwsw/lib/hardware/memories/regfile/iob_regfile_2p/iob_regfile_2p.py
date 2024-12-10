@@ -16,7 +16,7 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_ctls",
                 "instance_name": "iob_ctls_inst",

@@ -89,7 +89,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_fp_clz",
                 "instance_name": "clz0",

@@ -42,8 +42,8 @@ def version_str_to_digits(version_str):
 
 
 def auto_setup_iob_ctls(core):
-    """Auto-add iob_ctls module to blocks list"""
-    core["blocks"].append(
+    """Auto-add iob_ctls module to subblocks list"""
+    core["subblocks"].append(
         {
             "core_name": "iob_ctls",
             "instance_name": "iob_ctls_inst",

@@ -311,7 +311,7 @@ def setup(py_params_dict):
         # Peripheral cbus wires added automatically
         # NOTE: Add other peripheral wires here
     ]
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_vexriscv",
             "instance_name": "cpu",
@@ -389,12 +389,12 @@ def setup(py_params_dict):
         },
     ]
     if params["use_extmem"]:
-        attributes_dict["blocks"][-1]["parameters"].update(
+        attributes_dict["subblocks"][-1]["parameters"].update(
             {
                 "MEM_ADDR_W": "AXI_ADDR_W - 2",
             }
         )
-        attributes_dict["blocks"][-1]["connect"].update(
+        attributes_dict["subblocks"][-1]["connect"].update(
             {
                 "mem_axi_m": (
                     "axi_m",
@@ -405,12 +405,12 @@ def setup(py_params_dict):
                 ),
             }
         )
-        attributes_dict["blocks"][-1]["masters"].pop("int_mem")
-        attributes_dict["blocks"][-1]["masters"] = {
+        attributes_dict["subblocks"][-1]["masters"].pop("int_mem")
+        attributes_dict["subblocks"][-1]["masters"] = {
             "int_mem": params["addr_w"] - 2 - 3,
             "mem": params["addr_w"] - 2 - 3,
-        } | attributes_dict["blocks"][-1]["masters"]
-    attributes_dict["blocks"] += [
+        } | attributes_dict["subblocks"][-1]["masters"]
+    attributes_dict["subblocks"] += [
         {
             "core_name": "iob_bootrom",
             "instance_name": "bootrom",
@@ -505,23 +505,31 @@ def setup(py_params_dict):
             "instantiate": False,
             "dest_dir": "hardware/simulation/src",
         },
-        # Synthesis module (needed for macros)
+    ]
+    attributes_dict["superblocks"] = [
+        # Memory wrapper
         {
-            "core_name": "iob_system_syn",
-            "instance_name": "iob_system_syn",
-            "instantiate": False,
-            "dest_dir": "hardware/syn/src",
+            "core_name": "iob_system_mwrap",
+            "instance_name": "iob_system_mwrap",
             "iob_system_params": params,
+            "superblocks": [
+                # Synthesis module (needed for macros)
+                {
+                    "core_name": "iob_system_syn",
+                    "instance_name": "iob_system_syn",
+                    "dest_dir": "hardware/syn/src",
+                    "iob_system_params": params,
+                },
+                # Simulation wrapper
+                {
+                    "core_name": "iob_system_sim",
+                    "instance_name": "iob_system_sim",
+                    "dest_dir": "hardware/simulation/src",
+                    "iob_system_params": params,
+                },
+                # FPGA wrappers added automatically
+            ],
         },
-        # Simulation wrapper
-        {
-            "core_name": "iob_system_sim",
-            "instance_name": "iob_system_sim",
-            "instantiate": False,
-            "dest_dir": "hardware/simulation/src",
-            "iob_system_params": params,
-        },
-        # FPGA wrappers added automatically
     ]
     attributes_dict["sw_modules"] = [
         # Software modules

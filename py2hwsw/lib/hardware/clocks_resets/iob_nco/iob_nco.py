@@ -119,7 +119,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
@@ -178,20 +178,6 @@ def setup(py_params_dict):
                     "period_frac_io": "period_frac",
                 },
             },
-            # For simulation
-            {
-                "core_name": "iob_tasks",
-                "instance_name": "iob_tasks_inst",
-                "dest_dir": "hardware/simulation/src",
-                "instantiate": False,
-            },
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "instantiate": False,
-                "dest_dir": "hardware/simulation/src",
-            },
             {
                 "core_name": "iob_acc_ld",
                 "instantiate": False,
@@ -219,6 +205,21 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_regfile_at2p",
                 "instantiate": False,
+            },
+            # For simulation
+            {
+                "core_name": "iob_tasks",
+                "instance_name": "iob_tasks_inst",
+                "dest_dir": "hardware/simulation/src",
+                "instantiate": False,
+            },
+        ],
+        "superblocks": [
+            # Simulation wrapper
+            {
+                "core_name": "iob_sim",
+                "instance_name": "iob_sim",
+                "dest_dir": "hardware/simulation/src",
             },
         ],
         "snippets": [],

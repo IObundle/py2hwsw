@@ -88,7 +88,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             """
             iob_reg_re reg0 -p DATA_W:DATA_W RST_VAL:RST_VAL -c
             clk_en_rst_s:clk_en_rst_s 

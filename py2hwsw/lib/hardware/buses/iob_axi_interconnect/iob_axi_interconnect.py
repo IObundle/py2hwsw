@@ -107,7 +107,7 @@ def setup(py_params_dict):
                 "descr": "AXI master interface",
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_arbiter",
                 "instance_name": "arbiter_inst",

@@ -62,7 +62,7 @@ def setup(py_params_dict):
             ],
         },
     ]
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         # ROM
         {
             "core_name": "iob_rom_sp",
@@ -106,37 +106,37 @@ def setup(py_params_dict):
         },
     ]
     if params["init_mem"]:
-        attributes_dict["blocks"][-1]["parameters"].update(
+        attributes_dict["subblocks"][-1]["parameters"].update(
             {
                 "FILE": f'"{params["name"]}_firmware"',
             }
         )
 
     # Copy iob_axi_ram block, but with READ_ON_WRITE=1
-    attributes_dict["blocks"].append(copy.deepcopy(attributes_dict["blocks"][-1]))
-    attributes_dict["blocks"][-1].pop("if_defined")
-    attributes_dict["blocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"
-    attributes_dict["blocks"][-1]["parameters"].update(
+    attributes_dict["subblocks"].append(copy.deepcopy(attributes_dict["subblocks"][-1]))
+    attributes_dict["subblocks"][-1].pop("if_defined")
+    attributes_dict["subblocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"
+    attributes_dict["subblocks"][-1]["parameters"].update(
         {
             "READ_ON_WRITE": 1,
         }
     )
 
-    attributes_dict["blocks"].append(
-        # IOb-System
+    attributes_dict["subblocks"].append(
+        # Add instantiator as a subblock (iob_system by default)
         {
-            "core_name": "iob_system",
-            "instance_name": "iob_system",
+            "core_name": py_params_dict["instantiator"]["original_name"],
+            "instance_name": py_params_dict["instantiator"]["original_name"],
             "instance_description": "IOb-SoC core",
-            "setup": False,
             "parameters": {
                 i["name"]: i["name"]
                 for i in iob_system_attr["confs"]
                 if i["type"] in ["P", "F"]
             },
             "connect": {i["name"]: i["name"] for i in iob_system_attr["ports"]},
-            **params,
         }
     )
+
+    attributes_dict["superblocks"] = py_params_dict["superblocks"]
 
     return attributes_dict

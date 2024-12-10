@@ -34,7 +34,7 @@ def setup(py_params_dict):
                 "descr": "CPU native interface",
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg_e",
                 "instance_name": "iob_reg_e_inst",

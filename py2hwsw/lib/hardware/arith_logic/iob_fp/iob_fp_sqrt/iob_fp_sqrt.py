@@ -291,7 +291,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_int_sqrt",
                 "instance_name": "int_sqrt",

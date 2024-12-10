@@ -211,7 +211,7 @@ def setup(py_params_dict):
     #
     # Blocks
     #
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_axi_interconnect",
             "instance_name": "iob_axi_interconnect_core",

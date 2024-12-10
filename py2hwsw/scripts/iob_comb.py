@@ -144,10 +144,10 @@ class iob_comb(iob_snippet):
 
                     if not any(
                         block.instance_name == f"{signal.name}_reg"
-                        for group in core.blocks
+                        for group in core.subblocks
                         for block in group.blocks
                     ):
-                        core.create_block_group(
+                        core.create_subblock_group(
                             core_name=reg_type,
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},

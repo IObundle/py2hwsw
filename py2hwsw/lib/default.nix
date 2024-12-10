@@ -41,12 +41,12 @@
 
 let
   # For debug
-  disable_py2_build = 0;
+  force_py2_build = 0;
 
   py2hwsw =
     if py2hwsw_pkg == "none" then
       # Caller does not provide py2hwsw package
-      if disable_py2_build == 0 then
+      if force_py2_build == 1 then
         # Environment variable with py2hwsw path is set
         pkgs.python3.pkgs.buildPythonPackage rec {
           pname = "py2hwsw";
@@ -121,6 +121,7 @@ let
     else
       pkg.name;
   list_of_pkg_names = builtins.filter (x: x != null) (map get_name py2hwsw_dependencies);
+  bin_path = builtins.toPath ../../bin;
 
 in
 
@@ -130,4 +131,7 @@ in
 pkgs.mkShell {
   name = "iob-shell";
   buildInputs = py2hwsw_dependencies;
+  shellHook = ''
+    export PATH="$PATH:${bin_path}"
+  '';
 }

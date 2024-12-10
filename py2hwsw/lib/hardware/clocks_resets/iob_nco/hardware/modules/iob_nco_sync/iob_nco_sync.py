@@ -124,7 +124,7 @@ def setup(py_params_dict):
             },
         ],
         "wires": [],
-        "blocks": [],
+        "subblocks": [],
         "snippets": [],
     }
 

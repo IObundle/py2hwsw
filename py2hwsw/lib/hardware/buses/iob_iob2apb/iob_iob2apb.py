@@ -107,7 +107,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg",
                 "instance_name": "pc_reg",

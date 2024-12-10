@@ -114,7 +114,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [],
+        "subblocks": [],
     }
 
     return attributes_dict

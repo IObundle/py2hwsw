@@ -83,7 +83,7 @@ def setup(py_params_dict):
                 "descr": "AXI read interface",
             },
         ],
-        "blocks": [],
+        "subblocks": [],
     }
 
     return attributes_dict

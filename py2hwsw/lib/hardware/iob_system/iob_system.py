@@ -511,7 +511,6 @@ def setup(py_params_dict):
         {
             "core_name": "iob_system_syn",
             "instance_name": "iob_system_syn",
-            "instantiate": False,
             "dest_dir": "hardware/syn/src",
             "iob_system_params": params,
         },
@@ -519,7 +518,6 @@ def setup(py_params_dict):
         {
             "core_name": "iob_system_sim",
             "instance_name": "iob_system_sim",
-            "instantiate": False,
             "dest_dir": "hardware/simulation/src",
             "iob_system_params": params,
         },

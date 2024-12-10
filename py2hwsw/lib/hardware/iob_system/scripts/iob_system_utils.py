@@ -79,7 +79,6 @@ def append_board_wrappers(attributes_dict, params):
                 "core_name": "iob_system_" + board,
                 "instance_name": "iob_system_" + board,
                 "instance_description": f"FPGA wrapper for {board}",
-                "instantiate": False,
                 "dest_dir": f"hardware/fpga/{tool}/{board}",
                 "iob_system_params": params,
             },

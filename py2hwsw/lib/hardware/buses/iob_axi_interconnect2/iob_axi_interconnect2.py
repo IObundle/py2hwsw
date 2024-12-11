@@ -217,7 +217,7 @@ def setup(py_params_dict):
         attributes_dict["blocks"].append(
             {
                 "core_name": "iob_axi_split",
-                "name": f"{py_params_dict["name"]}_split",
+                "name": f"{py_params_dict['name']}_split",
                 "instance_name": f"iob_axi_split_{i}",
                 "instance_description": f"AXI split for slave {i}",
                 "parameters": AXI_VERILOG_PARAMS_MAP,
@@ -240,7 +240,7 @@ def setup(py_params_dict):
         attributes_dict["blocks"].append(
             {
                 "core_name": "iob_axi_merge",
-                "name": f"{py_params_dict["name"]}_merge",
+                "name": f"{py_params_dict['name']}_merge",
                 "instance_name": f"iob_axi_merge_{i}",
                 "instance_description": f"AXI merge for master {i}",
                 "parameters": AXI_VERILOG_PARAMS_MAP,

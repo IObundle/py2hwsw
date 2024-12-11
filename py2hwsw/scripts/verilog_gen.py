@@ -191,8 +191,9 @@ def generate_verilog(core):
 
     f_module = open(file_path, "w+")
 
-    if param_gen.has_params(core.confs):
-        params_line = f"#(\n{param_gen.generate_params(core)}) ("
+    params = param_gen.generate_params(core)
+    if params:
+        params_line = f"#(\n{params}) ("
     else:
         params_line = "("
 
@@ -200,8 +201,8 @@ def generate_verilog(core):
     if core.wires:
         module_body_lines += wire_gen.generate_wires(core) + "\n\n"
 
-    if core.blocks:
-        module_body_lines += block_gen.generate_blocks(core) + "\n\n"
+    if core.subblocks:
+        module_body_lines += block_gen.generate_subblocks(core) + "\n\n"
 
     if core.comb:
         module_body_lines += comb_gen.generate_comb(core) + "\n\n"

@@ -9,22 +9,22 @@ def setup(py_params_dict):
         "confs": [
             """
             DATA_W -t P -v 32 -m NA -M NA
-            'Data bus width'
+            -d 'Data bus width'
 
             FRACTIONAL_W -t P -v 0 -m NA -M NA
-            'Fractional part width'
+            -d 'Fractional part width'
 
             REAL_W -t P -v 'DATA_W - FRACTIONAL_W' -m NA -M NA
-            'Real part width'
+            -d 'Real part width'
 
             SIZE_W -t P -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
-            'Size width'
+            -d 'Size width'
 
             END_COUNT -t F -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA
-            'End count'
+            -d 'End count'
 
             COUNT_W -t F -v $clog2(END_COUNT) -m NA -M NA
-            'Count width'
+            -d 'Count width'
             """,
         ],
         "ports": [

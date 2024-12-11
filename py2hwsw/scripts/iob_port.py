@@ -26,6 +26,7 @@ class iob_port(iob_wire):
     # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
     e_connect_bit_slices: list = field(default_factory=list)
     doc_only: bool = False
+    doc_clearpage: bool = False
 
     def __post_init__(self):
         if not self.name:
@@ -110,8 +111,8 @@ class iob_port(iob_wire):
 
 attrs = [
     "name",
-    ["-i", "signals", {"nargs": 2}, ["type", "subtype"]],
-    ["-s", "signals", {"nargs": 2, "action": "append"}, ["name", "width"]],
+    ["-i", "signals", {"nargs": 1}, ("type",)],
+    ["-s", "signals", {"nargs": "+"}, ["name:width"]],
 ]
 
 

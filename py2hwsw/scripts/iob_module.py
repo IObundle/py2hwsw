@@ -3,12 +3,13 @@
 # SPDX-License-Identifier: MIT
 
 from iob_base import iob_base, process_elements_from_list
-from iob_conf import create_conf
+from iob_conf import create_conf_group
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
 from iob_comb import iob_comb, create_comb
 from iob_fsm import iob_fsm, create_fsm
+from iob_block import create_block_group, iob_block_group
 
 
 class iob_module(iob_base):
@@ -40,7 +41,7 @@ class iob_module(iob_base):
             "confs",
             [],
             list,
-            get_list_attr_handler(self.create_conf),
+            get_list_attr_handler(self.create_conf_group),
             "List of module macros and Verilog (false-)parameters.",
         )
         self.set_default_attribute(
@@ -83,23 +84,31 @@ class iob_module(iob_base):
         )
         # List of instances of other cores inside this core
         self.set_default_attribute(
-            "blocks",
+            "subblocks",
             [],
             list,
-            get_list_attr_handler(self.create_instance),
+            get_list_attr_handler(self.create_subblock_group),
             "List of instances of other cores inside this core.",
+        )
+        # List of wrappers for this core
+        self.set_default_attribute(
+            "superblocks",
+            [],
+            list,
+            get_list_attr_handler(self.create_superblock_group),
+            "List of wrappers for this core. Will only be setup if this core is a top module, or a wrapper of the top module.",
         )
         # List of software modules required by this core
         self.set_default_attribute(
             "sw_modules",
             [],
             list,
-            get_list_attr_handler(self.create_sw_instance),
+            get_list_attr_handler(self.create_sw_instance_group),
             "List of software modules required by this core.",
         )
 
-    def create_conf(self, *args, **kwargs):
-        create_conf(self, *args, **kwargs)
+    def create_conf_group(self, *args, **kwargs):
+        create_conf_group(self, *args, **kwargs)
 
     def create_port(self, *args, **kwargs):
         create_port(self, *args, **kwargs)
@@ -119,14 +128,27 @@ class iob_module(iob_base):
     def create_fsm(self, *args, **kwargs):
         create_fsm(self, *args, **kwargs)
 
-    def create_instance(self, **kwargs):
-        """Import core and create an instance of it inside this module"""
-        # Method body implemented in subclass
+    def create_superblock_group(self, *args, **kwargs):
+        kwargs.pop("instantiate", None)
+        create_block_group(
+            self,
+            *args,
+            instantiate=False,
+            is_superblock=True,
+            blocks_attribute_name="superblocks",
+            **kwargs
+        )
 
-    def create_sw_instance(self, **kwargs):
-        """Import core and run its setup process"""
-        # Setup process is equal to normal core, but should not be instantiated in Verilog
-        self.create_instance(instantiate=False, **kwargs)
+    def create_subblock_group(self, *args, **kwargs):
+        if self.is_superblock:
+            # Remove instantiator subblock from the group to ensure that it is not setup again
+            if self.handle_instantiator_subblock(*args, **kwargs):
+                return
+        create_block_group(self, *args, **kwargs)
+
+    def create_sw_instance_group(self, *args, **kwargs):
+        kwargs.pop("instantiate", None)
+        self.create_subblock_group(*args, instantiate=False, **kwargs)
 
     def update_global_top_module(self):
         """Update global top module if it has not been set before.
@@ -134,6 +156,46 @@ class iob_module(iob_base):
         """
         if not __class__.global_top_module:
             __class__.global_top_module = self
+
+    def handle_instantiator_subblock(self, *args, **kwargs):
+        """If given kwargs describes the instantiator subblock, return True. Otherwise return False.
+        If given kwargs describes a group of blocks that contains the instantiator subblock, then remove it from that list.
+        Also append instantiator object found to the core's 'subblocks' list.
+        """
+        blocks = kwargs.pop("blocks", None)
+        instantiator = self.instantiator
+        if blocks is None and kwargs.get("core_name") == instantiator.original_name:
+            self.update_instantiator_obj(instantiator, kwargs)
+            return True
+
+        if blocks:
+            for idx, block in blocks:
+                if block["core_name"] == instantiator.original_name:
+                    self.update_instantiator_obj(instantiator, block)
+                    del blocks[idx]
+                    break
+
+        return False
+
+    def update_instantiator_obj(self, instantiator_obj, instance_dict):
+        """Update given instantiator object with values for verilog parameters and external port connections.
+        Also, add instantiator object to the 'subblocks' list of this superblock.
+        :param instantiator_obj: Instantiator object
+        :param instance_dict: Dictionary describing verilog instance. Includes port connections and verilog parameter values.
+        """
+        instantiator_obj.instantiate = True
+        # Set values to pass via verilog parameters
+        instantiator_obj.parameters = instance_dict.get("parameters", {})
+        # Connect ports of instantiator to external wires (wires of this superblock)
+        instantiator_obj.connect_instance_ports(instance_dict.get("connect", {}), self)
+        # Create a block group dedicated for instantiator subblock, and add it to the 'subblocks' list of current superblock
+        self.subblocks.append(
+            iob_block_group(
+                name="instantiator_subblock",
+                descr="Block group for instantiator subblock (the subblock that uses this one as a superblock)",
+                blocks=[instantiator_obj],
+            )
+        )
 
 
 def get_list_attr_handler(func):

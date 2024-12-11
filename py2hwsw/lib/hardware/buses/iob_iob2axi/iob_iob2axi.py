@@ -7,7 +7,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "version": "0.1",
         "generate_hw": False,
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "m_axi_m_port",
                 "instance_name": "m_axi_m_port_inst",
@@ -44,11 +44,12 @@ def setup(py_params_dict):
                 "core_name": "iob_functions",
                 "instance_name": "iob_functions_inst",
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
         ],

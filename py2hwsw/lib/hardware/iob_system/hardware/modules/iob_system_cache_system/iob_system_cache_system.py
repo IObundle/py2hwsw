@@ -147,7 +147,7 @@ def setup(py_params_dict):
             "descr": "iob-system external memory l2 cache interface",
         },
     ]
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_merge",
             "name": "iob_i_d_into_l2_merge",

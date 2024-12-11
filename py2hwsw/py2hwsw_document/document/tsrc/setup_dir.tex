@@ -4,41 +4,39 @@
 
 The setup directory of a core may have the following structure:
 
-% TODO: Find a way of printing these unicode chars
-%
-%\begin{verbatim}
-%.
-%├── core_name.py
-%├── core_name.json
-%├── document
-%│   ├── doc_build.mk
-%│   ├── figures
-%│   └── tsrc
-%├── hardware
-%│   ├── src
-%│   ├── fpga
-%│   │   ├── fpga_build.mk
-%│   │   ├── src
-%│   │   ├── quartus
-%│   │   └── vivado
-%│   ├── modules
-%│   ├── simulation
-%│   │   ├── sim_build.mk
-%│   │   └── src
-%│   └── syn
-%│       ├── src
-%│       └── genus
-%├── software
-%│   ├── sw_build.mk
-%│   └── src
-%├── scripts
-%├── submodules
-%├── Makefile
-%├── README.md
-%├── LICENSE
-%├── CITATION.cff
-%└── default.nix
-%\end{verbatim}
+\begin{verbatim}
+.
+├── core_name.py
+├── core_name.json
+├── document
+│   ├── doc_build.mk
+│   ├── figures
+│   └── tsrc
+├── hardware
+│   ├── src
+│   ├── fpga
+│   │   ├── fpga_build.mk
+│   │   ├── src
+│   │   ├── quartus
+│   │   └── vivado
+│   ├── modules
+│   ├── simulation
+│   │   ├── sim_build.mk
+│   │   └── src
+│   └── syn
+│       ├── src
+│       └── genus
+├── software
+│   ├── sw_build.mk
+│   └── src
+├── scripts
+├── submodules
+├── Makefile
+├── README.md
+├── LICENSE
+├── CITATION.cff
+└── default.nix
+\end{verbatim}
 
 Only the \texttt{core\_name.py} or \texttt{core\_name.json} file is needed to pass the core's description to Py2HWSW.
 The remaining directories and files are optional.
@@ -55,3 +53,7 @@ The following directories and files do not follow a mandatory structure, but are
 The \texttt{hardware/modules} and \texttt{submodules} directories typically contain setup directories of other cores.
 
 The \texttt{scripts} directory contains scripts specific to the core, and may be called by the user or from the \texttt{core\_name.py} script.
+
+A simple example of a core's setup directory is available for the \href{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/basic_tests/iob_and}{iob\_and} core.
+
+A more complex example of a core's setup directory is available for the \href{https://github.com/IObundle/iob-soc}{iob\_soc} core.

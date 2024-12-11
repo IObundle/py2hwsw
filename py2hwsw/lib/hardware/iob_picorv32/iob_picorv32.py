@@ -99,7 +99,7 @@ def setup(py_params_dict):
                 "descr": "iob-picorv32 data bus",
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_inst",

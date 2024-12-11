@@ -1,0 +1,238 @@
+% SPDX-FileCopyrightText: 2024 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+\documentclass{ug}
+
+%
+% Packages and configuration
+%
+
+\usepackage{xltabular}
+
+\usepackage{hyperref}
+% Set up hyperlink colors
+\hypersetup{
+    colorlinks=true, % false: boxed links; true: colored links
+    linkcolor=blue, % color of internal links
+    citecolor=blue, % color of citations
+    urlcolor=blue   % color of external links
+}
+
+
+\usepackage{listings}
+\usepackage{xcolor}
+% Define colors
+\definecolor{keywordcolor}{RGB}{0, 0, 255} % Blue for keywords
+\definecolor{commentcolor}{RGB}{0, 128, 0} % Green for comments
+\definecolor{stringcolor}{RGB}{255, 0, 0} % Red for strings
+\definecolor{backgroundcolor}{RGB}{245, 245, 245} % Light gray background
+
+% Set up listings
+\lstdefinestyle{Python}{
+    backgroundcolor=\color{backgroundcolor},
+    basicstyle=\ttfamily,
+    keywordstyle=\color{keywordcolor},
+    commentstyle=\color{commentcolor},
+    stringstyle=\color{stringcolor},
+    numbers=left,
+    numberstyle=\tiny,
+    stepnumber=1,
+    numbersep=5pt,
+    showstringspaces=false,
+    tabsize=4,
+    breaklines=true
+}
+% Set the default style for all lstlisting environments
+\lstset{style=Python}
+
+% Support unicode chars for drawing directory trees (├ ─ └)
+\usepackage{pmboxdraw}
+
+%
+% Document content
+%
+
+\input{ug_title}
+\date{\today}
+\category{User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}}
+
+\input{color}
+
+\begin{document}
+
+\maketitle
+\pagenumbering{gobble}
+
+\vspace*{\fill}
+User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
+\hspace*{\fill} \includegraphics[keepaspectratio,scale=.7]{Logo.png}
+
+\cleardoublepage
+\pagenumbering{roman}
+\setcounter{page}{1}
+\input{revhist}
+\cleardoublepage
+\tableofcontents
+\clearpage
+\listoftables
+\clearpage
+\listoffigures
+\cleardoublepage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+%
+% Introduction
+%
+\section{Introduction}
+\label{sec:intro}
+\input{intro}
+%\input{symb}
+
+\subsection{What Is Py2HWSW?}
+\label{sec:whatispy2}
+\input{whatispy2}
+
+\subsection{What Is Py2HWSW For?}
+\label{sec:purpose}
+\input{purpose}
+
+\subsection{What Problem Does Py2HWSW Solve?}
+\label{sec:problem}
+\input{problem}
+
+\subsection{What Design Principles Underlie Py2HWSW?}
+\label{sec:principles}
+\input{principles}
+
+\subsection{How Does Py2HWSW Accomplish Its Goals?}
+\label{sec:how}
+\input{how}
+
+%
+% Getting Started
+%
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
+\section{Getting Started}
+\label{sec:gs}
+
+\subsection{Setup Directory}
+\label{sec:setup_dir}
+\input{setup_dir}
+
+\subsection{Create An AND Gate Core: iob\_and}
+\label{sec:iob_and}
+\input{iob_and}
+
+\subsection{Setup And Build}
+\label{sec:setup_build}
+\input{setup_build}
+
+%
+% How It Works
+%
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
+\section{How It Works}
+\label{sec:how_it_works}
+
+This section gives a detailed description of the Py2HWSW framework.
+
+\subsection{Setup Flow Chart}
+\label{sec:py2_flow_chart}
+
+Figure~\ref{fig:py2_flow_chart} presents a high-level flow chart of the Py2HWSW setup procedure.
+
+\begin{figure}[H]
+  \centering {\includegraphics[width=\columnwidth]{py2_flow_chart.pdf}}
+  \vspace{-0.7cm}
+  \caption{High-Level Flow Chart of Py2HWSW Setup Procedure}
+  \label{fig:py2_flow_chart}
+\end{figure}
+
+\subsection{Block hierarchy}
+\label{sec:py2_block_hierarchy}
+
+Figure~\ref{fig:py2_superblocks_subblocks} presents an example block hierarchy for a Py2HWSW project.
+Superblocks are only used if they are superblocks of the project's top module or of one of its wrappers.
+
+\begin{figure}[H]
+  \centering {\includegraphics[width=\columnwidth]{superblocks_subblocks.pdf}}
+  \vspace{-0.7cm}
+  \caption{Block Hierarchy of a Py2HWSW Project}
+  \label{fig:py2_superblocks_subblocks}
+\end{figure}
+
+\subsection{Main launch script: py2hwsw.py}
+\label{sec:launch_script}
+\input{launch_script}
+
+\subsection{Main class for core representation: iob\_core.py}
+\label{sec:iob_core}
+\input{iob_core}
+
+% TODO: Subsections below
+% %
+% % How To Use
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{How To Use}
+% \label{sec:usage}
+% 
+% \subsection{Setup}
+% \label{sec:setup}
+% \input{setup}
+% 
+% \subsection{Simulation}
+% \label{sec:tbbd}
+% \input{sim}
+% 
+% \ifdefined\ASICSYNTH
+% \subsection{ASIC Synthesis}
+% \label{sec:synth}
+% \input{synth}
+% \fi
+% 
+% \ifdefined\FPGACOMP
+% \subsection{FPGA Compilation}
+% \label{sec:fpga}
+% \input{fpga}
+% \fi
+% 
+% %
+% % Configuration
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{Configuration}
+% \label{sec:config}
+% \input{config}
+% 
+% %
+% % End to End Examples
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{End to End Examples}
+% \label{sec:examples}
+% \input{examples}
+% 
+% %
+% % FAQ
+% %
+% \ifdefined\SECTIONCLEARPAGE
+% \clearpage
+% \fi
+% \section{FAQ}
+% \label{sec:faq}
+% \input{faq}
+
+\end{document}

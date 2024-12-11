@@ -13,7 +13,14 @@ bsp = [
 
 def setup(py_params_dict):
     attributes_dict = {
-        "confs": bsp,
+        "name": py_params_dict["instantiator"]["name"] + "_aes_ku040_db_g",
+        "confs": [
+            {
+                "name": "bsp",
+                "descr": "Board Support Package confs",
+                "confs": bsp,
+            },
+        ],
     }
 
     return attributes_dict

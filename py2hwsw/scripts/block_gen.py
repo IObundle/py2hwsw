@@ -3,10 +3,11 @@
 # SPDX-License-Identifier: MIT
 
 #
-#    blocks_gen.py: instantiate Verilog modules and generate their documentation
+#    subblocks_gen.py: instantiate Verilog modules and generate their documentation
 #
 
 from latex import write_table
+import sys
 
 import iob_colors
 from iob_base import fail_with_msg
@@ -14,18 +15,19 @@ from iob_signal import get_real_signal
 import param_gen
 
 
-# Generate blocks.tex file with TeX table of blocks (Verilog modules instances)
-def generate_blocks_table_tex(out_dir):
-    blocks_file = open(f"{out_dir}/blocks.tex", "w")
+# Generate subblocks.tex file with TeX table of subblocks (Verilog modules instances)
+def generate_subblocks_table_tex(subblocks, out_dir):
+    subblocks_file = open(f"{out_dir}/subblocks.tex", "w")
 
-    blocks_file.write(
+    subblocks_file.write(
         "The Verilog modules in the top-level entity of the core are \
-        described in the following table. The table elements represent \
-        the blocks in the Block Diagram.\n"
+        described in the following tables. The table elements represent \
+        the subblocks in the Block Diagram.\n"
     )
 
-    blocks_file.write(
-        """
+    for group in subblocks:
+        subblocks_file.write(
+            """
 \\begin{table}[H]
   \\centering
   \\begin{tabularx}{\\textwidth}{|l|l|X|}
@@ -34,81 +36,91 @@ def generate_blocks_table_tex(out_dir):
     \\rowcolor{iob-green}
     {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
 
-    \\input blocks_module_tab
+    \\input """
+            + group.name
+            + """_subblocks_tab
 
   \\end{tabularx}
-  \\caption{Verilog modules in the top-level entity of the core}
-  \\label{blocks_module_tab:is}
+  \\caption{"""
+            + group.descr.replace("_", "\\_")
+            + """}
+  \\label{"""
+            + group.name
+            + """_subblocks_tab:is}
 \\end{table}
 """
-    )
-
-    blocks_file.write("\\clearpage")
-    blocks_file.close()
-
-
-# Generate TeX table of blocks
-def generate_blocks_tex(blocks, out_dir):
-    # Create blocks.tex file
-    generate_blocks_table_tex(out_dir)
-
-    tex_table = []
-    for block in blocks:
-        if not block.instantiate:
-            continue
-        tex_table.append(
-            [
-                block.name,
-                block.instance_name,
-                block.instance_description,
-            ]
         )
+        if group.doc_clearpage:
+            subblocks_file.write("\\clearpage")
 
-    write_table(f"{out_dir}/blocks_module", tex_table)
+    subblocks_file.write("\\clearpage")
+    subblocks_file.close()
 
 
-def generate_blocks(core):
+# Generate TeX table of subblocks
+def generate_subblocks_tex(subblocks, out_dir):
+    # Create subblocks.tex file
+    generate_subblocks_table_tex(subblocks, out_dir)
+
+    # Create table for each group
+    for group in subblocks:
+        tex_table = []
+        for block in group.blocks:
+            if not block.instantiate:
+                continue
+            tex_table.append(
+                [
+                    block.name,
+                    block.instance_name,
+                    block.instance_description,
+                ]
+            )
+
+        write_table(f"{out_dir}/{group.name}_subblocks", tex_table)
+
+
+def generate_subblocks(core):
     """Generate verilog code with verilog instances of this module.
     returns: Generated verilog code
     """
     code = ""
-    for instance in core.blocks:
-        if not instance.instantiate:
-            continue
-        # Open ifdef if conditional interface
-        if instance.if_defined:
-            code += f"`ifdef {instance.if_defined}\n"
-        if instance.if_not_defined:
-            code += f"`ifndef {instance.if_not_defined}\n"
+    for group in core.subblocks:
+        for instance in group.blocks:
+            if not instance.instantiate:
+                continue
+            # Open ifdef if conditional interface
+            if instance.if_defined:
+                code += f"`ifdef {instance.if_defined}\n"
+            if instance.if_not_defined:
+                code += f"`ifndef {instance.if_not_defined}\n"
 
-        params_str = ""
-        if instance.parameters:
-            params_str = f"""#(
+            params_str = ""
+            if instance.parameters:
+                params_str = f"""#(
 {param_gen.generate_inst_params(instance)}\
     ) """
 
-        code += f"""\
-    // {instance.instance_description}
-    {instance.name} {params_str}{instance.instance_name} (
-{get_instance_port_connections(instance)}\
-    );
+            code += f"""\
+        // {instance.instance_description}
+        {instance.name} {params_str}{instance.instance_name} (
+    {get_instance_port_connections(instance)}\
+        );
 
-"""
-
-        # Close ifdef if conditional interface
-        if instance.if_defined or instance.if_not_defined:
-            code += "`endif\n"
+    """
+            # Close ifdef if conditional interface
+            if instance.if_defined or instance.if_not_defined:
+                code += "`endif\n"
 
     return code
 
 
-def generate_blocks_snippet(core):
-    """Write verilog snippet ('.vs' file) with blocks of this core.
+def generate_subblocks_snippet(core):
+    """Write verilog snippet ('.vs' file) with subblocks of this core.
     This snippet may be included manually in verilog modules if needed.
     """
-    code = generate_blocks(core)
+    code = generate_subblocks(core)
     out_dir = core.build_dir + "/hardware/src"
-    with open(f"{out_dir}/{core.name}_blocks.vs", "w+") as f:
+    with open(f"{out_dir}/{core.name}_subblocks.vs", "w+") as f:
         f.write(code)
 
 

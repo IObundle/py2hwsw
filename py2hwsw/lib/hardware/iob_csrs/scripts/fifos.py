@@ -493,8 +493,8 @@ def create_fifo_instance(attributes_dict, csr_ref):
         if fifo_type == "W":
             attributes_dict["wires"] += [
                 f"""
-                {fifo_name}_empty -s {fifo_name}_empty 1
-                '{fifo_name} empty output'
+                {fifo_name}_empty -s {fifo_name}_empty:1
+                -d '{fifo_name} empty output'
                 """,
                 {
                     "name": f"{fifo_name}_write_io",
@@ -515,8 +515,8 @@ def create_fifo_instance(attributes_dict, csr_ref):
         else:  # fifo_type == "R"
             attributes_dict["wires"] += [
                 f"""
-                {fifo_name}_full -s {fifo_name}_full 1
-                '{fifo_name} full output'
+                {fifo_name}_full -s {fifo_name}_full:1
+                -d '{fifo_name} full output'
                 """,
                 {
                     "name": f"{fifo_name}_read_io",
@@ -566,7 +566,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
     # Blocks
     #
     if is_async:
-        attributes_dict["blocks"].append(
+        attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_fifo_async",
                 "instance_name": fifo_name,
@@ -594,7 +594,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             }
         )
     else:  # not is_async
-        attributes_dict["blocks"].append(
+        attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_fifo_sync",
                 "instance_name": fifo_name,
@@ -614,7 +614,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 },
             }
         )
-    attributes_dict["blocks"].append(
+    attributes_dict["subblocks"].append(
         {
             "core_name": "iob_functions",
             "instantiate": False,

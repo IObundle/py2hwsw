@@ -66,6 +66,14 @@ def setup(py_params_dict):
                 "min": "0",
                 "max": "1",
             },
+            {  # Needed for testbench
+                "name": "USE_ETHERNET",
+                "descr": "Enable ethernet connections",
+                "type": "M",
+                "val": params["use_ethernet"],
+                "min": "0",
+                "max": "1",
+            },
             {  # Needed for software
                 "name": "MEM_ADDR_W",
                 "descr": "Memory bus address width",
@@ -318,7 +326,7 @@ def setup(py_params_dict):
                 },
             },
         ]
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_vexriscv",
             "instance_name": "cpu",
@@ -363,7 +371,7 @@ def setup(py_params_dict):
         },
         {
             "core_name": "iob_axi_interconnect2",
-            "name": "iob_soc_axi_interconnect",
+            "name": params["name"] + "_axi_interconnect",
             "instance_name": "iob_axi_interconnect",
             "instance_description": "AXI interconnect instance",
             "parameters": {
@@ -405,7 +413,7 @@ def setup(py_params_dict):
             "num_masters": 4,
         },
     ]
-    attributes_dict["blocks"] += [
+    attributes_dict["subblocks"] += [
         {
             "core_name": "iob_bootrom",
             "instance_name": "bootrom",
@@ -415,11 +423,11 @@ def setup(py_params_dict):
                 "cbus_s": (
                     "bootrom_cbus",
                     [
-                        "bootrom_axi_araddr[13-2-1:0]",
+                        f"bootrom_axi_araddr[{params['bootrom_addr_w']+1}-2-1:0]",
                         "bootrom_axi_arid[0]",
                         "bootrom_axi_rid[0]",
                         "{1'b0, bootrom_axi_arlock}",
-                        "bootrom_axi_awaddr[13-2-1:0]",
+                        f"bootrom_axi_awaddr[{params['bootrom_addr_w']+1}-2-1:0]",
                         "bootrom_axi_awid[0]",
                         "bootrom_axi_bid[0]",
                         "{1'b0, bootrom_axi_awlock}",
@@ -453,7 +461,7 @@ def setup(py_params_dict):
         },
         {
             "core_name": "iob_split",
-            "name": "iob_pbus_split",
+            "name": params["name"] + "_pbus_split",
             "instance_name": "iob_pbus_split",
             "instance_description": "Split between peripherals",
             "connect": {
@@ -500,23 +508,31 @@ def setup(py_params_dict):
             "instantiate": False,
             "dest_dir": "hardware/simulation/src",
         },
-        # Synthesis module (needed for macros)
+    ]
+    attributes_dict["superblocks"] = [
+        # Memory wrapper
         {
-            "core_name": "iob_system_syn",
-            "instance_name": "iob_system_syn",
-            "instantiate": False,
-            "dest_dir": "hardware/syn/src",
+            "core_name": "iob_system_mwrap",
+            "instance_name": "iob_system_mwrap",
             "iob_system_params": params,
+            "superblocks": [
+                # Synthesis module (needed for macros)
+                {
+                    "core_name": "iob_system_syn",
+                    "instance_name": "iob_system_syn",
+                    "dest_dir": "hardware/syn/src",
+                    "iob_system_params": params,
+                },
+                # Simulation wrapper
+                {
+                    "core_name": "iob_system_sim",
+                    "instance_name": "iob_system_sim",
+                    "dest_dir": "hardware/simulation/src",
+                    "iob_system_params": params,
+                },
+                # FPGA wrappers added automatically
+            ],
         },
-        # Simulation wrapper
-        {
-            "core_name": "iob_system_sim",
-            "instance_name": "iob_system_sim",
-            "instantiate": False,
-            "dest_dir": "hardware/simulation/src",
-            "iob_system_params": params,
-        },
-        # FPGA wrappers added automatically
     ]
     attributes_dict["sw_modules"] = [
         # Software modules

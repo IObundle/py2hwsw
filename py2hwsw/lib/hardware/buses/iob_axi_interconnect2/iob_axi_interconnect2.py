@@ -207,14 +207,14 @@ def setup(py_params_dict):
     #
     # Blocks
     #
-    attributes_dict["blocks"] = []
+    attributes_dict["subblocks"] = []
     # Create axi_split blocks for each slave interface
     for i in range(N_SLAVES):
         split_master_port_connections = {}
         for j in range(N_MASTERS):
             split_master_port_connections[f"output_{j}_m"] = f"connect_s{i}_m{j}"
 
-        attributes_dict["blocks"].append(
+        attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_axi_split",
                 "name": f"{py_params_dict['name']}_split",
@@ -237,7 +237,7 @@ def setup(py_params_dict):
         for j in range(N_SLAVES):
             merge_slave_port_connections[f"input_{j}_s"] = f"connect_s{j}_m{i}"
 
-        attributes_dict["blocks"].append(
+        attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_axi_merge",
                 "name": f"{py_params_dict['name']}_merge",

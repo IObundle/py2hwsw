@@ -340,7 +340,7 @@ def setup(py_params_dict):
     #
     # Blocks
     #
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_reg_re",
             "instance_name": "active_read_transaction_reg_re",
@@ -402,7 +402,7 @@ def setup(py_params_dict):
     for signal, direction, width, sig_type in axi_signals:
         if direction == "input":
             # Demuxers
-            attributes_dict["blocks"].append(
+            attributes_dict["subblocks"].append(
                 {
                     "core_name": "iob_demux",
                     "instance_name": "iob_demux_" + signal,
@@ -423,7 +423,7 @@ def setup(py_params_dict):
             )
         else:  # output direction
             # Muxers
-            attributes_dict["blocks"].append(
+            attributes_dict["subblocks"].append(
                 {
                     "core_name": "iob_mux",
                     "instance_name": "iob_mux_" + signal,

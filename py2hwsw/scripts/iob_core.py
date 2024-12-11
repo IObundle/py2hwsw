@@ -460,11 +460,17 @@ class iob_core(iob_module, iob_instance):
                     f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
                 )
             port.connect_external(wire, bit_slices=bit_slices)
-        # find unconnected ports
         for port in self.ports:
             if not port.e_connect and port.interface:
                 if port.interface.type in mem_if_names and instantiator:
                     self.connect_memory(port, instantiator)
+        if self.is_top_module:
+            # if any port is not connected, and are memory ports, create memwrapper
+            if any([port.interface.type in mem_if_names for port in self.ports]):
+                self.create_memwrapper(instantiator)
+
+    def create_memwrapper(self, instantiator):
+        pass
 
     def __create_build_dir(self):
         """Create build directory if it doesn't exist"""

@@ -95,7 +95,7 @@ def setup(py_params_dict):
             en_rst_i:en_rst_i
             data_i:data_int
             data_o:data_o
-            'Accomulator register with synchronous reset and enable'
+            -d 'Accomulator register with synchronous reset and enable'
             """
         ],
         "snippets": [

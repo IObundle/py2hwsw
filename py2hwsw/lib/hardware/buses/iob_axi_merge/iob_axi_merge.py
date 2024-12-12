@@ -15,6 +15,10 @@ def setup(py_params_dict):
     # Number of bits required for input selection
     NBITS = (NUM_INPUTS - 1).bit_length()
 
+    ACTIVE_TRANSFER_COUNTER_DATA_W = py_params_dict.get(
+        "active_transfer_counter_data_w", 4
+    )
+
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
     # ID_W = int(py_params_dict["id_w"]) if "id_w" in py_params_dict else 1
@@ -170,27 +174,48 @@ def setup(py_params_dict):
     # Wires
     #
     attributes_dict["wires"] = [
-        # Active read transfer reg
+        # Active read transfer acc
         {
-            "name": "active_read_transaction_reg_en_rst",
-            "descr": "Enable and reset signal for active_read_transaction_reg",
+            "name": "active_read_transaction_acc_en_rst",
+            "descr": "Enable and reset signal for active_read_transaction_acc",
             "signals": [
-                {"name": "active_read_transaction_reg_en", "width": 1},
+                {"name": "active_read_transaction_acc_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
         {
-            "name": "active_read_transaction_reg_data_i",
-            "descr": "Input of active_read_transaction_reg",
+            "name": "active_read_transaction_acc_input",
+            "descr": "Input of active_read_transaction_acc",
+            "signals": [
+                {
+                    "name": "active_read_transaction_acc_input",
+                    "width": ACTIVE_TRANSFER_COUNTER_DATA_W,
+                },
+            ],
+        },
+        {
+            "name": "active_read_transaction_count",
+            "descr": "Output of active_read_transaction_acc",
+            "signals": [
+                {
+                    "name": "active_read_transaction_count",
+                    "width": ACTIVE_TRANSFER_COUNTER_DATA_W,
+                },
+            ],
+        },
+        {
+            "name": "active_read_transaction",
+            "descr": "Check for any active read transactions",
             "signals": [
                 {"name": "active_read_transaction", "width": 1},
             ],
         },
         {
-            "name": "active_read_transaction_reg_data_o",
-            "descr": "Output of active_read_transaction_reg",
+            "name": "active_read_transaction_start_end",
+            "descr": "Start and end signals of active read transaction",
             "signals": [
-                {"name": "active_read_transaction_reg", "width": 1},
+                {"name": "start_active_read_transaction", "width": 1},
+                {"name": "end_active_read_transaction", "width": 1},
             ],
         },
         # Read selection register signals
@@ -229,27 +254,48 @@ def setup(py_params_dict):
                 {"name": "read_sel_reg"},
             ],
         },
-        # Active write transfer reg
+        # Active write transfer acc
         {
-            "name": "active_write_transaction_reg_en_rst",
-            "descr": "Enable and reset signal for active_write_transaction_reg",
+            "name": "active_write_transaction_acc_en_rst",
+            "descr": "Enable and reset signal for active_write_transaction_acc",
             "signals": [
-                {"name": "active_write_transaction_reg_en", "width": 1},
+                {"name": "active_write_transaction_acc_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
         {
-            "name": "active_write_transaction_reg_data_i",
-            "descr": "Input of active_write_transaction_reg",
+            "name": "active_write_transaction_acc_input",
+            "descr": "Input of active_write_transaction_acc",
+            "signals": [
+                {
+                    "name": "active_write_transaction_acc_input",
+                    "width": ACTIVE_TRANSFER_COUNTER_DATA_W,
+                },
+            ],
+        },
+        {
+            "name": "active_write_transaction_count",
+            "descr": "Output of active_write_transaction_acc",
+            "signals": [
+                {
+                    "name": "active_write_transaction_count",
+                    "width": ACTIVE_TRANSFER_COUNTER_DATA_W,
+                },
+            ],
+        },
+        {
+            "name": "active_write_transaction",
+            "descr": "Check for any active write transactions",
             "signals": [
                 {"name": "active_write_transaction", "width": 1},
             ],
         },
         {
-            "name": "active_write_transaction_reg_data_o",
-            "descr": "Output of active_write_transaction_reg",
+            "name": "active_write_transaction_start_end",
+            "descr": "Start and end signals of active write transaction",
             "signals": [
-                {"name": "active_write_transaction_reg", "width": 1},
+                {"name": "start_active_write_transaction", "width": 1},
+                {"name": "end_active_write_transaction", "width": 1},
             ],
         },
         # Write selection register signals
@@ -372,18 +418,32 @@ def setup(py_params_dict):
     # Blocks
     #
     attributes_dict["subblocks"] = [
+        # Read blocks
+        # {
+        #    "core_name": "iob_reg_re",
+        #    "instance_name": "active_read_transaction_reg_re",
+        #    "parameters": {
+        #        "DATA_W": 1,
+        #        "RST_VAL": "1'b0",
+        #    },
+        #    "connect": {
+        #        "clk_en_rst_s": "clk_en_rst_s",
+        #        "en_rst_i": "active_read_transaction_reg_en_rst",
+        #        "data_i": "active_read_transaction_reg_data_i",
+        #        "data_o": "active_read_transaction_reg_data_o",
+        #    },
+        # },
         {
-            "core_name": "iob_reg_re",
-            "instance_name": "active_read_transaction_reg_re",
+            "core_name": "iob_acc",
+            "instance_name": "active_read_transaction_acc",
             "parameters": {
-                "DATA_W": 1,
-                "RST_VAL": "1'b0",
+                "DATA_W": ACTIVE_TRANSFER_COUNTER_DATA_W,
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "active_read_transaction_reg_en_rst",
-                "data_i": "active_read_transaction_reg_data_i",
-                "data_o": "active_read_transaction_reg_data_o",
+                "en_rst_i": "active_read_transaction_acc_en_rst",
+                "incr_i": "active_read_transaction_acc_input",
+                "data_o": "active_read_transaction_count",
             },
         },
         {
@@ -412,18 +472,32 @@ def setup(py_params_dict):
                 "encoded_o": "read_prio_enc_o",
             },
         },
+        # Write blocks
+        # {
+        #     "core_name": "iob_reg_re",
+        #     "instance_name": "active_write_transaction_reg_re",
+        #     "parameters": {
+        #         "DATA_W": 1,
+        #         "RST_VAL": "1'b0",
+        #     },
+        #     "connect": {
+        #         "clk_en_rst_s": "clk_en_rst_s",
+        #         "en_rst_i": "active_write_transaction_reg_en_rst",
+        #         "data_i": "active_write_transaction_reg_data_i",
+        #         "data_o": "active_write_transaction_reg_data_o",
+        #     },
+        # },
         {
-            "core_name": "iob_reg_re",
-            "instance_name": "active_write_transaction_reg_re",
+            "core_name": "iob_acc",
+            "instance_name": "active_write_transaction_acc",
             "parameters": {
-                "DATA_W": 1,
-                "RST_VAL": "1'b0",
+                "DATA_W": ACTIVE_TRANSFER_COUNTER_DATA_W,
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "active_write_transaction_reg_en_rst",
-                "data_i": "active_write_transaction_reg_data_i",
-                "data_o": "active_write_transaction_reg_data_o",
+                "en_rst_i": "active_write_transaction_acc_en_rst",
+                "incr_i": "active_write_transaction_acc_input",
+                "data_o": "active_write_transaction_count",
             },
         },
         {
@@ -504,14 +578,26 @@ def setup(py_params_dict):
         {
             "verilog_code": """
    // Only switch masters when there is no current active transaction
-   assign read_sel = active_read_transaction_reg ? read_sel_reg : read_prio_enc_o;
-   assign active_read_transaction_reg_en = (output_axi_arvalid_o & !active_read_transaction_reg) | (output_axi_rlast_i & output_axi_rvalid_i & output_axi_rready_o);
-   assign active_read_transaction = output_axi_arvalid_o & !active_read_transaction_reg;
+   assign read_sel = active_read_transaction ? read_sel_reg : read_prio_enc_o;
+
+   assign start_active_read_transaction = output_axi_arvalid_o & output_axi_arready_i;
+   assign end_active_read_transaction = output_axi_rlast_i & output_axi_rvalid_i & output_axi_rready_o;
+   assign active_read_transaction = |active_read_transaction_count;
+
+   // iob_acc inputs
+   assign active_read_transaction_acc_en = start_active_read_transaction | end_active_read_transaction;
+   assign active_read_transaction_acc_input = start_active_read_transaction ? 1 : -1;
 
    // Only switch masters when there is no current active transaction
-   assign write_sel = active_write_transaction_reg ? write_sel_reg : write_prio_enc_o;
-   assign active_write_transaction_reg_en = (output_axi_awvalid_o & !active_write_transaction_reg) | (output_axi_bvalid_i & output_axi_bready_o);
-   assign active_write_transaction = output_axi_awvalid_o & !active_write_transaction_reg;
+   assign write_sel = active_write_transaction ? write_sel_reg : write_prio_enc_o;
+
+   assign start_active_write_transaction = output_axi_awvalid_o & output_axi_awready_i;
+   assign end_active_write_transaction = output_axi_bvalid_i & output_axi_bready_o;
+   assign active_write_transaction = |active_write_transaction_count;
+
+   // iob_acc inputs
+   assign active_write_transaction_acc_en = start_active_write_transaction | end_active_write_transaction;
+   assign active_write_transaction_acc_input = start_active_write_transaction ? 1 : -1;
 """,
         },
     ]

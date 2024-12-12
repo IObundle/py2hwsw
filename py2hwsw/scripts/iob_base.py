@@ -190,30 +190,38 @@ def debug(msg, level=0):
 
 
 def str_to_kwargs(attrs: list):
-    """ Decorator to convert a string to keyword arguments.
-        @param attrs: list of attributes to parse
-            for a positional argument, its element should be a string
-            for a keyword argument, its element should be a list with the following format:
-                [flag, dest, kwargs, case]
-                flag: str, the flag to use in the command line
-                dest: str, the name of the argument
-                kwargs: dict, the keyword arguments to pass to the add_argument method
-                case: str, a keyword to describe a special case
-            for a parser, its element should be a dictionary with the following format:
-                {parser_name: list}
-                parser_name: str, the name of the parser
-                list: list, the list of attributes to parse
-                parser_name can have the following format:
-                    parser_name or parser_name&dest if the name in the string and the name in the parser are different
+    """Decorator to convert a string to keyword arguments.
+    @param attrs: list of attributes to parse
+        for a positional argument, its element should be a string
+        for a keyword argument, its element should be a list with the following format:
+            [flag, dest, kwargs, case]
+            flag: str, the flag to use in the command line
+            dest: str, the name of the argument
+            kwargs: dict, the keyword arguments to pass to the add_argument method
+            case: str, a keyword to describe a special case
+        for a parser, its element should be a dictionary with the following format:
+            {parser_name: list}
+            parser_name: str, the name of the parser
+            list: list, the list of attributes to parse
+            parser_name can have the following format:
+                parser_name or parser_name&dest if the name in the string and the name in the parser are different
     """
+
     def create_parsers(attrs: list, parser_name: str = "main") -> dict:
-        """ Create a dictionary of parsers and other usefull information """
+        """Create a dictionary of parsers and other usefull information"""
         parser = argparse.ArgumentParser()
         dicts = {}
         parser_dest = parser_name
-        if '&' in parser_name:
-            parser_name, parser_dest = parser_name.split('&')
-        parser_dict = {parser_name: {'parser':parser, 'dicts': dicts, 'vars': {}, 'dest':parser_dest}}
+        if "&" in parser_name:
+            parser_name, parser_dest = parser_name.split("&")
+        parser_dict = {
+            parser_name: {
+                "parser": parser,
+                "dicts": dicts,
+                "vars": {},
+                "dest": parser_dest,
+            }
+        }
         if (d := ["-d", "descr"]) not in attrs:
             attrs.append(d)
         for attr in attrs:
@@ -230,64 +238,67 @@ def str_to_kwargs(attrs: list):
             elif isinstance(attr, dict):
                 for key, value in attr.items():
                     new_dict = create_parsers(value, key)
-                    parser_dict[parser_name]['vars'].update({key.split('&')[0]:[]})
+                    parser_dict[parser_name]["vars"].update({key.split("&")[0]: []})
                     parser_dict.update(new_dict)
         return parser_dict
 
     def parse_args(parser_dict: dict, args: list) -> dict:
-        """ Parse the arguments of a list given a dictionary of parsers 
-            The first element of the list must be the key of the parser
+        """Parse the arguments of a list given a dictionary of parsers
+        The first element of the list must be the key of the parser
         """
         key = args[0]
-        parser = parser_dict[key]['parser']
-        dicts = parser_dict[key]['dicts']
+        parser = parser_dict[key]["parser"]
+        dicts = parser_dict[key]["dicts"]
         args = args[1:]
         args = parser.parse_args(args)
         kwargs = vars(args)
-        for arg in kwargs:
-            if arg in dicts and kwargs[arg] is not None:
-                if isinstance(dicts[arg], str):
-                    if dicts[arg] == "pairs":
-                        kwargs[arg] = dict(
-                                pair.split(":") for pair in kwargs[arg]
-                                )
-                elif isinstance(dicts[arg], list):
-                    _keys = [
-                            key
-                            for item in dicts[arg]
-                            for key in item.split(":")
-                            ]
-                    _values = [
-                            value
-                            for item in kwargs[arg]
-                            for value in item.split(":")
-                            ]
-                    kwargs[arg] = [
+        try:
+            for arg in kwargs:
+                if arg in dicts and kwargs[arg] is not None:
+                    if isinstance(dicts[arg], str):
+                        if dicts[arg] == "pairs":
+                            kwargs[arg] = dict(pair.split(":") for pair in kwargs[arg])
+                    elif isinstance(dicts[arg], list):
+                        _keys = [key for item in dicts[arg] for key in item.split(":")]
+                        _values = [
+                            value for item in kwargs[arg] for value in item.split(":")
+                        ]
+                        kwargs[arg] = [
                             dict(zip(_keys, _values[i:]))
                             for i in range(0, len(_values), len(_keys))
-                            ]
-                elif isinstance(dicts[arg], tuple):
-                    kwargs[arg] = dict(zip(dicts[arg], kwargs[arg]))
-        for key, value in list(kwargs.items()):
-            if ':' in key:
-                kwargs.pop(key)
-                keys = key.split(":")
-                if isinstance(value, list):
-                    values = [pair.split(":") for pair in value]
-                    for i in range(len(keys)):
-                        kwargs[keys[i]] = [v[i] for v in values]
-                else:
-                    values = value.split(":")
-                    for i in range(len(keys)):
-                        kwargs[keys[i]] = values[i]
+                        ]
+                    elif isinstance(dicts[arg], tuple):
+                        kwargs[arg] = dict(zip(dicts[arg], kwargs[arg]))
+            for key, value in list(kwargs.items()):
+                if ":" in key:
+                    kwargs.pop(key)
+                    keys = key.split(":")
+                    if isinstance(value, list):
+                        values = [pair.split(":") for pair in value]
+                        for i in range(len(keys)):
+                            kwargs[keys[i]] = [v[i] for v in values]
+                    else:
+                        values = value.split(":")
+                        for i in range(len(keys)):
+                            kwargs[keys[i]] = values[i]
+        except Exception as e:
+            print(
+                iob_colors.FAIL
+                + f"Failed to parse arguments:\n"
+                + str(args)
+                + "\nException: "
+                + str(e)
+                + iob_colors.ENDC
+            )
+            exit(1)
         return {k: v for k, v in kwargs.items() if v is not None}
 
     def organize_kwargs(parser_dict: dict, string: str) -> dict:
-        """ Splits the strint into a list of lists and parse each list with the correct parser
-            The first element of the list must be the key of the parser
-            The hyerarchy of the parsers is defined by the order of the elements in the list and the parser_dict
+        """Splits the strint into a list of lists and parse each list with the correct parser
+        The first element of the list must be the key of the parser
+        The hyerarchy of the parsers is defined by the order of the elements in the list and the parser_dict
         """
-        args = ['main'] + shlex.split(string)
+        args = ["main"] + shlex.split(string)
         lists = []
         while args:
             key = args.pop(0)
@@ -297,46 +308,59 @@ def str_to_kwargs(attrs: list):
                 lists[-1].append(key)
 
         def make_hierarchy(sub_lists: list, parser: str) -> dict:
-            if parser_dict[parser]['vars'] != {}:
+            if parser_dict[parser]["vars"] != {}:
                 output = {}
-                output[parser_dict[parser]['dest']] = []
+                output[parser_dict[parser]["dest"]] = []
                 sub_kwargs = {}
                 sub_kwargs[parser] = []
                 last_key = None
-                for key in parser_dict[parser]['vars']:
-                    output[parser_dict[key]['dest']] = []
+                for key in parser_dict[parser]["vars"]:
+                    output[parser_dict[key]["dest"]] = []
                     sub_kwargs[key] = []
                 while sub_lists:
                     element = sub_lists.pop(0)
-                    if element[0] in parser_dict[parser]['vars'] or element[0] == parser:
+                    if (
+                        element[0] in parser_dict[parser]["vars"]
+                        or element[0] == parser
+                    ):
                         key = element[0]
                         sub_kwargs[key].append(element)
                         last_key = key
                     else:
                         sub_kwargs[last_key][-1].append(element)
                 for key in sub_kwargs.keys():
-                    if parser_dict[key]['vars'] != {} and key != parser:
+                    if parser_dict[key]["vars"] != {} and key != parser:
                         output[parser][-1].update(make_hierarchy(sub_kwargs[key], key))
                     else:
                         for sub_list in sub_kwargs[key]:
-                            extracted = [item for item in sub_list if isinstance(item, list)]
-                            not_extracted = [item for item in sub_list if not isinstance(item, list)]
-                            output[parser_dict[key]['dest']].append(parse_args(parser_dict, not_extracted))
+                            extracted = [
+                                item for item in sub_list if isinstance(item, list)
+                            ]
+                            not_extracted = [
+                                item for item in sub_list if not isinstance(item, list)
+                            ]
+                            output[parser_dict[key]["dest"]].append(
+                                parse_args(parser_dict, not_extracted)
+                            )
                             if extracted:
-                                output[parser_dict[key]['dest']][-1].update(make_hierarchy(extracted, key))
+                                output[parser_dict[key]["dest"]][-1].update(
+                                    make_hierarchy(extracted, key)
+                                )
             else:
                 if isinstance(sub_lists, list):
                     sub_lists = sub_lists[0]
                 output = parse_args(parser_dict, sub_lists)
             for key in output.keys():
                 for i in range(len(output[key])):
-                    if 'core_name' in output[key][i]:
-                        output[key][i]['instance_description'] = output[key][i].pop('descr')
+                    if "core_name" in output[key][i]:
+                        output[key][i]["instance_description"] = output[key][i].pop(
+                            "descr"
+                        )
             return {k: v for k, v in output.items() if v != []}
 
-        kwargs = make_hierarchy(lists, 'main')
-        if 'main' in kwargs:
-            return kwargs['main'][0]
+        kwargs = make_hierarchy(lists, "main")
+        if "main" in kwargs:
+            return kwargs["main"][0]
         return kwargs
 
     def decorator(func):
@@ -351,7 +375,9 @@ def str_to_kwargs(attrs: list):
                 return None
             else:
                 return func(core, *args, **kwargs)
+
         return wrapper
+
     return decorator
 
 

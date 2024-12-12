@@ -49,7 +49,7 @@ def setup(py_params_dict):
             -d 'or output'
             """,
         ],
-        "blocks": [
+        "subblocks": [
             """
             iob_and iob_and_ab -p W:W -c
             a_i:a_i
@@ -74,11 +74,12 @@ def setup(py_params_dict):
             y_o:y_o
             -d 'Inverter'
             """,
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
         ],

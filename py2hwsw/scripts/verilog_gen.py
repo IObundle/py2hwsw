@@ -201,8 +201,8 @@ def generate_verilog(core):
     if core.wires:
         module_body_lines += wire_gen.generate_wires(core) + "\n\n"
 
-    if core.blocks:
-        module_body_lines += block_gen.generate_blocks(core) + "\n\n"
+    if core.subblocks:
+        module_body_lines += block_gen.generate_subblocks(core) + "\n\n"
 
     if core.comb:
         module_body_lines += comb_gen.generate_comb(core) + "\n\n"

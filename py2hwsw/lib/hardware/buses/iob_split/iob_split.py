@@ -205,7 +205,7 @@ def setup(py_params_dict):
             ],
         },
     ]
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_reg_re",
             "instance_name": "sel_reg_re",

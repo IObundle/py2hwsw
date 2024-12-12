@@ -61,7 +61,7 @@ def setup(py_params_dict):
             },
         ],
     }
-    attributes_dict["blocks"] = [
+    attributes_dict["subblocks"] = [
         {
             "core_name": "iob_reset_sync",
             "instance_name": "rst_sync",

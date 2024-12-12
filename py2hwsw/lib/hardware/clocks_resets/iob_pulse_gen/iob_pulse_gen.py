@@ -109,7 +109,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg",
                 "instance_name": "start_detected_inst",
@@ -149,11 +149,12 @@ def setup(py_params_dict):
                     "data_o": "pulse_o",
                 },
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
         ],

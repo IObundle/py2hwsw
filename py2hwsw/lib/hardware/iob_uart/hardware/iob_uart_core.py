@@ -42,7 +42,7 @@ def setup(py_params_dict):
                 "descr": "RS232 interface",
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg_e",
             },

@@ -164,7 +164,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             f"""iob_csrs csrs_inst 
 				-d 'Control/Status Registers' 
                 --no_autoaddr 
@@ -217,11 +217,12 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
         ],

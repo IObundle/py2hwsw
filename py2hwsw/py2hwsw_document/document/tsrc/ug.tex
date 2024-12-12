@@ -154,6 +154,19 @@ Figure~\ref{fig:py2_flow_chart} presents a high-level flow chart of the Py2HWSW 
   \label{fig:py2_flow_chart}
 \end{figure}
 
+\subsection{Block hierarchy}
+\label{sec:py2_block_hierarchy}
+
+Figure~\ref{fig:py2_superblocks_subblocks} presents an example block hierarchy for a Py2HWSW project.
+Superblocks are only used if they are superblocks of the project's top module or of one of its wrappers.
+
+\begin{figure}[H]
+  \centering {\includegraphics[width=\columnwidth]{superblocks_subblocks.pdf}}
+  \vspace{-0.7cm}
+  \caption{Block Hierarchy of a Py2HWSW Project}
+  \label{fig:py2_superblocks_subblocks}
+\end{figure}
+
 \subsection{Main launch script: py2hwsw.py}
 \label{sec:launch_script}
 \input{launch_script}

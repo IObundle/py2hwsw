@@ -16,7 +16,7 @@ def setup(py_params_dict):
                 "descr": "Clock and reset",
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_reg_re",
                 "instance_name": "iob_reg_re_inst",

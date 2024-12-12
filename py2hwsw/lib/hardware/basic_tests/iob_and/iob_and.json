@@ -42,11 +42,10 @@
             ]
         }
     ],
-    "blocks": [
+    "superblocks": [
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": false,
                 "dest_dir": "hardware/simulation/src"
             }
     ],

@@ -50,19 +50,30 @@ def iob_system_scripts(attributes_dict, params, py_params):
 def assert_block_attributes(attributes_dict, py_params):
     """Assert that all block attributes are valid."""
     child_attributes = py_params.get("system_attributes", {})
-    for block in attributes_dict["blocks"] + child_attributes.get("blocks", []):
-        assert block.get("core_name", None), "All blocks must have a core name!"
-        assert block.get(
-            "instance_name", None
-        ), f"Block '{block['core_name']}' must have an instance name!"
+    for attribute in ["subblocks", "superblocks"]:
+        for block in attributes_dict.get(attribute, []) + child_attributes.get(
+            attribute, []
+        ):
+            assert block.get("core_name", None), "All subblocks must have a core name!"
+            assert block.get(
+                "instance_name", None
+            ), f"Block '{block['core_name']}' must have an instance name!"
 
 
 def append_board_wrappers(attributes_dict, params):
-    """Append board wrappers to blocks list based on boards_list.
+    """Append board wrappers to superblocks list based on boards_list.
     :param dict attributes_dict: iob_system attributes
     :param dict params: iob_system python parameters
     """
     # FIXME: We should have a way for child cores to specify their board's tool (assuming child cores may add new unknown boards)
+
+    # Find memory wrapper dictionary
+    mwrap_dict = None
+    for block in attributes_dict["superblocks"]:
+        if block["core_name"] == "iob_system_mwrap":
+            mwrap_dict = block
+            break
+
     tools = {
         "aes_ku040_db_g": "vivado",
         "cyclonev_gt_dk": "quartus",
@@ -71,12 +82,11 @@ def append_board_wrappers(attributes_dict, params):
     }
     for board in attributes_dict.get("board_list", []):
         tool = tools[board]
-        attributes_dict["blocks"].append(
+        mwrap_dict["superblocks"].append(
             {
                 "core_name": "iob_system_" + board,
                 "instance_name": "iob_system_" + board,
                 "instance_description": f"FPGA wrapper for {board}",
-                "instantiate": False,
                 "dest_dir": f"hardware/fpga/{tool}/{board}",
                 "iob_system_params": params,
             },
@@ -109,7 +119,7 @@ def handle_system_overrides(attributes_dict, py_params):
 
         # Select identifier attribute. Used to compare if should override each element.
         identifier = "name"
-        if child_attribute_name in ["blocks", "sw_modules"]:
+        if child_attribute_name in ["subblocks", "superblocks", "sw_modules"]:
             identifier = "instance_name"
         elif child_attribute_name in ["board_list", "snippets", "ignore_snippets"]:
             # Elements in list do not have identifier, so just append them to parent list
@@ -143,11 +153,11 @@ def set_build_dir(attributes_dict, py_params):
 
 
 def get_iob_system_peripherals_list(attributes_dict):
-    """Parses blocks list in iob_system attributes, for blocks with the `peripheral_addr_w` attribute set.
+    """Parses subblocks list in iob_system attributes, for subblocks with the `peripheral_addr_w` attribute set.
     Also removes `peripheral_addr_w` attribute from each block after adding it to the peripherals list.
     """
     peripherals = []
-    for block in attributes_dict["blocks"]:
+    for block in attributes_dict["subblocks"]:
         if "peripheral_addr_w" in block and block["peripheral_addr_w"]:
             peripherals.append({"ref": block, "addr_w": block["peripheral_addr_w"]})
             block.pop("peripheral_addr_w")
@@ -157,12 +167,12 @@ def get_iob_system_peripherals_list(attributes_dict):
 def connect_peripherals_cbus(attributes_dict, peripherals, params):
     """Update given attributes_dict to connect peripherals cbus to system's pbus_split.
     :param dict attributes_dict: iob_system attributes
-    :param list peripherals: list of peripheral blocks
+    :param list peripherals: list of peripheral subblocks
     :param dict params: iob_system python parameters
     """
     # Find pbus_split
     pbus_split = None
-    for block in attributes_dict["blocks"]:
+    for block in attributes_dict["subblocks"]:
         if block["instance_name"] == "iob_pbus_split":
             pbus_split = block
 
@@ -229,7 +239,7 @@ def generate_peripheral_base_addresses(
 ):
     """Create C header file containing peripheral base addresses.
     :param dict attributes_dict: iob_system attributes
-    :param list peripherals_list: list of peripheral blocks
+    :param list peripherals_list: list of peripheral subblocks
     :param dict params: iob_system python parameters
     :param dict py_params: iob_system argument python parameters
     """
@@ -263,7 +273,7 @@ def generate_peripheral_base_addresses(
 def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
     """Generate automatic makefile segments for iob_system.
     :param dict attributes_dict: iob_system attributes
-    :param list peripherals: list of peripheral blocks
+    :param list peripherals: list of peripheral subblocks
     :param dict params: iob_system python parameters
     :param dict py_params: iob_system argument python parameters
     """

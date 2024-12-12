@@ -48,7 +48,7 @@ module iob_axistream_out #(
    `include "iob_axistream_out_wires.vs"
 
    // configuration control and status register file.
-   `include "iob_axistream_out_blocks.vs"
+   `include "iob_axistream_out_subblocks.vs"
 
    //AXI Stream interface
    assign axis_tvalid_o = axis_tvalid;

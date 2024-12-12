@@ -79,7 +79,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_counter_ld",
                 "instance_name": "cnt0",

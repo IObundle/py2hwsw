@@ -107,7 +107,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
@@ -180,11 +180,12 @@ def setup(py_params_dict):
                     "reg_interface_io": "iob_timer_core_reg_interface",
                 },
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
         ],

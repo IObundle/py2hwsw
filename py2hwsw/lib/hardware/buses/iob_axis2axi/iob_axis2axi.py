@@ -172,7 +172,7 @@ def setup(py_params_dict):
             #     "signals": [],
             # },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_fifo_sync",
                 "instance_name": "iob_fifo_sync_inst",
@@ -206,11 +206,12 @@ def setup(py_params_dict):
                 "core_name": "iob_axis2axi_out",
                 "instance_name": "iob_axis2axi_out_inst",
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
         ],

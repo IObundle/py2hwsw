@@ -411,7 +411,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "blocks": [
+        "subblocks": [
             {
                 "core_name": "iob_csrs",
                 "instance_name": "csrs_inst",
@@ -564,11 +564,12 @@ def setup(py_params_dict):
                     "async_fifo_read_extmem_io": "async_fifo_read_extmem",
                 },
             },
+        ],
+        "superblocks": [
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
                 "instance_name": "iob_sim",
-                "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
         ],

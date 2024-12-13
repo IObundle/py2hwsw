@@ -272,6 +272,20 @@ def setup(py_params_dict):
             ],
         },
         {
+            "name": "unused_interconnect_bits",
+            "descr": "Wires to connect to unused output bits of interconnect",
+            "signals": [
+                {"name": "unused_m0_araddr_bits", "width": (params["addr_w"] - 2) - 13},
+                {"name": "unused_m0_awaddr_bits", "width": (params["addr_w"] - 2) - 13},
+                {"name": "unused_m1_araddr_bits", "width": (params["addr_w"] - 2) - 22},
+                {"name": "unused_m1_awaddr_bits", "width": (params["addr_w"] - 2) - 22},
+                {"name": "unused_m2_araddr_bits", "width": (params["addr_w"] - 2) - 28},
+                {"name": "unused_m2_awaddr_bits", "width": (params["addr_w"] - 2) - 28},
+                {"name": "unused_m3_araddr_bits", "width": (params["addr_w"] - 2) - 28},
+                {"name": "unused_m3_awaddr_bits", "width": (params["addr_w"] - 2) - 28},
+            ],
+        },
+        {
             "name": "bootrom_cbus",
             "descr": "iob-system boot controller data interface",
             "signals": {
@@ -319,7 +333,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W-2",
+                    "ADDR_W": params["addr_w"] - 2,
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": 1,
@@ -385,11 +399,19 @@ def setup(py_params_dict):
                 "rst_i": "rst",
                 "s0_axi_s": "cpu_ibus",
                 "s1_axi_s": "cpu_dbus",
-                "m0_axi_m": "int_mem_axi_m",
+                "m0_axi_m": (
+                    "int_mem_axi_m",
+                    [
+                        "{unused_m0_araddr_bits, int_mem_axi_araddr_o}",
+                        "{unused_m0_awaddr_bits, int_mem_axi_awaddr_o}",
+                    ],
+                ),
                 "m1_axi_m": (
                     "axi_m",
                     (
                         [
+                            "{unused_m1_araddr_bits, axi_araddr_o}",
+                            "{unused_m1_awaddr_bits, axi_awaddr_o}",
                             "axi_arlock_o[0]",
                             "axi_awlock_o[0]",
                         ]
@@ -397,10 +419,18 @@ def setup(py_params_dict):
                         else []
                     ),
                 ),
-                "m2_axi_m": "bootrom_cbus",
+                "m2_axi_m": (
+                    "bootrom_cbus",
+                    [
+                        "{unused_m2_araddr_bits, bootrom_axi_araddr}",
+                        "{unused_m2_awaddr_bits, bootrom_axi_awaddr}",
+                    ],
+                ),
                 "m3_axi_m": (
                     "axi_periphs_cbus",
                     [
+                        "{unused_m3_araddr_bits, periphs_axi_araddr}",
+                        "{unused_m3_awaddr_bits, periphs_axi_awaddr}",
                         "periphs_axi_awlock[0]",
                         "periphs_axi_arlock[0]",
                     ],

@@ -585,7 +585,7 @@ def setup(py_params_dict):
    assign active_read_transaction = |active_read_transaction_count;
 
    // iob_acc inputs
-   assign active_read_transaction_acc_en = start_active_read_transaction | end_active_read_transaction;
+   assign active_read_transaction_acc_en = start_active_read_transaction ^ end_active_read_transaction;
    assign active_read_transaction_acc_input = start_active_read_transaction ? 1 : -1;
 
    // Only switch masters when there is no current active transaction
@@ -596,7 +596,7 @@ def setup(py_params_dict):
    assign active_write_transaction = |active_write_transaction_count;
 
    // iob_acc inputs
-   assign active_write_transaction_acc_en = start_active_write_transaction | end_active_write_transaction;
+   assign active_write_transaction_acc_en = start_active_write_transaction ^ end_active_write_transaction;
    assign active_write_transaction_acc_input = start_active_write_transaction ? 1 : -1;
 """,
         },

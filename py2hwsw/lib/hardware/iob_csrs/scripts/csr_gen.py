@@ -285,8 +285,8 @@ class csr_gen:
                 lines += "    );\n\n"
             if n_items > 1:
                 lines += self.gen_regfile_read_addr_logic(row)
-        else:  # compute wen
-            lines += f"    assign {name}_wen{suffix} = ({name}_addressed_w & (internal_iob_valid & internal_iob_ready))? |internal_iob_wstrb: 1'b0;\n"
+        else:  # not auto: compute wen
+            lines += f"    assign {name}_wen{suffix} = ({name}_addressed_w & internal_iob_valid)? |internal_iob_wstrb: 1'b0;\n"
             if suffix:
                 lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
 
@@ -311,7 +311,7 @@ class csr_gen:
         if not auto:  # output read enable
             lines += f"    wire {name}_addressed_r;\n"
             lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable >= {addr}) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
-            lines += f"    assign {name}_ren{suffix} = {name}_addressed_r & (internal_iob_valid & internal_iob_ready) & (~|internal_iob_wstrb);\n"
+            lines += f"    assign {name}_ren{suffix} = {name}_addressed_r & internal_iob_valid & (~|internal_iob_wstrb);\n"
 
         return lines
 

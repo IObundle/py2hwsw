@@ -100,12 +100,12 @@ def fpga_setup(python_module):
                     if os.path.isfile(setup_tool_file):
                         shutil.copy2(setup_tool_file, dst_file)
                         nix_permission_hack(dst_file)
-                # then copy the fpga directory (excluding any .pdf)
+                # then copy the fpga directory (excluding 'doc' directory)
                 shutil.copytree(
                     setup_fpga_dir,
                     os.path.join(dst_dir, tool, fpga),
                     dirs_exist_ok=True,
-                    ignore=shutil.ignore_patterns("*.pdf", "*.py"),
+                    ignore=shutil.ignore_patterns("doc", "*.py"),
                 )
                 nix_permission_hack(os.path.join(dst_dir, tool, fpga))
 

@@ -140,7 +140,9 @@ def replace_duplicate_signals_by_references(wires, signals):
         for key, value in signal.items():
             if original_signal.__dict__[key] != value:
                 fail_with_msg(
-                    f"Signal reference '{signal['name']}' has different '{key}' than the original signal!"
+                    f"Signal reference '{signal['name']}' has different '{key}' than the original signal!\n"
+                    f"Original signal '{original_signal.name}' value: '{original_signal.__dict__[key]}'.\n"
+                    f"Signal reference '{signal['name']}' value: '{value}'."
                 )
         # Replace signal by a reference to the original
         signals[idx] = iob_signal_reference(signal=original_signal)

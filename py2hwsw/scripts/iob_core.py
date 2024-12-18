@@ -84,7 +84,6 @@ class iob_core(iob_module, iob_instance):
         connect = kwargs.get("connect", {})
         self.instantiator = kwargs.get("instantiator", None)
         is_parent = kwargs.get("is_parent", False)
-        setup = kwargs.get("setup", True)
 
         # Create core based on 'parent' core (if applicable)
         if self.handle_parent(*args, **kwargs):
@@ -162,12 +161,6 @@ class iob_core(iob_module, iob_instance):
             descr="Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
         )
         self.set_default_attribute(
-            "setup",
-            setup,
-            bool,
-            descr="Select if should setup the core. We may not want to setup some cores to prevent circular dependencies. For example, the top-core wrappers typically dont want to start the setup for the top-core again.",
-        )
-        self.set_default_attribute(
             "is_top_module",
             __class__.global_top_module == self,
             bool,
@@ -186,8 +179,6 @@ class iob_core(iob_module, iob_instance):
         # Don't setup this core if using a project wide special target.
         if __class__.global_special_target:
             self.abort_reason = "special_target"
-        if not self.setup:
-            self.abort_reason = "no_setup"
 
         # Read 'attributes' dictionary and set corresponding core attributes
         superblocks = attributes.pop("superblocks", [])
@@ -212,9 +203,6 @@ class iob_core(iob_module, iob_instance):
         # )
 
         if self.abort_reason:
-            # Generate instance parameters when aborted due to 'no_setup' so that modules above it (like wrappers) can still instantiate it.
-            if self.abort_reason == "no_setup":
-                param_gen.generate_inst_params(self)
             return
 
         self.__create_build_dir()
@@ -338,7 +326,6 @@ class iob_core(iob_module, iob_instance):
             instantiator=kwargs.get("instantiator", None),
             connect=kwargs.get("connect", {}),
             parameters=kwargs.get("parameters", {}),
-            setup=kwargs.get("setup", True),
         )
 
         # Copy parent attributes to child

@@ -91,18 +91,18 @@ def setup(py_params_dict):
         "subblocks": [
             """
             iob_reg_re reg0 -p DATA_W:DATA_W RST_VAL:RST_VAL -c
-            clk_en_rst_s:clk_en_rst_s 
+            clk_en_rst_s:clk_en_rst_s
             en_rst_i:en_rst_i
             data_i:data_int
             data_o:data_o
-            'Accomulator register with synchronous reset and enable'
+            -d 'Accomulator register with synchronous reset and enable'
             """
         ],
         "snippets": [
             {
-                "verilog_code": f"""
+                "verilog_code": """
        assign data_nxt = data_o + incr_i;
-       assign data_int = data_nxt_o[DATA_W-1:0];
+       assign data_int = data_nxt[DATA_W-1:0];
             """,
             },
         ],

@@ -1,9 +1,0 @@
-# SPDX-FileCopyrightText: 2024 IObundle
-#
-# SPDX-License-Identifier: MIT
-
-# Serial port settings
-pu port             /dev/usb-uart
-pu baudrate         115200
-# Disable hardware flow control
-pu rtscts           No

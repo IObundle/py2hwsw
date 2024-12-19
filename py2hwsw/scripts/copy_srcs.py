@@ -60,7 +60,7 @@ def sim_setup(python_module):
         f"{get_lib_dir()}/{sim_dir}",
         f"{build_dir}/{sim_dir}",
         dirs_exist_ok=True,
-        ignore=shutil.ignore_patterns("*.pdf"),
+        ignore=shutil.ignore_patterns("*.pdf", "*.py"),
     )
     nix_permission_hack(f"{build_dir}/{sim_dir}")
 
@@ -82,7 +82,7 @@ def fpga_setup(python_module):
         src_dir,
         dst_dir,
         dirs_exist_ok=True,
-        ignore=shutil.ignore_patterns("*.pdf", *tools_list),
+        ignore=shutil.ignore_patterns("*.pdf", "*.py", *tools_list),
     )
     nix_permission_hack(dst_dir)
 
@@ -100,12 +100,12 @@ def fpga_setup(python_module):
                     if os.path.isfile(setup_tool_file):
                         shutil.copy2(setup_tool_file, dst_file)
                         nix_permission_hack(dst_file)
-                # then copy the fpga directory (excluding any .pdf)
+                # then copy the fpga directory (excluding 'doc' directory)
                 shutil.copytree(
                     setup_fpga_dir,
                     os.path.join(dst_dir, tool, fpga),
                     dirs_exist_ok=True,
-                    ignore=shutil.ignore_patterns("*.pdf"),
+                    ignore=shutil.ignore_patterns("doc", "*.py"),
                 )
                 nix_permission_hack(os.path.join(dst_dir, tool, fpga))
 
@@ -524,7 +524,7 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
     nix_permission_hack(os.path.join(core.build_dir, dst_directory))
 
 
-def copy_rename_setup_directory(core, exclude_file_list=[]):
+def copy_rename_setup_directory(core, exclude_file_list=["*.py"]):
     """Copy and rename files from the module's setup dir.
     Any string from the files in the setup dir that matches the
     module's class name (core.original_name) will be replaced by the

@@ -275,14 +275,14 @@ def setup(py_params_dict):
             "name": "unused_interconnect_bits",
             "descr": "Wires to connect to unused output bits of interconnect",
             "signals": [
-                {"name": "unused_m0_araddr_bits", "width": (params["addr_w"] - 2) - 13},
-                {"name": "unused_m0_awaddr_bits", "width": (params["addr_w"] - 2) - 13},
-                {"name": "unused_m1_araddr_bits", "width": (params["addr_w"] - 2) - 22},
-                {"name": "unused_m1_awaddr_bits", "width": (params["addr_w"] - 2) - 22},
-                {"name": "unused_m2_araddr_bits", "width": (params["addr_w"] - 2) - 28},
-                {"name": "unused_m2_awaddr_bits", "width": (params["addr_w"] - 2) - 28},
-                {"name": "unused_m3_araddr_bits", "width": (params["addr_w"] - 2) - 28},
-                {"name": "unused_m3_awaddr_bits", "width": (params["addr_w"] - 2) - 28},
+                {"name": "unused_m0_araddr_bits", "width": params["addr_w"] - params['fw_addr_w']},
+                {"name": "unused_m0_awaddr_bits", "width": params["addr_w"] - params['fw_addr_w']},
+                {"name": "unused_m1_araddr_bits", "width": f"{params['addr_w']} - AXI_ADDR_W"},
+                {"name": "unused_m1_awaddr_bits", "width": f"{params['addr_w']} - AXI_ADDR_W"},
+                {"name": "unused_m2_araddr_bits", "width": params["addr_w"] - (params['bootrom_addr_w'] + 1)},
+                {"name": "unused_m2_awaddr_bits", "width": params["addr_w"] - (params['bootrom_addr_w'] + 1)},
+                {"name": "unused_m3_araddr_bits", "width": 2},
+                {"name": "unused_m3_awaddr_bits", "width": 2},
             ],
         },
         {
@@ -292,7 +292,7 @@ def setup(py_params_dict):
                 "type": "axi",
                 "prefix": "bootrom_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 2 - 2,
+                "ADDR_W": (params['bootrom_addr_w'] + 1) - 2, # +1 for csrs; -2 for lsbs
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": "1",
@@ -453,11 +453,9 @@ def setup(py_params_dict):
                 "cbus_s": (
                     "bootrom_cbus",
                     [
-                        f"bootrom_axi_araddr[{params['bootrom_addr_w']+1}-2-1:0]",
                         "bootrom_axi_arid[0]",
                         "bootrom_axi_rid[0]",
                         "{1'b0, bootrom_axi_arlock}",
-                        f"bootrom_axi_awaddr[{params['bootrom_addr_w']+1}-2-1:0]",
                         "bootrom_axi_awid[0]",
                         "bootrom_axi_bid[0]",
                         "{1'b0, bootrom_axi_awlock}",

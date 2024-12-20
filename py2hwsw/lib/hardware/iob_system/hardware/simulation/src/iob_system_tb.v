@@ -11,6 +11,9 @@
 
 //Peripherals _csrs_def.vh file includes.
 `include "iob_uart_csrs_def.vh"
+`ifdef IOB_SYSTEM_USE_ETHERNET
+`include "iob_eth_csrs_def.vh"
+`endif
 
 module iob_system_tb;
 

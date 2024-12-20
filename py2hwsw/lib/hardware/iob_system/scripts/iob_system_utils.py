@@ -70,7 +70,7 @@ def append_board_wrappers(attributes_dict, params):
     # Find memory wrapper dictionary
     mwrap_dict = None
     for block in attributes_dict["superblocks"]:
-        if block["core_name"] == "iob_system_mwrap":
+        if block["instance_name"] == "iob_system_mwrap":
             mwrap_dict = block
             break
 

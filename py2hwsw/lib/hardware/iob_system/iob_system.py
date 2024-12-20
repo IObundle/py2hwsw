@@ -200,7 +200,7 @@ def setup(py_params_dict):
                     "ADDR_W": "AXI_ADDR_W-2",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
-                    "LOCK_W": "AXI_LEN_W",
+                    "LOCK_W": 1,
                 },
             },
         ]
@@ -412,8 +412,6 @@ def setup(py_params_dict):
                         [
                             "{unused_m1_araddr_bits, axi_araddr_o}",
                             "{unused_m1_awaddr_bits, axi_awaddr_o}",
-                            "axi_arlock_o[0]",
-                            "axi_awlock_o[0]",
                         ]
                         if params["use_extmem"]
                         else []

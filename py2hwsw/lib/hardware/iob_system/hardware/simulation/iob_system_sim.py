@@ -38,7 +38,7 @@ def setup(py_params_dict):
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
                 "type": "F",
-                "val": "`DDR_ADDR_W",
+                "val": params["mem_addr_w"],
                 "min": "1",
                 "max": "32",
             },
@@ -92,6 +92,20 @@ def setup(py_params_dict):
     #
     attributes_dict["wires"] = [
         {
+            "name": "clk",
+            "descr": "Clock signal",
+            "signals": [
+                {"name": "clk_i"},
+            ],
+        },
+        {
+            "name": "rst",
+            "descr": "Reset signal",
+            "signals": [
+                {"name": "arst_i"},
+            ],
+        },
+        {
             "name": "rs232",
             "descr": "rs232 bus",
             "signals": {
@@ -120,7 +134,7 @@ def setup(py_params_dict):
                     "ADDR_W": "AXI_ADDR_W - 2",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
-                    "LOCK_W": "AXI_LEN_W",
+                    "LOCK_W": 1,
                 },
             },
         ]
@@ -223,6 +237,32 @@ def setup(py_params_dict):
             },
         },
     ]
+    if params["use_extmem"]:
+        attributes_dict["subblocks"] += [
+            {
+                "core_name": "iob_axi_ram",
+                "instance_name": "ddr_model_mem",
+                "instance_description": "External memory",
+                "parameters": {
+                    "ID_WIDTH": "AXI_ID_W",
+                    "ADDR_WIDTH": "AXI_ADDR_W-2",
+                    "DATA_WIDTH": "AXI_DATA_W",
+                },
+                "connect": {
+                    "clk_i": "clk",
+                    "rst_i": "rst",
+                    "axi_s": (
+                        "axi",
+                        [
+                            # "{int_mem_axi_araddr, 2'b0}",
+                            # "{int_mem_axi_awaddr, 2'b0}",
+                            "{1'b0, axi_arlock}",
+                            "{1'b0, axi_awlock}",
+                        ],
+                    ),
+                },
+            },
+        ]
     if params["use_ethernet"]:
         attributes_dict["subblocks"] += [
             {

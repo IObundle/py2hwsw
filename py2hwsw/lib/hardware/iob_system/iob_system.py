@@ -275,12 +275,30 @@ def setup(py_params_dict):
             "name": "unused_interconnect_bits",
             "descr": "Wires to connect to unused output bits of interconnect",
             "signals": [
-                {"name": "unused_m0_araddr_bits", "width": params["addr_w"] - params['fw_addr_w']},
-                {"name": "unused_m0_awaddr_bits", "width": params["addr_w"] - params['fw_addr_w']},
-                {"name": "unused_m1_araddr_bits", "width": f"{params['addr_w']} - AXI_ADDR_W"},
-                {"name": "unused_m1_awaddr_bits", "width": f"{params['addr_w']} - AXI_ADDR_W"},
-                {"name": "unused_m2_araddr_bits", "width": params["addr_w"] - (params['bootrom_addr_w'] + 1)},
-                {"name": "unused_m2_awaddr_bits", "width": params["addr_w"] - (params['bootrom_addr_w'] + 1)},
+                {
+                    "name": "unused_m0_araddr_bits",
+                    "width": params["addr_w"] - params["fw_addr_w"],
+                },
+                {
+                    "name": "unused_m0_awaddr_bits",
+                    "width": params["addr_w"] - params["fw_addr_w"],
+                },
+                {
+                    "name": "unused_m1_araddr_bits",
+                    "width": f"{params['addr_w']} - AXI_ADDR_W",
+                },
+                {
+                    "name": "unused_m1_awaddr_bits",
+                    "width": f"{params['addr_w']} - AXI_ADDR_W",
+                },
+                {
+                    "name": "unused_m2_araddr_bits",
+                    "width": params["addr_w"] - (params["bootrom_addr_w"] + 1),
+                },
+                {
+                    "name": "unused_m2_awaddr_bits",
+                    "width": params["addr_w"] - (params["bootrom_addr_w"] + 1),
+                },
                 {"name": "unused_m3_araddr_bits", "width": 2},
                 {"name": "unused_m3_awaddr_bits", "width": 2},
             ],
@@ -292,7 +310,8 @@ def setup(py_params_dict):
                 "type": "axi",
                 "prefix": "bootrom_",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": (params['bootrom_addr_w'] + 1) - 2, # +1 for csrs; -2 for lsbs
+                "ADDR_W": (params["bootrom_addr_w"] + 1)
+                - 2,  # +1 for csrs; -2 for lsbs
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
                 "LOCK_W": "1",

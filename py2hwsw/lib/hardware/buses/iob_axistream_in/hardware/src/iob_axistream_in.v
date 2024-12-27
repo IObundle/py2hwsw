@@ -137,19 +137,25 @@ module iob_axistream_in #(
    //tlast
    assign axis_tlast = axis_tlast_i & axis_fifo_write;
 
-   // received words counter
-   iob_counter #(
-      .DATA_W (DATA_W),
-      .RST_VAL(0)
-   ) word_count_inst (
-      .clk_i (axis_clk_i),
-      .cke_i (axis_cke_i),
-      .arst_i(axis_arst_i),
-      .rst_i (axis_sw_rst),
-      .en_i  (axis_word_count_en),
-      .data_o(axis_word_count)
+   // received words counter - count in gray code to use in CDC
+   wire [DATA_W-1:0] axis_gray_word_count;
+   iob_gray_counter #(
+       .W(DATA_W)
+   ) word_gray_counter_inst (
+       .clk_i (axis_clk_i),
+       .cke_i (axis_cke_i),
+       .arst_i(axis_arst_i),
+       .rst_i (axis_sw_rst),
+       .en_i  (axis_word_count_en),
+       .data_o(axis_gray_word_count)
    );
 
+   iob_gray2bin #(
+      .DATA_W(DATA_W)
+   ) gray2bin_axis_word_count (
+      .gr_i (axis_gray_word_count),
+      .bin_o(axis_word_count)
+   );
 
    //Synchronizers from clk (csrs) to axis domain
    iob_sync #(
@@ -194,14 +200,22 @@ module iob_axistream_in #(
       .signal_o(tlast_detected_rd)
    );
 
+   wire [DATA_W-1:0] nwords_rd_gray;
    iob_sync #(
       .DATA_W (DATA_W),
-      .RST_VAL(0)
-   ) word_counter_sync (
+      .RST_VAL({DATA_W{1'd0}})
+   ) axis_word_count_gray_sync0 (
       .clk_i   (clk_i),
       .arst_i  (arst_i),
-      .signal_i(axis_word_count),
-      .signal_o(nwords_rd)
+      .signal_i(axis_gray_word_count),
+      .signal_o(nwords_rd_gray)
+   );
+
+   iob_gray2bin #(
+      .DATA_W(DATA_W)
+   ) gray2bin_nword_rd (
+      .gr_i (nwords_rd_gray),
+      .bin_o(nwords_rd)
    );
 
    //tlast detection

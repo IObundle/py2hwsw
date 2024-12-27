@@ -145,13 +145,19 @@ def setup(py_params_dict):
    endgenerate
 `else  // !IOB_MEM_NO_READ_ON_WRITE
    //this allows ISE 14.7 to work; do not remove
+   localparam INIT_RAM = (HEXFILE != "none") ? 1 : 0;
    localparam mem_init_file_int = HEXFILE;
 
    // Declare the RAM
    reg [DATA_W-1:0] mem[(2**ADDR_W)-1:0];
 
    // Initialize the RAM
-   initial if (mem_init_file_int != "none") $readmemh(mem_init_file_int, mem, 0, (2 ** ADDR_W) - 1);
+   generate
+       if (INIT_RAM) begin : mem_init
+           initial
+                $readmemh(mem_init_file_int, mem, 0, (2 ** ADDR_W) - 1);
+       end
+   endgenerate
 
    //read port
    always @(posedge clk_i) if (r_en_i) r_data_o_reg <= mem[r_addr_i];

@@ -85,6 +85,9 @@ class iob_core(iob_module, iob_instance):
         self.instantiator = kwargs.get("instantiator", None)
         is_parent = kwargs.get("is_parent", False)
 
+        # Store kwargs to allow checking python parameters after object has been created
+        self.python_parameters = kwargs
+
         # Create core based on 'parent' core (if applicable)
         if self.handle_parent(*args, **kwargs):
             return
@@ -270,8 +273,7 @@ class iob_core(iob_module, iob_instance):
         # Generate docs
         doc_gen.generate_docs(self)
         # Generate ipxact file
-        # if self.generate_ipxact: #TODO: When should this be generated?
-        #    ipxact_gen.generate_ipxact_xml(self, reg_table, self.build_dir + "/ipxact")
+        ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
         # Lint and format sources
         self.lint_and_format()
 

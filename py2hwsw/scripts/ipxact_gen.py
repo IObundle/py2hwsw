@@ -221,9 +221,9 @@ class Port:
 
     """
 
-    def __init__(self, name, type, n_bits, description):
+    def __init__(self, name, direction, n_bits, description):
         self.name = name
-        self.type = type
+        self.direction = direction
         self.n_bits = n_bits
         self.description = description
 
@@ -236,12 +236,12 @@ class Port:
         """
 
         # set the direction
-        if self.type == "I":
+        if self.direction == "input":
             direction = "in"
-        elif self.type == "O":
+        elif self.direction == "output":
             direction = "out"
         else:
-            print("ERROR: Port type not recognized")
+            print("ERROR: Port direction not recognized")
             exit(1)
 
         # Search for parameters in the n_bits and replace them with their ID
@@ -275,39 +275,26 @@ def gen_ports_list(core):
     return: ports list
     """
 
-    if_ports_list = []
+    ports_list = []
 
-    for interface in core.ports:
+    for group in core.ports:
         # Skip doc_only interfaces
-        if interface.doc_only:
+        if group.doc_only:
             continue
 
-        # Check if this interface is a standard interface (from if_gen.py)
-        # FIXME: This is outdated. New iob_port from py2hwsw already generates all signals with if_gen. No need to generate them here.
-        if_prefix, if_name = find_suffix_from_list(interface.name, if_gen.interfaces)
-        if if_name:
-            # Generate the ports list for the interface
-            if_gen.create_signal_table(if_name)
-            prefix = f"{if_name+'_'}{if_prefix}"
-            param_prefix = prefix.upper()
-            if_ports_list += if_gen.generate_interface(if_name, "", param_prefix)
-        else:  # Interface is not standard, simply add the ports list
-            if_ports_list += interface.signals
+        for signal in group.signals:
+            n_bits = signal.width
+            if type(n_bits) is str and n_bits.isnumeric():
+                n_bits = int(n_bits)
 
-    ports_list = []
-    for port in if_ports_list:
-        n_bits = port.n_bits
-        if n_bits.isnumeric():
-            n_bits = int(n_bits)
-
-        ports_list.append(
-            Port(
-                port.name,
-                port.type,
-                n_bits,
-                port.descr,
+            ports_list.append(
+                Port(
+                    signal.name,
+                    signal.direction,
+                    n_bits,
+                    signal.descr,
+                )
             )
-        )
 
     return ports_list
 

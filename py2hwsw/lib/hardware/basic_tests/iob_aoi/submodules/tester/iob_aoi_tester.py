@@ -89,9 +89,8 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """\
-
-   # Tester body / verification code
-   # Currently using non-synthesizable code
+   // Tester body / verification code
+   // Currently using non-synthesizable code
 
    reg     [3:0] data_i = 0;
    wire          data_o;

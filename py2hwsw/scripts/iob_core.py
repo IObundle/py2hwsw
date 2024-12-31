@@ -85,7 +85,7 @@ class iob_core(iob_module, iob_instance):
         self.instantiator = kwargs.get("instantiator", None)
         is_parent = kwargs.get("is_parent", False)
 
-        # Store kwargs to allow checking python parameters after object has been created
+        # Store kwargs to allow access to python parameters after object has been created
         self.python_parameters = kwargs
 
         # Create core based on 'parent' core (if applicable)
@@ -175,6 +175,12 @@ class iob_core(iob_module, iob_instance):
             bool,
             descr="Selects if core is superblock of another. Auto-filled. DO NOT CHANGE.",
         )
+        self.set_default_attribute(
+            "is_tester",
+            False,
+            bool,
+            descr="Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 
@@ -197,7 +203,13 @@ class iob_core(iob_module, iob_instance):
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, self.instantiator)
 
-        if not self.is_top_module:
+        if self.is_tester:
+            # If is tester, build dir is same "dest_dir". (default: submodules/tester)
+            self.build_dir = os.path.join(
+                __class__.global_build_dir, kwargs.get("dest_dir", "submodules/tester")
+            )
+            self.dest_dir = "hardware/src"
+        elif not self.is_top_module:
             self.build_dir = __class__.global_build_dir
         self.setup_dir = find_module_setup_dir(self.original_name)[0]
         # print(
@@ -212,14 +224,14 @@ class iob_core(iob_module, iob_instance):
 
         # Copy files from LIB to setup various flows
         # (should run before copy of files from module's setup dir)
-        if self.is_top_module:
+        if self.is_top_module or self.is_tester:
             copy_srcs.flows_setup(self)
 
         # Copy files from the module's setup dir
         copy_srcs.copy_rename_setup_directory(self)
 
         # Generate config_build.mk
-        if self.is_top_module:
+        if self.is_top_module or self.is_tester:
             config_gen.config_build_mk(self)
 
         # Generate configuration files
@@ -261,7 +273,7 @@ class iob_core(iob_module, iob_instance):
         # TODO as well: Each module has a local `snippets` list.
         # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
-        if self.is_top_module and not is_parent:
+        if (self.is_top_module and not is_parent) or self.is_tester:
             self.post_setup()
 
     def post_setup(self):

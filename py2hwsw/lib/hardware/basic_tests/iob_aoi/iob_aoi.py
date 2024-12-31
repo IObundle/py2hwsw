@@ -82,6 +82,12 @@ def setup(py_params_dict):
                 "instance_name": "iob_sim",
                 "dest_dir": "hardware/simulation/src",
             },
+            # Tester
+            {
+                "core_name": "iob_aoi_tester",
+                "instance_name": "iob_tester",
+                "dest_dir": "submodules/tester2",
+            },
         ],
     }
 

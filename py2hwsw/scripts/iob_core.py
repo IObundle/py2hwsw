@@ -189,6 +189,15 @@ class iob_core(iob_module, iob_instance):
         if __class__.global_special_target:
             self.abort_reason = "special_target"
 
+        # Temporarily change global_build_dir to match tester's directory (for tester blocks)
+        build_dir_backup = __class__.global_build_dir
+        if attributes.get("is_tester", False):
+            # If is tester, build dir is same "dest_dir". (default: submodules/tester)
+            __class__.global_build_dir = os.path.join(
+                __class__.global_build_dir, kwargs.get("dest_dir", "submodules/tester")
+            )
+            self.dest_dir = "hardware/src"
+
         # Read 'attributes' dictionary and set corresponding core attributes
         superblocks = attributes.pop("superblocks", [])
         self.parse_attributes_dict(attributes)
@@ -203,19 +212,17 @@ class iob_core(iob_module, iob_instance):
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, self.instantiator)
 
-        if self.is_tester:
-            # If is tester, build dir is same "dest_dir". (default: submodules/tester)
-            self.build_dir = os.path.join(
-                __class__.global_build_dir, kwargs.get("dest_dir", "submodules/tester")
-            )
-            self.dest_dir = "hardware/src"
-        elif not self.is_top_module:
+        if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
         self.setup_dir = find_module_setup_dir(self.original_name)[0]
         # print(
         #     f"DEBUG: {self.name} {self.original_name} {self.build_dir} {self.is_top_module}",
         #     file=sys.stderr,
         # )
+
+        # Restore global_build_dir (previously changed for tester blocks)
+        if self.is_tester:
+            __class__.global_build_dir = build_dir_backup
 
         if self.abort_reason:
             return

@@ -75,7 +75,7 @@ VSRC+=$(wildcard ../src/*.v)
 #include the UUT's headers and sources
 VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
 VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
-VFLAGS+=-I../../{python_module.relative_path_to_UUT}/hardware/src
+INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
 """,
         )
 
@@ -100,6 +100,20 @@ def fpga_setup(python_module):
         ignore=shutil.ignore_patterns("*.pdf", "*.py", *tools_list),
     )
     nix_permission_hack(dst_dir)
+
+    if python_module.is_tester:
+        # Append UUT's verilog sources in Tester's simulation Makefile
+        replace_str_in_file(
+            f"{build_dir}/{fpga_dir}/Makefile",
+            "VSRC += $(wildcard ../common_src/*.v)",
+            # FIXME: Include directories as well in build.tcl files
+            f"""\
+VSRC += $(wildcard ../common_src/*.v)
+#include the UUT's headers and sources
+VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
+VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+""",
+        )
 
     # Copy LIB fpga directories only if their name is present in the board_list
     for fpga in python_module.board_list:

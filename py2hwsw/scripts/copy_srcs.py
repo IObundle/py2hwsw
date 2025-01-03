@@ -11,7 +11,6 @@ import shutil
 import importlib.util
 
 # IObundle scripts imported:
-import if_gen
 import iob_colors
 from iob_base import nix_permission_hack
 
@@ -24,6 +23,8 @@ def get_lib_dir():
 def flows_setup(python_module):
     # Setup simulation
     sim_setup(python_module)
+
+    # TODO: "is_tester" includes for remaining flows
 
     # Setup fpga
     fpga_setup(python_module)
@@ -63,6 +64,20 @@ def sim_setup(python_module):
         ignore=shutil.ignore_patterns("*.pdf", "*.py"),
     )
     nix_permission_hack(f"{build_dir}/{sim_dir}")
+
+    if python_module.is_tester:
+        # Append UUT's verilog sources in Tester's simulation Makefile
+        replace_str_in_file(
+            f"{build_dir}/{sim_dir}/Makefile",
+            "VSRC+=$(wildcard ../src/*.v)",
+            f"""\
+VSRC+=$(wildcard ../src/*.v)
+#include the UUT's headers and sources
+VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
+VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+VFLAGS+=-I../../{python_module.relative_path_to_UUT}/hardware/src
+""",
+        )
 
 
 # Setup fpga files, but only the ones in the board_list
@@ -568,3 +583,20 @@ def copy_rename_setup_directory(core, exclude_file_list=["*.py"]):
             os.path.join(core.setup_dir, "custom_config_build.mk"),
             os.path.join(core.build_dir, "custom_config_build.mk"),
         )
+
+
+def replace_str_in_file(file_path, old_str, new_str):
+    """Replace string old_str with new_str in file_path
+    :param file_path: Path of the file to be modified
+    :param old_str: The string to be replaced
+    :param new_str: The new string
+    """
+    # Read in the file
+    with open(file_path) as f:
+        file_str = f.read()
+
+    # Replace all occurrences
+    new_file_str = file_str.replace(old_str, new_str)
+
+    with open(file_path, "w") as f:
+        f.write(new_file_str)

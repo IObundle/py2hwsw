@@ -229,6 +229,11 @@ class iob_core(iob_module, iob_instance):
 
         self.__create_build_dir()
 
+        if self.is_tester:
+            self.relative_path_to_UUT = os.path.relpath(
+                __class__.global_build_dir, self.build_dir
+            )
+
         # Copy files from LIB to setup various flows
         # (should run before copy of files from module's setup dir)
         if self.is_top_module or self.is_tester:

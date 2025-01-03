@@ -106,12 +106,12 @@ def fpga_setup(python_module):
         replace_str_in_file(
             f"{build_dir}/{fpga_dir}/Makefile",
             "VSRC += $(wildcard ../common_src/*.v)",
-            # FIXME: Include directories as well in build.tcl files
             f"""\
 VSRC += $(wildcard ../common_src/*.v)
 #include the UUT's headers and sources
 VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
 VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
 """,
         )
 
@@ -151,6 +151,20 @@ def lint_setup(python_module):
     )
     nix_permission_hack(f"{build_dir}/{lint_dir}")
 
+    if python_module.is_tester:
+        # Append UUT's verilog sources in Tester's simulation Makefile
+        replace_str_in_file(
+            f"{build_dir}/{lint_dir}/Makefile",
+            "VSRC=$(wildcard ../src/*.v)",
+            f"""\
+VSRC=$(wildcard ../src/*.v)
+#include the UUT's headers and sources
+VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
+VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
+""",
+        )
+
 
 # synthesis
 def syn_setup(python_module):
@@ -166,6 +180,20 @@ def syn_setup(python_module):
             os.makedirs(os.path.dirname(dest_file), exist_ok=True)
             shutil.copyfile(f"{src_file}", f"{dest_file}")
             nix_permission_hack(dest_file)
+
+    if python_module.is_tester:
+        # Append UUT's verilog sources in Tester's simulation Makefile
+        replace_str_in_file(
+            f"{build_dir}/{syn_dir}/Makefile",
+            "VSRC+=$(wildcard ../src/*.v)",
+            f"""\
+VSRC+=$(wildcard ../src/*.v)
+#include the UUT's headers and sources
+VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
+VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
+""",
+        )
 
 
 # Check if any *_setup.py modules exist (like sim_setup.py, fpga_setup.py, ...).

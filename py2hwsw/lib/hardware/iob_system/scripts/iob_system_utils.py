@@ -107,8 +107,8 @@ def handle_system_overrides(attributes_dict, py_params):
         if child_attribute_name in ["original_name", "setup_dir", "parent"]:
             continue
 
-        # Override other attributes of type string
-        if type(child_value) is str:
+        # Override other attributes of type string and bool
+        if type(child_value) is str or type(child_value) is bool:
             attributes_dict[child_attribute_name] = child_value
             continue
 

@@ -378,8 +378,8 @@ class iob_core(iob_module, iob_instance):
             if child_attribute_name in ["original_name", "setup_dir", "parent"]:
                 continue
 
-            # Override other attributes of type string
-            if type(child_value) is str:
+            # Override other attributes of type string and bool
+            if type(child_value) is str or type(child_value) is bool:
                 parent_attributes[child_attribute_name] = child_value
                 continue
 

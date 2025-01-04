@@ -86,7 +86,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_aoi_tester",
                 "instance_name": "iob_tester",
-                "dest_dir": "submodules/tester2",
+                "dest_dir": "submodules/tester",
             },
         ],
     }

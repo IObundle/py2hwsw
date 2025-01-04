@@ -578,6 +578,13 @@ def setup(py_params_dict):
                 # FPGA wrappers added automatically
             ],
         },
+        # Tester
+        {
+            "core_name": "iob_system_tester",
+            "instance_name": "iob_system_tester",
+            "iob_system_params": params,
+            "dest_dir": "submodules/tester",
+        },
     ]
     attributes_dict["sw_modules"] = [
         # Software modules

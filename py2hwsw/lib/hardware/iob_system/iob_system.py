@@ -581,7 +581,8 @@ def setup(py_params_dict):
         },
     ]
     if params["include_tester"]:
-        attributes_dict["superblocks"] += [
+        # Append tester to "superblocks" list of memory wrapper
+        attributes_dict["superblocks"][-1]["superblocks"] += [
             {
                 "core_name": "iob_system_tester",
                 "instance_name": "iob_system_tester",

@@ -23,6 +23,7 @@ def setup(py_params_dict):
         "bootrom_addr_w": 12,
         "fw_addr": 0,
         "fw_addr_w": 15,
+        "include_tester": True,
     }
 
     update_params(params, py_params_dict)
@@ -578,14 +579,16 @@ def setup(py_params_dict):
                 # FPGA wrappers added automatically
             ],
         },
-        # Tester
-        {
-            "core_name": "iob_system_tester",
-            "instance_name": "iob_system_tester",
-            "iob_system_params": params,
-            "dest_dir": "submodules/tester",
-        },
     ]
+    if params["include_tester"]:
+        attributes_dict["superblocks"] += [
+            {
+                "core_name": "iob_system_tester",
+                "instance_name": "iob_system_tester",
+                "iob_system_params": params,
+                "dest_dir": "submodules/tester",
+            },
+        ]
     attributes_dict["sw_modules"] = [
         # Software modules
         {

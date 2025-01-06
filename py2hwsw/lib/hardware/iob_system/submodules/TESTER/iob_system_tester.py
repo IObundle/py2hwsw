@@ -13,6 +13,7 @@ def setup(py_params_dict):
             # Tester is a child core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
             # Tester will inherit all attributes/files from the iob_system core.
             "core_name": "iob_system",
+            "include_tester": False,
             # Every parameter in the lines below will be passed to the iob_system parent core.
             **py_params_dict,
             "system_attributes": {

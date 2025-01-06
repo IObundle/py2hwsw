@@ -149,6 +149,13 @@ def set_build_dir(attributes_dict, py_params):
         build_dir = py_params["build_dir"]
     else:
         build_dir = f"../{attributes_dict['name']}_V{attributes_dict['version']}"
+
+    # If this system is a tester, set build dir based on dest_dir
+    if attributes_dict.get("is_tester", False):
+        build_dir = os.path.join(
+            build_dir, py_params.get("dest_dir", "submodules/tester")
+        )
+
     attributes_dict["build_dir"] = build_dir
 
 

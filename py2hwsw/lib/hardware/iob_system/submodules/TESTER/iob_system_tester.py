@@ -6,8 +6,6 @@
 def setup(py_params_dict):
     # Py2hwsw dictionary describing current core
     core_dict = {
-        # Set "is_tester" attribute to generate Makefile and flows allowing to run this core as top module
-        "is_tester": True,
         "version": "0.1",
         "parent": {
             # Tester is a child core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
@@ -17,6 +15,8 @@ def setup(py_params_dict):
             # Every parameter in the lines below will be passed to the iob_system parent core.
             **py_params_dict,
             "system_attributes": {
+                # Set "is_tester" attribute to generate Makefile and flows allowing to run this core as top module
+                "is_tester": True,
                 # Every attribute in this dictionary will override/append to the ones of the iob_system parent core.
                 "board_list": ["aes_ku040_db_g", "cyclonev_gt_dk", "zybo_z7"],
                 "wires": [

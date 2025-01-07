@@ -46,7 +46,12 @@ def setup(py_params_dict):
                         "instance_name": "SUT",
                         "instance_description": "System Under Test (SUT) to be verified by this tester.",
                         # "peripheral_addr_w": 4,  # Width of cbus of this peripheral. Only applies if SUT has CSRs (via regfileif).
-                        "parameters": {},
+                        "parameters": {
+                            "AXI_ID_W": "AXI_ID_W",
+                            "AXI_LEN_W": "AXI_LEN_W",
+                            "AXI_ADDR_W": "AXI_ADDR_W",
+                            "AXI_DATA_W": "AXI_DATA_W",
+                        },
                         "connect": {
                             "clk_en_rst_s": "clk_en_rst_s",
                             # Cbus (if any) is connected automatically

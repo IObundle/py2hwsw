@@ -294,6 +294,17 @@ class iob_core(iob_module, iob_instance):
         self._replace_snippet_includes()
         # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
         self._remove_duplicate_sources()
+        if self.is_tester:
+            # Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
+            self._remove_duplicate_sources(
+                main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
+                subfolders=[
+                    "hardware/src",
+                    "hardware/simulation/src",
+                    "hardware/fpga/src",
+                    "hardware/common_src",
+                ],
+            )
         # Generate docs
         doc_gen.generate_docs(self)
         # Generate ipxact file
@@ -486,18 +497,20 @@ class iob_core(iob_module, iob_instance):
         )
         nix_permission_hack(f"{self.build_dir}/Makefile")
 
-    def _remove_duplicate_sources(self):
+    def _remove_duplicate_sources(self, main_folder="hardware/src", subfolders=None):
         """Remove sources in the build directory from subfolders that exist in `hardware/src`"""
-        # Go through all subfolders that may contain duplicate sources
-        for subfolder in [
-            "hardware/simulation/src",
-            "hardware/fpga/src",
-            "hardware/common_src",
-        ]:
+        if not subfolders:
+            subfolders = [
+                "hardware/simulation/src",
+                "hardware/fpga/src",
+                "hardware/common_src",
+            ]
 
-            # Get common srcs between `hardware/src` and current subfolder
+        # Go through all subfolders that may contain duplicate sources
+        for subfolder in subfolders:
+            # Get common srcs between main_folder and current subfolder
             common_srcs = find_common_deep(
-                os.path.join(self.build_dir, "hardware/src"),
+                os.path.join(self.build_dir, main_folder),
                 os.path.join(self.build_dir, subfolder),
             )
             # Remove common sources

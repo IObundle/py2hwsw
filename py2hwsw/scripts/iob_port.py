@@ -3,9 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass, field
-from typing import Dict
 
-import iob_colors
 import if_gen
 from iob_wire import iob_wire
 from iob_base import (

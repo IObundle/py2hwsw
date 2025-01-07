@@ -24,8 +24,6 @@ def flows_setup(python_module):
     # Setup simulation
     sim_setup(python_module)
 
-    # TODO: "is_tester" includes for remaining flows
-
     # Setup fpga
     fpga_setup(python_module)
 
@@ -605,7 +603,7 @@ def copy_rename_setup_directory(core, exclude_file_list=["*.py"]):
         "software",
     ]
     # Files that should only be copied if it is top module
-    if core.is_top_module:
+    if core.is_top_module or core.is_tester:
         dir_list += [
             "hardware/simulation",
             "hardware/common_src",

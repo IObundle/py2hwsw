@@ -10,6 +10,9 @@ from iob_base import find_obj_in_list, fail_with_msg
 
 
 def get_core_params(confs):
+    """Filter given 'confs' list for 'P' and 'F' parameters.
+    Returns a new filtered list containing only 'P' and 'F' parameters.
+    """
     core_parameters = []
     for group in confs:
         for conf in group.confs:

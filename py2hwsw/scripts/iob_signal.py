@@ -17,12 +17,15 @@ class iob_signal:
     isreg: bool = False
     reg_signals: list[str] = field(default_factory=list)
     descr: str = "Default description"
+    # Logic value for future simulation effort using global signals list.
+    # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
+    value: str or int = 0
 
     def __post_init__(self):
         if not self.name:
             fail_with_msg("Signal name is not set", ValueError)
 
-        if self.name.endswith("_i"): 
+        if self.name.endswith("_i"):
             self.direction = "input"
         elif self.name.endswith("_o"):
             self.direction = "output"
@@ -52,6 +55,7 @@ class iob_signal:
             return int(self.width)
         except ValueError:
             return self.width
+
 
 @dataclass
 class iob_signal_reference:

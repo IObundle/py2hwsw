@@ -11,12 +11,20 @@ from iob_base import fail_with_msg
 class iob_signal:
     """Class that represents a wire/port signal"""
 
+    # Identifier name for the signal.
     name: str = ""
+    # Number of bits in the signal.
     width: str or int = 1
-    isvar: bool = False
-    isreg: bool = False
-    reg_signals: list[str] = field(default_factory=list)
+    # Description of the signal.
     descr: str = "Default description"
+    # If enabled, signal will be generated with type `reg` in Verilog.
+    isvar: bool = False
+
+    # Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
+    isreg: bool = False
+    # Used for `iob_comb`: List of signals associated to the infered register.
+    reg_signals: list[str] = field(default_factory=list)
+
     # Logic value for future simulation effort using global signals list.
     # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
     value: str or int = 0

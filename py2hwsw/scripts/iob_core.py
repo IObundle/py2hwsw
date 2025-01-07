@@ -45,6 +45,8 @@ import verilog_lint
 class iob_core(iob_module, iob_instance):
     """Generic class to describe how to generate a base IOb IP core"""
 
+    # List of global wires.
+    # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
     global_wires: list
     # Project settings
     global_build_dir: str = ""

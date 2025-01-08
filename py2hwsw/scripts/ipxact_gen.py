@@ -9,6 +9,12 @@ import math
 import if_gen
 import re
 import os
+import sys
+
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "../lib/hardware/iob_csrs")
+)
+from iob_csrs import static_reg_tables
 
 # Generates IP-XACT for the given core
 #
@@ -215,9 +221,9 @@ class Port:
 
     """
 
-    def __init__(self, name, type, n_bits, description):
+    def __init__(self, name, direction, n_bits, description):
         self.name = name
-        self.type = type
+        self.direction = direction
         self.n_bits = n_bits
         self.description = description
 
@@ -230,12 +236,12 @@ class Port:
         """
 
         # set the direction
-        if self.type == "I":
+        if self.direction == "input":
             direction = "in"
-        elif self.type == "O":
+        elif self.direction == "output":
             direction = "out"
         else:
-            print("ERROR: Port type not recognized")
+            print("ERROR: Port direction not recognized")
             exit(1)
 
         # Search for parameters in the n_bits and replace them with their ID
@@ -269,38 +275,26 @@ def gen_ports_list(core):
     return: ports list
     """
 
-    if_ports_list = []
+    ports_list = []
 
-    for interface in core.ports:
+    for group in core.ports:
         # Skip doc_only interfaces
-        if interface.doc_only:
+        if group.doc_only:
             continue
 
-        # Check if this interface is a standard interface (from if_gen.py)
-        if_prefix, if_name = find_suffix_from_list(interface["name"], if_gen.interfaces)
-        if if_name:
-            # Generate the ports list for the interface
-            if_gen.create_signal_table(if_name)
-            prefix = f"{if_name+'_'}{if_prefix}"
-            param_prefix = prefix.upper()
-            if_ports_list += if_gen.generate_interface(if_name, "", param_prefix)
-        else:  # Interface is not standard, simply add the ports list
-            if_ports_list += interface["ports"]
+        for signal in group.signals:
+            n_bits = signal.width
+            if type(n_bits) is str and n_bits.isnumeric():
+                n_bits = int(n_bits)
 
-    ports_list = []
-    for port in if_ports_list:
-        n_bits = port["n_bits"]
-        if n_bits.isnumeric():
-            n_bits = int(n_bits)
-
-        ports_list.append(
-            Port(
-                port["name"],
-                port["type"],
-                n_bits,
-                port["descr"],
+            ports_list.append(
+                Port(
+                    signal.name,
+                    signal.direction,
+                    n_bits,
+                    signal.descr,
+                )
             )
-        )
 
     return ports_list
 
@@ -343,13 +337,13 @@ def gen_memory_map_xml(sw_regs, parameters_list):
     for sw_reg in sw_regs:
         # create the sw register object
         sw_reg_obj = SwRegister(
-            sw_reg["name"],
-            sw_reg["addr"],
-            sw_reg["n_bits"],
-            sw_reg["type"],
+            sw_reg.name,
+            sw_reg.addr,
+            sw_reg.n_bits,
+            sw_reg.type,
             "arst_i",
-            sw_reg["rst_val"],
-            sw_reg["descr"],
+            sw_reg.rst_val,
+            sw_reg.descr,
             parameters_list,
         )
 
@@ -410,19 +404,19 @@ def gen_parameters_list(core):
         # Skip doc_only groups
         if group.doc_only:
             continue
-        for conf in group:
+        for conf in group.confs:
             # Skip doc_only confs
             if conf.doc_only:
                 continue
-            if conf["type"] != "M":
+            if conf.type != "M":
                 parameters_list.append(
                     Parameter(
-                        conf["name"],
-                        conf["type"],
-                        conf["val"],
-                        conf["min"],
-                        conf["max"],
-                        conf["descr"],
+                        conf.name,
+                        conf.type,
+                        conf.val,
+                        conf.min,
+                        conf.max,
+                        conf.descr,
                     )
                 )
 
@@ -528,7 +522,7 @@ def gen_parameters_xml(parameters_list):
     return xml_code
 
 
-def generate_ipxact_xml(core, sw_regs, dest_dir):
+def generate_ipxact_xml(core, dest_dir):
     """
     Generate the xml file for the given core
     @param core: core object
@@ -536,17 +530,21 @@ def generate_ipxact_xml(core, sw_regs, dest_dir):
     return: None
     """
 
-    # try to open file document/tsrc/intro.tex and read it into self.description
-    try:
-        with open("document/tsrc/intro.tex", "r") as file:
-            core.description = file.read()
-    except:
-        print("ERROR: Could not open document/tsrc/intro.tex")
-        exit(1)
+    csr_block = None
+    # Find iob_csrs block in subblocks list
+    for block_group in core.subblocks:
+        for block in block_group.blocks:
+            if block.original_name == "iob_csrs":
+                csr_block = block
+                break
+        if csr_block:
+            break
 
     # Add the CSR IF,
-    # TODO: Core no longer has csrs. Now csrs have their own lib module (csrs.py)
-    core_name = core.name + "_" + core.csr_if + "_" + core.data_if
+    core_name = core.name
+    if csr_block and "csr_if" in core.python_parameters:
+        core_name += "_" + core.python_parameters["csr_if"]
+    # core_name += += "_" + core.data_if
 
     # Core name to be displayed in the xml file
     # Change "_" to "-" and capitalize all the letters
@@ -560,7 +558,10 @@ def generate_ipxact_xml(core, sw_regs, dest_dir):
     parameters_list = gen_parameters_list(core)
 
     # Genererate the memory map xml code
-    memory_map_xml = gen_memory_map_xml(sw_regs, parameters_list)
+    memory_map_xml = ""
+    if csr_block:
+        sw_regs = static_reg_tables[core.name + "_csrs"]
+        memory_map_xml = gen_memory_map_xml(sw_regs, parameters_list)
 
     # Generate instantiations xml code
     instantiations_xml = gen_instantiations_xml(core, parameters_list)

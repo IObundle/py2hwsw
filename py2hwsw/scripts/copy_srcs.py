@@ -11,7 +11,6 @@ import shutil
 import importlib.util
 
 # IObundle scripts imported:
-import if_gen
 import iob_colors
 from iob_base import nix_permission_hack
 
@@ -64,6 +63,20 @@ def sim_setup(python_module):
     )
     nix_permission_hack(f"{build_dir}/{sim_dir}")
 
+    if python_module.is_tester:
+        # Append UUT's verilog sources in Tester's simulation Makefile
+        replace_str_in_file(
+            f"{build_dir}/{sim_dir}/Makefile",
+            "VSRC+=$(wildcard ../src/*.v)",
+            f"""\
+VSRC+=$(wildcard ../src/*.v)
+#include the UUT's headers and sources
+VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
+VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
+""",
+        )
+
 
 # Setup fpga files, but only the ones in the board_list
 def fpga_setup(python_module):
@@ -85,6 +98,20 @@ def fpga_setup(python_module):
         ignore=shutil.ignore_patterns("*.pdf", "*.py", *tools_list),
     )
     nix_permission_hack(dst_dir)
+
+    if python_module.is_tester:
+        # Append UUT's verilog sources in Tester's simulation Makefile
+        replace_str_in_file(
+            f"{build_dir}/{fpga_dir}/Makefile",
+            "VSRC += $(wildcard ../common_src/*.v)",
+            f"""\
+VSRC += $(wildcard ../common_src/*.v)
+#include the UUT's headers and sources
+VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
+VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
+""",
+        )
 
     # Copy LIB fpga directories only if their name is present in the board_list
     for fpga in python_module.board_list:
@@ -122,6 +149,20 @@ def lint_setup(python_module):
     )
     nix_permission_hack(f"{build_dir}/{lint_dir}")
 
+    if python_module.is_tester:
+        # Append UUT's verilog sources in Tester's simulation Makefile
+        replace_str_in_file(
+            f"{build_dir}/{lint_dir}/Makefile",
+            "VSRC=$(wildcard ../src/*.v)",
+            f"""\
+VSRC=$(wildcard ../src/*.v)
+#include the UUT's headers and sources
+VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
+VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
+""",
+        )
+
 
 # synthesis
 def syn_setup(python_module):
@@ -137,6 +178,20 @@ def syn_setup(python_module):
             os.makedirs(os.path.dirname(dest_file), exist_ok=True)
             shutil.copyfile(f"{src_file}", f"{dest_file}")
             nix_permission_hack(dest_file)
+
+    if python_module.is_tester:
+        # Append UUT's verilog sources in Tester's simulation Makefile
+        replace_str_in_file(
+            f"{build_dir}/{syn_dir}/Makefile",
+            "VSRC+=$(wildcard ../src/*.v)",
+            f"""\
+VSRC+=$(wildcard ../src/*.v)
+#include the UUT's headers and sources
+VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
+VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
+INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
+""",
+        )
 
 
 # Check if any *_setup.py modules exist (like sim_setup.py, fpga_setup.py, ...).
@@ -548,7 +603,7 @@ def copy_rename_setup_directory(core, exclude_file_list=["*.py"]):
         "software",
     ]
     # Files that should only be copied if it is top module
-    if core.is_top_module:
+    if core.is_top_module or core.is_tester:
         dir_list += [
             "hardware/simulation",
             "hardware/common_src",
@@ -568,3 +623,20 @@ def copy_rename_setup_directory(core, exclude_file_list=["*.py"]):
             os.path.join(core.setup_dir, "custom_config_build.mk"),
             os.path.join(core.build_dir, "custom_config_build.mk"),
         )
+
+
+def replace_str_in_file(file_path, old_str, new_str):
+    """Replace string old_str with new_str in file_path
+    :param file_path: Path of the file to be modified
+    :param old_str: The string to be replaced
+    :param new_str: The new string
+    """
+    # Read in the file
+    with open(file_path) as f:
+        file_str = f.read()
+
+    # Replace all occurrences
+    new_file_str = file_str.replace(old_str, new_str)
+
+    with open(file_path, "w") as f:
+        f.write(new_file_str)

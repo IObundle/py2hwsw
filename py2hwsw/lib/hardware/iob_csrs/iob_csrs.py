@@ -13,6 +13,10 @@ from iob_csr import create_csr_group
 from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
 
+# Static (shared) dictionary to store reg tables of generated csrs
+# May be read by other python modules
+static_reg_tables = {}
+
 
 def setup(py_params_dict):
     """Standard Py2HWSW setup function"""
@@ -108,6 +112,10 @@ def setup(py_params_dict):
 
     # Generate snippets
     csr_gen_obj, reg_table = reg_gen.generate_csr(attributes_with_csrs)
+
+    # Store reg_table in static dict
+    global static_reg_tables
+    static_reg_tables[params["name"]] = reg_table
 
     # Generate docs
     csr_gen_obj.generate_regs_tex(

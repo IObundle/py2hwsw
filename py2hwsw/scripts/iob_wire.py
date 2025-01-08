@@ -21,18 +21,18 @@ from iob_signal import iob_signal, iob_signal_reference, get_real_signal
 class iob_wire:
     """Class to represent a wire in an iob module"""
 
+    # Identifier name for the wire.
     name: str = ""
-    # interface to auto-generate with if_gen.py
+    # Name of the standard interface to auto-generate with `if_gen.py` script.
     interface: if_gen.interface = None
+    # Description of the wire.
     descr: str = "Default description"
-    # Only set the wire if this Verilog macro is defined
+    # Conditionally define this wire if the specified Verilog macro is defined/undefined.
     if_defined: str = ""
     if_not_defined: str = ""
     # List of signals belonging to this wire
-    # (each signal is similar to a Verilog wire)
+    # (each signal represents a hardware Verilog wire).
     signals: List = field(default_factory=list)
-    # Reference to a global signal connected to this one
-    global_wire = None
 
     def __post_init__(self):
         if not self.name:

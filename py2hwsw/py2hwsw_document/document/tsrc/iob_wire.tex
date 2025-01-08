@@ -1,0 +1,24 @@
+% SPDX-FileCopyrightText: 2024 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+%
+% Main classes
+%
+
+The \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_wire.py}{iob\_wire} class is used to represent a group of hardware wires (signals) used to interconnect components automatically generated.
+This class contains a set of attributes, each preceded by a comment describing the purpose of the attribute.
+
+\lstinputlisting[firstline=21,lastline=35,language=Python]{iob_wire.py}
+\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_wire.py}{View Source}
+
+The `signals` attribute stores a list of signal objects, represented by the `iob\_signal` class~\ref{iob_signal}.
+
+%
+% Generator methods
+%
+
+The py2hwsw tool uses the `generate\_wires` method from the `wire\_gen.py` script to generate the Verilog code for the wire based on the attributes from the corresponding instance of the `iob\_wire` class.
+
+\lstinputlisting[firstline=20,lastline=37,language=Python]{wire_gen.py}
+\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/wire_gen.py}{View Source}

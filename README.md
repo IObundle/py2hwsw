@@ -10,14 +10,13 @@ SPDX-License-Identifier: MIT
 
 This project introduces a Python framework to (1) manage the
 files of an embedded hardware/software (HW/SW) codesign project and (2) generate
-the Verilog code of the hardware components. The flow will
-use only open-source tools.
+the Verilog code of the hardware components. The flow uses only open-source tools.
 
 An embedded HW/SW project requires that various source files be conveniently
 organized in a directory tree so that the various EDA tools can run. Typically, 
 makefiles and different scripting languages are employed to drive these tools,
-which is often a barrier for new developers. The proposed Python framework will
-raise developer accessibility by providing a single cockpit for the design
+which is often a barrier for new developers. The Python framework raises
+developer accessibility by providing a single cockpit for the design
 process.
 
 Hardware Design Languages such as Verilog and VHDL give a lot of flexibility to

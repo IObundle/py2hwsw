@@ -138,6 +138,7 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
+    localparam INIT_RAM = (MEM_INIT_FILE_INT != "none") ? 1 : 0;
     reg [DATA_W-1:0] dA_o_reg;
     reg [DATA_W-1:0] dB_o_reg;
     assign dA_o=dA_o_reg;
@@ -146,7 +147,11 @@ def setup(py_params_dict):
    reg [DATA_W-1:0] ram[2**ADDR_W-1:0];
 
    // Initialize the RAM
-   initial if (MEM_INIT_FILE_INT != "none") $readmemh(MEM_INIT_FILE_INT, ram, 0, 2 ** ADDR_W - 1);
+   generate
+       if (INIT_RAM) begin : mem_init
+           initial $readmemh(MEM_INIT_FILE_INT, ram, 0, 2 ** ADDR_W - 1);
+       end
+   endgenerate
 
    generate
       if (MEM_NO_READ_ON_WRITE) begin : with_MEM_NO_READ_ON_WRITE

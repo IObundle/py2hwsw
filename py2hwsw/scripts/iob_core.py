@@ -45,6 +45,8 @@ import verilog_lint
 class iob_core(iob_module, iob_instance):
     """Generic class to describe how to generate a base IOb IP core"""
 
+    # List of global wires.
+    # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
     global_wires: list
     # Project settings
     global_build_dir: str = ""
@@ -84,6 +86,9 @@ class iob_core(iob_module, iob_instance):
         connect = kwargs.get("connect", {})
         self.instantiator = kwargs.get("instantiator", None)
         is_parent = kwargs.get("is_parent", False)
+
+        # Store kwargs to allow access to python parameters after object has been created
+        self.python_parameters = kwargs
 
         # Create core based on 'parent' core (if applicable)
         if self.handle_parent(*args, **kwargs):
@@ -172,6 +177,12 @@ class iob_core(iob_module, iob_instance):
             bool,
             descr="Selects if core is superblock of another. Auto-filled. DO NOT CHANGE.",
         )
+        self.set_default_attribute(
+            "is_tester",
+            False,
+            bool,
+            descr="Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 
@@ -179,6 +190,15 @@ class iob_core(iob_module, iob_instance):
         # Don't setup this core if using a project wide special target.
         if __class__.global_special_target:
             self.abort_reason = "special_target"
+
+        # Temporarily change global_build_dir to match tester's directory (for tester blocks)
+        build_dir_backup = __class__.global_build_dir
+        if attributes.get("is_tester", False):
+            # If is tester, build dir is same "dest_dir". (default: submodules/tester)
+            __class__.global_build_dir = os.path.join(
+                __class__.global_build_dir, kwargs.get("dest_dir", "submodules/tester")
+            )
+            self.dest_dir = "hardware/src"
 
         # Read 'attributes' dictionary and set corresponding core attributes
         superblocks = attributes.pop("superblocks", [])
@@ -202,21 +222,30 @@ class iob_core(iob_module, iob_instance):
         #     file=sys.stderr,
         # )
 
+        # Restore global_build_dir (previously changed for tester blocks)
+        if self.is_tester:
+            __class__.global_build_dir = build_dir_backup
+
         if self.abort_reason:
             return
 
         self.__create_build_dir()
 
+        if self.is_tester:
+            self.relative_path_to_UUT = os.path.relpath(
+                __class__.global_build_dir, self.build_dir
+            )
+
         # Copy files from LIB to setup various flows
         # (should run before copy of files from module's setup dir)
-        if self.is_top_module:
+        if self.is_top_module or self.is_tester:
             copy_srcs.flows_setup(self)
 
         # Copy files from the module's setup dir
         copy_srcs.copy_rename_setup_directory(self)
 
         # Generate config_build.mk
-        if self.is_top_module:
+        if self.is_top_module or self.is_tester:
             config_gen.config_build_mk(self)
 
         # Generate configuration files
@@ -258,7 +287,7 @@ class iob_core(iob_module, iob_instance):
         # TODO as well: Each module has a local `snippets` list.
         # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
-        if self.is_top_module and not is_parent:
+        if (self.is_top_module and not is_parent) or self.is_tester:
             self.post_setup()
 
     def post_setup(self):
@@ -267,11 +296,21 @@ class iob_core(iob_module, iob_instance):
         self._replace_snippet_includes()
         # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
         self._remove_duplicate_sources()
+        if self.is_tester:
+            # Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
+            self._remove_duplicate_sources(
+                main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
+                subfolders=[
+                    "hardware/src",
+                    "hardware/simulation/src",
+                    "hardware/fpga/src",
+                    "hardware/common_src",
+                ],
+            )
         # Generate docs
         doc_gen.generate_docs(self)
         # Generate ipxact file
-        # if self.generate_ipxact: #TODO: When should this be generated?
-        #    ipxact_gen.generate_ipxact_xml(self, reg_table, self.build_dir + "/ipxact")
+        ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
         # Lint and format sources
         self.lint_and_format()
 
@@ -352,8 +391,8 @@ class iob_core(iob_module, iob_instance):
             if child_attribute_name in ["original_name", "setup_dir", "parent"]:
                 continue
 
-            # Override other attributes of type string
-            if type(child_value) is str:
+            # Override other attributes of type string and bool
+            if type(child_value) is str or type(child_value) is bool:
                 parent_attributes[child_attribute_name] = child_value
                 continue
 
@@ -460,18 +499,20 @@ class iob_core(iob_module, iob_instance):
         )
         nix_permission_hack(f"{self.build_dir}/Makefile")
 
-    def _remove_duplicate_sources(self):
+    def _remove_duplicate_sources(self, main_folder="hardware/src", subfolders=None):
         """Remove sources in the build directory from subfolders that exist in `hardware/src`"""
-        # Go through all subfolders that may contain duplicate sources
-        for subfolder in [
-            "hardware/simulation/src",
-            "hardware/fpga/src",
-            "hardware/common_src",
-        ]:
+        if not subfolders:
+            subfolders = [
+                "hardware/simulation/src",
+                "hardware/fpga/src",
+                "hardware/common_src",
+            ]
 
-            # Get common srcs between `hardware/src` and current subfolder
+        # Go through all subfolders that may contain duplicate sources
+        for subfolder in subfolders:
+            # Get common srcs between main_folder and current subfolder
             common_srcs = find_common_deep(
-                os.path.join(self.build_dir, "hardware/src"),
+                os.path.join(self.build_dir, main_folder),
                 os.path.join(self.build_dir, subfolder),
             )
             # Remove common sources

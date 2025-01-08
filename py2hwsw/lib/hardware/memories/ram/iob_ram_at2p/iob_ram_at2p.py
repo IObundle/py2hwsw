@@ -109,17 +109,18 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
+   localparam INIT_RAM = (HEXFILE != "none") ? 1 : 0;
             // Declare the RAM
    reg [DATA_W-1:0] ram[(2**ADDR_W)-1:0];
    reg [DATA_W-1:0] r_data_o_reg;
    assign r_data_o=r_data_o_reg;
 
    // Initialize the RAM
-   initial begin
-       if (MEM_INIT_FILE_INT != "none") begin
-           $readmemh(MEM_INIT_FILE_INT, ram, 0, (2 ** ADDR_W) - 1);
+   generate
+       if (INIT_RAM) begin : mem_init
+           initial $readmemh(MEM_INIT_FILE_INT, ram, 0, (2 ** ADDR_W) - 1);
        end
-   end
+   endgenerate
 
    //write
    always @(posedge w_clk_i) begin

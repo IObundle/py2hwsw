@@ -3,9 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass, field
-from typing import Dict
 
-import iob_colors
 import if_gen
 from iob_wire import iob_wire
 from iob_base import (
@@ -25,7 +23,9 @@ class iob_port(iob_wire):
     e_connect: iob_wire | None = None
     # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
     e_connect_bit_slices: list = field(default_factory=list)
+    # If enabled, port will only appear in documentation. Not in the verilog code.
     doc_only: bool = False
+    # If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     doc_clearpage: bool = False
 
     def __post_init__(self):

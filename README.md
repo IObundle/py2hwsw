@@ -8,40 +8,36 @@ SPDX-License-Identifier: MIT
 
 ## A Python framework for embedded HW/SW projects
 
-In this project, we propose to develop a Python framework to (1) manage the
+This project introduces a Python framework to (1) manage the
 files of an embedded hardware/software (HW/SW) codesign project and (2) generate
-the Verilog code of the hardware components. The flow will
-use only open-source tools.
+the Verilog code of the hardware components. The flow uses only open-source tools.
 
 An embedded HW/SW project requires that various source files be conveniently
-organized in a directory tree so that the build scripts can produce the needed
-artifacts. Typically, Makefiles and different scripting languages are employed,
-which is often a barrier for new developers. The proposed Python framework will
-raise developer accessibility by providing a single cockpit for the design
+organized in a directory tree so that the various EDA tools can run. Typically, 
+makefiles and different scripting languages are employed to drive these tools,
+which is often a barrier for new developers. The Python framework raises
+developer accessibility by providing a single cockpit for the design
 process.
 
 Hardware Design Languages such as Verilog and VHDL give a lot of flexibility to
-users. Still, the design tools reject most of their features and force users to
-use a small, low-level subset if we want the code to be human-readable and
-portable to both FPGAs and ASICs. The result is a very tedious and error-prone
-hardware design process.
+users. Still, the industry imposes strict linting rules that reverse this flexibility,
+allowing only a small subset of these languages that ensure sound FPGAs and ASIC designs.
+Writing HDL code in a  lint-friendly fashion is tedious and error-prone.
 
-Py2HWSW aims to develop a Python generator of portable Verilog code. Py2HW is
-not a High-Level Synthesis (HLS) language. It is instead a tool to help hardware
-designers produce readable, lint-clean, and portable Verilog code that can be
-used seamlessly in any FPGA or ASIC.
+Py2HWSW solves this problem by generating lint-friendly and portable Verilog code that can 
+be ported seamlessly between FPGA and ASIC flows.
 
 ### Installation
 
 Py2HWSW runs on [nix-shell](https://nixos.org/download.html#nix-install-linux)
-and self installs when an example is run. Alternatively you may manuall install
-the program and all its dependendencies listed in the [py2hwsw default.nix
+and self-installs when an example is run. Alternatively, manually install
+the program and all its dependencies listed in the [py2hwsw default.nix
 file](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/default.nix).
 
 
 ## Usage example
 
-The Py2HWSW framework main usage example is
+The Py2HWSW framework's leading usage example is
 [IOb-SoC](https://github.com/IObundle/iob-soc), a System-on-Chip (SoC) template
 comprising an open-source RISC-V processor, a memory subsystem, and a UART.
 

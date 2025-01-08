@@ -24,8 +24,8 @@ include syn_build.mk
 endif
 
 #include the module's headers and sources
-VHDR+=$(wildcard ../src/*.vh)  
-VSRC+=$(wildcard ../src/*.v) 
+VHDR+=$(wildcard ../src/*.vh)
+VSRC+=$(wildcard ../src/*.v)
 
 INCLUDE+=.
 INCLUDE+=../src

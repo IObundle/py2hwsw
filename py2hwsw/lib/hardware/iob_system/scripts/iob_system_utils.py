@@ -321,9 +321,11 @@ iob_eth_rmac.h:
             file.write(
                 """
 # Tester target to build UUT's software
+# Build UUT software with "TESTER" macro defined
 UTARGETS+=build_uut_software
 build_uut_software:
-	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software build
+	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software clean
+	USER_CFLAGS=-DTESTER make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software build
 
 .PHONY: build_uut_software
 """

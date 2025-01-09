@@ -107,6 +107,11 @@ endif
 """
     )
 
+    if python_module.is_tester:
+        file2create.write(
+            f"RELATIVE_PATH_TO_UUT={python_module.relative_path_to_UUT}\n"
+        )
+
     file2create.close()
 
 

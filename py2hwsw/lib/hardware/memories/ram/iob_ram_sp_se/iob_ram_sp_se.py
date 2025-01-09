@@ -85,7 +85,7 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-            
+
 
    // Operation
 `ifdef IOB_MEM_NO_READ_ON_WRITE
@@ -114,15 +114,20 @@ def setup(py_params_dict):
    endgenerate
 `else  // !IOB_MEM_NO_READ_ON_WRITE
    // this allows ISE 14.7 to work; do not remove
+   localparam INIT_RAM = (HEXFILE != "none") ? 1 : 0;
    localparam mem_init_file_int = {HEXFILE, ".hex"};
 
    // Core Memory
    reg [DATA_W-1:0] ram_block[(2**ADDR_W)-1:0];
 
    // Initialize the RAM
-   initial
-      if (mem_init_file_int != "none.hex")
-         $readmemh(mem_init_file_int, ram_block, 0, 2 ** ADDR_W - 1);
+   generate
+       if (INIT_RAM) begin : mem_init
+           initial
+              if (mem_init_file_int != "none.hex")
+                 $readmemh(mem_init_file_int, ram_block, 0, 2 ** ADDR_W - 1);
+       end
+   endgenerate
 
    reg     [DATA_W-1:0] d_o_int;
    integer              i;

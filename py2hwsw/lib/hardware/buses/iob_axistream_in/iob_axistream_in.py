@@ -366,6 +366,14 @@ def setup(py_params_dict):
                 "core_name": "iob_edge_detect",
                 "instantiate": False,
             },
+            {
+                "core_name": "iob_gray_counter",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_gray2bin",
+                "instantiate": False,
+            },
         ],
         "superblocks": [
             # Simulation wrapper

@@ -110,15 +110,16 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
+   localparam INIT_RAM = (MEM_INIT_FILE_INT != "none") ? 1 : 0;
             // Declare the ROM
    reg [DATA_W-1:0] rom[(2**ADDR_W)-1:0];
 
    // Initialize the ROM
-   initial begin
-       if (MEM_INIT_FILE_INT != "none") begin
-           $readmemh(MEM_INIT_FILE_INT, rom, 0, (2 ** ADDR_W) - 1);
+   generate
+       if (INIT_RAM) begin : mem_init
+           initial $readmemh(MEM_INIT_FILE_INT, rom, 0, (2 ** ADDR_W) - 1);
        end
-   end
+   endgenerate
 
    always @(posedge clk_i) begin  // Port A
       if (r_en_a_i) begin

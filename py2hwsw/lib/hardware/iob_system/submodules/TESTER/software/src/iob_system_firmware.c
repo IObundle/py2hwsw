@@ -63,6 +63,12 @@ int main() {
   uart_puts("\n[Tester]: Reading SUT messages...\n");
   IOB_UART_INIT_BASEADDR(UART1_BASE);
 
+  // Delay to ensure SUT is waiting for ack
+  for (unsigned int i = 0; i < 100; i++)
+    asm volatile("nop");
+  // Send second ack to SUT to continue boot
+  uart_putc(ACK);
+
   i = 0;
   // Read and store messages sent from SUT
   while ((c = uart_getc()) != EOT) {

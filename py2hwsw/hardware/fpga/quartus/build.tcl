@@ -6,10 +6,11 @@
 set NAME [lindex $argv 0]
 set BOARD [lindex $argv 1]
 set VSRC [lindex $argv 2]
-set IS_FPGA [lindex $argv 3]
-set USE_EXTMEM [lindex $argv 4]
-set SEED [lindex $argv 5]
-set USE_QUARTUS_PRO [lindex $argv 6]
+set INCLUDE_DIRS [lindex $argv 3]
+set IS_FPGA [lindex $argv 4]
+set USE_EXTMEM [lindex $argv 5]
+set SEED [lindex $argv 6]
+set USE_QUARTUS_PRO [lindex $argv 7]
 
 load_package flow
 
@@ -36,6 +37,10 @@ set_global_assignment -name SEARCH_PATH ../src
 set_global_assignment -name SEARCH_PATH ../common_src
 set_global_assignment -name SEARCH_PATH ./src
 set_global_assignment -name SEARCH_PATH quartus/$BOARD
+
+foreach dir $INCLUDE_DIRS {
+    set_global_assignment -name SEARCH_PATH $dir
+}
 
 #verilog sources, quartus IPs, use extension
 foreach file [split $VSRC \ ] {

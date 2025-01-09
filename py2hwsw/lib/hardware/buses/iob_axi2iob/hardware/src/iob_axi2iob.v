@@ -156,8 +156,8 @@ module iob_axi2iob #(
       .clk_i (clk_i),
       .arst_i(arst_i),
       .cke_i (cke_i),
-      .rst_i (1'b0),
-      .en_i  (iob_rvalid_e),
+      .rst_i (m_axil_rvalid & m_axil_rready),
+      .en_i  (iob_rvalid_i),
       .data_i(iob_rvalid_i),
       .data_o(iob_rvalid_q)
    );
@@ -170,7 +170,7 @@ module iob_axi2iob #(
       .arst_i(arst_i),
       .cke_i (cke_i),
       .rst_i (1'b0),
-      .en_i  (iob_rvalid_e),
+      .en_i  (iob_rvalid_i),
       .data_i(iob_rdata_i),
       .data_o(iob_rdata_q)
    );

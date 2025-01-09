@@ -338,6 +338,9 @@ def setup(py_params_dict):
     # Generate wires for muxers and demuxers
     for signal, direction, width, _ in axi_signals:
         if direction == "input":
+            prefix = "input_"
+            if signal in ["axi_arvalid", "axi_awvalid"]:
+                prefix = "demux_"
             # Demux signals
             attributes_dict["wires"] += [
                 {
@@ -345,7 +348,7 @@ def setup(py_params_dict):
                     "descr": f"Input of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal + "_i",
+                            "name": prefix + signal + "_i",
                         },
                     ],
                 },
@@ -361,6 +364,9 @@ def setup(py_params_dict):
                 },
             ]
         else:  # output direction
+            prefix = "input_"
+            if signal in ["axi_arready", "axi_awready"]:
+                prefix = "mux_"
             # Mux signals
             attributes_dict["wires"] += [
                 {
@@ -378,7 +384,7 @@ def setup(py_params_dict):
                     "descr": f"Output of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal + "_o",
+                            "name": prefix + signal + "_o",
                         },
                     ],
                 },
@@ -523,6 +529,10 @@ def setup(py_params_dict):
         {
             # Extract output selection bits from address
             "verilog_code": f"""
+   //
+   // Read
+   //
+
    // Only switch slaves when there is no current active transaction
    assign read_sel = active_read_transaction ? read_sel_reg : input_axi_araddr_i[{ADDR_W-1}-:{NBITS}];
 
@@ -534,6 +544,15 @@ def setup(py_params_dict):
    assign active_read_transaction_acc_en = start_active_read_transaction ^ end_active_read_transaction;
    assign active_read_transaction_acc_input = start_active_read_transaction ? 1 : -1;
 
+   // Block valid/ready signals if there is an active transaction, and there is a new one for another slave
+   wire block_read_transaction = active_read_transaction & (input_axi_araddr_i[{ADDR_W-1}-:{NBITS}] != read_sel);
+   assign demux_axi_arvalid_i = block_read_transaction ? 1'b0 : input_axi_arvalid_i;
+   assign input_axi_arready_o = block_read_transaction ? 1'b0 : mux_axi_arready_o;
+
+
+   //
+   // Write
+   //
 
    // Only switch slaves when there is no current active transaction
    assign write_sel = active_write_transaction ? write_sel_reg : input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}];
@@ -545,6 +564,11 @@ def setup(py_params_dict):
    // iob_acc inputs
    assign active_write_transaction_acc_en = start_active_write_transaction ^ end_active_write_transaction;
    assign active_write_transaction_acc_input = start_active_write_transaction ? 1 : -1;
+
+   // Block valid/ready signals if there is an active transaction, and there is a new one for another slave
+   wire block_write_transaction = active_write_transaction & (input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}] != write_sel);
+   assign demux_axi_awvalid_i = block_write_transaction ? 1'b0 : input_axi_awvalid_i;
+   assign input_axi_awready_o = block_write_transaction ? 1'b0 : mux_axi_awready_o;
 """,
         },
     ]

@@ -5,6 +5,7 @@
 #grab TOP from environment variable NAME in tcl
 set TOP $env(NAME)
 set CSR_IF $env(CSR_IF)
+set INCLUDE_DIRS $env(INCLUDE_DIRS)
 
 puts "TOP: $TOP"
 puts "CSR_IF: $CSR_IF"
@@ -34,6 +35,7 @@ set_option language_mode mixed
 set_option enableV05 yes
 set_option top $TOP
 set_option incdir { . ../src }
+set_option incdir $INCLUDE_DIRS
 #set_option active_methodology $SPYGLASS_HOME/GuideWare/latest/block/rtl_handoff
 set_option pragma { synopsys synthesis }
 #set_option sdc2sgdc yes

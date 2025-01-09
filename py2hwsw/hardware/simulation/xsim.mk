@@ -25,6 +25,8 @@ ifneq ($(wildcard hardware/src),)
 VFLAGS+=-i hardware/src
 endif
 
+VFLAGS+=$(addprefix -i ,$(INCLUDE_DIRS))
+
 ifeq ($(VCD),1)
 VFLAGS+=-d VCD
 endif

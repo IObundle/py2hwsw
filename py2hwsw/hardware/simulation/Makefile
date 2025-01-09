@@ -119,6 +119,7 @@ endif
 
 test: $(TEST_LIST)
 
+build_hex: $(HEX)
 
 debug:
 	@echo NAME=$(NAME)
@@ -129,4 +130,4 @@ debug:
 
 .PRECIOUS: uut.vcd test.log
 
-.PHONY: build run waves gen-clean debug test $(TEST_LIST) fix-vcd remote_build_dir
+.PHONY: build run waves gen-clean debug test $(TEST_LIST) fix-vcd remote_build_dir build_hex

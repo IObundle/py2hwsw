@@ -14,7 +14,7 @@ include config_build.mk
 
 BSP_H ?= software/src/iob_bsp.h
 SIM_DIR := hardware/simulation
-BOARD_DIR := $(shell find -name $(BOARD) -type d -print -quit)
+BOARD_DIR := $(shell find hardware/fpga -name $(BOARD) -type d -print -quit)
 SYN_DIR=hardware/syn
 
 #

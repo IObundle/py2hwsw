@@ -325,6 +325,7 @@ iob_eth_rmac.h:
 UTARGETS+=build_uut_software
 build_uut_software:
 	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software clean
+	cp $(ROOT_DIR)/software/src/iob_bsp.h $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software/src/
 	USER_CFLAGS=-DTESTER make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software build
 
 .PHONY: build_uut_software

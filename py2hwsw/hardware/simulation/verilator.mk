@@ -5,6 +5,7 @@
 VTOP?=$(NAME)
 
 VFLAGS+=--cc --exe -I. -I../src -I../common_src -Isrc --top-module $(VTOP)
+VFLAGS+=$(addprefix -I,$(INCLUDE_DIRS))
 VFLAGS+=-Wno-lint --Wno-UNOPTFLAT
 VFLAGS+=--no-timing
 # Include embedded headers

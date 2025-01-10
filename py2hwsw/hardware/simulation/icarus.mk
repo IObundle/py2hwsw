@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 VFLAGS+=-W all -g2005-sv -I. -I../src -I../common_src -Isrc -Ihardware/src
+VFLAGS+=$(addprefix -I,$(INCLUDE_DIRS))
 
 ifeq ($(VCD),1)
 VFLAGS+=-DVCD

@@ -7,8 +7,9 @@ set NAME [lindex $argv 0]
 set CSR_IF [lindex $argv 1]
 set BOARD [lindex $argv 2]
 set VSRC [lindex $argv 3]
-set IS_FPGA [lindex $argv 4]
-set USE_EXTMEM [lindex $argv 5]
+set INCLUDE_DIRS [lindex $argv 4]
+set IS_FPGA [lindex $argv 5]
+set USE_EXTMEM [lindex $argv 6]
 
 #verilog sources, vivado IPs, use file extension
 foreach file [split $VSRC \ ] {
@@ -29,6 +30,11 @@ if {[file exists "vivado/premap.tcl"]} {
     source "vivado/premap.tcl"
 }
 
+set SYNTH_FLAGS {}
+foreach dir $INCLUDE_DIRS {
+    lappend SYNTH_FLAGS "-include_dirs ${dir}"
+}
+
 
 #read design constraints and synthesize design
 if { $IS_FPGA == "1" } {
@@ -43,7 +49,7 @@ if { $IS_FPGA == "1" } {
     if {[file exists "vivado/tool.sdc"]} {
         read_xdc vivado/tool.sdc
     }
-    synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD -part $PART -top $NAME -verbose
+    eval synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $NAME -verbose
 } else {
     #read design constraints
     puts "Out of context synthesis"
@@ -52,7 +58,7 @@ if { $IS_FPGA == "1" } {
     if {[file exists "vivado/tool.sdc"]} {
         read_xdc -mode out_of_context vivado/tool.sdc
     }
-    synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD -part $PART -top $NAME -mode out_of_context -flatten_hierarchy full -verbose
+    eval synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $NAME -mode out_of_context -flatten_hierarchy full -verbose
 }
 
 #set post-map custom assignments

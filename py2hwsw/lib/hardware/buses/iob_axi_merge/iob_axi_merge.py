@@ -346,7 +346,7 @@ def setup(py_params_dict):
             "name": "read_prio_enc_o",
             "descr": "Output of read priority encoder",
             "signals": [
-                {"name": "read_prio_enc_o"},
+                {"name": "read_prio_enc_o", "width": NBITS},
             ],
         },
         # Write priority encoder signals
@@ -361,7 +361,7 @@ def setup(py_params_dict):
             "name": "write_prio_enc_o",
             "descr": "Output of write priority encoder",
             "signals": [
-                {"name": "write_prio_enc_o"},
+                {"name": "write_prio_enc_o", "width": NBITS},
             ],
         },
     ]

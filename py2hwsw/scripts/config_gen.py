@@ -11,8 +11,14 @@ from latex import write_table
 
 
 def conf_vh(macros, top_module, out_dir):
+    """Given a list with groups of macros, generate a `*_conf.vh` file with the Verilog macro definitions.
+    :param macros: list with groups (iob_conf_group class) of macros (iob_conf class).
+    :param top_module: top module name
+    :param out_dir: output directory
+    """
     file2create = open(f"{out_dir}/{top_module}_conf.vh", "w")
     core_prefix = f"{top_module}_".upper()
+
     # These ifndefs cause issues when this file is included in multiple files and it contains other ifdefs inside this block.
     # For example, assume this file is included in another one that does not have `MACRO1` defined. Now assume that inside this block there is an `ifdef MACRO1` block.
     # Since `MACRO1` is not defined in the file that is including this, the `ifdef MACRO1` wont be executed.
@@ -20,6 +26,7 @@ def conf_vh(macros, top_module, out_dir):
     # wont execute because of the `ifndef` added here, therefore the `ifdef MACRO1` block will also not execute when it should have.
     # file2create.write(f"`ifndef VH_{fname}_VH\n")
     # file2create.write(f"`define VH_{fname}_VH\n\n")
+
     for group in macros:
         # If group has 'doc_only' attribute set to True, skip it
         if group.doc_only:
@@ -42,10 +49,16 @@ def conf_vh(macros, top_module, out_dir):
                 file2create.write(f"`define {core_prefix}{m_name} 1\n")
             if macro.if_defined or macro.if_not_defined:
                 file2create.write("`endif\n")
+
     # file2create.write(f"\n`endif // VH_{fname}_VH\n")
 
 
 def conf_h(macros, top_module, out_dir):
+    """Given a list with groups of macros, generate a `*_conf.h` file with the software macro definitions.
+    :param macros: list with groups (iob_conf_group class) of macros (iob_conf class).
+    :param top_module: top module name
+    :param out_dir: output directory
+    """
     if len(macros) == 0:
         return
     os.makedirs(out_dir, exist_ok=True)
@@ -85,12 +98,19 @@ def config_build_mk(python_module):
     file2create.write("CSR_IF ?=iob\n")
     file2create.write(f"BUILD_DIR_NAME={python_module.build_dir.split('/')[-1]}\n")
     file2create.write(f"IS_FPGA={int(python_module.is_system)}\n")
-    file2create.write("""
+    file2create.write(
+        """
 CONFIG_BUILD_DIR = $(dir $(lastword $(MAKEFILE_LIST)))
 ifneq ($(wildcard $(CONFIG_BUILD_DIR)/custom_config_build.mk),)
 include $(CONFIG_BUILD_DIR)/custom_config_build.mk
 endif
-""")
+"""
+    )
+
+    if python_module.is_tester:
+        file2create.write(
+            f"RELATIVE_PATH_TO_UUT={python_module.relative_path_to_UUT}\n"
+        )
 
     file2create.close()
 
@@ -185,6 +205,9 @@ def generate_confs_tex(confs, out_dir):
 
 
 def generate_confs(core):
+    """Generate Verilog and software macros based on the core's 'confs' list.
+    :param core: core object
+    """
     conf_vh(
         core.confs,
         core.name,

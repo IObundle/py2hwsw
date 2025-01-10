@@ -113,6 +113,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_reg",
                 "instance_name": "start_detected_inst",
+                "instance_description": "Detect start signal",
                 "parameters": {
                     "DATA_W": 1,
                     "RST_VAL": 0,
@@ -126,6 +127,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_counter",
                 "instance_name": "cnt0",
+                "instance_description": "Counter for pulse generation",
                 "parameters": {
                     "DATA_W": "WIDTH",
                     "RST_VAL": "{WIDTH{1'b0}}",
@@ -139,6 +141,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_reg",
                 "instance_name": "pulse_reg",
+                "instance_description": "Pulse output state",
                 "parameters": {
                     "DATA_W": 1,
                     "RST_VAL": 0,

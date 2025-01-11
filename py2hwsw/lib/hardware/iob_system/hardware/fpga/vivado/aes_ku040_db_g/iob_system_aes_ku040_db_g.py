@@ -20,6 +20,7 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": params["name"] + "_aes_ku040_db_g",
+        "generate_hw": True,
         "version": "0.1",
         #
         # Configuration

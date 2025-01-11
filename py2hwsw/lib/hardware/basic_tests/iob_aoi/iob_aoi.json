@@ -1,5 +1,6 @@
 {
     "version": "0.1",
+    "generate_hw": true,
     "confs": [
         "\n            W -t P -v 1 -m 1 -M 32\n            -d 'Ports width'\n            "
     ],

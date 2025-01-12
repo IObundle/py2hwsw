@@ -32,7 +32,7 @@ if {[file exists "vivado/premap.tcl"]} {
 
 set SYNTH_FLAGS {}
 foreach dir $INCLUDE_DIRS {
-    lappend SYNTH_FLAGS "-include_dirs ${dir}"
+    lappend SYNTH_FLAGS "-include_dirs" "${dir}"
 }
 
 

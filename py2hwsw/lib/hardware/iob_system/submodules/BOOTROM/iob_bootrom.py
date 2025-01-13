@@ -13,6 +13,7 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "version": VERSION,
+        "generate_hw": True,
         "confs": [
             {
                 "name": "DATA_W",

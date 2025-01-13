@@ -156,7 +156,7 @@ class iob_core(iob_module, iob_instance):
         )
         self.set_default_attribute(
             "generate_hw",
-            True,
+            False,
             bool,
             descr="Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.",
         )

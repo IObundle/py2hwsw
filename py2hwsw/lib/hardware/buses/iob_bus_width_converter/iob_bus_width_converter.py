@@ -138,6 +138,7 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": f"iob_{INTERFACE}_bus_width_converter",
+        "generate_hw": True,
         "version": "0.1",
         "confs": verilog_parameters,
         "ports": [

@@ -6,6 +6,8 @@
 def setup(py_params_dict):
     attributes_dict = {
         "version": "0.3",
+        # Note: This core currently has a manual verilog source! The generate_hw is true only because of the generated csrs subblock.
+        "generate_hw": True,
         "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g"],
         "confs": [
             {
@@ -71,7 +73,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "axistream",
+                "name": "axistream_io",
                 "descr": "AXI Stream interface signals",
                 "signals": [
                     {
@@ -112,7 +114,7 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "sys_axis",
+                "name": "sys_axis_io",
                 "descr": "System AXI Stream interface.",
                 "signals": [
                     {
@@ -325,16 +327,16 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "iob_s",
                     # Register interfaces
-                    "soft_reset": "soft_reset",
-                    "enable": "enable",
-                    "data": "data",
-                    "mode": "mode",
-                    "nwords": "nwords",
-                    "tlast_detected": "tlast_detected",
-                    "fifo_full": "fifo_full",
-                    "fifo_empty": "fifo_empty",
-                    "fifo_threshold": "fifo_threshold",
-                    "fifo_level": "fifo_level",
+                    "soft_reset_o": "soft_reset",
+                    "enable_o": "enable",
+                    "data_io": "data",
+                    "mode_o": "mode",
+                    "nwords_i": "nwords",
+                    "tlast_detected_i": "tlast_detected",
+                    "fifo_full_i": "fifo_full",
+                    "fifo_empty_i": "fifo_empty",
+                    "fifo_threshold_o": "fifo_threshold",
+                    "fifo_level_i": "fifo_level",
                 },
             },
             # TODO: Connect remaining subblocks

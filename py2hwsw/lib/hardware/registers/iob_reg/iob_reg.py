@@ -11,6 +11,7 @@ def setup(py_params_dict):
         edge = py_params_dict["RST_POL"]
     attributes_dict = {
         "version": "0.1",
+        "generate_hw": True,
         "confs": [
             {
                 "name": "DATA_W",

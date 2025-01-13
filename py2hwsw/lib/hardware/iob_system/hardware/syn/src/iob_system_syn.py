@@ -12,6 +12,7 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": params["name"] + "_syn",
+        "generate_hw": True,
         "confs": [
             {
                 "name": "bsp",

@@ -36,8 +36,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef _PRINTF_H_
-#define _PRINTF_H_
+#ifndef _IOB_PRINTF_H_
+#define _IOB_PRINTF_H_
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -122,4 +122,4 @@ int fctprintf(void (*out)(char character, void *arg), void *arg,
 }
 #endif
 
-#endif // _PRINTF_H_
+#endif // _IOB_PRINTF_H_

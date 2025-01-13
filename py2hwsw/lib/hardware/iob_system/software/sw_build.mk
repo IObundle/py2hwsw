@@ -42,7 +42,7 @@ IOB_SYSTEM_LFLAGS=-Wl,-Bstatic,-T,$(TEMPLATE_LDS),--strip-debug
 # FIRMWARE SOURCES
 IOB_SYSTEM_FW_SRC=src/iob_system_firmware.S
 IOB_SYSTEM_FW_SRC+=src/iob_system_firmware.c
-IOB_SYSTEM_FW_SRC+=src/printf.c
+IOB_SYSTEM_FW_SRC+=src/iob_printf.c
 # PERIPHERAL SOURCES
 IOB_SYSTEM_FW_SRC+=$(addprefix src/,$(addsuffix .c,$(PERIPHERALS)))
 IOB_SYSTEM_FW_SRC+=$(addprefix src/,$(addsuffix _csrs_emb.c,$(PERIPHERALS)))
@@ -77,7 +77,7 @@ iob_system_preboot:
 
 # SOURCES
 EMUL_SRC+=src/iob_system_firmware.c
-EMUL_SRC+=src/printf.c
+EMUL_SRC+=src/iob_printf.c
 
 # PERIPHERAL SOURCES
 EMUL_SRC+=$(addprefix src/,$(addsuffix .c,$(PERIPHERALS)))

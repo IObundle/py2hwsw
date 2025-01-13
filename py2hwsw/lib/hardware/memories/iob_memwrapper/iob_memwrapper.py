@@ -18,14 +18,11 @@ def setup(py_params_dict):
 
     mwrap_wires = []
     mwrap_ports = []
-    snippets = [{"verilog_code": ""}] 
     for port in attrs["ports"]:
         if isinstance(port["signals"], dict):
             if port["signals"]["type"] in mem_if_names:
                 wire = copy.deepcopy(port)
                 mwrap_wires.append(wire)
-                snippet = f"    assign {wire['signals']['prefix']}clk = clk_i;\n"
-                snippets[0]["verilog_code"] += snippet
             else:
                 mwrap_ports.append(port)
         else:
@@ -34,8 +31,6 @@ def setup(py_params_dict):
     attributes_dict["ports"] = mwrap_ports
 
     attributes_dict["wires"] = mwrap_wires
-
-    attributes_dict["snippets"] = snippets
 
     attributes_dict["subblocks"] = [
         {

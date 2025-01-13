@@ -202,16 +202,21 @@ class iob_core(iob_module, iob_instance):
             self.dest_dir = "hardware/src"
 
         # Read 'attributes' dictionary and set corresponding core attributes
-        self.superblocks = attributes.pop("superblocks", [])
+        superblocks = attributes.pop("superblocks", [])
         self.parse_attributes_dict(attributes)
 
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, self.instantiator)
+        
+        # Create memory wrapper for top module if any memory interfaces are used
+        if self.is_top_module:
+            if any(port.interface.type in mem_if_names for port in self.ports if port.interface):
+                superblocks = self.create_memwrapper(superblocks=superblocks)
 
         # Ensure superblocks are set up last
         # and only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
-            self.parse_attributes_dict({"superblocks": self.superblocks})
+            self.parse_attributes_dict({"superblocks": superblocks})
         if self.is_superblock:
             # Generate verilog parameters of instantiator subblock
             param_gen.generate_inst_params(self.instantiator)
@@ -507,24 +512,17 @@ class iob_core(iob_module, iob_instance):
             if not port.e_connect and port.interface:
                 if port.interface.type in mem_if_names and instantiator:
                     self.connect_memory(port, instantiator)
-        if self.is_top_module:
-            if any(port.interface.type in mem_if_names for port in self.ports if port.interface):
-                self.create_memwrapper()
 
-    def create_memwrapper(self):
+    def create_memwrapper(self, superblocks):
         """Create memory wrapper for top module"""
-        self.superblocks.append(
+        superblocks.append(
             {
-                "name": f"{self.name}_memwrapper",
-                "blocks": [
-                    {
-                        "core_name": "iob_memwrapper",
-                        "instance_name": f"{self.name}_memwrapper",
-                        "mem_if_names:": mem_if_names,
-                    },
-                ],
-            }
+                "core_name": "iob_memwrapper",
+                "instance_name": f"{self.name}_memwrapper",
+                "mem_if_names": mem_if_names,
+            },
         )
+        return superblocks
 
     def __create_build_dir(self):
         """Create build directory if it doesn't exist"""

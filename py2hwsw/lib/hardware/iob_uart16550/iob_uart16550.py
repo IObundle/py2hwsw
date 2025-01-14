@@ -1,6 +1,6 @@
 def setup(py_params_dict):
     attributes_dict = {
-        "generate_hw": True,
+        "generate_hw": False,
         "version": "0.1",
         "ports": [
             {
@@ -40,7 +40,6 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_iob2wishbone",
-                "instantiate": False,
             },
         ],
     }

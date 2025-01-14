@@ -1,6 +1,6 @@
 #include "iob_eth.h"
 #include "iob_eth_defines.h"
-#include "printf.h"
+#include "iob_printf.h"
 
 // Frame template (includes every field of the frame before the payload)
 static char TEMPLATE[TEMPLATE_LEN];

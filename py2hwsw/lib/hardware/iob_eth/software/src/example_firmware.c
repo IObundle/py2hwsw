@@ -1,7 +1,7 @@
 #include "iob-eth.h"
 #include "iob-uart.h"
 #include "periphs.h"
-#include "printf.h"
+#include "iob_printf.h"
 #include "stdlib.h"
 #include "system.h"
 

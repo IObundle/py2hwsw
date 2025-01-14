@@ -195,8 +195,9 @@ class iob_core(iob_module, iob_instance):
         build_dir_backup = __class__.global_build_dir
         if attributes.get("is_tester", False):
             # If is tester, build dir is same "dest_dir". (default: submodules/tester)
+            self.relative_path_to_tester = kwargs.get("dest_dir", "submodules/tester")
             __class__.global_build_dir = os.path.join(
-                __class__.global_build_dir, kwargs.get("dest_dir", "submodules/tester")
+                __class__.global_build_dir, self.relative_path_to_tester
             )
             self.dest_dir = "hardware/src"
 
@@ -246,7 +247,7 @@ class iob_core(iob_module, iob_instance):
 
         # Generate config_build.mk
         if self.is_top_module or self.is_tester:
-            config_gen.config_build_mk(self)
+            config_gen.config_build_mk(self, __class__.global_top_module)
 
         # Generate configuration files
         config_gen.generate_confs(self)

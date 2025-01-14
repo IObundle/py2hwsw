@@ -24,7 +24,7 @@ FPGA_PROG=vivado -nojournal -log vivado.log -mode batch -source vivado/prog.tcl 
 # work-around for http://svn.clifford.at/handicraft/2016/vivadosig11
 export RDI_VERBOSE = False
 
-VIVADO_FLAGS= -nojournal -log reports/vivado.log -mode batch -source vivado/build.tcl -tclargs $(FPGA_TOP) $(CSR_IF) $(BOARD) "$(VSRC)" "$(INCLUDE_DIRS)" $(IS_FPGA) $(USE_EXTMEM)
+VIVADO_FLAGS= -nojournal -log reports/vivado.log -mode batch -source vivado/build.tcl -tclargs $(FPGA_TOP) $(CSR_IF) $(BOARD) "$(VSRC)" " $(INCLUDE_DIRS)" $(IS_FPGA) $(USE_EXTMEM)
 
 $(FPGA_OBJ): $(VSRC) $(VHDR) $(wildcard $(BOARD)/*.sdc)
 	mkdir -p reports && vivado $(VIVADO_FLAGS) 

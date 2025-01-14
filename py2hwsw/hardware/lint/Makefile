@@ -22,6 +22,7 @@ $(VSRC):
 	@ls $@ >> $(NAME)_files.list
 
 LINTER?=verilator
+RSYNC_ROOT_DIR=../..
 include $(LINTER).mk
 
 run: clean $(NAME)_files.list

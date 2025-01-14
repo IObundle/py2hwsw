@@ -288,6 +288,7 @@ def setup(py_params_dict):
                 "data_o": "mux_wstrb_data_o",
             },
         },
+        # demuxers
         {
             "core_name": "iob_demux",
             "instance_name": "iob_demux_rdata",
@@ -301,7 +302,6 @@ def setup(py_params_dict):
                 "data_o": "demux_rdata_data_o",
             },
         },
-        # demuxers
         {
             "core_name": "iob_demux",
             "instance_name": "iob_demux_rvalid",
@@ -323,6 +323,7 @@ def setup(py_params_dict):
                 "N": NUM_INPUTS,
             },
             "connect": {
+                # Ready selection must not be registered
                 "sel_i": "input_sel",
                 "data_i": "demux_ready_data_i",
                 "data_o": "demux_ready_data_o",

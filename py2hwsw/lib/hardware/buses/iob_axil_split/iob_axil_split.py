@@ -283,6 +283,8 @@ def setup(py_params_dict):
                 },
             )
         else:  # output direction
+            # Use registered select signal for response signals (except for ready)
+            sel_signal_suffix = "" if "ready" in signal else "_reg"
             # Muxers
             attributes_dict["subblocks"].append(
                 {
@@ -294,9 +296,9 @@ def setup(py_params_dict):
                     },
                     "connect": {
                         "sel_i": (
-                            "output_read_sel_reg"
+                            "output_read_sel" + sel_signal_suffix
                             if sig_type == "read"
-                            else "output_write_sel_reg"
+                            else "output_write_sel" + sel_signal_suffix
                         ),
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",

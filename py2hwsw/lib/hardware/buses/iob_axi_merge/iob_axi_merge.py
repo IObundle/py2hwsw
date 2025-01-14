@@ -531,6 +531,8 @@ def setup(py_params_dict):
     # Generate muxers and demuxers
     for signal, direction, width, sig_type in axi_signals:
         if direction == "output":
+            # Use registered select signal for response signals (except for ready)
+            sel_signal_suffix = "" if "ready" in signal else "_reg"
             # Demuxers
             attributes_dict["subblocks"].append(
                 {
@@ -542,9 +544,9 @@ def setup(py_params_dict):
                     },
                     "connect": {
                         "sel_i": (
-                            "input_read_sel"
+                            "input_read_sel" + sel_signal_suffix
                             if sig_type == "read"
-                            else "input_write_sel"
+                            else "input_write_sel" + sel_signal_suffix
                         ),
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",

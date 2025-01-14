@@ -16,7 +16,7 @@ def setup(py_params_dict):
     gen_custom_config_build(py_params_dict)
 
     # Copy simulation testbench utility files
-    dst = f"{py_params_dict["build_dir"]}/hardware/simulation/src"
+    dst = f"{py_params_dict['build_dir']}/hardware/simulation/src"
     os.makedirs(dst, exist_ok=True)
     src = f"{os.path.dirname(__file__)}/hardware/simulation/src"
     for src_file in [
@@ -32,26 +32,26 @@ def setup(py_params_dict):
 
     shutil.copytree(
         f"{os.path.dirname(__file__)}/scripts",
-        f"{py_params_dict["build_dir"]}/scripts",
+        f"{py_params_dict['build_dir']}/scripts",
         dirs_exist_ok=True,
     )
-    nix_permission_hack(f"{py_params_dict["build_dir"]}/scripts")
+    nix_permission_hack(f"{py_params_dict['build_dir']}/scripts")
 
      # Check if pyRawWrapper exists
-    pyRawWrapper_path = f"{py_params_dict["build_dir"]}/scripts/pyRawWrapper/pyRawWrapper"
+    pyRawWrapper_path = f"{py_params_dict['build_dir']}/scripts/pyRawWrapper/pyRawWrapper"
 
     if not os.path.exists(pyRawWrapper_path):
         print("Create pyRawWrapper for RAW access to ethernet frames")
 
         # Run make compile
         subprocess.run(
-            ["make", "-C", f"{py_params_dict["build_dir"]}/scripts/pyRawWrapper", "compile"],
+            ["make", "-C", f"{py_params_dict['build_dir']}/scripts/pyRawWrapper", "compile"],
             check=True
         )
 
         # Run sudo make set-capabilities
         subprocess.run(
-            ["sudo", "make", "-C", f"{py_params_dict["build_dir"]}/scripts/pyRawWrapper", "set-capabilities"],
+            ["sudo", "make", "-C", f"{py_params_dict['build_dir']}/scripts/pyRawWrapper", "set-capabilities"],
             check=True
         )
 

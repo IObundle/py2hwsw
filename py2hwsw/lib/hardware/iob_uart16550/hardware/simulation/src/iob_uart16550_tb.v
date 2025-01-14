@@ -1,6 +1,5 @@
 `timescale 1ns / 1ps
 
-`include "iob_utils.vh"
 `include "uart_defines.vh"
 
 module iob_uart16550_tb;

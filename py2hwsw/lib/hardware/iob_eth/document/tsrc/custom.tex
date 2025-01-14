@@ -1,0 +1,882 @@
+\section{Software Register Details}
+\label{sec:swreg_details}
+
+This section presents each software register in detail.
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-17   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    16      & RW & RECSMALL - Receive Small Packets. 
+
+                0 = Packets smaller than MINFL are ignored; 
+
+                1 = Packets smaller than MINFL are accepted. \\ \hline
+    15      & RW &   PAD - Padding enabled. 
+
+                0 = do not add pads to short frames; 
+
+                1 = add pads to short frames (until the minimum frame length is equal to MINFL). \\ \hline
+    \rowcolor{iob-blue}
+    14      & RW &   HUGEN = Huge Packets Enable. 
+
+                0 = the maximum frame length is MAXFL. All Additional bytes are discarded; 
+
+                1 = Frames up 64KB are transmitted. \\ \hline
+    13      & RW &   CRCEN - CRC Enable. 
+
+                0 = Tx MAC does not append the CRC (passed frames already contain the CRC; 
+
+                1 = Tx MAC appends the CRC to every frame. \\ \hline
+    \rowcolor{iob-blue}
+    12      & RW &   DLYCRCEN - Delayed CRC Enabled. 
+
+                0 = Normal operation (CRC calculation starts immediately after the SFD); 
+
+                1 = CRC calculation starts 4 bytes after the SFD. \\ \hline
+    11      & RW &  Reserved \\ \hline
+    \rowcolor{iob-blue}
+    10      & RW &  FULLD - Full Duplex. 
+
+                0 = Half duplex mode; 
+
+                1 = Full duplex mode. \\ \hline
+    9       & RW &  EXDFREN - Excess Defer Enabled. 
+
+                0 = When the excessive deferral limit is reached, a packet is aborted; 
+
+                1 = MAC waits for the carrier indefinitely. \\ \hline
+    \rowcolor{iob-blue}
+    8       & RW &  NOBCKOF - No Backoff. 
+
+                0 = Normal operation (a binary exponential backoff algorithm is used); 
+
+                1 = Tx MAC starts retransmitting immediately after the collision. \\ \hline
+    7       & RW &  LOOPBCK - Loop Back. 
+
+                0 = Normal operation; 
+
+                1 = Tx is looped back to the RX. \\ \hline
+    \rowcolor{iob-blue}
+    6       & RW &  IFG - Interframe Gap for Incoming frames. 
+
+                0 = Normal operation (minimum IFG is required for a frame to be accepted; 
+
+                1 = All frames are accepted regardless to the IFG. \\ \hline
+    5       & RW &  PRO - Promiscuous. 
+
+                0 = Check the destination address of the incoming frames; 
+
+                1 = Receive the frame regardless of its address. \\ \hline
+    \rowcolor{iob-blue}
+    4       & RW &   IAM - Individual Address Mode. 
+
+                0 = Normal operation (physical address is checked when the frame is received); 
+
+                1 = The individual hash table is used to check all individual addresses received. \\ \hline
+    3       & RW &   BRO - Broadcast Address. 
+
+                0 = Receive all frames containing the breadcast address; 
+
+                1 = Reject all frames containing the broadcast address unless the PRO bit=1. \\ \hline
+    \rowcolor{iob-blue}
+    2       & RW &   NOPRE - No Preamble. 
+
+                0 = Normal operation (7-byte preamble); 
+
+                1 = No preamble is sent. \\ \hline
+    1       & RW &   TXEN - Transmit Enable. 
+
+                0 = Transmit is disabled; 
+
+                1 = Transmit is enabled. 
+
+                If the value, written to the TX\_BD\_NUM register, is equal to 0x0 (zero buffer descriptors are used), then the transmitter is automatically disabled regardless of the TXEN bit. \\ \hline
+    \rowcolor{iob-blue}
+    0       & RW &   RXEN - Receive Enable. 
+
+                0 = Transmit is disabled; 
+
+                1 = Transmit is enabled. 
+
+                If the value, written to the TX\_BD\_NUM register, is equal to 0x80 (all buffer descriptors are used for transmit buffer descriptors, so there is no receive BD), then the receiver is automatically disabled regardless of the RXEN bit.
+ \\ \hline
+ 
+  \end{tabularx}
+    \caption{MODER (Mode Register)}
+  \label{swreg_details:moder}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-7   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    6      & RW & RXC - Receive Control Frame
+
+                This bit indicates that the control frame was received. It is
+                cleared by writting 1 to it. Bit RXFLOW (CTRLMODER register)
+                must be set to 1 in order to get the RXC bit set. \\ \hline
+    5      & RW & TXC - Transmit Control Frame
+
+                This bit indicates that a control frame was transmitted. It is
+                cleared by writting 1 to it. Bit RXFLOW (CTRLMODER register)
+                must be set to 1 in order to get the TXC bit set. \\ \hline
+    \rowcolor{iob-blue}
+    4      & RW & BUSY - Busy
+
+                This bit indicates that a buffer was received and discarded due
+                to a lack of buffers. It is cleared by writing 1 to it. This
+                bit appears regardless to the IRQ bits in the Receive or
+                Transmit Buffer Descriptors.\\ \hline
+    3      & RW & RXE - Receive Error
+
+                This bit indicates that an error occurred while receiving data.
+                It is cleared by writing 1 to it. This bit appears only when
+                IRQ bit is set in the Receive Buffer Descriptor.\\ \hline
+    \rowcolor{iob-blue}
+    2      & RW & RXB - Receive Frame
+
+                This bit indicates that a frame was received. It is cleared by
+                writing 1 to it. This bit appears only when IRQ bit is set in
+                the Receive Buffer Descriptor. If a control frame is received,
+                then RXC bit is set instead of the RXB bit. (CTRLMODER (Control
+                Module Mode Register) description for more details.)\\
+                \hline
+    1      & RW & TXE - Transmit Error
+
+                This bit indicates that a buffer was not transmitted due to a
+                transmit error. It is cleared by writing 1 to it. This bit
+                appears only when IRQ bit is set in the Receive Buffer
+                Descriptor. This bit appears only when IRQ bit is set in the
+                Transmit Buffer Descriptor.\\ \hline
+    \rowcolor{iob-blue}
+    0      & RW & TXB - Transmit Buffer
+
+                This bit indicates that a buffer has been transmitted. It is
+                cleared by writing 1 to it. This bit appears only when IRQ bit
+                is set in the Transmit Buffer Descriptor.\\ \hline
+  \end{tabularx}
+    \caption{INT\_SOURCE (Interrupt Source Register)}
+  \label{swreg_details:int_source}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-7   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    6      & RW & RXC\_M - Receive Control Frame Mask
+                
+                0 = Event masked
+
+                1 = Event causes an interrupt \\ \hline
+    5      & RW & TXC - Transmit Control Frame Mask
+
+                0 = Event masked
+
+                1 = Event causes an interrupt \\ \hline
+    \rowcolor{iob-blue}
+    4      & RW & BUSY - Busy Mask
+
+                0 = Event masked
+
+                1 = Event causes an interrupt \\ \hline
+    3      & RW & RXE - Receive Error Mask
+
+                0 = Event masked
+
+                1 = Event causes an interrupt \\ \hline
+    \rowcolor{iob-blue}
+    2      & RW & RXB - Receive Frame Mask
+
+                0 = Event masked
+
+                1 = Event causes an interrupt \\ \hline
+   1      & RW & TXE - Transmit Error Mask
+
+                0 = Event masked
+
+                1 = Event causes an interrupt \\ \hline
+    \rowcolor{iob-blue}
+    0      & RW & TXB - Transmit Buffer Mask
+
+                0 = Event masked
+
+                1 = Event causes an interrupt \\ \hline
+  \end{tabularx}
+    \caption{INT\_MASK (Interrupt Mask Register)}
+  \label{swreg_details:int_mask}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-7   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    6-0      & RW & IPGT - Back to Back Inter Packet Gap
+
+                Full Duplex: The recommended value is 0x15, which equals
+                $0.96\mu s$ IPG (100 Mbps) or $9.6\mu s$ (10 Mbps). The desired
+                period in nibble times minus 6 should be written to the
+                register.
+
+                Half Duplex: The recommended value is 0x12, which equals
+                $0.96\mu s$ IPG (100 Mbps) or $9.6\mu s$ (10 Mbps). The desired
+                period in nibble times minus 3 should be written to the
+                register. \\ \hline
+  \end{tabularx}
+    \caption{IPGT (Back to Back Inter Packet Gap Register)}
+  \label{swreg_details:ipgt}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-7   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    6-0      & RW & IPGR1 - Non Back to Back Inter Packet Gap 1
+
+                When a carrier sense appears within the IPGR1 window, Tx MAC
+                defers and the IPGR counter is reset. When a carrier sense
+                appears later than the IPGR1 window, the IPGR counter continues
+                counting. The recommended and default value for this register
+                is 0xC. It must be within the range [0,IPGR2]. \\ \hline
+  \end{tabularx}
+    \caption{IPGR1 (Non Back to Back Inter Packet Gap Register 1)}
+  \label{swreg_details:ipgr1}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-7   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    6-0      & RW & IPGR2 - Non Back to Back Inter Packet Gap 2
+
+                The recommended and default value is 0x12, which equals to $0.96
+                \mu s$ IPG (100 Mbps) or $9.6 \mu s$ (10 Mbps).\\ \hline
+  \end{tabularx}
+    \caption{IPGR2 (Non Back to Back Inter Packet Gap Register 2)}
+  \label{swreg_details:ipgr2}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-16   & RW  & MINFL - Minimum Frame Length 
+
+                The minimum Ethernet packet is 64 bytes long. If a reception of
+                smaller frames is needed, assert the RECSMALL bit (in the mode
+                register MODER) or change the value of this register. To
+                transmit small packets, assert the PAD bit or the MINFL value
+                (see the PAD bit description in the MODER register). \\ \hline
+    \rowcolor{iob-blue}
+    15-0   & RW  & MAXFL - Maximum Frame Length 
+
+                The maximum Ethernet packet is 1518 bytes long. To support this
+                and to leave some additional space for the tags, a default
+                maximum packet length equals 1536 bytes (0x0600). If there is a
+                need to support bigger packets, you can assert the HUGEN bit or
+                increase the value of the MAXFL field (see the HUGEN bit
+                description in the MODER).\\ \hline
+  \end{tabularx}
+    \caption{PACKETLEN (Packet Length Register)}
+  \label{swreg_details:packetlen}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-20   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    19-16      & RW & MAXRET - Maximum Retry
+
+                This field specifies the maximum number of consequential
+                retransmission attempts after the collision is detected. When
+                the maximum number has been reached, the Tx MAC reports an
+                error and stops transmitting the current packet. According to
+                the Ethernet standard, the MAXRET default value is set to 0xf
+                (15).\\ \hline
+    15-6      & RW &   Reserved \\ \hline
+    \rowcolor{iob-blue}
+    5-0       & RW &   COLLVALID - Collision Valid 
+%
+                This field specifies a collision time window. A collision that
+                occurs later than the time window is reported as a "Late
+                Collisions" and transmission of the current packet is aborted.
+                The default value equals 0x3f (by default, a late collision is
+                every collision that occurs 64 bytes ($63 + 1$) from the
+                preamble) \\ \hline
+  \end{tabularx}
+    \caption{COLLCONF (Collision and Retry Configuration Register)}
+  \label{swreg_details:collconf}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-8   & RW  & Reserved \\ \hline
+    \rowcolor{iob-blue}
+      7-0   & RW  & Transmit Buffer Descriptor (Tx BD) Number
+
+                Number of the Tx BD. Number of the Rx BD equals to the (0x80 –
+                Tx BD number). Maximum number of the Tx BD is 0x80. Values
+                greater then 0x80 cannot be written to this register
+                (ignored).\\ \hline
+  \end{tabularx}
+    \caption{TX\_BD\_NUM (Transmit BD Number Register)}
+  \label{swreg_details:tx_bd_num}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-3   & RW  & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    2  & RW  & TXFLOW - Transmit Flow Control
+
+                0 = PAUSE control frames are blocked. 
+
+                1 = PAUSE control frames are allowed to be sent. This bit
+                enables the TXC bit in the INT\_SOURCE register.\\ \hline
+    1  & RW  & RXFLOW - Receive Flow Control
+
+                0 = Received PAUSE control frames are ignored.
+
+                1 = The transmit function (Tx MAC) is blocked when a PAUSE
+                control frame is received. This bit enables the RXC bit in the
+                INT\_SOURCE register.\\ \hline
+    \rowcolor{iob-blue}
+    0  & RW  & PASSALL - Pass All Receive Frames
+
+                0 = Control frames are not passed to the host. RXFLOW must be
+                set to 1 in order to use PAUSE control frames.
+
+                1 = All received frames are passed to the host.\\ \hline
+  \end{tabularx}
+    \caption{CTRLMODER (Control Module Mode Register)}
+  \label{swreg_details:ctrlmoder}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf PASSALL \#} & {\bf RXFLOW} & {\bf Description} \\ \hline
+
+    0   & 0 &   When a PAUSE control frame is received, nothing happens. The
+                control frame is not stored to the memory.\\ \hline
+    \rowcolor{iob-blue}
+    0   & 1 &   When a PAUSE control frame is received, RXC interrupt is set
+                and pause timer is updated. The control frame is not stored to
+                the memory.\\ \hline
+    1   & 0 &   When a PAUSE control frame is received, it is stored to the
+                memory as a normal data frame. RXB interrupt is set (if the
+                related buffer descriptor has an IRQ bit set to 1). RXC
+                interrupt is not set and pause timer is not updated.\\ \hline
+    \rowcolor{iob-blue}
+    1   & 1 &   When a PAUSE control frame is received, RXC interrupt is set
+                and pause timer is updated. Besides that the control frame is
+                also stored to the memory as a normal data frame.\\ \hline
+  \end{tabularx}
+    \caption{PASSALL and RXFLOW Operation}
+  \label{swreg_details:passall_rxflow}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-9   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    8      & RW & MIINOPRE - No Preamble
+
+                0 = 32-bit premable sent
+
+                1 = No preamble sent\\ \hline
+    7-0      & RW &   CLKDIV - Clock Divider
+
+                The field is a host clock divider factor. The host clock can be
+                divided by an even number, greater then 1. The default value is
+                0x64 (100).\\ \hline
+  \end{tabularx}
+    \caption{MIIMODER (MII Mode Register)}
+  \label{swreg_details:miimoder}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-3   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    2      & RW & WCTRLDATA - Write Control Data \\ \hline
+    1      & RW & RSTAT - Read Status \\ \hline
+    \rowcolor{iob-blue}
+    0      & RW & SCANSTAT - Scan Status \\ \hline
+  \end{tabularx}
+    \caption{MIICOMMAND (MII Command Register)}
+  \label{swreg_details:miicommand}
+\end{table}
+
+\textbf{Note: While one operation is in progress, BUSY signal (MIISTATUS
+register is set. Next operation can be started after the previous one is
+finished (and BUSY signal cleared to zero).}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-13   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    12-8    & RW & RGAD - Register Address (within the PHY selected by the
+                        FIAD[4:0]) \\ \hline
+    7-5     & RW & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    4-0     & RW & FIAD - PHY Address \\ \hline
+  \end{tabularx}
+    \caption{MIIADDRESS (MII Address Register)}
+  \label{swreg_details:miiaddress}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-16   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+      15-0    & RW &  CTRLDATA - Control Data (data to be written to the PHY)
+                    \\ \hline
+  \end{tabularx}
+    \caption{MIITX\_DATA (MII Transmit Data)}
+  \label{swreg_details:miitx_data}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-16   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    15-0    & R &  PRSD - Received Data (data to be read from PHY) \\ \hline
+  \end{tabularx}
+    \caption{MIIRX\_DATA (MII Receive Data)}
+  \label{swreg_details:miirx_data}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-3   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    2      & R & NVALID - Invalid
+
+                0 = The data in the MSTATUS register is valid.
+
+                1 = The data in the MSTATUS register is invalid. 
+
+                This bit is only valid when the scan status operation is
+                active.\\ \hline
+    1      & R & BUSY
+
+                0 = The MII is ready.
+
+                1 = The MII is bysy (operation in progress). \\ \hline
+    \rowcolor{iob-blue}
+    0      & R & LINKFAIL
+
+                0 = The link is OK.
+
+                1 = The link failed. 
+
+                The link fail condition occurred (now the link might be OK).
+                Another status read gets a new status.\\ \hline
+  \end{tabularx}
+    \caption{MIISTATUS (MII Status Register)}
+  \label{swreg_details:miistatus}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-24   & RW  & Byte 2 of the Ethernet MAC address (individual address) \\
+                    \hline
+    \rowcolor{iob-blue}
+    23-16   & RW  & Byte 3 of the Ethernet MAC address (individual address) \\
+                    \hline
+    15-8    & RW  & Byte 4 of the Ethernet MAC address (individual address) \\
+                    \hline
+    \rowcolor{iob-blue}
+    7-0     & RW  & Byte 5 of the Ethernet MAC address (individual address) \\
+                    \hline
+  \end{tabularx}
+    \caption{MAC\_ADDR0 (MAC Address Register 0)}
+  \label{swreg_details:mac_addr0}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-16   & RW  & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    15-8    & RW  & Byte 0 of the Ethernet MAC address (individual address) \\
+                    \hline
+    7-0     & RW  & Byte 1 of the Ethernet MAC address (individual address) \\
+                    \hline
+  \end{tabularx}
+    \caption{MAC\_ADDR1 (MAC Address Register 1)}
+  \label{swreg_details:mac_addr1}
+\end{table}
+
+Note: When an address is transmitted, byte 0 is sent first and byte 5 last.
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-0   & RW  & Hash0 value \\ \hline
+  \end{tabularx}
+    \caption{HASH0 (HASH Register 0)}
+  \label{swreg_details:hash0}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-0   & RW  & Hash1 value \\ \hline
+  \end{tabularx}
+    \caption{HASH1 (HASH Register 1)}
+  \label{swreg_details:hash1}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    31-17   &   & Reserved \\ \hline
+    \rowcolor{iob-blue}
+    16      & RW & TXPAUSERQ - Tx Pause Request
+
+                Writing 1 to this bit starts sending control frame procedure.
+                Bit is automatically cleared to zero. \\ \hline
+    15-0    & RW & TXPAUSETV - Tx Pause Timer Value
+
+                 The value that is send in the pause control frame.\\ \hline
+  \end{tabularx}
+    \caption{TXCTRL (Tx Control Register)}
+  \label{swreg_details:txctrl}
+\end{table}
+
+\section{Buffer Descriptors}
+\label{sec:buffer_descriptors}
+The buffer descriptors are 64 bits long. The first 32 bits are reserved for
+length and status while the last 32 bits contain the pointer to the associated
+buffer (where data is stored). The Ethernet MAC core has an internal RAM that
+can store up to 128 BDs (for both Rx and Tx). 
+
+The internal memory saves all descriptors at addresses from 0x400 to 0x7ff (128
+64bit descriptors). The transmit descriptors are located between the start
+address (0x400) and the address that equals the value written in the
+TX\_BD\_NUM register (page 14) multiplied by 8. This register holds the number
+of the used Tx buffer descriptors. The receive descriptors are located between
+the start address (0x400), plus the address number written in the TX\_BD\_NUM
+multiplied by 8, and the descriptor end address (0x7ff). The transmit and
+receive status of the packet is written to the associated buffer descriptor
+once its transmission/reception is finished.
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    63-32   & RW  & TXPNT - Transmit Pointer
+
+                This is the buffer pointer when the associated frame is
+                stored.\\ \hline
+    \rowcolor{iob-blue}
+    31-16   & RW & LEN - Length
+
+                 Number of bytes associated with the BD to be transmitted.\\
+                 \hline
+    15      & RW & RD - Tx BD Ready
+
+                0 = The buffer associated with this buffer descriptor is not
+                ready, and you are free to manipulate it. After the data from
+                the associated buffer has been transmitted or after an error
+                condition occurred, this bit is cleared to 0.
+
+                1 = The data buffer is ready for transmission or is currently
+                being transmitted. You are not allowed to manipulate this
+                descriptor once this bit is set. \\ \hline
+    \rowcolor{iob-blue}
+    14      & RW & IRQ - Interrupt Request Enable
+
+                0 = No interrupt is generated after the transmission.
+
+                1 = When data associated with this buffer descriptor is sent, a
+                TXB or TXE interrupt will be asserted (INT\_SOURCE (Interrupt
+                Source Register) for more details).\\ \hline
+    13      & RW & WR - Wrap
+
+                0 = This buffer descriptor is not the last descriptor in the
+                buffer descriptor table.
+
+                1 = This buffer descriptor is the last descriptor in the buffer
+                descriptor table. After this buffer descriptor was used, the
+                first buffer descriptor in the table will be used again. \\
+                \hline
+    \rowcolor{iob-blue}
+    12      & RW & PAD - Pad Enable
+
+                0 = No pads will be add at the end of short packets.
+
+                1 = Pads will be added to the end of short packets.\\ \hline
+    11      & RW & CRC - CRC Enable
+
+                0 = CRC won't be added at the end of the packet.
+
+                1 = CRC will be added at the end of the packet.\\ \hline
+    \rowcolor{iob-blue}
+    10-9    & RW & Reserved \\ \hline
+    8       & RW & UR - Underrun
+
+                Underrun occured while sending this buffer.\\ \hline
+    \rowcolor{iob-blue}
+    7-4     & RW & RTRY - Retry Count
+
+                This bit indicates the number of retries before the frame was
+                successfully sent.\\ \hline
+    3       & RW & RL - Retransmission Limit
+
+                This bit is set when the transmitter fails. (Retry Limit + 1)
+                attempts to successfully transmit a message due to repeated
+                collisions on the medium. The Retry Limit is set in the
+                COLLCONF register.\\ \hline
+    \rowcolor{iob-blue}
+    2       & RW & LC - Late Collision
+
+                Late collision occurred while sending this buffer. The
+                transmission is stopped and this bit is written. Late collision
+                is defined in the COLLCONF register.\\ \hline
+    1       & RW & DF - Defer Indication
+
+                The frame was deferred before being sent successfully, i.e. the
+                transmitter had to wait for Carrier Sense before sending
+                because the line was busy. This is not a collision indication.
+                Collisions are indicated in RTRY.\\ \hline
+    \rowcolor{iob-blue}
+    0       & RW & CS - Carrier Sense Lost
+
+                This bit is set when Carrier Sense is lost during a frame
+                transmission. The Ethernet controller writes CS after it
+                finishes sending the buffer.\\ \hline
+  \end{tabularx}
+    \caption{Tx Buffer Descriptor}
+  \label{buffer_descriptors:tx}
+\end{table}
+
+
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+    
+    \hline
+    \rowcolor{iob-green}
+    {\bf Bit \#} & {\bf R/W} & {\bf Description} \\ \hline
+
+    63-32   & RW  & RXPNT - Receive Pointer
+
+                This is the pointer to the buffer storing the associated
+                frame.\\ \hline
+    \rowcolor{iob-blue}
+    31-16   & RW & LEN - Length
+
+                 Number of bytes associated with the BD to be transmitted.\\
+                 \hline
+    15      & RW & E - Empty
+
+                0 = The data buffer associated with this buffer descriptor has
+                been filled with data or has stopped because an error occurred.
+                The core can read or write this BD. As long as this bit is
+                zero, this buffer descriptor won’t be used.
+
+                1 = The data buffer is empty (and ready for receiving data) or
+                currently receiving data.\\ \hline
+    \rowcolor{iob-blue}
+    14      & RW & IRQ - Interrupt Request Enable
+
+                0 = No interrupt is generated after the reception.
+
+                1 = When data is received (or error occurs), an RXF interrupt
+                will be asserted (See INT\_SOURCE (Interrupt Source Register)
+                for more details).\\ \hline
+    13      & RW & WR - Wrap
+
+                0 = This buffer descriptor is not the last descriptor in the
+                buffer descriptor table.
+
+                1 = This buffer descriptor is the last descriptor in the buffer
+                descriptor table. After this buffer descriptor was used, the
+                first buffer descriptor in the table will be used again. \\
+                \hline
+    \rowcolor{iob-blue}
+    12-9    & RW & Reserved \\ \hline
+    8       & RW & CF - Control Frame
+
+                0 = Normal data frame received.
+
+                1 = Control frame received. \\ \hline
+    \rowcolor{iob-blue}
+    7       & RW & M - Miss
+
+                0 = The frame is received because of an address recognition
+                hit.
+
+                1 = The frame is received because of promiscuous mode.
+
+                The Ethernet controller sets M for frames that are accepted in
+                promiscuous mode but are tagged as a miss by internal address
+                recognition. Thus, in promiscuous mode, M determines whether a
+                frame is destined for this station.\\ \hline
+    6       & RW & OR - Overrun
+
+                This bit is set when a receiver overrun occurs during frame
+                reception.\\ \hline
+    \rowcolor{iob-blue}
+    5       & RW & IS - Invalid Symbol
+
+                This bit is set when the reception of an invalid symbol is
+                detected by the PHY.\\ \hline
+    4       & RW & DN - Dribble Nibble
+
+                This bit is set when a received frame cannot de divided by 8
+                (one extra nibble has been received).\\ \hline
+    \rowcolor{iob-blue}
+    3       & RW & TL - Too Long
+
+                This bit is set when a received frame is too long (bigger than
+                the value set in the PACKETLEN register.\\ \hline
+    2       & RW & SF - Short Frame
+
+                This bit is set when a frame that is smaller than the minimum
+                length is received (minimum length is set in the PACKETLEN
+                register.\\ \hline
+    \rowcolor{iob-blue}
+    1       & RW & CRC - Rx CRC Error
+
+                This bit is set when a received frame contains a CRC error.\\
+                \hline
+    0       & RW & LC - Late Collision
+
+                This bit is set when a late collision occured while receiving a
+                frame.\\ \hline
+  \end{tabularx}
+    \caption{Rx Buffer Descriptor}
+  \label{buffer_descriptors:rx}
+\end{table}

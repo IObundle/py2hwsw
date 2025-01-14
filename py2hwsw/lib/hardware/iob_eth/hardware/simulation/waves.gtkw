@@ -1,0 +1,186 @@
+[*]
+[*] GTKWave Analyzer v3.3.103 (w)1999-2019 BSI
+[*] Sun Jan  9 12:11:46 2022
+[*]
+[dumpfile] "/home/zettasticks/IOBundle/iob-soc-eth/submodules/ETHERNET/hardware/simulation/iob_eth.vcd"
+[dumpfile_mtime] "Sun Jan  9 11:49:30 2022"
+[dumpfile_size] 464039
+[savefile] "/home/zettasticks/IOBundle/iob-soc-eth/submodules/ETHERNET/hardware/simulation/waves.gtkw"
+[timestart] 5000
+[size] 1848 1016
+[pos] -1 -1
+*-17.892015 5000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] dma_tb.
+[treeopen] dma_tb.dma.
+[sst_width] 348
+[signals_width] 356
+[sst_expanded] 1
+[sst_vpaned_height] 186
+@28
+dma_tb.burst_in.clk
+@200
+-BURST_IN
+@22
+dma_tb.burst_in.addr[10:0]
+dma_tb.burst_in.data[31:0]
+dma_tb.burst_in.data_in[31:0]
+@28
+dma_tb.burst_in.increment_addr
+dma_tb.burst_in.rst
+dma_tb.burst_in.start
+@22
+dma_tb.burst_in.start_addr[10:0]
+@28
+dma_tb.burst_in.valid
+dma_tb.burst_in.write
+@200
+-BURST_OUT
+@22
+dma_tb.burst_out.addr[10:0]
+dma_tb.burst_out.data_in[31:0]
+dma_tb.burst_out.data_out[31:0]
+@28
+dma_tb.burst_out.init
+dma_tb.burst_out.ready
+dma_tb.burst_out.rst
+dma_tb.burst_out.start
+@22
+dma_tb.burst_out.start_addr[10:0]
+@28
+dma_tb.burst_out.stored
+@22
+dma_tb.burst_out.storedData[31:0]
+@28
+dma_tb.burst_out.valid
+@200
+-DMA_IN
+@22
+dma_tb.dma.data_in[31:0]
+@28
+dma_tb.dma.ready_in
+@200
+-DMA_OUT
+@22
+dma_tb.dma.data_out[31:0]
+@28
+dma_tb.dma.valid_out
+@201
+-DMA_CONFIG
+@22
+dma_tb.dma.addr[31:0]
+dma_tb.dma.length[15:0]
+@28
+dma_tb.dma.readNotWrite
+dma_tb.dma.ready
+dma_tb.dma.start
+@200
+-DMA_STATE
+@22
+dma_tb.dma.address[31:0]
+@28
+dma_tb.dma.align_valid_out
+@22
+dma_tb.dma.counter[10:0]
+dma_tb.dma.dma_len[7:0]
+@28
+dma_tb.dma.dma_ready
+@22
+dma_tb.dma.final_strb[3:0]
+@28
+dma_tb.dma.firstValid
+dma_tb.dma.first_transfer
+@22
+dma_tb.dma.first_transfer_len[15:0]
+@28
+dma_tb.dma.incrementAddress
+@22
+dma_tb.dma.initial_strb[3:0]
+@28
+dma_tb.dma.last_transfer
+@22
+dma_tb.dma.last_transfer_len[15:0]
+@28
+dma_tb.dma.n_ready
+dma_tb.dma.output_last
+dma_tb.dma.r_valid
+@22
+dma_tb.dma.rdata[31:0]
+@28
+dma_tb.dma.reset_first_transfer
+dma_tb.dma.set_first_transfer
+dma_tb.dma.split_ready_in
+@22
+dma_tb.dma.state[3:0]
+dma_tb.dma.state_next[3:0]
+dma_tb.dma.stored_len[15:0]
+@28
+dma_tb.dma.valid
+dma_tb.dma.w_valid
+@22
+dma_tb.dma.wdata[31:0]
+dma_tb.dma.wstrb[3:0]
+dma_tb.dma.wstrb_int[3:0]
+@200
+-DMA_AXI
+@22
+dma_tb.dma.m_axi_araddr[31:0]
+@28
+dma_tb.dma.m_axi_arburst[1:0]
+@22
+dma_tb.dma.m_axi_arcache[3:0]
+@28
+dma_tb.dma.m_axi_arid
+@22
+dma_tb.dma.m_axi_arlen[7:0]
+@28
+dma_tb.dma.m_axi_arlock
+dma_tb.dma.m_axi_arprot[2:0]
+@22
+dma_tb.dma.m_axi_arqos[3:0]
+@28
+dma_tb.dma.m_axi_arready
+dma_tb.dma.m_axi_arsize[2:0]
+dma_tb.dma.m_axi_arvalid
+@22
+dma_tb.dma.m_axi_awaddr[31:0]
+@28
+dma_tb.dma.m_axi_awburst[1:0]
+@22
+dma_tb.dma.m_axi_awcache[3:0]
+@28
+dma_tb.dma.m_axi_awid
+@22
+dma_tb.dma.m_axi_awlen[7:0]
+@28
+dma_tb.dma.m_axi_awlock
+dma_tb.dma.m_axi_awprot[2:0]
+@22
+dma_tb.dma.m_axi_awqos[3:0]
+@28
+dma_tb.dma.m_axi_awready
+dma_tb.dma.m_axi_awsize[2:0]
+dma_tb.dma.m_axi_awvalid
+dma_tb.dma.m_axi_bid
+dma_tb.dma.m_axi_bready
+dma_tb.dma.m_axi_bresp[1:0]
+dma_tb.dma.m_axi_bvalid
+@22
+dma_tb.dma.m_axi_rdata[31:0]
+@28
+dma_tb.dma.m_axi_rid
+dma_tb.dma.m_axi_rlast
+dma_tb.dma.m_axi_rready
+dma_tb.dma.m_axi_rresp[1:0]
+dma_tb.dma.m_axi_rvalid
+@22
+dma_tb.dma.m_axi_wdata[31:0]
+@28
+dma_tb.dma.m_axi_wid
+dma_tb.dma.m_axi_wlast
+dma_tb.dma.m_axi_wready
+@22
+dma_tb.dma.m_axi_wstrb[3:0]
+@28
+dma_tb.dma.m_axi_wvalid
+[pattern_trace] 1
+[pattern_trace] 0

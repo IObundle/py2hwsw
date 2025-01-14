@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+
+# importing modules
+import os
+import sys
+
+import subprocess
+import copy
+
+# get ROOT_DIR variable from current dir
+# searches ROOT_DIR in Makefile in current dir
+def get_root_dir():
+    result = subprocess.run("grep -m 1 ^ROOT_DIR Makefile", shell=True, stdout=subprocess.PIPE)
+    # convert from bytes to string
+    # get text after "="
+    # remove newline
+    return result.stdout.decode("utf-8").split("=")[-1].replace("\n", "")
+
+
+# get path to ETHERNET from current directory
+def get_eth_path():
+    # find ETHERNET DIR
+    find_cmd = f'find {get_root_dir()} -maxdepth 2 -type d -name "ETHERNET"'
+    result = subprocess.run(find_cmd, shell=True, stdout=subprocess.PIPE)
+    if result.returncode == 0:
+        # convert from bytes to string
+        # remove newline
+        eth_path = result.stdout.decode("utf-8").replace("\n", "")
+    else:
+        print("Failed to find ETHERNET_DIR")
+        eth_path = None
+
+    return eth_path
+
+def run_eth(eth_stdout):
+
+    ETHERNET_DIR = get_eth_path()
+
+    # Check local execution (pc / sim(unsupported))
+    if ('-L' in sys.argv or '--local' in sys.argv):
+        command = f'make -C {ETHERNET_DIR} pc-eth'
+    elif ('-s' in sys.argv): # fpga execution
+        command = f'make -C {ETHERNET_DIR} run-eth-scripts'
+
+    eth_proc = subprocess.Popen(command, shell=True, stdout=eth_stdout)
+
+    return eth_proc
+
+def run_console():
+    # assume console is in same dir as this script
+    # deepcopy to keep original arguments list
+    console_args = copy.deepcopy(sys.argv)
+    # change the script name to console, use same remaining arguments
+    console_args[0] = f'{os.path.dirname(console_args[0])}/console'
+    console_cmd = ' '.join(console_args)
+
+    subprocess.run(console_cmd, shell=True)
+
+def eth_console_main():
+    eth_stdout_name = "ethernet.log"
+    with open(eth_stdout_name, "w") as eth_stdout:
+        # run ethernet makefile target in parallel
+        eth_proc = run_eth(eth_stdout)
+
+        # run regular console program
+        run_console()
+
+        # wait for ethernet makefile to finish
+        print("Waiting for ethernet target...")
+        eth_proc.wait()
+        print("Ethernet target finished")
+        print("Check ethernet.log for output")
+
+if __name__ == "__main__": 
+    eth_console_main()

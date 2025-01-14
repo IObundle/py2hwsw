@@ -1,5 +1,6 @@
 def setup(py_params_dict):
     attributes_dict = {
+        "generate_hw": True,
         "version": "0.1",
         "ports": [
             {

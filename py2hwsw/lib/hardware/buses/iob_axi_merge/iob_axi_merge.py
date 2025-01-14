@@ -543,11 +543,7 @@ def setup(py_params_dict):
                         "N": NUM_INPUTS,
                     },
                     "connect": {
-                        "sel_i": (
-                            "input_read_sel" + sel_signal_suffix
-                            if sig_type == "read"
-                            else "input_write_sel" + sel_signal_suffix
-                        ),
+                        "sel_i": f"input_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
@@ -564,11 +560,7 @@ def setup(py_params_dict):
                         "N": NUM_INPUTS,
                     },
                     "connect": {
-                        "sel_i": (
-                            "input_read_sel"
-                            if sig_type == "read"
-                            else "input_write_sel"
-                        ),
+                        "sel_i": f"input_{sig_type}_sel",
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },

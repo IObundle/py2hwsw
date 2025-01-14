@@ -32,7 +32,7 @@ if {[file exists "vivado/premap.tcl"]} {
 
 set SYNTH_FLAGS {}
 foreach dir $INCLUDE_DIRS {
-    lappend SYNTH_FLAGS "-include_dirs ${dir}"
+    lappend SYNTH_FLAGS "-include_dirs" "${dir}"
 }
 
 
@@ -49,7 +49,7 @@ if { $IS_FPGA == "1" } {
     if {[file exists "vivado/tool.sdc"]} {
         read_xdc vivado/tool.sdc
     }
-    synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $NAME -verbose
+    eval synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $NAME -verbose
 } else {
     #read design constraints
     puts "Out of context synthesis"
@@ -58,7 +58,7 @@ if { $IS_FPGA == "1" } {
     if {[file exists "vivado/tool.sdc"]} {
         read_xdc -mode out_of_context vivado/tool.sdc
     }
-    synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $NAME -mode out_of_context -flatten_hierarchy full -verbose
+    eval synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $NAME -mode out_of_context -flatten_hierarchy full -verbose
 }
 
 #set post-map custom assignments

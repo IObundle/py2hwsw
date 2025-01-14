@@ -18,6 +18,7 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": params["name"] + "_cyclonev_gt_dk",
+        "generate_hw": True,
         "version": "0.1",
         "confs": [
             {

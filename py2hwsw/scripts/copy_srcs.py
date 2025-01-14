@@ -76,6 +76,18 @@ VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
 INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
 """,
         )
+        # Replace remote simulation dir
+        replace_str_in_file(
+            f"{build_dir}/{sim_dir}/Makefile",
+            "REMOTE_SIM_DIR=$(REMOTE_BUILD_DIR)/hardware/simulation",
+            f"REMOTE_SIM_DIR=$(REMOTE_BUILD_DIR)/{python_module.relative_path_to_tester}/{sim_dir}",
+        )
+        # Replace ROOT_DIR for rsync to remote machine
+        replace_str_in_file(
+            f"{build_dir}/{sim_dir}/Makefile",
+            "-avz --force --delete ../..",
+            f"-avz --force --delete ../../{python_module.relative_path_to_UUT}",
+        )
 
 
 # Setup fpga files, but only the ones in the board_list
@@ -111,6 +123,18 @@ VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
 VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
 INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
 """,
+        )
+        # Replace remote fpga dir
+        replace_str_in_file(
+            f"{build_dir}/{fpga_dir}/Makefile",
+            "REMOTE_FPGA_DIR=$(REMOTE_BUILD_DIR)/hardware/fpga",
+            f"REMOTE_FPGA_DIR=$(REMOTE_BUILD_DIR)/{python_module.relative_path_to_tester}/{fpga_dir}",
+        )
+        # Replace ROOT_DIR for rsync to remote machine
+        replace_str_in_file(
+            f"{build_dir}/{fpga_dir}/Makefile",
+            "-avz --delete --force ../..",
+            f"-avz --delete --force ../../{python_module.relative_path_to_UUT}",
         )
 
     # Copy LIB fpga directories only if their name is present in the board_list
@@ -162,6 +186,18 @@ VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
 INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
 """,
         )
+        # Replace remote lint dir
+        replace_str_in_file(
+            f"{build_dir}/{lint_dir}/Makefile",
+            "REMOTE_LINT_DIR=$(REMOTE_BUILD_DIR)/hardware/lint",
+            f"REMOTE_LINT_DIR=$(REMOTE_BUILD_DIR)/{python_module.relative_path_to_tester}/{lint_dir}",
+        )
+        # Replace ROOT_DIR for rsync to remote machine
+        replace_str_in_file(
+            f"{build_dir}/{lint_dir}/Makefile",
+            "RSYNC_ROOT_DIR=../..",
+            f"RSYNC_ROOT_DIR=../../{python_module.relative_path_to_UUT}",
+        )
 
 
 # synthesis
@@ -191,6 +227,18 @@ VHDR+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.vh)
 VSRC+=$(wildcard ../../{python_module.relative_path_to_UUT}/hardware/src/*.v)
 INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
 """,
+        )
+        # Replace remote syn dir
+        replace_str_in_file(
+            f"{build_dir}/{syn_dir}/Makefile",
+            "REMOTE_SYN_DIR=$(REMOTE_BUILD_DIR)/hardware/syn",
+            f"REMOTE_SYN_DIR=$(REMOTE_BUILD_DIR)/{python_module.relative_path_to_tester}/{syn_dir}",
+        )
+        # Replace ROOT_DIR for rsync to remote machine
+        replace_str_in_file(
+            f"{build_dir}/{syn_dir}/Makefile",
+            "-avz --force --delete ../..",
+            f"-avz --force --delete ../../{python_module.relative_path_to_UUT}",
         )
 
 

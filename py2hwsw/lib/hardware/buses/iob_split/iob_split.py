@@ -20,6 +20,7 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": py_params_dict["name"],
+        "generate_hw": True,
         "version": "0.1",
         "ports": [
             {
@@ -273,6 +274,7 @@ def setup(py_params_dict):
                 "data_o": "demux_wstrb_data_o",
             },
         },
+        # Muxers
         {
             "core_name": "iob_mux",
             "instance_name": "iob_mux_rdata",
@@ -286,7 +288,6 @@ def setup(py_params_dict):
                 "data_o": "mux_rdata_data_o",
             },
         },
-        # Muxers
         {
             "core_name": "iob_mux",
             "instance_name": "iob_mux_rvalid",
@@ -308,6 +309,7 @@ def setup(py_params_dict):
                 "N": NUM_OUTPUTS,
             },
             "connect": {
+                # Ready selection must not be registered
                 "sel_i": "output_sel",
                 "data_i": "mux_ready_data_i",
                 "data_o": "mux_ready_data_o",

@@ -15,6 +15,7 @@ bsp = [
 def setup(py_params_dict):
     attributes_dict = {
         "name": py_params_dict["instantiator"]["name"] + "_dk_dev_10cx220_a",
+        "generate_hw": True,
         "confs": [
             {
                 "name": "bsp",

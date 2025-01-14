@@ -6,9 +6,9 @@
 
 #include "iob_bsp.h"
 #include "iob_nco.h"
+#include "iob_printf.h"
 #include "iob_uart.h"
 #include "periphs.h"
-#include "printf.h"
 #include "system.h"
 
 int main() {

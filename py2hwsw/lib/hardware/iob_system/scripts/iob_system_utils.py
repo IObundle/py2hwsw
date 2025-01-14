@@ -316,6 +316,21 @@ iob_eth_rmac.h:
 	echo "#define ETH_RMAC_ADDR 0x$(RMAC_ADDR)" > $@\n
 """,
             )
+        if attributes_dict.get("is_tester", False):
+            # Create target to build UUT's software
+            file.write(
+                """
+# Tester target to build UUT's software
+# Build UUT software with "TESTER" macro defined
+UTARGETS+=build_uut_software
+build_uut_software:
+	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software clean
+	cp $(ROOT_DIR)/software/src/iob_bsp.h $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software/src/
+	USER_CFLAGS=-DTESTER make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software build
+
+.PHONY: build_uut_software
+"""
+            )
 
     #
     # Create auto_fpga_build.mk
@@ -333,6 +348,25 @@ iob_eth_rmac.h:
             file.write(
                 'CONSOLE_CMD=$(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -s $(BOARD_SERIAL_PORT) -c $(PYTHON_DIR)/console.py -m "$(RMAC_ADDR)" -i "$(ETH_IF)"\n',
             )
+        if attributes_dict.get("is_tester", False):
+            # Create target to copy UUT's hex files
+            file.write(
+                """
+# Tester targets to build and get UUT's hex files
+RUN_DEPS+=get_uut_run_deps
+BUILD_DEPS+=get_uut_build_deps
+
+get_uut_build_deps:
+	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga build_deps
+	cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga/*.hex .
+
+get_uut_run_deps:
+	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga run_deps
+	cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga/*.hex .
+
+.PHONY: get_uut_build_deps get_uut_run_deps
+"""
+            )
 
     #
     # Create auto_sim_build.mk
@@ -347,6 +381,20 @@ iob_eth_rmac.h:
             file.write(
                 'ETH2FILE_SCRIPT="$(PYTHON_DIR)/eth2file.py"\n'
                 'CONSOLE_CMD=$(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -L -c $(PYTHON_DIR)/console.py -e $(ETH2FILE_SCRIPT) -m "$(RMAC_ADDR)" -i "$(ETH_IF)" -t 60\n',
+            )
+        if attributes_dict.get("is_tester", False):
+            # Create target to copy UUT's hex files
+            file.write(
+                """
+# Tester target to build and get UUT's hex files
+HEX+=get_uut_hex
+
+get_uut_hex:
+	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation build_hex
+	cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation/*.hex .
+
+.PHONY: get_uut_hex
+"""
             )
 
     #

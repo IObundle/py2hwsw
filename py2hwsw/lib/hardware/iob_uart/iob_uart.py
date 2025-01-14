@@ -8,6 +8,7 @@ def setup(py_params_dict):
     NAME = py_params_dict["name"] if "name" in py_params_dict else "iob_uart"
     attributes_dict = {
         "name": NAME,
+        "generate_hw": True,
         "version": "0.1",
         "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g"],
         "confs": [

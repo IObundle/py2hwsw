@@ -57,6 +57,7 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": params["name"],
+        "generate_hw": True,
         "version": params["version"],
         "confs": confs,
         "ports": [

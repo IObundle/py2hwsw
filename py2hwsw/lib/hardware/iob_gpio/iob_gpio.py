@@ -12,6 +12,15 @@ def setup(py_params_dict):
         bool(py_params_dict["tristate"]) if "tristate" in py_params_dict else False
     )
 
+    params = {
+        "csr_if_widths": {"ADDR_W": 32, "DATA_W": 32},
+    }
+
+    # Update params with values from py_params_dict
+    for param in py_params_dict:
+        if param in params:
+            params[param] = py_params_dict[param]
+
     attributes_dict = {
         "name": NAME,
         "version": "0.1",
@@ -59,9 +68,10 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
             {
-                "name": "iob_s",
+                "name": "cbus_s",
                 "signals": {
                     "type": "iob",
+                    **params["csr_if_widths"],
                 },
                 "descr": "CPU native interface",
             },
@@ -110,7 +120,7 @@ def setup(py_params_dict):
         # Create Reg
         regs.append(
             {
-                "name": f"input_{idx}",
+                "name": "input_" + str(idx),
                 "type": "R",
                 "n_bits": 32,
                 "rst_val": 0,
@@ -120,33 +130,13 @@ def setup(py_params_dict):
             }
         )
         # Connect reg to port
-        reg_connections[f"input_{idx}"] = f"input_{idx}"
-    # Create wires, regs, and reg connections for each output
+        reg_connections["input_" + str(idx) + "_i"] = "input_" + str(idx) + "_i"
+    # Create regs and reg connections for each output
     for idx in range(N_OUTPUTS):
-        # Wires for reg connections (references to port signals)
-        attributes_dict["wires"].append(
-            {
-                "name": "output_port_" + str(idx),
-                "descr": "",
-                "signals": [
-                    {"name": "output_port_" + str(idx)},
-                ],
-            }
-        )
-        if TRISTATE:
-            attributes_dict["wires"].append(
-                {
-                    "name": "output_enable_" + str(idx),
-                    "descr": "",
-                    "signals": [
-                        {"name": "output_enable_" + str(idx)},
-                    ],
-                }
-            )
         # Create Regs
         regs.append(
             {
-                "name": f"output_{idx}",
+                "name": "output_" + str(idx),
                 "type": "W",
                 "n_bits": 32,
                 "rst_val": 0,
@@ -158,7 +148,7 @@ def setup(py_params_dict):
         if TRISTATE:
             regs.append(
                 {
-                    "name": f"output_enable_{idx}",
+                    "name": "output_enable_" + str(idx),
                     "type": "W",
                     "n_bits": 32,
                     "rst_val": 0,
@@ -168,9 +158,11 @@ def setup(py_params_dict):
                 }
             )
         # Connect regs to wires
-        reg_connections[f"output_{idx}"] = f"output_port_{idx}"
+        reg_connections["output_" + str(idx) + "_o"] = "output_" + str(idx) + "_o"
         if TRISTATE:
-            reg_connections[f"output_enable_{idx}"] = f"output_enable_{idx}"
+            reg_connections["output_enable_" + str(idx) + "_o"] = (
+                "output_enable_" + str(idx) + "_o"
+            )
 
     attributes_dict["subblocks"] = [
         {
@@ -186,7 +178,7 @@ def setup(py_params_dict):
             ],
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "control_if_s": "iob_s",
+                "control_if_s": "cbus_s",
                 **reg_connections,
             },
         },

@@ -537,7 +537,7 @@ def setup(py_params_dict):
 
    // iob_acc inputs
    assign active_read_transaction_acc_en = start_active_read_transaction ^ end_active_read_transaction;
-   assign active_read_transaction_acc_input = start_active_read_transaction ? 1 : -1;
+   assign active_read_transaction_acc_input = start_active_read_transaction ? {ACTIVE_TRANSFER_COUNTER_DATA_W}'d1 : -{ACTIVE_TRANSFER_COUNTER_DATA_W}'d1;
 
    // Block address valid/ready signals for/of current slave if master is trying to address another slave
    wire block_read_transaction = active_read_transaction & (input_axi_araddr_i[{ADDR_W-1}-:{NBITS}] != read_sel);
@@ -558,7 +558,7 @@ def setup(py_params_dict):
 
    // iob_acc inputs
    assign active_write_transaction_acc_en = start_active_write_transaction ^ end_active_write_transaction;
-   assign active_write_transaction_acc_input = start_active_write_transaction ? 1 : -1;
+   assign active_write_transaction_acc_input = start_active_write_transaction ? {ACTIVE_TRANSFER_COUNTER_DATA_W}'d1 : -{ACTIVE_TRANSFER_COUNTER_DATA_W}'d1;
 
    // Block address valid/ready signals for/of current slave if master is trying to address another slave
    wire block_write_transaction = active_write_transaction & (input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}] != write_sel);

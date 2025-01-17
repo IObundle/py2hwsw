@@ -13,23 +13,23 @@ from typing import Dict
 from iob_signal import iob_signal, iob_signal_reference
 
 mem_if_names = [
-    "rom_2p", # x
-    "rom_atdp", # x
-    "rom_sp", # x
-    "rom_tdp", # x
-    "ram_2p", # x 
-    "ram_at2p", # x 
-    "ram_atdp", # x
-    "ram_atdp_be", # x
-    "ram_sp", # x
-    "ram_sp_be", # x
-    "ram_sp_se", # x
+    "rom_2p",
+    "rom_atdp",
+    "rom_sp",
+    "rom_tdp",
+    "ram_2p",
+    "ram_at2p",
+    "ram_atdp",
+    "ram_atdp_be",
+    "ram_sp",
+    "ram_sp_be",
+    "ram_sp_se",
     "ram_t2p",
     "ram_t2p_be",
     "ram_t2p_tiled",
-    "ram_tdp", # x
-    "ram_tdp_be", # x
-    "ram_tdp_be_xil", # x
+    "ram_tdp",
+    "ram_tdp_be",
+    "ram_tdp_be_xil",
     "regfile_2p",
     "regfile_at2p",
     "regfile_sp",

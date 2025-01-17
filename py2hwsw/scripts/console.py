@@ -14,6 +14,7 @@ from threading import Thread
 import subprocess
 
 # Global variables
+debug = False
 ser = None
 SerialFlag = True
 tb_read = None
@@ -212,6 +213,8 @@ def init_print():
     print("|                   IOb-Console                 |")
     print("+-----------------------------------------------+")
     print()
+    if debug:
+        print("  Console debug mode is enabled!")
     if SerialFlag:
         print("  BaudRate = {0}".format(ser.baudrate))
         print("  StopBits = {0}".format(ser.stopbits))
@@ -267,6 +270,7 @@ def init_files():
 def init_console():
     global SerialFlag
     global ser
+    global debug
 
     if "-L" in sys.argv or "--local" in sys.argv:
         SerialFlag = False
@@ -291,6 +295,9 @@ def init_console():
     else:
         usage("PROGNAME: not enough program arguments")
 
+    if "-d" in sys.argv:
+        debug = True
+
     init_print()
 
 
@@ -310,6 +317,10 @@ def main():
         elif ser.isOpen():
             byte = ser.read()
 
+        # Print every char's value in hex if debug
+        if debug:
+            print(byte.hex(), end=" ", flush=True)
+
         # process command
         if byte == ENQ:
             # Only send ACK once if received multiple ENQ
@@ -319,6 +330,8 @@ def main():
                     ser.write(ACK)
                 else:
                     tb_write(ACK)
+                if debug:
+                    print(f"{PROGNAME}: Got ENQ, sent ACK!")
             continue
         else:
             # Reset gotENQ if received non-ENQ
@@ -340,7 +353,7 @@ def main():
             subprocess.run(script_arguments)
             print(f"{PROGNAME}: start reading user input")
             input_thread.start()
-        else:
+        elif not debug:
             print(str(byte, "iso-8859-1"), end="", flush=True)
 
 

@@ -63,6 +63,7 @@ ifneq ($(FPGA_STUB),)
 endif
 endif
 
+BOARD_SERIAL_PORT ?=/dev/usb-uart
 #console start command
 CONSOLE_CMD ?=$(PYTHON_DIR)/console.py -s $(BOARD_SERIAL_PORT)
 

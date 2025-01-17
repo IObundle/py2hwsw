@@ -22,6 +22,8 @@ if {[project_exists $NAME]} {
     project_new $NAME
 }
 
+set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
+
 set_global_assignment -name TOP_LEVEL_ENTITY $NAME
 
 #board data

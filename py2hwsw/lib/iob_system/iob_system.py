@@ -467,16 +467,16 @@ def setup(py_params_dict):
             "core_name": "iob_bootrom",
             "instance_name": "bootrom",
             "instance_description": "Boot ROM peripheral",
+            "parameters": {
+                "AXI_ID_W": "AXI_ID_W",
+                "AXI_LEN_W": "AXI_LEN_W",
+            },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "cbus_s": (
                     "bootrom_cbus",
                     [
-                        "bootrom_axi_arid[0]",
-                        "bootrom_axi_rid[0]",
                         "{1'b0, bootrom_axi_arlock}",
-                        "bootrom_axi_awid[0]",
-                        "bootrom_axi_bid[0]",
                         "{1'b0, bootrom_axi_awlock}",
                     ],
                 ),
@@ -491,6 +491,7 @@ def setup(py_params_dict):
             "instance_description": "Convert AXI to AXI lite for CLINT",
             "parameters": {
                 "AXI_ID_WIDTH": "AXI_ID_W",
+                "AXI_LEN_WIDTH": "AXI_LEN_W",
                 "ADDR_WIDTH": params["addr_w"] - 2 - 2,
                 "DATA_WIDTH": "AXI_DATA_W",
             },

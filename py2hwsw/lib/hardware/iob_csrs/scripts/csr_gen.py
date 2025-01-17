@@ -451,7 +451,8 @@ class csr_gen:
                         ]
                         port_has_outputs = True
                         snippet += f"""
-   assign {name}_waddr_o = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
+   wire [ADDR_W-1-2:0] {name}_waddr_int = internal_iob_addr_stable[ADDR_W-1:2]-{max(1,(addr>>2).bit_length())}'d{addr>>2};
+   assign {name}_waddr_o = {name}_waddr_int[{log2n_items}-1:0];
 """
                     register_signals += [
                         {
@@ -479,7 +480,8 @@ class csr_gen:
                     ]
                     port_has_outputs = True
                     snippet += f"""
-   assign {name}_raddr_o = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
+   wire [ADDR_W-1-2:0] {name}_raddr_int = internal_iob_addr_stable[ADDR_W-1:2]-{max(1,(addr>>2).bit_length())}'d{addr>>2};
+   assign {name}_raddr_o = {name}_raddr_int[{log2n_items}-1:0];
 """
                 if auto:
                     register_signals.append(
@@ -637,7 +639,7 @@ class csr_gen:
                 "instance_description": "store iob addr",
                 "parameters": {
                     "DATA_W": "ADDR_W",
-                    "RST_VAL": "'b0",
+                    "RST_VAL": "{ADDR_W{1'b0}}",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
@@ -732,7 +734,8 @@ class csr_gen:
                     "parameters": {
                         "ADDR_WIDTH": "ADDR_W",
                         "DATA_WIDTH": "DATA_W",
-                        "AXI_ID_WIDTH": "1",
+                        "AXI_ID_WIDTH": "AXI_ID_W",
+                        "AXI_LEN_WIDTH": "AXI_LEN_W",
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
@@ -757,9 +760,12 @@ class csr_gen:
         snippet += "    wire [($clog2(WSTRB_W)+1)-1:0] byte_offset;\n"
         snippet += "    iob_ctls #(.W(WSTRB_W), .MODE(0), .SYMBOL(0)) bo_inst (.data_i(internal_iob_wstrb), .count_o(byte_offset));\n"
 
-        # compute write address
-        snippet += "    wire [ADDR_W-1:0] waddr;\n"
-        snippet += "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr_stable) + byte_offset;\n"
+        for row in table:
+            if "W" in row.type:
+                # compute write address
+                snippet += "    wire [ADDR_W-1:0] waddr;\n"
+                snippet += "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr_stable) + byte_offset;\n"
+                break
 
         # insert write register logic
         for row in table:

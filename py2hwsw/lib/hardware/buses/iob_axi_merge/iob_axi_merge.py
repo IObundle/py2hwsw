@@ -531,6 +531,8 @@ def setup(py_params_dict):
     # Generate muxers and demuxers
     for signal, direction, width, sig_type in axi_signals:
         if direction == "output":
+            # Use registered select signal for response signals (except for ready)
+            sel_signal_suffix = "" if "ready" in signal else "_reg"
             # Demuxers
             attributes_dict["subblocks"].append(
                 {
@@ -541,11 +543,7 @@ def setup(py_params_dict):
                         "N": NUM_INPUTS,
                     },
                     "connect": {
-                        "sel_i": (
-                            "input_read_sel"
-                            if sig_type == "read"
-                            else "input_write_sel"
-                        ),
+                        "sel_i": f"input_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
@@ -562,11 +560,7 @@ def setup(py_params_dict):
                         "N": NUM_INPUTS,
                     },
                     "connect": {
-                        "sel_i": (
-                            "input_read_sel"
-                            if sig_type == "read"
-                            else "input_write_sel"
-                        ),
+                        "sel_i": f"input_{sig_type}_sel",
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },
@@ -577,7 +571,7 @@ def setup(py_params_dict):
     #
     attributes_dict["snippets"] = [
         {
-            "verilog_code": """
+            "verilog_code": f"""
    // Only switch masters when there is no current active transaction
    assign read_sel = active_read_transaction ? read_sel_reg : read_prio_enc_o;
 
@@ -587,7 +581,7 @@ def setup(py_params_dict):
 
    // iob_acc inputs
    assign active_read_transaction_acc_en = start_active_read_transaction ^ end_active_read_transaction;
-   assign active_read_transaction_acc_input = start_active_read_transaction ? 1 : -1;
+   assign active_read_transaction_acc_input = start_active_read_transaction ? {ACTIVE_TRANSFER_COUNTER_DATA_W}'d1 : -{ACTIVE_TRANSFER_COUNTER_DATA_W}'d1;
 
    // Only switch masters when there is no current active transaction
    assign write_sel = active_write_transaction ? write_sel_reg : write_prio_enc_o;
@@ -598,7 +592,7 @@ def setup(py_params_dict):
 
    // iob_acc inputs
    assign active_write_transaction_acc_en = start_active_write_transaction ^ end_active_write_transaction;
-   assign active_write_transaction_acc_input = start_active_write_transaction ? 1 : -1;
+   assign active_write_transaction_acc_input = start_active_write_transaction ? {ACTIVE_TRANSFER_COUNTER_DATA_W}'d1 : -{ACTIVE_TRANSFER_COUNTER_DATA_W}'d1;
 """,
         },
     ]

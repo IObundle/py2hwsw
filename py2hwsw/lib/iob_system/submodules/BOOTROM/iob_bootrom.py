@@ -31,6 +31,22 @@ def setup(py_params_dict):
                 "min": "0",
                 "max": "32",
             },
+            {
+                "name": "AXI_ID_W",
+                "descr": "AXI ID bus width",
+                "type": "P",
+                "val": "1",
+                "min": "0",
+                "max": "4",
+            },
+            {
+                "name": "AXI_LEN_W",
+                "descr": "AXI burst length width",
+                "type": "P",
+                "val": "8",
+                "min": "1",
+                "max": "8",
+            },
         ],
         #
         # Ports
@@ -52,6 +68,8 @@ def setup(py_params_dict):
                     # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
                     "ADDR_W": BOOTROM_ADDR_W - 2 + 1,
                     "DATA_W": "DATA_W",
+                    "ID_W": "AXI_ID_W",
+                    "LEN_W": "AXI_LEN_W",
                 },
             },
             {
@@ -117,6 +135,10 @@ def setup(py_params_dict):
                     }
                 ],
                 "csr_if": "axi",
+                "parameters": {
+                    "AXI_ID_W": "AXI_ID_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
+                },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "control_if_s": "cbus_s",

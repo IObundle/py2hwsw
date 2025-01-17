@@ -38,7 +38,7 @@ def setup(py_params_dict):
             # macros
             {  # Needed for testbench
                 "name": "ADDR_W",
-                "descr": "Address bus width",
+                "descr": "Testbench address bus width.",
                 "type": "M",
                 "val": params["addr_w"],
                 "min": "1",
@@ -46,7 +46,7 @@ def setup(py_params_dict):
             },
             {  # Needed for testbench
                 "name": "DATA_W",
-                "descr": "Data bus width",
+                "descr": "Testbench data bus width.",
                 "type": "M",
                 "val": params["data_w"],
                 "min": "1",
@@ -54,7 +54,7 @@ def setup(py_params_dict):
             },
             {  # Needed for makefile and software
                 "name": "INIT_MEM",
-                "descr": "Enable MUL and DIV CPU instructions",
+                "descr": "Select if memory is pre-initialized with firmware. Otherwise bootloader will request a firmware transfer and load it into memory.",
                 "type": "M",
                 "val": params["init_mem"],
                 "min": "0",
@@ -62,7 +62,7 @@ def setup(py_params_dict):
             },
             {  # Needed for makefile and software
                 "name": "USE_EXTMEM",
-                "descr": "Enable MUL and DIV CPU instructions",
+                "descr": "Enable external memory support.",
                 "type": "M",
                 "val": params["use_extmem"],
                 "min": "0",
@@ -70,7 +70,7 @@ def setup(py_params_dict):
             },
             {  # Needed for testbench
                 "name": "USE_ETHERNET",
-                "descr": "Enable ethernet connections",
+                "descr": "Updates system wrappers, testbenches, scripts, and makefiles to support ethernet.",
                 "type": "M",
                 "val": params["use_ethernet"],
                 "min": "0",
@@ -78,7 +78,7 @@ def setup(py_params_dict):
             },
             {  # Needed for software
                 "name": "MEM_ADDR_W",
-                "descr": "Memory bus address width",
+                "descr": "External memory bus address width.",
                 "type": "M",
                 "val": params["mem_addr_w"],
                 "min": "0",
@@ -86,7 +86,7 @@ def setup(py_params_dict):
             },
             {  # Needed for software
                 "name": "FW_ADDR",
-                "descr": "Firmware address",
+                "descr": "Firmware load address.",
                 "type": "M",
                 "val": params["fw_addr"],
                 "min": "0",
@@ -94,7 +94,7 @@ def setup(py_params_dict):
             },
             {  # Needed for software
                 "name": "FW_ADDR_W",
-                "descr": "Firmware address",
+                "descr": "Width of address space reserved for Firmware.",
                 "type": "M",
                 "val": params["fw_addr_w"],
                 "min": "0",
@@ -102,7 +102,7 @@ def setup(py_params_dict):
             },
             {  # Needed for testbench
                 "name": "RST_POL",
-                "descr": "Reset polarity.",
+                "descr": "Reset signal polarity.",
                 "type": "M",
                 "val": "1",
                 "min": "0",
@@ -454,16 +454,16 @@ def setup(py_params_dict):
             "core_name": "iob_bootrom",
             "instance_name": "bootrom",
             "instance_description": "Boot ROM peripheral",
+            "parameters": {
+                "AXI_ID_W": "AXI_ID_W",
+                "AXI_LEN_W": "AXI_LEN_W",
+            },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "cbus_s": (
                     "bootrom_cbus",
                     [
-                        "bootrom_axi_arid[0]",
-                        "bootrom_axi_rid[0]",
                         "{1'b0, bootrom_axi_arlock}",
-                        "bootrom_axi_awid[0]",
-                        "bootrom_axi_bid[0]",
                         "{1'b0, bootrom_axi_awlock}",
                     ],
                 ),
@@ -478,6 +478,7 @@ def setup(py_params_dict):
             "instance_description": "Convert AXI to AXI lite for CLINT",
             "parameters": {
                 "AXI_ID_WIDTH": "AXI_ID_W",
+                "AXI_LEN_WIDTH": "AXI_LEN_W",
                 "ADDR_WIDTH": params["addr_w"] - 2 - 2,
                 "DATA_WIDTH": "AXI_DATA_W",
             },

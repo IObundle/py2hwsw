@@ -21,13 +21,19 @@ static_reg_tables = {}
 def setup(py_params_dict):
     """Standard Py2HWSW setup function"""
     params = {
+        # Use the same name as instantiator + the suffix "_csrs"
         "name": py_params_dict["instantiator"]["name"] + "_csrs",
+        # Version of the CSRs module
         "version": "1.0",
+        # Type of interface for CSR bus
         "csr_if": "iob",
+        # List of Control Status Registers (CSRs)
         "csrs": [],
+        # Select if register addresses should be auto-generated
         "autoaddr": True,
-        # Overlap Read and Write register addresses
+        # Allow overlap between Read and Write register addresses
         "rw_overlap": False,
+        # Build directory for csrs (usually auto-passed py py2hwsw).
         "build_dir": "",
     }
 
@@ -40,7 +46,12 @@ def setup(py_params_dict):
 
     assert params["build_dir"], print("Error: Register build dir empty.")
 
-    # Copy instantiator confs but remove ADDR_W
+    # Generate verilog parameters for CSR interface
+    csr_if_params = {}
+    if params["csr_if"] == "axi":
+        csr_if_params = {"AXI_ID_W": 1, "AXI_LEN_W": 8}
+
+    # Copy instantiator confs but skip ADDR_W and CSR params
     confs = [
         {
             "name": "ADDR_W",
@@ -52,8 +63,26 @@ def setup(py_params_dict):
         },
     ]
     for conf in py_params_dict["instantiator"]["confs"]:
-        if conf["name"] != "ADDR_W":
-            confs.append(conf)
+        if conf["name"] == "ADDR_W" or conf["name"] in csr_if_params:
+            continue
+        confs.append(conf)
+
+    # Append parameters for csr interface
+    if_gen_params = {}
+    for param_name, param_value in csr_if_params.items():
+        confs.append(
+            {
+                "name": param_name,
+                "type": "P",
+                "val": param_value,
+                "min": "NA",
+                "max": "NA",
+                "descr": f"{param_name} CSR interface parameter",
+            }
+        )
+        # Remove csr_if suffix from parameter name (remove "AXI_" prefix)
+        name_without_suffix = param_name[len(params["csr_if"]) + 1 :]
+        if_gen_params[name_without_suffix] = param_name
 
     attributes_dict = {
         "name": params["name"],
@@ -74,6 +103,7 @@ def setup(py_params_dict):
                     "type": params["csr_if"],
                     "ADDR_W": "ADDR_W - 2",
                     "DATA_W": "DATA_W",
+                    **if_gen_params,
                 },
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",
             },

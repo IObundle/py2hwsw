@@ -492,17 +492,15 @@ def setup(py_params_dict):
                         "N": NUM_OUTPUTS,
                     },
                     "connect": {
-                        "sel_i": (
-                            "output_read_sel"
-                            if sig_type == "read"
-                            else "output_write_sel"
-                        ),
+                        "sel_i": f"output_{sig_type}_sel",
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
                 },
             )
         else:  # output direction
+            # Use registered select signal for response signals (except for ready)
+            sel_signal_suffix = "" if "ready" in signal else "_reg"
             # Muxers
             attributes_dict["subblocks"].append(
                 {
@@ -513,11 +511,7 @@ def setup(py_params_dict):
                         "N": NUM_OUTPUTS,
                     },
                     "connect": {
-                        "sel_i": (
-                            "output_read_sel"
-                            if sig_type == "read"
-                            else "output_write_sel"
-                        ),
+                        "sel_i": f"output_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },
@@ -543,9 +537,9 @@ def setup(py_params_dict):
 
    // iob_acc inputs
    assign active_read_transaction_acc_en = start_active_read_transaction ^ end_active_read_transaction;
-   assign active_read_transaction_acc_input = start_active_read_transaction ? 1 : -1;
+   assign active_read_transaction_acc_input = start_active_read_transaction ? {ACTIVE_TRANSFER_COUNTER_DATA_W}'d1 : -{ACTIVE_TRANSFER_COUNTER_DATA_W}'d1;
 
-   // Block valid/ready signals if there is an active transaction, and there is a new one for another slave
+   // Block address valid/ready signals for/of current slave if master is trying to address another slave
    wire block_read_transaction = active_read_transaction & (input_axi_araddr_i[{ADDR_W-1}-:{NBITS}] != read_sel);
    assign demux_axi_arvalid_i = block_read_transaction ? 1'b0 : input_axi_arvalid_i;
    assign input_axi_arready_o = block_read_transaction ? 1'b0 : mux_axi_arready_o;
@@ -564,9 +558,9 @@ def setup(py_params_dict):
 
    // iob_acc inputs
    assign active_write_transaction_acc_en = start_active_write_transaction ^ end_active_write_transaction;
-   assign active_write_transaction_acc_input = start_active_write_transaction ? 1 : -1;
+   assign active_write_transaction_acc_input = start_active_write_transaction ? {ACTIVE_TRANSFER_COUNTER_DATA_W}'d1 : -{ACTIVE_TRANSFER_COUNTER_DATA_W}'d1;
 
-   // Block valid/ready signals if there is an active transaction, and there is a new one for another slave
+   // Block address valid/ready signals for/of current slave if master is trying to address another slave
    wire block_write_transaction = active_write_transaction & (input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}] != write_sel);
    assign demux_axi_awvalid_i = block_write_transaction ? 1'b0 : input_axi_awvalid_i;
    assign input_axi_awready_o = block_write_transaction ? 1'b0 : mux_axi_awready_o;

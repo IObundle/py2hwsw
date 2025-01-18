@@ -438,8 +438,8 @@ def setup(py_params_dict):
     attributes_dict["snippets"] = [
         {
             "verilog_code": """
-   assign read_sel = read_prio_enc_o;
-   assign write_sel = write_prio_enc_o;
+   assign read_sel = |mux_axi_arvalid ? read_prio_enc_o : read_sel_reg;
+   assign write_sel = |mux_axi_awvalid ? write_prio_enc_o : write_sel_reg;
 """,
         },
     ]

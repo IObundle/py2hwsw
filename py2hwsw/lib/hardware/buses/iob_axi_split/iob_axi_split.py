@@ -385,10 +385,10 @@ def setup(py_params_dict):
     attributes_dict["snippets"] = [
         {
             "verilog_code": f"""
-   assign read_sel = input_axil_araddr_i[{ADDR_W-1}-:{NBITS}];
-   assign read_sel_reg_en = input_axil_arvalid_i;
-   assign write_sel = input_axil_awaddr_i[{ADDR_W-1}-:{NBITS}];
-   assign write_sel_reg_en = input_axil_awvalid_i;
+   assign read_sel = read_sel_reg_en ? input_axi_araddr_i[{ADDR_W-1}-:{NBITS}] : read_sel_reg;
+   assign read_sel_reg_en = input_axi_arvalid_i;
+   assign write_sel = write_sel_reg_en ? input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}] : write_sel_reg;
+   assign write_sel_reg_en = input_axi_awvalid_i;
 """,
         },
     ]

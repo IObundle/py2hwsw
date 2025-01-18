@@ -35,24 +35,29 @@ def setup(py_params_dict):
     # Disble 'black' python formatter for this block
     # fmt: off
     axi_signals = [
+        # --------------------------------------------------------------------------
         # Name         |Direction|Width                        |Ch Type |Registered|
         #
         # AXI-Lite Write
         #
+        # AW Channel
         ("axi_awaddr",  "input",  ADDR_W,                       "write", False),
         ("axi_awprot",  "input",  PROT_W,                       "write", False),
         ("axi_awvalid", "input",  1,                            "write", False),
         ("axi_awready", "output", 1,                            "write", False),
-
+        # W Channel
         ("axi_wdata",   "input",  DATA_W,                       "write", False),
         ("axi_wstrb",   "input",  int(DATA_W / DATA_SECTION_W), "write", False),
         ("axi_wvalid",  "input",  1,                            "write", False),
         ("axi_wready",  "output", 1,                            "write", False),
-
+        # B Channel
         ("axi_bresp",   "output", RESP_W,                       "write", True),
         ("axi_bvalid",  "output", 1,                            "write", True),
         ("axi_bready",  "input",  1,                            "write", True),
+        #
         # AXI specific write
+        #
+        # AW Channel
         ("axi_awid",    "input",  "ID_W",                       "write", False),
         ("axi_awlen",   "input",  "LEN_W",                      "write", False),
         ("axi_awsize",  "input",  SIZE_W,                       "write", False),
@@ -60,22 +65,28 @@ def setup(py_params_dict):
         ("axi_awlock",  "input",  LOCK_W,                       "write", False),
         ("axi_awcache", "input",  CACHE_W,                      "write", False),
         ("axi_awqos",   "input",  QOS_W,                        "write", False),
-
+        # W Channel
         ("axi_wlast",   "input",  1,                            "write", False),
-
+        # B Channel
         ("axi_bid",     "output", "ID_W",                       "write", True),
 
+        #
         # AXI-Lite Read
+        #
+        # AR Channel
         ("axi_araddr",  "input",  ADDR_W,                        "read", False),
         ("axi_arprot",  "input",  PROT_W,                        "read", False),
         ("axi_arvalid", "input",  1,                             "read", False),
         ("axi_arready", "output", 1,                             "read", False),
-
+        # R Channel
         ("axi_rdata",   "output", DATA_W,                        "read", True),
         ("axi_rresp",   "output", RESP_W,                        "read", True),
         ("axi_rvalid",  "output", 1,                             "read", True),
         ("axi_rready",  "input",  1,                             "read", True),
+        #
         # AXI specific read
+        #
+        # AR Channel
         ("axi_arid",    "input",  "ID_W",                        "read", False),
         ("axi_arlen",   "input",  "LEN_W",                       "read", False),
         ("axi_arsize",  "input",  SIZE_W,                        "read", False),
@@ -83,7 +94,7 @@ def setup(py_params_dict):
         ("axi_arlock",  "input",  LOCK_W,                        "read", False),
         ("axi_arcache", "input",  CACHE_W,                       "read", False),
         ("axi_arqos",   "input",  QOS_W,                         "read", False),
-
+        # R Channel
         ("axi_rid",     "output", "ID_W",                        "read", True),
         ("axi_rlast",   "output", 1,                             "read", True),
     ]

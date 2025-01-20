@@ -49,11 +49,14 @@ def setup(py_params_dict):
     ]
 
     for wire in mwrap_wires:
-        prefix_str = wire["signals"]["prefix"]
+        if wire["signals"]["prefix"]:
+            prefix_str = wire["signals"]["prefix"]
+        else:
+            prefix_str = wire["name"] + '_'
         attributes_dict["subblocks"].append(
             {
                 "core_name": f"iob_{wire['signals']['type']}",
-                "instance_name": f"{wire['signals']['prefix']}_mem",
+                "instance_name": f"{prefix_str}_mem",
                 "parameters": {
                     "DATA_W": f"{prefix_str.upper()}_DATA_W",
                     "ADDR_W": f"{prefix_str.upper()}_ADDR_W",

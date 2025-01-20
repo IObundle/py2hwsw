@@ -211,7 +211,7 @@ class iob_core(iob_module, iob_instance):
         
         # Create memory wrapper for top module if any memory interfaces are used
         if self.is_top_module:
-            if any(port.interface.type in mem_if_names for port in self.ports if port.interface):
+            if any((port.interface.type in mem_if_names and port.name.endswith('m')) for port in self.ports if port.interface):
                 superblocks = self.create_memwrapper(superblocks=superblocks)
 
         # Ensure superblocks are set up last
@@ -512,6 +512,7 @@ class iob_core(iob_module, iob_instance):
         for port in self.ports:
             if not port.e_connect and port.interface:
                 if port.interface.type in mem_if_names and instantiator:
+                    print(port)
                     self.connect_memory(port, instantiator)
 
     def create_memwrapper(self, superblocks):

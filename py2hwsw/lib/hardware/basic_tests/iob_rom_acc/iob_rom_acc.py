@@ -1,4 +1,4 @@
-# SPDZ-FileCopyrightText: 2024 IOBundle
+# SPDX-FileCopyrightText: 2024 IOBundle
 #
 # SPDX-License-Identifier: MIT
 

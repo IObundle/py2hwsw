@@ -248,20 +248,23 @@ module iob_axi_crossbar_addr #(
    wire [S_INT_THREADS-1:0] thread_cpl_match;
    wire [S_INT_THREADS-1:0] thread_trans_start;
    wire [S_INT_THREADS-1:0] thread_trans_complete;
+   wire [S_INT_THREADS-1:0] lower_thread_trans_start;
 
    generate
       genvar n;
 
       for (n = 0; n < S_INT_THREADS; n = n + 1) begin
          initial begin
-            thread_count_reg[n] <= 0;
+            thread_count_reg[n] = 0;
          end
 
          assign thread_active[n] = thread_count_reg[n] != 0;
          assign thread_match[n] = thread_active[n] && thread_id_reg[n] == s_axi_aid;
          assign thread_match_dest[n] = thread_match[n] && thread_m_reg[n] == m_select_next && (M_REGIONS < 2 || thread_region_reg[n] == m_axi_aregion_next);
          assign thread_cpl_match[n] = thread_active[n] && thread_id_reg[n] == s_cpl_id;
-         assign thread_trans_start[n] = (thread_match[n] || (!thread_active[n] && !thread_match && !(thread_trans_start & ({S_INT_THREADS{1'b1}} >> (S_INT_THREADS-n))))) && trans_start;
+         if (n == 0) assign lower_thread_trans_start[n] = 1'b0;
+         else assign lower_thread_trans_start[n] = |thread_trans_start[n-1:0];
+         assign thread_trans_start[n] = (thread_match[n] || (!thread_active[n] && !thread_match && !lower_thread_trans_start[n])) && trans_start;
          assign thread_trans_complete[n] = thread_cpl_match[n] && trans_complete;
 
          always @(posedge clk) begin

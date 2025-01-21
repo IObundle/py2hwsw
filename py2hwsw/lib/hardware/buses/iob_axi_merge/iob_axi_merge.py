@@ -7,13 +7,13 @@ def setup(py_params_dict):
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated merge module."
     )
-    assert "num_inputs" in py_params_dict, print(
-        "Error: Missing number of inputs for generated merge module."
+    assert "num_slaves" in py_params_dict, print(
+        "Error: Missing number of slaves for generated merge module."
     )
 
-    NUM_INPUTS = int(py_params_dict["num_inputs"])
-    # Number of bits required for input selection
-    NBITS = (NUM_INPUTS - 1).bit_length()
+    NUM_SLAVES = int(py_params_dict["num_slaves"])
+    # Number of bits required for slave selection
+    NBITS = (NUM_SLAVES - 1).bit_length()
 
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
@@ -148,11 +148,11 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "output_m",
+            "name": "m_m",
             "signals": {
                 "type": "axi",
-                "file_prefix": py_params_dict["name"] + "_output_",
-                "prefix": "output_",
+                "file_prefix": py_params_dict["name"] + "_m_",
+                "prefix": "m_",
                 "DATA_W": DATA_W,
                 "ADDR_W": ADDR_W,
                 "ID_W": "ID_W",
@@ -165,17 +165,17 @@ def setup(py_params_dict):
                 "RESP_W": RESP_W,
                 "LEN_W": "LEN_W",
             },
-            "descr": "Merge output",
+            "descr": "Merge master",
         },
     ]
-    for port_idx in range(NUM_INPUTS):
+    for port_idx in range(NUM_SLAVES):
         attributes_dict["ports"].append(
             {
-                "name": f"input_{port_idx}_s",
+                "name": f"s_{port_idx}_s",
                 "signals": {
                     "type": "axi",
-                    "file_prefix": f"{py_params_dict['name']}_input{port_idx}_",
-                    "prefix": f"input{port_idx}_",
+                    "file_prefix": f"{py_params_dict['name']}_s{port_idx}_",
+                    "prefix": f"s{port_idx}_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W - NBITS,
                     "ID_W": "ID_W",
@@ -188,7 +188,7 @@ def setup(py_params_dict):
                     "RESP_W": RESP_W,
                     "LEN_W": "LEN_W",
                 },
-                "descr": "Merge input interfaces",
+                "descr": "Merge slave interfaces",
             },
         )
     #
@@ -241,15 +241,15 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "input_read_sel",
-            "descr": "Select input interface",
+            "name": "s_read_sel",
+            "descr": "Select slave interface",
             "signals": [
                 {"name": "read_sel"},
             ],
         },
         {
-            "name": "input_read_sel_reg",
-            "descr": "Registered select input interface",
+            "name": "s_read_sel_reg",
+            "descr": "Registered select slave interface",
             "signals": [
                 {"name": "read_sel_reg"},
             ],
@@ -300,15 +300,15 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "input_write_sel",
-            "descr": "Select input interface",
+            "name": "s_write_sel",
+            "descr": "Select slave interface",
             "signals": [
                 {"name": "write_sel"},
             ],
         },
         {
-            "name": "input_write_sel_reg",
-            "descr": "Registered select input interface",
+            "name": "s_write_sel_reg",
+            "descr": "Registered select slave interface",
             "signals": [
                 {"name": "write_sel_reg"},
             ],
@@ -318,7 +318,7 @@ def setup(py_params_dict):
             "name": "read_prio_enc_i",
             "descr": "Input of read priority encoder",
             "signals": [
-                {"name": "mux_axi_arvalid", "width": f"{NUM_INPUTS} * 1"},
+                {"name": "mux_axi_arvalid", "width": f"{NUM_SLAVES} * 1"},
             ],
         },
         {
@@ -333,7 +333,7 @@ def setup(py_params_dict):
             "name": "write_prio_enc_i",
             "descr": "Input of write priority encoder",
             "signals": [
-                {"name": "mux_axi_awvalid", "width": f"{NUM_INPUTS} * 1"},
+                {"name": "mux_axi_awvalid", "width": f"{NUM_SLAVES} * 1"},
             ],
         },
         {
@@ -354,7 +354,7 @@ def setup(py_params_dict):
                     "descr": f"Input of {signal} demux",
                     "signals": [
                         {
-                            "name": "output_" + signal + "_i",
+                            "name": "m_" + signal + "_i",
                         },
                     ],
                 },
@@ -364,7 +364,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "demux_" + signal,
-                            "width": f"{NUM_INPUTS} * {width}",
+                            "width": f"{NUM_SLAVES} * {width}",
                         },
                     ],
                 },
@@ -378,7 +378,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "mux_" + signal,
-                            "width": f"{NUM_INPUTS} * {width}",
+                            "width": f"{NUM_SLAVES} * {width}",
                         },
                     ],
                 },
@@ -387,7 +387,7 @@ def setup(py_params_dict):
                     "descr": f"Output of {signal} demux",
                     "signals": [
                         {
-                            "name": "output_" + signal + "_o",
+                            "name": "m_" + signal + "_o",
                         },
                     ],
                 },
@@ -430,7 +430,7 @@ def setup(py_params_dict):
             "core_name": "iob_prio_enc",
             "instance_name": "read_sel_enc",
             "parameters": {
-                "W": NUM_INPUTS,
+                "W": NUM_SLAVES,
                 "MODE": '"HIGH"',
             },
             "connect": {
@@ -471,7 +471,7 @@ def setup(py_params_dict):
             "core_name": "iob_prio_enc",
             "instance_name": "write_sel_enc",
             "parameters": {
-                "W": NUM_INPUTS,
+                "W": NUM_SLAVES,
                 "MODE": '"HIGH"',
             },
             "connect": {
@@ -491,10 +491,10 @@ def setup(py_params_dict):
                     "instance_name": "iob_demux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_INPUTS,
+                        "N": NUM_SLAVES,
                     },
                     "connect": {
-                        "sel_i": f"input_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
@@ -508,10 +508,10 @@ def setup(py_params_dict):
                     "instance_name": "iob_mux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_INPUTS,
+                        "N": NUM_SLAVES,
                     },
                     "connect": {
-                        "sel_i": f"input_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },
@@ -525,13 +525,13 @@ def setup(py_params_dict):
             "verilog_code": """
    // Only switch masters when there is no current active transaction
    assign read_sel = active_read_transaction_reg ? read_sel_reg : read_prio_enc_o;
-   assign active_read_transaction_reg_en = (output_axi_arvalid_o & !active_read_transaction_reg) | (output_axi_rlast_i & output_axi_rvalid_i & output_axi_rready_o);
-   assign active_read_transaction = output_axi_arvalid_o & !active_read_transaction_reg;
+   assign active_read_transaction_reg_en = (m_axi_arvalid_o & !active_read_transaction_reg) | (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o);
+   assign active_read_transaction = m_axi_arvalid_o & !active_read_transaction_reg;
 
    // Only switch masters when there is no current active transaction
    assign write_sel = active_write_transaction_reg ? write_sel_reg : write_prio_enc_o;
-   assign active_write_transaction_reg_en = (output_axi_awvalid_o & !active_write_transaction_reg) | (output_axi_bvalid_i & output_axi_bready_o);
-   assign active_write_transaction = output_axi_awvalid_o & !active_write_transaction_reg;
+   assign active_write_transaction_reg_en = (m_axi_awvalid_o & !active_write_transaction_reg) | (m_axi_bvalid_i & m_axi_bready_o);
+   assign active_write_transaction = m_axi_awvalid_o & !active_write_transaction_reg;
 """,
         },
     ]
@@ -541,21 +541,21 @@ def setup(py_params_dict):
     for signal, direction, width, _, _ in axi_signals:
         if direction == "output":
             # Connect demuxers outputs
-            for port_idx in range(NUM_INPUTS):
+            for port_idx in range(NUM_SLAVES):
                 verilog_code += f"""
-   assign input{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
+   assign s{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
 """
         elif signal in ["axi_araddr", "axi_awaddr"]:
             # Connect address muxer inputs
             verilog_code += f"   assign mux_{signal} = {{"
-            for port_idx in range(NUM_INPUTS - 1, -1, -1):
-                verilog_code += f"{{{NBITS}'d{port_idx}}}, input{port_idx}_{signal}_i, "
+            for port_idx in range(NUM_SLAVES - 1, -1, -1):
+                verilog_code += f"{{{NBITS}'d{port_idx}}}, s{port_idx}_{signal}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
         else:  # Input direction
             # Connect muxer inputs
             verilog_code += f"   assign mux_{signal} = {{"
-            for port_idx in range(NUM_INPUTS - 1, -1, -1):
-                verilog_code += f"input{port_idx}_{signal}_i, "
+            for port_idx in range(NUM_SLAVES - 1, -1, -1):
+                verilog_code += f"s{port_idx}_{signal}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
     # Create snippet with muxer and demuxer connections
     attributes_dict["snippets"] += [

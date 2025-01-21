@@ -213,7 +213,7 @@ def setup(py_params_dict):
     for i in range(N_SLAVES):
         split_master_port_connections = {}
         for j in range(N_MASTERS):
-            split_master_port_connections[f"output_{j}_m"] = f"connect_s{i}_m{j}"
+            split_master_port_connections[f"m_{j}_m"] = f"connect_s{i}_m{j}"
 
         attributes_dict["subblocks"].append(
             {
@@ -222,11 +222,11 @@ def setup(py_params_dict):
                 "instance_name": f"iob_axi_split_{i}",
                 "instance_description": f"AXI split for slave {i}",
                 "parameters": AXI_VERILOG_PARAMS_MAP,
-                "num_outputs": N_MASTERS,
+                "num_masters": N_MASTERS,
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "rst_i",
-                    "input_s": f"s{i}_axi_s",
+                    "s_s": f"s{i}_axi_s",
                     **split_master_port_connections,
                 },
                 **axi_python_params,
@@ -236,7 +236,7 @@ def setup(py_params_dict):
     for i in range(N_MASTERS):
         merge_slave_port_connections = {}
         for j in range(N_SLAVES):
-            merge_slave_port_connections[f"input_{j}_s"] = f"connect_s{j}_m{i}"
+            merge_slave_port_connections[f"s_{j}_s"] = f"connect_s{j}_m{i}"
 
         attributes_dict["subblocks"].append(
             {
@@ -245,12 +245,12 @@ def setup(py_params_dict):
                 "instance_name": f"iob_axi_merge_{i}",
                 "instance_description": f"AXI merge for master {i}",
                 "parameters": AXI_VERILOG_PARAMS_MAP,
-                "num_inputs": N_SLAVES,
+                "num_slaves": N_SLAVES,
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "rst_i",
                     **merge_slave_port_connections,
-                    "output_m": f"merge_{i}_output",
+                    "m_m": f"merge_{i}_output",
                 },
                 **axi_python_params,
             }

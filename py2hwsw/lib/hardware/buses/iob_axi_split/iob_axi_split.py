@@ -7,13 +7,13 @@ def setup(py_params_dict):
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated split module."
     )
-    assert "num_outputs" in py_params_dict, print(
-        "Error: Missing number of outputs for generated split module."
+    assert "num_masters" in py_params_dict, print(
+        "Error: Missing number of masters for generated split module."
     )
 
-    NUM_OUTPUTS = int(py_params_dict["num_outputs"])
-    # Number of bits required for output selection
-    NBITS = (NUM_OUTPUTS - 1).bit_length()
+    NUM_MASTERS = int(py_params_dict["num_masters"])
+    # Number of bits required for master selection
+    NBITS = (NUM_MASTERS - 1).bit_length()
 
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
@@ -148,11 +148,11 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "input_s",
+            "name": "s_s",
             "signals": {
                 "type": "axi",
-                "file_prefix": py_params_dict["name"] + "_input_",
-                "prefix": "input_",
+                "file_prefix": py_params_dict["name"] + "_s_",
+                "prefix": "s_",
                 "DATA_W": DATA_W,
                 "ADDR_W": ADDR_W,
                 "ID_W": "ID_W",
@@ -165,17 +165,17 @@ def setup(py_params_dict):
                 "RESP_W": RESP_W,
                 "LEN_W": "LEN_W",
             },
-            "descr": "Split input",
+            "descr": "Split slave",
         },
     ]
-    for port_idx in range(NUM_OUTPUTS):
+    for port_idx in range(NUM_MASTERS):
         attributes_dict["ports"].append(
             {
-                "name": f"output_{port_idx}_m",
+                "name": f"m_{port_idx}_m",
                 "signals": {
                     "type": "axi",
-                    "file_prefix": f"{py_params_dict['name']}_output{port_idx}_",
-                    "prefix": f"output{port_idx}_",
+                    "file_prefix": f"{py_params_dict['name']}_m{port_idx}_",
+                    "prefix": f"m{port_idx}_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W - NBITS,
                     "ID_W": "ID_W",
@@ -188,7 +188,7 @@ def setup(py_params_dict):
                     "RESP_W": RESP_W,
                     "LEN_W": "LEN_W",
                 },
-                "descr": "Split output interface",
+                "descr": "Split master interface",
             },
         )
     #
@@ -219,15 +219,15 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "output_read_sel",
-            "descr": "Select output interface",
+            "name": "m_read_sel",
+            "descr": "Select master interface",
             "signals": [
                 {"name": "read_sel"},
             ],
         },
         {
-            "name": "output_read_sel_reg",
-            "descr": "Registered select output interface",
+            "name": "m_read_sel_reg",
+            "descr": "Registered select master interface",
             "signals": [
                 {"name": "read_sel_reg"},
             ],
@@ -256,15 +256,15 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "output_write_sel",
-            "descr": "Select output interface",
+            "name": "m_write_sel",
+            "descr": "Select master interface",
             "signals": [
                 {"name": "write_sel"},
             ],
         },
         {
-            "name": "output_write_sel_reg",
-            "descr": "Registered select output interface",
+            "name": "m_write_sel_reg",
+            "descr": "Registered select master interface",
             "signals": [
                 {"name": "write_sel_reg"},
             ],
@@ -280,7 +280,7 @@ def setup(py_params_dict):
                     "descr": f"Input of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal + "_i",
+                            "name": "s_" + signal + "_i",
                         },
                     ],
                 },
@@ -290,7 +290,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "demux_" + signal,
-                            "width": f"{NUM_OUTPUTS} * {width}",
+                            "width": f"{NUM_MASTERS} * {width}",
                         },
                     ],
                 },
@@ -304,7 +304,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "mux_" + signal,
-                            "width": f"{NUM_OUTPUTS} * {width}",
+                            "width": f"{NUM_MASTERS} * {width}",
                         },
                     ],
                 },
@@ -313,7 +313,7 @@ def setup(py_params_dict):
                     "descr": f"Output of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal + "_o",
+                            "name": "s_" + signal + "_o",
                         },
                     ],
                 },
@@ -364,10 +364,10 @@ def setup(py_params_dict):
                     "instance_name": "iob_demux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_OUTPUTS,
+                        "N": NUM_MASTERS,
                     },
                     "connect": {
-                        "sel_i": f"output_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"m_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
@@ -381,10 +381,10 @@ def setup(py_params_dict):
                     "instance_name": "iob_mux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_OUTPUTS,
+                        "N": NUM_MASTERS,
                     },
                     "connect": {
-                        "sel_i": f"output_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"m_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },
@@ -396,20 +396,20 @@ def setup(py_params_dict):
     attributes_dict["snippets"] = [
         {
             "verilog_code": f"""
-   assign read_sel = read_sel_reg_en ? input_axi_araddr_i[{ADDR_W-1}-:{NBITS}] : read_sel_reg;
-   assign read_sel_reg_en = input_axi_arvalid_i;
-   assign write_sel = write_sel_reg_en ? input_axi_awaddr_i[{ADDR_W-1}-:{NBITS}] : write_sel_reg;
-   assign write_sel_reg_en = input_axi_awvalid_i;
+   assign read_sel = read_sel_reg_en ? s_axi_araddr_i[{ADDR_W-1}-:{NBITS}] : read_sel_reg;
+   assign read_sel_reg_en = s_axi_arvalid_i;
+   assign write_sel = write_sel_reg_en ? s_axi_awaddr_i[{ADDR_W-1}-:{NBITS}] : write_sel_reg;
+   assign write_sel_reg_en = s_axi_awvalid_i;
 """,
         },
     ]
 
     verilog_code = ""
     # Connect address signal
-    for port_idx in range(NUM_OUTPUTS):
+    for port_idx in range(NUM_MASTERS):
         verilog_code += f"""
-   assign output{port_idx}_axi_araddr_o = demux_axi_araddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
-   assign output{port_idx}_axi_awaddr_o = demux_axi_awaddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
+   assign m{port_idx}_axi_araddr_o = demux_axi_araddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
+   assign m{port_idx}_axi_awaddr_o = demux_axi_awaddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
 """
     # Connect other signals
     for signal, direction, width, _, _ in axi_signals:
@@ -418,15 +418,15 @@ def setup(py_params_dict):
 
         if direction == "input":
             # Connect demuxers outputs
-            for port_idx in range(NUM_OUTPUTS):
+            for port_idx in range(NUM_MASTERS):
                 verilog_code += f"""
-   assign output{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
+   assign m{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
 """
         else:  # Output direction
             # Connect muxer inputs
             verilog_code += f"    assign mux_{signal} = {{"
-            for port_idx in range(NUM_OUTPUTS - 1, -1, -1):
-                verilog_code += f"output{port_idx}_{signal}_i, "
+            for port_idx in range(NUM_MASTERS - 1, -1, -1):
+                verilog_code += f"m{port_idx}_{signal}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
     # Create snippet with muxer and demuxer connections
     attributes_dict["snippets"] += [

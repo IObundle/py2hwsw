@@ -4,6 +4,7 @@
 
 import sys
 import os
+import math
 
 # Add iob-system scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
@@ -405,18 +406,22 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_axi_interconnect2",
-            "name": params["name"] + "_axi_interconnect",
-            "instance_name": "iob_axi_interconnect",
-            "instance_description": "AXI interconnect instance",
+            "core_name": "iob_axi_crossbar",
+            "name": params["name"] + "_axi_crossbar",
+            "instance_name": "iob_axi_crossbar",
+            "instance_description": "AXI crossbar instance",
+            "num_masters": 2,
+            "num_slaves": 4,
             "parameters": {
-                "ID_W": "AXI_ID_W",
-                "LEN_W": "AXI_LEN_W",
-                # "INT_MEM_ADDR_W": f"{params['fw_addr_w']} - 2",
-                # "MEM_ADDR_W": "AXI_ADDR_W - 2",
+                "ADDR_WIDTH": params["addr_w"] - 2,
+                "DATA_WIDTH": params["data_w"],
+                # ID width of master interfaces must be at least: AXI_ID_W + clog2(num_masters)
+                "M_ID_WIDTH": f"AXI_ID_W+{math.ceil(math.log2(2))}",
+                "S_ID_WIDTH": "AXI_ID_W",
+                # "LEN_W": "AXI_LEN_W",
             },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
+                "clk_i": "clk",
                 "rst_i": "rst",
                 "s0_axi_s": "cpu_ibus",
                 "s1_axi_s": "cpu_dbus",
@@ -455,11 +460,6 @@ def setup(py_params_dict):
                     ],
                 ),
             },
-            "addr_w": params["addr_w"] - 2,
-            "data_w": params["data_w"],
-            "lock_w": 1,
-            "num_slaves": 2,
-            "num_masters": 4,
         },
     ]
     attributes_dict["subblocks"] += [

@@ -130,12 +130,12 @@ module iob_axi_crossbar_addr #(
    initial begin
       if (S_ACCEPT < 1) begin
          $error("Error: need at least 1 accept (instance %m)");
-         $finish;
+         $finish();
       end
 
       if (S_THREADS < 1) begin
          $error("Error: need at least 1 thread (instance %m)");
-         $finish;
+         $finish();
       end
 
       if (S_THREADS > S_ACCEPT) begin
@@ -145,13 +145,13 @@ module iob_axi_crossbar_addr #(
 
       if (M_REGIONS < 1) begin
          $error("Error: need at least 1 region (instance %m)");
-         $finish;
+         $finish();
       end
 
       for (i = 0; i < M_COUNT * M_REGIONS; i = i + 1) begin
          if (M_ADDR_WIDTH[i*32 +: 32] && (M_ADDR_WIDTH[i*32 +: 32] < 12 || M_ADDR_WIDTH[i*32 +: 32] > ADDR_WIDTH)) begin
             $error("Error: address width out of range (instance %m)");
-            $finish;
+            $finish();
          end
       end
 
@@ -175,7 +175,7 @@ module iob_axi_crossbar_addr #(
                 M_BASE_ADDR_INT[i*ADDR_WIDTH+:ADDR_WIDTH] & ({ADDR_WIDTH{1'b1}} << M_ADDR_WIDTH[i*32+:32]),
                 M_BASE_ADDR_INT[i*ADDR_WIDTH+:ADDR_WIDTH] | ({ADDR_WIDTH{1'b1}} >> (ADDR_WIDTH - M_ADDR_WIDTH[i*32+:32])));
             $error("Error: address range not aligned (instance %m)");
-            $finish;
+            $finish();
          end
       end
 
@@ -196,7 +196,7 @@ module iob_axi_crossbar_addr #(
                       M_BASE_ADDR_INT[j*ADDR_WIDTH+:ADDR_WIDTH] & ({ADDR_WIDTH{1'b1}} << M_ADDR_WIDTH[j*32+:32]),
                       M_BASE_ADDR_INT[j*ADDR_WIDTH+:ADDR_WIDTH] | ({ADDR_WIDTH{1'b1}} >> (ADDR_WIDTH - M_ADDR_WIDTH[j*32+:32])));
                   $error("Error: address ranges overlap (instance %m)");
-                  $finish;
+                  $finish();
                end
             end
          end

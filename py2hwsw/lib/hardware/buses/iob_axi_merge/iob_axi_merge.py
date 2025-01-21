@@ -197,25 +197,25 @@ def setup(py_params_dict):
     attributes_dict["wires"] = [
         # Active read transfer reg
         {
-            "name": "active_read_transaction_reg_en_rst",
-            "descr": "Enable and reset signal for active_read_transaction_reg",
+            "name": "busy_read_reg_en_rst",
+            "descr": "Enable and reset signal for busy_read_reg",
             "signals": [
-                {"name": "active_read_transaction_reg_en", "width": 1},
+                {"name": "busy_read_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
         {
-            "name": "active_read_transaction_reg_data_i",
-            "descr": "Input of active_read_transaction_reg",
+            "name": "busy_read_reg_data_i",
+            "descr": "Input of busy_read_reg",
             "signals": [
-                {"name": "active_read_transaction", "width": 1},
+                {"name": "busy_read", "width": 1},
             ],
         },
         {
-            "name": "active_read_transaction_reg_data_o",
-            "descr": "Output of active_read_transaction_reg",
+            "name": "busy_read_reg_data_o",
+            "descr": "Output of busy_read_reg",
             "signals": [
-                {"name": "active_read_transaction_reg", "width": 1},
+                {"name": "busy_read_reg", "width": 1},
             ],
         },
         # Read selection register signals
@@ -256,25 +256,25 @@ def setup(py_params_dict):
         },
         # Active write transfer reg
         {
-            "name": "active_write_transaction_reg_en_rst",
-            "descr": "Enable and reset signal for active_write_transaction_reg",
+            "name": "busy_write_reg_en_rst",
+            "descr": "Enable and reset signal for busy_write_reg",
             "signals": [
-                {"name": "active_write_transaction_reg_en", "width": 1},
+                {"name": "busy_write_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
         {
-            "name": "active_write_transaction_reg_data_i",
-            "descr": "Input of active_write_transaction_reg",
+            "name": "busy_write_reg_data_i",
+            "descr": "Input of busy_write_reg",
             "signals": [
-                {"name": "active_write_transaction", "width": 1},
+                {"name": "busy_write", "width": 1},
             ],
         },
         {
-            "name": "active_write_transaction_reg_data_o",
-            "descr": "Output of active_write_transaction_reg",
+            "name": "busy_write_reg_data_o",
+            "descr": "Output of busy_write_reg",
             "signals": [
-                {"name": "active_write_transaction_reg", "width": 1},
+                {"name": "busy_write_reg", "width": 1},
             ],
         },
         # Write selection register signals
@@ -400,16 +400,16 @@ def setup(py_params_dict):
         # Read blocks
         {
             "core_name": "iob_reg_re",
-            "instance_name": "active_read_transaction_reg_re",
+            "instance_name": "busy_read_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "active_read_transaction_reg_en_rst",
-                "data_i": "active_read_transaction_reg_data_i",
-                "data_o": "active_read_transaction_reg_data_o",
+                "en_rst_i": "busy_read_reg_en_rst",
+                "data_i": "busy_read_reg_data_i",
+                "data_o": "busy_read_reg_data_o",
             },
         },
         {
@@ -441,16 +441,16 @@ def setup(py_params_dict):
         # Write blocks
         {
             "core_name": "iob_reg_re",
-            "instance_name": "active_write_transaction_reg_re",
+            "instance_name": "busy_write_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "active_write_transaction_reg_en_rst",
-                "data_i": "active_write_transaction_reg_data_i",
-                "data_o": "active_write_transaction_reg_data_o",
+                "en_rst_i": "busy_write_reg_en_rst",
+                "data_i": "busy_write_reg_data_i",
+                "data_o": "busy_write_reg_data_o",
             },
         },
         {
@@ -524,14 +524,14 @@ def setup(py_params_dict):
         {
             "verilog_code": """
    // Only switch masters when there is no current active transaction
-   assign read_sel = active_read_transaction_reg ? read_sel_reg : read_prio_enc_o;
-   assign active_read_transaction_reg_en = (m_axi_arvalid_o & !active_read_transaction_reg) | (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o);
-   assign active_read_transaction = m_axi_arvalid_o & !active_read_transaction_reg;
+   assign read_sel = busy_read_reg ? read_sel_reg : read_prio_enc_o;
+   assign busy_read_reg_en = (m_axi_arvalid_o & !busy_read_reg) | (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o);
+   assign busy_read = m_axi_arvalid_o & !busy_read_reg;
 
    // Only switch masters when there is no current active transaction
-   assign write_sel = active_write_transaction_reg ? write_sel_reg : write_prio_enc_o;
-   assign active_write_transaction_reg_en = (m_axi_awvalid_o & !active_write_transaction_reg) | (m_axi_bvalid_i & m_axi_bready_o);
-   assign active_write_transaction = m_axi_awvalid_o & !active_write_transaction_reg;
+   assign write_sel = busy_write_reg ? write_sel_reg : write_prio_enc_o;
+   assign busy_write_reg_en = (m_axi_awvalid_o & !busy_write_reg) | (m_axi_bvalid_i & m_axi_bready_o);
+   assign busy_write = m_axi_awvalid_o & !busy_write_reg;
 """,
         },
     ]

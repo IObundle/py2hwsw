@@ -201,21 +201,21 @@ def setup(py_params_dict):
             "descr": "Enable and reset signal for busy_read_reg",
             "signals": [
                 {"name": "busy_read_reg_en", "width": 1},
-                {"name": "rst_i"},
+                {"name": "busy_read_reg_rst", "width": 1},
             ],
         },
         {
             "name": "busy_read_reg_data_i",
             "descr": "Input of busy_read_reg",
             "signals": [
-                {"name": "busy_read", "width": 1},
+                {"name": "busy_read_reg_i", "width": 1},
             ],
         },
         {
             "name": "busy_read_reg_data_o",
             "descr": "Output of busy_read_reg",
             "signals": [
-                {"name": "busy_read_reg", "width": 1},
+                {"name": "busy_read_reg_o", "width": 1},
             ],
         },
         # Read selection register signals
@@ -260,21 +260,21 @@ def setup(py_params_dict):
             "descr": "Enable and reset signal for busy_write_reg",
             "signals": [
                 {"name": "busy_write_reg_en", "width": 1},
-                {"name": "rst_i"},
+                {"name": "busy_write_reg_rst", "width": 1},
             ],
         },
         {
             "name": "busy_write_reg_data_i",
             "descr": "Input of busy_write_reg",
             "signals": [
-                {"name": "busy_write", "width": 1},
+                {"name": "busy_write_reg_i", "width": 1},
             ],
         },
         {
             "name": "busy_write_reg_data_o",
             "descr": "Output of busy_write_reg",
             "signals": [
-                {"name": "busy_write_reg", "width": 1},
+                {"name": "busy_write_reg_o", "width": 1},
             ],
         },
         # Write selection register signals
@@ -524,14 +524,16 @@ def setup(py_params_dict):
         {
             "verilog_code": """
    // Only switch masters when there is no current active transaction
-   assign read_sel = busy_read_reg ? read_sel_reg : read_prio_enc_o;
-   assign busy_read_reg_en = (m_axi_arvalid_o & !busy_read_reg) | (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o);
-   assign busy_read = m_axi_arvalid_o & !busy_read_reg;
+   assign read_sel = busy_read_reg_o ? read_sel_reg : read_prio_enc_o;
+   assign busy_read_reg_en = m_axi_arvalid_o & !busy_read_reg_o;
+   assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
+   assign busy_read_reg_i = 1'b1;
 
    // Only switch masters when there is no current active transaction
-   assign write_sel = busy_write_reg ? write_sel_reg : write_prio_enc_o;
-   assign busy_write_reg_en = (m_axi_awvalid_o & !busy_write_reg) | (m_axi_bvalid_i & m_axi_bready_o);
-   assign busy_write = m_axi_awvalid_o & !busy_write_reg;
+   assign write_sel = busy_write_reg_o ? write_sel_reg : write_prio_enc_o;
+   assign busy_write_reg_en = m_axi_awvalid_o & !busy_write_reg_o;
+   assign busy_write_reg_rst = (m_axi_bvalid_i & m_axi_bready_o) | rst_i;
+   assign busy_write_reg_i = 1'b1;
 """,
         },
     ]

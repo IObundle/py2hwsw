@@ -195,6 +195,29 @@ def setup(py_params_dict):
     # Wires
     #
     attributes_dict["wires"] = [
+        # Active read transfer reg
+        {
+            "name": "active_read_transaction_reg_en_rst",
+            "descr": "Enable and reset signal for active_read_transaction_reg",
+            "signals": [
+                {"name": "active_read_transaction_reg_en", "width": 1},
+                {"name": "rst_i"},
+            ],
+        },
+        {
+            "name": "active_read_transaction_reg_data_i",
+            "descr": "Input of active_read_transaction_reg",
+            "signals": [
+                {"name": "active_read_transaction", "width": 1},
+            ],
+        },
+        {
+            "name": "active_read_transaction_reg_data_o",
+            "descr": "Output of active_read_transaction_reg",
+            "signals": [
+                {"name": "active_read_transaction_reg", "width": 1},
+            ],
+        },
         # Read selection register signals
         {
             "name": "read_sel_reg_rst",
@@ -229,6 +252,29 @@ def setup(py_params_dict):
             "descr": "Registered select input interface",
             "signals": [
                 {"name": "read_sel_reg"},
+            ],
+        },
+        # Active write transfer reg
+        {
+            "name": "active_write_transaction_reg_en_rst",
+            "descr": "Enable and reset signal for active_write_transaction_reg",
+            "signals": [
+                {"name": "active_write_transaction_reg_en", "width": 1},
+                {"name": "rst_i"},
+            ],
+        },
+        {
+            "name": "active_write_transaction_reg_data_i",
+            "descr": "Input of active_write_transaction_reg",
+            "signals": [
+                {"name": "active_write_transaction", "width": 1},
+            ],
+        },
+        {
+            "name": "active_write_transaction_reg_data_o",
+            "descr": "Output of active_write_transaction_reg",
+            "signals": [
+                {"name": "active_write_transaction_reg", "width": 1},
             ],
         },
         # Write selection register signals
@@ -353,6 +399,20 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         # Read blocks
         {
+            "core_name": "iob_reg_re",
+            "instance_name": "active_read_transaction_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_read_transaction_reg_en_rst",
+                "data_i": "active_read_transaction_reg_data_i",
+                "data_o": "active_read_transaction_reg_data_o",
+            },
+        },
+        {
             "core_name": "iob_reg_r",
             "instance_name": "read_sel_reg_r",
             "parameters": {
@@ -379,6 +439,20 @@ def setup(py_params_dict):
             },
         },
         # Write blocks
+        {
+            "core_name": "iob_reg_re",
+            "instance_name": "active_write_transaction_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_write_transaction_reg_en_rst",
+                "data_i": "active_write_transaction_reg_data_i",
+                "data_o": "active_write_transaction_reg_data_o",
+            },
+        },
         {
             "core_name": "iob_reg_r",
             "instance_name": "write_sel_reg_r",
@@ -449,8 +523,15 @@ def setup(py_params_dict):
     attributes_dict["snippets"] = [
         {
             "verilog_code": """
-   assign read_sel = |mux_axi_arvalid ? read_prio_enc_o : read_sel_reg;
-   assign write_sel = |mux_axi_awvalid ? write_prio_enc_o : write_sel_reg;
+   // Only switch masters when there is no current active transaction
+   assign read_sel = active_read_transaction_reg ? read_sel_reg : read_prio_enc_o;
+   assign active_read_transaction_reg_en = (output_axi_arvalid_o & !active_read_transaction_reg) | (output_axi_rlast_i & output_axi_rvalid_i & output_axi_rready_o);
+   assign active_read_transaction = output_axi_arvalid_o & !active_read_transaction_reg;
+
+   // Only switch masters when there is no current active transaction
+   assign write_sel = active_write_transaction_reg ? write_sel_reg : write_prio_enc_o;
+   assign active_write_transaction_reg_en = (output_axi_awvalid_o & !active_write_transaction_reg) | (output_axi_bvalid_i & output_axi_bready_o);
+   assign active_write_transaction = output_axi_awvalid_o & !active_write_transaction_reg;
 """,
         },
     ]

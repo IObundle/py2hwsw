@@ -392,7 +392,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_axi_interconnect2",
+            "core_name": "iob_axi_full_xbar",
             "name": params["name"] + "_axi_interconnect",
             "instance_name": "iob_axi_interconnect",
             "instance_description": "AXI interconnect instance",

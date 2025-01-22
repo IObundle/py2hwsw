@@ -393,9 +393,9 @@ def setup(py_params_dict):
         },
         {
             "core_name": "iob_axi_full_xbar",
-            "name": params["name"] + "_axi_interconnect",
-            "instance_name": "iob_axi_interconnect",
-            "instance_description": "AXI interconnect instance",
+            "name": params["name"] + "_axi_full_xbar",
+            "instance_name": "iob_axi_full_xbar",
+            "instance_description": "AXI full xbar instance",
             "parameters": {
                 "ID_W": "AXI_ID_W",
                 "LEN_W": "AXI_LEN_W",

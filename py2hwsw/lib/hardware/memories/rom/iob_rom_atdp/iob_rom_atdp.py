@@ -43,68 +43,9 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_a_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "clk_a_i", "width": 1},
-                ],
-            },
-            {
-                "name": "addr_a_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "addr_a_i", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "r_en_a_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_en_a_i", "width": 1},
-                ],
-            },
-            {
-                "name": "clk_b_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "clk_b_i", "width": 1},
-                ],
-            },
-            {
-                "name": "addr_b_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "addr_b_i", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "r_en_b_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_en_b_i", "width": 1},
-                ],
-            },
-            {
-                "name": "r_data_a_o",
-                "descr": "Output port",
-                "signals": [
-                    {
-                        "name": "r_data_a_o",
-                        "width": "DATA_W",
-                        "isvar": True,
-                    },
-                ],
-            },
-            {
-                "name": "r_data_b_o",
-                "descr": "Output port",
-                "signals": [
-                    {
-                        "name": "r_data_b_o",
-                        "width": "DATA_W",
-                        "isvar": True,
-                    },
-                ],
+                "name": "rom_atdp_s",
+                "descr": "ROM ATDP",
+                "signals": {"type": "rom_atdp"},
             },
         ],
         "superblocks": [
@@ -130,11 +71,11 @@ def setup(py_params_dict):
    endgenerate
 
    always @(posedge clk_a_i)  // Port A
-      if (r_en_a_i)
+      if (en_a_i)
          r_data_a_o <= rom[addr_a_i];
 
    always @(posedge clk_b_i)  // Port B
-      if (r_en_b_i)
+      if (en_b_i)
          r_data_b_o <= rom[addr_b_i];
             """,
             },

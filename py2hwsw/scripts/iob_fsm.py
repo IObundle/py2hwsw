@@ -20,7 +20,7 @@ class iob_fsm(iob_comb):
             raise ValueError("type must be either 'prog' or 'fsm'")
         if self.type == "fsm":
             self.state_reg_name = "state"
-            update_statement = "state_nxt <= state;"
+            update_statement = "state_nxt = state;"
         else:
             self.state_reg_name = "pc"
             update_statement = "pc_nxt = pc + 1;"
@@ -92,13 +92,14 @@ def create_fsm(core, *args, **kwargs):
     core.set_default_attribute("fsm", None)
 
     verilog_code = kwargs.get("verilog_code", "")
+    type = kwargs.get("type", "prog")
 
     assert_attributes(
         iob_fsm,
         kwargs,
         error_msg=f"Invalid {kwargs.get('name', '')} fsm attribute '[arg]'!",
     )
-    fsm = iob_fsm(verilog_code=verilog_code)
+    fsm = iob_fsm(type=type, verilog_code=verilog_code)
 
     core.create_wire(
         name=fsm.state_reg_name,

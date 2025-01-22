@@ -93,11 +93,11 @@ module iob_rom_tdp_tb;
       .clk_i(clk),
 
       .r_en_a_i  (r_en_a),
-      .addr_a_i  (addr_a),
+      .r_addr_a_i  (addr_a),
       .r_data_a_o(r_data_a),
 
       .r_en_b_i  (r_en_b),
-      .addr_b_i  (addr_b),
+      .r_addr_b_i  (addr_b),
       .r_data_b_o(r_data_b)
    );
 

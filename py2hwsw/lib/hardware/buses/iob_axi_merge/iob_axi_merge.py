@@ -347,6 +347,9 @@ def setup(py_params_dict):
     # Generate wires for muxers and demuxers
     for signal, direction, width, _, _ in axi_signals:
         if direction == "output":
+            prefix = "m_"
+            if signal in ["axi_arready", "axi_awready"]:
+                prefix = "demux_"
             # Demux signals
             attributes_dict["wires"] += [
                 {
@@ -354,7 +357,7 @@ def setup(py_params_dict):
                     "descr": f"Input of {signal} demux",
                     "signals": [
                         {
-                            "name": "m_" + signal + "_i",
+                            "name": prefix + signal + "_i",
                         },
                     ],
                 },
@@ -370,6 +373,9 @@ def setup(py_params_dict):
                 },
             ]
         else:  # input direction
+            prefix = "m_"
+            if signal in ["axi_arvalid", "axi_awvalid"]:
+                prefix = "mux_"
             # Mux signals
             attributes_dict["wires"] += [
                 {
@@ -387,7 +393,7 @@ def setup(py_params_dict):
                     "descr": f"Output of {signal} demux",
                     "signals": [
                         {
-                            "name": "m_" + signal + "_o",
+                            "name": prefix + signal + "_o",
                         },
                     ],
                 },
@@ -523,17 +529,34 @@ def setup(py_params_dict):
     attributes_dict["snippets"] = [
         {
             "verilog_code": """
+   //
+   // Read
+   //
+
    // Only switch masters when there is no current active transaction
    assign read_sel = busy_read_reg_o ? read_sel_reg : read_prio_enc_o;
    assign busy_read_reg_en = m_axi_arvalid_o & !busy_read_reg_o;
    assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
    assign busy_read_reg_i = 1'b1;
 
+   // Block address valid/ready signals of current master if there is still an active transaction
+   assign m_axi_arvalid_o = ~busy_read_reg_o & mux_axi_arvalid_o;
+   assign demux_axi_arready_i = ~busy_read_reg_o & m_axi_arready_i;
+
+   //
+   // Write
+   //
+
    // Only switch masters when there is no current active transaction
    assign write_sel = busy_write_reg_o ? write_sel_reg : write_prio_enc_o;
    assign busy_write_reg_en = m_axi_awvalid_o & !busy_write_reg_o;
    assign busy_write_reg_rst = (m_axi_bvalid_i & m_axi_bready_o) | rst_i;
    assign busy_write_reg_i = 1'b1;
+
+   // Block address valid/ready signals of current master if there is still an active transaction
+   assign m_axi_awvalid_o = ~busy_write_reg_o & mux_axi_awvalid_o;
+   assign demux_axi_awready_i = ~busy_write_reg_o & m_axi_awready_i;
+
 """,
         },
     ]

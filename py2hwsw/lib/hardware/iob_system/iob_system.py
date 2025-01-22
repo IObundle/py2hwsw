@@ -90,7 +90,7 @@ def setup(py_params_dict):
                 "type": "M",
                 "val": params["fw_addr"],
                 "min": "0",
-                "max": "32",
+                "max": "0x7FFFFFFF",
             },
             {  # Needed for software
                 "name": "FW_ADDR_W",

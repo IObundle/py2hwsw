@@ -4,16 +4,14 @@
 
 import copy
 
-import iob_system
-
 
 def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
 
-    iob_system_attr = iob_system.setup(params)
+    iob_system_attr = py_params_dict["instantiator"]
 
     attributes_dict = {
-        "name": params["name"] + "_mwrap",
+        "name": params["name"] + "_mwrap_old",
         "generate_hw": True,
         "version": "0.1",
         "confs": [
@@ -64,20 +62,20 @@ def setup(py_params_dict):
         },
     ]
     attributes_dict["subblocks"] = [
-        # ROM
-        {
-            "core_name": "iob_rom_sp",
-            "instance_name": "boot_rom",
-            "instance_description": "Boot ROM",
-            "parameters": {
-                "ADDR_W": params["bootrom_addr_w"] - 2,
-                "DATA_W": params["data_w"],
-                "HEXFILE": '{BOOT_HEXFILE, ".hex"}',
-            },
-            "connect": {
-                "rom_sp_s": "rom_bus_m",
-            },
-        },
+        # ROM (Disabled here because it is now in auto-generated iob_memwrapper)
+        # {
+        #     "core_name": "iob_rom_sp",
+        #     "instance_name": "boot_rom",
+        #     "instance_description": "Boot ROM",
+        #     "parameters": {
+        #         "ADDR_W": params["bootrom_addr_w"] - 2,
+        #         "DATA_W": params["data_w"],
+        #         "HEXFILE": '{BOOT_HEXFILE, ".hex"}',
+        #     },
+        #     "connect": {
+        #         "rom_sp_s": "rom_bus_m",
+        #     },
+        # },
         # Internal memory
         {
             "core_name": "iob_axi_ram",

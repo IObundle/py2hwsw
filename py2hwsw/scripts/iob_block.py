@@ -4,7 +4,6 @@
 
 from dataclasses import dataclass, field
 from iob_base import (
-    convert_dict2obj_list,
     str_to_kwargs,
     fail_with_msg,
     assert_attributes,

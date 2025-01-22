@@ -16,6 +16,5 @@
   //call main
   jal ra, main
 
-  // Jump to the pre-bootloader
-  li x5, 0x80000000
-  jalr x0, 0(x5)
+  // Stop the processor
+  ebreak

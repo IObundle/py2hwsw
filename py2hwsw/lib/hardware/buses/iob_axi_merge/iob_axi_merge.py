@@ -315,32 +315,32 @@ def setup(py_params_dict):
         },
         # Read priority encoder signals
         {
-            "name": "read_prio_enc_i",
+            "name": "read_sel_prio_enc_i",
             "descr": "Input of read priority encoder",
             "signals": [
                 {"name": "mux_axi_arvalid", "width": f"{NUM_SLAVES} * 1"},
             ],
         },
         {
-            "name": "read_prio_enc_o",
+            "name": "read_sel_prio_enc_o",
             "descr": "Output of read priority encoder",
             "signals": [
-                {"name": "read_prio_enc_o", "width": NBITS},
+                {"name": "read_sel_prio_enc_o", "width": NBITS},
             ],
         },
         # Write priority encoder signals
         {
-            "name": "write_prio_enc_i",
+            "name": "write_sel_prio_enc_i",
             "descr": "Input of write priority encoder",
             "signals": [
                 {"name": "mux_axi_awvalid", "width": f"{NUM_SLAVES} * 1"},
             ],
         },
         {
-            "name": "write_prio_enc_o",
+            "name": "write_sel_prio_enc_o",
             "descr": "Output of write priority encoder",
             "signals": [
-                {"name": "write_prio_enc_o", "width": NBITS},
+                {"name": "write_sel_prio_enc_o", "width": NBITS},
             ],
         },
     ]
@@ -440,8 +440,8 @@ def setup(py_params_dict):
                 "MODE": '"HIGH"',
             },
             "connect": {
-                "unencoded_i": "read_prio_enc_i",
-                "encoded_o": "read_prio_enc_o",
+                "unencoded_i": "read_sel_prio_enc_i",
+                "encoded_o": "read_sel_prio_enc_o",
             },
         },
         # Write blocks
@@ -481,8 +481,8 @@ def setup(py_params_dict):
                 "MODE": '"HIGH"',
             },
             "connect": {
-                "unencoded_i": "write_prio_enc_i",
-                "encoded_o": "write_prio_enc_o",
+                "unencoded_i": "write_sel_prio_enc_i",
+                "encoded_o": "write_sel_prio_enc_o",
             },
         },
     ]
@@ -534,8 +534,8 @@ def setup(py_params_dict):
    //
 
    // Only switch masters when there is no current active transaction
-   assign read_sel = busy_read_reg_o ? read_sel_reg : read_prio_enc_o;
-   assign busy_read_reg_en = m_axi_arvalid_o & !busy_read_reg_o;
+   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o;
+   assign busy_read_reg_en = m_axi_arvalid_o & m_axi_arready_i & !busy_read_reg_o;
    assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
    assign busy_read_reg_i = 1'b1;
 
@@ -548,8 +548,8 @@ def setup(py_params_dict):
    //
 
    // Only switch masters when there is no current active transaction
-   assign write_sel = busy_write_reg_o ? write_sel_reg : write_prio_enc_o;
-   assign busy_write_reg_en = m_axi_awvalid_o & !busy_write_reg_o;
+   assign write_sel = busy_write_reg_o ? write_sel_reg : write_sel_prio_enc_o;
+   assign busy_write_reg_en = m_axi_awvalid_o & m_axi_awready_i & !busy_write_reg_o;
    assign busy_write_reg_rst = (m_axi_bvalid_i & m_axi_bready_o) | rst_i;
    assign busy_write_reg_i = 1'b1;
 

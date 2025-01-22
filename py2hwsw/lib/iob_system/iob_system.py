@@ -22,7 +22,7 @@ def setup(py_params_dict):
         "mem_addr_w": 24,
         "bootrom_addr_w": 12,
         "fw_addr": 0,
-        "fw_addr_w": 15,
+        "fw_addr_w": 18,
         "include_tester": True,
     }
 

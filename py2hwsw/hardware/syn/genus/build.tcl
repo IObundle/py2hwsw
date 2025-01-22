@@ -2,20 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-#----------------------------------------------------------------------
-# Copyright (c) 2017 CAST, Inc.
-# Copyright (c) 2023 IObundle, Lda.
-#
-# Please review the terms of the license agreement before using this
-# file.  If you are not an authorized user, please destroy this source
-# code file and notify CAST immediately that you inadvertently received
-# an unauthorized copy.
-#----------------------------------------------------------------------
-#  GENUS template;  requires design.tcl  to set variables and path 
-#----------------------------------------------------------------------
-#
-#
-
 #
 # set DESIGN and hdl_search_path paths
 #

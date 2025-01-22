@@ -551,7 +551,7 @@ def generate_ipxact_xml(core, dest_dir):
     core_name_display = core_name.replace("_", "-").upper()
 
     # Set the core vendor and library
-    core_vendor = "CAST"
+    core_vendor = "IObundle"
     core_library = "IP"
 
     # Generate the parameters table

@@ -208,10 +208,14 @@ class iob_core(iob_module, iob_instance):
 
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, self.instantiator)
-        
+
         # Create memory wrapper for top module if any memory interfaces are used
         if self.is_top_module:
-            if any((port.interface.type in mem_if_names and port.name.endswith('m')) for port in self.ports if port.interface):
+            if any(
+                (port.interface.type in mem_if_names and port.name.endswith("m"))
+                for port in self.ports
+                if port.interface
+            ):
                 superblocks = self.create_memwrapper(superblocks=superblocks)
 
         # Ensure superblocks are set up last
@@ -221,7 +225,6 @@ class iob_core(iob_module, iob_instance):
         if self.is_superblock:
             # Generate verilog parameters of instantiator subblock
             param_gen.generate_inst_params(self.instantiator)
-
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
@@ -455,17 +458,13 @@ class iob_core(iob_module, iob_instance):
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
     def connect_memory(self, port, instantiator):
-        """ Create memory port in instantiatior and connect it to self"""
+        """Create memory port in instantiatior and connect it to self"""
         _name = f"{port.name}"
         _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
         _signals.update(port.interface.widths)
         if _signals["prefix"] == "":
             _signals.update({"prefix": f"{_name}_"})
-        instantiator.create_port(
-            name=_name,
-            signals = _signals,
-            descr=port.descr
-        )
+        instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
         _port = find_obj_in_list(instantiator.ports + instantiator.wires, _name)
         port.connect_external(_port, bit_slices=[])
 

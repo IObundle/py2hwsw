@@ -4,6 +4,7 @@
 
 import copy
 
+
 def setup(py_params_dict):
 
     mem_if_names = py_params_dict["mem_if_names"]
@@ -13,7 +14,7 @@ def setup(py_params_dict):
         "name": f"{attrs['name']}_mwrap",
         "generate_hw": True,
         "version": "0.1",
-        "confs": attrs['confs'],
+        "confs": attrs["confs"],
     }
 
     mwrap_wires = []
@@ -34,17 +35,13 @@ def setup(py_params_dict):
 
     attributes_dict["subblocks"] = [
         {
-            "core_name": attrs['name'],
+            "core_name": attrs["name"],
             "instance_name": f"{attrs['name']}_inst",
             "instance_description": "Wrapped module",
             "parameters": {
-                i["name"]: i["name"]
-                for i in attrs["confs"]
-                if i["type"] in ["P", "F"]
+                i["name"]: i["name"] for i in attrs["confs"] if i["type"] in ["P", "F"]
             },
-            "connect": {
-                i["name"]: i["name"] for i in attrs["ports"]
-            },
+            "connect": {i["name"]: i["name"] for i in attrs["ports"]},
         }
     ]
 
@@ -52,7 +49,7 @@ def setup(py_params_dict):
         if wire["signals"]["prefix"]:
             prefix_str = wire["signals"]["prefix"]
         else:
-            prefix_str = wire["name"] + '_'
+            prefix_str = wire["name"] + "_"
         attributes_dict["subblocks"].append(
             {
                 "core_name": f"iob_{wire['signals']['type']}",
@@ -64,7 +61,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     f"{wire['signals']['type']}_s": wire["name"],
-                }
+                },
             }
         )
 

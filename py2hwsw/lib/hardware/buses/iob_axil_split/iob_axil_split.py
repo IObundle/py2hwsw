@@ -17,13 +17,13 @@ def setup(py_params_dict):
 
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
+    PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
+    RESP_W = int(py_params_dict["resp_w"]) if "resp_w" in py_params_dict else 2
     DATA_SECTION_W = (
         int(py_params_dict["data_section_w"])
         if "data_section_w" in py_params_dict
         else 8
     )
-    PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
-    RESP_W = int(py_params_dict["resp_w"]) if "resp_w" in py_params_dict else 2
 
     axil_signals = [
         ("axil_araddr", "input", ADDR_W, "read"),
@@ -51,20 +51,18 @@ def setup(py_params_dict):
         "name": py_params_dict["name"],
         "generate_hw": True,
         "version": "0.1",
-        "ports": [
-            {
-                "name": "clk_en_rst_s",
-                "signals": {
-                    "type": "clk_en_rst",
-                },
-                "descr": "Clock, clock enable and async reset",
-            }
-        ],
     }
     #
     # Ports
     #
     attributes_dict["ports"] = [
+        {
+            "name": "clk_en_rst_s",
+            "signals": {
+                "type": "clk_en_rst",
+            },
+            "descr": "Clock, clock enable and async reset",
+        },
         {
             "name": "reset_i",
             "descr": "Reset signal",
@@ -180,6 +178,7 @@ def setup(py_params_dict):
             ],
         },
     ]
+    # Generate wires for muxers and demuxers
     for signal, direction, width, _ in axil_signals:
         if direction == "input":
             # Demux signals
@@ -189,7 +188,7 @@ def setup(py_params_dict):
                     "descr": f"Input of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal,
+                            "name": "input_" + signal + "_i",
                         },
                     ],
                 },
@@ -222,7 +221,7 @@ def setup(py_params_dict):
                     "descr": f"Output of {signal} demux",
                     "signals": [
                         {
-                            "name": "input_" + signal,
+                            "name": "input_" + signal + "_o",
                         },
                     ],
                 },
@@ -231,6 +230,7 @@ def setup(py_params_dict):
     # Blocks
     #
     attributes_dict["subblocks"] = [
+        # Read blocks
         {
             "core_name": "iob_reg_re",
             "instance_name": "read_sel_reg_re",
@@ -245,6 +245,7 @@ def setup(py_params_dict):
                 "data_o": "read_sel_reg_data_o",
             },
         },
+        # Write blocks
         {
             "core_name": "iob_reg_re",
             "instance_name": "write_sel_reg_re",
@@ -260,6 +261,7 @@ def setup(py_params_dict):
             },
         },
     ]
+    # Generate muxers and demuxers
     for signal, direction, width, sig_type in axil_signals:
         if direction == "input":
             # Demuxers
@@ -305,8 +307,8 @@ def setup(py_params_dict):
             # Extract output selection bits from address
             "verilog_code": f"""
    assign read_sel = input_axil_araddr_i[{ADDR_W-1}-:{NBITS}];
-   assign write_sel = input_axil_awaddr_i[{ADDR_W-1}-:{NBITS}];
    assign read_sel_reg_en = input_axil_arvalid_i;
+   assign write_sel = input_axil_awaddr_i[{ADDR_W-1}-:{NBITS}];
    assign write_sel_reg_en = input_axil_awvalid_i;
 """,
         },

@@ -4,8 +4,13 @@
 
 import copy
 
-def setup(py_params_dict):
 
+def setup(py_params_dict):
+    """Memory wrapper core. Inteended to be used as a superblock of other cores.
+    Required memories are automatically generated based on the ports of the instantiator (subblock).
+    """
+
+    # List of supported memory interfaces (usually taken from if_gen.py)
     mem_if_names = py_params_dict["mem_if_names"]
     attrs = py_params_dict["instantiator"]
 
@@ -13,7 +18,7 @@ def setup(py_params_dict):
         "name": f"{attrs['name']}_mwrap",
         "generate_hw": True,
         "version": "0.1",
-        "confs": attrs['confs'],
+        "confs": attrs["confs"],
     }
 
     mwrap_wires = []
@@ -34,37 +39,33 @@ def setup(py_params_dict):
 
     attributes_dict["subblocks"] = [
         {
-            "core_name": attrs['name'],
+            "core_name": attrs["original_name"],
             "instance_name": f"{attrs['name']}_inst",
             "instance_description": "Wrapped module",
             "parameters": {
-                i["name"]: i["name"]
-                for i in attrs["confs"]
-                if i["type"] in ["P", "F"]
+                i["name"]: i["name"] for i in attrs["confs"] if i["type"] in ["P", "F"]
             },
-            "connect": {
-                i["name"]: i["name"] for i in attrs["ports"]
-            },
+            "connect": {i["name"]: i["name"] for i in attrs["ports"]},
         }
     ]
 
     for wire in mwrap_wires:
-        if wire["signals"]["prefix"]:
+        if wire["signals"].get("prefix", None):
             prefix_str = wire["signals"]["prefix"]
         else:
-            prefix_str = wire["name"] + '_'
+            prefix_str = wire["name"] + "_"
         attributes_dict["subblocks"].append(
             {
                 "core_name": f"iob_{wire['signals']['type']}",
-                "instance_name": f"{prefix_str}_mem",
+                "instance_name": f"{prefix_str}mem",
                 "parameters": {
-                    "DATA_W": f"{prefix_str.upper()}_DATA_W",
-                    "ADDR_W": f"{prefix_str.upper()}_ADDR_W",
-                    "HEXFILE": f"{prefix_str.upper()}_HEXFILE",
+                    "DATA_W": f"{prefix_str.upper()}DATA_W",
+                    "ADDR_W": f"{prefix_str.upper()}ADDR_W",
+                    "HEXFILE": f"{prefix_str.upper()}HEXFILE",
                 },
                 "connect": {
                     f"{wire['signals']['type']}_s": wire["name"],
-                }
+                },
             }
         )
 

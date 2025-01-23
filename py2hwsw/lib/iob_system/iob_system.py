@@ -22,7 +22,7 @@ def setup(py_params_dict):
         "mem_addr_w": 24,
         "bootrom_addr_w": 12,
         "fw_addr": 0,
-        "fw_addr_w": 15,
+        "fw_addr_w": 18,
         "include_tester": True,
     }
 
@@ -31,7 +31,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": params["name"],
         "generate_hw": True,
-        "version": "0.7",
+        "version": "0.8",
         "is_system": True,
         "board_list": ["aes_ku040_db_g"],
         "confs": [
@@ -149,6 +149,31 @@ def setup(py_params_dict):
                 "min": "1",
                 "max": "4",
             },
+            # False-parameters needed for auto-generated memory wrapper
+            {
+                "name": "BOOTROM_MEM_ADDR_W",
+                "descr": "",
+                "type": "F",
+                "val": params["bootrom_addr_w"] - 2,
+                "min": "1",
+                "max": "32",
+            },
+            {
+                "name": "BOOTROM_MEM_DATA_W",
+                "descr": "",
+                "type": "F",
+                "val": params["data_w"],
+                "min": "1",
+                "max": "32",
+            },
+            {
+                "name": "BOOTROM_MEM_HEXFILE",
+                "descr": "Bootloader file name",
+                "type": "F",
+                "val": f'"{params["name"]}_bootrom.hex"',
+                "min": "NA",
+                "max": "NA",
+            },
         ],
     }
     attributes_dict["ports"] = [
@@ -161,8 +186,8 @@ def setup(py_params_dict):
         },
         {
             "name": "rom_bus_m",
-            "descr": "Ports for connection with ROM memory",
-            "signals": {"type": "rom_sp"},
+            "descr": "Ports for connection with boot ROM memory",
+            "signals": {"type": "rom_sp", "prefix": "bootrom_mem_"},
         },
         {
             "name": "int_mem_axi_m",
@@ -392,10 +417,10 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_axi_interconnect2",
-            "name": params["name"] + "_axi_interconnect",
-            "instance_name": "iob_axi_interconnect",
-            "instance_description": "AXI interconnect instance",
+            "core_name": "iob_axi_full_xbar",
+            "name": params["name"] + "_axi_full_xbar",
+            "instance_name": "iob_axi_full_xbar",
+            "instance_description": "AXI full xbar instance",
             "parameters": {
                 "ID_W": "AXI_ID_W",
                 "LEN_W": "AXI_LEN_W",

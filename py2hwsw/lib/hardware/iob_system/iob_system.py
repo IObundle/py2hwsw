@@ -21,7 +21,7 @@ def setup(py_params_dict):
         "data_w": 32,
         "mem_addr_w": 24,
         "bootrom_addr_w": 12,
-        "fw_addr": 0,
+        "fw_baseaddr": 0,
         "fw_addr_w": 15,
         "include_tester": True,
     }
@@ -85,10 +85,10 @@ def setup(py_params_dict):
                 "max": "32",
             },
             {  # Needed for software
-                "name": "FW_ADDR",
+                "name": "FW_BASEADDR",
                 "descr": "Firmware address",
                 "type": "M",
-                "val": params["fw_addr"],
+                "val": params["fw_baseaddr"],
                 "min": "0",
                 "max": "0x7FFFFFFF",
             },

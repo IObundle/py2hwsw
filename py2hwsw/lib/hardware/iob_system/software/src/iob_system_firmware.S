@@ -6,7 +6,7 @@
 #include "iob_system_periphs.h"
 #include "iob_system_system.h"
 
-#define STACK_ADDR (IOB_SYSTEM_FW_ADDR + (1 << IOB_SYSTEM_FW_ADDR_W))
+#define STACK_ADDR (IOB_SYSTEM_FW_BASEADDR + (1 << IOB_SYSTEM_FW_ADDR_W))
 
 .section .init
 .globl main

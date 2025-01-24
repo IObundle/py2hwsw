@@ -29,29 +29,41 @@ be ported seamlessly between FPGA and ASIC flows.
 
 ### Installation
 
-Py2HWSW runs on [nix-shell](https://nixos.org/download.html#nix-install-linux)
-and self-installs when an example is run. Alternatively, manually install
-the program and all its dependencies listed in the [py2hwsw default.nix
-file](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/default.nix).
+Py2HWSW runs on a Nix shell. First, download and install
+[nix-shell](https://nixos.org/download.html#nix-install-linux).
+
+Py2HWSW will self-install when nix-shell is run in a directory that contains the
+[py2hwsw default.nix
+file](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/default.nix). All
+dependencies will also be installed.
+
+Alternatively, it is possible but more complex to install Py2HWSW and its
+dependencies manually. The explanation of the manual installation process is
+beyond the scope of this README. To do that, check the list of dependencies in
+the default.nix file and figure out how to install them on your system.
 
 
-## Usage example
+## Usage
 
 The Py2HWSW framework's leading usage example is
 [IOb-SoC](https://github.com/IObundle/iob-soc), a System-on-Chip (SoC) template
 comprising an open-source RISC-V processor, a memory subsystem, and a UART.
 
-### Build user guide
+Simpler examples, including the submodules used in IOb-SoC, are available in the
+python/lib directory. Follow its README.md file for more information.
 
-Py2HWSW can generate a user guide with LaTeX using the `--py2hwsw_docs` argument.
 
-To generate a documentation directory with the user guide sources and build it, run:
+### User Guide
+
+A preliminary version of the Py2HWSW user guide can be found
+[here](py2hwsw/py2hwsw_document/document/ug.pdf).  This user guide is a work in
+progress and will be updated as the project evolves. It uses LaTeX and can be
+built with the following command:
+
 ```bash
-py2hwsw --py2hwsw_docs
-make -C py2hwsw_docs/document/ build
+make -C py2hwsw/lib doc-build
 ```
 
-A prebuilt user guide can be found [here](py2hwsw/py2hwsw_document/document/ug.pdf).
 
 ## Funding
 

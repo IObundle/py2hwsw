@@ -52,7 +52,7 @@ def setup(py_params_dict):
                     "ADDR_W": 3 - 2,  # Same as `IOB_UART_CSRS_ADDR_W - 2 lsbs
                     "DATA_W": "DATA_W",
                 },
-                "descr": "CPU native interface",
+                "descr": "Control and Status Registers interface",
             },
             {
                 "name": "rs232_m",

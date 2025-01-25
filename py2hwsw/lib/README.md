@@ -168,12 +168,3 @@ black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://gith
         format:
            @./lib/scripts/sw_format.py clang
         ```
-
-## Tests
-Currently tests are automated for the memory modules in the `test.mk` makefile.
-Run tests for all memory modules with the command: 
-```
-make -f test.mk test
-```
-
-

@@ -879,7 +879,7 @@ class csr_gen:
                 "instance_description": "rdata register",
                 "parameters": {
                     "DATA_W": 8 * self.cpu_n_bytes,
-                    "RST_VAL": "1'b0",
+                    "RST_VAL": f"{8 * self.cpu_n_bytes}'b0",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",

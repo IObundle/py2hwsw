@@ -13,15 +13,19 @@ REMOTE_LINT_DIR=$(REMOTE_BUILD_DIR)/hardware/lint
 
 LINT_TOP=$(NAME)
 
-VHDR=$(wildcard ../src/*.vh)
+INCLUDE_DIRS+=.
+INCLUDE_DIRS+=../src
+INCLUDE_DIRS+=../simulation/src
+
 VSRC=$(wildcard ../src/*.v)
+VSRC=$(wildcard ../simulation/src/*.v)
 
 $(NAME)_files.list: $(VSRC)
 
 $(VSRC):
 	@ls $@ >> $(NAME)_files.list
 
-LINTER?=verilator
+LINTER ?=verilator
 RSYNC_ROOT_DIR=../..
 include $(LINTER).mk
 

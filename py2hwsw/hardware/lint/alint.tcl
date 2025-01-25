@@ -4,9 +4,11 @@
 
 set TOP [lindex $argv 0]
 set CSR_IF [lindex $argv 1]
+set INCLUDE_DIRS [lindex $argv 3]
 
 puts "TOP: $TOP"
 puts "CSR_IF: $CSR_IF"
+puts "INCLUDE_DIRS: $INCLUDE_DIRS"
 
 set WS alint/$TOP\_ws
 set PRJ $TOP\_prj
@@ -27,7 +29,9 @@ puts "Reading files"
 
 
 #includes
-project.pref.vlogdirs -path ../src/
+foreach dir $INCLUDE_DIRS {
+    project.pref.vlogdirs -path $dir
+}
 
 workspace.file.add -destination $PRJ -f $TOP\_files.list
 

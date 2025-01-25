@@ -9,6 +9,7 @@ SHELL:=bash
 export SIMULATOR ?= icarus
 export SYNTHESIZER ?= yosys
 export BOARD ?= cyclonev_gt_dk
+export LINTER ?= spyglass
 
 include config_build.mk
 
@@ -92,9 +93,8 @@ pc-emul-clean:
 # LINT
 #
 
-LINTER ?= spyglass
 LINT_DIR=hardware/lint
-lint-run:
+lint-run: $(BSP_VH)
 	make -C $(LINT_DIR) run
 
 lint-clean:

@@ -159,6 +159,7 @@ def setup(py_params_dict):
                 },
                 "descr": "Clock, clock enable and reset",
             },
+            # FIXME: Cbus is now generated automatically. This port cannot be manually added here.
             {
                 "name": "cbus_s",
                 "signals": {

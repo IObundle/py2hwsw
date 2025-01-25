@@ -68,14 +68,6 @@ def setup(py_params_dict):
                 },
                 "descr": "Clock, clock enable and reset",
             },
-            {
-                "name": "cbus_s",
-                "signals": {
-                    "type": "iob",
-                    **params["csr_if_widths"],
-                },
-                "descr": "CPU native interface",
-            },
         ],
     }
     for idx in range(N_INPUTS):
@@ -179,7 +171,7 @@ def setup(py_params_dict):
             ],
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "control_if_s": "cbus_s",
+                # 'control_if_m' port connected automatically
                 **reg_connections,
             },
         },

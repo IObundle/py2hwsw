@@ -45,7 +45,7 @@ def setup(py_params_dict):
                         "core_name": py_params_dict["instantiator"]["original_name"],
                         "instance_name": "SUT",
                         "instance_description": "System Under Test (SUT) to be verified by this tester.",
-                        # "peripheral_addr_w": 4,  # Width of cbus of this peripheral. Only applies if SUT has CSRs (via regfileif).
+                        # "is_peripheral": True,  # Only applies if SUT has CSRs (via regfileif).
                         "parameters": {
                             "AXI_ID_W": "AXI_ID_W",
                             "AXI_LEN_W": "AXI_LEN_W",
@@ -63,7 +63,7 @@ def setup(py_params_dict):
                         "core_name": "iob_uart",
                         "instance_name": "UART1",
                         "instance_description": "UART peripheral for communication with SUT.",
-                        "peripheral_addr_w": 3,  # Width of cbus of this peripheral
+                        "is_peripheral": True,
                         "parameters": {},
                         "connect": {
                             "clk_en_rst_s": "clk_en_rst_s",

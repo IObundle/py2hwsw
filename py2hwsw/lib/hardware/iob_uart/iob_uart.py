@@ -21,14 +21,6 @@ def setup(py_params_dict):
                 "descr": "Data bus width.",
             },
             {
-                "name": "ADDR_W",
-                "type": "P",
-                "val": "3",  # Same as `IOB_UART_CSRS_ADDR_W
-                "min": "NA",
-                "max": "NA",
-                "descr": "Address bus width",
-            },
-            {
                 "name": "RST_POL",
                 "type": "M",
                 "val": "1",
@@ -44,15 +36,6 @@ def setup(py_params_dict):
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
-            },
-            {
-                "name": "cbus_s",
-                "signals": {
-                    "type": CSR_IF,
-                    "ADDR_W": 3 - 2,  # Same as `IOB_UART_CSRS_ADDR_W - 2 lsbs
-                    "DATA_W": "DATA_W",
-                },
-                "descr": "Control and Status Registers interface",
             },
             {
                 "name": "rs232_m",
@@ -166,13 +149,13 @@ def setup(py_params_dict):
             },
         ],
         "subblocks": [
+            # iob_csrs 'control_if_s' port is connected automatically by py2hwsw
             f"""iob_csrs csrs_inst 
 				-d 'Control/Status Registers' 
                 --no_autoaddr 
                 --rw_overlap 
                 -c 
                     "clk_en_rst_s":"clk_en_rst_s"
-                    "control_if_s":"cbus_s"
                     "softreset_o":"softreset"
                     "div_o":"div"
                     "txdata_io":"txdata"

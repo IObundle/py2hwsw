@@ -204,10 +204,15 @@ class iob_core(iob_module, iob_instance):
 
         # Read 'attributes' dictionary and set corresponding core attributes
         superblocks = attributes.pop("superblocks", [])
+        # Note: Parsing attributes (specifically the subblocks list) also causes the setup process for subblocks to run
         self.parse_attributes_dict(attributes)
 
         # Connect ports of this instance to external wires (wires of the instantiator)
         self.connect_instance_ports(connect, self.instantiator)
+
+        # iob_csrs specific code
+        if self.is_system:
+            self.__fix_subblock_cbus_widths()
 
         # Create memory wrapper for top module if any memory interfaces are used
         if self.is_top_module or self.is_tester:
@@ -457,6 +462,34 @@ class iob_core(iob_module, iob_instance):
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
             self.set_default_attribute("build_dir", __class__.global_build_dir)
 
+    def __fix_subblock_cbus_widths(self):
+        """Used specifically for iob_system type cores
+        Goes through subblocks list, and fixes address widths of cbus interfaces to match the peripheral's cbus port
+        Assumes peripheral has a cbus port of type "iob".
+        """
+        assert (
+            self.is_system
+        ), "Internal error: only iob_system type cores need fixing cbus width"
+        for subblock_group in self.subblocks:
+            for subblock in subblock_group.blocks:
+                for port in subblock.ports:
+                    if (
+                        port.name == "cbus_s"
+                        and port.interface.type == "iob"
+                        and port.e_connect
+                    ):
+                        # print(
+                        #     "DEBUG",
+                        #     self.name,
+                        #     port,
+                        #     file=sys.stderr,
+                        # )
+                        port_width = port.interface.widths["ADDR_W"]
+                        external_wire_prefix = port.e_connect.interface.prefix
+                        port.e_connect_bit_slices = [
+                            f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
+                        ]
+
     def __connect_memory(self, port, instantiator):
         """Create memory port in instantiatior and connect it to self"""
         _name = f"{port.name}"
@@ -516,6 +549,35 @@ class iob_core(iob_module, iob_instance):
                     and not self.is_tester
                 ):
                     self.__connect_memory(port, instantiator)
+        # iob_csrs specific code
+        if self.original_name == "iob_csrs":
+            self.__connect_cbus_port(instantiator)
+
+    def __connect_cbus_port(self, instantiator):
+        """Automatically adds "cbus_s" port to instantiators of iob_csrs (are usually iob_system peripherals).
+        Also, connects the newly created instantiator port to the iob_csrs `control_if_s` port.
+        :param instantiator: Instantiator core object
+        """
+        assert (
+            self.original_name == "iob_csrs"
+        ), "Internal error: cbus can only be created for instantiator of 'iob_csrs' module."
+        # Find CSR control port in iob_csrs, and copy its properites to a newly generated "cbus_s" port of instantiator
+        csrs_port = find_obj_in_list(self.ports, "control_if_s")
+
+        # Don´t create cbus_s port if it already exists (user may have created it manually)
+        if find_obj_in_list(instantiator.ports, "cbus_s"):
+            return
+
+        instantiator.create_port(
+            name="cbus_s",
+            signals={
+                "type": csrs_port.interface.type,
+                **csrs_port.interface.widths,
+            },
+            descr="Control and Status Registers interface (auto-generated)",
+        )
+        # Connect newly created port to self
+        csrs_port.connect_external(instantiator.ports[-1], bit_slices=[])
 
     def __create_memwrapper(self, superblocks):
         """Create memory wrapper for top module"""

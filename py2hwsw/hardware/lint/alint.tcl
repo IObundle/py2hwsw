@@ -35,34 +35,39 @@ foreach dir $INCLUDE_DIRS {
 
 workspace.file.add -destination $PRJ -f $TOP\_files.list
 
-# Open the sdc files for reading
-set sdcfile1 [open "../syn/umc130/$TOP\_dev.sdc" "r"]
-set sdcfile2 [open "../syn/src/$TOP\.sdc" "r"]
-set sdcfile3 [open "../syn/src/$TOP\_$CSR_IF.sdc" "r"]
-set sdcfile4 [open "../syn/$TOP\_tool.sdc" "r"]
+# List of SDC files to open
+set sdcFiles {
+    "../syn/umc130/$TOP_dev.sdc"
+    "../syn/src/$TOP.sdc"
+    "../syn/src/$TOP_$CSR_IF.sdc"
+    "../syn/$TOP_tool.sdc"
+}
 
 # Open the output file for writing
 set outfile [open "merged.sdc" "w"]
 
-# Read the contents of the cdc files
-set contents1 [read $sdcfile1]
-set contents2 [read $sdcfile2]
-set contents3 [read $sdcfile3]
-set contents4 [read $sdcfile4]
+# Loop through each SDC file
+foreach sdcFile $sdcFiles {
+    # Check if the file exists before trying to open it
+    if {[file exists $sdcFile]} {
+        # Open the SDC file for reading
+        set sdcFileHandle [open $sdcFile "r"]
+        
+        # Read the contents of the SDC file
+        set contents [read $sdcFileHandle]
+        
+        # Write the contents to the output file
+        puts $outfile $contents
+        
+        # Close the SDC file
+        close $sdcFileHandle
+    } else {
+        puts "Warning: File $sdcFile does not exist."
+    }
+}
 
-# Write the contents of the sdc files to the output file
-puts $outfile $contents1
-puts $outfile $contents2
-puts $outfile $contents3
-puts $outfile $contents4
-
-# Close the input and output files
-close $sdcfile1
-close $sdcfile2
-close $sdcfile3
-close $sdcfile4
+# Close the output file
 close $outfile
-
 
 workspace.file.add -destination $PRJ merged.sdc
 

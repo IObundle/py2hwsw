@@ -8,6 +8,8 @@ SHELL:=bash
 
 include ../../config_build.mk
 
+LINTER ?=verilator
+
 REMOTE_BUILD_DIR=$(USER)/$(BUILD_DIR_NAME)
 REMOTE_LINT_DIR=$(REMOTE_BUILD_DIR)/hardware/lint
 
@@ -20,12 +22,16 @@ INCLUDE_DIRS+=../simulation/src
 VSRC=$(wildcard ../src/*.v)
 VSRC=$(wildcard ../simulation/src/*.v)
 
+#include local lint segment
+ifneq ($(wildcard lint_build.mk),)
+include lint_build.mk
+endif
+
 $(NAME)_files.list: $(VSRC)
 
 $(VSRC):
 	@ls $@ >> $(NAME)_files.list
 
-LINTER ?=verilator
 RSYNC_ROOT_DIR=../..
 include $(LINTER).mk
 

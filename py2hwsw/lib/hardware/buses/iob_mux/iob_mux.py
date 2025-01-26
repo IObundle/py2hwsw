@@ -32,7 +32,7 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "sel_i",
-                        "width": "($clog2(N)+($clog2(N)==0))",
+                        "width": "($clog2(N) == 0 ? 1 : $clog2(N))",
                     },
                 ],
             },

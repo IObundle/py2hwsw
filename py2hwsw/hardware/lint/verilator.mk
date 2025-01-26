@@ -7,7 +7,7 @@
 VFLAGS+=$(addprefix -I,$(INCLUDE_DIRS))
 
 run-lint:
-	verilator --lint-only -Wall --timing $(VFLAGS) $(VSRC)
+	verilator --lint-only -Wall --timing $(VFLAGS) verilator_config.vlt $(VSRC)
 
 clean-lint:
 

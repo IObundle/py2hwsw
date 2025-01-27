@@ -485,7 +485,7 @@ def setup(py_params_dict):
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "cbus_s": (
+                "iob_bootrom_csrs_cbus_s": (
                     "bootrom_cbus",
                     [
                         "{1'b0, bootrom_axi_arlock}",
@@ -538,7 +538,7 @@ def setup(py_params_dict):
             "core_name": "iob_uart",
             "instance_name": "UART0",
             "instance_description": "UART peripheral",
-            "peripheral_addr_w": 3,
+            "is_peripheral": True,  # This attribute signals to iob_system scripts that this block is a peripheral
             "parameters": {},
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
@@ -550,14 +550,14 @@ def setup(py_params_dict):
             "core_name": "iob_timer",
             "instance_name": "TIMER0",
             "instance_description": "Timer peripheral",
-            "peripheral_addr_w": 4,
+            "is_peripheral": True,
             "parameters": {},
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 # Cbus connected automatically
             },
         },
-        # NOTE: Instantiate other peripherals here, using the 'peripheral_addr_w' flag
+        # NOTE: Instantiate other peripherals here, using the 'is_peripheral' flag
         #
         # Modules that need to be setup, but are not instantiated directly inside
         # 'iob_system' Verilog module

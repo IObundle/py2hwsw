@@ -55,8 +55,8 @@ def setup(py_params_dict):
     confs = [
         {
             "name": "ADDR_W",
-            "type": "P",
-            "val": "ND",
+            "type": "F",
+            "val": "ND",  # ret automatically
             "min": "0",
             "max": "32",
             "descr": "Address bus width",
@@ -101,7 +101,7 @@ def setup(py_params_dict):
                 "name": "control_if_s",
                 "signals": {
                     "type": params["csr_if"],
-                    "ADDR_W": "ADDR_W - 2",
+                    # ADDR_W set automatically
                     "DATA_W": "DATA_W",
                     **if_gen_params,
                 },
@@ -183,8 +183,10 @@ def setup(py_params_dict):
     # TODO: Append csr_if to config_build.mk ?
     # file2create.write(f"CSR_IF={python_module.csr_if}\n\n")
 
-    # Set correct address width macro
+    # Set correct address width in ADDR_W (false-)parameter
     attributes_dict["confs"][0]["val"] = csr_gen_obj.core_addr_w
+    # Set correct address width in control_if port (ADDR_W - 2 lsbs)
+    attributes_dict["ports"][1]["signals"]["ADDR_W"] = csr_gen_obj.core_addr_w - 2
 
     return attributes_dict
 

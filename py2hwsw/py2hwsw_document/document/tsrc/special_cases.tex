@@ -1,0 +1,15 @@
+% SPDX-FileCopyrightText: 2024 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+Most of the cores provived by the py2hwsw's library are built using the standard interfaces mentioned in section~\ref{sec:py2_standard_interfaces}.
+
+However, there are some cores that due to limitations of the standard interfaces, rely instead on internal py2hwsw methods for extra features.
+The following list describes the cores don't rely solely on the standard interfaces.
+
+\begin{itemize}
+\item \textbf{iob\_system}: This core uses the `is\_system` attribute to enable an internal py2hwsw method that automatically fixes the address widths of the cbus interfaces of the system's peripherals.
+\item \textbf{iob\_csrs}: The py2hwsw tool contains an internal method to automatically search for the "iob\_csrs" subblock and insert a "<prefix>\_cbus\_s" port on the instantiator core of this subblock. It then connects this newly created "<prefix>\_cbus\_s" port of the instantiator core to the iob\_csrs "control\_if\_s" port. The '<prefix>' is replaced by instance name of iob\_csrs subblock.
+\end{itemize}
+
+

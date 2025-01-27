@@ -9,14 +9,6 @@ def setup(py_params_dict):
         "generate_hw": True,
         "confs": [
             {
-                "name": "ADDR_W",
-                "type": "P",
-                "val": 7,  # Same as CSRS_ADDR_W
-                "min": 0,
-                "max": 32,
-                "descr": "Address bus width",
-            },
-            {
                 "name": "DATA_W",
                 "type": "P",
                 "val": 32,
@@ -32,15 +24,6 @@ def setup(py_params_dict):
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
-            },
-            {
-                "name": "cbus_s",
-                "signals": {
-                    "type": "iob",
-                    "ADDR_W": "ADDR_W - 2",
-                    "DATA_W": "DATA_W",
-                },
-                "descr": "CPU native interface",
             },
         ],
         "wires": [
@@ -415,7 +398,7 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_csrs",
-                "instance_name": "csrs_inst",
+                "instance_name": "iob_csrs_demo_csrs",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
                     {
@@ -536,7 +519,7 @@ def setup(py_params_dict):
                 "csr_if": "iob",
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "control_if_s": "cbus_s",
+                    # 'control_if_m' port connected automatically
                     #
                     # Register interfaces
                     #

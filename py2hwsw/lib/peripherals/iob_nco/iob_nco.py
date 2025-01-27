@@ -18,14 +18,6 @@ def setup(py_params_dict):
                 "descr": "Data bus width",
             },
             {
-                "name": "ADDR_W",
-                "type": "P",
-                "val": "4",  # Same as `IOB_NCO_CSRS_ADDR_W
-                "min": "0",
-                "max": "32",
-                "descr": "Address bus width",
-            },
-            {
                 "name": "PERIOD_W",
                 "type": "F",
                 "val": "2*DATA_W",
@@ -49,15 +41,6 @@ def setup(py_params_dict):
                     "type": "clk_en_rst",
                 },
                 "descr": "clock, clock enable and reset",
-            },
-            {
-                "name": "iob_s",
-                "signals": {
-                    "type": "iob",
-                    "ADDR_W": 4 - 2,  # Same as `IOB_NCO_CSRS_ADDR_W - 2
-                    "DATA_W": "DATA_W",
-                },
-                "descr": "CPU native interface",
             },
             {
                 "name": "clk_gen_io",
@@ -124,7 +107,7 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_csrs",
-                "instance_name": "csrs_inst",
+                "instance_name": "iob_nco_csrs",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
                     {
@@ -172,7 +155,7 @@ def setup(py_params_dict):
                 ],
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "control_if_s": "iob_s",
+                    # 'control_if_m' port connected automatically
                     # Register interfaces
                     "soft_reset_o": "soft_reset",
                     "enable_o": "enable",

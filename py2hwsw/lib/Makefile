@@ -46,8 +46,10 @@ fpga-run: fpga-build
 doc-build:
 	nix-shell --run "py2hwsw --py2hwsw_docs && make -C py2hwsw_docs/document/ build"
 
+doc-update: doc-build
+	cp py2hwsw_docs/document/ug.pdf ../py2hwsw_document/document/ug.pdf
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean
+.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build doc-update
 
 
 # Install board server and client

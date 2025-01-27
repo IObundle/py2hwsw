@@ -150,7 +150,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             # iob_csrs 'control_if_s' port is connected automatically by py2hwsw
-            f"""iob_csrs csrs_inst 
+            f"""iob_csrs iob_uart_csrs 
 				-d 'Control/Status Registers' 
                 --no_autoaddr 
                 --rw_overlap 

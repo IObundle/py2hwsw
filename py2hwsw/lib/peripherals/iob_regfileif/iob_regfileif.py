@@ -159,24 +159,6 @@ def setup(py_params_dict):
                 },
                 "descr": "Clock, clock enable and reset",
             },
-            # FIXME: Cbus is now generated automatically. This port cannot be manually added here.
-            {
-                "name": "cbus_s",
-                "signals": {
-                    "type": params["internal_csr_if"],
-                    **params["internal_csr_if_widths"],
-                },
-                "descr": "Internal CPU native interface. Registers have their direction inverted from this CPU's perspective.",
-            },
-            {
-                "name": "external_control_if_s",
-                "signals": {
-                    "type": params["external_csr_if"],
-                    "prefix": "external_",
-                    **params["external_csr_if_widths"],
-                },
-                "descr": "External CPU native interface.",
-            },
         ],
         "wires": reg_wires
         + [
@@ -194,12 +176,12 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_csrs",
-                "instance_name": "csrs_external",
+                "instance_name": "iob_regfileif_csrs_external",
                 "instance_description": "Control/Status Registers for external CPU",
                 "csrs": params["csrs"],
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "control_if_s": "external_control_if_s",
+                    # iob_csrs 'control_if_s' port is connected automatically by py2hwsw
                     **external_reg_connections,
                 },
                 "csr_if": params["external_csr_if"],
@@ -210,12 +192,12 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_csrs",
                 "name": attributes_dict["name"] + "_inverted_csrs",
-                "instance_name": "csrs_internal_inverted",
+                "instance_name": "iob_regfileif_csrs",
                 "instance_description": "Control/Status Registers for internal CPU (inverted registers)",
                 "csrs": csrs_inverted,
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "control_if_s": "cbus_s",
+                    # iob_csrs 'control_if_s' port is connected automatically by py2hwsw
                     **internal_reg_connections,
                 },
                 "csr_if": params["internal_csr_if"],

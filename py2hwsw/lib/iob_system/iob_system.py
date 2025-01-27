@@ -485,7 +485,7 @@ def setup(py_params_dict):
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "cbus_s": (
+                "iob_bootrom_csrs_cbus_s": (
                     "bootrom_cbus",
                     [
                         "{1'b0, bootrom_axi_arlock}",
@@ -538,7 +538,7 @@ def setup(py_params_dict):
             "core_name": "iob_uart",
             "instance_name": "UART0",
             "instance_description": "UART peripheral",
-            "is_peripheral": True,
+            "is_peripheral": True,  # This attribute signals to iob_system scripts that this block is a peripheral
             "parameters": {},
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",

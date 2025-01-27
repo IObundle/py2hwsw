@@ -474,7 +474,7 @@ class iob_core(iob_module, iob_instance):
             for subblock in subblock_group.blocks:
                 for port in subblock.ports:
                     if (
-                        port.name == "cbus_s"
+                        port.name == subblock.original_name + "_csrs_cbus_s"
                         and port.interface.type == "iob"
                         and port.e_connect
                     ):
@@ -554,24 +554,22 @@ class iob_core(iob_module, iob_instance):
             self.__connect_cbus_port(instantiator)
 
     def __connect_cbus_port(self, instantiator):
-        """Automatically adds "cbus_s" port to instantiators of iob_csrs (are usually iob_system peripherals).
+        """Automatically adds "<prefix>_cbus_s" port to instantiators of iob_csrs (are usually iob_system peripherals).
+        The '<prefix>' is replaced by instance name of iob_csrs subblock.
         Also, connects the newly created instantiator port to the iob_csrs `control_if_s` port.
         :param instantiator: Instantiator core object
         """
         assert (
             self.original_name == "iob_csrs"
         ), "Internal error: cbus can only be created for instantiator of 'iob_csrs' module."
-        # Find CSR control port in iob_csrs, and copy its properites to a newly generated "cbus_s" port of instantiator
+        # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of instantiator
         csrs_port = find_obj_in_list(self.ports, "control_if_s")
 
-        # Don´t create cbus_s port if it already exists (user may have created it manually)
-        if find_obj_in_list(instantiator.ports, "cbus_s"):
-            return
-
         instantiator.create_port(
-            name="cbus_s",
+            name=f"{self.instance_name}_cbus_s",
             signals={
                 "type": csrs_port.interface.type,
+                "prefix": self.instance_name + "_",
                 **csrs_port.interface.widths,
             },
             descr="Control and Status Registers interface (auto-generated)",

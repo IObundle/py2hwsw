@@ -117,27 +117,29 @@
 \end{frame}
 
 
-\begin{frame}{Instantiate an IP core in your SoC}
+\begin{frame}[fragile]{Instantiate an IP core in your SoC}
   \begin{itemize}
   \item The Timer IP core in \href{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/peripherals/iob_timer} is used here as an example
-  \item Add the Timer IP core to the list of subblocks in the {\tt iob\_system.py} file:\\
-    \begin{lstlisting}
-    attributes_dict["subblocks"] = [
-        {
-            "core_name": "iob_timer",
-            "instance_name": "TIMER0",
-            "instance_description": "Timer peripheral",
-            "is_peripheral": True,  # This attribute signals to iob\_system scripts that this block is a peripheral
-            "parameters": {},
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                # Cbus connected automatically
-            },
-        },
-      ]
-    \end{lstlisting}
+  \item Add the Timer IP core to the list of subblocks in the {\tt iob\_system.py} file:
+    \begin{tiny}
+      \begin{lstlisting}
+attributes_dict["subblocks"] = [
+  {
+    "core_name": "iob_timer",
+    "instance_name": "TIMER0",
+    "instance_description": "Timer peripheral",
+    "is_peripheral": True,  # This attribute signals to iob\_system scripts that this block is a peripheral
+    "parameters": {},
+    "connect": {
+      "clk_en_rst_s": "clk_en_rst_s",
+      # Cbus connected automatically
+    },
+  },
+]
+      \end{lstlisting}
       Ensure that the {\tt "is\_peripheral"} attribute is set to {\tt True} in the {\tt iob\_system.py} file. This attribute signals to iob\_system scripts that this block is a peripheral and should have its Control Status Registers bus (Cbus) connected automatically.
       To be able to connect the cbus port of the peripheral automatically, the iob\_system scripts expect that the cbus port is named using the following convention: {\tt <peripheral\_core\_name>\_csrs\_cbus\_s}.
+    \end{tiny}
   \end{itemize}
 \end{frame}
 

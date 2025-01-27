@@ -7,7 +7,7 @@
 set -e
 
 #find directories containing testbenches
-TBS=`find ${LIB_DIR}/hardware | grep _tb.v | grep -v include`
+TBS=`find ${LIB_DIR} | grep _tb.v | grep -v include`
 
 FILTER_OUT_TBS=""
 #for debug

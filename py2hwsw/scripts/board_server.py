@@ -4,6 +4,10 @@
 #
 # SPDX-License-Identifier: MIT
 
+import time
+import socket
+
+
 DEBUG = False
 
 
@@ -19,15 +23,12 @@ DEBUG = False
 # To check if the server is running run:
 #        > sudo make board_server_status
 
-import time
-import socket
-
 # Define the server's IP, port and version
 # Must match the client's IP and port
 
 HOST = "localhost"  # Listen on all available interfaces
 PORT = 50007  # Use a non-privileged port
-VERSION = "V0.2"
+VERSION = "V0.3"
 
 # user and duration board is needed
 USER = ""

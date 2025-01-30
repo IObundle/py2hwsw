@@ -29,7 +29,7 @@ DEBUG = False
 # Must match the server's
 HOST = "localhost"  # Use the loopback interface
 PORT = 50007  # Use the same port as the server
-VERSION = "V0.2"
+VERSION = "V0.3"
 
 # user and duration board is needed
 USER = os.environ["USER"]
@@ -47,9 +47,16 @@ simulator_run_command = None
 # Print usage and exit
 def perror():
     print(
-        f"Usage: client.py [grab [duration in seconds] -c [console launch command] [-p [fpga program command] | -s [simulator run command]] | release]"
+        f"""
+Usage: ./{sys.argv[0]} [grab [duration in seconds] -c [console launch command] [-p [fpga program command] | -s [simulator run command]] | release]
+    If -p is given then -c is required. If -s is given then -c is optional.
+    On fpga program (-p) mode, it will launch the fpga program command first, wait for it to finish, and then launch the console command.
+        In this mode, it will try to contact the `board_server` first to reserve/grab the board to avoid collisions on shared machines/boards.
+        If the `board_server` is not available, it prints a warning and runs normally.
+    On simulator run (-s) mode, it will run the simulator command and the console command in parallel.
+        In this mode, the grab duration specifies the timeout for the simulation. The `board_server` is not used in simulation mode.
+"""
     )
-    print("If -p is given then -c is required. If -s is given then -c is optional.")
     sys.exit(1)
 
 
@@ -75,9 +82,9 @@ def send_request(request):
         # Connect with the server
         try:
             s.connect((HOST, PORT))
-        except:
-            print(f"{iob_colors.FAIL}Could not connect to server{iob_colors.ENDC}")
-            sys.exit(1)
+        except Exception:
+            print(f"{iob_colors.WARNING}Could not connect to board server{iob_colors.ENDC}")
+            return
 
         # Send the request to the server
         s.sendall(request.encode("utf-8"))
@@ -204,7 +211,7 @@ if __name__ == "__main__":
         simulator_run_command
     ), f"{iob_colors.FAIL}Either `-p` or `-s` must be present with 'grab' command. (Cannot be both){iob_colors.ENDC}"
 
-    # Ensure -c is given with -p
+    # Ensure `-c` is given for `-p`
     assert (
         not fpga_prog_command or console_command
     ), f"{iob_colors.FAIL}Argument `-c` must be present with `-p`.{iob_colors.ENDC}"
@@ -213,7 +220,8 @@ if __name__ == "__main__":
     if DEBUG:
         print(f'{iob_colors.OKBLUE}DEBUG: Request is "{request}"{iob_colors.ENDC}')
 
-    # Don't send request if command is "grab" and we are in simulation mode
+    # Don't send request for "grab" command in simulation mode
+    # User may still want to send release or query commands without fpga command.
     if command != "grab" or fpga_prog_command:
         send_request(request)
 

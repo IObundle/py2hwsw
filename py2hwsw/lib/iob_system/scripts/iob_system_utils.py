@@ -160,14 +160,13 @@ def set_build_dir(attributes_dict, py_params):
 
 
 def get_iob_system_peripherals_list(attributes_dict):
-    """Parses subblocks list in iob_system attributes, for subblocks with the `peripheral_addr_w` attribute set.
-    Also removes `peripheral_addr_w` attribute from each block after adding it to the peripherals list.
+    """Parses subblocks list in iob_system attributes, for subblocks with the `is_peripheral` attribute set.
+    Also removes `is_peripheral` attribute from each block after adding it to the peripherals list.
     """
     peripherals = []
     for block in attributes_dict["subblocks"]:
-        if "peripheral_addr_w" in block and block["peripheral_addr_w"]:
-            peripherals.append({"ref": block, "addr_w": block["peripheral_addr_w"]})
-            block.pop("peripheral_addr_w")
+        if block.pop("is_peripheral", False):
+            peripherals.append(block)
     return peripherals
 
 
@@ -191,7 +190,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
     pbus_split["num_outputs"] = num_peripherals
 
     for idx, peripheral in enumerate(peripherals):
-        peripheral_name = peripheral["ref"]["instance_name"].lower()
+        peripheral_name = peripheral["instance_name"].lower()
         # Add peripheral cbus wire
         attributes_dict["wires"].append(
             {
@@ -207,12 +206,9 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
         # Connect cbus to pbus_split
         pbus_split["connect"][f"output_{idx}_m"] = f"{peripheral_name}_cbus"
         # Connect cbus to peripheral
-        peripheral["ref"]["connect"]["cbus_s"] = (
-            f"{peripheral_name}_cbus",
-            [
-                f"{peripheral_name}_cbus_iob_addr[{peripheral['addr_w']-2}-1:0]",
-            ],
-        )
+        peripheral["connect"][
+            f"{peripheral['core_name']}_csrs_cbus_s"
+        ] = f"{peripheral_name}_cbus"
 
     # Add CLINT and PLIC wires (they are not in peripherals list)
     attributes_dict["wires"] += [
@@ -259,8 +255,8 @@ def generate_peripheral_base_addresses(
 
     # Include CLINT and PLIC in peripherals list
     complete_peripherals_list = peripherals_list + [
-        {"ref": {"instance_name": "CLINT0"}},
-        {"ref": {"instance_name": "PLIC0"}},
+        {"instance_name": "CLINT0"},
+        {"instance_name": "PLIC0"},
     ]
     n_slaves_w = (len(complete_peripherals_list) - 1).bit_length()
 
@@ -271,7 +267,7 @@ def generate_peripheral_base_addresses(
     os.makedirs(os.path.dirname(out_file), exist_ok=True)
     with open(out_file, "w") as f:
         for idx, instance in enumerate(complete_peripherals_list):
-            instance_name = instance["ref"]["instance_name"]
+            instance_name = instance["instance_name"]
             f.write(
                 f"#define {instance_name}_BASE (PBUS_BASE + ({idx}<<(P_BIT-{n_slaves_w})))\n"
             )
@@ -300,8 +296,8 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
         # Create a list with every unique peripheral name, except clint, and plic
         peripheral_name_list = []
         for peripheral in peripherals:
-            if peripheral["ref"]["core_name"] not in peripheral_name_list:
-                peripheral_name_list.append(peripheral["ref"]["core_name"])
+            if peripheral["core_name"] not in peripheral_name_list:
+                peripheral_name_list.append(peripheral["core_name"])
         file.write("PERIPHERALS ?=" + " ".join(peripheral_name_list) + "\n")
         if params["use_ethernet"]:
             # Set custom ethernet CONSOLE_CMD

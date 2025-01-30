@@ -17,14 +17,6 @@ def setup(py_params_dict):
                 "descr": "Data bus width",
             },
             {
-                "name": "ADDR_W",
-                "type": "P",
-                "val": "4",  # Same as `IOB_TIMER_CSRS_ADDR_W
-                "min": "NA",
-                "max": "NA",
-                "descr": "Address bus width",
-            },
-            {
                 "name": "WDATA_W",
                 "type": "P",
                 "val": "1",
@@ -40,15 +32,6 @@ def setup(py_params_dict):
                     "type": "clk_en_rst",
                 },
                 "descr": "Clock, clock enable and reset",
-            },
-            {
-                "name": "cbus_s",
-                "signals": {
-                    "type": "iob",
-                    "ADDR_W": 4 - 2,  # Same as `IOB_TIMER_CSRS_ADDR_W -2 lsbs
-                    "DATA_W": "DATA_W",
-                },
-                "descr": "CPU native interface",
             },
         ],
         "wires": [
@@ -111,7 +94,7 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_csrs",
-                "instance_name": "csrs_inst",
+                "instance_name": "iob_timer_csrs",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
                     {
@@ -163,7 +146,7 @@ def setup(py_params_dict):
                 "csr_if": "iob",
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "control_if_s": "cbus_s",
+                    # 'control_if_m' port connected automatically
                     # Register interfaces
                     "reset_o": "reset",
                     "enable_o": "enable",

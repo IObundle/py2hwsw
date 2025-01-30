@@ -60,19 +60,6 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "cbus_s",
-                "descr": "Front-end control interface",
-                "signals": {
-                    "type": "axi",
-                    "prefix": "cbus_",
-                    # BOOTROM_ADDR_W + 1 for remaining csrs ("VERSION" csr)
-                    "ADDR_W": BOOTROM_ADDR_W - 2 + 1,
-                    "DATA_W": "DATA_W",
-                    "ID_W": "AXI_ID_W",
-                    "LEN_W": "AXI_LEN_W",
-                },
-            },
-            {
                 "name": "ext_rom_bus_m",
                 "descr": "External ROM signals",
                 "signals": {"type": "rom_sp", "prefix": "ext_rom_"},
@@ -114,7 +101,7 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_csrs",
-                "instance_name": "csrs_inst",
+                "instance_name": "iob_bootrom_csrs",
                 "version": VERSION,
                 "csrs": [
                     {
@@ -141,7 +128,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "control_if_s": "cbus_s",
+                    # 'control_if_m' port connected automatically
                     # Register interfaces
                     "rom_io": "rom",
                 },

@@ -33,7 +33,7 @@
  	\definecolor{dodgerblue}{RGB}{0, 119,202}
 \usecolortheme[named=myuniversity]{structure}
 
-\title[IOb-SoC Presentation]{IOb-SoC}
+\title[IOb-System Presentation]{IOb-System}
 \subtitle{Tutorial: Create a RISC-V-based System-on-Chip}
 \institute[IObundle Lda.]{IObundle Lda.}
 \titlegraphic{\includegraphics[height=2.5cm]{figures/Logo.png}}
@@ -67,18 +67,18 @@
   \begin{itemize}
   \item Introduction
   \item Project setup
-  \item Instantiate a RISC-V CPU in IOb-SoC
+  \item Instantiate a RISC-V CPU in IOb-System
   \item Instantiate an IP core in your SoC
   \item Write the software to drive the IP core
-  \item Simulate IOb-SoC
-  \item Run IOb-SoC on an FPGA board
+  \item Simulate IOb-System
+  \item Run IOb-System on an FPGA board
   \item Conclusion
   \end{itemize}
     \column{0.5\textwidth}
     \begin{figure}
       \centering
       \includegraphics[width=0.9\textwidth]{bd.pdf}
-      \caption{IOb-SoC block diagram}
+      \caption{IOb-System block diagram}
       \label{fig:my_label}
     \end{figure}
   \end{columns}
@@ -90,7 +90,7 @@
 \begin{center}
     \begin{itemize}
       \item Building processor-based systems from scratch is challenging
-      \item The IOb-SoC template eases this task by providing a base Verilog SoC equipped with
+      \item The IOb-System template eases this task by providing a base Verilog SoC equipped with
         \begin{itemize}
         \item a RISC-V CPU
         \item a memory system including boot ROM, RAM, 2-level cache system and an AXI4 interface to external memory (DDR)
@@ -111,23 +111,35 @@
     \item Commercial EDA tools must be installed locally or on some remote server (Vivado, Quartus, Cadence, etc) 
     \item FPGA boards must be attached to your Linux machine or to some remote server
     \item Set up {\bf ssh} access key to GitHub (\url{github.com}) (using https will ask for your password many times)
-    \item Follow the instructions in the IOb-SoC repository's README file to clone the repository and install the tools
+    \item Follow the instructions in the IOb-System repository's README file to clone the repository and install the tools
   \end{itemize}
 \end{center}
 \end{frame}
 
 
-\begin{frame}{Instantiate an IP core in your SoC}
+\begin{frame}[fragile]{Instantiate an IP core in your SoC}
   \begin{itemize}
-  \item The Timer IP core in {\tt lib/hardware/modules/iob-timer} is used here as an example
-  \item Add a symbolic link to the Timer IP core directory:\\
-    {\tt \tiny ln -s n {\tt lib/hardware/modules/iob-timer submodules/TIMER}}
-  \item Add the Timer IP core to the list of peripherals in the {\tt iob\_soc.py} file:\\
-    {\tt peripherals =  {\em TIMER}}
-  \item Add the IP core special connections in the {\tt iob\_soc.py} file:\\
-    {\tt peripheral\_portmap =  {\em ...}}
-  \item Include the Timer IP core  in the submodules list in the  {\tt iob\_soc.py} file:\\
-    {\tt submodules\_list += iob\_timer}
+  \item The Timer IP core in \href{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/peripherals/iob_timer} is used here as an example
+  \item Add the Timer IP core to the list of subblocks in the {\tt iob\_system.py} file:
+    \begin{tiny}
+      \begin{lstlisting}
+attributes_dict["subblocks"] = [
+  {
+    "core_name": "iob_timer",
+    "instance_name": "TIMER0",
+    "instance_description": "Timer peripheral",
+    "is_peripheral": True,  # This attribute signals to iob\_system scripts that this block is a peripheral
+    "parameters": {},
+    "connect": {
+      "clk_en_rst_s": "clk_en_rst_s",
+      # Cbus connected automatically
+    },
+  },
+]
+      \end{lstlisting}
+      Ensure that the {\tt "is\_peripheral"} attribute is set to {\tt True} in the {\tt iob\_system.py} file. This attribute signals to iob\_system scripts that this block is a peripheral and should have its Control Status Registers bus (Cbus) connected automatically.
+      To be able to connect the cbus port of the peripheral automatically, the iob\_system scripts expect that the cbus port is named using the following convention: {\tt <peripheral\_core\_name>\_csrs\_cbus\_s}.
+    \end{tiny}
   \end{itemize}
 \end{frame}
 
@@ -168,7 +180,7 @@ int main()
 \end{frame}
 
 
-\begin{frame}[fragile]{Simulate IOb-SoC}
+\begin{frame}[fragile]{Simulate IOb-System}
 \begin{itemize}
 \item Run the simulation with the firmware pre-initialised in the memory:\\
   {\tt make sim-run}
@@ -202,7 +214,7 @@ IOb-Console: exiting...
 \end{frame}
 
 
-\begin{frame}{Run IOb-SoC on an FPGA board (1)}
+\begin{frame}{Run IOb-System on an FPGA board (1)}
 \begin{itemize}
 \item To compile and run your SoC in one of our FPGA boards, contacts us at info@iobundle.com.
 \item To compile and run your SoC on your FPGA board, add a directory into {\tt ./hardware/fpga/<toolchain>/<new\_board>}, where <toolchain> is either *vivado* or *quartus*. Use the existing board directories as examples
@@ -217,9 +229,9 @@ IOb-Console: exiting...
 \end{frame}
 
 
-\begin{frame}[fragile]{Run IOb-SoC on an FPGA board (2)}
+\begin{frame}[fragile]{Run IOb-System on an FPGA board (2)}
 \begin{itemize}
-\item When running IOb-SoC on an FPGA with the default settings and the firmware
+\item When running IOb-System on an FPGA with the default settings and the firmware
   pre-initialised in the memory, the following should be printed:
 \end{itemize}
 
@@ -253,7 +265,7 @@ IOb-Console: exiting...
 
 \begin{frame}{Conclusion}
   \begin{itemize}
-  \item A tutorial on creating a simple SoC using IOb-SoC has been presented
+  \item A tutorial on creating a simple SoC using IOb-System has been presented
   \item The addition of an example peripheral IP core has been illustrated
   \item A simple firmware that uses the IP core driver functions has been explained
   \item RTL simulation of the system running the firmware has been demonstrated

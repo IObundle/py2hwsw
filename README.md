@@ -4,7 +4,7 @@ SPDX-FileCopyrightText: 2024 IObundle
 SPDX-License-Identifier: MIT
 -->
 
-# py2hwsw
+# Py2HWSW
 
 ## A Python framework for embedded HW/SW projects
 
@@ -27,7 +27,7 @@ Writing HDL code in a  lint-friendly fashion is tedious and error-prone.
 Py2HWSW solves this problem by generating lint-friendly and portable Verilog code that can 
 be ported seamlessly between FPGA and ASIC flows.
 
-### Installation
+## Installation
 
 Py2HWSW runs on a Nix shell. First, download and install
 [nix-shell](https://nixos.org/download.html#nix-install-linux).
@@ -50,10 +50,11 @@ The Py2HWSW framework's leading usage example is
 comprising an open-source RISC-V processor, a memory subsystem, and a UART.
 
 Simpler examples, including the submodules used in IOb-SoC, are available in the
-python/lib directory. Follow its README.md file for more information.
+[py2hwsw/lib](https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib)
+directory.
 
 
-### User Guide
+## User Guide
 
 A preliminary version of the Py2HWSW user guide can be found
 [here](py2hwsw/py2hwsw_document/document/ug.pdf).  This user guide is a work in

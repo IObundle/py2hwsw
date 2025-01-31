@@ -21,7 +21,7 @@ def setup(py_params_dict):
         "data_w": 32,
         "mem_addr_w": 24,
         "bootrom_addr_w": 12,
-        "fw_addr": 0,
+        "fw_baseaddr": 0,
         "fw_addr_w": 18,
         "include_tester": True,
     }
@@ -85,12 +85,17 @@ def setup(py_params_dict):
                 "max": "32",
             },
             {  # Needed for software
+<<<<<<< HEAD:py2hwsw/lib/iob_system/iob_system.py
                 "name": "FW_ADDR",
                 "descr": "Firmware load address.",
+=======
+                "name": "FW_BASEADDR",
+                "descr": "Firmware address",
+>>>>>>> 4482346461981a046995483da59af0cde479d8ba:py2hwsw/lib/hardware/iob_system/iob_system.py
                 "type": "M",
-                "val": params["fw_addr"],
+                "val": params["fw_baseaddr"],
                 "min": "0",
-                "max": "32",
+                "max": "0x7FFFFFFF",
             },
             {  # Needed for software
                 "name": "FW_ADDR_W",

@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import os
-import sys
 
 #
 # Functions for iob_system.py
@@ -38,8 +37,8 @@ def iob_system_scripts(attributes_dict, params, py_params):
     set_build_dir(attributes_dict, py_params)
     peripherals = get_iob_system_peripherals_list(attributes_dict)
     connect_peripherals_cbus(attributes_dict, peripherals, params)
+    generate_memory_map(attributes_dict, peripherals, params, py_params)
     generate_makefile_segments(attributes_dict, peripherals, params, py_params)
-    generate_peripheral_base_addresses(attributes_dict, peripherals, params, py_params)
 
 
 #
@@ -237,21 +236,77 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
     pbus_split["connect"][f"output_{num_peripherals-1}_m"] = "plic_cbus"
 
 
+def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
+    """Create C header file containing system memory map.
+    :param dict attributes_dict: iob_system attributes
+    :param list peripherals_list: list of peripheral subblocks
+    :param dict params: iob_system python parameters
+    :param dict py_params: iob_system argument python parameters
+    """
+
+    # Don't create files for other targets (like clean)
+    if "py2hwsw_target" not in py_params or py_params["py2hwsw_target"] != "setup":
+        return
+
+    memory_map = {}
+
+    num_memory_regions = 0
+    memory_region_enable_parameters = [
+        "use_intmem",
+        "use_extmem",
+        "use_bootrom",
+        "use_peripherals",
+    ]
+    for param_name in memory_region_enable_parameters:
+        if params[param_name]:
+            region_name = param_name[4:]
+            memory_map[region_name] = num_memory_regions
+            num_memory_regions += 1
+    num_sel_bits = (num_memory_regions - 1).bit_length()
+    assert num_memory_regions, "No memory regions defined"
+    print("------------------------------------------------------")
+    print(f"Memory map for {attributes_dict['name']} (iob_system):")
+    for region_name in memory_map.keys():
+        memory_map[region_name] = memory_map[region_name] << (
+            params["addr_w"] - num_sel_bits
+        )
+        region_width = params["addr_w"] - num_sel_bits
+        region_size = 1 << region_width
+        print(
+            f"[{memory_map[region_name]:#0{2+(params['addr_w']>>2)}x}-{memory_map[region_name]+region_size-1:#0{2+(params['addr_w']>>2)}x}]: {region_name} ({region_width} bits)"
+        )
+    print("------------------------------------------------------")
+
+    if params["use_peripherals"]:
+        memory_map |= generate_peripheral_base_addresses(
+            attributes_dict,
+            peripherals_list,
+            params,
+            py_params,
+            memory_map["peripherals"],
+        )
+
+    out_file = os.path.join(
+        attributes_dict["build_dir"], "software", f"{attributes_dict['name']}_mmap.h"
+    )
+
+    os.makedirs(os.path.dirname(out_file), exist_ok=True)
+    with open(out_file, "w") as f:
+        for region_name, base_address in memory_map.items():
+            f.write(f"#define {region_name.upper()}_BASE {hex(base_address)}\n")
+    print(f"See '{out_file}' for complete list of memory regions.")
+
+
 def generate_peripheral_base_addresses(
-    attributes_dict, peripherals_list, params, py_params
+    attributes_dict, peripherals_list, params, py_params, pbus_base
 ):
     """Create C header file containing peripheral base addresses.
     :param dict attributes_dict: iob_system attributes
     :param list peripherals_list: list of peripheral subblocks
     :param dict params: iob_system python parameters
     :param dict py_params: iob_system argument python parameters
+    :returns dict: peripheral base addresses. Format: {peripheral_name: address}
     """
-    out_file = os.path.join(
-        attributes_dict["build_dir"], "software", f"{attributes_dict['name']}_periphs.h"
-    )
-    # Don't override output file
-    if os.path.isfile(out_file):
-        return
 
     # Include CLINT and PLIC in peripherals list
     complete_peripherals_list = peripherals_list + [
@@ -259,18 +314,20 @@ def generate_peripheral_base_addresses(
         {"instance_name": "PLIC0"},
     ]
     n_slaves_w = (len(complete_peripherals_list) - 1).bit_length()
+    # Calculate p_bit by finding how many leading 0 bits there are in pbus_base
+    p_bit = 0
+    n = pbus_base
+    while n > 0 and (n & 1) == 0:
+        p_bit += 1
+        n >>= 1  # Right shift the number by 1 bit
 
-    # Don't create files for other targets (like clean)
-    if "py2hwsw_target" not in py_params or py_params["py2hwsw_target"] != "setup":
-        return
-
-    os.makedirs(os.path.dirname(out_file), exist_ok=True)
-    with open(out_file, "w") as f:
-        for idx, instance in enumerate(complete_peripherals_list):
-            instance_name = instance["instance_name"]
-            f.write(
-                f"#define {instance_name}_BASE (PBUS_BASE + ({idx}<<(P_BIT-{n_slaves_w})))\n"
-            )
+    peripherals_base_addresses = {}
+    for idx, instance in enumerate(complete_peripherals_list):
+        instance_name = instance["instance_name"]
+        peripherals_base_addresses[instance_name] = pbus_base + (
+            idx << (p_bit - n_slaves_w)
+        )
+    return peripherals_base_addresses
 
 
 def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
@@ -298,7 +355,8 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
         for peripheral in peripherals:
             if peripheral["core_name"] not in peripheral_name_list:
                 peripheral_name_list.append(peripheral["core_name"])
-        file.write("PERIPHERALS ?=" + " ".join(peripheral_name_list) + "\n")
+        if peripherals:
+            file.write("PERIPHERALS ?=" + " ".join(peripheral_name_list) + "\n")
         if params["use_ethernet"]:
             # Set custom ethernet CONSOLE_CMD
             file.write(

@@ -13,16 +13,33 @@ from iob_system_utils import update_params, iob_system_scripts
 
 def setup(py_params_dict):
     params = {
+        # Name of the generated System
         "name": "iob_system",
+        # If should initialize memories from data in .hex files
         "init_mem": True,
+        # If should include an internal memory
+        "use_intmem": True,
+        # If should use external memory (usually DDR)
         "use_extmem": False,
+        # If should include a bootrom
+        "use_bootrom": True,
+        # If should include peripherals
+        "use_peripherals": True,
+        # If should setup ethernet ports and testbenches
         "use_ethernet": False,
+        # CPU address width
         "addr_w": 32,
+        # CPU data width
         "data_w": 32,
+        # External memory address width
         "mem_addr_w": 24,
+        # Bootrom address width
         "bootrom_addr_w": 12,
+        # Firmware base address
         "fw_addr": 0,
+        # Firmware address width
         "fw_addr_w": 18,
+        # If should include a tester system
         "include_tester": True,
     }
 
@@ -189,20 +206,23 @@ def setup(py_params_dict):
             "descr": "Ports for connection with boot ROM memory",
             "signals": {"type": "rom_sp", "prefix": "bootrom_mem_"},
         },
-        {
-            "name": "int_mem_axi_m",
-            "descr": "AXI master interface for internal memory",
-            "signals": {
-                "type": "axi",
-                "prefix": "int_mem_",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": f"{params['fw_addr_w']}-2",
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-                "LOCK_W": 1,
-            },
-        },
     ]
+    if params["use_intmem"]:
+        attributes_dict["ports"] += [
+            {
+                "name": "int_mem_axi_m",
+                "descr": "AXI master interface for internal memory",
+                "signals": {
+                    "type": "axi",
+                    "prefix": "int_mem_",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": f"{params['fw_addr_w']}-2",
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                    "LOCK_W": 1,
+                },
+            },
+        ]
     if params["use_extmem"]:
         attributes_dict["ports"] += [
             {
@@ -218,17 +238,18 @@ def setup(py_params_dict):
                 },
             },
         ]
-    attributes_dict["ports"] += [
-        # Peripheral IO ports
-        {
-            "name": "rs232_m",
-            "descr": "iob-system uart interface",
-            "signals": {
-                "type": "rs232",
+    if params["use_peripherals"]:
+        attributes_dict["ports"] += [
+            # Peripheral IO ports
+            {
+                "name": "rs232_m",
+                "descr": "iob-system uart interface",
+                "signals": {
+                    "type": "rs232",
+                },
             },
-        },
-        # NOTE: Add ports for peripherals here
-    ]
+            # NOTE: Add ports for peripherals here
+        ]
 
     attributes_dict["wires"] = [
         {
@@ -317,64 +338,56 @@ def setup(py_params_dict):
                 {"name": "unused_m3_awaddr_bits", "width": 2},
             ],
         },
-        {
-            "name": "bootrom_cbus",
-            "descr": "iob-system boot controller data interface",
-            "signals": {
-                "type": "axi",
-                "prefix": "bootrom_",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": (params["bootrom_addr_w"] + 1)
-                - 2,  # +1 for csrs; -2 for lsbs
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-                "LOCK_W": "1",
-            },
-        },
-        {
-            "name": "axi_periphs_cbus",
-            "descr": "AXI bus for peripheral CSRs",
-            "signals": {
-                "type": "axi",
-                "prefix": "periphs_",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 2 - 2,
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-            },
-        },
-        {
-            "name": "iob_periphs_cbus",
-            "descr": "AXI-Lite bus for peripheral CSRs",
-            "signals": {
-                "type": "iob",
-                "prefix": "periphs_",
-                "ID_W": "AXI_ID_W",
-                "ADDR_W": params["addr_w"] - 2 - 2,
-                "DATA_W": "AXI_DATA_W",
-                "LEN_W": "AXI_LEN_W",
-            },
-        },
-        # Peripheral cbus wires added automatically
-        # NOTE: Add other peripheral wires here
     ]
-    if not params["use_extmem"]:
+    if params["use_bootrom"]:
         attributes_dict["wires"] += [
             {
-                "name": "axi_m",
-                "descr": "Unused AXI master interface (for use_extmem=0)",
+                "name": "bootrom_cbus",
+                "descr": "iob-system boot controller data interface",
                 "signals": {
                     "type": "axi",
+                    "prefix": "bootrom_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": params["addr_w"] - 2,
+                    "ADDR_W": (params["bootrom_addr_w"] + 1)
+                    - 2,  # +1 for csrs; -2 for lsbs
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
-                    "LOCK_W": 1,
+                    "LOCK_W": "1",
                 },
             },
         ]
+    if params["use_peripherals"]:
+        attributes_dict["wires"] += [
+            {
+                "name": "axi_periphs_cbus",
+                "descr": "AXI bus for peripheral CSRs",
+                "signals": {
+                    "type": "axi",
+                    "prefix": "periphs_",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": params["addr_w"] - 2 - 2,
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                },
+            },
+            {
+                "name": "iob_periphs_cbus",
+                "descr": "AXI-Lite bus for peripheral CSRs",
+                "signals": {
+                    "type": "iob",
+                    "prefix": "periphs_",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": params["addr_w"] - 2 - 2,
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                },
+            },
+            # Peripheral cbus wires added automatically
+            # NOTE: Add other peripheral wires here
+        ]
     attributes_dict["subblocks"] = [
         {
+            # FIXME: Configure uncached range via parameter (based on peripherals range)
             "core_name": "iob_vexriscv",
             "instance_name": "cpu",
             "instance_description": "RISC-V CPU instance",
@@ -424,141 +437,151 @@ def setup(py_params_dict):
             "parameters": {
                 "ID_W": "AXI_ID_W",
                 "LEN_W": "AXI_LEN_W",
-                # "INT_MEM_ADDR_W": f"{params['fw_addr_w']} - 2",
-                # "MEM_ADDR_W": "AXI_ADDR_W - 2",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "rst_i": "rst",
                 "s0_axi_s": "cpu_ibus",
                 "s1_axi_s": "cpu_dbus",
-                "m0_axi_m": (
-                    "int_mem_axi_m",
-                    [
-                        "{unused_m0_araddr_bits, int_mem_axi_araddr_o}",
-                        "{unused_m0_awaddr_bits, int_mem_axi_awaddr_o}",
-                    ],
-                ),
-                "m1_axi_m": (
-                    "axi_m",
-                    (
-                        [
-                            "{unused_m1_araddr_bits, axi_araddr_o}",
-                            "{unused_m1_awaddr_bits, axi_awaddr_o}",
-                        ]
-                        if params["use_extmem"]
-                        else []
-                    ),
-                ),
-                "m2_axi_m": (
-                    "bootrom_cbus",
-                    [
-                        "{unused_m2_araddr_bits, bootrom_axi_araddr}",
-                        "{unused_m2_awaddr_bits, bootrom_axi_awaddr}",
-                    ],
-                ),
-                "m3_axi_m": (
-                    "axi_periphs_cbus",
-                    [
-                        "{unused_m3_araddr_bits, periphs_axi_araddr}",
-                        "{unused_m3_awaddr_bits, periphs_axi_awaddr}",
-                        "periphs_axi_awlock[0]",
-                        "periphs_axi_arlock[0]",
-                    ],
-                ),
+                # Master interfaces connected below
             },
             "addr_w": params["addr_w"] - 2,
             "data_w": params["data_w"],
             "lock_w": 1,
             "num_slaves": 2,
-            "num_masters": 4,
         },
     ]
+    full_xbar_master_interfaces = {
+        "use_intmem": (
+            "int_mem_axi_m",
+            [
+                "{unused_m0_araddr_bits, int_mem_axi_araddr_o}",
+                "{unused_m0_awaddr_bits, int_mem_axi_awaddr_o}",
+            ],
+        ),
+        "use_extmem": (
+            "axi_m",
+            [
+                "{unused_m1_araddr_bits, axi_araddr_o}",
+                "{unused_m1_awaddr_bits, axi_awaddr_o}",
+            ],
+        ),
+        "use_bootrom": (
+            "bootrom_cbus",
+            [
+                "{unused_m2_araddr_bits, bootrom_axi_araddr}",
+                "{unused_m2_awaddr_bits, bootrom_axi_awaddr}",
+            ],
+        ),
+        "use_peripherals": (
+            "axi_periphs_cbus",
+            [
+                "{unused_m3_araddr_bits, periphs_axi_araddr}",
+                "{unused_m3_awaddr_bits, periphs_axi_awaddr}",
+                "periphs_axi_awlock[0]",
+                "periphs_axi_arlock[0]",
+            ],
+        ),
+    }
+    # Connect xbar master interfaces
+    num_masters = 0
+    for param_name, interface_connection in full_xbar_master_interfaces.items():
+        if params[param_name]:
+            attributes_dict["subblocks"][-1]["connect"] |= {f"m{num_masters}_axi_m": interface_connection}
+            num_masters += 1
+    attributes_dict["subblocks"][-1]["num_masters"] = num_masters
+
+    if params["use_bootrom"]:
+        attributes_dict["subblocks"] += [
+            {
+                "core_name": "iob_bootrom",
+                "instance_name": "bootrom",
+                "instance_description": "Boot ROM peripheral",
+                "parameters": {
+                    "AXI_ID_W": "AXI_ID_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "iob_bootrom_csrs_cbus_s": (
+                        "bootrom_cbus",
+                        [
+                            "{1'b0, bootrom_axi_arlock}",
+                            "{1'b0, bootrom_axi_awlock}",
+                        ],
+                    ),
+                    "ext_rom_bus_m": "rom_bus_m",
+                },
+                "bootrom_addr_w": params["bootrom_addr_w"],
+                "soc_name": params["name"],
+            },
+        ]
+    if params["use_peripherals"]:
+        attributes_dict["subblocks"] += [
+            {
+                "core_name": "iob_axi2iob",
+                "instance_name": "periphs_axi2iob",
+                "instance_description": "Convert AXI to AXI lite for CLINT",
+                "parameters": {
+                    "AXI_ID_WIDTH": "AXI_ID_W",
+                    "AXI_LEN_WIDTH": "AXI_LEN_W",
+                    "ADDR_WIDTH": params["addr_w"] - 2 - 2,
+                    "DATA_WIDTH": "AXI_DATA_W",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "axi_s": (
+                        "axi_periphs_cbus",
+                        [
+                            "periphs_axi_arlock[0]",
+                            "periphs_axi_awlock[0]",
+                        ],
+                    ),
+                    "iob_m": "iob_periphs_cbus",
+                },
+            },
+            {
+                "core_name": "iob_split",
+                "name": params["name"] + "_pbus_split",
+                "instance_name": "iob_pbus_split",
+                "instance_description": "Split between peripherals",
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "reset_i": "split_reset",
+                    "input_s": "iob_periphs_cbus",
+                    # Peripherals cbus connections added automatically
+                },
+                "num_outputs": 0,  # Num outputs configured automatically
+                "addr_w": params["addr_w"] - 2 - 2,
+            },
+            # Peripherals
+            {
+                "core_name": "iob_uart",
+                "instance_name": "UART0",
+                "instance_description": "UART peripheral",
+                # This attribute signals to iob_system scripts that this block is a peripheral
+                "is_peripheral": True,
+                "parameters": {},
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    # Cbus connected automatically
+                    "rs232_m": "rs232_m",
+                },
+            },
+            {
+                "core_name": "iob_timer",
+                "instance_name": "TIMER0",
+                "instance_description": "Timer peripheral",
+                "is_peripheral": True,
+                "parameters": {},
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    # Cbus connected automatically
+                },
+            },
+            # NOTE: Instantiate other peripherals here, using the 'is_peripheral' flag
+        ]
     attributes_dict["subblocks"] += [
-        {
-            "core_name": "iob_bootrom",
-            "instance_name": "bootrom",
-            "instance_description": "Boot ROM peripheral",
-            "parameters": {
-                "AXI_ID_W": "AXI_ID_W",
-                "AXI_LEN_W": "AXI_LEN_W",
-            },
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "iob_bootrom_csrs_cbus_s": (
-                    "bootrom_cbus",
-                    [
-                        "{1'b0, bootrom_axi_arlock}",
-                        "{1'b0, bootrom_axi_awlock}",
-                    ],
-                ),
-                "ext_rom_bus_m": "rom_bus_m",
-            },
-            "bootrom_addr_w": params["bootrom_addr_w"],
-            "soc_name": params["name"],
-        },
-        {
-            "core_name": "iob_axi2iob",
-            "instance_name": "periphs_axi2iob",
-            "instance_description": "Convert AXI to AXI lite for CLINT",
-            "parameters": {
-                "AXI_ID_WIDTH": "AXI_ID_W",
-                "AXI_LEN_WIDTH": "AXI_LEN_W",
-                "ADDR_WIDTH": params["addr_w"] - 2 - 2,
-                "DATA_WIDTH": "AXI_DATA_W",
-            },
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "axi_s": (
-                    "axi_periphs_cbus",
-                    [
-                        "periphs_axi_arlock[0]",
-                        "periphs_axi_awlock[0]",
-                    ],
-                ),
-                "iob_m": "iob_periphs_cbus",
-            },
-        },
-        {
-            "core_name": "iob_split",
-            "name": params["name"] + "_pbus_split",
-            "instance_name": "iob_pbus_split",
-            "instance_description": "Split between peripherals",
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "reset_i": "split_reset",
-                "input_s": "iob_periphs_cbus",
-                # Peripherals cbus connections added automatically
-            },
-            "num_outputs": 0,  # Num outputs configured automatically
-            "addr_w": params["addr_w"] - 2 - 2,
-        },
-        # Peripherals
-        {
-            "core_name": "iob_uart",
-            "instance_name": "UART0",
-            "instance_description": "UART peripheral",
-            "is_peripheral": True,  # This attribute signals to iob_system scripts that this block is a peripheral
-            "parameters": {},
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                # Cbus connected automatically
-                "rs232_m": "rs232_m",
-            },
-        },
-        {
-            "core_name": "iob_timer",
-            "instance_name": "TIMER0",
-            "instance_description": "Timer peripheral",
-            "is_peripheral": True,
-            "parameters": {},
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                # Cbus connected automatically
-            },
-        },
-        # NOTE: Instantiate other peripherals here, using the 'is_peripheral' flag
-        #
         # Modules that need to be setup, but are not instantiated directly inside
         # 'iob_system' Verilog module
         # Testbench
@@ -619,25 +642,6 @@ def setup(py_params_dict):
 """
         }
     ]
-    if not params["use_extmem"]:
-        attributes_dict["snippets"] += [
-            {
-                "verilog_code": """
-   // Connect inputs of unused external memory AXI interface to zero
-   assign axi_arready = 'b0;
-   assign axi_rdata = 'b0;
-   assign axi_rresp = 'b0;
-   assign axi_rvalid = 'b0;
-   assign axi_rid = 'b0;
-   assign axi_rlast = 'b0;
-   assign axi_awready = 'b0;
-   assign axi_wready = 'b0;
-   assign axi_bresp = 'b0;
-   assign axi_bvalid = 'b0;
-   assign axi_bid = 'b0;
-"""
-            }
-        ]
 
     iob_system_scripts(attributes_dict, params, py_params_dict)
 

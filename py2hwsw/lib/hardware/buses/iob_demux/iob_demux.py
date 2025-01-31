@@ -68,7 +68,7 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-            // //Select the data to output
+   // Select the data to output
    genvar i;
    generate
       for (i = 0; i < N; i = i + 1) begin : gen_demux

@@ -246,7 +246,7 @@ def setup(py_params_dict):
                 "instance_description": "External memory",
                 "parameters": {
                     "ID_WIDTH": "AXI_ID_W",
-                    "ADDR_WIDTH": "AXI_ADDR_W-2",
+                    "ADDR_WIDTH": "AXI_ADDR_W",
                     "DATA_WIDTH": "AXI_DATA_W",
                 },
                 "connect": {
@@ -255,8 +255,8 @@ def setup(py_params_dict):
                     "axi_s": (
                         "axi",
                         [
-                            # "{int_mem_axi_araddr, 2'b0}",
-                            # "{int_mem_axi_awaddr, 2'b0}",
+                            "{int_mem_axi_araddr, 2'b0}",
+                            "{int_mem_axi_awaddr, 2'b0}",
                             "{1'b0, axi_arlock}",
                             "{1'b0, axi_awlock}",
                         ],

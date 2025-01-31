@@ -6,8 +6,7 @@
 
 #include "iob_bsp.h"
 #include "iob_system_conf.h"
-#include "iob_system_periphs.h"
-#include "iob_system_system.h"
+#include "iob_system_mmap.h"
 #include "iob_uart.h"
 
 #define PROGNAME "IOb-Bootloader"

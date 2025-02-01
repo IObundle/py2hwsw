@@ -387,10 +387,14 @@ def setup(py_params_dict):
         ]
     attributes_dict["subblocks"] = [
         {
-            # FIXME: Configure uncached range via parameter (based on peripherals range)
             "core_name": "iob_vexriscv",
+            "name": params["name"] + "_vexriscv",
             "instance_name": "cpu",
             "instance_description": "RISC-V CPU instance",
+            # Reset address and uncached range are filled automatically
+            # "reset_addr": 0x00000000,
+            # "uncached_start_addr": 0x00000000,
+            # "uncached_size": 2**32,
             "parameters": {
                 "AXI_ID_W": "1",
                 "AXI_ADDR_W": params["addr_w"],

@@ -264,13 +264,13 @@ def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
             num_memory_regions += 1
     num_sel_bits = (num_memory_regions - 1).bit_length()
     assert num_memory_regions, "No memory regions defined"
+    region_width = params["addr_w"] - num_sel_bits
     print("------------------------------------------------------")
     print(f"Memory map for {attributes_dict['name']} (iob_system):")
     for region_name in memory_map.keys():
         memory_map[region_name] = memory_map[region_name] << (
             params["addr_w"] - num_sel_bits
         )
-        region_width = params["addr_w"] - num_sel_bits
         region_size = 1 << region_width
         print(
             f"[{memory_map[region_name]:#0{2+(params['addr_w']>>2)}x}-{memory_map[region_name]+region_size-1:#0{2+(params['addr_w']>>2)}x}]: {region_name} ({region_width} bits)"
@@ -295,6 +295,21 @@ def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
         for region_name, base_address in memory_map.items():
             f.write(f"#define {region_name.upper()}_BASE {hex(base_address)}\n")
     print(f"See '{out_file}' for complete list of memory regions.")
+
+    # Find CPU subblock
+    cpu_subblock = None
+    for subblock in attributes_dict["subblocks"]:
+        if subblock["instance_name"] == "cpu":
+            cpu_subblock = subblock
+            break
+    # Update reset address and uncached region passed via python parameters to the CPU
+    bootrom_addr = memory_map.get("bootrom", None)
+    if bootrom_addr is not None:
+        cpu_subblock["reset_addr"] = bootrom_addr
+    peripherals_addr = memory_map.get("peripherals", None)
+    if peripherals_addr is not None:
+        cpu_subblock["uncached_start_addr"] = peripherals_addr
+        cpu_subblock["uncached_size"] = 2**region_width
 
 
 def generate_peripheral_base_addresses(

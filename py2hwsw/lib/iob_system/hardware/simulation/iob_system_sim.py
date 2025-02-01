@@ -255,8 +255,8 @@ def setup(py_params_dict):
                     "axi_s": (
                         "axi",
                         [
-                            "{int_mem_axi_araddr, 2'b0}",
-                            "{int_mem_axi_awaddr, 2'b0}",
+                            "{axi_araddr, 2'b0}",
+                            "{axi_awaddr, 2'b0}",
                             "{1'b0, axi_arlock}",
                             "{1'b0, axi_awlock}",
                         ],

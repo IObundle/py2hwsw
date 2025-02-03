@@ -148,7 +148,10 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
 {newlinechar.join("- " + get_real_signal(port).name for port in port.e_connect.signals)}
 {iob_colors.ENDC}"""
 
-        instance_portmap += f"        // {port.name} port\n"
+        # If port has only non-iob signals, skip it
+        if any(isinstance(signal, iob_signal) for signal in port.signals):
+            instance_portmap += f"        // {port.name} port\n"
+            continue
         # Connect individual signals
         for idx, signal in enumerate(port.signals):
             if not isinstance(signal, iob_signal):
@@ -157,15 +160,13 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
             real_e_signal = get_real_signal(port.e_connect.signals[idx])
             e_signal_name = real_e_signal.name
 
-            comma = ""
-            if port_idx < len(instance.ports) - 1 or idx < len(port.signals) - 1:
-                comma = ","
-
             for bit_slice in port.e_connect_bit_slices:
                 if e_signal_name in bit_slice:
                     e_signal_name = bit_slice
                     break
 
-            instance_portmap += f"        .{port_name}({e_signal_name}){comma}\n"
+            instance_portmap += f"        .{port_name}({e_signal_name}),\n"
+
+    instance_portmap = instance_portmap[:-2] + "\n"  # Remove last comma
 
     return instance_portmap

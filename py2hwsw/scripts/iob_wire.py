@@ -79,6 +79,7 @@ def create_wire(core, *args, signals=[], **kwargs):
         interface_obj = None
         if type(signals) is list:
             # Convert user signal dictionaries into 'iob_signal' objects
+            replace_duplicate_signals_by_references(core.wires + core.ports, signals)
             sig_obj_list = convert_dict2obj_list(signals, iob_signal)
         elif type(signals) is dict:
             # Convert user interface dictionary into 'if_gen.interface' object

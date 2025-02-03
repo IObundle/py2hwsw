@@ -264,6 +264,12 @@ def setup(py_params_dict):
                 },
             },
         ]
+        if params["init_mem"] and not params["use_intmem"]:
+            attributes_dict["subblocks"][-1]["parameters"].update(
+                {
+                    "FILE": f'"{params["name"]}_firmware"',
+                }
+            )
     if params["use_ethernet"]:
         attributes_dict["subblocks"] += [
             {

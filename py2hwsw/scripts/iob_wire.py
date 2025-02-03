@@ -132,7 +132,7 @@ def replace_duplicate_signals_by_references(wires, signals):
     reference to the original.
     """
     for idx, signal in enumerate(signals):
-        if isintance(signal, iob_signal_reference):
+        if isinstance(signal, iob_signal_reference):
             continue
         if type(signal) is iob_signal:
             signal = signal.__dict__

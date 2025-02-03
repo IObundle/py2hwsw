@@ -501,6 +501,20 @@ class iob_core(iob_module, iob_instance):
         _port = find_obj_in_list(instantiator.ports + instantiator.wires, _name)
         port.connect_external(_port, bit_slices=[])
 
+    def __connect_clk_interface(self, port, instantiator):
+        """Create, if needed, a clock interface port in instantiator and connect it to self"""
+        _name = f"{port.name}"
+        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
+        _signals.update(port.interface.widths)
+        for p in instantiator.ports:
+            if p.interface:
+                if p.interface.type == port.interface.type:
+                    port.connect_external(p, bit_slices=[])
+                    return
+        instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
+        _port = find_obj_in_list(instantiator.ports, _name)
+        port.connect_external(_port, bit_slices=[])
+
     def connect_instance_ports(self, connect, instantiator):
         """
         param connect: External wires to connect to ports of this instance
@@ -549,6 +563,13 @@ class iob_core(iob_module, iob_instance):
                     and not self.is_tester
                 ):
                     self.__connect_memory(port, instantiator)
+                elif(
+                    port.interface.type in ["clk_en_rst", "clk_rst"]
+                    and instantiator
+                    and not self.is_tester
+                ):
+                    self.__connect_clk_interface(port, instantiator)
+
         # iob_csrs specific code
         if self.original_name == "iob_csrs":
             self.__connect_cbus_port(instantiator)

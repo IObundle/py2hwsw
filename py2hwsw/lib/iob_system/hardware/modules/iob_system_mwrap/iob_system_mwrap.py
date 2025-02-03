@@ -63,6 +63,7 @@ def setup(py_params_dict):
                 ],
             },
         ]
+    attributes_dict["subblocks"] = []
     # ROM (Disabled here because it is now in auto-generated iob_memwrapper)
     # attributes_dict["subblocks"] = [
     # {
@@ -80,7 +81,7 @@ def setup(py_params_dict):
     # },
     # ]
     if params["use_intmem"]:
-        attributes_dict["subblocks"] = [
+        attributes_dict["subblocks"] += [
             # Internal memory
             {
                 "core_name": "iob_axi_ram",

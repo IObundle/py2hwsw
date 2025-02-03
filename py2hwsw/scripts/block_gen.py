@@ -11,7 +11,7 @@ import sys
 
 import iob_colors
 from iob_base import fail_with_msg
-from iob_signal import get_real_signal
+from iob_signal import get_real_signal, iob_signal
 import param_gen
 
 
@@ -151,6 +151,8 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
         instance_portmap += f"        // {port.name} port\n"
         # Connect individual signals
         for idx, signal in enumerate(port.signals):
+            if not isinstance(signal, iob_signal):
+                continue
             port_name = signal.name
             real_e_signal = get_real_signal(port.e_connect.signals[idx])
             e_signal_name = real_e_signal.name

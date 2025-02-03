@@ -11,6 +11,7 @@ from latex import write_table
 import os
 
 import if_gen
+from iob_signal import iob_signal
 
 
 def reverse_port(port_type):
@@ -39,7 +40,8 @@ def generate_ports(core):
         lines.append(f"    // {port.name}\n")
 
         for signal_idx, signal in enumerate(port.signals):
-            lines.append("    " + signal.get_verilog_port())
+            if isinstance(signal, iob_signal):
+                lines.append("    " + signal.get_verilog_port())
 
         # Close ifdef if conditional interface
         if port.if_defined or port.if_not_defined:
@@ -48,7 +50,7 @@ def generate_ports(core):
     # Remove comma from last port line
     if lines:
         i = -1
-        while lines[i].startswith("`endif"):
+        while lines[i].startswith("`endif") or lines[i].startswith("    // "):
             i -= 1
         lines[i] = lines[i].replace(",", "", 1)
 
@@ -129,13 +131,14 @@ def generate_ios_tex(ports, out_dir):
         tex_table = []
         # Interface is not standard, read ports
         for signal in port.signals:
-            tex_table.append(
-                [
-                    signal.name,
-                    signal.direction,
-                    signal.width,
-                    signal.descr,
-                ]
-            )
+            if isinstance(signal, iob_signal):
+                tex_table.append(
+                    [
+                        signal.name,
+                        signal.direction,
+                        signal.width,
+                        signal.descr,
+                    ]
+                )
 
         write_table(f"{out_dir}/{port.name}_if", tex_table)

@@ -503,6 +503,8 @@ class iob_core(iob_module, iob_instance):
 
     def __connect_clk_interface(self, port, instantiator):
         """Create, if needed, a clock interface port in instantiator and connect it to self"""
+        if not instantiator.generate_hw:
+            return
         _name = f"{port.name}"
         _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
         _signals.update(port.interface.widths)

@@ -284,6 +284,7 @@ def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
             params,
             py_params,
             memory_map["peripherals"],
+            region_width,
         )
 
     out_file = os.path.join(
@@ -313,13 +314,14 @@ def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
 
 
 def generate_peripheral_base_addresses(
-    attributes_dict, peripherals_list, params, py_params, pbus_base
+    attributes_dict, peripherals_list, params, py_params, pbus_base, region_width
 ):
     """Create C header file containing peripheral base addresses.
     :param dict attributes_dict: iob_system attributes
     :param list peripherals_list: list of peripheral subblocks
     :param dict params: iob_system python parameters
     :param dict py_params: iob_system argument python parameters
+    :param int region_width: width of the peripheral region
     :returns dict: peripheral base addresses. Format: {peripheral_name: address}
     """
 
@@ -329,18 +331,12 @@ def generate_peripheral_base_addresses(
         {"instance_name": "PLIC0"},
     ]
     n_slaves_w = (len(complete_peripherals_list) - 1).bit_length()
-    # Calculate p_bit by finding how many leading 0 bits there are in pbus_base
-    p_bit = 0
-    n = pbus_base
-    while n > 0 and (n & 1) == 0:
-        p_bit += 1
-        n >>= 1  # Right shift the number by 1 bit
 
     peripherals_base_addresses = {}
     for idx, instance in enumerate(complete_peripherals_list):
         instance_name = instance["instance_name"]
         peripherals_base_addresses[instance_name] = pbus_base + (
-            idx << (p_bit - n_slaves_w)
+            idx << (region_width - n_slaves_w)
         )
     return peripherals_base_addresses
 

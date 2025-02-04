@@ -45,6 +45,12 @@ def setup(py_params_dict):
 
     update_params(params, py_params_dict)
 
+    num_xbar_masters = 0
+    for param_name in ["use_intmem", "use_extmem", "use_bootrom", "use_peripherals"]:
+        if params[param_name]:
+            num_xbar_masters += 1
+    xbar_sel_w = (num_xbar_masters-1).bit_length()
+
     attributes_dict = {
         "name": params["name"],
         "generate_hw": True,
@@ -334,8 +340,8 @@ def setup(py_params_dict):
                     "name": "unused_m2_awaddr_bits",
                     "width": params["addr_w"] - (params["bootrom_addr_w"] + 1),
                 },
-                {"name": "unused_m3_araddr_bits", "width": 2},
-                {"name": "unused_m3_awaddr_bits", "width": 2},
+                {"name": "unused_m3_araddr_bits", "width": xbar_sel_w},
+                {"name": "unused_m3_awaddr_bits", "width": xbar_sel_w},
             ],
         },
     ]
@@ -365,7 +371,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "prefix": "periphs_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": params["addr_w"] - 2 - 2,
+                    "ADDR_W": params["addr_w"] - 2 - xbar_sel_w,
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                 },
@@ -377,7 +383,7 @@ def setup(py_params_dict):
                     "type": "iob",
                     "prefix": "periphs_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": params["addr_w"] - 2 - 2,
+                    "ADDR_W": params["addr_w"] - 2 - xbar_sel_w,
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                 },
@@ -529,7 +535,7 @@ def setup(py_params_dict):
                 "parameters": {
                     "AXI_ID_WIDTH": "AXI_ID_W",
                     "AXI_LEN_WIDTH": "AXI_LEN_W",
-                    "ADDR_WIDTH": params["addr_w"] - 2 - 2,
+                    "ADDR_WIDTH": params["addr_w"] - 2 - xbar_sel_w,
                     "DATA_WIDTH": "AXI_DATA_W",
                 },
                 "connect": {
@@ -556,7 +562,7 @@ def setup(py_params_dict):
                     # Peripherals cbus connections added automatically
                 },
                 "num_outputs": 0,  # Num outputs configured automatically
-                "addr_w": params["addr_w"] - 2 - 2,
+                "addr_w": params["addr_w"] - 2 - xbar_sel_w,
             },
             # Peripherals
             {

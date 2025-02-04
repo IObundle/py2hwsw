@@ -83,6 +83,14 @@ def setup(py_params_dict):
                 "min": "0",
                 "max": "1",
             },
+            {  # May be used by software
+                "name": "USE_INTMEM",
+                "descr": "Enable internal memory support.",
+                "type": "M",
+                "val": params["use_intmem"],
+                "min": "0",
+                "max": "1",
+            },
             {  # Needed for makefile and software
                 "name": "USE_EXTMEM",
                 "descr": "Enable external memory support.",

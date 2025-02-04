@@ -91,7 +91,7 @@ def setup(py_params_dict):
                 "parameters": {
                     "ID_WIDTH": "AXI_ID_W",
                     "LEN_WIDTH": "AXI_LEN_W",
-                    "ADDR_WIDTH": params["fw_addr_w"],
+                    "ADDR_WIDTH": params["mem_addr_w"],
                     "DATA_WIDTH": "AXI_DATA_W",
                     "READ_ON_WRITE": 0,
                 },

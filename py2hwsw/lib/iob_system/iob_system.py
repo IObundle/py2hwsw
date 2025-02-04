@@ -31,8 +31,8 @@ def setup(py_params_dict):
         "addr_w": 32,
         # CPU data width
         "data_w": 32,
-        # External memory address width
-        "mem_addr_w": 24,
+        # Memory address width
+        "mem_addr_w": 18,
         # Bootrom address width
         "bootrom_addr_w": 12,
         # Firmware base address
@@ -107,7 +107,7 @@ def setup(py_params_dict):
                 "min": "0",
                 "max": "1",
             },
-            {  # Needed for software
+            {  # Needed for software and makefiles
                 "name": "MEM_ADDR_W",
                 "descr": "External memory bus address width.",
                 "type": "M",
@@ -230,7 +230,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "prefix": "int_mem_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": f"{params['fw_addr_w']}-2",
+                    "ADDR_W": f"{params['mem_addr_w']}-2",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": 1,
@@ -326,11 +326,11 @@ def setup(py_params_dict):
             "signals": [
                 {
                     "name": "unused_m0_araddr_bits",
-                    "width": params["addr_w"] - params["fw_addr_w"],
+                    "width": params["addr_w"] - params["mem_addr_w"],
                 },
                 {
                     "name": "unused_m0_awaddr_bits",
-                    "width": params["addr_w"] - params["fw_addr_w"],
+                    "width": params["addr_w"] - params["mem_addr_w"],
                 },
                 {
                     "name": "unused_m1_araddr_bits",

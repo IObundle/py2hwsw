@@ -618,7 +618,7 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
                     break
             else:
                 print(
-                    f"Note: FPGA directory '{fpga}' not found in subdirectories of {core.setup_dir}/hardware/fpga/"
+                    f"Note: The setup FPGA directory '{fpga}' not found in subdirectories of '{core.setup_dir}/hardware/fpga/'"
                 )
 
         nix_permission_hack(os.path.join(core.build_dir, directory))

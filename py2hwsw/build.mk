@@ -95,7 +95,11 @@ pc-emul-clean:
 
 LINT_DIR=hardware/lint
 lint-run: $(BSP_VH)
+ifeq ($(USE_FPGA),1)
+	make -C $(LINT_DIR) run BOARD_DIR=$(BOARD_DIR)
+else
 	make -C $(LINT_DIR) run
+endif
 
 lint-clean:
 	if [ -f "$(LINT_DIR)/Makefile" ]; then make -C $(LINT_DIR) clean; fi

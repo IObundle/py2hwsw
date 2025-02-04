@@ -748,6 +748,22 @@ class iob_core(iob_module, iob_instance):
         module = __class__.get_core_obj(core_name, **kwargs)
         print(module.build_dir)
 
+    def print_core_name(core_name, **kwargs):
+        """Print build directory."""
+        # Set project wide special target (will prevent normal setup)
+        __class__.global_special_target = "print_core_name"
+        # Build a new module instance, to obtain its attributes
+        module = __class__.get_core_obj(core_name, **kwargs)
+        print(module.name)
+
+    def print_core_version(core_name, **kwargs):
+        """Print build directory."""
+        # Set project wide special target (will prevent normal setup)
+        __class__.global_special_target = "print_core_version"
+        # Build a new module instance, to obtain its attributes
+        module = __class__.get_core_obj(core_name, **kwargs)
+        print(module.version)
+
     @staticmethod
     def print_core_dict(core_name, **kwargs):
         """Print core attributes dictionary."""

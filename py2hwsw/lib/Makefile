@@ -49,6 +49,13 @@ doc-build:
 doc-update: doc-build
 	cp py2hwsw_docs/document/ug.pdf ../py2hwsw_document/document/ug.pdf
 
+
+delivery:
+	nix-shell --run "CORE=$(CORE) BUILD_DIR=$(BUILD_DIR) ../scripts/delivery.sh"
+
+
+
+
 .PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build doc-update
 
 

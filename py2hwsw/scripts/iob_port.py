@@ -142,5 +142,5 @@ def create_port(core, *args, signals=[], **kwargs):
         error_msg=f"Invalid {kwargs.get('name', '')} port attribute '[arg]'!",
     )
     port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
-    replace_duplicate_signals_by_references(core.wires + core.ports, port.signals)
+    replace_duplicate_signals_by_references(core.ports, port.signals)
     core.ports.append(port)

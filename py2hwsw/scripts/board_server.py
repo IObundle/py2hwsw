@@ -28,7 +28,7 @@ DEBUG = False
 
 HOST = "localhost"  # Listen on all available interfaces
 PORT = 50007  # Use a non-privileged port
-VERSION = "V0.3"
+VERSION = "V0.2"
 
 # user and duration board is needed
 USER = ""

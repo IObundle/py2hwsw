@@ -13,7 +13,7 @@ LINT_SYNC_FLAGS=$(SYNOPSYS_SYNC_FLAGS)
 
 run-lint:
 ifeq ($(LINT_SERVER),)
-	NAME=$(NAME) CSR_IF=$(CSR_IF) INCLUDE_DIRS=$(INCLUDE_DIRS) spyglass -licqueue -shell -tcl spyglass.tcl
+	NAME=$(NAME) CSR_IF=$(CSR_IF) INCLUDE_DIRS="$(INCLUDE_DIRS)" spyglass -licqueue -shell -tcl spyglass.tcl
 else
 	ssh $(LINT_SSH_FLAGS) $(LINT_USER)@$(LINT_SERVER) "if [ ! -d $(REMOTE_BUILD_DIR) ]; then mkdir -p $(REMOTE_BUILD_DIR); fi"
 	rsync -avz --delete --exclude .git $(LINT_SYNC_FLAGS) $(RSYNC_ROOT_DIR) $(LINT_USER)@$(LINT_SERVER):$(REMOTE_BUILD_DIR)

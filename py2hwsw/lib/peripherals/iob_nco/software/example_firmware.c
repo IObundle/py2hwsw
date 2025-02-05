@@ -8,8 +8,7 @@
 #include "iob_nco.h"
 #include "iob_printf.h"
 #include "iob_uart.h"
-#include "periphs.h"
-#include "system.h"
+#include "mmap.h"
 
 int main() {
   unsigned long long elapsed;

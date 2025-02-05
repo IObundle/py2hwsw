@@ -32,6 +32,8 @@ if __name__ == "__main__":
             "setup",
             "clean",
             "print_build_dir",
+            "print_core_name",
+            "print_core_version",
             "print_core_dict",
             "print_py2hwsw_attributes",
         ],
@@ -130,6 +132,10 @@ if __name__ == "__main__":
         iob_core.clean_build_dir(args.core_name)
     elif args.target == "print_build_dir":
         iob_core.print_build_dir(args.core_name, **py_params)
+    elif args.target == "print_core_name":
+        iob_core.print_core_name(args.core_name, **py_params)
+    elif args.target == "print_core_version":
+        iob_core.print_core_version(args.core_name, **py_params)
     elif args.target == "print_core_dict":
         iob_core.print_core_dict(args.core_name, **py_params)
     elif args.target == "print_py2hwsw_attributes":

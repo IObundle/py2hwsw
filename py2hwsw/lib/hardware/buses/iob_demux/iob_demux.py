@@ -24,6 +24,14 @@ def setup(py_params_dict):
                 "max": "NA",
                 "descr": "Number of outputs",
             },
+            {
+                "name": "SEL_W",
+                "type": "F",
+                "val": "($clog2(N) == 0 ? 1 : $clog2(N))",
+                "min": "NA",
+                "max": "NA",
+                "descr": "Width of selector interface",
+            },
         ],
         "ports": [
             {
@@ -32,7 +40,7 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "sel_i",
-                        "width": "($clog2(N)+($clog2(N)==0))",
+                        "width": "SEL_W",
                     },
                 ],
             },
@@ -60,11 +68,11 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-            // //Select the data to output
+   // Select the data to output
    genvar i;
    generate
       for (i = 0; i < N; i = i + 1) begin : gen_demux
-         assign data_o[i*DATA_W+:DATA_W] = (sel_i==i)? data_i : {DATA_W{1'b0}};
+         assign data_o[i*DATA_W+:DATA_W] = (sel_i==i[0+:SEL_W])? data_i : {DATA_W{1'b0}};
       end
    endgenerate
 

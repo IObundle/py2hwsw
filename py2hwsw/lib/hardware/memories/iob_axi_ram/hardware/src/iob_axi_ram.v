@@ -231,7 +231,7 @@ module iob_axi_ram #(
             if (axi_wready_o && axi_wvalid_i) begin
                mem_wr_en = 1'b1;
                if (write_burst_reg != 2'b00) begin
-                  write_addr_next = write_addr_reg + (1'b1 << write_size_reg);
+                  write_addr_next = write_addr_reg + (1 << write_size_reg);
                end
                write_count_next = write_count_reg - 1'b1;
                if (write_count_reg > 0) begin
@@ -335,7 +335,7 @@ module iob_axi_ram #(
                axi_rid_next    = read_id_reg;
                axi_rlast_next  = read_count_reg == 0;
                if (read_burst_reg != 2'b00) begin
-                  read_addr_next = read_addr_reg + (1'b1 << read_size_reg);
+                  read_addr_next = read_addr_reg + (1 << read_size_reg);
                end
                read_count_next = read_count_reg - 1'b1;
                if (read_count_reg > 0) begin

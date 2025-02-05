@@ -45,81 +45,89 @@ def setup(py_params_dict):
 
     attributes_dict["ports"] = mwrap_ports
 
-    attributes_dict["wires"] = mwrap_wires + [
-        {
-            "name": "clk",
-            "descr": "Clock signal",
-            "signals": [
-                {"name": "clk_i"},
-            ],
-        },
-        {
-            "name": "rst",
-            "descr": "Reset signal",
-            "signals": [
-                {"name": "arst_i"},
-            ],
-        },
-    ]
-    attributes_dict["subblocks"] = [
-        # ROM (Disabled here because it is now in auto-generated iob_memwrapper)
-        # {
-        #     "core_name": "iob_rom_sp",
-        #     "instance_name": "boot_rom",
-        #     "instance_description": "Boot ROM",
-        #     "parameters": {
-        #         "ADDR_W": params["bootrom_addr_w"] - 2,
-        #         "DATA_W": params["data_w"],
-        #         "HEXFILE": '{BOOT_HEXFILE, ".hex"}',
-        #     },
-        #     "connect": {
-        #         "rom_sp_s": "rom_bus_m",
-        #     },
-        # },
-        # Internal memory
-        {
-            "core_name": "iob_axi_ram",
-            "instance_name": "internal_memory",
-            "instance_description": "Internal memory",
-            "if_defined": "IOB_MEM_NO_READ_ON_WRITE",
-            "parameters": {
-                "ID_WIDTH": "AXI_ID_W",
-                "LEN_WIDTH": "AXI_LEN_W",
-                "ADDR_WIDTH": params["fw_addr_w"],
-                "DATA_WIDTH": "AXI_DATA_W",
-                "READ_ON_WRITE": 0,
+    attributes_dict["wires"] = mwrap_wires
+    if params["use_intmem"]:
+        attributes_dict["wires"] += [
+            {
+                "name": "clk",
+                "descr": "Clock signal",
+                "signals": [
+                    {"name": "clk_i"},
+                ],
             },
-            "connect": {
-                "clk_i": "clk",
-                "rst_i": "rst",
-                "axi_s": (
-                    "int_mem_axi_m",
-                    [
-                        "{int_mem_axi_araddr, 2'b0}",
-                        "{int_mem_axi_awaddr, 2'b0}",
-                        "{1'b0, int_mem_axi_arlock}",
-                        "{1'b0, int_mem_axi_awlock}",
-                    ],
-                ),
+            {
+                "name": "rst",
+                "descr": "Reset signal",
+                "signals": [
+                    {"name": "arst_i"},
+                ],
             },
-        },
-    ]
-    if params["init_mem"]:
+        ]
+    attributes_dict["subblocks"] = []
+    # ROM (Disabled here because it is now in auto-generated iob_memwrapper)
+    # attributes_dict["subblocks"] = [
+    # {
+    #     "core_name": "iob_rom_sp",
+    #     "instance_name": "boot_rom",
+    #     "instance_description": "Boot ROM",
+    #     "parameters": {
+    #         "ADDR_W": params["bootrom_addr_w"] - 2,
+    #         "DATA_W": params["data_w"],
+    #         "HEXFILE": '{BOOT_HEXFILE, ".hex"}',
+    #     },
+    #     "connect": {
+    #         "rom_sp_s": "rom_bus_m",
+    #     },
+    # },
+    # ]
+    if params["use_intmem"]:
+        attributes_dict["subblocks"] += [
+            # Internal memory
+            {
+                "core_name": "iob_axi_ram",
+                "instance_name": "internal_memory",
+                "instance_description": "Internal memory",
+                "if_defined": "IOB_MEM_NO_READ_ON_WRITE",
+                "parameters": {
+                    "ID_WIDTH": "AXI_ID_W",
+                    "LEN_WIDTH": "AXI_LEN_W",
+                    "ADDR_WIDTH": params["mem_addr_w"],
+                    "DATA_WIDTH": "AXI_DATA_W",
+                    "READ_ON_WRITE": 0,
+                },
+                "connect": {
+                    "clk_i": "clk",
+                    "rst_i": "rst",
+                    "axi_s": (
+                        "int_mem_axi_m",
+                        [
+                            "{int_mem_axi_araddr, 2'b0}",
+                            "{int_mem_axi_awaddr, 2'b0}",
+                            "{1'b0, int_mem_axi_arlock}",
+                            "{1'b0, int_mem_axi_awlock}",
+                        ],
+                    ),
+                },
+            },
+        ]
+        if params["init_mem"]:
+            attributes_dict["subblocks"][-1]["parameters"].update(
+                {
+                    "FILE": f'"{params["name"]}_firmware"',
+                }
+            )
+
+        # Copy iob_axi_ram block, but with READ_ON_WRITE=1
+        attributes_dict["subblocks"].append(
+            copy.deepcopy(attributes_dict["subblocks"][-1])
+        )
+        attributes_dict["subblocks"][-1].pop("if_defined")
+        attributes_dict["subblocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"
         attributes_dict["subblocks"][-1]["parameters"].update(
             {
-                "FILE": f'"{params["name"]}_firmware"',
+                "READ_ON_WRITE": 1,
             }
         )
-
-    # Copy iob_axi_ram block, but with READ_ON_WRITE=1
-    attributes_dict["subblocks"].append(copy.deepcopy(attributes_dict["subblocks"][-1]))
-    attributes_dict["subblocks"][-1].pop("if_defined")
-    attributes_dict["subblocks"][-1]["if_not_defined"] = "IOB_MEM_NO_READ_ON_WRITE"
-    attributes_dict["subblocks"][-1]["parameters"].update(
-        {
-            "READ_ON_WRITE": 1,
-        }
-    )
 
     attributes_dict["subblocks"].append(
         # Add instantiator as a subblock (iob_system by default)

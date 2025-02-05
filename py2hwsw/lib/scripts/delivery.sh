@@ -73,7 +73,8 @@ rm -f $BUILD_DIR/config_delivery.mk
 echo "Release tar file"
 DELIVERYTARNAME=$TARNAME
 DELIVERYTARNAME+="_rel.tgz"
-tar cvzf ../$DELIVERYTARNAME $BUILD_DIR
+tar cvzf $DELIVERYTARNAME $BUILD_DIR
+mv $DELIVERYTARNAME $BUILD_DIR/
 
 echo ""
 echo "Done"

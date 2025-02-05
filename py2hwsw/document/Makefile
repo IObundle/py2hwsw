@@ -27,7 +27,7 @@ TSRC = $(patsubst tsrc/%, ./%, $(wildcard tsrc/*))
 
 TSRC+=name.tex
 name.tex:
-	 @echo $(NAME) | sed "s/_/\\_/g" > $@
+	 @echo $(NAME) | sed 's/_/\\_/g' > $@
 
 TSRC+=signature.tex
 signature.tex:

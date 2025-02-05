@@ -49,7 +49,7 @@ def setup(py_params_dict):
     for param_name in ["use_intmem", "use_extmem", "use_bootrom", "use_peripherals"]:
         if params[param_name]:
             num_xbar_masters += 1
-    xbar_sel_w = (num_xbar_masters-1).bit_length()
+    xbar_sel_w = (num_xbar_masters - 1).bit_length()
 
     attributes_dict = {
         "name": params["name"],
@@ -505,7 +505,9 @@ def setup(py_params_dict):
     num_masters = 0
     for param_name, interface_connection in full_xbar_master_interfaces.items():
         if params[param_name]:
-            attributes_dict["subblocks"][-1]["connect"] |= {f"m{num_masters}_axi_m": interface_connection}
+            attributes_dict["subblocks"][-1]["connect"] |= {
+                f"m{num_masters}_axi_m": interface_connection
+            }
             num_masters += 1
     attributes_dict["subblocks"][-1]["num_masters"] = num_masters
 

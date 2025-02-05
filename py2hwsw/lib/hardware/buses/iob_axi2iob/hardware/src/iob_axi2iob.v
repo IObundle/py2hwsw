@@ -303,7 +303,7 @@ module iob_axi2iob #(
                m_axil_wvalid_next  = 1'b1;
                w_burst_next        = w_burst_reg - 1'b1;
                w_burst_active_next = w_burst_reg != 0;
-               w_addr_next         = w_addr_reg + (1'b1 << w_burst_size_reg);
+               w_addr_next         = w_addr_reg + (1 << w_burst_size_reg);
                s_axi_wready_next   = 1'b0;
                m_axil_bready_next  = ~s_axi_bvalid_o & ~m_axil_awvalid;
                w_state_next        = STATE_RESP;
@@ -488,7 +488,7 @@ module iob_axi2iob #(
                s_axi_rlast_next  = 1'b0;
                s_axi_rvalid_next = 1'b1;
                r_burst_next      = r_burst_reg - 1'b1;
-               r_addr_next       = r_addr_reg + (1'b1 << r_burst_size_reg);
+               r_addr_next       = r_addr_reg + (1 << r_burst_size_reg);
                if (r_burst_reg == 0) begin
                   // last data word, return to idle
                   m_axil_rready_next = 1'b0;

@@ -6,8 +6,7 @@
 
 #include "iob_bsp.h"
 #include "iob_system_conf.h"
-#include "iob_system_periphs.h"
-#include "iob_system_system.h"
+#include "iob_system_mmap.h"
 #include "iob_uart.h"
 
 #define PROGNAME "IOb-Bootloader"
@@ -29,7 +28,7 @@ int main() {
 
 #ifdef IOB_SYSTEM_USE_EXTMEM
   uart_puts(PROGNAME);
-  uart_puts(": DDR in use. Program runs from internal memory.\n");
+  uart_puts(": DDR in use.\n");
 #endif
 
   // address to copy firmware to

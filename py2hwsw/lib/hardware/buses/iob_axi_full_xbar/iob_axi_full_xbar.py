@@ -190,7 +190,7 @@ def setup(py_params_dict):
                     | {"ADDR_W": axi_python_params["addr_w"] - M_SELECT_NBITS},
                 }
             )
-    # Wires for output fo merges
+    # Wires for output for merges
     for i in range(N_MASTERS):
         attributes_dict["wires"].append(
             {

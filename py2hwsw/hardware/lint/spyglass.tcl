@@ -9,6 +9,7 @@ set INCLUDE_DIRS $env(INCLUDE_DIRS)
 
 puts "TOP: $TOP"
 puts "CSR_IF: $CSR_IF"
+puts "INCLUDE_DIRS: $INCLUDE_DIRS"
 
 new_project spyglass -projectwdir .
 
@@ -34,7 +35,6 @@ set_option language_mode mixed
 #set_option designread_disable_flatten no
 set_option enableV05 yes
 set_option top $TOP
-set_option incdir { . ../src }
 set_option incdir $INCLUDE_DIRS
 #set_option active_methodology $SPYGLASS_HOME/GuideWare/latest/block/rtl_handoff
 set_option pragma { synopsys synthesis }

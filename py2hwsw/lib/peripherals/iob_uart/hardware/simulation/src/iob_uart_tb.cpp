@@ -3,22 +3,24 @@
 // SPDX-License-Identifier: MIT
 
 #include "Viob_uart.h"
-#include "iob_bsp.h"
-#include "iob_tasks_tb.h"
-#include "iob_uart_csrs.h"
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
 #include <verilated.h>
 
 #if (VM_TRACE == 1) // If verilator was invoked with --trace
 #include <verilated_vcd_c.h>
 #endif
 
-#define MAX_SIM_TIME 120
+#define MAX_SIM_TIME 120000
 
 vluint64_t main_time = 0;
 Viob_uart *dut;
 VerilatedVcdC *tfp;
+
+extern "C" {
+int iob_uart_core_tb();
+}
 
 double sc_time_stamp() { // Called by $time in Verilog
   return main_time;
@@ -26,11 +28,22 @@ double sc_time_stamp() { // Called by $time in Verilog
 
 void tick() {
   if (main_time >= MAX_SIM_TIME) {
+#if (VM_TRACE == 1)
+    tfp->dump(main_time); // Dump last values
+    tfp->close();         // Close tracing file
+    std::cout << "Generated vcd file" << std::endl;
+    delete tfp;
+#endif
+
     throw std::runtime_error(
         "Simulation time exceeded maximum simulation time");
   }
   dut->clk_i = !dut->clk_i;
   dut->eval();
+#if (VM_TRACE == 1)
+  tfp->dump(main_time); // Dump values into tracing file
+#endif
+  main_time++;
   dut->clk_i = !dut->clk_i;
   dut->eval();
 #if (VM_TRACE == 1)
@@ -39,8 +52,9 @@ void tick() {
   main_time++;
 }
 
-iob_arst_pulse() {
+void iob_arst_pulse() {
   dut->clk_i = 0;
+  dut->cke_i = 1;
   dut->arst_i = 0;
   tick();
   dut->arst_i = 1;
@@ -52,27 +66,49 @@ iob_arst_pulse() {
 }
 
 // write to the UART
-void iob_write(uint32_t addr, uint32_t data) {
-  dut->iob_uart_csrs_addr_i = addr;
-  dut->iob_uart_csrs_wdata_i = data;
-  dut->iob_uart_csrs_we_i = 1;
+void iob_write(uint32_t addr, uint8_t size, uint32_t data) {
+
+  // compute wstrb from size and address (assumes 32-bit bus)
+  uint8_t wstrb = 0;
+  if (size == 32) {
+    wstrb = 0xF;
+  } else if (size == 16) {
+    wstrb = 0x3 << (addr & 0x2);
+  } else if (size == 8) {
+    wstrb = 0x1 << (addr & 0x3);
+  }
+
+  dut->iob_uart_csrs_iob_valid_i = 1;
+  dut->iob_uart_csrs_iob_addr_i = addr;
+  dut->iob_uart_csrs_iob_wdata_i = data;
+  dut->iob_uart_csrs_iob_wstrb_i = wstrb;
+  tick();
   while (!dut->iob_uart_csrs_iob_ready_o) {
     tick();
   }
+  dut->iob_uart_csrs_iob_valid_i = 0;
   tick();
-  dut->iob_uart_csrs_we_i = 0;
 }
 
 // read from the UART
-uint32_t iob_read(uint32_t addr) {
-  dut->iob_uart_csrs_addr_i = addr;
-  dut->iob_uart_csrs_we_i = 0;
+uint32_t iob_read(uint32_t addr, uint8_t size) {
+  dut->iob_uart_csrs_iob_valid_i = 1;
+  dut->iob_uart_csrs_iob_addr_i = addr;
+  dut->iob_uart_csrs_iob_wstrb_i = 0;
   tick();
   while (!dut->iob_uart_csrs_iob_ready_o) {
     tick();
   }
+  dut->iob_uart_csrs_iob_valid_i = 0;
+  int data = dut->iob_uart_csrs_iob_rdata_o;
+
+  if (size == 16) {
+    data = (data >> (addr & 0x2)) & 0xFFFF;
+  } else if (size == 8) {
+    return (data >> (addr & 0x3)) & 0xFF;
+  }
   tick();
-  return dut->iob_uart_csrs_rdata_o;
+  return data;
 }
 
 int main(int argc, char **argv) {
@@ -87,75 +123,10 @@ int main(int argc, char **argv) {
   tfp->open("uut.vcd");         // Open tracing file
 #endif
 
-  // issue a hard async reset to the DUT
-  iob_arst_pulse();
-
-  // hold soft reset low
-  IOB_UART_SET_SOFTRESET(0);
-
-  // disable TX and RX
-  IOB_UART_SET_TXEN(0);
-  IOB_UART_SET_RXEN(0);
-
-  // set the divisor
-  IOB_UART_SET_DIV(FREQ / BAUD);
-
-  // assert tx and rx not ready
-  uint8_t tx_ready = IOB_UART_GET_TXREADY();
-  if (tx_ready != 0) {
-    std::cout << "Error: TX ready initially" << std::endl;
-    return 1;
-  }
-  uint8_t rx_ready = IOB_UART_GET_RXREADY();
-  if (rx_ready != 0) {
-    std::cout << "Error: RX ready initially" << std::endl;
-    return 1;
-  }
-
-  // pulse soft reset
-  IOB_UART_SET_SOFTRESET(1);
-  IOB_UART_SET_SOFTRESET(0);
-
-  // enable RX and TX
-  IOB_UART_SET_RXEN(1);
-  IOB_UART_SET_TXEN(1);
-
-  int failed = 0;
-
-  // open test log file
-  std::ofstream log_file;
-  log_file.open("test.log");
-
-  // data send/receive loop
-  for (int i = 0; i < 256; i++) {
-    // wait for tx ready
-    while (!IOB_UART_GET_TXREADY())
-      ;
-
-    // write word to send
-    IOB_UART_SET_TXDATA(i);
-
-    // wait for rx ready
-    while (!IOB_UART_GET_RXREADY())
-      ;
-
-    // read received word
-    uint8_t rx_data = IOB_UART_GET_RXDATA();
-
-    // check if received word is the same as sent word
-    if (rx_data != i) {
-      // signal error printing expected and received word
-      std::cout << "Error: Expected " << i << " but received " << rx_data
-                << std::endl;
-      failed += 1;
-    }
-
-    if (failed != 0) {
-      log_file << "Test failed!" << std::endl;
-      log_file.close();
-      exit(EXIT_FAILURE);
-    }
-  }
+  //
+  // CALL THE CORE TEST BENCH
+  //
+  int failed = iob_uart_core_tb();
 
 #if (VM_TRACE == 1)
   tfp->dump(main_time); // Dump values into tracing file
@@ -173,10 +144,5 @@ int main(int argc, char **argv) {
 #endif
 
   delete dut;
-
-  std::ofstream log_file;
-  log_file.open("test.log");
-  log_file << "Test passed!" << std::endl;
-  log_file.close();
-  exit(EXIT_SUCCESS);
+  exit(failed);
 }

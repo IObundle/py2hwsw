@@ -7,3 +7,4 @@
 #
 
 NOCLEAN+=-o -name "uart_tb.v"
+

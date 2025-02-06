@@ -78,8 +78,8 @@ def create_wire(core, *args, signals=[], **kwargs):
         sig_obj_list = []
         interface_obj = None
         if type(signals) is list:
-            replace_duplicate_signals_by_references(core.wires + core.ports, signals)
             # Convert user signal dictionaries into 'iob_signal' objects
+            replace_duplicate_signals_by_references(core.wires + core.ports, signals)
             sig_obj_list = convert_dict2obj_list(signals, iob_signal)
         elif type(signals) is dict:
             # Convert user interface dictionary into 'if_gen.interface' object
@@ -94,6 +94,7 @@ def create_wire(core, *args, signals=[], **kwargs):
             error_msg=f"Invalid {kwargs.get('name', '')} wire attribute '[arg]'!",
         )
         wire = iob_wire(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
+        replace_duplicate_signals_by_references(core.wires + core.ports, wire.signals)
         core.wires.append(wire)
     except Exception:
         add_traceback_msg(f"Failed to create wire '{kwargs['name']}'.")
@@ -131,6 +132,10 @@ def replace_duplicate_signals_by_references(wires, signals):
     reference to the original.
     """
     for idx, signal in enumerate(signals):
+        if isinstance(signal, iob_signal_reference):
+            continue
+        if type(signal) is iob_signal:
+            signal = signal.__dict__
         original_signal = find_signal_in_wires(wires, signal["name"])
         if not original_signal:
             continue

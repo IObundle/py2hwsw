@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 import copy
+import os
+from latex import write_table
 
 
 def setup(py_params_dict):
@@ -49,19 +51,30 @@ def setup(py_params_dict):
         }
     ]
 
+    list_of_mems = []
     for wire in mwrap_wires:
         if wire["signals"].get("prefix", None):
             prefix_str = wire["signals"]["prefix"]
         else:
             prefix_str = wire["name"] + "_"
+        list_of_mems.append(
+            {
+                "name": f"{prefix_str}mem",
+                "type": f"iob_{wire['signals']['type']}",
+                "addr_w": f"{prefix_str.upper()}ADDR_W",
+                "data_w": f"{prefix_str.upper()}DATA_W",
+                "hexfile": f"{prefix_str.upper()}HEXFILE",
+                "descr": wire["descr"],  # Memory description extracted from wire
+            }
+        )
         attributes_dict["subblocks"].append(
             {
-                "core_name": f"iob_{wire['signals']['type']}",
-                "instance_name": f"{prefix_str}mem",
+                "core_name": list_of_mems[-1]["type"],
+                "instance_name": list_of_mems[-1]["name"],
                 "parameters": {
-                    "DATA_W": f"{prefix_str.upper()}DATA_W",
-                    "ADDR_W": f"{prefix_str.upper()}ADDR_W",
-                    "HEXFILE": f"{prefix_str.upper()}HEXFILE",
+                    "DATA_W": list_of_mems[-1]["data_w"],
+                    "ADDR_W": list_of_mems[-1]["addr_w"],
+                    "HEXFILE": list_of_mems[-1]["hexfile"],
                 },
                 "connect": {
                     f"{wire['signals']['type']}_s": wire["name"],
@@ -72,4 +85,68 @@ def setup(py_params_dict):
     if "superblocks" in attrs:
         attributes_dict["superblocks"] = attrs["superblocks"]
 
+    # Generate LaTeX table of memories
+    # But don't create files for other targets (like clean)
+    if py_params_dict.get("py2hwsw_target", "") == "setup":
+        assert py_params_dict["build_dir"], "[iob_memwrapper]: Error: build_dir not set"
+        generate_mems_tex(
+            list_of_mems, os.path.join(py_params_dict["build_dir"], "document/tsrc")
+        )
+
     return attributes_dict
+
+
+#
+# Document functions
+#
+
+
+# Generate mems.tex file with list TeX tables of mems
+def generate_mems_tex(mems, out_dir):
+    """Generate TeX for memories section
+    :param mems: list of memories
+    :param out_dir: output directory
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    mems_file = open(f"{out_dir}/mems.tex", "w")
+
+    mems_file.write(
+        """
+    The memories of the core are described in the following table.
+    The tables give information on the name, type, address and data width in bits, and a textual description.
+"""
+    )
+
+    mems_file.write(
+        """
+    \\begin{table}[H]
+      \\centering
+      \\begin{tabularx}{\\textwidth}{|l|c|c|c|X|}
+        \\hline
+        \\rowcolor{iob-green}
+        {\\bf Name} & {\\bf Type} & {\\bf Addr Width} & {\\bf Data Width} & {\\bf Description} \\\\ \\hline
+        \\input mems_tab
+      \\end{tabularx}
+      \\caption{Table of memories of the core}
+      \\label{mems_tab:is}
+    \\end{table}
+"""
+    )
+
+    mems_file.write("\\clearpage")
+    mems_file.close()
+
+    # Generate mems table
+    tex_table = []
+    for mem in mems:
+        tex_table.append(
+            [
+                mem["name"],
+                mem["type"],
+                str(mem["addr_w"]),
+                str(mem["data_w"]),
+                mem["descr"],
+            ]
+        )
+
+    write_table(f"{out_dir}/mems", tex_table)

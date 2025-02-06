@@ -2,6 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
+CSRC = $(wildcard ./src/*.c)
+OBJSRC = $(CSRC:.c=.o)
+
+UFLAGS+=VERILATOR=$(VERILATOR)
+VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) $(OBJSRC)
+VSRC+=$(wildcard ./src/*_tb.cpp)
+
+
 VTOP?=$(NAME)
 
 VFLAGS+=--cc --exe -I. -I../src -I../common_src -Isrc --top-module $(VTOP)
@@ -28,8 +36,11 @@ SIM_USER=$(VSIM_USER)
 
 SIM_OBJ=V$(VTOP)
 
+%.o: %.c
+	gcc -I../../       -I../../software/src -c -o $@ $<
+
 comp: $(VHDR) $(VSRC) $(HEX)
-	verilator $(VFLAGS) $(VSRC) src/$(NAME)_tb.cpp
+	verilator $(VFLAGS) $(VSRC)
 	cd ./obj_dir && make -f $(SIM_OBJ).mk
 
 exec: comp

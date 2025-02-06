@@ -10,6 +10,7 @@ RUN_DEPS+=iob_system_bootrom.hex iob_system_firmware.hex
 BUILD_DEPS+=iob_system_bootrom.hex $(if $(filter $(INIT_MEM),1),iob_system_firmware.hex)
 
 QUARTUS_SEED ?=5
+SDC_PREFIX=iob_system_fpga_wrapper
 
 ROOT_DIR :=../..
 include $(ROOT_DIR)/software/sw_build.mk

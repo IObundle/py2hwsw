@@ -26,6 +26,7 @@ BOARD ?= cyclonev_gt_dk
 FPGA_TOOL:=$(shell find . -name $(BOARD) | cut -d"/" -f2)
 
 FPGA_TOP ?=$(NAME)_$(BOARD)
+SDC_PREFIX ?=$(NAME)
 
 ifeq ($(FPGA_TOOL),)
 $(error Cannot find FPGA toolchain for board $(BOARD). Please make sure that the board name is correct and that the board is supported by the FPGA toolchain)

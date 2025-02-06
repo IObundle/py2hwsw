@@ -130,7 +130,7 @@ using it.
 To build the Py2HWSW User Guide, run the following command:
 
 ```bash
-make doc-buid
+make py2-doc-buid
 ```
 
 ## Code Style

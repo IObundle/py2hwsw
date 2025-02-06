@@ -118,7 +118,7 @@ if __name__ == "__main__":
 
     if not args.core_name:
         parser.print_usage(sys.stderr)
-        fail_with_msg("Core name is required.")
+        exit(1)
 
     py_params = {}
     if args.py_params:
@@ -140,5 +140,3 @@ if __name__ == "__main__":
         iob_core.print_core_dict(args.core_name, **py_params)
     elif args.target == "print_py2hwsw_attributes":
         iob_core.print_py2hwsw_attributes(args.core_name, **py_params)
-    else:
-        fail_with_msg(f"Unknown target: {args.target}")

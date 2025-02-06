@@ -62,7 +62,7 @@ progress and will be updated as the project evolves. It uses LaTeX and can be
 built with the following command:
 
 ```bash
-make -C py2hwsw/lib doc-build
+make -C py2hwsw/lib py2-doc-build
 ```
 
 

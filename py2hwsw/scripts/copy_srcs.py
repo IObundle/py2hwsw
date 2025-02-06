@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -181,7 +181,7 @@ def lint_setup(python_module):
             old_content = file.read()
     with open(file_path, 'w') as file:
         file.write(f"""
-// SPDX-FileCopyrightText: 2024 IObundle
+// SPDX-FileCopyrightText: 2025 IObundle
 //
 // SPDX-License-Identifier: MIT
 

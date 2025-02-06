@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # SPDX-FileCopyrightText: 2018 Alex Forencich
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 

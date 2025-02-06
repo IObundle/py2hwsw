@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "iob_uart_csrs.h"
 
 // Core Setters and Getters

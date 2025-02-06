@@ -2,10 +2,22 @@
 #
 # SPDX-License-Identifier: MIT
 
-./py2hwsw/lib/hardware/buses/axi_interconnect/hardware/src/axi_interconnect.v
+./py2hwsw/lib/hardware/buses/iob_axi_interconnect/hardware/src/iob_axi_interconnect.v
 ./py2hwsw/lib/hardware/buses/iob_arbiter/hardware/src/iob_arbiter.v
 ./py2hwsw/lib/hardware/buses/iob_arbiter/hardware/src/iob_priority_encoder.v
-./py2hwsw/lib/hardware/iob_picorv32/hardware/src/picorv32.v
-./py2hwsw/lib/hardware/memories/axi_ram/hardware/src/axi_ram.v
-./py2hwsw/lib/scripts/yosys-abc.nix
 
+./py2hwsw/lib/hardware/buses/iob_axi_crossbar/hardware/src/iob_axi_crossbar_addr.v
+./py2hwsw/lib/hardware/buses/iob_axi_crossbar/hardware/src/iob_axi_crossbar_core.v
+./py2hwsw/lib/hardware/buses/iob_axi_crossbar/hardware/src/iob_axi_crossbar_rd.v
+./py2hwsw/lib/hardware/buses/iob_axi_crossbar/hardware/src/iob_axi_crossbar_wr.v
+./py2hwsw/lib/hardware/buses/iob_axi_crossbar/hardware/src/iob_axi_register_rd.v
+./py2hwsw/lib/hardware/buses/iob_axi_crossbar/hardware/src/iob_axi_register_wr.v
+./py2hwsw/lib/hardware/buses/iob_axi_crossbar/scripts/iob_axi_crossbar_wrap.py
+
+./py2hwsw/lib/hardware/iob_picorv32/hardware/src/iob_picorv32.v
+./py2hwsw/lib/hardware/iob_picorv32/hardware/src/iob_picorv32_core.v
+
+./py2hwsw/lib/hardware/memories/iob_axi_ram/hardware/src/iob_axi_ram.v
+
+./py2hwsw/lib/scripts/yosys-abc.nix
+./py2hwsw/lib/iob_system/submodules/VEXRISCV

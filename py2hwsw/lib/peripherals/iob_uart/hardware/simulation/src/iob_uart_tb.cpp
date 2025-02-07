@@ -8,131 +8,85 @@
 #include <stdio.h>
 #include <verilated.h>
 
+#include "iob_tasks.h"
+
 #if (VM_TRACE == 1) // If verilator was invoked with --trace
 #include <verilated_vcd_c.h>
 #endif
 
 #define MAX_SIM_TIME 120000
 
-vluint64_t main_time = 0;
-Viob_uart *dut;
-VerilatedVcdC *tfp;
+extern vluint64_t main_time;
+extern timer_settings_t task_timer_settings;
 
-extern "C" {
+//////////////////////////////////////////
+Viob_uart *dut = new Viob_uart;
+
+// extern "C"
 int iob_uart_core_tb();
-}
+
+//////////////////////////////////////////
+
+void call_eval() { dut->eval(); }
+
+#if (VM_TRACE == 1)
+#if (VM_TRACE_FST == 1)
+VerilatedFstC *tfp = new VerilatedFstC; // Create tracing object
+#else
+VerilatedVcdC *tfp = new VerilatedVcdC; // Create tracing object
+#endif
+
+void call_dump(vluint64_t time) { tfp->dump(time); }
+#endif
 
 double sc_time_stamp() { // Called by $time in Verilog
   return main_time;
 }
 
-void tick() {
-  if (main_time >= MAX_SIM_TIME) {
-#if (VM_TRACE == 1)
-    tfp->dump(main_time); // Dump last values
-    tfp->close();         // Close tracing file
-    std::cout << "Generated vcd file" << std::endl;
-    delete tfp;
-#endif
+// uart interface
+iob_native_t uart_if = {&dut->iob_uart_csrs_iob_valid_i,
+                        &dut->iob_uart_csrs_iob_addr_i,
+                        UCHAR,
+                        &dut->iob_uart_csrs_iob_wdata_i,
+                        &dut->iob_uart_csrs_iob_wstrb_i,
+                        &dut->iob_uart_csrs_iob_rdata_o,
+                        &dut->iob_uart_csrs_iob_rvalid_o,
+                        &dut->iob_uart_csrs_iob_ready_o};
 
-    throw std::runtime_error(
-        "Simulation time exceeded maximum simulation time");
-  }
-  dut->clk_i = !dut->clk_i;
-  dut->eval();
-#if (VM_TRACE == 1)
-  tfp->dump(main_time); // Dump values into tracing file
-#endif
-  main_time++;
-  dut->clk_i = !dut->clk_i;
-  dut->eval();
-#if (VM_TRACE == 1)
-  tfp->dump(main_time); // Dump values into tracing file
-#endif
-  main_time++;
-}
-
-void iob_arst_pulse() {
+void iob_hard_reset() {
   dut->clk_i = 0;
   dut->cke_i = 1;
   dut->arst_i = 0;
-  tick();
+  for (int i = 0; i < 100; i++)
+    Timer(CLK_PERIOD);
   dut->arst_i = 1;
-  for (uint32_t i = 0; i < 8; i++) {
-    tick();
-  }
+  for (int i = 0; i < 100; i++)
+    Timer(CLK_PERIOD);
   dut->arst_i = 0;
-  tick();
-}
-
-// write to the UART
-void iob_write(uint32_t addr, uint8_t size, uint32_t data) {
-
-  // compute wstrb from size and address (assumes 32-bit bus)
-  uint8_t wstrb = 0;
-  if (size == 32) {
-    wstrb = 0xF;
-  } else if (size == 16) {
-    wstrb = 0x3 << (addr & 0x2);
-  } else if (size == 8) {
-    wstrb = 0x1 << (addr & 0x3);
-  }
-
-  dut->iob_uart_csrs_iob_valid_i = 1;
-  dut->iob_uart_csrs_iob_addr_i = addr;
-  dut->iob_uart_csrs_iob_wdata_i = data;
-  dut->iob_uart_csrs_iob_wstrb_i = wstrb;
-  tick();
-  while (!dut->iob_uart_csrs_iob_ready_o) {
-    tick();
-  }
-  dut->iob_uart_csrs_iob_valid_i = 0;
-  tick();
-}
-
-// read from the UART
-uint32_t iob_read(uint32_t addr, uint8_t size) {
-  dut->iob_uart_csrs_iob_valid_i = 1;
-  dut->iob_uart_csrs_iob_addr_i = addr;
-  dut->iob_uart_csrs_iob_wstrb_i = 0;
-  tick();
-  while (!dut->iob_uart_csrs_iob_ready_o) {
-    tick();
-  }
-  dut->iob_uart_csrs_iob_valid_i = 0;
-  int data = dut->iob_uart_csrs_iob_rdata_o;
-
-  if (size == 16) {
-    data = (data >> (addr & 0x2)) & 0xFFFF;
-  } else if (size == 8) {
-    return (data >> (addr & 0x3)) & 0xFF;
-  }
-  tick();
-  return data;
 }
 
 int main(int argc, char **argv) {
 
   Verilated::commandArgs(argc, argv); // Init verilator context
-  dut = new Viob_uart;                // Create DUT object
+  task_timer_settings.clk = &dut->clk_i;
+  task_timer_settings.eval = call_eval;
+#if (VM_TRACE == 1)
+  task_timer_settings.dump = call_dump;
+#endif
 
 #if (VM_TRACE == 1)
   Verilated::traceEverOn(true); // Enable tracing
-  tfp = new VerilatedVcdC;      // Create tracing object
-  dut->trace(tfp, 99);          // Trace 99 levels of hierarchy
-  tfp->open("uut.vcd");         // Open tracing file
+  dut->trace(tfp, 1);
+  tfp->open("uut.vcd");
 #endif
 
+  int failed = 0;
+  iob_hard_reset();
   //
   // CALL THE CORE TEST BENCH
   //
-  int failed = iob_uart_core_tb();
 
-#if (VM_TRACE == 1)
-  tfp->dump(main_time); // Dump values into tracing file
-#endif
-
-  main_time++;
+  failed = iob_uart_core_tb();
 
   dut->final();
 
@@ -144,5 +98,15 @@ int main(int argc, char **argv) {
 #endif
 
   delete dut;
+
+  // create test log file
+  FILE *log = fopen("test.log", "w");
+  if (failed != 0) {
+    fprintf(log, "Test failed!");
+  } else {
+    fprintf(log, "Test passed!");
+  }
+  fclose(log);
+
   exit(failed);
 }

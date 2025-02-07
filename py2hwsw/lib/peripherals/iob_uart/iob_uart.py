@@ -201,6 +201,12 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
+            {
+                "core_name": "iob_tasks",
+                "instance_name": "iob_tasks_inst",
+                "instantiate": False,
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
         "superblocks": [
             # Simulation wrapper

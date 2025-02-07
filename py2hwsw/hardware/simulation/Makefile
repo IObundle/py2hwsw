@@ -39,7 +39,12 @@ ifneq ($(wildcard sim_build.mk),)
 include sim_build.mk
 endif
 
+#
+# Include the simulator stub
+#
 include $(SIMULATOR).mk
+
+
 UFLAGS+=VCD=$(VCD)
 UFLAGS+=COV=$(COV)
 UFLAGS+=SYN=$(SYN)

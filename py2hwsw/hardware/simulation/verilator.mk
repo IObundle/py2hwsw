@@ -2,22 +2,21 @@
 #
 # SPDX-License-Identifier: MIT
 
-CSRC = $(wildcard ./src/*.c)
-OBJSRC = $(CSRC:.c=.o)
-
-UFLAGS+=VERILATOR=$(VERILATOR)
-VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) $(OBJSRC)
-VSRC+=$(wildcard ./src/*_tb.cpp)
-
 
 VTOP?=$(NAME)
 
-VFLAGS+=--cc --exe -I. -I../src -I../common_src -Isrc --top-module $(VTOP)
+VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) ./src/iob_tasks.cpp
+
+ifeq ($(USE_ETHERNET),1)
+VSRC+=./src/iob_eth_csrs_emb_verilator.c ./src/iob_eth_driver_tb.cpp
+endif
+
+VFLAGS+=--cc --exe -I. -I../src -I../common_src -I./src --top-module $(VTOP)
 VFLAGS+=$(addprefix -I,$(INCLUDE_DIRS))
 VFLAGS+=-Wno-lint --Wno-UNOPTFLAT
 VFLAGS+=--no-timing
 # Include embedded headers
-VFLAGS+=-CFLAGS "-I../../../software/src -I../../../software/include -I../../../software"
+VFLAGS+=-CFLAGS "-I../../../software/src -I../../../software/include"
 
 ifeq ($(VCD),1)
 VFLAGS+=--trace
@@ -36,11 +35,10 @@ SIM_USER=$(VSIM_USER)
 
 SIM_OBJ=V$(VTOP)
 
-%.o: %.c
-	gcc -I../../       -I../../software/src -c -o $@ $<
+#VFLAGS+=--debug
 
-comp: $(VHDR) $(VSRC) $(HEX)
-	verilator $(VFLAGS) $(VSRC)
+comp: $(VHDR) $(VSRC) $(HEX) $(COBJ)
+	verilator $(VFLAGS) $(VSRC) src/$(NAME)_tb.cpp
 	cd ./obj_dir && make -f $(SIM_OBJ).mk
 
 exec: comp

@@ -27,7 +27,16 @@
 extern vluint64_t main_time;
 extern timer_settings_t task_timer_settings;
 
-void cpu_inituart(iob_native_t *uart_if);
+void cpu_inituart(iob_native_t *uart_if) {
+  // pulse reset uart
+  iob_write(IOB_UART_SOFTRESET_ADDR, 1, IOB_UART_SOFTRESET_W / 8, uart_if);
+  iob_write(IOB_UART_SOFTRESET_ADDR, 0, IOB_UART_SOFTRESET_W / 8, uart_if);
+  // config uart div factor
+  iob_write(IOB_UART_DIV_ADDR, int(FREQ / BAUD), IOB_UART_DIV_W / 8, uart_if);
+  // enable uart for receiving
+  iob_write(IOB_UART_RXEN_ADDR, 1, IOB_UART_RXEN_W / 8, uart_if);
+  iob_write(IOB_UART_TXEN_ADDR, 1, IOB_UART_TXEN_W / 8, uart_if);
+}
 
 Viob_system_sim *dut = new Viob_system_sim;
 
@@ -60,6 +69,12 @@ int main(int argc, char **argv, char **env) {
   task_timer_settings.dump = call_dump;
 #endif
 
+#if (VM_TRACE == 1)
+  Verilated::traceEverOn(true); // Enable tracing
+  dut->trace(tfp, 1);
+  tfp->open("uut.vcd");
+#endif
+
   iob_native_t uart_if = {
       &dut->uart_iob_valid_i,  &dut->uart_iob_addr_i,  UCHAR,
       &dut->uart_iob_wdata_i,  &dut->uart_iob_wstrb_i, &dut->uart_iob_rdata_o,
@@ -74,12 +89,6 @@ int main(int argc, char **argv, char **env) {
                          &dut->ethernet_iob_rdata_o,
                          &dut->ethernet_iob_rvalid_o,
                          &dut->ethernet_iob_ready_o};
-#endif
-
-#if (VM_TRACE == 1)
-  Verilated::traceEverOn(true); // Enable tracing
-  dut->trace(tfp, 1);
-  tfp->open("uut.vcd");
 #endif
 
   dut->clk_i = 0;
@@ -97,6 +106,8 @@ int main(int argc, char **argv, char **env) {
   *(uart_if.iob_valid) = 0;
   *(uart_if.iob_wstrb) = 0;
   cpu_inituart(&uart_if);
+
+  ///////////////////////////////////////////////////////////////
 
   FILE *soc2cnsl_fd;
   FILE *cnsl2soc_fd;
@@ -145,6 +156,8 @@ int main(int argc, char **argv, char **env) {
 #endif
   }
 
+  ///////////////////////////////////////////////////////////////
+
   dut->final();
 
 #if (VM_TRACE == 1)
@@ -158,15 +171,4 @@ int main(int argc, char **argv, char **env) {
   dut = NULL;
 
   exit(0);
-}
-
-void cpu_inituart(iob_native_t *uart_if) {
-  // pulse reset uart
-  iob_write(IOB_UART_SOFTRESET_ADDR, 1, IOB_UART_SOFTRESET_W / 8, uart_if);
-  iob_write(IOB_UART_SOFTRESET_ADDR, 0, IOB_UART_SOFTRESET_W / 8, uart_if);
-  // config uart div factor
-  iob_write(IOB_UART_DIV_ADDR, int(FREQ / BAUD), IOB_UART_DIV_W / 8, uart_if);
-  // enable uart for receiving
-  iob_write(IOB_UART_RXEN_ADDR, 1, IOB_UART_RXEN_W / 8, uart_if);
-  iob_write(IOB_UART_TXEN_ADDR, 1, IOB_UART_TXEN_W / 8, uart_if);
 }

@@ -12,24 +12,17 @@ include $(ROOT_DIR)/software/sw_build.mk
 
 VTOP:=iob_system_tb
 
-# SOURCES
+# VERILATOR ADDITIONAL SOURCES #####################################
 ifeq ($(SIMULATOR),verilator)
 
-VSRC+=./src/iob_tasks.cpp
-
-ifeq ($(USE_ETHERNET),1)
-VSRC+=./src/iob_eth_csrs_emb_verilator.c ./src/iob_eth_driver_tb.cpp
-endif
-
-# get header files (needed for iob_system_tb.cpp)
-VHDR+=iob_uart_csrs.h
-iob_uart_csrs.h: ../../software/src/iob_uart_csrs.h
-	cp $< $@
+# uart control header
+VHDR+=../../software/src/iob_uart_csrs.h
 
 # verilator top module
 VTOP:=iob_system_sim
 
 endif
+####################################################################
 
 CONSOLE_CMD ?=rm -f soc2cnsl cnsl2soc; ../../scripts/console.py -L
 

@@ -1,6 +1,8 @@
-// SPDX-FileCopyrightText: 2024 IObundle
-//
-// SPDX-License-Identifier: MIT
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #include "Viob_uart.h"
 #include <fstream>

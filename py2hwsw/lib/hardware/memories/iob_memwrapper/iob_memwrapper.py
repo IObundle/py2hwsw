@@ -5,6 +5,8 @@
 import copy
 import os
 from latex import write_table
+from iob_base import find_obj_in_list
+import sys
 
 
 def setup(py_params_dict):
@@ -57,24 +59,29 @@ def setup(py_params_dict):
             prefix_str = wire["signals"]["prefix"]
         else:
             prefix_str = wire["name"] + "_"
+
+        addr_w_param = f"{prefix_str.upper()}ADDR_W"
+        data_w_param = f"{prefix_str.upper()}DATA_W"
+        hexfile_param = f"{prefix_str.upper()}HEXFILE"
         list_of_mems.append(
             {
                 "name": f"{prefix_str}mem",
                 "type": f"iob_{wire['signals']['type']}",
-                "addr_w": f"{prefix_str.upper()}ADDR_W",
-                "data_w": f"{prefix_str.upper()}DATA_W",
-                "hexfile": f"{prefix_str.upper()}HEXFILE",
-                "descr": wire["descr"],  # Memory description extracted from wire
+                # Get default values of parameters
+                "addr_w": find_obj_in_list(attrs["confs"], addr_w_param)["val"],
+                "data_w": find_obj_in_list(attrs["confs"], data_w_param)["val"],
+                "hexfile": find_obj_in_list(attrs["confs"], hexfile_param)["val"],
             }
         )
+
         attributes_dict["subblocks"].append(
             {
                 "core_name": list_of_mems[-1]["type"],
                 "instance_name": list_of_mems[-1]["name"],
                 "parameters": {
-                    "DATA_W": list_of_mems[-1]["data_w"],
-                    "ADDR_W": list_of_mems[-1]["addr_w"],
-                    "HEXFILE": list_of_mems[-1]["hexfile"],
+                    "DATA_W": data_w_param,
+                    "ADDR_W": addr_w_param,
+                    "HEXFILE": hexfile_param,
                 },
                 "connect": {
                     f"{wire['signals']['type']}_s": wire["name"],
@@ -113,7 +120,7 @@ def generate_mems_tex(mems, out_dir):
     mems_file.write(
         """
     The memories of the core are described in the following table.
-    The tables give information on the name, type, address and data width in bits, and a textual description.
+    The tables give information on the name, type, address and data width in bits, and initialization file name.
 """
     )
 
@@ -124,7 +131,7 @@ def generate_mems_tex(mems, out_dir):
       \\begin{tabularx}{\\textwidth}{|l|c|c|c|X|}
         \\hline
         \\rowcolor{iob-green}
-        {\\bf Name} & {\\bf Type} & {\\bf Addr Width} & {\\bf Data Width} & {\\bf Description} \\\\ \\hline
+        {\\bf Name} & {\\bf Type} & {\\bf Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
         \\input mems_tab
       \\end{tabularx}
       \\caption{Table of memories of the core}
@@ -145,7 +152,7 @@ def generate_mems_tex(mems, out_dir):
                 mem["type"],
                 str(mem["addr_w"]),
                 str(mem["data_w"]),
-                mem["descr"],
+                mem["hexfile"],
             ]
         )
 

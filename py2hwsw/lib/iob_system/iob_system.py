@@ -41,6 +41,8 @@ def setup(py_params_dict):
         "fw_addr_w": 18,
         # If should include a tester system
         "include_tester": True,
+        # CPU selection
+        "cpu": "iob_vexriscv",
     }
 
     update_params(params, py_params_dict)
@@ -401,8 +403,8 @@ def setup(py_params_dict):
         ]
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_vexriscv",
-            "name": params["name"] + "_vexriscv",
+            "core_name": params["cpu"],
+            "name": params["name"] + "_" + params["cpu"],
             "instance_name": "cpu",
             "instance_description": "RISC-V CPU instance",
             # Reset address and uncached range are filled automatically

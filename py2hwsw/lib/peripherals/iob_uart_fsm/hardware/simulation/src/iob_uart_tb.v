@@ -22,10 +22,8 @@
    #PRE RESET=`IOB_UART_RST_POL; #DURATION RESET=~`IOB_UART_RST_POL; #POST;\
    @(posedge CLK) #1;
 
-
-
 module iob_uart_tb;
-   
+
    parameter clk_frequency = 100e6;  //100 MHz
    parameter baud_rate = 1e6;  //high value to speed sim
    parameter clk_per = 1e9 / clk_frequency;
@@ -37,8 +35,6 @@ module iob_uart_tb;
    reg                        arst = ~`IOB_UART_RST_POL;
    reg                        clk;
    reg                        cke = 1;
-   
-   iob_clock #(.CLK_PERIOD(10)) clk_inst (.clk_o(clk));
 
    reg [7:0]                  word;
    
@@ -62,6 +58,8 @@ module iob_uart_tb;
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
+      clk      = 1;
+
       //apply async reset
       `IOB_RESET(clk, arst, 100, 1_000, 100);
 
@@ -99,8 +97,6 @@ module iob_uart_tb;
 
       //enable rx and tx
       iob_write(`IOB_UART_RXEN_ADDR, 1, `IOB_UART_RXEN_W);
-
-      repeat (100) @(posedge clk);
       iob_write(`IOB_UART_TXEN_ADDR, 1, `IOB_UART_TXEN_W);
 
 
@@ -152,6 +148,14 @@ module iob_uart_tb;
       $finish();
 
    end
+
+   //
+   // CLOCK
+   //
+
+   //system clock
+   always #(clk_per / 2) clk = ~clk;
+
 
    // Instantiate the Unit Under Test (UUT)
    iob_uart uut 

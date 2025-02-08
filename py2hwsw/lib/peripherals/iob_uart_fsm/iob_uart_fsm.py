@@ -62,7 +62,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "txdata",
-                "descr": "",
+                "descr": "CSR TX data register interface (no auto selected)",
                 "signals": [
                     {"name": "txdata_wdata_wr", "width": 8},
                     {"name": "txdata_wen_wr", "width": 1},
@@ -99,7 +99,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "rxdata",
-                "descr": "",
+                "descr": "CSR RX data register interface (no auto selected)",
                 "signals": [
                     {"name": "rxdata_rdata_rd", "width": 8},
                     {"name": "rxdata_rvalid_rd", "width": 1},
@@ -166,7 +166,7 @@ def setup(py_params_dict):
                     "rxdata_io":"rxdata"
                 --csr_if {CSR_IF}
                 --csr-group 
-				    uart 
+				    uart
                     -d 'UART software accessible registers' 
                         -r softreset:1 -t W -d 'Soft reset'  --rst_val 0 --addr 0 --log2n_items 0
                         -r div:16 -t W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
@@ -192,20 +192,25 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_uart_core",
-                "instance_name": "iob_uart_core_inst",
-                "instance_description": "UART core driver",
+                "core_name": "iob_tx_fsm",
+                "instance_name": "tx_fsm",
+                "instance_description": "Transmitter FSM",
                 "connect": {
-                    "clk_rst_s": "clk_rst",
-                    "reg_interface_io": "iob_uart_core_reg_interface",
-                    "rs232_m": "rs232_m",
+                    "rst_i": "softreset_wr",
+                    "txen_i": "txen_wr",
+                    "txdata_i": "txdata_wdata_wr",
+                    "txready_o": "txready_rd",
+                    "rs232_txd_o": "rs232_int_txd",
+                    "bit_duration_i": "div_wr",
                 },
             },
             {
-                "core_name": "iob_clock",
-                "instance_name": "iob_clk_inst",
-                "dest_dir": "hardware/simulation/src",
-                "instantiate": False,
+                "core_name": "iob_rx_fsm",
+                "instance_name": "rx_fsm",
+                "instance_description": "Receiver FSM",
+                "connect": {
+                    "rst_i": "softreset_wr",
+                },
             },
         ],
         "superblocks": [

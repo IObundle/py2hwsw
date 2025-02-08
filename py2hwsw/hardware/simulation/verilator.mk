@@ -2,47 +2,37 @@
 #
 # SPDX-License-Identifier: MIT
 
+# remote simulation server
+SIM_SERVER=$(VLT_SERVER)
+SIM_USER=$(VLT_USER)
 
+# top level module name and simulation object
 VTOP?=$(NAME)
-
-VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) ./src/iob_tasks.cpp
-
-ifeq ($(USE_ETHERNET),1)
-VSRC+=./src/iob_eth_csrs_emb_verilator.c ./src/iob_eth_driver_tb.cpp
-endif
-
-VFLAGS+=--cc --exe -I. -I../src -I../common_src -I./src --top-module $(VTOP)
-VFLAGS+=$(addprefix -I,$(INCLUDE_DIRS))
-VFLAGS+=-Wno-lint --Wno-UNOPTFLAT
-VFLAGS+=--no-timing
-# Include embedded headers
-VFLAGS+=-CFLAGS "-I../../../software/src -I../../../software/include"
-
-ifeq ($(VCD),1)
-VFLAGS+=--trace
-VFLAGS+=-DVCD -CFLAGS "-DVCD"
-endif
-
-ifneq ($(VTHREADS),)
-VFLAGS+=--threads $(VTHREADS)
-# Setup multi-threading optimizations according to:
-# https://verilator.org/guide/latest/verilating.html
-V_MULTI_THREAD_STR:=numactl -m 0 -C $(shell seq -s, 0 $$(($(VTHREADS)-1)) ) --
-endif
-
-SIM_SERVER=$(VSIM_SERVER)
-SIM_USER=$(VSIM_USER)
-
 SIM_OBJ=V$(VTOP)
 
-#VFLAGS+=--debug
+# filter out the verilog testbench
+VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) ./src/iob_core_tb.c ./src/iob_vlt_tb.cpp
+
+# include files
+VLTINCLUDES=$(addprefix -I, ./ ./src ../src ../../software/include ../../software/src)
+CPPINCLUDES=$(addprefix -I, ./ ../ ../src ../../src ../../../software/include ../../../software/src)
+
+VFLAGS+=$(VLTINCLUDES) -CFLAGS "$(CPPINCLUDES)"
+
+# verilator  flags
+VFLAGS+=--cc --exe --top-module $(VTOP) #compile to C++, alow user C/C++ code, and set top module
+VFLAGS+=-Wno-lint --Wno-UNOPTFLAT
+VFLAGS+=--no-timing
+ifeq ($(VCD),1)
+VFLAGS+=--trace -DVCD
+endif
 
 comp: $(VHDR) $(VSRC) $(HEX) $(COBJ)
-	verilator $(VFLAGS) $(VSRC) src/$(NAME)_tb.cpp
+	verilator $(VFLAGS) $(VSRC)
 	cd ./obj_dir && make -f $(SIM_OBJ).mk
 
 exec: comp
-	$(V_MULTI_THREAD_STR) ./obj_dir/$(SIM_OBJ)
+	./obj_dir/$(SIM_OBJ)
 
 clean: gen-clean
 	@rm -rf obj_dir

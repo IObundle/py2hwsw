@@ -17,7 +17,7 @@ VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) ./src/iob_core_tb.c ./src/
 VLTINCLUDES=$(addprefix -I, ./ ./src ../src ../../software/include ../../software/src)
 CPPINCLUDES=$(addprefix -I, ./ ../ ../src ../../src ../../../software/include ../../../software/src)
 
-VFLAGS+=$(VLTINCLUDES) -CFLAGS "$(CPPINCLUDES)"
+VFLAGS+=$(VLTINCLUDES) -CFLAGS "$(CPPINCLUDES) -g"
 
 # verilator  flags
 VFLAGS+=--cc --exe --top-module $(VTOP) #compile to C++, alow user C/C++ code, and set top module

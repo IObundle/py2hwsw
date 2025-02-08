@@ -44,24 +44,25 @@ dut_t *dut = new dut_t;
 // Clock tick
 void clk_tick(unsigned int n = 1) {
   for (unsigned int i = 0; i < n; i++) {
-    dut->clk_i = !dut->clk_i;
     dut->eval();
-    sim_time += CLK_PERIOD / 2;
 #if (VM_TRACE == 1)
     tfp->dump(sim_time); // Dump values into tracing file
 #endif
-    dut->clk_i = !dut->clk_i;
+    sim_time += CLK_PERIOD / 2 - 1;
+    dut->clk_i = !dut->clk_i; // negedge
     dut->eval();
-    sim_time += CLK_PERIOD / 2;
 #if (VM_TRACE == 1)
     tfp->dump(sim_time);
 #endif
+    sim_time += CLK_PERIOD / 2;
+    dut->clk_i = !dut->clk_i; // posedge
+    sim_time += 1;
   }
 }
 
 // Reset dut
 void iob_hard_reset() {
-  dut->clk_i = 0;
+  dut->clk_i = 1;
   dut->cke_i = 0;
   dut->arst_i = 0;
   dut->eval();
@@ -91,6 +92,7 @@ void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
     break;
   case 2:
     dut->csrs_iob_wstrb_i = 0x3 << (cpu_address & 0x2);
+    dut->csrs_iob_wdata_i = cpu_data << ((cpu_address & 0x2) * 8);
     break;
   default:
     dut->csrs_iob_wstrb_i = 0xF;

@@ -16,7 +16,7 @@ int iob_core_tb() {
   IOB_UART_SET_SOFTRESET(0);
 
   // print the soft reset message
-  printf("Soft reset complete\n");
+  printf("Soft reset set to 0\n");
 
   // disable TX and RX
 
@@ -24,7 +24,9 @@ int iob_core_tb() {
   IOB_UART_SET_RXEN(0);
 
   // set the divisor
-  IOB_UART_SET_DIV(FREQ / BAUD);
+
+  int div = FREQ / BAUD;
+  IOB_UART_SET_DIV(div);
 
   // print the baud rate
   printf("Baud rate set to %d\n", BAUD);

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 ifeq ($(SIMULATOR),verilator)
-VSRC+=./src/iob_uart_csrs.c 
+VSRC+=./src/iob_uart_csrs.c
+VTOP=iob_uart_sim
 endif
 

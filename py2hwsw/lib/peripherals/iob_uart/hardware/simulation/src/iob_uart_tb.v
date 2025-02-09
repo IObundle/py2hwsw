@@ -7,10 +7,8 @@
 `include "iob_uart_csrs_def.vh"
 `include "iob_uart_conf.vh"
 
-`define IOB_NBYTES (32/8)
 `define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))
-`define IOB_NBYTES_W $clog2(`IOB_NBYTES)
-`define IOB_WORD_ADDR(ADDR) ((ADDR>>`IOB_NBYTES_W)<<`IOB_NBYTES_W)
+`define IOB_WORD_ADDRESS(ADDR) ((ADDR>>2)<<2)
 
 `define IOB_BYTE_OFFSET(ADDR) (ADDR%(32/8))
 
@@ -42,15 +40,11 @@ module iob_uart_tb;
 
    reg [7:0]                  word;
    
-   //rs232 interface (frontend)
-   wire                       rts2cts;
-   wire                       tx2rx;
-
    //iob interface (backend)
    reg                        iob_valid_i;
    reg [31:0]                 iob_wdata_i;
    reg [`IOB_UART_CSRS_ADDR_W-1:0] iob_addr_i;
-   reg [7:0]                       iob_wstrb_i;
+   reg [3:0]                       iob_wstrb_i;
    wire                            iob_rvalid_o;
    wire [31:0]                     iob_rdata_o;
    wire                            iob_ready_o;
@@ -96,10 +90,14 @@ module iob_uart_tb;
       iob_write(`IOB_UART_SOFTRESET_ADDR, 1, `IOB_UART_SOFTRESET_W);
       iob_write(`IOB_UART_SOFTRESET_ADDR, 0, `IOB_UART_SOFTRESET_W);
 
+      //get version and print
+      iob_read(`IOB_UART_VERSION_ADDR, word, `IOB_UART_VERSION_W);
+      $display("Version: %d", word);
 
-      //enable rx and tx
+      //enable rx
       iob_write(`IOB_UART_RXEN_ADDR, 1, `IOB_UART_RXEN_W);
 
+      //wait 100 cycles and enable tx
       repeat (100) @(posedge clk);
       iob_write(`IOB_UART_TXEN_ADDR, 1, `IOB_UART_TXEN_W);
 
@@ -154,16 +152,11 @@ module iob_uart_tb;
    end
 
    // Instantiate the Unit Under Test (UUT)
-   iob_uart uut 
+   iob_uart_sim uut 
      (
       .clk_i          (clk),
       .arst_i         (arst),
       .cke_i          (cke),
-
-      .rs232_rxd_i    (tx2rx),
-      .rs232_txd_o    (tx2rx),
-      .rs232_rts_o    (rts2cts),
-      .rs232_cts_i    (rts2cts),
 
       .iob_uart_csrs_iob_valid_i (iob_valid_i),
       .iob_uart_csrs_iob_addr_i  (iob_addr_i[`IOB_UART_CSRS_ADDR_W-1:2]),
@@ -182,7 +175,7 @@ task iob_write;
 
    begin
       @(posedge clk) #1 iob_valid_i = 1;  //sync and assign
-      iob_addr_i  = `IOB_WORD_ADDR(addr);
+      iob_addr_i  = `IOB_WORD_ADDRESS(addr);
       iob_wdata_i = `IOB_GET_WDATA(addr, data);
       iob_wstrb_i = `IOB_GET_WSTRB(addr, width);
 
@@ -201,7 +194,7 @@ task iob_read;
 
    begin
       @(posedge clk) #1 iob_valid_i = 1;
-      iob_addr_i = `IOB_WORD_ADDR(addr);
+      iob_addr_i = `IOB_WORD_ADDRESS(addr);
       iob_wstrb_i = 0;
 
       #1 while (!iob_ready_o) #1;

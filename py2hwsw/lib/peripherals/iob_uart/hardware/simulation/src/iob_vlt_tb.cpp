@@ -24,12 +24,6 @@ VerilatedVcdC *tfp = new VerilatedVcdC; // Create tracing object
 #endif
 #endif
 
-/*
-double sc_time_stamp() { // Called by $time in Verilog
-  return main_time;
-}
-*/
-
 // simulation time
 vluint64_t sim_time = 0;
 
@@ -48,7 +42,7 @@ void clk_tick(unsigned int n = 1) {
 #if (VM_TRACE == 1)
     tfp->dump(sim_time); // Dump values into tracing file
 #endif
-    sim_time += CLK_PERIOD / 2 - 1;
+    sim_time += CLK_PERIOD / 2;
     dut->clk_i = !dut->clk_i; // negedge
     dut->eval();
 #if (VM_TRACE == 1)
@@ -56,7 +50,7 @@ void clk_tick(unsigned int n = 1) {
 #endif
     sim_time += CLK_PERIOD / 2;
     dut->clk_i = !dut->clk_i; // posedge
-    sim_time += 1;
+    dut->eval();
   }
 }
 
@@ -65,16 +59,12 @@ void iob_hard_reset() {
   dut->clk_i = 1;
   dut->cke_i = 0;
   dut->arst_i = 0;
-  dut->eval();
   clk_tick(100);
   dut->arst_i = 1;
-  dut->eval();
   clk_tick(100);
   dut->arst_i = 0;
   dut->cke_i = 1;
-#if (VM_TRACE == 1)
-  tfp->dump(sim_time);
-#endif
+  clk_tick(100);
 }
 
 // Write data to IOb Native slave
@@ -83,7 +73,7 @@ void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
 
   unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);
 
-  dut->csrs_iob_addr_i = cpu_address;
+  dut->csrs_iob_addr_i = (cpu_address >> 2); // remove byte address
   dut->csrs_iob_valid_i = 1;
   switch (nbytes) {
   case 1:
@@ -102,9 +92,9 @@ void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
   while (dut->csrs_iob_ready_o == 0) {
     clk_tick();
   }
+  clk_tick();
   dut->csrs_iob_valid_i = 0;
   dut->csrs_iob_wstrb_i = 0;
-  clk_tick();
 }
 
 // Read data from IOb Native slave
@@ -113,13 +103,11 @@ unsigned int iob_read(unsigned int cpu_address, unsigned int cpu_data_w) {
   unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);
   unsigned int cpu_data;
 
-  dut->csrs_iob_addr_i = cpu_address;
+  dut->csrs_iob_addr_i = (cpu_address >> 2); // remove byte address
   dut->csrs_iob_valid_i = 1;
   while (dut->csrs_iob_ready_o == 0) {
     clk_tick();
   }
-  dut->csrs_iob_valid_i = 0;
-  clk_tick();
   switch (nbytes) {
   case 1:
     cpu_data = (dut->csrs_iob_rdata_o >> ((cpu_address & 0x3) * 8)) & 0xFF;
@@ -131,6 +119,8 @@ unsigned int iob_read(unsigned int cpu_address, unsigned int cpu_data_w) {
     cpu_data = dut->csrs_iob_rdata_o;
     break;
   }
+  clk_tick();
+  dut->csrs_iob_valid_i = 0;
   return cpu_data;
 }
 

@@ -207,6 +207,16 @@ def setup(py_params_dict):
                 "dest_dir": "hardware/simulation/src",
                 "instantiate": False,
             },
+            {
+                "core_name": "iob_sync",
+                "instance_name": "iob_sync_inst",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_reg_re",
+                "instance_name": "iob_reg_re_inst",
+                "instantiate": False,
+            },
         ],
         "superblocks": [
             # Simulation wrapper

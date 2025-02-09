@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "Viob_uart.h"
-typedef Viob_uart dut_t;
+#include "Viob_uart_sim.h"
+typedef Viob_uart_sim dut_t;
 
 void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
                unsigned int cpu_data);

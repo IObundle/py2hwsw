@@ -50,8 +50,18 @@ int iob_core_tb() {
   IOB_UART_SET_SOFTRESET(1);
   IOB_UART_SET_SOFTRESET(0);
 
-  // enable RX and TX
+  // enable RX
   IOB_UART_SET_RXEN(1);
+
+  unsigned int version;
+
+  // read version 20 times to burn time
+  for (int i = 0; i < 20; i++) {
+    version = IOB_UART_GET_VERSION();
+  }
+  printf("Version is %d\n", version);
+
+  // enable TX
   IOB_UART_SET_TXEN(1);
 
   printf("TX and RX enabled\n");
@@ -61,8 +71,6 @@ int iob_core_tb() {
     // wait for tx ready
     while (!IOB_UART_GET_TXREADY())
       ;
-
-    printf("TX ready asserted\n");
 
     // write word to send
     IOB_UART_SET_TXDATA(i);

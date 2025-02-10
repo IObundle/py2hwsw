@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "iob_bsp.h"
 #include "iob_uart_csrs.h"
 #include <stdio.h>

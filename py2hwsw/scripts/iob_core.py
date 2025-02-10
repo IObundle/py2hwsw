@@ -503,7 +503,7 @@ class iob_core(iob_module, iob_instance):
 
     def __connect_clk_interface(self, port, instantiator):
         """Create, if needed, a clock interface port in instantiator and connect it to self"""
-        if not instantiator.generate_hw:
+        if not instantiator.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
         _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
@@ -565,7 +565,7 @@ class iob_core(iob_module, iob_instance):
                     and not self.is_tester
                 ):
                     self.__connect_memory(port, instantiator)
-                elif(
+                elif (
                     port.interface.type in ["clk_en_rst", "clk_rst"]
                     and instantiator
                     and not self.is_tester

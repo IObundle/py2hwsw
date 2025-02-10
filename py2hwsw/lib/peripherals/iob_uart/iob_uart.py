@@ -207,11 +207,12 @@ def setup(py_params_dict):
                 "dest_dir": "hardware/simulation/src",
                 "instantiate": False,
             },
-            {
-                "core_name": "iob_sync",
-                "instance_name": "iob_sync_inst",
-                "instantiate": False,
-            },
+            # uncomment the following block to reveal a bug in py2hwsw
+            #            {
+            #                "core_name": "iob_sync",
+            #                "instance_name": "iob_sync_inst",
+            #                "instantiate": False,
+            #            },
             {
                 "core_name": "iob_reg_re",
                 "instance_name": "iob_reg_re_inst",

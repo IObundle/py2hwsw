@@ -5,18 +5,18 @@ module iob_uart_sim #(
    parameter DATA_W = `IOB_UART_DATA_W
 ) (
    // clk_en_rst_s
-   input                 clk_i,
-   input                 cke_i,
-   input                 arst_i,
+   input                        clk_i,
+   input                        cke_i,
+   input                        arst_i,
 
    // iob_uart_csrs_cbus_s
-   input                 iob_uart_csrs_iob_valid_i,
-   input                 iob_uart_csrs_iob_addr_i,
-   input  [  DATA_W-1:0] iob_uart_csrs_iob_wdata_i,
-   input  [DATA_W/8-1:0] iob_uart_csrs_iob_wstrb_i,
-   output                iob_uart_csrs_iob_rvalid_o,
-   output [  DATA_W-1:0] iob_uart_csrs_iob_rdata_o,
-   output                iob_uart_csrs_iob_ready_o
+   input                        iob_uart_csrs_iob_valid_i,
+   input [`IOB_UART_ADDR_W-1:0] iob_uart_csrs_iob_addr_i,
+   input [ DATA_W-1:0]          iob_uart_csrs_iob_wdata_i,
+   input [DATA_W/8-1:0]         iob_uart_csrs_iob_wstrb_i,
+   output                       iob_uart_csrs_iob_rvalid_o,
+   output [ DATA_W-1:0]         iob_uart_csrs_iob_rdata_o,
+   output                       iob_uart_csrs_iob_ready_o
    // clk_rst_s
 );
 
@@ -36,7 +36,7 @@ module iob_uart_sim #(
       .rs232_cts_i    (rts2cts),
 
       .iob_uart_csrs_iob_valid_i (iob_uart_csrs_iob_valid_i),
-      .iob_uart_csrs_iob_addr_i  (iob_uart_csrs_iob_addr_i),
+      .iob_uart_csrs_iob_addr_i  (iob_uart_csrs_iob_addr_i[2]),
       .iob_uart_csrs_iob_wdata_i (iob_uart_csrs_iob_wdata_i),
       .iob_uart_csrs_iob_wstrb_i (iob_uart_csrs_iob_wstrb_i),
       .iob_uart_csrs_iob_rvalid_o(iob_uart_csrs_iob_rvalid_o),

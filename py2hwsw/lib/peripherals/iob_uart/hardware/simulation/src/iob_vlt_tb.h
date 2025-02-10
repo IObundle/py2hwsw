@@ -7,13 +7,7 @@
 #include "Viob_uart_sim.h"
 typedef Viob_uart_sim dut_t;
 
-void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
-               unsigned int cpu_data);
-unsigned int iob_read(unsigned int cpu_address, unsigned int cpu_data_w);
-
-int iob_core_tb();
-
-// these defines will be deprecated when iob_uart_csrs_ becomes csrs_iob_
+// these defines will be deprecated when iob_uart_csrs_ becomes iob_csrs_
 #define csrs_iob_valid_i iob_uart_csrs_iob_valid_i
 #define csrs_iob_ready_o iob_uart_csrs_iob_ready_o
 

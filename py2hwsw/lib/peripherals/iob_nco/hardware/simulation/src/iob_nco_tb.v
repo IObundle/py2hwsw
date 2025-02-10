@@ -88,17 +88,17 @@ module iob_nco_tb;
 
    iob_nco nco (
       `include "iob_nco_clk_en_rst_s_portmap.vs"
-      .clk_in_i                 (clk_in),
-      .clk_in_arst_i            (arst),
-      .clk_in_cke_i             (1'b1),
-      .iob_nco_csrs_iob_valid_i (iob_valid_i),
-      .iob_nco_csrs_iob_addr_i  (iob_addr_i[`IOB_NCO_CSRS_ADDR_W-1:2]),
-      .iob_nco_csrs_iob_wdata_i (iob_wdata_i),
-      .iob_nco_csrs_iob_wstrb_i (iob_wstrb_i),
-      .iob_nco_csrs_iob_rdata_o (iob_rdata_o),
-      .iob_nco_csrs_iob_ready_o (iob_ready_o),
-      .iob_nco_csrs_iob_rvalid_o(iob_rvalid_o),
-      .clk_out_o                (clk_out)
+      .clk_in_i             (clk_in),
+      .clk_in_arst_i        (arst),
+      .clk_in_cke_i         (1'b1),
+      .iob_csrs_iob_valid_i (iob_valid_i),
+      .iob_csrs_iob_addr_i  (iob_addr_i[`IOB_NCO_CSRS_ADDR_W-1:2]),
+      .iob_csrs_iob_wdata_i (iob_wdata_i),
+      .iob_csrs_iob_wstrb_i (iob_wstrb_i),
+      .iob_csrs_iob_rdata_o (iob_rdata_o),
+      .iob_csrs_iob_ready_o (iob_ready_o),
+      .iob_csrs_iob_rvalid_o(iob_rvalid_o),
+      .clk_out_o            (clk_out)
    );
 
    `include "iob_nco_csrs_emb_tb.vs"

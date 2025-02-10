@@ -53,17 +53,17 @@ module iob_csrs_demo_tb;
    //instantiate iob_csrs_demo core
    iob_csrs_demo iob_csrs_demo0 (
       // clk_en_rst_s port
-      .clk_i                          (clk),
-      .cke_i                          (1'b1),
-      .arst_i                         (rst),
+      .clk_i                (clk),
+      .cke_i                (1'b1),
+      .arst_i               (rst),
       // cbus_s port
-      .iob_csrs_demo_csrs_iob_valid_i (iob_valid_i),
-      .iob_csrs_demo_csrs_iob_addr_i  (iob_addr_i[`IOB_CSRS_DEMO_CSRS_ADDR_W-1:2]),
-      .iob_csrs_demo_csrs_iob_wdata_i (iob_wdata_i),
-      .iob_csrs_demo_csrs_iob_wstrb_i (iob_wstrb_i),
-      .iob_csrs_demo_csrs_iob_rvalid_o(iob_rvalid_o),
-      .iob_csrs_demo_csrs_iob_rdata_o (iob_rdata_o),
-      .iob_csrs_demo_csrs_iob_ready_o (iob_ready_o)
+      .iob_csrs_iob_valid_i (iob_valid_i),
+      .iob_csrs_iob_addr_i  (iob_addr_i[`IOB_CSRS_DEMO_CSRS_ADDR_W-1:2]),
+      .iob_csrs_iob_wdata_i (iob_wdata_i),
+      .iob_csrs_iob_wstrb_i (iob_wstrb_i),
+      .iob_csrs_iob_rvalid_o(iob_rvalid_o),
+      .iob_csrs_iob_rdata_o (iob_rdata_o),
+      .iob_csrs_iob_ready_o (iob_ready_o)
    );
 
 endmodule

@@ -58,7 +58,7 @@ void iob_write(uint32_t addr, uint32_t data) {
   dut->iob_uart_csrs_addr_i = addr;
   dut->iob_uart_csrs_wdata_i = data;
   dut->iob_uart_csrs_we_i = 1;
-  while (!dut->iob_uart_csrs_iob_ready_o) {
+  while (!dut->iob_csrs_iob_ready_o) {
     tick();
   }
   tick();
@@ -70,7 +70,7 @@ uint32_t iob_read(uint32_t addr) {
   dut->iob_uart_csrs_addr_i = addr;
   dut->iob_uart_csrs_we_i = 0;
   tick();
-  while (!dut->iob_uart_csrs_iob_ready_o) {
+  while (!dut->iob_csrs_iob_ready_o) {
     tick();
   }
   tick();

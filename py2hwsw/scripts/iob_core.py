@@ -474,7 +474,7 @@ class iob_core(iob_module, iob_instance):
             for subblock in subblock_group.blocks:
                 for port in subblock.ports:
                     if (
-                        port.name == subblock.original_name + "_csrs_cbus_s"
+                        port.name == "iob_csrs_cbus_s"
                         and port.interface.type == "iob"
                         and port.e_connect
                     ):

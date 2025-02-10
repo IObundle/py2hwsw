@@ -228,7 +228,7 @@ def setup(py_params_dict):
             "csr_if": "iob",
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "iob_uart_csrs_cbus_s": (
+                "iob_csrs_cbus_s": (
                     "uart_s",
                     [
                         "uart_iob_addr_i[3-1:2]",
@@ -283,7 +283,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_eth_csrs_cbus_s": (
+                    "iob_csrs_cbus_s": (
                         "ethernet_s",
                         [
                             "ethernet_iob_addr_i[12-1:2]",

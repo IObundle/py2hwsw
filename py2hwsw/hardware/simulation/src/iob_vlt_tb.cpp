@@ -35,6 +35,8 @@ vluint64_t vcd_delayed_start = 0;
 
 dut_t *dut = new dut_t;
 
+int iob_core_tb();
+
 // Clock tick
 void clk_tick(unsigned int n = 1) {
   for (unsigned int i = 0; i < n; i++) {
@@ -73,7 +75,7 @@ void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
 
   unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);
 
-  dut->csrs_iob_addr_i = (cpu_address >> 2); // remove byte address
+  dut->csrs_iob_addr_i = cpu_address; // remove byte address
   dut->csrs_iob_valid_i = 1;
   switch (nbytes) {
   case 1:
@@ -103,7 +105,7 @@ unsigned int iob_read(unsigned int cpu_address, unsigned int cpu_data_w) {
   unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);
   unsigned int cpu_data;
 
-  dut->csrs_iob_addr_i = (cpu_address >> 2); // remove byte address
+  dut->csrs_iob_addr_i = cpu_address; // remove byte address
   dut->csrs_iob_valid_i = 1;
   while (dut->csrs_iob_ready_o == 0) {
     clk_tick();

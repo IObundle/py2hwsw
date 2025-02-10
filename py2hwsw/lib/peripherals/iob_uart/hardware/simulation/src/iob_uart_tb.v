@@ -159,7 +159,7 @@ module iob_uart_tb;
       .cke_i          (cke),
 
       .iob_uart_csrs_iob_valid_i (iob_valid_i),
-      .iob_uart_csrs_iob_addr_i  (iob_addr_i[`IOB_UART_CSRS_ADDR_W-1:2]),
+      .iob_uart_csrs_iob_addr_i  (iob_addr_i),
       .iob_uart_csrs_iob_wdata_i (iob_wdata_i),
       .iob_uart_csrs_iob_wstrb_i (iob_wstrb_i),
       .iob_uart_csrs_iob_rvalid_o(iob_rvalid_o),

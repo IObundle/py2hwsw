@@ -74,8 +74,6 @@ int iob_core_tb() {
       txread_reg = IOB_UART_GET_TXREADY();
     }
 
-    printf("rxread_reg = %d, txread_reg = %d\n", rxread_reg, txread_reg);
-
     if (rxread_reg) {
       cpu_char = IOB_UART_GET_RXDATA();
       fwrite(&cpu_char, sizeof(char), 1, soc2cnsl_fd);

@@ -70,7 +70,7 @@ def setup(py_params_dict):
             "descr": "Testbench uart csrs interface",
             "signals": {
                 "type": "iob",
-                "prefix": "uart_",
+                "prefix": "",
                 "ADDR_W": 3,
             },
         },
@@ -231,7 +231,7 @@ def setup(py_params_dict):
                 "iob_csrs_cbus_s": (
                     "uart_s",
                     [
-                        "uart_iob_addr_i[3-1:2]",
+                        "iob_addr_i[3-1:2]",
                     ],
                 ),
                 "rs232_m": "rs232_invert",

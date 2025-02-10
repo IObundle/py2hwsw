@@ -75,28 +75,28 @@ void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
 
   unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);
 
-  dut->csrs_iob_addr_i = cpu_address; // remove byte address
-  dut->csrs_iob_valid_i = 1;
+  dut->iob_addr_i = cpu_address; // remove byte address
+  dut->iob_valid_i = 1;
   switch (nbytes) {
   case 1:
-    dut->csrs_iob_wstrb_i = 0x1 << (cpu_address & 0x3);
-    dut->csrs_iob_wdata_i = cpu_data << ((cpu_address & 0x3) * 8);
+    dut->iob_wstrb_i = 0x1 << (cpu_address & 0x3);
+    dut->iob_wdata_i = cpu_data << ((cpu_address & 0x3) * 8);
     break;
   case 2:
-    dut->csrs_iob_wstrb_i = 0x3 << (cpu_address & 0x2);
-    dut->csrs_iob_wdata_i = cpu_data << ((cpu_address & 0x2) * 8);
+    dut->iob_wstrb_i = 0x3 << (cpu_address & 0x2);
+    dut->iob_wdata_i = cpu_data << ((cpu_address & 0x2) * 8);
     break;
   default:
-    dut->csrs_iob_wstrb_i = 0xF;
-    dut->csrs_iob_wdata_i = cpu_data;
+    dut->iob_wstrb_i = 0xF;
+    dut->iob_wdata_i = cpu_data;
     break;
   }
-  while (dut->csrs_iob_ready_o == 0) {
+  while (dut->iob_ready_o == 0) {
     clk_tick();
   }
   clk_tick();
-  dut->csrs_iob_valid_i = 0;
-  dut->csrs_iob_wstrb_i = 0;
+  dut->iob_valid_i = 0;
+  dut->iob_wstrb_i = 0;
 }
 
 // Read data from IOb Native slave
@@ -105,24 +105,24 @@ unsigned int iob_read(unsigned int cpu_address, unsigned int cpu_data_w) {
   unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);
   unsigned int cpu_data;
 
-  dut->csrs_iob_addr_i = cpu_address; // remove byte address
-  dut->csrs_iob_valid_i = 1;
-  while (dut->csrs_iob_ready_o == 0) {
+  dut->iob_addr_i = cpu_address; // remove byte address
+  dut->iob_valid_i = 1;
+  while (dut->iob_ready_o == 0) {
     clk_tick();
   }
   switch (nbytes) {
   case 1:
-    cpu_data = (dut->csrs_iob_rdata_o >> ((cpu_address & 0x3) * 8)) & 0xFF;
+    cpu_data = (dut->iob_rdata_o >> ((cpu_address & 0x3) * 8)) & 0xFF;
     break;
   case 2:
-    cpu_data = (dut->csrs_iob_rdata_o >> ((cpu_address & 0x2) * 8)) & 0xFFFF;
+    cpu_data = (dut->iob_rdata_o >> ((cpu_address & 0x2) * 8)) & 0xFFFF;
     break;
   default:
-    cpu_data = dut->csrs_iob_rdata_o;
+    cpu_data = dut->iob_rdata_o;
     break;
   }
   clk_tick();
-  dut->csrs_iob_valid_i = 0;
+  dut->iob_valid_i = 0;
   return cpu_data;
 }
 

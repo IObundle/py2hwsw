@@ -206,7 +206,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
         pbus_split["connect"][f"output_{idx}_m"] = f"{peripheral_name}_cbus"
         # Connect cbus to peripheral
         peripheral["connect"][
-            f"{peripheral['core_name']}_csrs_cbus_s"
+            "iob_csrs_cbus_s"
         ] = f"{peripheral_name}_cbus"
 
     # Add CLINT and PLIC wires (they are not in peripherals list)

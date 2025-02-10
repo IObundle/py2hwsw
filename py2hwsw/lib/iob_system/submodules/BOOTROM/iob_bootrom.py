@@ -101,7 +101,7 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_csrs",
-                "instance_name": "iob_bootrom_csrs",
+                "instance_name": "iob_csrs",
                 "version": VERSION,
                 "csrs": [
                     {

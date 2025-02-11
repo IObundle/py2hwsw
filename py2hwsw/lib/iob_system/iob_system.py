@@ -85,13 +85,8 @@ def setup(py_params_dict):
                 "max": "32",
             },
             {  # Needed for software
-<<<<<<< HEAD:py2hwsw/lib/iob_system/iob_system.py
-                "name": "FW_ADDR",
-                "descr": "Firmware load address.",
-=======
                 "name": "FW_BASEADDR",
                 "descr": "Firmware address",
->>>>>>> 4482346461981a046995483da59af0cde479d8ba:py2hwsw/lib/hardware/iob_system/iob_system.py
                 "type": "M",
                 "val": params["fw_baseaddr"],
                 "min": "0",

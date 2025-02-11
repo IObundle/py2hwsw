@@ -222,7 +222,7 @@ def setup(py_params_dict):
                 "name": "rxclk_buf_io",
                 "descr": "rxclkbuf io",
                 "signals": [
-                    {"name": "enet_rx_clk"},
+                    {"name": "enet_rx_clk_i"},
                     {"name": "eth_clk", "width": "1"},
                 ],
             },
@@ -234,7 +234,26 @@ def setup(py_params_dict):
                     {"name": "low", "width": "1"},
                     {"name": "high"},
                     {"name": "eth_clk"},
-                    {"name": "enet_gtx_clk"},
+                    {"name": "enet_gtx_clk_o"},
+                ],
+            },
+            {
+                "name": "phy",
+                "descr": "PHY Interface Ports",
+                "signals": [
+                    {"name": "eth_MTxClk", "width": "1"},
+                    {"name": "MTxEn", "width": "1"},
+                    {"name": "MTxD", "width": "4"},
+                    {"name": "MTxErr", "width": "1"},
+                    {"name": "eth_MRxClk", "width": "1"},
+                    {"name": "MRxDv", "width": "1"},
+                    {"name": "MRxD", "width": "4"},
+                    {"name": "MRxErr", "width": "1"},
+                    {"name": "eth_MColl", "width": "1"},
+                    {"name": "eth_MCrS", "width": "1"},
+                    {"name": "MDC", "width": "1"},
+                    {"name": "MDIO", "width": "1"},
+                    {"name": "phy_rstn", "width": "1"},
                 ],
             },
         ]
@@ -259,6 +278,8 @@ def setup(py_params_dict):
             "dest_dir": "hardware/common_src",
         },
     ]
+    if params["use_ethernet"]:
+        attributes_dict["subblocks"][-1]["connect"].update({"phy_io": "phy"})
     if params["use_extmem"]:
         attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
     attributes_dict["subblocks"] += [
@@ -355,6 +376,23 @@ def setup(py_params_dict):
     // Ethernet connections
     assign low = 1'b0;
     assign enet_resetn_inv = ~enet_resetn_o;
+
+    //MII
+    assign eth_MRxClk = eth_clk;
+    assign MRxD = {enet_rx_d3_i, enet_rx_d2_i, enet_rx_d1_i, enet_rx_d0_i};
+    assign MRxDv = enet_rx_dv_i;
+    //assign MRxErr = enet_rx_err_o;
+    assign MRxErr = 1'b0;
+
+    assign eth_MTxClk = eth_clk;
+    assign {enet_tx_d3_o, enet_tx_d2_o, enet_tx_d1_o, enet_tx_d0_o} = MTxD;
+    assign enet_tx_en_o = MTxEn;
+    //assign enet_tx_err_o = MTxErr;
+
+    assign enet_resetn_o = phy_rstn;
+
+    assign eth_MColl = 1'b0;
+    assign eth_MCrS = 1'b0;
 """,
             },
         ]

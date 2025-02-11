@@ -5,36 +5,9 @@
 `timescale 1ns / 1ps
 
 module iob_iob2axi #(
-   parameter ADDR_W     = 0,
-   parameter DATA_W     = 0,
-   // AXI-4 Full I/F parameters
-   parameter AXI_ADDR_W = ADDR_W,
-   parameter AXI_DATA_W = DATA_W
+   `include "iob_axi2iob_params.vs"
 ) (
-   //
-   // Control I/F
-   //
-   input               run_i,
-   input               direction_i,  // 0 for reading, 1 for writing
-   input  [ADDR_W-1:0] addr_i,
-   output              ready_o,
-   output              error_o,
-
-   //
-   // Native Slave I/F
-   //
-   input                 s_valid_i,
-   input  [  ADDR_W-1:0] s_addr_i,
-   input  [  DATA_W-1:0] s_wdata_i,
-   input  [DATA_W/8-1:0] s_wstrb_i,
-   output [  DATA_W-1:0] s_rdata_o,
-   output                s_ready_o,
-
-   //
-   // AXI-4 Full Master I/F
-   //
-   `include "iob_iob2axi_m_axi_m_port.vs"
-   `include "iob_iob2axi_clk_rst_s_port.vs"
+   `include "iob_axi2iob_io.vs"
 );
 
    `include "iob_functions.vs"
@@ -53,17 +26,17 @@ module iob_iob2axi #(
    wire [DATA_W/8-1:0] rd_wstrb, wr_rstrb;
    wire rd_ready, wr_ready;
 
-   assign ready_o   = ready_int & ~run_int;
-   assign error_o   = error_rd | error_wr;
+   assign ready_o     = ready_int & ~run_int;
+   assign error_o     = error_rd | error_wr;
 
-   assign s_ready_o = |s_wstrb_i ? in_fifo_ready : out_fifo_ready;
+   assign iob_ready_o = |iob_wstrb_i ? in_fifo_ready : out_fifo_ready;
 
    //
    // Input FIFO
    //
    wire                       in_fifo_full;
-   wire                       in_fifo_wr = s_valid_i & |s_wstrb_i & ~in_fifo_full;
-   wire [DATA_W+DATA_W/8-1:0] in_fifo_wdata = {s_wdata_i, s_wstrb_i};
+   wire                       in_fifo_wr = iob_valid_i & |iob_wstrb_i & ~in_fifo_full;
+   wire [DATA_W+DATA_W/8-1:0] in_fifo_wdata = {iob_wdata_i, iob_wstrb_i};
 
    wire                       in_fifo_empty;
    wire                       in_fifo_rd = wr_valid;
@@ -99,7 +72,7 @@ module iob_iob2axi #(
       if (rst_i) begin
          in_fifo_ready_int <= 1'b0;
       end else begin
-         in_fifo_ready_int <= s_valid_i & |s_wstrb_i;
+         in_fifo_ready_int <= iob_valid_i & |iob_wstrb_i;
       end
    end
 
@@ -130,7 +103,7 @@ module iob_iob2axi #(
    wire [  DATA_W-1:0] out_fifo_wdata = rd_wdata;
 
    wire                out_fifo_empty;
-   wire                out_fifo_rd = s_valid_i & ~|s_wstrb_i & ~out_fifo_empty;
+   wire                out_fifo_rd = iob_valid_i & ~|iob_wstrb_i & ~out_fifo_empty;
    wire [  DATA_W-1:0] out_fifo_rdata;
 
    wire [`AXI_LEN_W:0] out_fifo_level;
@@ -155,7 +128,7 @@ module iob_iob2axi #(
       end
    end
 
-   assign s_rdata_o = out_fifo_rdata;
+   assign iob_rdata_o = out_fifo_rdata;
 
    reg out_fifo_ready_int;
    assign out_fifo_ready = out_fifo_ready_int & ~out_fifo_empty_reg;
@@ -163,7 +136,7 @@ module iob_iob2axi #(
       if (rst_i) begin
          out_fifo_ready_int <= 1'b0;
       end else begin
-         out_fifo_ready_int <= s_valid_i & ~|s_wstrb_i;
+         out_fifo_ready_int <= iob_valid_i & ~|iob_wstrb_i;
       end
    end
 

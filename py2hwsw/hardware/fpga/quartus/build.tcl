@@ -9,8 +9,9 @@ set VSRC [lindex $argv 2]
 set INCLUDE_DIRS [lindex $argv 3]
 set IS_FPGA [lindex $argv 4]
 set USE_EXTMEM [lindex $argv 5]
-set SEED [lindex $argv 6]
-set USE_QUARTUS_PRO [lindex $argv 7]
+set USE_ETHERNET [lindex $argv 6]
+set SEED [lindex $argv 7]
+set USE_QUARTUS_PRO [lindex $argv 8]
 
 load_package flow
 

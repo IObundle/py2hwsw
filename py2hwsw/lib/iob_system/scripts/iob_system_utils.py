@@ -340,6 +340,8 @@ build_uut_software:
         # Set INIT_MEM variable
         file.write(f"INIT_MEM:={int(params['init_mem'])}\n")
         if params["use_ethernet"]:
+            # Set USE_ETHERNET variable
+            file.write("USE_ETHERNET=1\n")
             # Set custom ethernet CONSOLE_CMD
             file.write(
                 'CONSOLE_CMD=$(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -s $(BOARD_SERIAL_PORT) -c $(PYTHON_DIR)/console.py -m "$(RMAC_ADDR)" -i "$(ETH_IF)"\n',

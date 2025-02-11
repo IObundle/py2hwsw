@@ -36,6 +36,7 @@ if __name__ == "__main__":
             "print_core_version",
             "print_core_dict",
             "print_py2hwsw_attributes",
+            "deliver",
         ],
     )
     parser.add_argument(
@@ -140,3 +141,5 @@ if __name__ == "__main__":
         iob_core.print_core_dict(args.core_name, **py_params)
     elif args.target == "print_py2hwsw_attributes":
         iob_core.print_py2hwsw_attributes(args.core_name, **py_params)
+    elif args.target == "deliver":
+        iob_core.deliver_core(args.core_name, **py_params)

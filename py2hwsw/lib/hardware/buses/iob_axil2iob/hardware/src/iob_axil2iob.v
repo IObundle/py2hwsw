@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 IObundle
+// SPDX-FileCopyrightText: 2025 IObundle
 //
 // SPDX-License-Identifier: MIT
 
@@ -15,6 +15,9 @@ module iob_axil2iob #(
 
    localparam WSTRB_W = DATA_W / 8;
 
+   wire [ADDR_W-1:0] iob_addr;
+   wire              iob_addr_en;
+
    // COMPUTE AXIL OUTPUTS
 
    // write address channel
@@ -26,27 +29,30 @@ module iob_axil2iob #(
    // write response
    assign axil_bresp_o   = 2'b0;
    wire axil_bvalid_nxt;
-   //bvalid will toggle in the two situations below:
-   assign axil_bvalid_nxt = (|axil_wstrb_i) ? iob_ready_i & iob_valid_o : 1'b0;
+
+   //bvalid 
+   assign axil_bvalid_nxt = (iob_valid_o & (|iob_wstrb_o)) ? iob_ready_i : (axil_bvalid_o & ~axil_bready_i);
 
    // read address
-   assign axil_arready_o  = iob_ready_i;
+   assign axil_arready_o = iob_ready_i;
 
    // read channel
-   assign axil_rresp_o    = 2'b0;
+   assign axil_rresp_o = 2'b0;
 
    //rvalid
-   assign axil_rvalid_o   = iob_rvalid_i;
+   assign axil_rvalid_o = iob_rvalid_i;
 
    //rdata
-   assign axil_rdata_o    = iob_rdata_i;
+   assign axil_rdata_o = iob_rdata_i;
 
    // COMPUTE IOb OUTPUTS
 
-   assign iob_valid_o     = (axil_wvalid_i & (|axil_wstrb_i)) | axil_arvalid_i;
-   assign iob_addr_o      = axil_arvalid_i ? axil_araddr_i : axil_awaddr_i;
-   assign iob_wdata_o     = axil_wdata_i;
-   assign iob_wstrb_o     = axil_arvalid_i ? {WSTRB_W{1'b0}} : axil_wstrb_i;
+   assign iob_valid_o = axil_awvalid_i | axil_wvalid_i | axil_arvalid_i;
+   assign iob_addr_o = axil_arvalid_i ? axil_araddr_i : axil_awvalid_i ? axil_awaddr_i : iob_addr;
+   assign iob_wdata_o = axil_wdata_i;
+   assign iob_wstrb_o = axil_wvalid_i ? axil_wstrb_i : {WSTRB_W{1'b0}};
+
+   assign iob_addr_en = axil_arvalid_i | axil_awvalid_i;
 
    iob_reg #(
       .DATA_W (1),
@@ -57,6 +63,18 @@ module iob_axil2iob #(
       .arst_i(arst_i),
       .data_i(axil_bvalid_nxt),
       .data_o(axil_bvalid_o)
+   );
+
+   iob_reg_e #(
+      .DATA_W (ADDR_W),
+      .RST_VAL(0)
+   ) iob_reg_addr (
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+      .en_i  (iob_addr_en),
+      .data_i(iob_addr_o),
+      .data_o(iob_addr)
    );
 
 endmodule

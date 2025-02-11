@@ -1,11 +1,11 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass, field
 
 import if_gen
-from iob_wire import iob_wire
+from iob_wire import iob_wire, replace_duplicate_signals_by_references
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
@@ -142,4 +142,5 @@ def create_port(core, *args, signals=[], **kwargs):
         error_msg=f"Invalid {kwargs.get('name', '')} port attribute '[arg]'!",
     )
     port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
+    replace_duplicate_signals_by_references(core.ports, port.signals)
     core.ports.append(port)

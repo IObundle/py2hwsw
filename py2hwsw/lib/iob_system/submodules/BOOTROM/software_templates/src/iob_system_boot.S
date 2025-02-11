@@ -1,10 +1,9 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
 #include "iob_system_conf.h"
-#include "iob_system_periphs.h"
-#include "iob_system_system.h"
+#include "iob_system_mmap.h"
 
 .section .init
 .globl main

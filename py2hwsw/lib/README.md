@@ -1,5 +1,5 @@
 <!--
-SPDX-FileCopyrightText: 2024 IObundle
+SPDX-FileCopyrightText: 2025 IObundle
 
 SPDX-License-Identifier: MIT
 -->
@@ -130,7 +130,7 @@ using it.
 To build the Py2HWSW User Guide, run the following command:
 
 ```bash
-make doc-buid
+make py2-doc-buid
 ```
 
 ## Code Style

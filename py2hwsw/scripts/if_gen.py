@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -224,7 +224,10 @@ def get_clk_en_rst_ports():
         clk_rst_ports[1],
     ]
 
-def get_mem_ports(suffix: str, async_clk: bool = False, addr: bool = True, enable: bool = True):
+
+def get_mem_ports(
+    suffix: str, async_clk: bool = False, addr: bool = True, enable: bool = True
+):
     suffix = f"_{suffix}" if suffix else ""
     clk_suffix = suffix if async_clk else ""
     extra_signals = []
@@ -252,7 +255,14 @@ def get_mem_ports(suffix: str, async_clk: bool = False, addr: bool = True, enabl
         ),
     ] + extra_signals
 
-def get_mem_read_ports(suffix: str, enable: bool = False, ready: bool = False, addr: bool = False, true: bool = False):
+
+def get_mem_read_ports(
+    suffix: str,
+    enable: bool = False,
+    ready: bool = False,
+    addr: bool = False,
+    true: bool = False,
+):
     suffix = f"_{suffix}" if suffix else ""
     rd_suffix = suffix if true else ""
     extra_signals = []
@@ -291,7 +301,9 @@ def get_mem_read_ports(suffix: str, enable: bool = False, ready: bool = False, a
     return mem_read_ports
 
 
-def get_mem_write_ports(suffix: str, ready: bool = False, addr: bool = False, true: bool = False):
+def get_mem_write_ports(
+    suffix: str, ready: bool = False, addr: bool = False, true: bool = False
+):
     suffix = f"_{suffix}" if suffix else ""
     wr_suffix = suffix if true else ""
     extra_signals = []
@@ -335,96 +347,161 @@ def remove_duplicates(ports):
             result.append(d)
     return result
 
+
 @parse_widths
 def get_rom_2p_ports():
-    ports = get_mem_ports("", addr=False, enable=False) + get_mem_read_ports("a", enable=True, ready=True, addr=True) + get_mem_read_ports("b", enable=True, ready=True, addr=True)
+    ports = (
+        get_mem_ports("", addr=False, enable=False)
+        + get_mem_read_ports("a", enable=True, ready=True, addr=True)
+        + get_mem_read_ports("b", enable=True, ready=True, addr=True)
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_rom_sp_ports():
     ports = get_mem_ports("") + get_mem_read_ports("")
     return remove_duplicates(ports)
 
+
 @parse_widths
 def get_rom_tdp_ports():
-    ports = get_mem_ports("", enable=False, addr=False) + get_mem_read_ports("a", enable=True, addr=True, true=True) + get_mem_read_ports("b", enable=True, addr=True, true=True)
+    ports = (
+        get_mem_ports("", enable=False, addr=False)
+        + get_mem_read_ports("a", enable=True, addr=True, true=True)
+        + get_mem_read_ports("b", enable=True, addr=True, true=True)
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_rom_atdp_ports():
-    ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a", true=True) + get_mem_read_ports("b", true=True)
+    ports = (
+        get_mem_ports("a", async_clk=True)
+        + get_mem_ports("b", async_clk=True)
+        + get_mem_read_ports("a", true=True)
+        + get_mem_read_ports("b", true=True)
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_2p_ports():
-    ports = get_mem_ports("", addr=False, enable=False) + get_mem_read_ports("", enable=True, ready=True, addr=True) + get_mem_write_ports("", ready=True, addr=True)
+    ports = (
+        get_mem_ports("", addr=False, enable=False)
+        + get_mem_read_ports("", enable=True, ready=True, addr=True)
+        + get_mem_write_ports("", ready=True, addr=True)
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_at2p_ports():
-    ports = get_mem_ports("r", async_clk=True, addr=False, enable=False) + get_mem_ports("w", async_clk=True, addr=False, enable=False) + get_mem_read_ports("", enable=True, addr=True) + get_mem_write_ports("", addr=True)
+    ports = (
+        get_mem_ports("r", async_clk=True, addr=False, enable=False)
+        + get_mem_ports("w", async_clk=True, addr=False, enable=False)
+        + get_mem_read_ports("", enable=True, addr=True)
+        + get_mem_write_ports("", addr=True)
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_atdp_ports():
-    ports = get_mem_ports("a", async_clk=True) + get_mem_ports("b", async_clk=True) + get_mem_read_ports("a", true=True) + get_mem_read_ports("b", true=True) + get_mem_write_ports("a", true=True) + get_mem_write_ports("b", true=True)
+    ports = (
+        get_mem_ports("a", async_clk=True)
+        + get_mem_ports("b", async_clk=True)
+        + get_mem_read_ports("a", true=True)
+        + get_mem_read_ports("b", true=True)
+        + get_mem_write_ports("a", true=True)
+        + get_mem_write_ports("b", true=True)
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_atdp_be_ports():
     return get_ram_atdp_ports()
+
 
 @parse_widths
 def get_ram_sp_ports():
     ports = get_mem_ports("") + get_mem_read_ports("") + get_mem_write_ports("")
     return remove_duplicates(ports)
 
+
 @parse_widths
 def get_ram_sp_be_ports():
     return get_ram_sp_ports()
+
 
 @parse_widths
 def get_ram_sp_se_ports():
     return get_ram_sp_ports()
 
+
 @parse_widths
 def get_ram_t2p_ports():
-    ports = get_mem_ports("", addr=False, enable=False) + get_mem_read_ports("", enable=True, addr=True) + get_mem_write_ports("", addr=True)
+    ports = (
+        get_mem_ports("", addr=False, enable=False)
+        + get_mem_read_ports("", enable=True, addr=True)
+        + get_mem_write_ports("", addr=True)
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_t2p_be_ports():
     return get_ram_t2p_ports()
 
+
 @parse_widths
 def get_ram_t2p_tiled_ports():
-    ports = get_mem_ports("", enable=False) + get_mem_read_ports("", enable=True) + get_mem_write_ports("")
+    ports = (
+        get_mem_ports("", enable=False)
+        + get_mem_read_ports("", enable=True)
+        + get_mem_write_ports("")
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_tdp_ports():
-    ports = get_mem_ports("a") + get_mem_ports("b") + get_mem_read_ports("a") + get_mem_read_ports("b") + get_mem_write_ports("a") + get_mem_write_ports("b")
+    ports = (
+        get_mem_ports("a")
+        + get_mem_ports("b")
+        + get_mem_read_ports("a")
+        + get_mem_read_ports("b")
+        + get_mem_write_ports("a")
+        + get_mem_write_ports("b")
+    )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_tdp_be_ports():
     return get_ram_tdp_ports()
 
+
 @parse_widths
 def get_ram_tdp_be_xil_ports():
     return get_ram_tdp_ports()
+
 
 @parse_widths
 def get_regfile_2p_ports():
     raise NotImplementedError("REGFILE 2P not interface implemented")
 
+
 @parse_widths
 def get_regfile_at2p_ports():
     raise NotImplementedError("REGFILE AT2P not interface implemented")
 
+
 @parse_widths
 def get_regfile_sp_ports():
     raise NotImplementedError("REGFILE SP not interface implemented")
+
 
 #
 # AXI4

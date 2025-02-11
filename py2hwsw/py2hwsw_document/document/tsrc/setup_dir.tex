@@ -1,4 +1,4 @@
-% SPDX-FileCopyrightText: 2024 IObundle
+% SPDX-FileCopyrightText: 2025 IObundle
 %
 % SPDX-License-Identifier: MIT
 
@@ -38,22 +38,33 @@ The setup directory of a core may have the following structure:
 └── default.nix
 \end{verbatim}
 
-Only the \texttt{core\_name.py} or \texttt{core\_name.json} file is needed to pass the core's description to Py2HWSW.
-The remaining directories and files are optional.
+Only the \texttt{core\_name.py} or \texttt{core\_name.json} file is needed to
+pass the core's description to Py2HWSW.  The remaining directories and files are
+optional.
 
-If the \texttt{document}, \texttt{hardware}, and \texttt{software} directories exist, they will be copied to the \texttt{build} directory, overriding any files already present there, such as standard ones or files from other cores.
+If the \texttt{document}, \texttt{hardware}, and \texttt{software} directories
+exist, they will be copied to the \texttt{build} directory, overriding any files
+already present there, such as standard ones or files from other cores.
 
-The \texttt{*\_build.mk} files allow the user to include core specific Makefile targets and variables from the build process.
-These will be copied to the \texttt{build} directory and included in the standard build process Makefiles.
+The \texttt{*\_build.mk} files allow the user to include core specific Makefile
+targets and variables from the build process.  These will be copied to the
+\texttt{build} directory and included in the standard build process Makefiles.
 
-The \texttt{src} directories contain manually written Verilog/C/TeX sources for the core, should they be needed.
+The \texttt{src} directories contain manually written Verilog/C/TeX sources for
+the core, should they be needed.
 
-The following directories and files do not follow a mandatory structure, but are typically used for the following purposes:
+The following directories and files do not follow a mandatory structure, but are
+typically used for the following purposes:
 
-The \texttt{hardware/modules} and \texttt{submodules} directories typically contain setup directories of other cores.
+The \texttt{hardware/modules} and \texttt{submodules} directories typically
+contain setup directories of other cores.
 
-The \texttt{scripts} directory contains scripts specific to the core, and may be called by the user or from the \texttt{core\_name.py} script.
+The \texttt{scripts} directory contains scripts specific to the core, and may be
+called by the user or from the \texttt{core\_name.py} script.
 
-A simple example of a core's setup directory is available for the \href{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/basic_tests/iob_and}{iob\_and} core.
+A simple example of a core's setup directory is available for the
+\href{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/basic_tests/iob_and}{iob\_and}
+core.
 
-A more complex example of a core's setup directory is available for the \href{https://github.com/IObundle/iob-soc}{iob\_soc} core.
+A more complex example of a core's setup directory is available for the
+\href{https://github.com/IObundle/iob-soc}{iob\_soc} core.

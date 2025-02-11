@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
+
+import time
+import socket
+
 
 DEBUG = False
 
@@ -18,9 +22,6 @@ DEBUG = False
 #
 # To check if the server is running run:
 #        > sudo make board_server_status
-
-import time
-import socket
 
 # Define the server's IP, port and version
 # Must match the client's IP and port

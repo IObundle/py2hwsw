@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -107,7 +107,7 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_csrs",
-                "instance_name": "iob_nco_csrs",
+                "instance_name": "iob_csrs",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
                     {

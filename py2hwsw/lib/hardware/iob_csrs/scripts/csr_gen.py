@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -450,9 +450,9 @@ class csr_gen:
                             },
                         ]
                         port_has_outputs = True
+                        # FIXME:Find out how to suppress linter warnings
                         snippet += f"""
-   wire [ADDR_W-1-2:0] {name}_waddr_int = internal_iob_addr_stable[ADDR_W-1:2]-{max(1,(addr>>2).bit_length())}'d{addr>>2};
-   assign {name}_waddr_o = {name}_waddr_int[{log2n_items}-1:0];
+   assign {name}_waddr_o = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
 """
                     register_signals += [
                         {
@@ -479,9 +479,9 @@ class csr_gen:
                         },
                     ]
                     port_has_outputs = True
+                    # FIXME:Find out how to suppress linter warnings
                     snippet += f"""
-   wire [ADDR_W-1-2:0] {name}_raddr_int = internal_iob_addr_stable[ADDR_W-1:2]-{max(1,(addr>>2).bit_length())}'d{addr>>2};
-   assign {name}_raddr_o = {name}_raddr_int[{log2n_items}-1:0];
+   assign {name}_raddr_o = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
 """
                 if auto:
                     register_signals.append(
@@ -879,7 +879,7 @@ class csr_gen:
                 "instance_description": "rdata register",
                 "parameters": {
                     "DATA_W": 8 * self.cpu_n_bytes,
-                    "RST_VAL": "1'b0",
+                    "RST_VAL": f"{8 * self.cpu_n_bytes}'b0",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
@@ -917,6 +917,23 @@ class csr_gen:
                             ],
                         },
                     )
+
+        # Create byte aligned wires
+        for row in table:
+            name = row.name
+            auto = row.autoreg
+            suffix = "" if row.internal_use else "_i"
+            n_bits = row.n_bits
+            n_bytes = int(self.bceil(n_bits, 3) / 8)
+            if n_bytes == 3:
+                n_bytes = 4
+            if "R" in row.type:
+                if name == "version":
+                    pass
+                elif auto:
+                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}{suffix} = {name}{suffix};\n"
+                else:
+                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata{suffix} = {name}_rdata{suffix};\n"
 
         snippet += f"""
     always @* begin
@@ -964,15 +981,15 @@ class csr_gen:
                 else:
                     snippet += f"            {aux_read_reg} = ((`IOB_WORD_ADDR(internal_iob_addr_stable) >= {self.bfloor(addr, addr_w_base)}) && (`IOB_WORD_ADDR(internal_iob_addr_stable) < {self.bfloor(addr_last, addr_w_base)}));\n"
                     snippet += f"        if({aux_read_reg}) "
-                snippet += f"begin\n"
+                snippet += "begin\n"
                 if name == "version":
                     rst_val = row.rst_val
-                    snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = 16'h{rst_val}|{8*n_bytes}'d0;\n"
+                    snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {8*n_bytes}'h{rst_val}|{8*n_bytes}'d0;\n"
                 elif auto:
-                    snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {name}{suffix}|{8*n_bytes}'d0;\n"
+                    snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}{suffix}|{8*n_bytes}'d0;\n"
                 else:
                     snippet += f"""
-            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {name}_rdata{suffix}|{8*n_bytes}'d0;
+            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}_rdata{suffix}|{8*n_bytes}'d0;
             rvalid_int = {name}_rvalid{suffix};
 """
                 if not auto:

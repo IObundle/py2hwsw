@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -32,8 +32,11 @@ if __name__ == "__main__":
             "setup",
             "clean",
             "print_build_dir",
+            "print_core_name",
+            "print_core_version",
             "print_core_dict",
             "print_py2hwsw_attributes",
+            "deliver",
         ],
     )
     parser.add_argument(
@@ -116,7 +119,7 @@ if __name__ == "__main__":
 
     if not args.core_name:
         parser.print_usage(sys.stderr)
-        fail_with_msg("Core name is required.")
+        exit(1)
 
     py_params = {}
     if args.py_params:
@@ -130,9 +133,13 @@ if __name__ == "__main__":
         iob_core.clean_build_dir(args.core_name)
     elif args.target == "print_build_dir":
         iob_core.print_build_dir(args.core_name, **py_params)
+    elif args.target == "print_core_name":
+        iob_core.print_core_name(args.core_name, **py_params)
+    elif args.target == "print_core_version":
+        iob_core.print_core_version(args.core_name, **py_params)
     elif args.target == "print_core_dict":
         iob_core.print_core_dict(args.core_name, **py_params)
     elif args.target == "print_py2hwsw_attributes":
         iob_core.print_py2hwsw_attributes(args.core_name, **py_params)
-    else:
-        fail_with_msg(f"Unknown target: {args.target}")
+    elif args.target == "deliver":
+        iob_core.deliver_core(args.core_name, **py_params)

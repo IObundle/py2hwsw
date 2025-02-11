@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -10,6 +10,7 @@ import if_gen
 import re
 import os
 import sys
+from iob_signal import iob_signal
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "../lib/hardware/iob_csrs")
@@ -283,6 +284,8 @@ def gen_ports_list(core):
             continue
 
         for signal in group.signals:
+            if not isinstance(signal, iob_signal):
+                continue
             n_bits = signal.width
             if type(n_bits) is str and n_bits.isnumeric():
                 n_bits = int(n_bits)

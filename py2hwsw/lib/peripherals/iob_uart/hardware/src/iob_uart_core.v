@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 IObundle
+// SPDX-FileCopyrightText: 2025 IObundle
 //
 // SPDX-License-Identifier: MIT
 
@@ -73,28 +73,28 @@ module iob_uart_core (
          //tx program
          always @(posedge clk_i, posedge arst_i)
             if (arst_i) begin
-               tx_pc       <= 1'b0;
+               tx_pc       <= 2'd0;
                tx_ready_o  <= 1'b0;
                tx_pattern  <= ~10'b0;
-               tx_bitcnt   <= 1'b0;
-               tx_cyclecnt <= 1'b0;
+               tx_bitcnt   <= 4'd0;
+               tx_cyclecnt <= 16'd0;
             end else if (rst_soft_i) begin
-               tx_pc       <= 1'b0;
+               tx_pc       <= 2'd0;
                tx_ready_o  <= 1'b0;
                tx_pattern  <= ~10'b0;
-               tx_bitcnt   <= 1'b0;
-               tx_cyclecnt <= 1'b0;
+               tx_bitcnt   <= 4'd0;
+               tx_cyclecnt <= 16'd0;
             end else if (tx_en_i && cts_int[1]) begin
 
-               tx_pc <= tx_pc + 1'b1;  //increment pc by default
+               tx_pc <= tx_pc + 2'd1;  //increment pc by default
 
                case (tx_pc)
 
                   0: begin  //wait for data to send
                      tx_ready_o  <= 1'b1;
-                     tx_bitcnt   <= 1'b0;
-                     tx_cyclecnt <= 1'b1;
-                     tx_pattern  <= ~9'b0;
+                     tx_bitcnt   <= 4'd0;
+                     tx_cyclecnt <= 16'd1;
+                     tx_pattern  <= ~10'b0;
                      if (!data_write_en_i) tx_pc <= tx_pc;
                      else tx_ready_o <= 1'b0;
                   end
@@ -105,14 +105,14 @@ module iob_uart_core (
 
                   2: begin  //send pattern
                      tx_pc       <= tx_pc;  //stay here util pattern sent
-                     tx_cyclecnt <= tx_cyclecnt + 1'b1;  //increment cycle counter
+                     tx_cyclecnt <= tx_cyclecnt + 16'd1;  //increment cycle counter
                      if (tx_cyclecnt == bit_duration_i)
                         if (tx_bitcnt == 4'd9) begin  //stop bit sent sent
-                           tx_pc <= 1'b0;  //restart program 
+                           tx_pc <= 2'd0;  //restart program 
                         end else begin  //data bit sent
                            tx_pattern  <= tx_pattern >> 1;
-                           tx_bitcnt   <= tx_bitcnt + 1'b1;  //send next bit
-                           tx_cyclecnt <= 1'b1;
+                           tx_bitcnt   <= tx_bitcnt + 4'd1;  //send next bit
+                           tx_cyclecnt <= 16'd1;
                         end
                   end
 
@@ -122,11 +122,11 @@ module iob_uart_core (
 
             end else begin
 
-               tx_pc       <= 1'b0;
+               tx_pc       <= 2'd0;
                tx_ready_o  <= 1'b0;
                tx_pattern  <= ~10'b0;
-               tx_bitcnt   <= 1'b0;
-               tx_cyclecnt <= 1'b0;
+               tx_bitcnt   <= 4'd0;
+               tx_cyclecnt <= 16'd0;
 
             end
 
@@ -141,65 +141,65 @@ module iob_uart_core (
          // receiver program
          always @(posedge clk_i, posedge arst_i) begin
             if (arst_i) begin
-               rx_pc       <= 1'b0;
-               rx_cyclecnt <= 1'b1;
-               rx_bitcnt   <= 1'b0;
+               rx_pc       <= 3'd0;
+               rx_cyclecnt <= 16'd1;
+               rx_bitcnt   <= 4'd0;
                rx_ready_o  <= 1'b0;
                rs232_rts_o <= 1'b0;
             end else if (rst_soft_i) begin
-               rx_pc       <= 1'b0;
-               rx_cyclecnt <= 1'b1;
-               rx_bitcnt   <= 1'b0;
+               rx_pc       <= 3'd0;
+               rx_cyclecnt <= 16'd1;
+               rx_bitcnt   <= 4'd0;
                rx_ready_o  <= 1'b0;
                rs232_rts_o <= 1'b0;
             end else if (rx_en_i) begin
-               rx_pc <= rx_pc + 1'b1;  //increment pc by default
+               rx_pc <= rx_pc + 3'd1;  //increment pc by default
 
                case (rx_pc)
 
                   0: begin  //sync up
                      rs232_rts_o <= 1'b1;
                      rx_ready_o  <= 1'b0;
-                     rx_cyclecnt <= 1'b1;
-                     rx_bitcnt   <= 1'b0;
+                     rx_cyclecnt <= 16'd1;
+                     rx_bitcnt   <= 4'd0;
                      if (!rs232_rxd_i)  //line is low, wait until it is high
                         rx_pc <= rx_pc;
                   end
 
                   1: begin  //line is high
-                     rx_cyclecnt <= rx_cyclecnt + 1'b1;
+                     rx_cyclecnt <= rx_cyclecnt + 16'd1;
                      if (rx_cyclecnt != bit_duration_i) rx_pc <= rx_pc;
                      else if (!rs232_rxd_i)  //error: line returned to low early
-                        rx_pc <= 1'b0;  //go back and resync
+                        rx_pc <= 3'd0;  //go back and resync
                   end
 
                   2: begin  //wait for start bit
-                     rx_cyclecnt <= 1'b1;
+                     rx_cyclecnt <= 16'd1;
                      if (rs232_rxd_i)  //start bit (low) has not arrived, wait
                         rx_pc <= rx_pc;
                   end
 
                   3: begin  //start bit is here
-                     rx_cyclecnt <= rx_cyclecnt + 1'b1;
+                     rx_cyclecnt <= rx_cyclecnt + 16'd1;
                      if (rx_cyclecnt != bit_duration_i / 2)  // wait half bit period
                         rx_pc <= rx_pc;
                      else if (rs232_rxd_i)  //error: line returned to high unexpectedly 
-                        rx_pc <= 1'b0;  //go back and resync
-                     else rx_cyclecnt <= 1'b1;
+                        rx_pc <= 3'd0;  //go back and resync
+                     else rx_cyclecnt <= 16'd1;
                   end
 
                   4: begin  // receive data
-                     rx_cyclecnt <= rx_cyclecnt + 1'b1;
+                     rx_cyclecnt <= rx_cyclecnt + 16'd1;
                      if (rx_cyclecnt == bit_duration_i) begin
-                        rx_cyclecnt <= 1'b1;
-                        rx_bitcnt   <= rx_bitcnt + 1'b1;
+                        rx_cyclecnt <= 16'd1;
+                        rx_bitcnt   <= rx_bitcnt + 4'd1;
                         rx_pattern  <= {rs232_rxd_i, rx_pattern[7:1]};  //sample rx line
                         if (rx_bitcnt == 4'd8) begin  //stop bit is here
                            rx_pattern <= rx_pattern;  //unsample rx line
                            rx_data_o  <= rx_pattern;  //unsample rx line
                            rx_ready_o <= 1'b1;
-                           rx_bitcnt  <= 1'b0;
-                           rx_pc      <= 2'd2;
+                           rx_bitcnt  <= 4'd0;
+                           rx_pc      <= 3'd2;
                         end else begin
                            rx_pc <= rx_pc;  //wait for more bits
                         end
@@ -216,9 +216,9 @@ module iob_uart_core (
                   rx_ready_o <= 1'b0;
                end
             end else begin
-               rx_pc       <= 1'b0;
-               rx_cyclecnt <= 1'b1;
-               rx_bitcnt   <= 1'b0;
+               rx_pc       <= 3'd0;
+               rx_cyclecnt <= 16'd1;
+               rx_bitcnt   <= 4'd0;
                rx_ready_o  <= 1'b0;
 
             end
@@ -228,27 +228,27 @@ module iob_uart_core (
          //tx program
          always @(posedge clk_i, negedge arst_i)
             if (!arst_i) begin
-               tx_pc       <= 1'b0;
+               tx_pc       <= 2'd0;
                tx_ready_o  <= 1'b0;
                tx_pattern  <= ~10'b0;
-               tx_bitcnt   <= 1'b0;
-               tx_cyclecnt <= 1'b0;
+               tx_bitcnt   <= 4'd0;
+               tx_cyclecnt <= 16'd0;
             end else if (rst_soft_i) begin
-               tx_pc       <= 1'b0;
+               tx_pc       <= 2'd0;
                tx_ready_o  <= 1'b0;
                tx_pattern  <= ~10'b0;
-               tx_bitcnt   <= 1'b0;
-               tx_cyclecnt <= 1'b0;
+               tx_bitcnt   <= 4'd0;
+               tx_cyclecnt <= 16'd0;
             end else if (tx_en_i && cts_int[1]) begin
 
-               tx_pc <= tx_pc + 1'b1;  //increment pc by default
+               tx_pc <= tx_pc + 2'd1;  //increment pc by default
 
                case (tx_pc)
 
                   0: begin  //wait for data to send
                      tx_ready_o  <= 1'b1;
-                     tx_bitcnt   <= 1'b0;
-                     tx_cyclecnt <= 1'b1;
+                     tx_bitcnt   <= 4'd0;
+                     tx_cyclecnt <= 16'd1;
                      tx_pattern  <= ~9'b0;
                      if (!data_write_en_i) tx_pc <= tx_pc;
                      else tx_ready_o <= 1'b0;
@@ -260,14 +260,14 @@ module iob_uart_core (
 
                   2: begin  //send pattern
                      tx_pc       <= tx_pc;  //stay here util pattern sent
-                     tx_cyclecnt <= tx_cyclecnt + 1'b1;  //increment cycle counter
+                     tx_cyclecnt <= tx_cyclecnt + 16'd1;  //increment cycle counter
                      if (tx_cyclecnt == bit_duration_i)
                         if (tx_bitcnt == 4'd9) begin  //stop bit sent sent
-                           tx_pc <= 1'b0;  //restart program 
+                           tx_pc <= 2'd0;  //restart program 
                         end else begin  //data bit sent
                            tx_pattern  <= tx_pattern >> 1;
-                           tx_bitcnt   <= tx_bitcnt + 1'b1;  //send next bit
-                           tx_cyclecnt <= 1'b1;
+                           tx_bitcnt   <= tx_bitcnt + 4'd1;  //send next bit
+                           tx_cyclecnt <= 16'd1;
                         end
                   end
 
@@ -277,11 +277,11 @@ module iob_uart_core (
 
             end else begin
 
-               tx_pc       <= 1'b0;
+               tx_pc       <= 2'd0;
                tx_ready_o  <= 1'b0;
                tx_pattern  <= ~10'b0;
-               tx_bitcnt   <= 1'b0;
-               tx_cyclecnt <= 1'b0;
+               tx_bitcnt   <= 4'd0;
+               tx_cyclecnt <= 16'd0;
 
             end
 
@@ -296,65 +296,65 @@ module iob_uart_core (
          // receiver program
          always @(posedge clk_i, negedge arst_i) begin
             if (!arst_i) begin
-               rx_pc       <= 1'b0;
-               rx_cyclecnt <= 1'b1;
-               rx_bitcnt   <= 1'b0;
+               rx_pc       <= 3'd0;
+               rx_cyclecnt <= 16'd1;
+               rx_bitcnt   <= 4'd0;
                rx_ready_o  <= 1'b0;
                rs232_rts_o <= 1'b0;
             end else if (rst_soft_i) begin
-               rx_pc       <= 1'b0;
-               rx_cyclecnt <= 1'b1;
-               rx_bitcnt   <= 1'b0;
+               rx_pc       <= 3'd0;
+               rx_cyclecnt <= 16'd1;
+               rx_bitcnt   <= 4'd0;
                rx_ready_o  <= 1'b0;
                rs232_rts_o <= 1'b0;
             end else if (rx_en_i) begin
-               rx_pc <= rx_pc + 1'b1;  //increment pc by default
+               rx_pc <= rx_pc + 3'd1;  //increment pc by default
 
                case (rx_pc)
 
                   0: begin  //sync up
                      rs232_rts_o <= 1'b1;
                      rx_ready_o  <= 1'b0;
-                     rx_cyclecnt <= 1'b1;
-                     rx_bitcnt   <= 1'b0;
+                     rx_cyclecnt <= 16'd1;
+                     rx_bitcnt   <= 4'd0;
                      if (!rs232_rxd_i)  //line is low, wait until it is high
                         rx_pc <= rx_pc;
                   end
 
                   1: begin  //line is high
-                     rx_cyclecnt <= rx_cyclecnt + 1'b1;
+                     rx_cyclecnt <= rx_cyclecnt + 16'd1;
                      if (rx_cyclecnt != bit_duration_i) rx_pc <= rx_pc;
                      else if (!rs232_rxd_i)  //error: line returned to low early
-                        rx_pc <= 1'b0;  //go back and resync
+                        rx_pc <= 3'd0;  //go back and resync
                   end
 
                   2: begin  //wait for start bit
-                     rx_cyclecnt <= 1'b1;
+                     rx_cyclecnt <= 16'd1;
                      if (rs232_rxd_i)  //start bit (low) has not arrived, wait
                         rx_pc <= rx_pc;
                   end
 
                   3: begin  //start bit is here
-                     rx_cyclecnt <= rx_cyclecnt + 1'b1;
+                     rx_cyclecnt <= rx_cyclecnt + 16'd1;
                      if (rx_cyclecnt != bit_duration_i / 2)  // wait half bit period
                         rx_pc <= rx_pc;
                      else if (rs232_rxd_i)  //error: line returned to high unexpectedly 
-                        rx_pc <= 1'b0;  //go back and resync
-                     else rx_cyclecnt <= 1'b1;
+                        rx_pc <= 3'd0;  //go back and resync
+                     else rx_cyclecnt <= 16'd1;
                   end
 
                   4: begin  // receive data
-                     rx_cyclecnt <= rx_cyclecnt + 1'b1;
+                     rx_cyclecnt <= rx_cyclecnt + 16'd1;
                      if (rx_cyclecnt == bit_duration_i) begin
-                        rx_cyclecnt <= 1'b1;
-                        rx_bitcnt   <= rx_bitcnt + 1'b1;
+                        rx_cyclecnt <= 16'd1;
+                        rx_bitcnt   <= rx_bitcnt + 4'd1;
                         rx_pattern  <= {rs232_rxd_i, rx_pattern[7:1]};  //sample rx line
                         if (rx_bitcnt == 4'd8) begin  //stop bit is here
                            rx_pattern <= rx_pattern;  //unsample rx line
                            rx_data_o  <= rx_pattern;  //unsample rx line
                            rx_ready_o <= 1'b1;
-                           rx_bitcnt  <= 1'b0;
-                           rx_pc      <= 2'd2;
+                           rx_bitcnt  <= 4'd0;
+                           rx_pc      <= 3'd2;
                         end else begin
                            rx_pc <= rx_pc;  //wait for more bits
                         end
@@ -371,9 +371,9 @@ module iob_uart_core (
                   rx_ready_o <= 1'b0;
                end
             end else begin
-               rx_pc       <= 1'b0;
-               rx_cyclecnt <= 1'b1;
-               rx_bitcnt   <= 1'b0;
+               rx_pc       <= 3'd0;
+               rx_cyclecnt <= 16'd1;
+               rx_bitcnt   <= 4'd0;
                rx_ready_o  <= 1'b0;
 
             end

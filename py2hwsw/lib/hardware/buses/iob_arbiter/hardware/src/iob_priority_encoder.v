@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2014-2018 Alex Forencich
-// SPDX-FileCopyrightText: 2024 IObundle
+// SPDX-FileCopyrightText: 2025 IObundle
 //
 // SPDX-License-Identifier: MIT
 
@@ -22,8 +22,8 @@ module iob_priority_encoder #(
 );
 
    // power-of-two width
-   parameter W1 = 2 ** $clog2(WIDTH);
-   parameter W2 = W1 / 2;
+   localparam W1 = 2 ** $clog2(WIDTH);
+   localparam W2 = W1 / 2;
 
    generate
       if (WIDTH == 1) begin : g_width_1

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2024 IObundle
+// SPDX-FileCopyrightText: 2025 IObundle
 //
 // SPDX-License-Identifier: MIT
 
@@ -7,21 +7,23 @@
 `include "iob_uart_csrs_def.vh"
 `include "iob_uart_conf.vh"
 
+`define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))
+`define IOB_WORD_ADDRESS(ADDR) ((ADDR>>2)<<2)
+
+`define IOB_BYTE_OFFSET(ADDR) (ADDR%(32/8))
+
+`define IOB_GET_WDATA(ADDR, DATA) (DATA<<(8*`IOB_BYTE_OFFSET(ADDR)))
+`define IOB_GET_WSTRB(ADDR, WIDTH) (((1<<`IOB_GET_NBYTES(WIDTH))-1)<<`IOB_BYTE_OFFSET(ADDR))
+`define IOB_GET_RDATA(ADDR, DATA, WIDTH) ((DATA>>(8*`IOB_BYTE_OFFSET(ADDR)))&((1<<WIDTH)-1))
+
 `define IOB_RESET(CLK, RESET, PRE, DURATION, POST) RESET=~`IOB_UART_RST_POL;\
    #PRE RESET=`IOB_UART_RST_POL; #DURATION RESET=~`IOB_UART_RST_POL; #POST;\
    @(posedge CLK) #1;
 
-//ASCII codes used
-`define STX 2 //start of text
-`define ETX 3 //end of text
-`define EOT 4 //end of transission
-`define ENQ 5 //enquiry
-`define ACK 6 //acklowledge
-`define FTX 7 //transmit file
-`define FRX 8 //receive file
+
 
 module iob_uart_tb;
-
+   
    parameter clk_frequency = 100e6;  //100 MHz
    parameter baud_rate = 1e6;  //high value to speed sim
    parameter clk_per = 1e9 / clk_frequency;
@@ -32,144 +34,176 @@ module iob_uart_tb;
    // CORE SIGNALS
    reg                        arst = ~`IOB_UART_RST_POL;
    reg                        clk;
+   reg                        cke = 1;
+   
+   iob_clock #(.CLK_PERIOD(10)) clk_inst (.clk_o(clk));
 
-   //control interface (backend)
-   reg                        rst_soft;
-   reg                        wr_en;
-   reg                        rd_en;
-   reg  [`IOB_UART_DIV_W-1:0] div;
-
-   reg                        tx_en;
-   reg  [                7:0] tx_data;
-   wire                       tx_ready;
-
-   reg                        rx_en;
-   wire [                7:0] rx_data;
-   reg  [                7:0] rcvd_data;
-   wire                       rx_ready;
-
-   //rs232 interface (frontend)
-   wire                       rts2cts;
-   wire                       tx2rx;
-
-
+   reg [7:0]                  word;
+   
+   //iob interface (backend)
+   reg                        iob_valid_i;
+   reg [31:0]                 iob_wdata_i;
+   reg [`IOB_UART_CSRS_ADDR_W-1:0] iob_addr_i;
+   reg [3:0]                       iob_wstrb_i;
+   wire                            iob_rvalid_o;
+   wire [31:0]                     iob_rdata_o;
+   wire                            iob_ready_o;
+   
+   integer                         failed = 0;
+   
    initial begin
 `ifdef VCD
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
-
-      clk      = 1;
-      rst_soft = 0;
-
-      rd_en    = 0;
-      wr_en    = 0;
-
-      tx_en    = 0;
-      rx_en    = 0;
-
-      div      = clk_frequency / baud_rate;
-
       //apply async reset
       `IOB_RESET(clk, arst, 100, 1_000, 100);
 
-      // assert tx not ready
-      if (tx_ready) begin
-         $display("ERROR: TX is ready initially");
-         $finish();
+      $display("Starting testbench");
+
+      iob_write(`IOB_UART_SOFTRESET_ADDR, 0, `IOB_UART_SOFTRESET_W);
+      iob_write(`IOB_UART_TXEN_ADDR, 0, `IOB_UART_TXEN_W);
+      iob_write(`IOB_UART_RXEN_ADDR, 0, `IOB_UART_RXEN_W);
+
+      $display("Softreset done");
+
+      iob_write(`IOB_UART_DIV_ADDR, clk_frequency / baud_rate, `IOB_UART_DIV_W);
+
+      $display("Baudrate set");
+
+      
+      iob_read(`IOB_UART_RXREADY_ADDR, word, `IOB_UART_RXREADY_W);
+      if (word != 0) begin
+         $display("Error: RX ready initially");
+         failed = failed + 1;
       end
 
-      // assert rx not ready
-      if (rx_ready) begin
-         $display("ERROR: RX is ready initially");
-         $finish();
+      iob_read(`IOB_UART_TXREADY_ADDR, word, `IOB_UART_TXREADY_W);
+      if (word != 0) begin
+         $display("Error: TX ready initially");
+         failed = failed + 1;
       end
+
+      $display("Ready signals checked");
 
       //pulse soft reset
-      #1 rst_soft = 1;
-      @(posedge clk) #1 rst_soft = 0;
+      iob_write(`IOB_UART_SOFTRESET_ADDR, 1, `IOB_UART_SOFTRESET_W);
+      iob_write(`IOB_UART_SOFTRESET_ADDR, 0, `IOB_UART_SOFTRESET_W);
 
+      //get version and print
+      iob_read(`IOB_UART_VERSION_ADDR, word, `IOB_UART_VERSION_W);
+      $display("Version: %d", word);
 
       //enable rx
-      @(posedge clk) #1 rx_en = 1;
+      iob_write(`IOB_UART_RXEN_ADDR, 1, `IOB_UART_RXEN_W);
 
-      //enable tx
-      #20000;
-      @(posedge clk) #1 tx_en = 1;
-
-
-      // write data to send
-      for (i = 0; i < 256; i = i + 1) begin
-
-         //wait for tx ready 
-         do @(posedge clk); while (!tx_ready);
-
-         //write word to send
-         @(posedge clk) #1 wr_en = 1;
-         tx_data = i;
-         @(posedge clk) #1 wr_en = 0;
-
-         //wait for core to receive datarx ready 
-         do @(posedge clk); while (!rx_ready);
-
-         //read received word
-         @(posedge clk) #1 rd_en = 1;
-         rcvd_data = rx_data;
-         @(posedge clk) #1 rd_en = 0;
+      //wait 100 cycles and enable tx
+      repeat (100) @(posedge clk);
+      iob_write(`IOB_UART_TXEN_ADDR, 1, `IOB_UART_TXEN_W);
 
 
-         // check received data
-         if (rcvd_data != i) begin
-            $display("Test failed: got %x, expected %x", rcvd_data, i);
-            fd = $fopen("test.log", "w");
-            $fdisplay(fd, "Test failed: got %x, expected %x", rcvd_data, i);
-            $fclose(fd);
-            $finish();
+      $display("TX and RX enabled");
+
+      
+      // data send/receive loop
+      for (i=0; i<256; i=i+1) begin
+
+         //wait for tx ready
+         word = 0;
+         while (word != 1) begin
+            iob_read(`IOB_UART_TXREADY_ADDR, word, `IOB_UART_TXREADY_W);
          end
 
-         @(posedge clk);
-         @(posedge clk);
-         @(posedge clk);
+         //send data
+         iob_write(`IOB_UART_TXDATA_ADDR, i, `IOB_UART_TXDATA_W);
 
-      end  // for (i=0; i < 256; i= i+1)
+         //wait for rx ready
+         word = 0;
+         while (word != 1) begin
+            iob_read(`IOB_UART_RXREADY_ADDR, word, `IOB_UART_RXREADY_W);
+         end
+
+         //read data
+         iob_read(`IOB_UART_RXDATA_ADDR, word, `IOB_UART_RXDATA_W);
+
+         //check data
+         if (word != i) begin
+            $display("Error: expected %d, got %d", i, word);
+            failed = failed + 1;
+         end
+         
+      end
 
       $display("%c[1;34m", 27);
-      $display("Test completed successfully.");
       $display("%c[0m", 27);
       fd = $fopen("test.log", "w");
-      $fdisplay(fd, "Test passed!");
+
+      if (failed == 0) begin
+         $display("All tests passed");
+         $fdisplay(fd, "Test passed!");
+      end else begin
+         $display("Failed tests: %d", failed);
+         $fdisplay(fd, "Test failed!");
+      end
+      
       $fclose(fd);
       $finish();
 
    end
 
-   //
-   // CLOCK
-   //
-
-   //system clock
-   always #(clk_per / 2) clk = ~clk;
-
-
    // Instantiate the Unit Under Test (UUT)
-   iob_uart_core uut (
+   iob_uart_sim uut 
+     (
       .clk_i          (clk),
       .arst_i         (arst),
-      .rst_soft_i     (rst_soft),
-      .tx_en_i        (tx_en),
-      .rx_en_i        (rx_en),
-      .tx_ready_o     (tx_ready),
-      .rx_ready_o     (rx_ready),
-      .tx_data_i      (tx_data),
-      .rx_data_o      (rx_data),
-      .data_write_en_i(wr_en),
-      .data_read_en_i (rd_en),
-      .bit_duration_i (div),
-      .rs232_rxd_i    (tx2rx),
-      .rs232_txd_o    (tx2rx),
-      .rs232_cts_i    (rts2cts),
-      .rs232_rts_o    (rts2cts)
+      .cke_i          (cke),
+
+      .iob_valid_i (iob_valid_i),
+      .iob_addr_i  (iob_addr_i),
+      .iob_wdata_i (iob_wdata_i),
+      .iob_wstrb_i (iob_wstrb_i),
+      .iob_rvalid_o(iob_rvalid_o),
+      .iob_rdata_o  (iob_rdata_o),
+      .iob_ready_o  (iob_ready_o)
    );
+
+// Write data to IOb Native slave
+task iob_write;
+   input [`IOB_UART_CSRS_ADDR_W-1:0] addr;
+   input [31:0] data;
+   input [$clog2(32):0] width;
+
+   begin
+      @(posedge clk) #1 iob_valid_i = 1;  //sync and assign
+      iob_addr_i  = `IOB_WORD_ADDRESS(addr);
+      iob_wdata_i = `IOB_GET_WDATA(addr, data);
+      iob_wstrb_i = `IOB_GET_WSTRB(addr, width);
+
+      #1 while (!iob_ready_o) #1;
+
+      @(posedge clk) iob_valid_i = 0;
+      iob_wstrb_i = 0;
+   end
+endtask
+
+// Read data from IOb Native slave
+task iob_read;
+   input [`IOB_UART_CSRS_ADDR_W-1:0] addr;
+   output [31:0] data;
+   input [$clog2(32):0] width;
+
+   begin
+      @(posedge clk) #1 iob_valid_i = 1;
+      iob_addr_i = `IOB_WORD_ADDRESS(addr);
+      iob_wstrb_i = 0;
+
+      #1 while (!iob_ready_o) #1;
+      @(posedge clk) #1 iob_valid_i = 0;
+
+      while (!iob_rvalid_o) #1;
+      data = #1 `IOB_GET_RDATA(addr, iob_rdata_o, width);
+   end
+endtask
 
 endmodule
 

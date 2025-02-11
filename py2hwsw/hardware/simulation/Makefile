@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -34,20 +34,17 @@ VSRC+= ../syn/results/*.v
 	make -C ../syn build
 endif
 
-#exclude verilog testbench when using Verilator
-ifeq ($(SIMULATOR), verilator)
-VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC))
-endif
-
 #include local simulation segment
 ifneq ($(wildcard sim_build.mk),)
 include sim_build.mk
 endif
 
+#
+# Include the simulator stub
+#
 include $(SIMULATOR).mk
-ifeq ($(SIMULATOR), verilator)
-UFLAGS+=VERILATOR=$(VERILATOR)
-endif
+
+
 UFLAGS+=VCD=$(VCD)
 UFLAGS+=COV=$(COV)
 UFLAGS+=SYN=$(SYN)

@@ -1,17 +1,19 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
 #extract cli args
 set NAME [lindex $argv 0]
-set BOARD [lindex $argv 1]
-set VSRC [lindex $argv 2]
-set INCLUDE_DIRS [lindex $argv 3]
-set IS_FPGA [lindex $argv 4]
-set USE_EXTMEM [lindex $argv 5]
-set USE_ETHERNET [lindex $argv 6]
-set SEED [lindex $argv 7]
-set USE_QUARTUS_PRO [lindex $argv 8]
+set CSR_IF [lindex $argv 1]
+set BOARD [lindex $argv 2]
+set VSRC [lindex $argv 3]
+set INCLUDE_DIRS [lindex $argv 4]
+set IS_FPGA [lindex $argv 5]
+set USE_EXTMEM [lindex $argv 6]
+set USE_ETHERNET [lindex $argv 7]
+set SEED [lindex $argv 8]
+set USE_QUARTUS_PRO [lindex $argv 9]
+set SDC_PREFIX [lindex $argv 10]
 
 load_package flow
 
@@ -61,8 +63,10 @@ if {$IS_FPGA != "1"} {
 
 
 #read synthesis design constraints
-set_global_assignment -name SDC_FILE ./quartus/$BOARD/board.sdc
-set_global_assignment -name SDC_FILE ./src/fpga.sdc
+set_global_assignment -name SDC_FILE ./quartus/$BOARD/$SDC_PREFIX\_dev.sdc
+set_global_assignment -name SDC_FILE ../src/$SDC_PREFIX.sdc
+set_global_assignment -name SDC_FILE ../src/$SDC_PREFIX\$CSR_IF.sdc
+set_global_assignment -name SDC_FILE ./src/$SDC_PREFIX.sdc
 
 set_global_assignment -name SYNCHRONIZER_IDENTIFICATION "Forced if Asynchronous"
 
@@ -120,10 +124,10 @@ if {[file exists "quartus/postmap.tcl"]} {
 }
 
 #read implementation design constraints
-if {[file exists "quartus/tool.sdc"] == 0} {
-    puts [open "quartus/tool.sdc" w] "derive_clock_uncertainty"
+if {[file exists "quartus/$SDC_PREFIX\_tool.sdc"] == 0} {
+    puts [open "quartus/$SDC_PREFIX\_tool.sdc" w] "derive_clock_uncertainty"
 }
-set_global_assignment -name SDC_FILE ./quartus/tool.sdc
+set_global_assignment -name SDC_FILE ./quartus/$SDC_PREFIX\_tool.sdc
 
 #run quartus fit
 if {[catch {execute_module -tool fit} result]} {

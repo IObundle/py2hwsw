@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -70,7 +70,7 @@ def setup(py_params_dict):
             "descr": "Testbench uart csrs interface",
             "signals": {
                 "type": "iob",
-                "prefix": "uart_",
+                "prefix": "",
                 "ADDR_W": 3,
             },
         },
@@ -228,10 +228,10 @@ def setup(py_params_dict):
             "csr_if": "iob",
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "iob_uart_csrs_cbus_s": (
+                "iob_csrs_cbus_s": (
                     "uart_s",
                     [
-                        "uart_iob_addr_i[3-1:2]",
+                        "iob_addr_i[3-1:2]",
                     ],
                 ),
                 "rs232_m": "rs232_invert",
@@ -246,7 +246,7 @@ def setup(py_params_dict):
                 "instance_description": "External memory",
                 "parameters": {
                     "ID_WIDTH": "AXI_ID_W",
-                    "ADDR_WIDTH": "AXI_ADDR_W-2",
+                    "ADDR_WIDTH": "AXI_ADDR_W",
                     "DATA_WIDTH": "AXI_DATA_W",
                 },
                 "connect": {
@@ -255,8 +255,8 @@ def setup(py_params_dict):
                     "axi_s": (
                         "axi",
                         [
-                            # "{int_mem_axi_araddr, 2'b0}",
-                            # "{int_mem_axi_awaddr, 2'b0}",
+                            "{axi_araddr, 2'b0}",
+                            "{axi_awaddr, 2'b0}",
                             "{1'b0, axi_arlock}",
                             "{1'b0, axi_awlock}",
                         ],
@@ -264,6 +264,12 @@ def setup(py_params_dict):
                 },
             },
         ]
+        if params["init_mem"] and not params["use_intmem"]:
+            attributes_dict["subblocks"][-1]["parameters"].update(
+                {
+                    "FILE": f'"{params["name"]}_firmware"',
+                }
+            )
     if params["use_ethernet"]:
         attributes_dict["subblocks"] += [
             {
@@ -277,7 +283,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_eth_csrs_cbus_s": (
+                    "iob_csrs_cbus_s": (
                         "ethernet_s",
                         [
                             "ethernet_iob_addr_i[12-1:2]",

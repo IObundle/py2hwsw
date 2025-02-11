@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -150,8 +150,8 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             # iob_csrs 'control_if_s' port is connected automatically by py2hwsw
-            f"""iob_csrs iob_uart_csrs 
-				-d 'Control/Status Registers' 
+            f"""iob_csrs iob_csrs
+                -d 'Control/Status Registers' 
                 --no_autoaddr 
                 --rw_overlap 
                 -c 
@@ -165,14 +165,13 @@ def setup(py_params_dict):
                     "rxready_i":"rxready"
                     "rxdata_io":"rxdata"
                 --csr_if {CSR_IF}
-                --csr-group 
-				    uart 
+                --csr-group uart 
                     -d 'UART software accessible registers' 
                         -r softreset:1 -t W -d 'Soft reset'  --rst_val 0 --addr 0 --log2n_items 0
                         -r div:16 -t W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
                         -r txdata:8 -t W -d 'TX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
                         -r txen:1 -t W -d 'TX enable.' --rst_val 0 --addr 5 --log2n_items 0
-				        -r rxen:1 -t W -d 'RX enable.' --rst_val 0 --addr 6 --log2n_items 0
+                        -r rxen:1 -t W -d 'RX enable.' --rst_val 0 --addr 6 --log2n_items 0
                         -r txready:1 -t R -d 'TX ready to receive data.' --rst_val 0 --addr 0 --log2n_items 0
                         -r rxready:1 -t R -d 'RX ready to be read.' --rst_val 0 --addr 1 --log2n_items 0
                         -r rxdata:8 -t R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
@@ -200,6 +199,23 @@ def setup(py_params_dict):
                     "reg_interface_io": "iob_uart_core_reg_interface",
                     "rs232_m": "rs232_m",
                 },
+            },
+            {
+                "core_name": "iob_clock",
+                "instance_name": "iob_clk_inst",
+                "dest_dir": "hardware/simulation/src",
+                "instantiate": False,
+            },
+            # uncomment the following block to reveal a bug in py2hwsw
+            #            {
+            #                "core_name": "iob_sync",
+            #                "instance_name": "iob_sync_inst",
+            #                "instantiate": False,
+            #            },
+            {
+                "core_name": "iob_reg_re",
+                "instance_name": "iob_reg_re_inst",
+                "instantiate": False,
             },
         ],
         "superblocks": [

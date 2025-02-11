@@ -1,10 +1,9 @@
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
 #include "iob_system_conf.h"
-#include "iob_system_periphs.h"
-#include "iob_system_system.h"
+#include "iob_system_mmap.h"
 
 #define STACK_ADDR (IOB_SYSTEM_FW_BASEADDR + (1 << IOB_SYSTEM_FW_ADDR_W))
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# SPDX-FileCopyrightText: 2024 IObundle
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
@@ -43,13 +43,23 @@ console_command = None
 fpga_prog_command = None
 simulator_run_command = None
 
+# Prefix for print messages
+CPREFIX = "[board_client]: "
+
 
 # Print usage and exit
 def perror():
     print(
-        f"Usage: client.py [grab [duration in seconds] -c [console launch command] [-p [fpga program command] | -s [simulator run command]] | release]"
+        f"""
+Usage: ./{sys.argv[0]} [grab [duration in seconds] -c [console launch command] [-p [fpga program command] | -s [simulator run command]] | release]
+    If -p is given then -c is required. If -s is given then -c is optional.
+    On fpga program (-p) mode, it will launch the fpga program command first, wait for it to finish, and then launch the console command.
+        In this mode, it will try to contact the `board_server` first to reserve/grab the board to avoid collisions on shared machines/boards.
+        If the `board_server` is not available, it prints a warning and runs normally.
+    On simulator run (-s) mode, it will run the simulator command and the console command in parallel.
+        In this mode, the grab duration specifies the timeout for the simulation. The `board_server` is not used in simulation mode.
+"""
     )
-    print("If -p is given then -c is required. If -s is given then -c is optional.")
     sys.exit(1)
 
 
@@ -75,9 +85,11 @@ def send_request(request):
         # Connect with the server
         try:
             s.connect((HOST, PORT))
-        except:
-            print(f"{iob_colors.FAIL}Could not connect to server{iob_colors.ENDC}")
-            sys.exit(1)
+        except Exception:
+            print(
+                f"{CPREFIX}{iob_colors.WARNING}Could not connect to board server{iob_colors.ENDC}"
+            )
+            return
 
         # Send the request to the server
         s.sendall(request.encode("utf-8"))
@@ -85,7 +97,7 @@ def send_request(request):
         # Receive the response from the server
         response = s.recv(1024).decode()
         s.close()
-        print(response)
+        print(CPREFIX + "Server response: " + response)
 
         # Process the response
         if "ERROR" in response:
@@ -94,7 +106,7 @@ def send_request(request):
         if "grab" in request and "Failure" in response:
             time_remaining = float(response.split(" ")[-2])
             print(
-                f"{iob_colors.WARNING}Trying again in",
+                f"{CPREFIX}{iob_colors.WARNING}Trying again in",
                 time_remaining,
                 f"seconds{iob_colors.ENDC}",
             )
@@ -144,7 +156,9 @@ def proc_wait(proc, timeout):
     try:
         proc.wait(timeout=timeout)
     except subprocess.TimeoutExpired:
-        print(f"{iob_colors.FAIL}Board grab duration expired!{iob_colors.ENDC}")
+        print(
+            f"{CPREFIX}{iob_colors.FAIL}Board grab duration expired!{iob_colors.ENDC}"
+        )
         kill_processes()
 
 
@@ -204,16 +218,19 @@ if __name__ == "__main__":
         simulator_run_command
     ), f"{iob_colors.FAIL}Either `-p` or `-s` must be present with 'grab' command. (Cannot be both){iob_colors.ENDC}"
 
-    # Ensure -c is given with -p
+    # Ensure `-c` is given for `-p`
     assert (
         not fpga_prog_command or console_command
     ), f"{iob_colors.FAIL}Argument `-c` must be present with `-p`.{iob_colors.ENDC}"
 
     request = form_request(command)
     if DEBUG:
-        print(f'{iob_colors.OKBLUE}DEBUG: Request is "{request}"{iob_colors.ENDC}')
+        print(
+            f'{CPREFIX}{iob_colors.OKBLUE}DEBUG: Request is "{request}"{iob_colors.ENDC}'
+        )
 
-    # Don't send request if command is "grab" and we are in simulation mode
+    # Don't send request for "grab" command in simulation mode
+    # User may still want to send release or query commands without fpga command.
     if command != "grab" or fpga_prog_command:
         send_request(request)
 
@@ -229,7 +246,7 @@ if __name__ == "__main__":
 
     # Launch simulator in the background if -s was given
     if simulator_run_command:
-        print(f"{iob_colors.INFO}Running simulator{iob_colors.ENDC}")
+        print(f"{CPREFIX}{iob_colors.INFO}Running simulator{iob_colors.ENDC}")
         sim_proc = subprocess.Popen(
             simulator_run_command,
             stdout=sys.stdout,
@@ -245,7 +262,7 @@ if __name__ == "__main__":
 
     # Program the FPGA if -p is given and wait
     if fpga_prog_command:
-        print(f"{iob_colors.INFO}Programming FPGA{iob_colors.ENDC}")
+        print(f"{CPREFIX}{iob_colors.INFO}Programming FPGA{iob_colors.ENDC}")
         fpga_prog_proc = subprocess.Popen(
             fpga_prog_command,
             stdout=sys.stdout,
@@ -257,7 +274,7 @@ if __name__ == "__main__":
         proc_wait(fpga_prog_proc, int(DURATION))
         if fpga_prog_proc.returncode != 0:
             print(
-                f"{iob_colors.FAIL}FPGA programmer exited with non-zero code.{iob_colors.ENDC}"
+                f"{CPREFIX}{iob_colors.FAIL}FPGA programmer exited with non-zero code.{iob_colors.ENDC}"
             )
             kill_processes()
 
@@ -267,7 +284,7 @@ if __name__ == "__main__":
     # Run console if -c is given and wait
     if console_command:
         # Run console and wait for completion/timeout.
-        print(f"{iob_colors.INFO}Running console{iob_colors.ENDC}")
+        print(f"{CPREFIX}{iob_colors.INFO}Running console{iob_colors.ENDC}")
         console_proc = subprocess.Popen(
             console_command,
             stdout=sys.stdout,
@@ -279,7 +296,7 @@ if __name__ == "__main__":
         proc_wait(console_proc, remaining_duration)
         if console_proc.returncode != 0:
             print(
-                f"{iob_colors.FAIL}Console exited with non-zero code.{iob_colors.ENDC}"
+                f"{CPREFIX}{iob_colors.FAIL}Console exited with non-zero code.{iob_colors.ENDC}"
             )
             kill_processes()
 
@@ -288,11 +305,13 @@ if __name__ == "__main__":
 
     # Wait for simulator to finish
     if simulator_run_command:
-        print(f"{iob_colors.INFO}Waiting for simulator to finish{iob_colors.ENDC}")
+        print(
+            f"{CPREFIX}{iob_colors.INFO}Waiting for simulator to finish{iob_colors.ENDC}"
+        )
         proc_wait(sim_proc, remaining_duration)
         if sim_proc.returncode != 0:
             print(
-                f"{iob_colors.FAIL}Simulator exited with non-zero code.{iob_colors.ENDC}"
+                f"{CPREFIX}{iob_colors.FAIL}Simulator exited with non-zero code.{iob_colors.ENDC}"
             )
             kill_processes()
 

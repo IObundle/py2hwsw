@@ -205,6 +205,48 @@ def setup(py_params_dict):
                 },
                 "descr": "iob-picorv32 data bus",
             },
+            # Ready_received register wires
+            {
+                "name": "ready_received_reg_en_rst",
+                "descr": "Enable and reset signal for ready_received_reg",
+                "signals": [
+                    {"name": "ready_received_reg_en", "width": 1},
+                    {"name": "ready_received_reg_rst", "width": 1},
+                ],
+            },
+            {
+                "name": "ready_received_reg_data_i",
+                "descr": "Input of ready_received_reg",
+                "signals": [
+                    {"name": "ready_received_reg_i", "width": 1},
+                ],
+            },
+            {
+                "name": "ready_received_reg_data_o",
+                "descr": "Output of ready_received_reg",
+                "signals": [
+                    {"name": "ready_received_reg_o", "width": 1},
+                ],
+            },
+            # CPU reset delayed register wires
+            {
+                "name": "cpu_reset_delayed_rst_i",
+                "signals": [
+                    {"name": "cpu_reset_delayed_rst_i", "width": 1},
+                ],
+            },
+            {
+                "name": "cpu_reset_delayed_data_i",
+                "signals": [
+                    {"name": "cpu_reset_delayed_data_i", "width": 2},
+                ],
+            },
+            {
+                "name": "cpu_reset_delayed_data_o",
+                "signals": [
+                    {"name": "cpu_reset_delayed_data_o", "width": 2},
+                ],
+            },
         ],
         "subblocks": [
             # TODO: Add iob_cache and a way to bypass it for uncached memory region
@@ -239,6 +281,7 @@ def setup(py_params_dict):
                     "AXIL_DATA_W": "AXI_DATA_W",
                 },
                 "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "iob_s": "i_bus",
                     "axil_m": "i_bus_axil",
                 },
@@ -254,8 +297,37 @@ def setup(py_params_dict):
                     "AXIL_DATA_W": "AXI_DATA_W",
                 },
                 "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "iob_s": "d_bus",
                     "axil_m": "d_bus_axil",
+                },
+            },
+            {
+                "core_name": "iob_reg_re",
+                "instance_name": "ready_received_re",
+                "parameters": {
+                    "DATA_W": 1,
+                    "RST_VAL": "1'b0",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "en_rst_i": "ready_received_reg_en_rst",
+                    "data_i": "ready_received_reg_data_i",
+                    "data_o": "ready_received_reg_data_o",
+                },
+            },
+            {
+                "core_name": "iob_reg_r",
+                "instance_name": "cpu_reset_delayed_reg",
+                "parameters": {
+                    "DATA_W": 2,
+                    "RST_VAL": "2'b11",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "rst_i": "cpu_reset_delayed_rst_i",
+                    "data_i": "cpu_reset_delayed_data_i",
+                    "data_o": "cpu_reset_delayed_data_o",
                 },
             },
         ],
@@ -275,11 +347,6 @@ def setup(py_params_dict):
    wire                iob_i_valid;
    wire                iob_d_valid;
 
-   //iob interface wires
-   wire                iob_i_rvalid;
-   wire                iob_d_rvalid;
-   wire                iob_d_ready;
-
    //compute the instruction bus request
    assign ibus_iob_valid = iob_i_valid;
    assign ibus_iob_addr  = cpu_addr;
@@ -293,20 +360,28 @@ def setup(py_params_dict):
    assign dbus_iob_wstrb = cpu_wstrb;
 
    //split cpu bus into instruction and data buses
-   assign iob_i_valid      = cpu_instr & cpu_valid;
+   wire cpu_iob_valid;
 
-   assign iob_d_valid      = (~cpu_instr) & cpu_valid & (~iob_d_rvalid);
+   assign iob_i_valid      = cpu_instr & cpu_iob_valid;
 
-   //extract iob interface wires from concatenated buses
-   assign iob_d_rvalid     = dbus_iob_rvalid;
-   assign iob_i_rvalid     = ibus_iob_rvalid;
-   assign iob_d_ready      = dbus_iob_ready;
+   assign iob_d_valid      = (~cpu_instr) & cpu_iob_valid;
 
    //cpu rdata and ready
    assign cpu_rdata        = cpu_instr ? ibus_iob_rdata : dbus_iob_rdata;
-   assign cpu_ready        = cpu_instr ? iob_i_rvalid : |cpu_wstrb ? iob_d_ready : iob_d_rvalid;
+   assign cpu_ready        = cpu_instr ? ibus_iob_rvalid : |cpu_wstrb ? dbus_iob_ready : dbus_iob_rvalid;
 
    assign cpu_reset = rst_i | arst_i;
+
+   // When reading, iob_valid must be deasserted after receiving iob_ready while waiting for iob_rvalid
+   assign cpu_iob_valid = cpu_valid & ~ready_received_reg_o;
+
+   assign ready_received_reg_i = 1'b1;
+   assign ready_received_reg_en = cpu_instr ? (ibus_iob_valid & ibus_iob_ready) : (dbus_iob_valid & ibus_iob_ready);
+   assign ready_received_reg_rst = cpu_ready | cpu_reset_delayed_data_o[1];
+
+   // Delay cpu reset by 2 clocks, since outputs of cpu are not stable on the first clocks after reset
+   assign cpu_reset_delayed_rst_i = cpu_reset;
+   assign cpu_reset_delayed_data_i = cpu_reset_delayed_data_o<<1;
 
    //intantiate the PicoRV32 CPU
    picorv32 #(

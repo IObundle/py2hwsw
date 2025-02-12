@@ -4,6 +4,7 @@
 
 
 def setup(py_params_dict):
+    # TODO: Use iob_picorv32_iob.v source located in '/hardware/alternate_src/'
     attributes_dict = {
         "version": "0.1",
         "generate_hw": False,

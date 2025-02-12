@@ -70,7 +70,6 @@ def setup(py_params_dict):
             "descr": "Testbench uart csrs interface",
             "signals": {
                 "type": "iob",
-                "prefix": "",
                 "ADDR_W": 3,
             },
         },

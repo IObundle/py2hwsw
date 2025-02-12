@@ -3,14 +3,17 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
+`include "iob_iob2axi_conf.vh"
 
 module iob_iob2axi #(
-   `include "iob_axi2iob_params.vs"
+   `include "iob_iob2axi_params.vs"
 ) (
-   `include "iob_axi2iob_io.vs"
+   `include "iob_iob2axi_io.vs"
 );
 
    `include "iob_functions.vs"
+
+   wire rst_i = arst_i;
 
    wire run_int;
    wire run_wr, run_rd;
@@ -42,7 +45,7 @@ module iob_iob2axi #(
    wire                       in_fifo_rd = wr_valid;
    wire [DATA_W+DATA_W/8-1:0] in_fifo_rdata;
 
-   wire [       `AXI_LEN_W:0] in_fifo_level;
+   wire [       AXI_LEN_W:0] in_fifo_level;
 
    reg                        in_fifo_empty_reg;
    always @(posedge clk_i, posedge rst_i) begin
@@ -79,10 +82,13 @@ module iob_iob2axi #(
    iob_fifo_sync #(
       .W_DATA_W(DATA_W + DATA_W / 8),
       .R_DATA_W(DATA_W + DATA_W / 8),
-      .ADDR_W  (`AXI_LEN_W)
+      .ADDR_W  (AXI_LEN_W)
    ) iob_fifo_sync0 (
-      .clk_i(clk_i),
-      .rst_i(rst_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+
+      .rst_i(1'b0),
 
       .w_en_i  (in_fifo_wr),
       .w_data_i(in_fifo_wdata),
@@ -106,8 +112,8 @@ module iob_iob2axi #(
    wire                out_fifo_rd = iob_valid_i & ~|iob_wstrb_i & ~out_fifo_empty;
    wire [  DATA_W-1:0] out_fifo_rdata;
 
-   wire [`AXI_LEN_W:0] out_fifo_level;
-   wire [`AXI_LEN_W:0] out_fifo_capacity = {1'b1, `AXI_LEN_W'd0} - out_fifo_level;
+   wire [AXI_LEN_W:0] out_fifo_level;
+   wire [AXI_LEN_W:0] out_fifo_capacity = {1'b1, AXI_LEN_W'd0} - out_fifo_level;
 
    reg                 out_fifo_empty_reg;
    always @(posedge clk_i, posedge rst_i) begin
@@ -143,10 +149,13 @@ module iob_iob2axi #(
    iob_fifo_sync #(
       .W_DATA_W(DATA_W),
       .R_DATA_W(DATA_W),
-      .ADDR_W  (`AXI_LEN_W)
+      .ADDR_W  (AXI_LEN_W)
    ) iob_fifo_sync1 (
-      .clk_i(clk_i),
-      .rst_i(rst_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+
+      .rst_i(1'b0),
 
       .w_en_i  (out_fifo_wr),
       .w_data_i(out_fifo_wdata),
@@ -162,12 +171,12 @@ module iob_iob2axi #(
    //
    // Compute next run
    //
-   wire [  `AXI_LEN_W:0] length_int = direction ? in_fifo_level : out_fifo_capacity;
+   wire [  AXI_LEN_W:0] length_int = direction ? in_fifo_level : out_fifo_capacity;
 
-   reg  [`AXI_LEN_W-1:0] count;
+   reg  [AXI_LEN_W-1:0] count;
    wire                  count_en = ~&count & |length_int;
 
-   assign run_int   = ready_int & |length_int & (length_int[`AXI_LEN_W] | &count);
+   assign run_int   = ready_int & |length_int & (length_int[AXI_LEN_W] | &count);
    assign run_wr    = direction ? run_int : 1'b0;
    assign run_rd    = direction ? 1'b0 : run_int;
 
@@ -175,9 +184,9 @@ module iob_iob2axi #(
 
    always @(posedge clk_i, posedge rst_i) begin
       if (rst_i) begin
-         count <= `AXI_LEN_W'd0;
+         count <= AXI_LEN_W'd0;
       end else if (run_int) begin
-         count <= `AXI_LEN_W'd0;
+         count <= AXI_LEN_W'd0;
       end else if (count_en) begin
          count <= count + 1'b1;
       end
@@ -188,7 +197,7 @@ module iob_iob2axi #(
    //
    localparam WADDR_W = ADDR_W - $clog2(DATA_W / 8);  // Word address width
 
-   reg  [`AXI_LEN_W-1:0] length_burst;
+   reg  [AXI_LEN_W-1:0] length_burst;
 
    reg  [    ADDR_W-1:0] addr_int;
    reg  [   WADDR_W-1:0] addr_int_next;
@@ -234,13 +243,13 @@ module iob_iob2axi #(
       .error_o (error_rd),
 
       // AXI-4 full read master I/F
-      `include "iob_iob2axi_m_m_axi_read_portmap.vs"
+      `include "iob_iob2axi_rd_m_axi_read_m_m_portmap.vs"
       // Native Master Write I/F
-      .m_valid_o(rd_valid),
-      .m_addr_o (rd_addr),
-      .m_wdata_o(rd_wdata),
-      .m_wstrb_o(rd_wstrb),
-      .m_ready_i(rd_ready)
+      .m_iob_valid_o(rd_valid),
+      .m_iob_addr_o (rd_addr),
+      .m_iob_wdata_o(rd_wdata),
+      .m_iob_wstrb_o(rd_wstrb),
+      .m_iob_ready_i(rd_ready)
    );
 
    //
@@ -261,14 +270,14 @@ module iob_iob2axi #(
       .error_o (error_wr),
 
       // AXI-4 full write master I/F
-      `include "iob_iob2axi_m_m_axi_write_portmap.vs"
+      `include "iob_iob2axi_wr_m_axi_write_m_m_portmap.vs"
 
       // Native Master Read I/F
-      .m_valid_o(wr_valid),
-      .m_addr_o (wr_addr),
-      .m_rdata_i(wr_rdata),
-      .m_rstrb_i(wr_rstrb),
-      .m_ready_i(wr_ready)
+      .m_iob_valid_o(wr_valid),
+      .m_iob_addr_o (wr_addr),
+      .m_iob_rdata_i(wr_rdata),
+      .m_iob_rstrb_i(wr_rstrb),
+      .m_iob_ready_i(wr_ready)
    );
 
 endmodule

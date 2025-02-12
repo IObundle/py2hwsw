@@ -13,7 +13,7 @@ def setup(py_params_dict):
                 "descr": "",
                 "type": "P",
                 "val": "0",
-                "min": "1",
+                "min": "0",
                 "max": "32",
             },
             {
@@ -86,6 +86,7 @@ def setup(py_params_dict):
                 "descr": "Master AXI interface",
                 "signals": {
                     "type": "axi",
+                    "prefix": "m_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -101,43 +102,29 @@ def setup(py_params_dict):
                     "DATA_W": "DATA_W",
                 },
             },
+            {
+                "name": "ext_fifo_sync0_mem_m",
+                "descr": "External memory interface for fifo sync 0",
+                "signals": {"type": "ram_t2p", "prefix": "fifo_sync0_"},
+            },
+            {
+                "name": "ext_fifo_sync1_mem_m",
+                "descr": "External memory interface for fifo sync 1",
+                "signals": {"type": "ram_t2p", "prefix": "fifo_sync1_"},
+            },
         ],
         "subblocks": [
             {
-                "core_name": "m_axi_m_port",
-                "instance_name": "m_axi_m_port_inst",
-            },
-            {
-                "core_name": "m_axi_write_m_port",
-                "instance_name": "m_axi_write_m_port_inst",
-            },
-            {
-                "core_name": "m_axi_read_m_port",
-                "instance_name": "m_axi_read_m_port_inst",
-            },
-            {
-                "core_name": "m_m_axi_write_portmap",
-                "instance_name": "m_m_axi_write_portmap_inst",
-            },
-            {
-                "core_name": "m_m_axi_read_portmap",
-                "instance_name": "m_m_axi_read_portmap_inst",
-            },
-            {
-                "core_name": "iob_iob2axi_wr",
-                "instance_name": "iob_iob2axi_wr_inst",
-            },
-            {
-                "core_name": "iob_iob2axi_rd",
-                "instance_name": "iob_iob2axi_rd_inst",
-            },
-            {
                 "core_name": "iob_fifo_sync",
-                "instance_name": "iob_fifo_sync_inst",
             },
             {
                 "core_name": "iob_functions",
-                "instance_name": "iob_functions_inst",
+            },
+            {
+                "core_name": "iob_iob2axi_rd",
+            },
+            {
+                "core_name": "iob_iob2axi_wr",
             },
         ],
         "superblocks": [

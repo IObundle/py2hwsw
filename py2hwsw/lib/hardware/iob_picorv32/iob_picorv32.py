@@ -57,6 +57,22 @@ def setup(py_params_dict):
                 "min": 0,
                 "max": 4,
             },
+            {
+                "name": "USE_COMPRESSED",
+                "type": "P",
+                "val": "1",
+                "min": "0",
+                "max": "1",
+                "descr": "Use compressed instructions",
+            },
+            {
+                "name": "USE_MUL_DIV",
+                "type": "P",
+                "val": "1",
+                "min": "0",
+                "max": "1",
+                "descr": "Use multiplication and division instructions",
+            },
         ],
         "ports": [
             {
@@ -152,8 +168,8 @@ def setup(py_params_dict):
                     "file_prefix": "iob_picorv32_ibus_",
                     "prefix": "ibus_",
                     "prefix": "ibus_",
-                    "DATA_W": "DATA_W",
-                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "AXI_DATA_W",
+                    "ADDR_W": "AXI_ADDR_W",
                 },
                 "descr": "iob-picorv32 instruction bus",
             },
@@ -164,14 +180,56 @@ def setup(py_params_dict):
                     "file_prefix": "iob_picorv32_dbus_",
                     "prefix": "dbus_",
                     "prefix": "dbus_",
-                    "DATA_W": "DATA_W",
-                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "AXI_DATA_W",
+                    "ADDR_W": "AXI_ADDR_W",
                 },
                 "descr": "iob-picorv32 data bus",
+            },
+            {
+                "name": "i_bus_iob2axi_control",
+                "descr": "Control interface",
+                "signals": [
+                    {"name": "i_bus_iob2axi_run", "width": 1},
+                    {"name": "i_bus_iob2axi_direction", "width": 1},
+                    {"name": "i_bus_iob2axi_addr", "width": "AXI_ADDR_W"},
+                    {"name": "i_bus_iob2axi_ready", "width": 1},
+                    {"name": "i_bus_iob2axi_error", "width": 1},
+                ],
+            },
+            {
+                "name": "d_bus_iob2axi_control",
+                "descr": "Control interface",
+                "signals": [
+                    {"name": "d_bus_iob2axi_run", "width": 1},
+                    {"name": "d_bus_iob2axi_direction", "width": 1},
+                    {"name": "d_bus_iob2axi_addr", "width": "AXI_ADDR_W"},
+                    {"name": "d_bus_iob2axi_ready", "width": 1},
+                    {"name": "d_bus_iob2axi_error", "width": 1},
+                ],
             },
         ],
         "subblocks": [
             # TODO: Add iob_cache and a way to bypass it for uncached memory region
+            # {
+            #     "core_name": "iob_system_cache_system",
+            #     "instance_name": "cache",
+            #     "instance_description": "L1 and L2 caches",
+            #     "parameters": {
+            #         "AXI_ADDR_W": "AXI_ADDR_W",
+            #         "AXI_DATA_W": "AXI_DATA_W",
+            #         "AXI_ID_W": "AXI_ID_W",
+            #         "AXI_LEN_W": "AXI_LEN_W",
+            #         "DDR_ADDR_W": 32, # do we need this?
+            #         "FIRM_ADDR_W": 32, # do we need this?
+            #     },
+            #     "connect": {
+            #         "clk_en_rst_s": "clk_en_rst_s",
+            #         "i_bus_s": "i_bus",
+            #         "d_bus_s": "d_bus",
+            #         "i_bus_axi_m": "i_bus_m",
+            #         "d_bus_axi_m": "d_bus_m",
+            #     },
+            # },
             {
                 "core_name": "iob_iob2axi",
                 "instance_name": "ibus_iob2axi",
@@ -183,8 +241,8 @@ def setup(py_params_dict):
                     "AXI_LEN_W": "AXI_LEN_W",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst_s",
-                    "control_io": "",
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "control_io": "i_bus_iob2axi_control",
                     "iob_s": "i_bus",
                     "axi_m": "i_bus_m",
                 },
@@ -200,8 +258,8 @@ def setup(py_params_dict):
                     "AXI_LEN_W": "AXI_LEN_W",
                 },
                 "connect": {
-                    "clk_en_rst": "clk_en_rst_s",
-                    "control_io": "",
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "control_io": "d_bus_iob2axi_control",
                     "iob_s": "d_bus",
                     "axi_m": "d_bus_m",
                 },
@@ -209,14 +267,14 @@ def setup(py_params_dict):
         ],
         "snippets": [
             {
-                "verilog_code": """
+                "verilog_code": f"""
    //picorv32 native interface wires
    wire                cpu_instr;
    wire                cpu_valid;
-   wire [  ADDR_W-1:0] cpu_addr;
-   wire [DATA_W/8-1:0] cpu_wstrb;
-   wire [  DATA_W-1:0] cpu_wdata;
-   wire [  DATA_W-1:0] cpu_rdata;
+   wire [  AXI_ADDR_W-1:0] cpu_addr;
+   wire [AXI_DATA_W/8-1:0] cpu_wstrb;
+   wire [  AXI_DATA_W-1:0] cpu_wdata;
+   wire [  AXI_DATA_W-1:0] cpu_rdata;
    wire                cpu_ready;
 
    //split cpu bus into ibus and dbus
@@ -231,8 +289,8 @@ def setup(py_params_dict):
    //compute the instruction bus request
    assign ibus_iob_valid = iob_i_valid;
    assign ibus_iob_addr  = cpu_addr;
-   assign ibus_iob_wdata = {DATA_W{1'b0}};
-   assign ibus_iob_wstrb = {(DATA_W / 8) {1'b0}};
+   assign ibus_iob_wdata = {{DATA_W{{1'b0}}}};
+   assign ibus_iob_wstrb = {{(DATA_W / 8) {{1'b0}}}};
 
    //compute the data bus request
    assign dbus_iob_valid = iob_d_valid;
@@ -261,7 +319,8 @@ def setup(py_params_dict):
       .COMPRESSED_ISA (USE_COMPRESSED),
       .ENABLE_FAST_MUL(USE_MUL_DIV),
       .ENABLE_DIV     (USE_MUL_DIV),
-      .BARREL_SHIFTER (1)
+      .BARREL_SHIFTER (1),
+      .PROGADDR_RESET (32'h{params["reset_addr"]:x})
    ) picorv32_core (
       .clk         (clk_i),
       .resetn      (~cpu_reset),
@@ -314,6 +373,16 @@ assign plic_iob_ready_o = 1'b0;
 //plic_iob_addr_i,
 //plic_iob_wdata_i,
 //plic_iob_wstrb_i,
+
+
+// Connect inputs of iob2axi control interface
+assign i_bus_iob2axi_run = 1'b0;
+assign i_bus_iob2axi_direction = 1'b0;
+assign i_bus_iob2axi_addr = {{AXI_ADDR_W{{1'b0}}}};
+assign d_bus_iob2axi_run = 1'b0;
+assign d_bus_iob2axi_direction = 1'b0;
+assign d_bus_iob2axi_addr = {{AXI_ADDR_W{{1'b0}}}};
+
 """
             }
         ],

@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-#
-# This file is included in BUILD_DIR/sim/Makefile
-#
+ifeq ($(SIMULATOR),verilator)
+VSRC+=./src/iob_uart_csrs.c
+VTOP=iob_uart_sim
+endif
 
-NOCLEAN+=-o -name "uart_tb.v"

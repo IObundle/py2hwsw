@@ -50,12 +50,12 @@ doc-build:
 py2-doc-build:
 	nix-shell --run "py2hwsw --py2hwsw_docs && make -C py2hwsw_docs/document/ build"
 
-py2-doc-update: doc-build
+py2-doc-update:
 	cp py2hwsw_docs/document/ug.pdf ../py2hwsw_document/document/ug.pdf
 
 
 delivery:
-	nix-shell --run "CORE=$(CORE) BUILD_DIR=$(BUILD_DIR) scripts/delivery.sh"
+	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
 
 

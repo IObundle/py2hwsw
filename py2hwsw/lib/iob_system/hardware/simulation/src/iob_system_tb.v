@@ -159,13 +159,14 @@ module iob_system_tb;
       .ethernet_iob_rvalid_o(ethernet_iob_rvalid),
 `endif
 
-      .uart_iob_valid_i (iob_valid_i),
-      .uart_iob_addr_i  (iob_addr_i),
-      .uart_iob_wdata_i (iob_wdata_i),
-      .uart_iob_wstrb_i (iob_wstrb_i),
-      .uart_iob_rdata_o (iob_rdata_o),
-      .uart_iob_ready_o (iob_ready_o),
-      .uart_iob_rvalid_o(iob_rvalid_o)
+      //control interface
+      .iob_valid_i (iob_valid_i),
+      .iob_addr_i  (iob_addr_i),
+      .iob_wdata_i (iob_wdata_i),
+      .iob_wstrb_i (iob_wstrb_i),
+      .iob_rdata_o (iob_rdata_o),
+      .iob_ready_o (iob_ready_o),
+      .iob_rvalid_o(iob_rvalid_o)
    );
 
    task cpu_inituart;

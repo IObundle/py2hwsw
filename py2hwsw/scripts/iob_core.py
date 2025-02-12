@@ -474,7 +474,7 @@ class iob_core(iob_module, iob_instance):
             for subblock in subblock_group.blocks:
                 for port in subblock.ports:
                     if (
-                        port.name == subblock.original_name + "_csrs_cbus_s"
+                        port.name == "iob_csrs_cbus_s"
                         and port.interface.type == "iob"
                         and port.e_connect
                     ):
@@ -503,7 +503,7 @@ class iob_core(iob_module, iob_instance):
 
     def __connect_clk_interface(self, port, instantiator):
         """Create, if needed, a clock interface port in instantiator and connect it to self"""
-        if not instantiator.generate_hw:
+        if not instantiator.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
         _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
@@ -565,7 +565,7 @@ class iob_core(iob_module, iob_instance):
                     and not self.is_tester
                 ):
                     self.__connect_memory(port, instantiator)
-                elif(
+                elif (
                     port.interface.type in ["clk_en_rst", "clk_rst"]
                     and instantiator
                     and not self.is_tester
@@ -752,7 +752,6 @@ class iob_core(iob_module, iob_instance):
         # Don't try to clean if build dir doesn't exist
         if not os.path.exists(module.build_dir):
             return
-
         print(
             f"{iob_colors.INFO}Cleaning build directory: {module.build_dir}{iob_colors.ENDC}"
         )
@@ -761,6 +760,25 @@ class iob_core(iob_module, iob_instance):
         print(
             f"{iob_colors.INFO}Cleaning complete. Removed: {module.build_dir}{iob_colors.ENDC}"
         )
+
+    @staticmethod
+    def deliver_core(core_name):
+        """Deliver core."""
+        # Set project wide special target (will prevent normal setup)
+        __class__.global_special_target = "deliver"
+        # Build a new module instance, to obtain its attributes
+        module = __class__.get_core_obj(core_name)
+        # Don't try to deliver if build dir doesn't exist
+        if not os.path.exists(module.build_dir):
+            #print error and exit 
+            print(
+                f"{iob_colors.FAIL}Build directory not found: {module.build_dir}{iob_colors.ENDC}"
+                )
+            exit(1)
+        print(
+            f"{iob_colors.INFO}Delivering core: {core_name} {iob_colors.ENDC}"
+            )
+        os.system(f"CORE={core_name} BUILD_DIR={module.build_dir} delivery.sh")
 
     @staticmethod
     def print_build_dir(core_name, **kwargs):

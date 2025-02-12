@@ -15,4 +15,6 @@ def generate_docs(core):
     if core.is_top_module:
         config_gen.generate_confs_tex(core.confs, core.build_dir + "/document/tsrc")
         io_gen.generate_ios_tex(core.ports, core.build_dir + "/document/tsrc")
-        block_gen.generate_subblocks_tex(core.subblocks, core.build_dir + "/document/tsrc")
+        block_gen.generate_subblocks_tex(
+            core.subblocks, core.build_dir + "/document/tsrc"
+        )

@@ -87,6 +87,18 @@ def setup(py_params_dict):
                 },
             },
         ]
+    if params["cpu"] == "none":
+        attributes_dict["ports"] += [
+            {
+                "name": "iob_s",
+                "descr": "Direct control of system peripherals csrs",
+                "signals": {
+                    "type": "iob",
+                    "prefix": "pbus_",
+                    "ADDR_W": 3,
+                },
+            },
+        ]
 
     #
     # Wires
@@ -220,6 +232,8 @@ def setup(py_params_dict):
         attributes_dict["subblocks"][-1]["connect"].update({"phy_io": "phy"})
     if params["use_extmem"]:
         attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
+    if params["cpu"] == "none":
+        attributes_dict["subblocks"][-1]["connect"].update({"iob_s": "iob_s"})
     attributes_dict["subblocks"] += [
         {
             "core_name": "iob_uart",

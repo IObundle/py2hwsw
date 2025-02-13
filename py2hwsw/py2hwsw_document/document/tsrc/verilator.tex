@@ -1,0 +1,49 @@
+% SPDX-FileCopyrightText: 2025 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+With mandatory structured IOs, the testbench behaves like a processor reading
+and writing to its CSR. A universal Verilator testbench has been developed for
+an IP with a structured IOb native interface (bridges to standard AXI-Lite, APB
+or Wishbone are supplied). The testbench is a C++ program provides hardware
+reset and CSR read and write functions.
+
+\subsubsection{IP core simulation}
+
+The IP cores using this testbench must provide a C function called
+{\tt iob\_core\_tb()}, the IP core’s specific test. They also must provide a C header
+called {\tt iob\_vlt\_tb.h} that defines the Device Under Test (DUT) as a Verilator
+type called {\tt dut\_t}. With knowledge of the DUT and its test, the universal
+Verilator testbench will exercise any IP core. Interestingly, {\tt iob\_core\_tb()} also
+runs, without modifications, on a RISC-V processor with the IP as a submodule,
+for example, for FPGA testing or emulation.
+
+The {\tt iob\_uart} core is used as an example, located in the {\tt
+  py2hwsw/lib/peripherals/iob\_uartiob-uart} directory.
+
+\begin{lstlisting}[language=bash]
+  $ git clone --recursive git@github.com:IObundle/py2hwsw.git
+  $ cd py2hwsw/lib
+  $ make sim-run CORE=iob\_uart SIMULATOR=verilator
+\end{lstlisting}
+
+The {\tt make sim-run} command will run core setup, creating the build directory
+at {\tt ../../../iob\_uart\_V0.1}. The Verilator simulator will be run in the
+build directory. The testbench will be compiled and run, and the output will be
+displayed on the console.
+
+\subsubsection{Subsystem simulation}
+
+To illustrate system test capabilities with the universal Verilator testbench,
+the {\tt iob\_system} subsystem core is used as an example, located in the {\tt
+  py2hwsw/lib/iob\_system} directory.
+
+\begin{lstlisting}[language=bash]
+  $ git clone --recursive git@github.com:IObundle/py2hwsw.git
+  $ cd py2hwsw/lib
+  $ make sim-run CORE=iob\_uart SIMULATOR=verilator
+\end{lstlisting}
+
+In this case the {\tt iob\_core\_tb()} function is running on the desktop,
+emualting a system tester. The console output comes from teh system itself
+runnig its embedded test, a more elaborated form of a hello world program.

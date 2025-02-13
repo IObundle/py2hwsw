@@ -12,6 +12,10 @@ module iob_iob2axil #(
    parameter ADDR_W      = AXIL_ADDR_W,  // IOb address bus width in bits
    parameter DATA_W      = AXIL_DATA_W   // IOb data bus width in bits
 ) (
+   // clk_en_rst_s
+   input                           clk_i,
+   input                           cke_i,
+   input                           arst_i,
    // AXI4 Lite master interface
    output wire                     axil_awvalid_o,
    input  wire                     axil_awready_i,
@@ -43,12 +47,34 @@ module iob_iob2axil #(
    output wire                iob_ready_o
 );
 
+   wire wvalid_reg_en = axil_awvalid_o;
+   wire wvalid_reg_rst = axil_wready_i;
+   wire wvalid_reg_i = 1'b1;
+   wire wvalid_reg_o;
+
+   iob_reg_re #(
+      .DATA_W (1),
+      .RST_VAL(1'b0)
+   ) wvalid_re (
+      // clk_en_rst_s port
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+      // en_rst_i port
+      .en_i  (wvalid_reg_en),
+      .rst_i (wvalid_reg_rst),
+      // data_i port
+      .data_i(wvalid_reg_i),
+      // data_o port
+      .data_o(wvalid_reg_o)
+   );
+
    //
    // COMPUTE IOb OUTPUTS
    //
    assign iob_rvalid_o   = axil_rvalid_i;
    assign iob_rdata_o    = axil_rdata_i;
-   assign iob_ready_o    = (~|iob_wstrb_i) ? (axil_wready_i | axil_awready_i) : axil_arready_i;
+   assign iob_ready_o    = (|iob_wstrb_i) ? (axil_wready_i | axil_awready_i) : axil_arready_i;
 
    //
    // COMPUTE AXIL OUTPUTS
@@ -60,7 +86,7 @@ module iob_iob2axil #(
    assign axil_awprot_o  = 3'd2;
 
    // write
-   assign axil_wvalid_o  = iob_valid_i & |iob_wstrb_i;
+   assign axil_wvalid_o  = wvalid_reg_o;
    assign axil_wdata_o   = iob_wdata_i;
    assign axil_wstrb_o   = iob_wstrb_i;
 

@@ -13,9 +13,12 @@
 #make this script exit on error
 set -e
 
-echo "Setup the build directory and tar it up"
-make clean setup
-
+#test if build directory exists and exit if not
+if [ ! -d "$BUILD_DIR" ]; then
+    echo "Error: Build directory $BUILD_DIR does not exist."
+    echo "Please make sure you have run setup before running this command."
+    exit 1
+fi
 
 #get name and version using bootstrap.py
 NAME=`py2hwsw $CORE print_core_name`

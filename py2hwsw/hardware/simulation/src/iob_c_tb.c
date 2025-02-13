@@ -20,24 +20,37 @@ static uint32_t req = 0;
 // Function to write to the c2v file
 void iob_write(uint32_t address, uint32_t data) {
 
-  uint32_t ack, mode;
+  uint32_t ack=-100, mode=-100, addr=-100, dat=-100;
+  uint32_t fscanf_ret;
 
-  //open the c2v file for writing and seend write request
+  //send request
   fpw = fopen(C2V_FILE, "wb");
+  if (fpw == NULL) {
+    printf("C: Error opening file %s\n", C2V_FILE);
+    exit(1);
+  }
   fprintf(fpw, "%08x %08x %08x %08x\n", req, W, address, data);
+  fflush(fpw);
   fclose(fpw);
   usleep(100);
 
+  int fscan_ret = -1;
+  
   //wait for ack
   do {
-    fpr = fopen(V2C_FILE, "rb"); // Open for reading in binary mode
-    if (fpr == NULL) {
-      continue;
-    }
-    while (fscanf(fpr, "%08x %08x %08x %08x\n", &ack, &mode, &address, &data) == EOF)
+    fpr = fopen(V2C_FILE, "rb");
+    if (fpr != NULL) {
       usleep(100);
-    fclose(fpr);
-  } while (ack != req  || mode != W);
+      fscan_ret = fscanf(fpr, "%08x %08x %08x %08x\n", &ack, &mode, &addr, &dat);
+      if (fscan_ret == 4) {
+        if (ack == req && mode == W && addr == address && dat == data) {
+          fclose(fpr);
+          break;
+        }
+      }
+      fclose(fpr);
+    }
+  } while (ack != req);
 
   printf("C: Written %08x to %08x\n", data, address);
   req++;
@@ -46,33 +59,58 @@ void iob_write(uint32_t address, uint32_t data) {
 // Function to read from the v2c file
 uint32_t iob_read(uint32_t address) {
 
-  uint32_t ack, mode, data;
+  uint32_t ack=-100, mode=-100, addr=-100, dat=-100;
+  uint32_t fscanf_ret;
 
-  //open the c2v file for writing and send read request
-  fpw = fopen(C2V_FILE, "wb"); // Open for reading and writing in binary mode
+  //send request
+  fpw = fopen(C2V_FILE, "wb");
+  if (fpw == NULL) {
+    printf("C: Error opening file %s\n", C2V_FILE);
+    exit(1);
+  }
   fprintf(fpw, "%08x %08x %08x %08x\n", req, R, address, 0);
+  fflush(fpw);
   fclose(fpw);
   usleep(100);
   
+  int fscan_ret = -1;
+
   //wait for ack
   do {
-    fpr = fopen(V2C_FILE, "rb"); // Open for reading and writing in binary mode
-    if (fpr == NULL) {
-      continue;
-    }
-    while (fscanf(fpr, "%08x %08x %08x %08x\n", &ack, &mode, &address, &data) == EOF)
+    fpr = fopen(V2C_FILE, "rb");
+    if (fpr != NULL) {
       usleep(100);
-    fclose(fpr);
-  } while (ack != req  || mode != R );
+      fscanf_ret = (fscanf (fpr, "%08x %08x %08x %08x\n", &ack, &mode, &addr, &dat) != 0);
+      if (fscan_ret == 4) {
+        if (ack == req && mode == R && addr == address) {
+          fclose(fpr);
+          break;
+        }
+      }
+      fclose(fpr);
+    }
+  } while (ack != req);
 
+  printf("C: Read %08x from %08x\n", dat, address);
   req++;
-  
-  return data;
-
+  return dat;
 }
 
+
+
 void iob_finish() {
-  fprintf(fpw, "%08x %08x %08x %08x\n", req, F, 0, 0); // Write finish
+  fpw = fopen(C2V_FILE, "wb");
+  if (fpw == NULL) {
+    printf("C: Error opening file %s\n", C2V_FILE);
+    exit(1);
+  }
+  fprintf(fpw, "%08x %08x %08x %08x\n", req, F, 0, 0);
+  fflush(fpw);
+  fclose(fpw);
+  usleep(1000);
+
+  printf("C: Finished\n");
+  exit(0);
 }
 
 // User-supplied testbench function (must be defined by the user)
@@ -80,32 +118,11 @@ int iob_core_tb(); // Declaration
 
 int main() {
 
-  //create the c2v file for writing
-  fpw = fopen(C2V_FILE, "wb"); // Open for reading and writing in binary mode
-  if (fpw == NULL) {
-    perror("C: Error opening c2v.txt for writing");
-    exit(1);
-  }
-  fprintf(fpw, "%08x %08x %08x %08x\n", -2, W, 0, 0);
-  printf("C: file fpw create for writing\n");
-  fclose(fpw);
-
-  //wait for the v2c file to be created and opened for reading
-  fpr = NULL;
-  while (fpr == NULL) {
-    fpr = fopen(V2C_FILE, "rb"); // Open for reading and writing in binary mode
-  }
-  printf("C: file fpr opened for reading\n");
-  fclose(fpr);
-
-   // Write a dummy value to the file
   iob_write(1, 2);
+  int ret = iob_read(3);
+
+  printf("C: ret = %d\n", ret);
+  
   iob_finish();
 
-  exit(0);
-
-  // Call the user's testbench function
-  //int failed = iob_core_tb();
-
-  //return failed;
 }

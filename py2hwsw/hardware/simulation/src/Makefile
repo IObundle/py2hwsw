@@ -12,9 +12,9 @@ tb: iob_c_tb.c iob_core_tb.c
 
 build: a.out tb
 
-run: build
-	./a.out &
-	./tb && killall -9 a.out
+run: clean build
+	./tb &
+	./a.out
 
 clean:
 	rm -f a.out tb *.txt

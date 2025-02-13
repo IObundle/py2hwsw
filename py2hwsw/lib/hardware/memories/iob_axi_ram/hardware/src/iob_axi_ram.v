@@ -120,7 +120,7 @@ module iob_axi_ram #(
    reg axi_bvalid_reg, axi_bvalid_next;
    reg axi_arready_reg, axi_arready_next;
    reg [ID_WIDTH-1:0] axi_rid_reg, axi_rid_next;
-   reg [DATA_WIDTH-1:0] axi_rdata_reg, axi_rdata_next;
+   wire [DATA_WIDTH-1:0] axi_rdata;
    reg axi_rlast_reg, axi_rlast_next;
    reg axi_rvalid_reg, axi_rvalid_next;
    reg [ID_WIDTH-1:0] axi_rid_pipe_reg;
@@ -141,35 +141,27 @@ module iob_axi_ram #(
    assign axi_bvalid_o  = axi_bvalid_reg;
    assign axi_arready_o = axi_arready_reg;
    assign axi_rid_o     = PIPELINE_OUTPUT ? axi_rid_pipe_reg : axi_rid_reg;
-   assign axi_rdata_o   = PIPELINE_OUTPUT ? axi_rdata_pipe_reg : axi_rdata_reg;
+   assign axi_rdata_o   = PIPELINE_OUTPUT ? axi_rdata_pipe_reg : axi_rdata;
    assign axi_rresp_o   = 2'b00;
    assign axi_rlast_o   = PIPELINE_OUTPUT ? axi_rlast_pipe_reg : axi_rlast_reg;
    assign axi_rvalid_o  = PIPELINE_OUTPUT ? axi_rvalid_pipe_reg : axi_rvalid_reg;
 
-   generate
-      genvar i;
-      localparam file_suffix = {"7", "6", "5", "4", "3", "2", "1", "0"};
-      for (i = 0; i < WORD_WIDTH; i = i + 1) begin : g_Bytes_in_word
-         localparam mem_init_file_int = (FILE != "none") ?
-          {FILE, "_", file_suffix[8*(i+1)-1-:8], ".hex"} : "none";
-         iob_ram_t2p #(
-            .HEXFILE(mem_init_file_int),
-            .ADDR_W (VALID_ADDR_WIDTH),
-            .DATA_W (WORD_SIZE)
-         ) ram (
-            .clk_i(clk_i),
+   iob_ram_t2p_be #(
+      .HEXFILE((FILE != "none") ? {FILE, ".hex"} : "none"),
+      .ADDR_W (VALID_ADDR_WIDTH),
+      .DATA_W (DATA_WIDTH)
+   ) ram (
+      .clk_i(clk_i),
 
-            // Read port
-            .r_en_i  (read_state_reg == READ_STATE_BURST),
-            .r_addr_i(read_addr_valid),
-            .r_data_o(axi_rdata_reg[WORD_SIZE*i+:WORD_SIZE]),
-            // Write port
-            .w_en_i  (mem_wr_en & axi_wstrb_i[i]),
-            .w_addr_i(write_addr_valid),
-            .w_data_i(axi_wdata_i[WORD_SIZE*i+:WORD_SIZE])
-         );
-      end
-   endgenerate
+      // Read port
+      .r_en_i  (read_state_reg == READ_STATE_BURST),
+      .r_addr_i(read_addr_valid),
+      .r_data_o(axi_rdata),
+      // Write port
+      .w_en_i  ({STRB_WIDTH{mem_wr_en}} & axi_wstrb_i),
+      .w_addr_i(write_addr_valid),
+      .w_data_i(axi_wdata_i)
+   );
 
    // always_comb in SystemVerilog
    always @(*) begin
@@ -372,7 +364,7 @@ module iob_axi_ram #(
 
          if (!axi_rvalid_pipe_reg || axi_rready_i) begin
             axi_rid_pipe_reg   <= axi_rid_reg;
-            axi_rdata_pipe_reg <= axi_rdata_reg;
+            axi_rdata_pipe_reg <= axi_rdata;
             axi_rlast_pipe_reg <= axi_rlast_reg;
          end
       end

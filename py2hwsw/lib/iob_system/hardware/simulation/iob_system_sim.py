@@ -149,6 +149,11 @@ def setup(py_params_dict):
                     "LOCK_W": 1,
                 },
             },
+            {
+                "name": "axi_ram_mem",
+                "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
+                "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
+            },
         ]
     if params["use_ethernet"]:
         attributes_dict["wires"] += [
@@ -274,13 +279,25 @@ def setup(py_params_dict):
                             "{1'b0, axi_awlock}",
                         ],
                     ),
+                    "external_mem_bus_m": "axi_ram_mem",
+                },
+            },
+            {
+                "core_name": "iob_ram_t2p_be",
+                "instance_name": "iob_ram_t2p_be_inst",
+                "parameters": {
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "AXI_DATA_W",
+                },
+                "connect": {
+                    "ram_t2p_be_s": "axi_ram_mem",
                 },
             },
         ]
         if params["init_mem"] and not params["use_intmem"]:
             attributes_dict["subblocks"][-1]["parameters"].update(
                 {
-                    "FILE": f'"{params["name"]}_firmware"',
+                    "HEXFILE": f'"{params["name"]}_firmware.hex"',
                 }
             )
     if params["use_ethernet"]:

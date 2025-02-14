@@ -213,4 +213,4 @@ def generate_confs(core):
         core.name,
         os.path.join(core.build_dir, core.dest_dir),
     )
-    conf_h(core.confs, core.name, core.build_dir + "/software/include")
+    conf_h(core.confs, core.name, core.build_dir + "/software/src")

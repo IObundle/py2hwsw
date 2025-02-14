@@ -169,7 +169,6 @@ def setup(py_params_dict):
                 "ID_WIDTH": "AXI_ID_W",
                 "ADDR_WIDTH": "AXI_ADDR_W",
                 "DATA_WIDTH": "AXI_DATA_W",
-                "READ_ON_WRITE": "1",
             },
             "connect": {
                 "clk_i": "clk",

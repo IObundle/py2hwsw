@@ -1234,9 +1234,9 @@ def gen_if(interface):
 
         # get ports
         if if_type.startswith("s"):
-            ports = get_signals(name, "slave", mult, widths, port_params)
+            ports = get_signals(name=name, if_type="slave", mult=mult, widths=widths, port_params=port_params)
         else:
-            ports = get_signals(name, "master", mult, widths, port_params)
+            ports = get_signals(name=name, if_type="master", mult=mult, widths=widths, port_params=port_params)
 
         eval_str = f"write_{if_type}(fout, prefix1,{prefix2_str} ports)"
         # print(eval_str, prefix1)

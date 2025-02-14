@@ -31,48 +31,7 @@ module iob_axi_ram #(
    // File with which to preload RAM
    parameter FILE            = "none"
 ) (
-   input wire clk_i,
-   input wire rst_i,
-
-   input  wire [  ID_WIDTH-1:0] axi_awid_i,
-   input  wire [ADDR_WIDTH-1:0] axi_awaddr_i,
-   input  wire [ LEN_WIDTH-1:0] axi_awlen_i,
-   input  wire [           2:0] axi_awsize_i,
-   input  wire [           1:0] axi_awburst_i,
-   input  wire [           1:0] axi_awlock_i,
-   input  wire [           3:0] axi_awcache_i,
-   input  wire [           2:0] axi_awprot_i,
-   input  wire [           3:0] axi_awqos_i,
-   input  wire                  axi_awvalid_i,
-   output wire                  axi_awready_o,
-
-   input  wire [DATA_WIDTH-1:0] axi_wdata_i,
-   input  wire [STRB_WIDTH-1:0] axi_wstrb_i,
-   input  wire                  axi_wlast_i,
-   input  wire                  axi_wvalid_i,
-   output wire                  axi_wready_o,
-
-   output wire [  ID_WIDTH-1:0] axi_bid_o,
-   output wire [           1:0] axi_bresp_o,
-   output wire                  axi_bvalid_o,
-   input  wire                  axi_bready_i,
-   input  wire [  ID_WIDTH-1:0] axi_arid_i,
-   input  wire [ADDR_WIDTH-1:0] axi_araddr_i,
-   input  wire [ LEN_WIDTH-1:0] axi_arlen_i,
-   input  wire [           2:0] axi_arsize_i,
-   input  wire [           1:0] axi_arburst_i,
-   input  wire [           1:0] axi_arlock_i,
-   input  wire [           3:0] axi_arcache_i,
-   input  wire [           2:0] axi_arprot_i,
-   input  wire [           3:0] axi_arqos_i,
-   input  wire                  axi_arvalid_i,
-   output wire                  axi_arready_o,
-   output wire [  ID_WIDTH-1:0] axi_rid_o,
-   output wire [DATA_WIDTH-1:0] axi_rdata_o,
-   output wire [           1:0] axi_rresp_o,
-   output wire                  axi_rlast_o,
-   output wire                  axi_rvalid_o,
-   input  wire                  axi_rready_i
+   `include "iob_axi_ram_io.vs"
 );
 
    localparam VALID_ADDR_WIDTH = ADDR_WIDTH - $clog2(STRB_WIDTH);
@@ -134,34 +93,28 @@ module iob_axi_ram #(
    wire [VALID_ADDR_WIDTH-1:0] read_addr_valid = read_addr_reg[(ADDR_WIDTH - VALID_ADDR_WIDTH)+:VALID_ADDR_WIDTH];
    wire [VALID_ADDR_WIDTH-1:0] write_addr_valid = write_addr_reg[(ADDR_WIDTH - VALID_ADDR_WIDTH)+:VALID_ADDR_WIDTH];
 
-   assign axi_awready_o = axi_awready_reg;
-   assign axi_wready_o  = axi_wready_reg;
-   assign axi_bid_o     = axi_bid_reg;
-   assign axi_bresp_o   = 2'b00;
-   assign axi_bvalid_o  = axi_bvalid_reg;
-   assign axi_arready_o = axi_arready_reg;
-   assign axi_rid_o     = PIPELINE_OUTPUT ? axi_rid_pipe_reg : axi_rid_reg;
-   assign axi_rdata_o   = PIPELINE_OUTPUT ? axi_rdata_pipe_reg : axi_rdata;
-   assign axi_rresp_o   = 2'b00;
-   assign axi_rlast_o   = PIPELINE_OUTPUT ? axi_rlast_pipe_reg : axi_rlast_reg;
-   assign axi_rvalid_o  = PIPELINE_OUTPUT ? axi_rvalid_pipe_reg : axi_rvalid_reg;
+   assign axi_awready_o    = axi_awready_reg;
+   assign axi_wready_o     = axi_wready_reg;
+   assign axi_bid_o        = axi_bid_reg;
+   assign axi_bresp_o      = 2'b00;
+   assign axi_bvalid_o     = axi_bvalid_reg;
+   assign axi_arready_o    = axi_arready_reg;
+   assign axi_rid_o        = PIPELINE_OUTPUT ? axi_rid_pipe_reg : axi_rid_reg;
+   assign axi_rdata_o      = PIPELINE_OUTPUT ? axi_rdata_pipe_reg : axi_rdata;
+   assign axi_rresp_o      = 2'b00;
+   assign axi_rlast_o      = PIPELINE_OUTPUT ? axi_rlast_pipe_reg : axi_rlast_reg;
+   assign axi_rvalid_o     = PIPELINE_OUTPUT ? axi_rvalid_pipe_reg : axi_rvalid_reg;
 
-   iob_ram_t2p_be #(
-      .HEXFILE((FILE != "none") ? {FILE, ".hex"} : "none"),
-      .ADDR_W (VALID_ADDR_WIDTH),
-      .DATA_W (DATA_WIDTH)
-   ) ram (
-      .clk_i(clk_i),
-
-      // Read port
-      .r_en_i  (read_state_reg == READ_STATE_BURST),
-      .r_addr_i(read_addr_valid),
-      .r_data_o(axi_rdata),
-      // Write port
-      .w_en_i  ({STRB_WIDTH{mem_wr_en}} & axi_wstrb_i),
-      .w_addr_i(write_addr_valid),
-      .w_data_i(axi_wdata_i)
-   );
+   // Connect ports of external iob_ram_t2p_be memory
+   assign ext_mem_clk_o    = clk_i;
+   // Read port
+   assign ext_mem_r_en_o   = read_state_reg == READ_STATE_BURST;
+   assign ext_mem_r_addr_o = read_addr_valid;
+   assign axi_rdata        = ext_mem_r_data_i;
+   // Write port
+   assign ext_mem_w_strb_o = {STRB_WIDTH{mem_wr_en}} & axi_wstrb_i;
+   assign ext_mem_w_addr_o = write_addr_valid;
+   assign ext_mem_w_data_o = axi_wdata_i;
 
    // always_comb in SystemVerilog
    always @(*) begin

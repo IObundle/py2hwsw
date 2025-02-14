@@ -564,6 +564,7 @@ class iob_core(iob_module, iob_instance):
                     and instantiator
                     and not self.is_tester
                 ):
+                    # print(f"DEBUG: Creating port '{port.name}' in '{instantiator.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
                     self.__connect_memory(port, instantiator)
                 elif (
                     port.interface.type in ["clk_en_rst", "clk_rst"]

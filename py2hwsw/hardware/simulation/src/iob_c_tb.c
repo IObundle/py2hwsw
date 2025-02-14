@@ -18,9 +18,9 @@ static FILE *fpr;
 static uint32_t req = 0;
 
 // Function to write to the c2v file
-void iob_write(uint32_t address, uint32_t data) {
+void iob_write(uint32_t address, uint32_t data_w, uint32_t data) {
 
-  uint32_t ack=-100, mode=-100, addr=-100, dat=-100;
+  uint32_t ack=-100, mode=-100, addr=-100, dat_w=-100, dat=-100;
   uint32_t fscanf_ret;
 
   //send request
@@ -29,7 +29,7 @@ void iob_write(uint32_t address, uint32_t data) {
     printf("C: Error opening file %s\n", C2V_FILE);
     exit(1);
   }
-  fprintf(fpw, "%08x %08x %08x %08x\n", req, W, address, data);
+  fprintf(fpw, "%08x %08x %08x %08x %08x\n", req, W, address, data_w, data);
   fflush(fpw);
   fclose(fpw);
   usleep(100);
@@ -41,7 +41,7 @@ void iob_write(uint32_t address, uint32_t data) {
     fpr = fopen(V2C_FILE, "rb");
     if (fpr != NULL) {
       usleep(100);
-      fscan_ret = fscanf(fpr, "%08x %08x %08x %08x\n", &ack, &mode, &addr, &dat);
+      fscan_ret = fscanf(fpr, "%08x %08x %08x %08x\n", &ack, &mode, &addr, &dat_w, &dat);
       if (fscan_ret == 4) {
         if (ack == req && mode == W && addr == address && dat == data) {
           fclose(fpr);
@@ -57,9 +57,9 @@ void iob_write(uint32_t address, uint32_t data) {
 }
 
 // Function to read from the v2c file
-uint32_t iob_read(uint32_t address) {
+uint32_t iob_read(uint32_t address, uint32_t data_w) {
 
-  uint32_t ack=-100, mode=-100, addr=-100, dat=-100;
+  uint32_t ack=-100, mode=-100, addr=-100, dat_w=-100, dat=-100;
   uint32_t fscanf_ret;
 
   //send request
@@ -68,7 +68,7 @@ uint32_t iob_read(uint32_t address) {
     printf("C: Error opening file %s\n", C2V_FILE);
     exit(1);
   }
-  fprintf(fpw, "%08x %08x %08x %08x\n", req, R, address, 0);
+  fprintf(fpw, "%08x %08x %08x %08x %08x\n", req, R, address, data_w, 0);
   fflush(fpw);
   fclose(fpw);
   usleep(100);
@@ -80,7 +80,7 @@ uint32_t iob_read(uint32_t address) {
     fpr = fopen(V2C_FILE, "rb");
     if (fpr != NULL) {
       usleep(100);
-      fscanf_ret = (fscanf (fpr, "%08x %08x %08x %08x\n", &ack, &mode, &addr, &dat) != 0);
+      fscanf_ret = (fscanf (fpr, "%08x %08x %08x %08x %08x\n", &ack, &mode, &addr, &ata_w, &dat) != 0);
       if (fscan_ret == 4) {
         if (ack == req && mode == R && addr == address) {
           fclose(fpr);
@@ -118,10 +118,7 @@ int iob_core_tb(); // Declaration
 
 int main() {
 
-  iob_write(1, 2);
-  int ret = iob_read(3);
-
-  printf("C: ret = %d\n", ret);
+  int failed = iob_core_tb();
   
   iob_finish();
 

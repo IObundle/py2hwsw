@@ -8,7 +8,7 @@
 `include "iob_uart_conf.vh"
 `include "iob_uart_csrs_def.vh"
 
-module iob_uart_sim #(
+module iob_uut #(
    parameter DATA_W = `IOB_UART_DATA_W
 ) (
    // clk_en_rst_s

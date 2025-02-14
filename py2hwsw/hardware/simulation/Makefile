@@ -57,7 +57,14 @@ ifneq ($(SIM_SERVER),)
 	rsync $(SIM_SYNC_FLAGS) -avz --force --delete ../.. $(SIM_USER)@$(SIM_SERVER):$(REMOTE_BUILD_DIR)
 endif
 
-build: $(VHDR) $(VSRC) $(HEX) remote_build_dir
+#compile C tb
+ifneq ($(wildcard iob_core_tb.c),)
+CTB=tb
+tb: iob_c_tb.c iob_core_tb.c
+	gcc -g -o $@ $^
+endif
+
+build: $(VHDR) $(VSRC) $(HEX) $(CTB) remote_build_dir
 ifeq ($(SIM_SERVER),)
 	make comp
 else
@@ -76,6 +83,9 @@ ifeq ($(SIM_SERVER),)
 ifneq ($(CONSOLE_CMD),)
 	$(BOARD_GRAB_CMD) -s 'make exec' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else
+ifneq ($(CTB),)
+	./tb &
+endif
 	make exec && echo "Checking test log..." && sleep 2
 endif
 else

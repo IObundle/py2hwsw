@@ -8,7 +8,9 @@
 #if (VM_TRACE == 1) // If verilator was invoked with --trace
 #include <verilated_vcd_c.h>
 #endif
-#include "iob_vlt_tb.h" //user file that defins the dut
+
+
+#include "Viob_uut.h" //user file that defins the dut
 
 #include "iob_bsp.h"
 
@@ -33,7 +35,7 @@ vluint64_t sim_time = 0;
 vluint64_t vcd_delayed_start = 0;
 #endif
 
-dut_t *dut = new dut_t;
+Viob_uut *dut = new Viob_uut; // Create instance of module
 
 int iob_core_tb();
 
@@ -70,25 +72,25 @@ void iob_hard_reset() {
 }
 
 // Write data to IOb Native slave
-void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
-               unsigned int cpu_data) {
+void iob_write(unsigned int address, unsigned data_w,
+               unsigned int data) {
 
-  unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);
+  unsigned int nbytes = data_w / 8 + (data_w % 8 ? 1 : 0);
 
-  dut->iob_addr_i = cpu_address; // remove byte address
+  dut->iob_addr_i = address; // remove byte address
   dut->iob_valid_i = 1;
   switch (nbytes) {
   case 1:
-    dut->iob_wstrb_i = 0x1 << (cpu_address & 0x3);
-    dut->iob_wdata_i = cpu_data << ((cpu_address & 0x3) * 8);
+    dut->iob_wstrb_i = 0x1 << (address & 0x3);
+    dut->iob_wdata_i = data << ((address & 0x3) * 8);
     break;
   case 2:
-    dut->iob_wstrb_i = 0x3 << (cpu_address & 0x2);
-    dut->iob_wdata_i = cpu_data << ((cpu_address & 0x2) * 8);
+    dut->iob_wstrb_i = 0x3 << (address & 0x2);
+    dut->iob_wdata_i = data << ((address & 0x2) * 8);
     break;
   default:
     dut->iob_wstrb_i = 0xF;
-    dut->iob_wdata_i = cpu_data;
+    dut->iob_wdata_i = data;
     break;
   }
   while (dut->iob_ready_o == 0) {
@@ -100,30 +102,30 @@ void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
 }
 
 // Read data from IOb Native slave
-unsigned int iob_read(unsigned int cpu_address, unsigned int cpu_data_w) {
+unsigned int iob_read(unsigned int address, unsigned int data_w) {
 
-  unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);
-  unsigned int cpu_data;
+  unsigned int nbytes = data_w / 8 + (data_w % 8 ? 1 : 0);
+  unsigned int data;
 
-  dut->iob_addr_i = cpu_address; // remove byte address
+  dut->iob_addr_i = address; // remove byte address
   dut->iob_valid_i = 1;
   while (dut->iob_ready_o == 0) {
     clk_tick();
   }
   switch (nbytes) {
   case 1:
-    cpu_data = (dut->iob_rdata_o >> ((cpu_address & 0x3) * 8)) & 0xFF;
+    data = (dut->iob_rdata_o >> ((address & 0x3) * 8)) & 0xFF;
     break;
   case 2:
-    cpu_data = (dut->iob_rdata_o >> ((cpu_address & 0x2) * 8)) & 0xFFFF;
+    data = (dut->iob_rdata_o >> ((address & 0x2) * 8)) & 0xFFFF;
     break;
   default:
-    cpu_data = dut->iob_rdata_o;
+    data = dut->iob_rdata_o;
     break;
   }
   clk_tick();
   dut->iob_valid_i = 0;
-  return cpu_data;
+  return data;
 }
 
 int main(int argc, char **argv) {

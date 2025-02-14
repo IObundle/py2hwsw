@@ -7,7 +7,7 @@ SIM_SERVER=$(VLT_SERVER)
 SIM_USER=$(VLT_USER)
 
 # top level module name and simulation object
-VTOP?=$(NAME)
+VTOP=iob_uut
 SIM_OBJ=V$(VTOP)
 
 # filter out the verilog testbench

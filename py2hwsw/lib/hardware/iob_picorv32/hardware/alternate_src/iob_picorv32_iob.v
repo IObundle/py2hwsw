@@ -42,6 +42,8 @@ module iob_picorv32 #(
    assign dbus_iob_wstrb_o = cpu_wstrb;
 
    //split cpu bus into instruction and data buses
+   // FIXME: This cpu_valid does not comply with the IOb bus specification: https://github.com/IObundle/iob-soc/blob/d59934bd7ec9ba98aa5f93007c64f99d42071314/submodules/LIB/hardware/modules/iob_interface/README.md
+   // A fix is available in the `iob_picorv32.v` source (also contains AXI interface)
    assign iob_i_valid      = cpu_instr & cpu_valid;
 
    assign iob_d_valid      = (~cpu_instr) & cpu_valid & (~iob_d_rvalid);

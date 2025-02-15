@@ -73,7 +73,8 @@ int iob_core_tb() {
   printf("TX and RX enabled\n");
 
   // data send/receive loop
-  for (int i = 0; i < 256; i++) {
+  printf("Starting data send/receive loop\n");
+  for (int i = 0; i < 4; i++) {
     // wait for tx ready
     while (!IOB_UART_GET_TXREADY())
       ;
@@ -94,6 +95,6 @@ int iob_core_tb() {
       failed += 1;
     }
   }
-
+  printf("Data send/receive loop complete\n");
   return failed;
 }

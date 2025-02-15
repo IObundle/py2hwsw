@@ -47,8 +47,7 @@ uint8_t IOB_UART_GET_RXREADY();
 uint8_t IOB_UART_GET_RXDATA();
 uint16_t IOB_UART_GET_VERSION();
 
-void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
-               unsigned int cpu_data);
-unsigned int iob_read(unsigned int cpu_address, unsigned int cpu_data_w);
+void iob_write(unsigned int address, unsigned data_w, unsigned int cpu_data);
+unsigned int iob_read(unsigned int address, unsigned int data_w);
 
 #endif // H_IOB_UART__CSRS_H

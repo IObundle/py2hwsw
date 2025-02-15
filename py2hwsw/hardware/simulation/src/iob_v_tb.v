@@ -20,31 +20,47 @@ module iob_v_tb;
 
    // Signals (examples - adjust as needed for your design)
    reg clk;
-   reg rst;
-   
+   reg cke;
+   reg arst;
+
+   //iob interface (backend)
+   reg                        iob_valid_i;
+   reg [31:0]                 iob_wdata_i;
+   reg [`IOB_UART_CSRS_ADDR_W-1:0] iob_addr_i;
+   reg [3:0]                       iob_wstrb_i;
+   wire                            iob_rvalid_o;
+   wire [31:0]                     iob_rdata_o;
+   wire                            iob_ready_o;
+
    // File handles
    integer c2v_read_fp = 0;
    integer v2c_write_fp = 0;
    
    // Variables
-   integer req=-100, ack=0, mode=-100, address=-100, data=-100;
+   integer req=-100, ack=0, mode=-100, address=-100, data=-100, data_w=-100;
 
    // Example test sequence (replace with your actual test logic)
    initial begin
+`ifdef VCD
+      $dumpfile("uut.vcd");
+      $dumpvars();
+`endif
       clk = 0;
-      rst = 1;
+      cke = 1;
+      arst = 0;
       #10;
-      rst = 0;
+      arst = 1;
+      #10;
+      arst = 0;
       #10;
       
       // Server loop
-      while(n < 10000) begin
+      while(1) begin
          //read request
          c2v_read_fp = $fopen("c2v.txt", "rb");
          if (c2v_read_fp != 0) begin
-            if ($fscanf(c2v_read_fp, "%08x %08x %08x %08x\n", req, mode, address, data)) begin 
-               $display("V: req=%08x mode=%08x address=%08x data=%08x", req, mode, address, data);
-
+            if ($fscanf(c2v_read_fp, "%08x %08x %08x %08x %08x\n", req, mode, address, data_w, data)) begin 
+               //$display("V: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode, address, data_w, data);
                //check if request number matches with ack number
                if(req == ack) begin
                   v2c_write_fp = $fopen("v2c.txt", "wb");
@@ -55,16 +71,16 @@ module iob_v_tb;
                         $finish;
                      end
                      if(mode == `R) begin //read request
-                        iob_read(address, data, 32);
+                        iob_read(address, data, data_w);
                         //send ack  and data
-                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x\n", ack, mode, address, data);
-                        $display("V: read request: adress=%08x data=%08x", address, data);
+                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w, data);
+                        //$display("V: read request: ack=%d adress=%08x data=%08x", ack, address, data);
                      end
                      else if(mode == `W) begin //write request
-                        iob_write(address, data, 32);
+                        iob_write(address, data, data_w);
                         //send ack
-                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x\n", ack, mode, address, data);
-                        $display("V: write request: adress=%08x data=%08x", address, data);
+                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w, data);
+                        //$display("V: write request: ack=%d adress=%08x data=%08x", ack, address, data);
                      end
                      $fclose(v2c_write_fp);
                   end // if (v2c_write_fp != 0)
@@ -74,7 +90,6 @@ module iob_v_tb;
             $fclose(c2v_read_fp);
          end // if (c2v_read_fp != 0)
          @(posedge clk);//advance clock
-         n = n + 1;
       end // while (1)
    end // initial begin
 

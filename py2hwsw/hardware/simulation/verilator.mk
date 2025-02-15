@@ -11,7 +11,7 @@ VTOP=iob_uut
 SIM_OBJ=V$(VTOP)
 
 # filter out the verilog testbench
-VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) ./src/iob_core_tb.c ./src/iob_vlt_tb.cpp
+VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) ./src/iob_core_tb.c ./src/iob_vlt_tb.cpp ./src/$(NAME)_csrs.c
 
 # include files
 VLTINCLUDES=$(addprefix -I, ./ ./src ../src ../../software/include ../../software/src)

@@ -5,7 +5,6 @@
  */
 
 #include "iob_bsp.h"
-#include "iob_system_conf.h"
 #include "iob_uart_csrs.h"
 #include <stdio.h>
 #include <stdlib.h>

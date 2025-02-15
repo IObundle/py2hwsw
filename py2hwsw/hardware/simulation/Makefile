@@ -58,10 +58,10 @@ ifneq ($(SIM_SERVER),)
 endif
 
 #compile C tb
-ifneq ($(wildcard iob_core_tb.c),)
+ifneq ($(wildcard ./src/iob_core_tb.c),)
 CTB=tb
-tb: iob_c_tb.c iob_core_tb.c
-	gcc -g -o $@ $^
+tb: ./src/iob_c_tb.c ./src/iob_core_tb.c ./src/$(NAME)_csrs.c
+	gcc -I./src -I../../software/src -g -o $@ $^
 endif
 
 build: $(VHDR) $(VSRC) $(HEX) $(CTB) remote_build_dir
@@ -78,13 +78,15 @@ BOARD_GRAB_CMD=../../scripts/board_client.py grab $(GRAB_TIMEOUT)
 run: test.log
 	test "$$(cat test.log)" = "Test passed!"
 
-test.log: remote_build_dir
+test.log: remote_build_dir $(CTB)
 ifeq ($(SIM_SERVER),)
 ifneq ($(CONSOLE_CMD),)
 	$(BOARD_GRAB_CMD) -s 'make exec' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else
 ifneq ($(CTB),)
+ifneq ($(SIMULATOR), verilator)
 	./tb &
+endif
 endif
 	make exec && echo "Checking test log..." && sleep 2
 endif

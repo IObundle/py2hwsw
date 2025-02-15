@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "iob_uart_csrs.h"
+#include "iob_system_csrs.h"
 
 int base_uart = -1;
 

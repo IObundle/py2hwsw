@@ -13,7 +13,7 @@ module iob_ram_t2p_be_tb;
    reg                clk;
 
    // Write signals
-   reg                w_en;
+   reg                w_strb;
    reg  [`DATA_W-1:0] w_data;
    reg  [`ADDR_W-1:0] w_addr;
 
@@ -31,7 +31,7 @@ module iob_ram_t2p_be_tb;
    initial begin
       clk     = 1;
       r_en    = 0;
-      w_en    = 0;
+      w_strb  = 0;
       r_addr  = 0;
       w_addr  = 0;
       w_data  = 0;
@@ -46,7 +46,7 @@ module iob_ram_t2p_be_tb;
 `endif
 
       @(posedge clk) #1;
-      w_en = 1;
+      w_strb = 1;
 
       // Write all the locations of RAM
       for (i = 0; i < 2 ** `ADDR_W; i = i + 1) begin
@@ -55,7 +55,7 @@ module iob_ram_t2p_be_tb;
          @(posedge clk) #1;
       end
 
-      w_en = 0;
+      w_strb = 0;
       @(posedge clk) #1;
 
       // Read all the locations of RAM with r_en = 0
@@ -105,7 +105,7 @@ module iob_ram_t2p_be_tb;
    ) uut (
       .clk_i(clk),
 
-      .w_en_i  (w_en),
+      .w_strb_i(w_strb),
       .w_addr_i(w_addr),
       .w_data_i(w_data),
 

@@ -193,6 +193,7 @@ def setup(py_params_dict):
             #
             # False-parameters for generated memories
             #
+            # BOOTROM
             {
                 "name": "BOOTROM_MEM_ADDR_W",
                 "descr": "",
@@ -213,7 +214,32 @@ def setup(py_params_dict):
                 "name": "BOOTROM_MEM_HEXFILE",
                 "descr": "Bootloader file name",
                 "type": "F",
-                "val": f'"{params["name"]}_bootrom.hex"',
+                "val": f'"{params["name"]}_bootrom"',
+                "min": "NA",
+                "max": "NA",
+            },
+            # INTERNAL MEMORY
+            {
+                "name": "EXT_MEM_ADDR_W",
+                "descr": "",
+                "type": "F",
+                "val": params["mem_addr_w"] - 2,
+                "min": "1",
+                "max": "32",
+            },
+            {
+                "name": "EXT_MEM_DATA_W",
+                "descr": "",
+                "type": "F",
+                "val": params["data_w"],
+                "min": "1",
+                "max": "32",
+            },
+            {
+                "name": "EXT_MEM_HEXFILE",
+                "descr": "Firmware file name",
+                "type": "F",
+                "val": f'"{params["name"]}_firmware"',
                 "min": "NA",
                 "max": "NA",
             },
@@ -230,26 +256,18 @@ def setup(py_params_dict):
     ]
     if params["use_bootrom"]:
         attributes_dict["ports"] += [
-        {
-            "name": "rom_bus_m",
-            "descr": "Ports for connection with boot ROM memory",
-            "signals": {"type": "rom_sp", "prefix": "bootrom_mem_"},
-        },
-    ]
+            {
+                "name": "rom_bus_m",
+                "descr": "Ports for connection with boot ROM memory",
+                "signals": {"type": "rom_sp", "prefix": "bootrom_mem_"},
+            },
+        ]
     if params["use_intmem"]:
         attributes_dict["ports"] += [
             {
-                "name": "int_mem_axi_m",
-                "descr": "AXI master interface for internal memory",
-                "signals": {
-                    "type": "axi",
-                    "prefix": "int_mem_",
-                    "ID_W": "AXI_ID_W",
-                    "ADDR_W": f"{params['mem_addr_w']}-2",
-                    "DATA_W": "AXI_DATA_W",
-                    "LEN_W": "AXI_LEN_W",
-                    "LOCK_W": 1,
-                },
+                "name": "external_mem_bus_m",
+                "descr": "Port for connection to external 'iob_ram_t2p_be' memory",
+                "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
             },
         ]
     if params["use_extmem"]:
@@ -375,6 +393,22 @@ def setup(py_params_dict):
                     {"name": "unused_m3_araddr_bits", "width": xbar_sel_w},
                     {"name": "unused_m3_awaddr_bits", "width": xbar_sel_w},
                 ],
+            },
+        ]
+    if params["use_intmem"]:
+        attributes_dict["wires"] += [
+            {
+                "name": "int_mem_axi",
+                "descr": "AXI master interface for internal memory",
+                "signals": {
+                    "type": "axi",
+                    "prefix": "int_mem_",
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": f"{params['mem_addr_w']}-2",
+                    "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
+                    "LOCK_W": 1,
+                },
             },
         ]
     if params["use_bootrom"]:
@@ -507,10 +541,10 @@ def setup(py_params_dict):
         ]
         full_xbar_master_interfaces = {
             "use_intmem": (
-                "int_mem_axi_m",
+                "int_mem_axi",
                 [
-                    "{unused_m0_araddr_bits, int_mem_axi_araddr_o}",
-                    "{unused_m0_awaddr_bits, int_mem_axi_awaddr_o}",
+                    "{unused_m0_araddr_bits, int_mem_axi_araddr}",
+                    "{unused_m0_awaddr_bits, int_mem_axi_awaddr}",
                 ],
             ),
             "use_extmem": (
@@ -547,6 +581,34 @@ def setup(py_params_dict):
                 num_masters += 1
         attributes_dict["subblocks"][-1]["num_masters"] = num_masters
 
+    if params["use_intmem"]:
+        attributes_dict["subblocks"] += [
+            {
+                "core_name": "iob_axi_ram",
+                "instance_name": "internal_memory",
+                "instance_description": "Internal memory",
+                "parameters": {
+                    "ID_WIDTH": "AXI_ID_W",
+                    "LEN_WIDTH": "AXI_LEN_W",
+                    "ADDR_WIDTH": params["mem_addr_w"],
+                    "DATA_WIDTH": "AXI_DATA_W",
+                },
+                "connect": {
+                    "clk_i": "clk",
+                    "rst_i": "rst",
+                    "axi_s": (
+                        "int_mem_axi",
+                        [
+                            "{int_mem_axi_araddr, 2'b0}",
+                            "{int_mem_axi_awaddr, 2'b0}",
+                            "{1'b0, int_mem_axi_arlock}",
+                            "{1'b0, int_mem_axi_awlock}",
+                        ],
+                    ),
+                    "external_mem_bus_m": "external_mem_bus_m",
+                },
+            },
+        ]
     if params["use_bootrom"]:
         attributes_dict["subblocks"] += [
             {
@@ -607,7 +669,9 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": "iob_periphs_cbus" if params["cpu"] != "none" else "iob_s",
+                    "input_s": (
+                        "iob_periphs_cbus" if params["cpu"] != "none" else "iob_s"
+                    ),
                     # Peripherals cbus connections added automatically
                 },
                 "num_outputs": 0,  # Num outputs configured automatically
@@ -652,33 +716,25 @@ def setup(py_params_dict):
         },
     ]
     attributes_dict["superblocks"] = [
-        # Memory wrapper
+        # Synthesis module (needed for macros)
         {
-            "core_name": "iob_system_mwrap",
-            "instance_name": "iob_system_mwrap",
+            "core_name": "iob_system_syn",
+            "instance_name": "iob_system_syn",
+            "dest_dir": "hardware/syn/src",
             "iob_system_params": params,
-            "superblocks": [
-                # Synthesis module (needed for macros)
-                {
-                    "core_name": "iob_system_syn",
-                    "instance_name": "iob_system_syn",
-                    "dest_dir": "hardware/syn/src",
-                    "iob_system_params": params,
-                },
-                # Simulation wrapper
-                {
-                    "core_name": "iob_system_sim",
-                    "instance_name": "iob_system_sim",
-                    "dest_dir": "hardware/simulation/src",
-                    "iob_system_params": params,
-                },
-                # FPGA wrappers added automatically
-            ],
         },
+        # Simulation wrapper
+        {
+            "core_name": "iob_system_sim",
+            "instance_name": "iob_system_sim",
+            "dest_dir": "hardware/simulation/src",
+            "iob_system_params": params,
+        },
+        # FPGA wrappers added automatically
     ]
     if params["include_tester"]:
         # Append tester to "superblocks" list of memory wrapper
-        attributes_dict["superblocks"][-1]["superblocks"] += [
+        attributes_dict["superblocks"] += [
             {
                 "core_name": "iob_system_tester",
                 "instance_name": "iob_system_tester",

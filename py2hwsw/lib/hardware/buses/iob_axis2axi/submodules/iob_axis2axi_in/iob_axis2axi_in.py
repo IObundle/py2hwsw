@@ -114,7 +114,20 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "subblocks": [],
+        "subblocks": [
+            {
+                "core_name": "iob_fifo_sync",
+            },
+            {
+                "core_name": "iob_counter",
+            },
+            {
+                "core_name": "iob_reg_r",
+            },
+            {
+                "core_name": "iob_reg_re",
+            },
+        ],
     }
 
     return attributes_dict

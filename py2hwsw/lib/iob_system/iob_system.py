@@ -601,17 +601,6 @@ def setup(py_params_dict):
             },
             # NOTE: Instantiate other peripherals here, using the 'is_peripheral' flag
         ]
-    attributes_dict["subblocks"] += [
-        # Modules that need to be setup, but are not instantiated directly inside
-        # 'iob_system' Verilog module
-        # Testbench
-        {
-            "core_name": "iob_tasks",
-            "instance_name": "iob_tasks_inst",
-            "instantiate": False,
-            "dest_dir": "hardware/simulation/src",
-        },
-    ]
     attributes_dict["superblocks"] = [
         # Memory wrapper
         {

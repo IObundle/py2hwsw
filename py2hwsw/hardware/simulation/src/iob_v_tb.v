@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+`include "iob_csrs.vh"
+
 `define R 0
 `define W 1
 `define F 2
@@ -26,11 +28,11 @@ module iob_v_tb;
    //iob interface (backend)
    reg                        iob_valid_i;
    reg [31:0]                 iob_wdata_i;
-   reg [`IOB_UART_CSRS_ADDR_W-1:0] iob_addr_i;
-   reg [3:0]                       iob_wstrb_i;
-   wire                            iob_rvalid_o;
-   wire [31:0]                     iob_rdata_o;
-   wire                            iob_ready_o;
+   reg [`IOB_CSRS_ADDR_W-1:0] iob_addr_i;
+   reg [3:0]                  iob_wstrb_i;
+   wire                       iob_rvalid_o;
+   wire [31:0]                iob_rdata_o;
+   wire                       iob_ready_o;
 
    // File handles
    integer c2v_read_fp = 0;
@@ -113,9 +115,9 @@ module iob_v_tb;
 
    // Write data to IOb Native slave
    task iob_write;
-      input [`IOB_UART_CSRS_ADDR_W-1:0] addr;
-      input [31:0]                      data;
-      input [$clog2(32):0]              width;
+      input [`IOB_CSRS_ADDR_W-1:0] addr;
+      input [31:0]                 data;
+      input [$clog2(32):0]         width;
       
       begin
          @(posedge clk) #1 iob_valid_i = 1;  //sync and assign
@@ -132,9 +134,9 @@ module iob_v_tb;
 
    // Read data from IOb Native slave
    task iob_read;
-      input [`IOB_UART_CSRS_ADDR_W-1:0] addr;
-      output [31:0]                     data;
-      input [$clog2(32):0]              width;
+      input [`IOB_CSRS_ADDR_W-1:0] addr;
+      output [31:0]                data;
+      input [$clog2(32):0]         width;
       
       begin
          @(posedge clk) #1 iob_valid_i = 1;

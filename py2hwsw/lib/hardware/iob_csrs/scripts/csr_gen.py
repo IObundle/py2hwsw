@@ -76,7 +76,7 @@ def eval_param_expression_from_config(param_expression, confs, param_attribute):
     # Create parameter dictionary with correct values to be replaced in string
     params_dict = {}
     for param in confs:
-        params_dict[param["name"]] = param[param_attribute]
+        params_dict[param["name"]] = param.get(param_attribute, None)
 
     return eval_param_expression(param_expression, params_dict)
 

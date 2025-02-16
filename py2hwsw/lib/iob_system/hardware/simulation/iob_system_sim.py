@@ -217,7 +217,7 @@ def setup(py_params_dict):
         -r rxready:1 -t R -d 'RX ready to be read.' --rst_val 0 --addr 1 --log2n_items 0
         -r rxdata:8 -t R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
         """,
-       {
+        {
             "core_name": py_params_dict["instantiator"]["original_name"],
             "instance_name": py_params_dict["instantiator"]["original_name"],
             "instance_description": "IOb-SoC memory wrapper",

@@ -199,7 +199,25 @@ def setup(py_params_dict):
     # Blocks
     #
     attributes_dict["subblocks"] = [
-        {
+        # iob_csrs 'control_if_s' port is connected automatically by py2hwsw
+        f"""iob_csrs iob_csrs
+        -d 'Control/Status Registers' 
+        --no_autoaddr 
+        --rw_overlap
+        --no_instance
+        --csr_if {"iob"}
+        --csr-group uart 
+        -d 'UART software accessible registers' 
+        -r softreset:1 -t W -d 'Soft reset'  --rst_val 0 --addr 0 --log2n_items 0
+        -r div:16 -t W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
+        -r txdata:8 -t W -d 'TX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
+        -r txen:1 -t W -d 'TX enable.' --rst_val 0 --addr 5 --log2n_items 0
+        -r rxen:1 -t W -d 'RX enable.' --rst_val 0 --addr 6 --log2n_items 0
+        -r txready:1 -t R -d 'TX ready to receive data.' --rst_val 0 --addr 0 --log2n_items 0
+        -r rxready:1 -t R -d 'RX ready to be read.' --rst_val 0 --addr 1 --log2n_items 0
+        -r rxdata:8 -t R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
+        """,
+       {
             "core_name": py_params_dict["instantiator"]["original_name"],
             "instance_name": py_params_dict["instantiator"]["original_name"],
             "instance_description": "IOb-SoC memory wrapper",

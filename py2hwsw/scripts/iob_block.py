@@ -34,6 +34,7 @@ attrs = [
     ["-c", "connect", {"nargs": "+"}, "pairs"],
     ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
     ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
+    ["--no_instance", "instantiate", {"action": "store_false"}],
     ["--csr_if", "csr_if"],
     {
         "--csr-group&csrs": [

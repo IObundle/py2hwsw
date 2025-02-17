@@ -512,7 +512,7 @@ class iob_core(iob_module, iob_instance):
         _signals.update(port.interface.widths)
         for p in instantiator.ports:
             if p.interface:
-                if p.interface.type == port.interface.type:
+                if p.interface.type == port.interface.type and p.interface.prefix == port.interface.prefix:
                     port.connect_external(p, bit_slices=[])
                     return
         instantiator.create_port(name=_name, signals=_signals, descr=port.descr)

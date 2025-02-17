@@ -125,6 +125,12 @@ class iob_core(iob_module, iob_instance):
             descr="Path to folder of build directory to be generated for this project.",
         )
         self.set_default_attribute(
+            "instance_name",
+            "",
+            str,
+            descr="Name of an instance of this class.",
+        )
+        self.set_default_attribute(
             "use_netlist",
             False,
             bool,

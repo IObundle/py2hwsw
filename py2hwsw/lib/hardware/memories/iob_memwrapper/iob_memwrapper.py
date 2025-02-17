@@ -6,7 +6,6 @@ import copy
 import os
 from latex import write_table
 from iob_base import find_obj_in_list
-import sys
 
 
 def setup(py_params_dict):

@@ -83,7 +83,14 @@ def setup(py_params_dict):
                 "descr": "AXI read interface",
             },
         ],
-        "subblocks": [],
+        "subblocks": [
+            {
+                "core_name": "iob_reg_r",
+            },
+            {
+                "core_name": "iob_reg_re",
+            },
+        ],
     }
 
     return attributes_dict

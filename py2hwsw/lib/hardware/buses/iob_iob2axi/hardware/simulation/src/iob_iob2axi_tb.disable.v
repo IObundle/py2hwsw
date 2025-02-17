@@ -171,62 +171,99 @@ module iob_iob2axi_tb;
       .s_ready_o(s_ready)
    );
 
+
+   // axi_ram_mem
+   wire          ext_mem_clk;
+   wire [32-1:0] ext_mem_r_data;
+   wire          ext_mem_r_en;
+   wire [32-1:0] ext_mem_r_addr;
+   wire [32-1:0] ext_mem_w_data;
+   wire [ 4-1:0] ext_mem_w_strb;
+   wire [32-1:0] ext_mem_w_addr;
+
    iob_axi_ram #(
       .ID_WIDTH  (`AXI_ID_W),
       .DATA_WIDTH(AXI_DATA_W),
       .ADDR_WIDTH(AXI_ADDR_W)
    ) iob_axi_ram0 (
-      .clk(clk),
-      .rst(rst),
+      .clk_i(clk),
+      .rst_i(rst),
 
       //
       // AXI-4 full master interface
       //
 
       // Address write
-      .s_axi_awid   (ddr_axi_awid),
-      .s_axi_awaddr (ddr_axi_awaddr),
-      .s_axi_awlen  (ddr_axi_awlen),
-      .s_axi_awsize (ddr_axi_awsize),
-      .s_axi_awburst(ddr_axi_awburst),
-      .s_axi_awlock (ddr_axi_awlock),
-      .s_axi_awprot (ddr_axi_awprot),
-      .s_axi_awcache(ddr_axi_awcache),
-      .s_axi_awvalid(ddr_axi_awvalid),
-      .s_axi_awready(ddr_axi_awready),
+      .axi_awid_i   (ddr_axi_awid),
+      .axi_awaddr_i (ddr_axi_awaddr),
+      .axi_awlen_i  (ddr_axi_awlen),
+      .axi_awsize_i (ddr_axi_awsize),
+      .axi_awburst_i(ddr_axi_awburst),
+      .axi_awlock_i (ddr_axi_awlock),
+      .axi_awprot_i (ddr_axi_awprot),
+      .axi_awqos_i  (ddr_axi_awqos),
+      .axi_awcache_i(ddr_axi_awcache),
+      .axi_awvalid_i(ddr_axi_awvalid),
+      .axi_awready_o(ddr_axi_awready),
 
       // Write
-      .s_axi_wvalid(ddr_axi_wvalid),
-      .s_axi_wdata (ddr_axi_wdata),
-      .s_axi_wstrb (ddr_axi_wstrb),
-      .s_axi_wlast (ddr_axi_wlast),
-      .s_axi_wready(ddr_axi_wready),
+      .axi_wvalid_i(ddr_axi_wvalid),
+      .axi_wdata_i (ddr_axi_wdata),
+      .axi_wstrb_i (ddr_axi_wstrb),
+      .axi_wlast_i (ddr_axi_wlast),
+      .axi_wready_o(ddr_axi_wready),
 
       // Write response
-      .s_axi_bid   (ddr_axi_bid),
-      .s_axi_bvalid(ddr_axi_bvalid),
-      .s_axi_bresp (ddr_axi_bresp),
-      .s_axi_bready(ddr_axi_bready),
+      .axi_bid_o   (ddr_axi_bid),
+      .axi_bvalid_o(ddr_axi_bvalid),
+      .axi_bresp_o (ddr_axi_bresp),
+      .axi_bready_i(ddr_axi_bready),
 
       // Address read
-      .s_axi_arid   (ddr_axi_arid),
-      .s_axi_araddr (ddr_axi_araddr),
-      .s_axi_arlen  (ddr_axi_arlen),
-      .s_axi_arsize (ddr_axi_arsize),
-      .s_axi_arburst(ddr_axi_arburst),
-      .s_axi_arlock (ddr_axi_arlock),
-      .s_axi_arcache(ddr_axi_arcache),
-      .s_axi_arprot (ddr_axi_arprot),
-      .s_axi_arvalid(ddr_axi_arvalid),
-      .s_axi_arready(ddr_axi_arready),
+      .axi_arid_i   (ddr_axi_arid),
+      .axi_araddr_i (ddr_axi_araddr),
+      .axi_arlen_i  (ddr_axi_arlen),
+      .axi_arsize_i (ddr_axi_arsize),
+      .axi_arburst_i(ddr_axi_arburst),
+      .axi_arlock_i (ddr_axi_arlock),
+      .axi_arcache_i(ddr_axi_arcache),
+      .axi_arprot_i (ddr_axi_arprot),
+      .axi_arqos_i  (ddr_axi_arqos),
+      .axi_arvalid_i(ddr_axi_arvalid),
+      .axi_arready_o(ddr_axi_arready),
 
       // Read
-      .s_axi_rid   (ddr_axi_rid),
-      .s_axi_rvalid(ddr_axi_rvalid),
-      .s_axi_rdata (ddr_axi_rdata),
-      .s_axi_rlast (ddr_axi_rlast),
-      .s_axi_rresp (ddr_axi_rresp),
-      .s_axi_rready(ddr_axi_rready)
+      .axi_rid_o   (ddr_axi_rid),
+      .axi_rvalid_o(ddr_axi_rvalid),
+      .axi_rdata_o (ddr_axi_rdata),
+      .axi_rlast_o (ddr_axi_rlast),
+      .axi_rresp_o (ddr_axi_rresp),
+      .axi_rready_i(ddr_axi_rready),
+
+
+      // external_mem_bus_m port
+      .ext_mem_clk_o   (ext_mem_clk),
+      .ext_mem_r_data_i(ext_mem_r_data),
+      .ext_mem_r_en_o  (ext_mem_r_en),
+      .ext_mem_r_addr_o(ext_mem_r_addr),
+      .ext_mem_w_data_o(ext_mem_w_data),
+      .ext_mem_w_strb_o(ext_mem_w_strb),
+      .ext_mem_w_addr_o(ext_mem_w_addr)
+   );
+
+   // Memory for iob_axi_ram
+   iob_ram_t2p_be #(
+      .ADDR_W(ADDR_W - 2),
+      .DATA_W(DATA_W)
+   ) iob_ram_t2p_be_inst (
+      // ram_t2p_be_s port
+      .clk_i   (ext_mem_clk),
+      .r_data_o(ext_mem_r_data),
+      .r_en_i  (ext_mem_r_en),
+      .r_addr_i(ext_mem_r_addr),
+      .w_data_i(ext_mem_w_data),
+      .w_strb_i(ext_mem_w_strb),
+      .w_addr_i(ext_mem_w_addr)
    );
 
 endmodule

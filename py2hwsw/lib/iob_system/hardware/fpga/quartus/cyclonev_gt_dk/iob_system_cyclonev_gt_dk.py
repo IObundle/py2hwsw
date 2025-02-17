@@ -2,16 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-# Copied from py2 'board.py'
-bsp = [
-    {"name": "BAUD", "type": "M", "val": "115200"},
-    {"name": "FREQ", "type": "M", "val": "50000000"},
-    {"name": "IOB_MEM_NO_READ_ON_WRITE", "type": "M", "val": "1"},
-    {"name": "DDR_DATA_W", "type": "M", "val": "32"},
-    {"name": "DDR_ADDR_W", "type": "M", "val": "28"},
-    {"name": "INTEL", "type": "M", "val": "1"},
-]
-
 
 def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
@@ -26,35 +16,50 @@ def setup(py_params_dict):
                 "descr": "AXI ID bus width",
                 "type": "F",
                 "val": "1",
-                "min": "1",
-                "max": "32",
             },
             {
                 "name": "AXI_LEN_W",
                 "descr": "AXI burst length width",
                 "type": "F",
                 "val": "4",
-                "min": "1",
-                "max": "8",
             },
             {
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
                 "type": "F",
-                "val": "`DDR_ADDR_W",
-                "min": "1",
-                "max": "32",
+                "val": "28",
             },
             {
                 "name": "AXI_DATA_W",
                 "descr": "AXI data bus width",
                 "type": "F",
-                "val": "`DDR_DATA_W",
-                "min": "1",
-                "max": "32",
+                "val": "32",
             },
-        ]
-        + bsp,
+            {
+                "name": "BAUD",
+                "descr": "UART baud rate",
+                "type": "F",
+                "val": "115200",
+            },
+            {
+                "name": "FREQ",
+                "descr": "Clock frequency",
+                "type": "F",
+                "val": "50000000",
+            },
+            {
+                "name": "MEM_NO_READ_ON_WRITE",
+                "descr": "No read on write flag",
+                "type": "F",
+                "val": "1",
+            },
+            {
+                "name": "INTEL",
+                "descr": "Intel flag",
+                "type": "F",
+                "val": "1",
+            },
+        ],
     }
     #
     # Ports

@@ -13,65 +13,23 @@ export LINTER ?= spyglass
 
 include config_build.mk
 
-BSP_H ?= software/src/iob_bsp.h
 SIM_DIR := hardware/simulation
 BOARD_DIR := $(shell find hardware/fpga -name $(BOARD) -type d -print -quit)
 SYN_DIR=hardware/syn
-
-#
-# Create iob_bsp.h from iob_bsp.vh
-#
 
 ifeq (fpga,$(findstring fpga,$(MAKECMDGOALS)))
   USE_FPGA = 1
 endif
 
-ifeq ($(USE_FPGA),1)
-BSP_VH = $(BOARD_DIR)/iob_bsp.vh
-else
-BSP_VH = $(SIM_DIR)/src/iob_bsp.vh
-endif
-
-BOARD_UPPER=$(shell echo $(BOARD) | tr '[:lower:]' '[:upper:]')
-NAME_UPPER=$(shell echo $(NAME) | tr '[:lower:]' '[:upper:]')
-
-$(BSP_VH):
-ifeq ($(USE_FPGA),1)
-	@echo "Creating $(BSP_VH) for FPGA"
-	cp $(BOARD_DIR)/$(NAME)_$(BOARD)_conf.vh $@;
-	sed -i 's/ $(NAME_UPPER)_$(BOARD_UPPER)_/ /g' $@;
-else
-	@echo "Creating $(BSP_VH) for simulation"
-	cp $(SIM_DIR)/src/$(NAME)_sim_conf.vh $@;
-	sed -i 's/ $(NAME_UPPER)_SIM_/ /g' $@;
-endif
-
-SYN_BSP_VH = $(SYN_DIR)/src/iob_bsp.vh
-$(SYN_BSP_VH):
-	@echo "Creating $@ for synthesis"
-	cp $(SYN_DIR)/src/$(NAME)_syn_conf.vh $@;
-	sed -i 's/ $(NAME_UPPER)_SYN_/ /g' $@;
-
-
-$(BSP_H): $(BSP_VH)
-	cp $(BSP_VH) $@;
-	sed -i 's/`/#/' $@;
-	sed -i 's/`//g' $@;
-
-
 # 
 # EMBEDDED SOFTWARE
 #
 SW_DIR=software
-fw-build: $(BSP_H)
+fw-build:
 	make -C $(SW_DIR) build
 
 fw-clean:
 	if [ -f "$(SW_DIR)/Makefile" ]; then make -C $(SW_DIR) clean; fi
-
-#this target is not the same as fw-build because iob_bsp.h is build for FPGA when fw-build is called
-#see $(BSP_H) target that uses $(MAKECMDGOALS) to check if fw-build is called for FPGA or simulation
-fpga-fw-build: fw-build
 
 #
 # PC EMUL
@@ -79,10 +37,10 @@ fpga-fw-build: fw-build
 pc-emul-build: fw-build
 	make -C $(SW_DIR) build_emul
 
-pc-emul-run: $(BSP_H)
+pc-emul-run:
 	make -C $(SW_DIR) run_emul
 
-pc-emul-test: $(BSP_H)
+pc-emul-test:
 	make -C $(SW_DIR) test_emul
 
 pc-emul-clean:
@@ -94,7 +52,7 @@ pc-emul-clean:
 #
 
 LINT_DIR=hardware/lint
-lint-run: $(BSP_VH)
+lint-run:
 ifeq ($(USE_FPGA),1)
 	make -C $(LINT_DIR) run BOARD_DIR=$(BOARD_DIR)
 else
@@ -139,13 +97,13 @@ sim-cov: sim-clean
 # FPGA
 #
 FPGA_DIR=hardware/fpga
-fpga-build: $(BSP_VH)
+fpga-build:
 	make -C $(FPGA_DIR) -j1 build
 
-fpga-run: $(BSP_VH)
+fpga-run:
 	make -C $(FPGA_DIR) -j1 run
 
-fpga-test: $(BSP_VH)
+fpga-test:
 	make -C $(FPGA_DIR) test
 
 fpga-debug:
@@ -158,7 +116,7 @@ fpga-clean:
 #
 # SYN
 #
-syn-build: $(SYN_BSP_VH)
+syn-build:
 	make -C $(SYN_DIR) build
 
 syn-clean:
@@ -170,10 +128,10 @@ syn-test: syn-clean syn-build
 # DOCUMENT
 #
 DOC_DIR=document
-doc-build: $(BSP_H)
+doc-build:
 	make -C $(DOC_DIR) build
 
-doc-view: $(BSP_H)
+doc-view:
 	make -C $(DOC_DIR) view
 
 doc-debug: 
@@ -206,10 +164,9 @@ dtest: test syn-test
 #
 
 clean: fw-clean pc-emul-clean lint-clean sim-clean fpga-clean syn-clean doc-clean
-	rm -f $(BSP_H)
 
 
-.PHONY: fw-build fpga-fw-build fw-clean \
+.PHONY: fw-build fw-clean \
 	pc-emul-build pc-emul-run pc-emul-clean \
 	lint-test lint-run lint-clean \
 	sim-build sim-run sim-debug sim-clean \

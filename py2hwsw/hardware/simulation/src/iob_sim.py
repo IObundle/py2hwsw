@@ -2,14 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-bsp = [
-    {"name": "BAUD", "type": "M", "val": "3000000"},
-    {"name": "FREQ", "type": "M", "val": "100000000"},
-    {"name": "DDR_DATA_W", "type": "M", "val": "32"},
-    {"name": "DDR_ADDR_W", "type": "M", "val": "24"},
-    {"name": "SIMULATION", "type": "M", "val": "1"},
-]
-
 
 def setup(py_params_dict):
     attributes_dict = {
@@ -17,9 +9,46 @@ def setup(py_params_dict):
         "generate_hw": True,
         "confs": [
             {
-                "name": "bsp",
-                "descr": "Board Support Package confs",
-                "confs": bsp,
+                "name": "AXI_ID_W",
+                "descr": "AXI ID bus width",
+                "type": "F",
+                "val": "4",
+            },
+            {
+                "name": "AXI_LEN_W",
+                "descr": "AXI burst length width",
+                "type": "F",
+                "val": "8",
+            },
+            {
+                "name": "AXI_ADDR_W",
+                "descr": "AXI address bus width",
+                "type": "F",
+                "val": "24",
+            },
+            {
+                "name": "AXI_DATA_W",
+                "descr": "AXI data bus width",
+                "type": "F",
+                "val": "32",
+            },
+            {
+                "name": "BAUD",
+                "descr": "UART baud rate",
+                "type": "F",
+                "val": "3000000",
+            },
+            {
+                "name": "FREQ",
+                "descr": "Clock frequency",
+                "type": "F",
+                "val": "100000000",
+            },
+            {
+                "name": "SIMULATION",
+                "descr": "Simulation flag",
+                "type": "F",
+                "val": "1",
             },
         ],
     }

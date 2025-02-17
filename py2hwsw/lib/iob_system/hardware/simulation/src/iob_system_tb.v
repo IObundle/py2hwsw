@@ -4,8 +4,8 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_bsp.vh"
 `include "iob_system_conf.vh"
+`include "iob_system_sim_conf.vh"
 `include "iob_uart_conf.vh"
 `include "iob_uart_csrs_def.vh"
 
@@ -17,7 +17,7 @@
 
 module iob_system_tb;
 
-   parameter realtime CLK_PER = 1s / `FREQ;
+   parameter realtime CLK_PER = 1s / `IOB_SYSTEM_SIM_FREQ;
 
    localparam ADDR_W = `IOB_SYSTEM_ADDR_W;
    localparam DATA_W = `IOB_SYSTEM_DATA_W;
@@ -175,7 +175,8 @@ module iob_system_tb;
          iob_write(`IOB_UART_SOFTRESET_ADDR, 1, `IOB_UART_SOFTRESET_W);
          iob_write(`IOB_UART_SOFTRESET_ADDR, 0, `IOB_UART_SOFTRESET_W);
          //config uart div factor
-         iob_write(`IOB_UART_DIV_ADDR, `FREQ / `BAUD, `IOB_UART_DIV_W);
+         iob_write(`IOB_UART_DIV_ADDR, `IOB_SYSTEM_SIM_FREQ / `IOB_SYSTEM_SIM_BAUD,
+                   `IOB_UART_DIV_W);
          //enable uart for receiving
          iob_write(`IOB_UART_RXEN_ADDR, 1, `IOB_UART_RXEN_W);
          iob_write(`IOB_UART_TXEN_ADDR, 1, `IOB_UART_TXEN_W);

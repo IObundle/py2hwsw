@@ -53,7 +53,11 @@ def setup(py_params_dict):
             {
                 "name": "ram_t2p_be_s",
                 "descr": "RAM interface",
-                "signals": {"type": "ram_t2p_be"},
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
             },
         ],
         "subblocks": [

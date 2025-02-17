@@ -101,6 +101,15 @@ module iob_axis2axi_tb;
    wire [2-1:0] ddr_axi_rresp;  //Read channel response
    wire ddr_axi_rlast;  //Read channel last word
 
+   // axi_ram_mem
+   wire axi_ram_ext_mem_clk;
+   wire [32-1:0] axi_ram_ext_mem_r_data;
+   wire axi_ram_ext_mem_r_en;
+   wire [32-1:0] axi_ram_ext_mem_r_addr;
+   wire [32-1:0] axi_ram_ext_mem_w_data;
+   wire [4-1:0] axi_ram_ext_mem_w_strb;
+   wire [32-1:0] axi_ram_ext_mem_w_addr;
+
    // Iterators
    integer i;
    integer fd;
@@ -518,7 +527,32 @@ module iob_axis2axi_tb;
       .axi_rdata_o (ddr_axi_rdata),
       .axi_rlast_o (ddr_axi_rlast),
       .axi_rresp_o (ddr_axi_rresp),
-      .axi_rready_i(s_rready)
+      .axi_rready_i(s_rready),
+
+
+      // external_mem_bus_m port
+      .ext_mem_clk_o   (axi_ram_ext_mem_clk),
+      .ext_mem_r_data_i(axi_ram_ext_mem_r_data),
+      .ext_mem_r_en_o  (axi_ram_ext_mem_r_en),
+      .ext_mem_r_addr_o(axi_ram_ext_mem_r_addr),
+      .ext_mem_w_data_o(axi_ram_ext_mem_w_data),
+      .ext_mem_w_strb_o(axi_ram_ext_mem_w_strb),
+      .ext_mem_w_addr_o(axi_ram_ext_mem_w_addr)
+   );
+
+   // Memory for iob_axi_ram
+   iob_ram_t2p_be #(
+      .ADDR_W(ADDR_W - 2),
+      .DATA_W(DATA_W)
+   ) iob_ram_t2p_be_inst (
+      // ram_t2p_be_s port
+      .clk_i   (axi_ram_ext_mem_clk),
+      .r_data_o(axi_ram_ext_mem_r_data),
+      .r_en_i  (axi_ram_ext_mem_r_en),
+      .r_addr_i(axi_ram_ext_mem_r_addr),
+      .w_data_i(axi_ram_ext_mem_w_data),
+      .w_strb_i(axi_ram_ext_mem_w_strb),
+      .w_addr_i(axi_ram_ext_mem_w_addr)
    );
 
 endmodule

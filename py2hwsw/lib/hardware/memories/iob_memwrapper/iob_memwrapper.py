@@ -21,7 +21,17 @@ def setup(py_params_dict):
         "name": f"{attrs['name']}_mwrap",
         "generate_hw": True,
         "version": "0.1",
-        "confs": attrs["confs"],
+        "confs": attrs["confs"]
+        + [
+            {
+                "name": "MEM_NO_READ_ON_WRITE",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "1",
+                "descr": "No simultaneous read/write",
+            },
+        ],
     }
 
     mwrap_wires = []
@@ -73,6 +83,11 @@ def setup(py_params_dict):
             }
         )
 
+        # Extra Verilog parameters for this memory subblock
+        extra_params = {}
+        if "ram" in list_of_mems[-1]["type"]:
+            extra_params["MEM_NO_READ_ON_WRITE"] = "MEM_NO_READ_ON_WRITE"
+
         attributes_dict["subblocks"].append(
             {
                 "core_name": list_of_mems[-1]["type"],
@@ -81,7 +96,8 @@ def setup(py_params_dict):
                     "DATA_W": data_w_param,
                     "ADDR_W": addr_w_param,
                     "HEXFILE": hexfile_param,
-                },
+                }
+                | extra_params,
                 "connect": {
                     f"{wire['signals']['type']}_s": wire["name"],
                 },

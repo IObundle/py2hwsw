@@ -209,13 +209,19 @@ def get_iob_clk_ports(port_params: str = "cke_arst"):
             descr="Clock",
         )
     ]
-    for port in ["cke", "arst", "anrst", "rst", "nrst", "en"]:
+    for port, descr in [
+        ("cke","Clock enable"),
+        ("arst","Asynchronous active-high reset"),
+        ("anrst","Asynchronous active-low reset"),
+        ("rst","Synchronous active-high reset"),
+        ("nrst","Synchronous active-low reset"),
+        ("en", "Enable")]:
         if port in port_params:
             ports.append(
                 iob_signal(
                     name=port + "_o",
                     width=1,
-                    descr=port,
+                    descr=descr,
                 )
             )
     return ports

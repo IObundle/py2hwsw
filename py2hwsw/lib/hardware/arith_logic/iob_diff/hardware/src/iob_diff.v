@@ -8,7 +8,7 @@ module iob_diff #(
     parameter DATA_W  = 32,
     parameter RST_VAL = 0
 ) (
-    `include "iob_diff_clk_en_rst_s_port.vs"
+    `include "iob_diff_iob_clk_s_port.vs"
 
     input rst_i,
 
@@ -18,7 +18,7 @@ module iob_diff #(
 
   wire [DATA_W-1:0] data_i_reg;
   iob_reg_r #(DATA_W, RST_VAL) reg0 (
-      `include "iob_diff_clk_en_rst_s_s_portmap.vs"
+      `include "iob_diff_iob_clk_s_s_portmap.vs"
 
       .rst_i(rst_i),
 

@@ -43,6 +43,7 @@ class iob_wire:
                 name = self.interface.type,
                 if_type = "",
                 mult = self.interface.mult,
+                port_params = self.interface.port_params,
                 widths = self.interface.widths,
                 signal_prefix = self.interface.prefix,
             )

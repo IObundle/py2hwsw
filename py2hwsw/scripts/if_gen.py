@@ -1256,9 +1256,10 @@ def gen_wires(interface):
     file_prefix = interface.file_prefix
     prefix = interface.prefix
     mult = interface.mult
+    port_params = interface.port_params
     widths = interface.widths
 
-    signals = get_signals(name, "", mult, widths)
+    signals = get_signals(name=name, if_type="", mult=mult, widths=widths, port_params=port_params)
 
     fout = open(file_prefix + name + "_wire.vs", "w")
     write_wire(fout, prefix, signals)

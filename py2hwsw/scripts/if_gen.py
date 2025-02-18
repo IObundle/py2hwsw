@@ -36,8 +36,8 @@ mem_if_names = [
 ]
 
 if_names = [
-    "clk_en_rst",
-    "clk_rst",
+        #"clk_en_rst",
+        #"clk_rst",
     "iob_clk",
     "iob",
     "axil_read",
@@ -230,32 +230,35 @@ def get_iob_clk_ports(port_params: str = "cke_arst"):
 
 @parse_widths
 def get_clk_rst_ports():
-    return [
-        iob_signal(
-            name="clk_o",
-            width=1,
-            descr="Clock",
-        ),
-        iob_signal(
-            name="arst_o",
-            width=1,
-            descr="Asynchronous active-high reset",
-        ),
-    ]
+    # deprecated
+    raise NotImplementedError("CLK_RST interface deprecateed in favor of IOB_CLK")
+    #return [
+        #iob_signal(
+            #name="clk_o",
+            #width=1,
+            #descr="Clock",
+        #),
+        #iob_signal(
+            #name="arst_o",
+            #width=1,
+            #descr="Asynchronous active-high reset",
+        #),
+    #]
 
 
 @parse_widths
 def get_clk_en_rst_ports():
-    clk_rst_ports = get_clk_rst_ports()
-    return [
-        clk_rst_ports[0],
-        iob_signal(
-            name="cke_o",
-            width=1,
-            descr="Enable",
-        ),
-        clk_rst_ports[1],
-    ]
+    raise NotImplementedError("CLK_EN_RST interface deprecateed in favor of IOB_CLK")
+#clk_rst_ports = get_clk_rst_ports()
+    #return [
+        #clk_rst_ports[0],
+        #iob_signal(
+            #name="cke_o",
+            #width=1,
+            #descr="Enable",
+        #),
+        #clk_rst_ports[1],
+    #]
 
 def get_mem_ports(
     suffix: str, async_clk: bool = False, addr: bool = True, enable: bool = True

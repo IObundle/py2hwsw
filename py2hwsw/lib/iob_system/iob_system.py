@@ -259,7 +259,12 @@ def setup(py_params_dict):
             {
                 "name": "rom_bus_m",
                 "descr": "Ports for connection with boot ROM memory",
-                "signals": {"type": "rom_sp", "prefix": "bootrom_mem_"},
+                "signals": {
+                    "type": "rom_sp",
+                    "prefix": "bootrom_mem_",
+                    "ADDR_W": params["bootrom_addr_w"] - 2,
+                    "DATA_W": params["data_w"],
+                },
             },
         ]
     if params["use_intmem"]:
@@ -267,7 +272,12 @@ def setup(py_params_dict):
             {
                 "name": "external_mem_bus_m",
                 "descr": "Port for connection to external 'iob_ram_t2p_be' memory",
-                "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": params["mem_addr_w"] - 2,
+                    "DATA_W": params["data_w"],
+                    },
             },
         ]
     if params["use_extmem"]:

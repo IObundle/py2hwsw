@@ -116,7 +116,12 @@ def setup(py_params_dict):
             {
                 "name": "external_mem_bus_m",
                 "descr": "Port for connection to external 'iob_ram_t2p_be' memory",
-                "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": "ADDR_WIDTH - 2",
+                    "DATA_W": "DATA_WIDTH",
+                },
             },
         ],
     }

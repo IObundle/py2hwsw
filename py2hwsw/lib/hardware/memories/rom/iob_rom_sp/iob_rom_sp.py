@@ -45,7 +45,11 @@ def setup(py_params_dict):
             {
                 "name": "rom_sp_s",
                 "descr": "ROM interface",
-                "signals": {"type": "rom_sp"},
+                "signals": {
+                    "type": "rom_sp",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
             },
         ],
         "superblocks": [

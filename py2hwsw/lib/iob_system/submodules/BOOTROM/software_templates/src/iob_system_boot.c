@@ -14,7 +14,7 @@
 int main() {
 
   // init uart
-  uart_init(UART0_BASE, FREQ / BAUD);
+  uart_init(UART0_BASE, IOB_BSP_FREQ / IOB_BSP_BAUD);
 
   // connect with console
   do {

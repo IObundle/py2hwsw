@@ -26,10 +26,14 @@ endif
 #
 SW_DIR=software
 fw-build:
-	make -C $(SW_DIR) build
+	make -C $(SW_DIR) build USE_FPGA=$(USE_FPGA)
 
 fw-clean:
 	if [ -f "$(SW_DIR)/Makefile" ]; then make -C $(SW_DIR) clean; fi
+
+#this target is not the same as fw-build because this one will cause USE_FPGA=1 to be true (this will affect software compilation)
+fpga-fw-build: fw-build
+
 
 #
 # PC EMUL

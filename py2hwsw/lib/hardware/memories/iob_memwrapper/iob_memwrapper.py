@@ -150,7 +150,7 @@ def generate_mems_tex(mems, out_dir):
       \\begin{tabularx}{\\textwidth}{|l|c|c|c|X|}
         \\hline
         \\rowcolor{iob-green}
-        {\\bf Name} & {\\bf Type} & {\\bf Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
+        {\\bf Name} & {\\bf Type} & {\\bf (Word-)Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
         \\input mems_tab
       \\end{tabularx}
       \\caption{Table of memories of the core}

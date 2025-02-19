@@ -158,8 +158,11 @@ def setup(py_params_dict):
             # Simulation wrapper
             {
                 "core_name": "iob_sim",
-                "instance_name": "iob_sim",
                 "dest_dir": "hardware/simulation/src",
+            },
+            {
+                "core_name": "iob_pulse_gen_tester",
+                "dest_dir": "submodules/tester",
             },
         ],
         "snippets": [

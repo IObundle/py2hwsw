@@ -450,7 +450,7 @@ HEX+=get_uut_hex
 
 get_uut_hex:
 	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation build_hex
-	cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation/*.hex .
+	-cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation/*.hex .
 
 .PHONY: get_uut_hex
 """

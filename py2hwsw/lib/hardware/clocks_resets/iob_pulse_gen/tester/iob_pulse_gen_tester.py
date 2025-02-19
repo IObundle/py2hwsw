@@ -43,7 +43,7 @@ def setup(py_params_dict):
                         "instance_description": "Unit Under Test (UUT) to be verified by this tester.",
                         "parameters": {
                             "START": 2,
-                            "DURATION": 10,
+                            "DURATION": 100,
                         },
                         "connect": {
                             "clk_en_rst_s": "clk_en_rst_s",

@@ -195,8 +195,8 @@ class iob_core(iob_module, iob_instance):
         # Temporarily change global_build_dir to match tester's directory (for tester blocks)
         build_dir_backup = __class__.global_build_dir
         if attributes.get("is_tester", False):
-            # If is tester, build dir is same "dest_dir". (default: submodules/tester)
-            self.relative_path_to_tester = kwargs.get("dest_dir", "submodules/tester")
+            # If is tester, build dir is same "dest_dir". (default: tester)
+            self.relative_path_to_tester = kwargs.get("dest_dir", "tester")
             __class__.global_build_dir = os.path.join(
                 __class__.global_build_dir, self.relative_path_to_tester
             )

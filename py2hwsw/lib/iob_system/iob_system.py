@@ -717,7 +717,7 @@ def setup(py_params_dict):
                 "core_name": "iob_system_tester",
                 "instance_name": "iob_system_tester",
                 "iob_system_params": params,
-                "dest_dir": "submodules/tester",
+                "dest_dir": "tester",
             },
             # Create second tester but without CPU
             # This Tester's verification instruments will be controlled by testbench
@@ -726,7 +726,7 @@ def setup(py_params_dict):
                 "instance_name": "iob_system_tester_no_cpu",
                 "cpu": "none",
                 "iob_system_params": params,
-                "dest_dir": "submodules/tester_no_cpu",
+                "dest_dir": "tester_no_cpu",
             },
         ]
     attributes_dict["sw_modules"] = [

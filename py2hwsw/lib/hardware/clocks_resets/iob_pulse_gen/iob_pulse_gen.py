@@ -162,7 +162,7 @@ def setup(py_params_dict):
             },
             {
                 "core_name": "iob_pulse_gen_tester",
-                "dest_dir": "submodules/tester",
+                "dest_dir": "tester",
             },
         ],
         "snippets": [

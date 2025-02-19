@@ -513,7 +513,7 @@ class iob_core(iob_module, iob_instance):
         for p in instantiator.ports:
             if p.interface:
                 if p.interface.type == port.interface.type and p.interface.prefix == port.interface.prefix:
-                    p.interface.port_params = "_".join(filter(None, [p.interface.port_params, port.interface.port_params]))
+                    p.interface.params = "_".join(filter(None, [p.interface.params, port.interface.params]))
                     port.connect_external(p, bit_slices=[])
                     return
         instantiator.create_port(name=_name, signals=_signals, descr=port.descr)

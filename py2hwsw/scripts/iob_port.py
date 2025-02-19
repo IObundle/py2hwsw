@@ -57,7 +57,7 @@ class iob_port(iob_wire):
                 if_type = _direction,
                 mult = self.interface.mult,
                 widths = self.interface.widths,
-                port_params = self.interface.port_params,
+                params = self.interface.params,
                 signal_prefix = self.interface.prefix,
             )
         elif _direction in ["slave", "master"]:

@@ -62,7 +62,7 @@ def setup(py_params_dict):
                 "descr": "Clock and reset inputs",
                 "signals": {
                     "type": "iob_clk",
-                    "port_params": "arst",
+                    "params": "arst",
                 },
             },
         ],

@@ -36,8 +36,8 @@ mem_if_names = [
 ]
 
 if_names = [
-        #"clk_en_rst",
-        #"clk_rst",
+    "clk_en_rst",
+    "clk_rst",
     "iob_clk",
     "iob",
     "axil_read",
@@ -74,7 +74,7 @@ class interface:
     file_prefix: str = ""
     prefix: str = ""
     mult: str | int = 1
-    port_params: str = ""
+    params: str = ""
     widths: Dict[str, str] = field(default_factory=dict)
     # For ports only:
     # For portmaps .vs only:
@@ -92,7 +92,7 @@ def dict2interface(interface_dict):
         "name": "cpu_i",
         "signals": {
             "type": "iob",
-            "port_params": "",
+            "params": "",
             # Widths/Other parameters
             "DATA_W": "DATA_W",
             "ADDR_W": "ADDR_W",
@@ -118,7 +118,7 @@ def dict2interface(interface_dict):
 def parse_widths(func):
     """Decorator to temporarily change values of global variables based on `widths` dictionary."""
 
-    def inner(widths={},port_params=""):
+    def inner(widths={},params=""):
         vars_backup = {}
         interface_name = func.__name__[4:-6]
         # Backup global variables
@@ -129,8 +129,8 @@ def parse_widths(func):
             vars_backup[k] = globals()[k]
             globals()[k] = v
         # Call the function
-        if port_params != "":
-            return_obj = func(port_params)
+        if params != "":
+            return_obj = func(params)
         else:
             return_obj = func()
         # Restore global variables
@@ -200,8 +200,8 @@ def get_iob_ports():
     ]
 
 @parse_widths
-def get_iob_clk_ports(port_params: str = "cke_arst"):
-    port_params = port_params.split("_")
+def get_iob_clk_ports(params: str = "cke_arst"):
+    params = params.split("_")
     ports = [
         iob_signal(
             name="clk_o",
@@ -216,7 +216,7 @@ def get_iob_clk_ports(port_params: str = "cke_arst"):
         ("rst","Synchronous active-high reset"),
         ("nrst","Synchronous active-low reset"),
         ("en", "Enable")]:
-        if port in port_params:
+        if port in params:
             ports.append(
                 iob_signal(
                     name=port + "_o",
@@ -1191,14 +1191,14 @@ def write_s_tb_wire(fout, prefix, wires):
 #
 
 
-def get_signals(name, if_type="", mult=1, widths={}, port_params="", signal_prefix=""):
+def get_signals(name, if_type="", mult=1, widths={}, params="", signal_prefix=""):
     """Get list of signals for given interface
     param if_type: Type of interface.
                    Examples: '' (unspecified), 'master', 'slave', ...
     param mult: Multiplication factor for all signal widths.
     param widths: Dictionary for configuration of specific signal widths.
     """
-    eval_str = "get_" + name + "_ports(port_params=port_params,widths=widths)"
+    eval_str = "get_" + name + "_ports(params=params,widths=widths)"
     # print(eval_str)
     signals = eval(eval_str)
 
@@ -1225,7 +1225,7 @@ def gen_if(interface):
     portmap_port_prefix = interface.portmap_port_prefix
     prefix = interface.prefix
     mult = interface.mult
-    port_params = interface.port_params
+    params = interface.params
     widths = interface.widths
 
     #
@@ -1243,9 +1243,9 @@ def gen_if(interface):
 
         # get ports
         if if_type.startswith("s"):
-            ports = get_signals(name=name, if_type="slave", mult=mult, widths=widths, port_params=port_params)
+            ports = get_signals(name=name, if_type="slave", mult=mult, widths=widths, params=params)
         else:
-            ports = get_signals(name=name, if_type="master", mult=mult, widths=widths, port_params=port_params)
+            ports = get_signals(name=name, if_type="master", mult=mult, widths=widths, params=params)
 
         eval_str = f"write_{if_type}(fout, prefix1,{prefix2_str} ports)"
         # print(eval_str, prefix1)
@@ -1259,10 +1259,10 @@ def gen_wires(interface):
     file_prefix = interface.file_prefix
     prefix = interface.prefix
     mult = interface.mult
-    port_params = interface.port_params
+    params = interface.params
     widths = interface.widths
 
-    signals = get_signals(name=name, if_type="", mult=mult, widths=widths, port_params=port_params)
+    signals = get_signals(name=name, if_type="", mult=mult, widths=widths, params=params)
 
     fout = open(file_prefix + name + "_wire.vs", "w")
     write_wire(fout, prefix, signals)

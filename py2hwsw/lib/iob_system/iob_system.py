@@ -245,7 +245,7 @@ def setup(py_params_dict):
                     "prefix": "ext_mem_",
                     "ADDR_W": params["mem_addr_w"] - 2,
                     "DATA_W": params["data_w"],
-                    },
+                },
             },
         ]
     if params["use_extmem"]:

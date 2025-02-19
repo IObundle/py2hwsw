@@ -83,6 +83,7 @@ def lint_files(files_list):
             result = subprocess.run(linter_cmd, shell=True)
             if result.returncode != 0:
                 exit(result.returncode)
+            print(f"{iob_colors.INFO}Lint successful!{iob_colors.ENDC}")
 
     # DEBUG: Print child directories and files to lint
     #    print("Base dir: "+directory, file=sys.stderr)

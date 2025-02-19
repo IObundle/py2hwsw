@@ -6,7 +6,7 @@
 def setup(py_params_dict):
     attributes_dict = {
         "name": py_params_dict["instantiator"]["name"] + "_cyclonev_gt_dk",
-        "generate_hw": True,
+        "generate_hw": False,
         "confs": [
             {
                 "name": "AXI_ID_W",

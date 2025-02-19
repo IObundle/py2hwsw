@@ -195,22 +195,6 @@ def setup(py_params_dict):
             #
             # BOOTROM
             {
-                "name": "BOOTROM_MEM_ADDR_W",
-                "descr": "",
-                "type": "F",
-                "val": params["bootrom_addr_w"] - 2,
-                "min": "1",
-                "max": "32",
-            },
-            {
-                "name": "BOOTROM_MEM_DATA_W",
-                "descr": "",
-                "type": "F",
-                "val": params["data_w"],
-                "min": "1",
-                "max": "32",
-            },
-            {
                 "name": "BOOTROM_MEM_HEXFILE",
                 "descr": "Bootloader file name",
                 "type": "F",
@@ -219,22 +203,6 @@ def setup(py_params_dict):
                 "max": "NA",
             },
             # INTERNAL MEMORY
-            {
-                "name": "EXT_MEM_ADDR_W",
-                "descr": "",
-                "type": "F",
-                "val": params["mem_addr_w"] - 2,
-                "min": "1",
-                "max": "32",
-            },
-            {
-                "name": "EXT_MEM_DATA_W",
-                "descr": "",
-                "type": "F",
-                "val": params["data_w"],
-                "min": "1",
-                "max": "32",
-            },
             {
                 "name": "EXT_MEM_HEXFILE",
                 "descr": "Firmware file name",

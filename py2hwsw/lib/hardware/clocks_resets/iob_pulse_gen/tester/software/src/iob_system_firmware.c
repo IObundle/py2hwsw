@@ -25,7 +25,9 @@ int main() {
   printf_init(&uart_putc);
 
   // Initial Tester message
-  uart_puts("\n\n\nHello world from Tester of 'iob_pulse_gen' core!\n\n\n");
+  uart_puts("\nHello world from Tester of 'iob_pulse_gen' core!\n\n\n");
+
+  uart_puts("Starting verification sequence of 'iob_pulse_gen'...\n\n");
 
   // Check that output of iob_pulse_gen is zero
   gpio_output = IOB_GPIO_GET_INPUT_0();
@@ -51,7 +53,7 @@ int main() {
     return 1;
   }
 
-  uart_puts("Verification of iob_pulse_gen passed!\n");
+  uart_puts("Verification of 'iob_pulse_gen' successful!\n\n");
 
   //
   // End test

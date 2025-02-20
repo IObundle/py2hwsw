@@ -8,7 +8,7 @@ module iob_axis2fifo #(
    parameter DATA_W     = 0,
    parameter AXIS_LEN_W = 0
 ) (
-   `include "iob_axis2fifo_clk_en_rst_s_port.vs"
+   `include "iob_axis2fifo_iob_clk_s_port.vs"
    input                   rst_i,
    input                   en_i,
    output [AXIS_LEN_W-1:0] len_o,
@@ -35,7 +35,7 @@ module iob_axis2fifo #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) tready_reg (
-      `include "iob_axis2fifo_clk_en_rst_s_s_portmap.vs"
+      `include "iob_axis2fifo_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .data_i(axis_tready_nxt),
       .data_o(axis_tready_o)
@@ -49,7 +49,7 @@ module iob_axis2fifo #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) tvalid_reg (
-      `include "iob_axis2fifo_clk_en_rst_s_s_portmap.vs"
+      `include "iob_axis2fifo_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .en_i  (in_regs_en),
       .data_i(axis_tvalid_i),
@@ -64,7 +64,7 @@ module iob_axis2fifo #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) tlast_reg (
-      `include "iob_axis2fifo_clk_en_rst_s_s_portmap.vs"
+      `include "iob_axis2fifo_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .en_i  (in_regs_en),
       .data_i(axis_tlast_nxt),
@@ -77,7 +77,7 @@ module iob_axis2fifo #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'b0}})
    ) tdata_reg (
-      `include "iob_axis2fifo_clk_en_rst_s_s_portmap.vs"
+      `include "iob_axis2fifo_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .en_i  (in_regs_en),
       .data_i(axis_tdata_i),
@@ -92,7 +92,7 @@ module iob_axis2fifo #(
       .DATA_W (AXIS_LEN_W),
       .RST_VAL({AXIS_LEN_W{1'b0}})
    ) word_count_inst (
-      `include "iob_axis2fifo_clk_en_rst_s_s_portmap.vs"
+      `include "iob_axis2fifo_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .en_i  (axis_word_count_en),
       .data_o(len_o)
@@ -104,7 +104,7 @@ module iob_axis2fifo #(
       .EDGE_TYPE("rising"),
       .OUT_TYPE ("step")
    ) tlast_detect (
-      `include "iob_axis2fifo_clk_en_rst_s_s_portmap.vs"
+      `include "iob_axis2fifo_iob_clk_s_s_portmap.vs"
       .rst_i     (rst_i),
       .bit_i     (axis_tlast_int),
       .detected_o(done_o)

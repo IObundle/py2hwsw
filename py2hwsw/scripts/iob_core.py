@@ -512,7 +512,8 @@ class iob_core(iob_module, iob_instance):
         _signals.update(port.interface.widths)
         for p in instantiator.ports:
             if p.interface:
-                if p.interface.type == port.interface.type:
+                if p.interface.type == port.interface.type and p.interface.prefix == port.interface.prefix:
+                    p.interface.params = "_".join(filter(None, [p.interface.params, port.interface.params]))
                     port.connect_external(p, bit_slices=[])
                     return
         instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
@@ -569,7 +570,7 @@ class iob_core(iob_module, iob_instance):
                     # print(f"DEBUG: Creating port '{port.name}' in '{instantiator.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
                     self.__connect_memory(port, instantiator)
                 elif (
-                    port.interface.type in ["clk_en_rst", "clk_rst"]
+                    port.interface.type == "iob_clk"
                     and instantiator
                     and not self.is_tester
                 ):

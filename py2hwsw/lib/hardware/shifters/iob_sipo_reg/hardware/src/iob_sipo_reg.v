@@ -7,7 +7,7 @@
 module iob_sipo_reg #(
     parameter DATA_W = 21
 ) (
-    `include "iob_sipo_reg_clk_en_rst_s_port.vs"
+    `include "iob_sipo_reg_iob_clk_s_port.vs"
     //serial input
     input s_i,
     //parallel output
@@ -21,7 +21,7 @@ module iob_sipo_reg #(
       .DATA_W (DATA_W),
       .RST_VAL(0)
   ) reg0 (
-      `include "iob_sipo_reg_clk_en_rst_s_s_portmap.vs"
+      `include "iob_sipo_reg_iob_clk_s_s_portmap.vs"
       .data_i(data),
       .data_o(p_o)
   );

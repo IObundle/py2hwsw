@@ -549,14 +549,6 @@ def setup(py_params_dict):
                 },
             },
         ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
-            },
-        ],
     }
 
     return attributes_dict

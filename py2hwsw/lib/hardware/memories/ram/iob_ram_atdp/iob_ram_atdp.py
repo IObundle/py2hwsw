@@ -40,6 +40,14 @@ def setup(py_params_dict):
                 "max": "NA",
                 "descr": "",
             },
+            {
+                "name": "MEM_NO_READ_ON_WRITE",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "1",
+                "descr": "No simultaneous read/write",
+            },
         ],
         "ports": [
             {
@@ -127,24 +135,16 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
-            },
-        ],
         "snippets": [
             {
                 "verilog_code": """
    localparam INIT_RAM = (MEM_INIT_FILE_INT != "none") ? 1 : 0;
-            // Declare the RAM
+   // Declare the RAM
    reg [DATA_W-1:0] ram[2**ADDR_W-1:0];
    reg [DATA_W-1:0] dA_o_reg;
    reg [DATA_W-1:0] dB_o_reg;
-    assign dA_o=dA_o_reg;
-    assign dB_o=dB_o_reg;
+   assign dA_o=dA_o_reg;
+   assign dB_o=dB_o_reg;
 
    // Initialize the RAM
    generate
@@ -153,30 +153,36 @@ def setup(py_params_dict):
        end
    endgenerate
 
-   //read port
-   always @(posedge clkA_i) begin  // Port A
-      if (enA_i)
-`ifdef IOB_MEM_NO_READ_ON_WRITE
-         if (weA_i) ram[addrA_i] <= dA_i;
-         else dA_o_reg <= ram[addrA_i];
-`else
-         if (weA_i) ram[addrA_i] <= dA_i;
-         dA_o_reg <= ram[addrA_i];
-`endif
-   end
-
-   //write port
-   always @(posedge clkB_i) begin  // Port B
-      if (enB_i)
-`ifdef IOB_MEM_NO_READ_ON_WRITE
-         if (weB_i) ram[addrB_i] <= dB_i;
-         else dB_o_reg <= ram[addrB_i];
-`else
-         if (weB_i) ram[addrB_i] <= dB_i;
-         dB_o_reg <= ram[addrB_i];
-`endif
-   end
-            """,
+   generate
+      if (MEM_NO_READ_ON_WRITE) begin : with_MEM_NO_READ_ON_WRITE
+         //read port
+         always @(posedge clkA_i) begin  // Port A
+            if (enA_i)
+               if (weA_i) ram[addrA_i] <= dA_i;
+               else dA_o_reg <= ram[addrA_i];
+         end
+         //write port
+         always @(posedge clkB_i) begin  // Port B
+            if (enB_i)
+               if (weB_i) ram[addrB_i] <= dB_i;
+               else dB_o_reg <= ram[addrB_i];
+         end
+      end else begin : not_MEM_NO_READ_ON_WRITE
+         //read port
+         always @(posedge clkA_i) begin  // Port A
+            if (enA_i)
+               if (weA_i) ram[addrA_i] <= dA_i;
+               dA_o_reg <= ram[addrA_i];
+         end
+         //write port
+         always @(posedge clkB_i) begin  // Port B
+            if (enB_i)
+               if (weB_i) ram[addrB_i] <= dB_i;
+               dB_o_reg <= ram[addrB_i];
+         end
+      end
+   endgenerate
+""",
             },
         ],
     }

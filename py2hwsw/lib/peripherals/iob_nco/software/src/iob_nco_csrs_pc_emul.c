@@ -9,8 +9,9 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "iob_bsp.h"
 #include "iob_nco_csrs.h"
+
+#define FREQ 100000000
 
 /* convert clock values from PC CLOCK FREQ to EMBEDDED FREQ */
 #define PC_TO_FREQ_FACTOR ((1.0 * FREQ) / CLOCKS_PER_SEC)

@@ -7,6 +7,16 @@ def setup(py_params_dict):
     attributes_dict = {
         "version": "0.1",
         "generate_hw": True,
+        "confs": [
+            {
+                "name": "FPGA_TOOL",
+                "type": "P",
+                "val": '"XILINX"',
+                "min": "NA",
+                "max": "NA",
+                "descr": "Use IPs from fpga tool. Avaliable options: 'XILINX', 'other'.",
+            },
+        ],
         "ports": [
             {
                 "name": "clk_i",
@@ -50,17 +60,19 @@ def setup(py_params_dict):
         ],
         "snippets": [
             {
-                "verilog_code": f"""
-        assign clk_int = n_i ? ~clk_i : clk_i;
-        `ifdef XILINX
-   BUFG BUFG_inst (
-      .I(clk_int),
-      .O(clk_o)
-   );
-`else
-   assign clk_o = clk_int;
-`endif
-            """,
+                "verilog_code": """
+   assign clk_int = n_i ? ~clk_i : clk_i;
+   generate
+      if (FPGA_TOOL == "XILINX") begin : tool_XILINX
+         BUFG BUFG_inst (
+            .I(clk_int),
+            .O(clk_o)
+         );
+      end else begin : tool_other
+         assign clk_o = clk_int;
+      end
+   endgenerate
+""",
             },
         ],
     }

@@ -195,22 +195,6 @@ def setup(py_params_dict):
             #
             # BOOTROM
             {
-                "name": "BOOTROM_MEM_ADDR_W",
-                "descr": "",
-                "type": "F",
-                "val": params["bootrom_addr_w"] - 2,
-                "min": "1",
-                "max": "32",
-            },
-            {
-                "name": "BOOTROM_MEM_DATA_W",
-                "descr": "",
-                "type": "F",
-                "val": params["data_w"],
-                "min": "1",
-                "max": "32",
-            },
-            {
                 "name": "BOOTROM_MEM_HEXFILE",
                 "descr": "Bootloader file name",
                 "type": "F",
@@ -219,22 +203,6 @@ def setup(py_params_dict):
                 "max": "NA",
             },
             # INTERNAL MEMORY
-            {
-                "name": "EXT_MEM_ADDR_W",
-                "descr": "",
-                "type": "F",
-                "val": params["mem_addr_w"] - 2,
-                "min": "1",
-                "max": "32",
-            },
-            {
-                "name": "EXT_MEM_DATA_W",
-                "descr": "",
-                "type": "F",
-                "val": params["data_w"],
-                "min": "1",
-                "max": "32",
-            },
             {
                 "name": "EXT_MEM_HEXFILE",
                 "descr": "Firmware file name",
@@ -259,7 +227,12 @@ def setup(py_params_dict):
             {
                 "name": "rom_bus_m",
                 "descr": "Ports for connection with boot ROM memory",
-                "signals": {"type": "rom_sp", "prefix": "bootrom_mem_"},
+                "signals": {
+                    "type": "rom_sp",
+                    "prefix": "bootrom_mem_",
+                    "ADDR_W": params["bootrom_addr_w"] - 2,
+                    "DATA_W": params["data_w"],
+                },
             },
         ]
     if params["use_intmem"]:
@@ -267,7 +240,12 @@ def setup(py_params_dict):
             {
                 "name": "external_mem_bus_m",
                 "descr": "Port for connection to external 'iob_ram_t2p_be' memory",
-                "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": params["mem_addr_w"] - 2,
+                    "DATA_W": params["data_w"],
+                },
             },
         ]
     if params["use_extmem"]:

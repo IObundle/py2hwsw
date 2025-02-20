@@ -4,6 +4,7 @@
 
 import copy
 import os
+import math
 from latex import write_table
 from iob_base import find_obj_in_list
 
@@ -21,7 +22,17 @@ def setup(py_params_dict):
         "name": f"{attrs['name']}_mwrap",
         "generate_hw": True,
         "version": "0.1",
-        "confs": attrs["confs"],
+        "confs": attrs["confs"]
+        + [
+            {
+                "name": "MEM_NO_READ_ON_WRITE",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "1",
+                "descr": "No simultaneous read/write",
+            },
+        ],
     }
 
     mwrap_wires = []
@@ -59,29 +70,38 @@ def setup(py_params_dict):
         else:
             prefix_str = wire["name"] + "_"
 
-        addr_w_param = f"{prefix_str.upper()}ADDR_W"
-        data_w_param = f"{prefix_str.upper()}DATA_W"
+        # Word address bus width
+        word_addr_w = wire["signals"].get("ADDR_W", 32)
+        # Data bus width
+        data_w = wire["signals"].get("DATA_W", 32)
+
         hexfile_param = f"{prefix_str.upper()}HEXFILE"
         list_of_mems.append(
             {
                 "name": f"{prefix_str}mem",
                 "type": f"iob_{wire['signals']['type']}",
                 # Get default values of parameters
-                "addr_w": find_obj_in_list(attrs["confs"], addr_w_param)["val"],
-                "data_w": find_obj_in_list(attrs["confs"], data_w_param)["val"],
+                "addr_w": word_addr_w,
+                "data_w": data_w,
                 "hexfile": find_obj_in_list(attrs["confs"], hexfile_param)["val"],
             }
         )
+
+        # Extra Verilog parameters for this memory subblock
+        extra_params = {}
+        if "ram" in list_of_mems[-1]["type"]:
+            extra_params["MEM_NO_READ_ON_WRITE"] = "MEM_NO_READ_ON_WRITE"
 
         attributes_dict["subblocks"].append(
             {
                 "core_name": list_of_mems[-1]["type"],
                 "instance_name": list_of_mems[-1]["name"],
                 "parameters": {
-                    "DATA_W": data_w_param,
-                    "ADDR_W": addr_w_param,
+                    "DATA_W": data_w,
+                    "ADDR_W": word_addr_w,
                     "HEXFILE": hexfile_param,
-                },
+                }
+                | extra_params,
                 "connect": {
                     f"{wire['signals']['type']}_s": wire["name"],
                 },
@@ -130,7 +150,7 @@ def generate_mems_tex(mems, out_dir):
       \\begin{tabularx}{\\textwidth}{|l|c|c|c|X|}
         \\hline
         \\rowcolor{iob-green}
-        {\\bf Name} & {\\bf Type} & {\\bf Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
+        {\\bf Name} & {\\bf Type} & {\\bf (Word-)Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
         \\input mems_tab
       \\end{tabularx}
       \\caption{Table of memories of the core}

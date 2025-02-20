@@ -2,12 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-bsp = [
-    {"name": "BAUD", "type": "M", "val": "115200"},
-    {"name": "FREQ", "type": "M", "val": "100000000"},
-    {"name": "XILINX", "type": "M", "val": "1"},
-]
-
 
 def setup(py_params_dict):
     attributes_dict = {
@@ -15,9 +9,16 @@ def setup(py_params_dict):
         "generate_hw": True,
         "confs": [
             {
-                "name": "bsp",
-                "descr": "Board Support Package confs",
-                "confs": bsp,
+                "name": "FREQ",
+                "descr": "Clock frequency",
+                "type": "F",
+                "val": "100000000",
+            },
+            {
+                "name": "XILINX",
+                "descr": "Xilinx flag to signal that this board uses Xilinx tools",
+                "type": "F",
+                "val": "1",
             },
         ],
     }

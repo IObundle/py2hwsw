@@ -155,11 +155,6 @@ def setup(py_params_dict):
             },
         ],
         "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
-            },
             {
                 "core_name": "iob_pulse_gen_tester",
                 "dest_dir": "tester",

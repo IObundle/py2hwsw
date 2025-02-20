@@ -1054,12 +1054,8 @@ class csr_gen:
         core_attributes["snippets"] += [{"verilog_code": snippet}]
 
     def write_hwheader(self, table, out_dir, top):
-        """Generate *_csrs_def.vh file. Macros from this file should only be used
-        inside the instance of the core/system since they may contain parameters which
-        are only known by the instance.
-        """
         os.makedirs(out_dir, exist_ok=True)
-        f_def = open(f"{out_dir}/{top}_csrs.vh", "w")
+        f_def = open(f"{out_dir}/{top}.vh", "w")
         f_def.write("//These macros may be dependent on instance parameters\n")
         f_def.write("//address macros\n")
         macro_prefix = f"{top}_".upper()
@@ -1097,7 +1093,7 @@ class csr_gen:
 
     def write_swheader(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        fswhdr = open(f"{out_dir}/{top}_csrs.h", "w")
+        fswhdr = open(f"{out_dir}/{top}.h", "w")
 
         core_prefix = f"{top}_".upper()
 
@@ -1158,11 +1154,11 @@ class csr_gen:
 
     def write_swcode(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        fsw = open(f"{out_dir}/{top}_csrs.c", "w")
+        fsw = open(f"{out_dir}/{top}.c", "w")
         core_prefix = f"{top}_".upper()
-        fsw.write(f'#include "{top}_csrs.h"\n\n')
+        fsw.write(f'#include "{top}.h"\n\n')
         fsw.write("\n// Base Address\n")
-        fsw.write("static int base;\n")
+        fsw.write("extern int base;\n")
         fsw.write(f"void {core_prefix}INIT_BASEADDR(uint32_t addr) {{\n")
         fsw.write("  base = addr;\n")
         fsw.write("}\n")
@@ -1189,9 +1185,7 @@ class csr_gen:
                 fsw.write(
                     f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg}) {{\n"
                 )
-                fsw.write(
-                    f"  (*( (volatile {sw_type} *) ( (base) + ({core_prefix}{name_upper}_ADDR){addr_shift}) ) = (value));\n"
-                )
+                fsw.write(f"  iob_write(addr_shift, n_bits, value);\n")
                 fsw.write("}\n\n")
             if "R" in row.type:
                 sw_type = self.csr_type(name, n_bytes)
@@ -1201,9 +1195,7 @@ class csr_gen:
                     addr_arg = "int addr"
                     addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
                 fsw.write(f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg}) {{\n")
-                fsw.write(
-                    f"  return (*( (volatile {sw_type} *) ( (base) + ({core_prefix}{name_upper}_ADDR){addr_shift}) ));\n"
-                )
+                fsw.write(f"  return iob_read(addr_shift, n_bits);\n")
                 fsw.write("}\n\n")
         fsw.close()
 

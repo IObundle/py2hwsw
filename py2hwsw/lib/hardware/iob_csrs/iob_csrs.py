@@ -23,7 +23,7 @@ def setup(py_params_dict):
     """Standard Py2HWSW setup function"""
     params = {
         # Use the same name as instantiator + the suffix "_csrs"
-        "name": py_params_dict["instantiator"]["name"],
+        "name": py_params_dict["instantiator"]["name"] + "_csrs",
         "dest_dir": py_params_dict["dest_dir"],
         # Version of the CSRs module
         "version": "1.0",

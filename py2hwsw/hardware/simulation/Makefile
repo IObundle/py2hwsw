@@ -57,11 +57,16 @@ ifneq ($(SIM_SERVER),)
 	rsync $(SIM_SYNC_FLAGS) -avz --force --delete ../.. $(SIM_USER)@$(SIM_SERVER):$(REMOTE_BUILD_DIR)
 endif
 
+#check for universal tb header
+ifeq ($(wildcard ./src/iob_v_tb.vh),)
+VSRC:=$(subst ./src/iob_v_tb.v, , $(VSRC))
+endif
+
 #compile C tb
 ifneq ($(wildcard ./src/iob_core_tb.c),)
 CTB=tb
-tb: ./src/iob_c_tb.c ./src/iob_core_tb.c ./src/$(NAME)_csrs.c
-	gcc -I./src -I../../software/src -g -o $@ $^
+tb: ../../software/src/iob_c_tb.c ../../software/src/iob_core_tb.c ../../software/src/$(NAME)_csrs.c
+	gcc -I../../software/src -g -o $@ $^
 endif
 
 build: $(VHDR) $(VSRC) $(HEX) $(CTB) remote_build_dir

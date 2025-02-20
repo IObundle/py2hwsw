@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-`include "iob_csrs.vh"
+`include "iob_v_tb.vh"
 
 `define R 0
 `define W 1

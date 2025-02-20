@@ -34,6 +34,7 @@ module iob_clock_wizard #(
 
    wire [15:0] do_unused;
    wire        drdy_unused;
+   wire        clkoutphy_unused;
    wire        psdone_unused;
    wire        locked_int;
    wire        clkfbout_clock_wizard;
@@ -73,7 +74,7 @@ module iob_clock_wizard #(
       .DRDY       (drdy_unused),
       .DWE        (1'b0),
       .CLKOUTPHYEN(1'b0),
-      .CLKOUTPHY  (),
+      .CLKOUTPHY  (clkoutphy_unused),
       // Other control and status signals
       .LOCKED     (locked_int),
       .PWRDWN     (1'b0),

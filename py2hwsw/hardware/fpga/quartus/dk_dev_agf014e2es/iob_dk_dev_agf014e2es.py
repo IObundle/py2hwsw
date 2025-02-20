@@ -6,7 +6,7 @@
 def setup(py_params_dict):
     attributes_dict = {
         "name": py_params_dict["instantiator"]["name"] + "_dk_dev_agf014e2es",
-        "generate_hw": True,
+        "generate_hw": False,
         "confs": [
             {
                 "name": "FREQ",

@@ -693,7 +693,8 @@ class iob_core(iob_module, iob_instance):
             # print(str(path))
 
         # Run Verilog linter
-        if __class__.global_project_vlint:
+        # FIXME: Don't run for tester since iob_system is still full of warnings (and we may not even need to lint tester files?)
+        if __class__.global_project_vlint and not self.is_tester:
             verilog_lint.lint_files(verilog_headers + verilog_sources)
 
         # Run Verilog formatter

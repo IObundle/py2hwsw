@@ -9,44 +9,20 @@ def setup(py_params_dict):
         "generate_hw": False,
         "confs": [
             {
-                "name": "AXI_ID_W",
-                "descr": "AXI ID bus width",
-                "type": "F",
-                "val": "4",
-            },
-            {
-                "name": "AXI_LEN_W",
-                "descr": "AXI burst length width",
-                "type": "F",
-                "val": "8",
-            },
-            {
-                "name": "AXI_ADDR_W",
-                "descr": "AXI address bus width",
+                "name": "DDR_ADDR_W",
+                "descr": "Width of DDR memory address bus (byte addressed).",
                 "type": "F",
                 "val": "30",
             },
             {
-                "name": "AXI_DATA_W",
-                "descr": "AXI data bus width",
-                "type": "F",
-                "val": "32",
-            },
-            {
-                "name": "BAUD",
-                "descr": "UART baud rate",
-                "type": "F",
-                "val": "115200",
-            },
-            {
                 "name": "FREQ",
-                "descr": "Clock frequency",
+                "descr": "Typical clock frequency for this FPGA board",
                 "type": "F",
                 "val": "100000000",
             },
             {
                 "name": "XILINX",
-                "descr": "xilinx flag",
+                "descr": "Xilinx flag to signal that this board uses Xilinx tools",
                 "type": "F",
                 "val": "1",
             },

@@ -9,20 +9,14 @@ def setup(py_params_dict):
         "generate_hw": False,
         "confs": [
             {
-                "name": "BAUD",
-                "descr": "UART baud rate",
-                "type": "F",
-                "val": "115200",
-            },
-            {
                 "name": "FREQ",
-                "descr": "Clock frequency",
+                "descr": "Typical clock frequency for this FPGA board",
                 "type": "F",
                 "val": "100000000",
             },
             {
                 "name": "XILINX",
-                "descr": "xilinx flag",
+                "descr": "Xilinx flag to signal that this board uses Xilinx tools",
                 "type": "F",
                 "val": "1",
             },

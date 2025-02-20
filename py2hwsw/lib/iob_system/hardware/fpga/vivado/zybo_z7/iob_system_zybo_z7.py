@@ -98,14 +98,15 @@ def setup(py_params_dict):
             "name": "ps_clk_rst",
             "descr": "Clock and reset",
             "signals": {
-                "type": "clk_rst",
+                "type": "iob_clk",
+                "params": "arst",
             },
         },
         {
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
             "signals": {
-                "type": "clk_en_rst",
+                "type": "iob_clk",
             },
         },
         {
@@ -119,8 +120,9 @@ def setup(py_params_dict):
             "name": "intercon_m_clk_rst",
             "descr": "AXI interconnect clock and reset inputs",
             "signals": {
-                "type": "clk_rst",
+                "type": "iob_clk",
                 "prefix": "intercon_m_",
+                "params": "arst",
             },
         },
         {

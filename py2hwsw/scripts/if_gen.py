@@ -74,7 +74,7 @@ class interface:
     file_prefix: str = ""
     prefix: str = ""
     mult: str | int = 1
-    params: str = ""
+    params: str = "None"
     widths: Dict[str, str] = field(default_factory=dict)
     # For ports only:
     # For portmaps .vs only:
@@ -118,7 +118,7 @@ def dict2interface(interface_dict):
 def parse_widths(func):
     """Decorator to temporarily change values of global variables based on `widths` dictionary."""
 
-    def inner(widths={},params=""):
+    def inner(widths={},params="None"):
         vars_backup = {}
         interface_name = func.__name__[4:-6]
         # Backup global variables
@@ -129,7 +129,7 @@ def parse_widths(func):
             vars_backup[k] = globals()[k]
             globals()[k] = v
         # Call the function
-        if params != "":
+        if params != "None":
             return_obj = func(params)
         else:
             return_obj = func()
@@ -200,7 +200,9 @@ def get_iob_ports():
     ]
 
 @parse_widths
-def get_iob_clk_ports(params: str = "cke_arst"):
+def get_iob_clk_ports(params: str = "None"):
+    if params == "None":
+        params = "cke_arst"
     params = params.split("_")
     ports = [
         iob_signal(
@@ -1191,7 +1193,7 @@ def write_s_tb_wire(fout, prefix, wires):
 #
 
 
-def get_signals(name, if_type="", mult=1, widths={}, params="", signal_prefix=""):
+def get_signals(name, if_type="", mult=1, widths={}, params="None", signal_prefix=""):
     """Get list of signals for given interface
     param if_type: Type of interface.
                    Examples: '' (unspecified), 'master', 'slave', ...

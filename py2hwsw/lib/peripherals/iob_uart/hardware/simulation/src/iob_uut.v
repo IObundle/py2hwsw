@@ -6,7 +6,7 @@
 
 `timescale 1ns / 1ps
 `include "iob_uart_conf.vh"
-`include "iob_uart_csrs.vh"
+`include "iob_uart_csrs_conf.vh"
 
 module iob_uut #(
    parameter DATA_W = `IOB_UART_DATA_W

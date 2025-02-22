@@ -63,9 +63,9 @@ VSRC:=$(subst ./src/iob_v_tb.v, , $(VSRC))
 endif
 
 #compile C tb
-ifneq ($(wildcard ./src/iob_core_tb.c),)
+ifneq ($(wildcard ../../software/tb/iob_core_tb.c),)
 CTB=tb
-tb: ../../software/src/iob_c_tb.c ../../software/src/iob_core_tb.c ../../software/src/$(NAME)_csrs.c
+tb: ../../software/tb/iob_c_tb.c ../../software/tb/iob_core_tb.c ../../software/src/$(NAME)_csrs.c
 	gcc -I../../software/src -g -o $@ $^
 endif
 

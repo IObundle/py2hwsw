@@ -4,15 +4,6 @@
 
 import os
 
-# Copied from py2 'board.py'
-bsp = [
-    {"name": "BAUD", "type": "M", "val": "115200"},
-    {"name": "FREQ", "type": "M", "val": "100000000"},
-    {"name": "DDR_DATA_W", "type": "M", "val": "32"},
-    {"name": "DDR_ADDR_W", "type": "M", "val": "30"},
-    {"name": "XILINX", "type": "M", "val": "1"},
-]
-
 
 def setup(py_params_dict):
     # user-passed parameters
@@ -46,7 +37,7 @@ def setup(py_params_dict):
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
                 "type": "F",
-                "val": "`DDR_ADDR_W",
+                "val": "30",
                 "min": "1",
                 "max": "32",
             },
@@ -54,12 +45,29 @@ def setup(py_params_dict):
                 "name": "AXI_DATA_W",
                 "descr": "AXI data bus width",
                 "type": "F",
-                "val": "`DDR_DATA_W",
+                "val": "32",
                 "min": "1",
                 "max": "32",
             },
-        ]
-        + bsp,
+            {
+                "name": "BAUD",
+                "descr": "UART baud rate",
+                "type": "F",
+                "val": "115200",
+            },
+            {
+                "name": "FREQ",
+                "descr": "Clock frequency",
+                "type": "F",
+                "val": "100000000",
+            },
+            {
+                "name": "XILINX",
+                "descr": "xilinx flag",
+                "type": "F",
+                "val": "1",
+            },
+        ],
     }
     #
     # Ports
@@ -139,7 +147,7 @@ def setup(py_params_dict):
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
             "signals": {
-                "type": "clk_en_rst",
+                "type": "iob_clk",
             },
         },
         {

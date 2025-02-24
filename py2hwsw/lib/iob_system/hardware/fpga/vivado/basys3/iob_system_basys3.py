@@ -2,13 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-# Copied from py2 'board.py'
-bsp = [
-    {"name": "BAUD", "type": "M", "val": "115200"},
-    {"name": "FREQ", "type": "M", "val": "100000000"},
-    {"name": "XILINX", "type": "M", "val": "1"},
-]
-
 
 def setup(py_params_dict):
     # user-passed parameters
@@ -42,7 +35,7 @@ def setup(py_params_dict):
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
                 "type": "F",
-                "val": "`DDR_ADDR_W" if params["use_extmem"] else "20",
+                "val": "NA" if params["use_extmem"] else "20",
                 "min": "1",
                 "max": "32",
             },
@@ -50,12 +43,29 @@ def setup(py_params_dict):
                 "name": "AXI_DATA_W",
                 "descr": "AXI data bus width",
                 "type": "F",
-                "val": "`DDR_DATA_W",
+                "val": "32",
                 "min": "1",
                 "max": "32",
             },
-        ]
-        + bsp,
+            {
+                "name": "BAUD",
+                "descr": "UART baud rate",
+                "type": "F",
+                "val": "115200",
+            },
+            {
+                "name": "FREQ",
+                "descr": "Clock frequency",
+                "type": "F",
+                "val": "100000000",
+            },
+            {
+                "name": "XILINX",
+                "descr": "xilinx flag",
+                "type": "F",
+                "val": "1",
+            },
+        ],
     }
 
     #
@@ -169,7 +179,6 @@ def setup(py_params_dict):
                 "ID_WIDTH": "AXI_ID_W",
                 "ADDR_WIDTH": "AXI_ADDR_W",
                 "DATA_WIDTH": "AXI_DATA_W",
-                "READ_ON_WRITE": "1",
             },
             "connect": {
                 "clk_i": "clk",

@@ -2,14 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-bsp = [
-    {"name": "BAUD", "type": "M", "val": "3000000"},
-    {"name": "FREQ", "type": "M", "val": "100000000"},
-    {"name": "DDR_DATA_W", "type": "M", "val": "32"},
-    {"name": "DDR_ADDR_W", "type": "M", "val": "24"},
-    {"name": "SIMULATION", "type": "M", "val": "1"},
-]
-
 
 def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
@@ -24,35 +16,44 @@ def setup(py_params_dict):
                 "descr": "AXI ID bus width",
                 "type": "F",
                 "val": "4",
-                "min": "1",
-                "max": "32",
             },
             {
                 "name": "AXI_LEN_W",
                 "descr": "AXI burst length width",
                 "type": "F",
                 "val": "8",
-                "min": "1",
-                "max": "8",
             },
             {
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
                 "type": "F",
                 "val": params["mem_addr_w"],
-                "min": "1",
-                "max": "32",
             },
             {
                 "name": "AXI_DATA_W",
                 "descr": "AXI data bus width",
                 "type": "F",
-                "val": "`DDR_DATA_W",
-                "min": "1",
-                "max": "32",
+                "val": "32",
             },
-        ]
-        + bsp,
+            {
+                "name": "BAUD",
+                "descr": "UART baud rate",
+                "type": "F",
+                "val": "3000000",
+            },
+            {
+                "name": "FREQ",
+                "descr": "Clock frequency",
+                "type": "F",
+                "val": "100000000",
+            },
+            {
+                "name": "SIMULATION",
+                "descr": "Simulation flag",
+                "type": "F",
+                "val": "1",
+            },
+        ],
     }
     #
     # Ports
@@ -62,7 +63,7 @@ def setup(py_params_dict):
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
             "signals": {
-                "type": "clk_en_rst",
+                "type": "iob_clk",
             },
         },
         {
@@ -70,7 +71,6 @@ def setup(py_params_dict):
             "descr": "Testbench uart csrs interface",
             "signals": {
                 "type": "iob",
-                "prefix": "",
                 "ADDR_W": 3,
             },
         },
@@ -84,6 +84,18 @@ def setup(py_params_dict):
                     "type": "iob",
                     "prefix": "ethernet_",
                     "ADDR_W": 12,
+                },
+            },
+        ]
+    if params["cpu"] == "none":
+        attributes_dict["ports"] += [
+            {
+                "name": "iob_s",
+                "descr": "Direct control of system peripherals csrs",
+                "signals": {
+                    "type": "iob",
+                    "prefix": "pbus_",
+                    "ADDR_W": 3,
                 },
             },
         ]
@@ -137,6 +149,11 @@ def setup(py_params_dict):
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": 1,
                 },
+            },
+            {
+                "name": "axi_ram_mem",
+                "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
+                "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
             },
         ]
     if params["use_ethernet"]:
@@ -220,6 +237,8 @@ def setup(py_params_dict):
         attributes_dict["subblocks"][-1]["connect"].update({"phy_io": "phy"})
     if params["use_extmem"]:
         attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
+    if params["cpu"] == "none":
+        attributes_dict["subblocks"][-1]["connect"].update({"iob_s": "iob_s"})
     attributes_dict["subblocks"] += [
         {
             "core_name": "iob_uart",
@@ -261,13 +280,25 @@ def setup(py_params_dict):
                             "{1'b0, axi_awlock}",
                         ],
                     ),
+                    "external_mem_bus_m": "axi_ram_mem",
+                },
+            },
+            {
+                "core_name": "iob_ram_t2p_be",
+                "instance_name": "iob_ram_t2p_be_inst",
+                "parameters": {
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "AXI_DATA_W",
+                },
+                "connect": {
+                    "ram_t2p_be_s": "axi_ram_mem",
                 },
             },
         ]
         if params["init_mem"] and not params["use_intmem"]:
             attributes_dict["subblocks"][-1]["parameters"].update(
                 {
-                    "FILE": f'"{params["name"]}_firmware"',
+                    "HEXFILE": f'"{params["name"]}_firmware.hex"',
                 }
             )
     if params["use_ethernet"]:

@@ -56,13 +56,18 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "descr": "Clock and reset",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
             },
             {
                 "name": "ext_rom_bus_m",
                 "descr": "External ROM signals",
-                "signals": {"type": "rom_sp", "prefix": "ext_rom_"},
+                "signals": {
+                    "type": "rom_sp",
+                    "prefix": "ext_rom_",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
             },
         ],
         #

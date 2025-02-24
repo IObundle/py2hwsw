@@ -16,7 +16,7 @@ module iob_regfile_2p #(
     parameter DATA_W  = 0,           //width of data
     parameter WSTRB_W = WDATA_W / 8  //width of write strobe
 ) (
-    `include "iob_regfile_2p_clk_en_rst_s_port.vs"
+    `include "iob_regfile_2p_iob_clk_s_port.vs"
     input                                              wen_i,
     input  [((RADDR_W+WADDR_W)+(WSTRB_W+WDATA_W))-1:0] req_i,
     output [                              RDATA_W-1:0] resp_o
@@ -65,7 +65,7 @@ module iob_regfile_2p #(
               .DATA_W (W),
               .RST_VAL({W{1'b0}})
           ) iob_reg_inst (
-              `include "iob_regfile_2p_clk_en_rst_s_s_portmap.vs"
+              `include "iob_regfile_2p_iob_clk_s_s_portmap.vs"
               .en_i  (wen[row_sel+col_sel]),
               .data_i(wdata_int[(col_sel*8)+:W]),
               .data_o(regfile[(row_sel+col_sel)*W+:W])

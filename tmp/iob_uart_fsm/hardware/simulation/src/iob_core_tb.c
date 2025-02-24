@@ -4,9 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "iob_bsp.h"
 #include "iob_uart_csrs.h"
 #include <stdio.h>
+
+#define FREQ 100000000
+#define BAUD 3000000
 
 int iob_core_tb() {
 

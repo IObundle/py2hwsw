@@ -10,9 +10,8 @@
 #endif
 #include "iob_vlt_tb.h" //user file that defins the dut
 
-#include "iob_bsp.h"
-
 #ifndef CLK_PERIOD
+#define FREQ 100000000
 #define CLK_PERIOD 1000000000 / FREQ // Example: 1/100MHz*10^9 = 10 ns
 #endif
 

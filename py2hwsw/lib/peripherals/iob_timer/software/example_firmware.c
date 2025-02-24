@@ -4,11 +4,13 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "iob_bsp.h"
 #include "iob_printf.h"
 #include "iob_timer.h"
 #include "iob_uart.h"
 #include "mmap.h"
+
+#define FREQ 100000000
+#define BAUD 3000000
 
 int main() {
   unsigned long long elapsed;

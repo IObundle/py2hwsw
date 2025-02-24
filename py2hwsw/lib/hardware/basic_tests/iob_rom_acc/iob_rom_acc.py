@@ -37,7 +37,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {"type": "clk_en_rst"},
+                "signals": {"type": "iob_clk"},
                 "descr": "Clock, enable and reset",
             },
             {

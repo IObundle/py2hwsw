@@ -26,7 +26,7 @@ int main() {
   timer_init(TIMER0_BASE);
 
   // init uart
-  uart_init(UART0_BASE, FREQ / BAUD);
+  uart_init(UART0_BASE, IOB_BSP_FREQ / IOB_BSP_BAUD);
   printf_init(&uart_putc);
 
   // test puts
@@ -39,7 +39,7 @@ int main() {
   uart_puts("[Tester]: Initializing SUT via UART...\n");
 
   // Init and switch to uart1 (connected to the SUT)
-  uart_init(UART1_BASE, FREQ / BAUD);
+  uart_init(UART1_BASE, IOB_BSP_FREQ / IOB_BSP_BAUD);
 
   // Wait for ENQ signal from SUT
   while ((c = uart_getc()) != ENQ)

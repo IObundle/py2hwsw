@@ -11,7 +11,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -21,14 +21,6 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_reg_re",
                 "instance_name": "iob_reg_re_inst",
-            },
-        ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
             },
         ],
     }

@@ -11,7 +11,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -114,7 +114,20 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "subblocks": [],
+        "subblocks": [
+            {
+                "core_name": "iob_fifo_sync",
+            },
+            {
+                "core_name": "iob_counter",
+            },
+            {
+                "core_name": "iob_reg_r",
+            },
+            {
+                "core_name": "iob_reg_re",
+            },
+        ],
     }
 
     return attributes_dict

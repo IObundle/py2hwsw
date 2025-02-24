@@ -38,7 +38,7 @@ module iob_apb2iob #(
       .DATA_W (2),
       .RST_VAL(2'd0)
    ) pc_reg (
-      `include "iob_apb2iob_clk_en_rst_s_s_portmap.vs"
+      `include "iob_apb2iob_iob_clk_s_s_portmap.vs"
       .data_i(pc_cnt_nxt),
       .data_o(pc_cnt)
    );
@@ -83,7 +83,7 @@ module iob_apb2iob #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) apb_ready_reg (
-      `include "iob_apb2iob_clk_en_rst_s_s_portmap.vs"
+      `include "iob_apb2iob_iob_clk_s_s_portmap.vs"
       .data_i(apb_ready_nxt),
       .data_o(apb_ready_o)
    );
@@ -92,7 +92,7 @@ module iob_apb2iob #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'd0}})
    ) apb_rdata_reg (
-      `include "iob_apb2iob_clk_en_rst_s_s_portmap.vs"
+      `include "iob_apb2iob_iob_clk_s_s_portmap.vs"
       .en_i  (iob_rvalid_i),
       .data_i(iob_rdata_i),
       .data_o(apb_rdata_o)

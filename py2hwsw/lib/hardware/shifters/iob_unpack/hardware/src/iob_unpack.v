@@ -7,7 +7,7 @@
 module iob_unpack #(
     parameter DATA_W = 21
 ) (
-    `include "iob_unpack_clk_en_rst_s_port.vs"
+    `include "iob_unpack_iob_clk_s_port.vs"
 
     input                    rst_i,
     input                    wrap_i,
@@ -96,7 +96,7 @@ module iob_unpack #(
   iob_bfifo #(
       .DATA_W(DATA_W)
   ) bfifo (
-      `include "iob_unpack_clk_en_rst_s_s_portmap.vs"
+      `include "iob_unpack_iob_clk_s_s_portmap.vs"
       .rst_i   (rst_i),
       //push packed data to be unpacked
       .write_i (push),
@@ -115,7 +115,7 @@ module iob_unpack #(
       .DATA_W ($clog2(DATA_W) + 1),
       .RST_VAL({$clog2(DATA_W) + 1{1'b0}})
   ) wrap_acc_reg (
-      `include "iob_unpack_clk_en_rst_s_s_portmap.vs"
+      `include "iob_unpack_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .data_i(wrap_acc_nxt),
       .data_o(wrap_acc)
@@ -126,7 +126,7 @@ module iob_unpack #(
       .DATA_W (2),
       .RST_VAL(2'b0)
   ) pcnt_reg (
-      `include "iob_unpack_clk_en_rst_s_s_portmap.vs"
+      `include "iob_unpack_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .data_i(pcnt_nxt),
       .data_o(pcnt)

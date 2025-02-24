@@ -11,7 +11,7 @@ module iob_shift_reg #(
     parameter ADDR_W = $clog2(N)
 
 ) (
-    `include "iob_shift_reg_clk_en_rst_s_port.vs"
+    `include "iob_shift_reg_iob_clk_s_port.vs"
 
     input               en_i,
     input               rst_i,
@@ -72,7 +72,7 @@ module iob_shift_reg #(
       .DATA_W (ADDR_W),
       .RST_VAL({ADDR_W{1'd0}})
   ) w_addr_cnt0 (
-      `include "iob_shift_reg_clk_en_rst_s_s_portmap.vs"
+      `include "iob_shift_reg_iob_clk_s_s_portmap.vs"
       .rst_i (rst_int_w),
       .en_i  (en_i),
       .data_o(addr_w)
@@ -82,7 +82,7 @@ module iob_shift_reg #(
       .DATA_W (1),
       .RST_VAL(0)
   ) out_enable (
-      `include "iob_shift_reg_clk_en_rst_s_s_portmap.vs"
+      `include "iob_shift_reg_iob_clk_s_s_portmap.vs"
       .data_i(out_en_nxt),
       .data_o(out_en)
   );

@@ -2,22 +2,23 @@
 #
 # SPDX-License-Identifier: MIT
 
-bsp = [
-    {"name": "BAUD", "type": "M", "val": "115200"},
-    {"name": "FREQ", "type": "M", "val": "50000000"},
-    {"name": "INTEL", "type": "M", "val": "1"},
-]
-
 
 def setup(py_params_dict):
     attributes_dict = {
         "name": py_params_dict["instantiator"]["name"] + "_de10_lite",
-        "generate_hw": True,
+        "generate_hw": False,
         "confs": [
             {
-                "name": "bsp",
-                "descr": "Board Support Package confs",
-                "confs": bsp,
+                "name": "FREQ",
+                "descr": "Typical clock frequency for this FPGA board",
+                "type": "F",
+                "val": "50000000",
+            },
+            {
+                "name": "INTEL",
+                "descr": "Intel flag to signal that this board uses Intel tools",
+                "type": "F",
+                "val": "1",
             },
         ],
     }

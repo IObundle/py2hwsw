@@ -195,8 +195,8 @@ class iob_core(iob_module, iob_instance):
         # Temporarily change global_build_dir to match tester's directory (for tester blocks)
         build_dir_backup = __class__.global_build_dir
         if attributes.get("is_tester", False):
-            # If is tester, build dir is same "dest_dir". (default: submodules/tester)
-            self.relative_path_to_tester = kwargs.get("dest_dir", "submodules/tester")
+            # If is tester, build dir is same "dest_dir". (default: tester)
+            self.relative_path_to_tester = kwargs.get("dest_dir", "tester")
             __class__.global_build_dir = os.path.join(
                 __class__.global_build_dir, self.relative_path_to_tester
             )
@@ -492,6 +492,8 @@ class iob_core(iob_module, iob_instance):
 
     def __connect_memory(self, port, instantiator):
         """Create memory port in instantiatior and connect it to self"""
+        if not instantiator.generate_hw or not self.instantiate:
+            return
         _name = f"{port.name}"
         _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
         _signals.update(port.interface.widths)
@@ -510,7 +512,8 @@ class iob_core(iob_module, iob_instance):
         _signals.update(port.interface.widths)
         for p in instantiator.ports:
             if p.interface:
-                if p.interface.type == port.interface.type:
+                if p.interface.type == port.interface.type and p.interface.prefix == port.interface.prefix:
+                    p.interface.params = "_".join(filter(None, [p.interface.params, port.interface.params]))
                     port.connect_external(p, bit_slices=[])
                     return
         instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
@@ -564,9 +567,10 @@ class iob_core(iob_module, iob_instance):
                     and instantiator
                     and not self.is_tester
                 ):
+                    # print(f"DEBUG: Creating port '{port.name}' in '{instantiator.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
                     self.__connect_memory(port, instantiator)
                 elif (
-                    port.interface.type in ["clk_en_rst", "clk_rst"]
+                    port.interface.type == "iob_clk"
                     and instantiator
                     and not self.is_tester
                 ):
@@ -689,7 +693,8 @@ class iob_core(iob_module, iob_instance):
             # print(str(path))
 
         # Run Verilog linter
-        if __class__.global_project_vlint:
+        # FIXME: Don't run for tester since iob_system is still full of warnings (and we may not even need to lint tester files?)
+        if __class__.global_project_vlint and not self.is_tester:
             verilog_lint.lint_files(verilog_headers + verilog_sources)
 
         # Run Verilog formatter

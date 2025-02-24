@@ -11,7 +11,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -174,44 +174,22 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_fifo_sync",
-                "instance_name": "iob_fifo_sync_inst",
+                "core_name": "iob_axis2axi_in",
             },
             {
-                "core_name": "iob_counter",
-                "instance_name": "iob_counter_inst",
-            },
-            {
-                "core_name": "iob_reg_r",
-                "instance_name": "iob_reg_r_inst",
-            },
-            {
-                "core_name": "iob_reg_re",
-                "instance_name": "iob_reg_re_inst",
+                "core_name": "iob_axis2axi_out",
             },
             # For simulation
             {
                 "core_name": "iob_axi_ram",
-                "instance_name": "iob_axi_ram_inst",
+                "dest_dir": "hardware/simulation/src",
+            },
+            {
+                "core_name": "iob_ram_t2p_be",
+                "dest_dir": "hardware/simulation/src",
             },
             {
                 "core_name": "iob_ram_at2p",
-                "instance_name": "iob_ram_at2p_inst",
-            },
-            {
-                "core_name": "iob_axis2axi_in",
-                "instance_name": "iob_axis2axi_in_inst",
-            },
-            {
-                "core_name": "iob_axis2axi_out",
-                "instance_name": "iob_axis2axi_out_inst",
-            },
-        ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
                 "dest_dir": "hardware/simulation/src",
             },
         ],

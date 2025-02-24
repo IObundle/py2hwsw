@@ -38,6 +38,7 @@ mem_if_names = [
 if_names = [
     "clk_en_rst",
     "clk_rst",
+    "iob_clk",
     "iob",
     "axil_read",
     "axil_write",
@@ -73,6 +74,7 @@ class interface:
     file_prefix: str = ""
     prefix: str = ""
     mult: str | int = 1
+    params: str = "None"
     widths: Dict[str, str] = field(default_factory=dict)
     # For ports only:
     # For portmaps .vs only:
@@ -90,7 +92,7 @@ def dict2interface(interface_dict):
         "name": "cpu_i",
         "signals": {
             "type": "iob",
-            "subtype": "master",
+            "params": "",
             # Widths/Other parameters
             "DATA_W": "DATA_W",
             "ADDR_W": "ADDR_W",
@@ -116,7 +118,7 @@ def dict2interface(interface_dict):
 def parse_widths(func):
     """Decorator to temporarily change values of global variables based on `widths` dictionary."""
 
-    def inner(widths={}):
+    def inner(widths={},params="None"):
         vars_backup = {}
         interface_name = func.__name__[4:-6]
         # Backup global variables
@@ -127,7 +129,10 @@ def parse_widths(func):
             vars_backup[k] = globals()[k]
             globals()[k] = v
         # Call the function
-        return_obj = func()
+        if params != "None":
+            return_obj = func(params)
+        else:
+            return_obj = func()
         # Restore global variables
         for k in widths:
             globals()[k] = vars_backup[k]
@@ -194,36 +199,68 @@ def get_iob_ports():
         ),
     ]
 
-
 @parse_widths
-def get_clk_rst_ports():
-    return [
+def get_iob_clk_ports(params: str = "None"):
+    if params == "None":
+        params = "cke_arst"
+    params = params.split("_")
+    ports = [
         iob_signal(
             name="clk_o",
             width=1,
             descr="Clock",
-        ),
-        iob_signal(
-            name="arst_o",
-            width=1,
-            descr="Asynchronous active-high reset",
-        ),
+        )
     ]
+    for port, descr in [
+        ("cke","Clock enable"),
+        ("arst","Asynchronous active-high reset"),
+        ("anrst","Asynchronous active-low reset"),
+        ("rst","Synchronous active-high reset"),
+        ("nrst","Synchronous active-low reset"),
+        ("en", "Enable")]:
+        if port in params:
+            ports.append(
+                iob_signal(
+                    name=port + "_o",
+                    width=1,
+                    descr=descr,
+                )
+            )
+    return ports
+
+
+
+@parse_widths
+def get_clk_rst_ports():
+    # deprecated
+    raise NotImplementedError("CLK_RST interface deprecateed in favor of IOB_CLK")
+    #return [
+        #iob_signal(
+            #name="clk_o",
+            #width=1,
+            #descr="Clock",
+        #),
+        #iob_signal(
+            #name="arst_o",
+            #width=1,
+            #descr="Asynchronous active-high reset",
+        #),
+    #]
 
 
 @parse_widths
 def get_clk_en_rst_ports():
-    clk_rst_ports = get_clk_rst_ports()
-    return [
-        clk_rst_ports[0],
-        iob_signal(
-            name="cke_o",
-            width=1,
-            descr="Enable",
-        ),
-        clk_rst_ports[1],
-    ]
-
+    raise NotImplementedError("CLK_EN_RST interface deprecateed in favor of IOB_CLK")
+#clk_rst_ports = get_clk_rst_ports()
+    #return [
+        #clk_rst_ports[0],
+        #iob_signal(
+            #name="cke_o",
+            #width=1,
+            #descr="Enable",
+        #),
+        #clk_rst_ports[1],
+    #]
 
 def get_mem_ports(
     suffix: str, async_clk: bool = False, addr: bool = True, enable: bool = True
@@ -254,7 +291,6 @@ def get_mem_ports(
             descr=f"Clock port {clk_suffix}",
         ),
     ] + extra_signals
-
 
 def get_mem_read_ports(
     suffix: str,
@@ -347,7 +383,6 @@ def remove_duplicates(ports):
             result.append(d)
     return result
 
-
 @parse_widths
 def get_rom_2p_ports():
     ports = (
@@ -357,12 +392,10 @@ def get_rom_2p_ports():
     )
     return remove_duplicates(ports)
 
-
 @parse_widths
 def get_rom_sp_ports():
     ports = get_mem_ports("") + get_mem_read_ports("")
     return remove_duplicates(ports)
-
 
 @parse_widths
 def get_rom_tdp_ports():
@@ -372,7 +405,6 @@ def get_rom_tdp_ports():
         + get_mem_read_ports("b", enable=True, addr=True, true=True)
     )
     return remove_duplicates(ports)
-
 
 @parse_widths
 def get_rom_atdp_ports():
@@ -384,7 +416,6 @@ def get_rom_atdp_ports():
     )
     return remove_duplicates(ports)
 
-
 @parse_widths
 def get_ram_2p_ports():
     ports = (
@@ -393,7 +424,6 @@ def get_ram_2p_ports():
         + get_mem_write_ports("", ready=True, addr=True)
     )
     return remove_duplicates(ports)
-
 
 @parse_widths
 def get_ram_at2p_ports():
@@ -404,7 +434,6 @@ def get_ram_at2p_ports():
         + get_mem_write_ports("", addr=True)
     )
     return remove_duplicates(ports)
-
 
 @parse_widths
 def get_ram_atdp_ports():
@@ -418,27 +447,22 @@ def get_ram_atdp_ports():
     )
     return remove_duplicates(ports)
 
-
 @parse_widths
 def get_ram_atdp_be_ports():
     return get_ram_atdp_ports()
-
 
 @parse_widths
 def get_ram_sp_ports():
     ports = get_mem_ports("") + get_mem_read_ports("") + get_mem_write_ports("")
     return remove_duplicates(ports)
 
-
 @parse_widths
 def get_ram_sp_be_ports():
     return get_ram_sp_ports()
 
-
 @parse_widths
 def get_ram_sp_se_ports():
     return get_ram_sp_ports()
-
 
 @parse_widths
 def get_ram_t2p_ports():
@@ -449,11 +473,9 @@ def get_ram_t2p_ports():
     )
     return remove_duplicates(ports)
 
-
 @parse_widths
 def get_ram_t2p_be_ports():
     return get_ram_t2p_ports()
-
 
 @parse_widths
 def get_ram_t2p_tiled_ports():
@@ -463,7 +485,6 @@ def get_ram_t2p_tiled_ports():
         + get_mem_write_ports("")
     )
     return remove_duplicates(ports)
-
 
 @parse_widths
 def get_ram_tdp_ports():
@@ -477,31 +498,25 @@ def get_ram_tdp_ports():
     )
     return remove_duplicates(ports)
 
-
 @parse_widths
 def get_ram_tdp_be_ports():
     return get_ram_tdp_ports()
-
 
 @parse_widths
 def get_ram_tdp_be_xil_ports():
     return get_ram_tdp_ports()
 
-
 @parse_widths
 def get_regfile_2p_ports():
     raise NotImplementedError("REGFILE 2P not interface implemented")
-
 
 @parse_widths
 def get_regfile_at2p_ports():
     raise NotImplementedError("REGFILE AT2P not interface implemented")
 
-
 @parse_widths
 def get_regfile_sp_ports():
     raise NotImplementedError("REGFILE SP not interface implemented")
-
 
 #
 # AXI4
@@ -1178,14 +1193,14 @@ def write_s_tb_wire(fout, prefix, wires):
 #
 
 
-def get_signals(name, if_type="", mult=1, widths={}, signal_prefix=""):
+def get_signals(name, if_type="", mult=1, widths={}, params="None", signal_prefix=""):
     """Get list of signals for given interface
     param if_type: Type of interface.
                    Examples: '' (unspecified), 'master', 'slave', ...
     param mult: Multiplication factor for all signal widths.
     param widths: Dictionary for configuration of specific signal widths.
     """
-    eval_str = "get_" + name + "_ports(widths=widths)"
+    eval_str = "get_" + name + "_ports(params=params,widths=widths)"
     # print(eval_str)
     signals = eval(eval_str)
 
@@ -1212,6 +1227,7 @@ def gen_if(interface):
     portmap_port_prefix = interface.portmap_port_prefix
     prefix = interface.prefix
     mult = interface.mult
+    params = interface.params
     widths = interface.widths
 
     #
@@ -1229,9 +1245,9 @@ def gen_if(interface):
 
         # get ports
         if if_type.startswith("s"):
-            ports = get_signals(name, "slave", mult, widths)
+            ports = get_signals(name=name, if_type="slave", mult=mult, widths=widths, params=params)
         else:
-            ports = get_signals(name, "master", mult, widths)
+            ports = get_signals(name=name, if_type="master", mult=mult, widths=widths, params=params)
 
         eval_str = f"write_{if_type}(fout, prefix1,{prefix2_str} ports)"
         # print(eval_str, prefix1)
@@ -1245,9 +1261,10 @@ def gen_wires(interface):
     file_prefix = interface.file_prefix
     prefix = interface.prefix
     mult = interface.mult
+    params = interface.params
     widths = interface.widths
 
-    signals = get_signals(name, "", mult, widths)
+    signals = get_signals(name=name, if_type="", mult=mult, widths=widths, params=params)
 
     fout = open(file_prefix + name + "_wire.vs", "w")
     write_wire(fout, prefix, signals)

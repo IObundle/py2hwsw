@@ -21,7 +21,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -547,14 +547,6 @@ def setup(py_params_dict):
                     "async_fifo_read_write_io": "async_fifo_read_write",
                     "async_fifo_read_extmem_io": "async_fifo_read_extmem",
                 },
-            },
-        ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
             },
         ],
     }

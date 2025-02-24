@@ -138,9 +138,10 @@ def get_instance_port_connections(instance):
             port.e_connect
         ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
         newlinechar = "\n"
-        assert len(port.signals) == len(
-            port.e_connect.signals
-        ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
+        if not port.interface or not port.e_connect.interface:
+            assert len(port.signals) == len(
+                    port.e_connect.signals
+                ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
 Port '{port.name}' has the following signals:
 {newlinechar.join("- " + get_real_signal(port).name for port in port.signals)}
 
@@ -159,6 +160,19 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
             port_name = signal.name
             real_e_signal = get_real_signal(port.e_connect.signals[idx])
             e_signal_name = real_e_signal.name
+            # Connect interface signals by name and not by order
+            if port.interface and port.e_connect.interface:
+                port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
+                for e_signal in port.e_connect.signals:
+                    real_e_signal = get_real_signal(e_signal)
+                    e_signal_name = real_e_signal.name
+                    if e_signal_name[-2:] in ["_o", "_i"]:
+                        e_signal_name = e_signal_name[:-2]
+                    e_signal_name = e_signal_name.replace(port.e_connect.interface.prefix, "", 1)
+                    if e_signal_name == port_name:
+                        e_signal_name = real_e_signal.name
+                        port_name = signal.name
+                        break
 
             for bit_slice in port.e_connect_bit_slices:
                 if e_signal_name in bit_slice:

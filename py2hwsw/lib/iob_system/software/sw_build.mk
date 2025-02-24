@@ -35,16 +35,18 @@ UTARGETS+=build_iob_system_software
 
 TEMPLATE_LDS=src/$@.lds
 
-IOB_SYSTEM_INCLUDES=-I. -Isrc -Iinclude
+IOB_SYSTEM_INCLUDES=-Isrc -Iinclude
 
-IOB_SYSTEM_LFLAGS=-Wl,-Bstatic,-T,$(TEMPLATE_LDS),--strip-debug
+IOB_SYSTEM_LFLAGS=-Wl,-L,src,-Bstatic,-T,$(TEMPLATE_LDS),--strip-debug
 
 # FIRMWARE SOURCES
 IOB_SYSTEM_FW_SRC=src/iob_system_firmware.S
 IOB_SYSTEM_FW_SRC+=src/iob_system_firmware.c
 IOB_SYSTEM_FW_SRC+=src/iob_printf.c
 # PERIPHERAL SOURCES
-IOB_SYSTEM_FW_SRC+=$(addprefix src/,$(addsuffix .c,$(PERIPHERALS)))
+DRIVERS=$(addprefix src/,$(addsuffix .c,$(PERIPHERALS)))
+# Only add driver files if they exist
+IOB_SYSTEM_FW_SRC+=$(foreach file,$(DRIVERS),$(wildcard $(file)*))
 IOB_SYSTEM_FW_SRC+=$(addprefix src/,$(addsuffix _csrs_emb.c,$(PERIPHERALS)))
 
 # BOOTLOADER SOURCES
@@ -58,17 +60,26 @@ IOB_SYSTEM_PREBOOT_SRC=src/iob_system_preboot.S
 
 build_iob_system_software: iob_system_firmware iob_system_boot iob_system_preboot
 
-iob_system_firmware:
+ifneq ($(USE_FPGA),)
+WRAPPER_CONFS_PREFIX=iob_system_$(BOARD)
+else
+WRAPPER_CONFS_PREFIX=iob_system_sim
+endif
+
+iob_bsp:
+	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h
+
+iob_system_firmware: iob_bsp
 	make $@.elf INCLUDES="$(IOB_SYSTEM_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_FW_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"
 
-iob_system_boot:
+iob_system_boot: iob_bsp
 	make $@.elf INCLUDES="$(IOB_SYSTEM_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_BOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"
 
 iob_system_preboot:
 	make $@.elf INCLUDES="$(IOB_SYSTEM_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_PREBOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"
 
 
-.PHONY: build_iob_system_software iob_system_firmware iob_system_boot
+.PHONY: build_iob_system_software iob_bsp iob_system_firmware iob_system_boot iob_system_preboot
 
 #########################################
 #         PC emulation targets          #

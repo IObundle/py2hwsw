@@ -330,6 +330,7 @@ class iob_core(iob_module, iob_instance):
         ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
         # Lint and format sources
         self.lint_and_format()
+        print(f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}")
 
     def handle_parent(self, *args, **kwargs):
         """Create a new core based on parent core.
@@ -758,12 +759,12 @@ class iob_core(iob_module, iob_instance):
         if not os.path.exists(module.build_dir):
             return
         print(
-            f"{iob_colors.INFO}Cleaning build directory: {module.build_dir}{iob_colors.ENDC}"
+            f"{iob_colors.INFO}Cleaning build directory: '{module.build_dir}'.{iob_colors.ENDC}"
         )
         os.system(f"make -C {module.build_dir} clean")
         shutil.rmtree(module.build_dir)
         print(
-            f"{iob_colors.INFO}Cleaning complete. Removed: {module.build_dir}{iob_colors.ENDC}"
+            f"{iob_colors.INFO}Cleaning complete. Removed: '{module.build_dir}'.{iob_colors.ENDC}"
         )
 
     @staticmethod

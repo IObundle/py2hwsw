@@ -14,13 +14,14 @@ from iob_signal import get_real_signal
 @dataclass
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
+    code: str = ""
 
     def __post_init__(self):
         """Wrap verilog code with the always block"""
         self.verilog_code = (
             f"""\talways @ (*)\n\t\tbegin\n"""
             + """\t\t\t"""
-            + self.verilog_code
+            + self.code
             + """\n\t\tend"""
         )
 
@@ -176,13 +177,13 @@ def create_comb(core, *args, **kwargs):
             "Comb circuits and FSMs are mutually exclusive. Use separate submodules."
         )
     core.set_default_attribute("comb", None)
-    verilog_code = kwargs.get("verilog_code", None)
+    code = kwargs.get("code", None)
     assert_attributes(
         iob_comb,
         kwargs,
         error_msg=f"Invalid {kwargs.get('name', '')} comb attribute '[arg]'!",
     )
-    comb = iob_comb(verilog_code=verilog_code)
+    comb = iob_comb(code=code)
     comb.set_needed_reg(core)
     comb.infer_registers(core)
     core.comb = comb

@@ -153,7 +153,7 @@ def setup(py_params_dict):
             },
         ],
         "comb": {
-            "verilog_code": """
+            "code": """
     pcnt_nxt    = pcnt + 1'b1;
     dqr_reg_nxt     = dqr_reg;
     divisor_reg_nxt = divisor_reg;

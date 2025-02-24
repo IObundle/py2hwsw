@@ -241,14 +241,14 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "m_read_sel",
+            "name": "s_read_sel",
             "descr": "Select slave interface",
             "signals": [
                 {"name": "read_sel"},
             ],
         },
         {
-            "name": "m_read_sel_reg",
+            "name": "s_read_sel_reg",
             "descr": "Registered select slave interface",
             "signals": [
                 {"name": "read_sel_reg"},
@@ -323,14 +323,14 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "m_write_sel",
+            "name": "s_write_sel",
             "descr": "Select slave interface",
             "signals": [
                 {"name": "write_sel"},
             ],
         },
         {
-            "name": "m_write_sel_reg",
+            "name": "s_write_sel_reg",
             "descr": "Registered select slave interface",
             "signals": [
                 {"name": "write_sel_reg"},

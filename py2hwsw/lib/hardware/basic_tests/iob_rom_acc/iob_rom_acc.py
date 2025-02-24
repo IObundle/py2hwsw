@@ -28,7 +28,7 @@ def setup(py_params_dict):
             {
                 "name": "VALUES_HEXFILE",
                 "type": "P",
-                "val": "rom.hex",
+                "val": '"rom.hex"',
                 "min": "NA",
                 "max": "NA",
                 "descr": "Hex file to load",
@@ -49,7 +49,7 @@ def setup(py_params_dict):
                 "name": "values_m",
                 "signals": {
                     "type": "rom_sp",
-                    "prefix": "values",
+                    "prefix": "values_",
                     "DATA_W": "VALUES_DATA_W",
                     "ADDR_W": "VALUES_ADDR_W",
                 },
@@ -64,11 +64,11 @@ def setup(py_params_dict):
         "wires": [
             {
                 "name": "r_data_i",
-                "signals": [{"name": "r_data_i"}],
+                "signals": [{"name": "values_r_data_i"}],
             },
             {
                 "name": "addr_o",
-                "signals": [{"name": "addr_o"}],
+                "signals": [{"name": "values_addr_o"}],
             },
             {
                 "name": "acc_en_rst",
@@ -124,13 +124,13 @@ def setup(py_params_dict):
         ],
         "fsm": {
             "type": "fsm",
-            "verilog_code": """
-            default_assignments:
+            "default_assignments": """
                 ctr_enable = 1'b0;
                 ctr_reset = 1'b0;
                 acc_enable = 1'b0;
                 acc_reset = 1'b0;
-
+            """,
+            "state_descriptions": """
             IDLE:  
                 if (start_i)
                 begin
@@ -138,7 +138,7 @@ def setup(py_params_dict):
                     acc_reset = 1'b1;
                     ctr_reset = 1'b1;
                 end
-                
+
             READ:
                 ctr_enable = 1'b1;
                 state_nxt = ACCUMULATE;
@@ -156,7 +156,7 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-    assign valuesclk_o = clk_i;
+    assign values_clk_o = clk_i;
             """
             }
         ],

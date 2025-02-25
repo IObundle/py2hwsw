@@ -562,6 +562,7 @@ class csr_gen:
         snippet = ""
         # macros
         snippet += """
+    // Include iob_functions for use in parameters
     `include "iob_functions.vs"
     `define IOB_NBYTES (DATA_W/8)
     `define IOB_NBYTES_W $clog2(`IOB_NBYTES)

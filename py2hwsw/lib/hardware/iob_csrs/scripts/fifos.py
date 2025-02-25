@@ -614,25 +614,9 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 },
             }
         )
-    attributes_dict["subblocks"].append(
-        {
-            "core_name": "iob_functions",
-            "instantiate": False,
-        }
-    )
     #
     # Snippets
     #
-    iob_functions_snippet = """
-   // Include iob_functions for use in parameters
-   `include "iob_functions.vs"
-"""
-    # Only add snippet once
-    for snippet in attributes_dict["snippets"]:
-        if snippet["verilog_code"] == iob_functions_snippet:
-            break
-    else:
-        attributes_dict["snippets"].append({"verilog_code": iob_functions_snippet})
 
     if not is_async:
         attributes_dict["snippets"].append(

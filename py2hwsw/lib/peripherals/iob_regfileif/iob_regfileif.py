@@ -141,17 +141,19 @@ def setup(py_params_dict):
 
                     # Assign wires to ports
                     if csr["autoreg"]:
-                        snippets += f"assign {csr["name"] + "_o"} = {csr["name"]};"
+                        snippets += f"assign {csr['name'] + '_o'} = {csr['name']};"
                         if csr["type"] == "RW":
-                            snippets += f"assign {csr["name"] + "_2_o"} = {csr["name"] + "_2"};"
+                            snippets += (
+                                f"assign {csr['name'] + '_2_o'} = {csr['name'] + '_2'};"
+                            )
                     else:
                         if csr["type"] == "W":
-                            snippets += f"assign {csr["name"] + "_o"} = {"internal_" + csr["name"]+ "_wdata_o"};"
+                            snippets += f"assign {csr['name'] + '_o'} = {'internal_' + csr['name']+ '_wdata_o'};"
                         elif csr["type"] == "R":
-                            snippets += f"assign {csr["name"] + "_o"} = {"external_" + csr["name"] + "_wdata_o"};"
+                            snippets += f"assign {csr['name'] + '_o'} = {'external_' + csr['name'] + '_wdata_o'};"
                         elif csr["type"] == "RW":
-                            snippets += f"""assign {csr["name"] + "_o"} = {"internal_" + csr["name"]+ "_wdata_o"};
-                            assign {csr["name"] + "_2_o"} = {"external_" + csr["name"] + "_wdata_o"};"""
+                            snippets += f"""assign {csr['name'] + '_o'} = {'internal_' + csr['name']+ '_wdata_o'};
+                            assign {csr['name'] + '_2_o'} = {'external_' + csr['name'] + '_wdata_o'};"""
                 csr.pop("output")
 
     # Invert CSRS direction for internal CPU
@@ -252,7 +254,7 @@ def setup(py_params_dict):
         ],
     }
 
-    #print(json.dumps(attributes_dict, indent=4))  # DEBUG
+    # print(json.dumps(attributes_dict, indent=4))  # DEBUG
 
     return attributes_dict
 

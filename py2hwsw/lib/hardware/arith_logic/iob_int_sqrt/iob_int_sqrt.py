@@ -128,22 +128,16 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "snippets": [
-            {
-                "verilog_code": """
-""",
-            },
-        ],
         "fsm": {
-            "verilog_code": """
-default_assignments:
+            "default_assignments": """
         right = {q, r[SIZE_W+1], 1'b1};
         left = {r[SIZE_W-1:0], a[DATA_W-1 -: 2]};
         a_in = {a[DATA_W-3:0], 2'b00};
         tmp =  r[SIZE_W+1] ? left + right : left - right;
         res_o = q;
         done_o = ~pc;
-
+""",
+            "state_descriptions": """
         idle:
             if (start_i) begin
                 a_nxt = op_i;

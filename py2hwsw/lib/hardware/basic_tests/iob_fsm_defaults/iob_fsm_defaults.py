@@ -17,10 +17,10 @@ def setup(py_params_dict):
             },
         ],
         "fsm": {
-            "verilog_code": """
-default_assignments:
-    a_o = 10;
-
+            "default_assignments": """
+a_o = 10;
+""",
+            "state_descriptions": """
 A: a_o = 0;
 
 B: a_o = 1;
@@ -35,7 +35,7 @@ else
 begin
     pc_nxt = B;
 end
-"""
+""",
         },
     }
 

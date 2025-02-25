@@ -165,13 +165,13 @@ def setup(py_params_dict):
             },
         ],
         "fsm": {
-            "verilog_code": """
-default_assignments:
+            "default_assignments": """
     incr        = 1'b0;
     quotient_o  = quotient_int + incr;
     res_acc_nxt = res_acc + remainder_o;
     res_acc_en  = 1'b0;
-
+""",
+            "state_descriptions": """
     if (!start_i) begin //wait for div start
         pc_nxt = pc;
     end

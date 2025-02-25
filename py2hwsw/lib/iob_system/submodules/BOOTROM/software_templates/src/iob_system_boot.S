@@ -16,5 +16,5 @@
   jal ra, main
 
   // Jump to the firmware
-  li x5, IOB_SYSTEM_FW_ADDR
+  li x5, IOB_SYSTEM_FW_BASEADDR
   jalr x0, 0(x5)

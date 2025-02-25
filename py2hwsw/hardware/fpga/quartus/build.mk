@@ -10,6 +10,8 @@ FPGA_USER=$(QUARTUS_USER)
 FPGA_SSH_FLAGS=$(QUARTUS_SSH_FLAGS)
 FPGA_SCP_FLAGS=$(QUARTUS_SCP_FLAGS)
 FPGA_SYNC_FLAGS=$(QUARTUS_SYNC_FLAGS)
+USE_EXTMEM ?=0
+USE_ETHERNET ?=0
 
 # Determine the Quartus edition to use (default to Standard)
 USE_QUARTUS_PRO ?=0
@@ -31,7 +33,7 @@ endif
 # Set the Quartus command to porgram the FPGA
 FPGA_PROG=nios2_command_shell.sh quartus_pgm -m jtag -c 1 -o "p;$(FPGA_TOP).sof"
 
-QUARTUS_FLAGS = -t quartus/build.tcl $(FPGA_TOP) $(CSR_IF) $(BOARD) "$(VSRC)" " $(INCLUDE_DIRS)" $(IS_FPGA) $(USE_EXTMEM) $(QUARTUS_SEED) $(USE_QUARTUS_PRO) $(SDC_PREFIX)
+QUARTUS_FLAGS = -t quartus/build.tcl $(FPGA_TOP) $(CSR_IF) $(BOARD) "$(VSRC)" " $(INCLUDE_DIRS)" $(IS_FPGA) $(USE_EXTMEM) $(USE_ETHERNET) $(QUARTUS_SEED) $(USE_QUARTUS_PRO) $(SDC_PREFIX)
 
 $(FPGA_OBJ): $(VHDR) $(VSRC) $(wildcard $(BOARD)/*.sdc)
 	nios2_command_shell.sh quartus_sh $(QUARTUS_FLAGS)

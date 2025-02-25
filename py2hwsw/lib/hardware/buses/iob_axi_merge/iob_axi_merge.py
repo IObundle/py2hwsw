@@ -323,6 +323,29 @@ def setup(py_params_dict):
                 {"name": "active_transaction_write_reg_o", "width": 1},
             ],
         },
+        # Data burst complete reg
+        {
+            "name": "data_burst_complete_write_reg_en_rst",
+            "descr": "Enable and reset signal for data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_en", "width": 1},
+                {"name": "data_burst_complete_write_reg_rst", "width": 1},
+            ],
+        },
+        {
+            "name": "data_burst_complete_write_reg_data_i",
+            "descr": "Input of data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_i", "width": 1},
+            ],
+        },
+        {
+            "name": "data_burst_complete_write_reg_data_o",
+            "descr": "Output of data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_o", "width": 1},
+            ],
+        },
         # Write selection register signals
         {
             "name": "write_sel_reg_rst",
@@ -394,7 +417,7 @@ def setup(py_params_dict):
     for signal, direction, width, _, _ in axi_signals:
         if direction == "output":
             prefix = "m_"
-            if signal in ["axi_arready", "axi_awready"]:
+            if signal in ["axi_arready", "axi_awready", "axi_wready"]:
                 prefix = "demux_"
             # Demux signals
             attributes_dict["wires"] += [
@@ -420,7 +443,7 @@ def setup(py_params_dict):
             ]
         else:  # input direction
             prefix = "m_"
-            if signal in ["axi_arvalid", "axi_awvalid"]:
+            if signal in ["axi_arvalid", "axi_awvalid", "axi_wvalid"]:
                 prefix = "mux_"
             # Mux signals
             attributes_dict["wires"] += [
@@ -534,6 +557,20 @@ def setup(py_params_dict):
             },
         },
         {
+            "core_name": "iob_reg_re",
+            "instance_name": "data_burst_complete_write_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "data_burst_complete_write_reg_en_rst",
+                "data_i": "data_burst_complete_write_reg_data_i",
+                "data_o": "data_burst_complete_write_reg_data_o",
+            },
+        },
+        {
             "core_name": "iob_reg_r",
             "instance_name": "write_sel_reg_r",
             "parameters": {
@@ -618,13 +655,16 @@ def setup(py_params_dict):
    assign m_axi_arvalid_o = ~active_transaction_read_reg_o & mux_axi_arvalid_o;
    assign demux_axi_arready_i = ~active_transaction_read_reg_o & m_axi_arready_i;
 
-   assign active_transaction_read_reg_en = (busy_read_reg_en | busy_read_reg_o) & m_axi_arready_i;
+   assign active_transaction_read_reg_en = m_axi_arvalid_o & m_axi_arready_i;
    assign active_transaction_read_reg_rst = busy_read_reg_rst;
    assign active_transaction_read_reg_i = 1'b1;
 
    //
    // Write
    //
+
+   // NOTE: Current logic does not allow wvalid to be asserted before awvalid!
+   //       If the wvalid comes before, the data will go to the currently selected master_interface, and that may not be the intended destination (real destination will be given later by awvalid)
 
    // Only switch masters when there is no current active transaction
    assign write_sel = busy_write_reg_o ? write_sel_reg : write_sel_prio_enc_o;
@@ -637,10 +677,17 @@ def setup(py_params_dict):
    assign m_axi_awvalid_o = ~active_transaction_write_reg_o & mux_axi_awvalid_o;
    assign demux_axi_awready_i = ~active_transaction_write_reg_o & m_axi_awready_i;
 
-   assign active_transaction_write_reg_en = (busy_write_reg_en | busy_write_reg_o) & m_axi_awready_i;
+   assign active_transaction_write_reg_en = m_axi_awvalid_o & m_axi_awready_i;
    assign active_transaction_write_reg_rst = busy_write_reg_rst;
    assign active_transaction_write_reg_i = 1'b1;
 
+   // Block data valid/ready signals of current master if there is still an active transaction
+   assign m_axi_wvalid_o = ~data_burst_complete_write_reg_o & mux_axi_wvalid_o;
+   assign demux_axi_wready_i = ~data_burst_complete_write_reg_o & m_axi_wready_i;
+
+   assign data_burst_complete_write_reg_en = m_axi_wlast_o & m_axi_wvalid_o & m_axi_wready_i;
+   assign data_burst_complete_write_reg_rst = busy_write_reg_rst;
+   assign data_burst_complete_write_reg_i = 1'b1;
 """,
         },
     ]

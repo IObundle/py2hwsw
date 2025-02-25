@@ -195,12 +195,34 @@ def setup(py_params_dict):
     # Wires
     #
     attributes_dict["wires"] = [
+        # Active read transfer reg
+        {
+            "name": "active_transaction_read_reg_en_rst",
+            "descr": "Enable and reset signal for active_transaction_read_reg",
+            "signals": [
+                {"name": "active_transaction_read_reg_en", "width": 1},
+                {"name": "active_transaction_read_reg_rst", "width": 1},
+            ],
+        },
+        {
+            "name": "active_transaction_read_reg_data_i",
+            "descr": "Input of active_transaction_read_reg",
+            "signals": [
+                {"name": "active_transaction_read_reg_i", "width": 1},
+            ],
+        },
+        {
+            "name": "active_transaction_read_reg_data_o",
+            "descr": "Output of active_transaction_read_reg",
+            "signals": [
+                {"name": "active_transaction_read_reg_o", "width": 1},
+            ],
+        },
         # Read selection register signals
         {
-            "name": "read_sel_reg_en_rst",
+            "name": "read_sel_reg_rst",
             "descr": "Enable and reset signal for read_sel_reg",
             "signals": [
-                {"name": "read_sel_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
@@ -219,25 +241,70 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "m_read_sel",
-            "descr": "Select master interface",
+            "name": "s_read_sel",
+            "descr": "Select slave interface",
             "signals": [
                 {"name": "read_sel"},
             ],
         },
         {
-            "name": "m_read_sel_reg",
-            "descr": "Registered select master interface",
+            "name": "s_read_sel_reg",
+            "descr": "Registered select slave interface",
             "signals": [
                 {"name": "read_sel_reg"},
             ],
         },
+        # Active write transfer reg
+        {
+            "name": "active_transaction_write_reg_en_rst",
+            "descr": "Enable and reset signal for active_transaction_write_reg",
+            "signals": [
+                {"name": "active_transaction_write_reg_en", "width": 1},
+                {"name": "active_transaction_write_reg_rst", "width": 1},
+            ],
+        },
+        {
+            "name": "active_transaction_write_reg_data_i",
+            "descr": "Input of active_transaction_write_reg",
+            "signals": [
+                {"name": "active_transaction_write_reg_i", "width": 1},
+            ],
+        },
+        {
+            "name": "active_transaction_write_reg_data_o",
+            "descr": "Output of active_transaction_write_reg",
+            "signals": [
+                {"name": "active_transaction_write_reg_o", "width": 1},
+            ],
+        },
+        # Data burst complete reg
+        {
+            "name": "data_burst_complete_write_reg_en_rst",
+            "descr": "Enable and reset signal for data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_en", "width": 1},
+                {"name": "data_burst_complete_write_reg_rst", "width": 1},
+            ],
+        },
+        {
+            "name": "data_burst_complete_write_reg_data_i",
+            "descr": "Input of data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_i", "width": 1},
+            ],
+        },
+        {
+            "name": "data_burst_complete_write_reg_data_o",
+            "descr": "Output of data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_o", "width": 1},
+            ],
+        },
         # Write selection register signals
         {
-            "name": "write_sel_reg_en_rst",
+            "name": "write_sel_reg_rst",
             "descr": "Enable and reset signal for write_sel_reg",
             "signals": [
-                {"name": "write_sel_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
         },
@@ -256,15 +323,15 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "m_write_sel",
-            "descr": "Select master interface",
+            "name": "s_write_sel",
+            "descr": "Select slave interface",
             "signals": [
                 {"name": "write_sel"},
             ],
         },
         {
-            "name": "m_write_sel_reg",
-            "descr": "Registered select master interface",
+            "name": "s_write_sel_reg",
+            "descr": "Registered select slave interface",
             "signals": [
                 {"name": "write_sel_reg"},
             ],
@@ -273,6 +340,9 @@ def setup(py_params_dict):
     # Generate wires for muxers and demuxers
     for signal, direction, width, _, _ in axi_signals:
         if direction == "input":
+            prefix = "s_"
+            if signal in ["axi_arvalid", "axi_awvalid", "axi_wvalid"]:
+                prefix = "demux_"
             # Demux signals
             attributes_dict["wires"] += [
                 {
@@ -280,7 +350,7 @@ def setup(py_params_dict):
                     "descr": f"Input of {signal} demux",
                     "signals": [
                         {
-                            "name": "s_" + signal + "_i",
+                            "name": prefix + signal + "_i",
                         },
                     ],
                 },
@@ -296,6 +366,9 @@ def setup(py_params_dict):
                 },
             ]
         else:  # output direction
+            prefix = "s_"
+            if signal in ["axi_arready", "axi_awready", "axi_wready"]:
+                prefix = "mux_"
             # Mux signals
             attributes_dict["wires"] += [
                 {
@@ -313,7 +386,7 @@ def setup(py_params_dict):
                     "descr": f"Output of {signal} demux",
                     "signals": [
                         {
-                            "name": "s_" + signal + "_o",
+                            "name": prefix + signal + "_o",
                         },
                     ],
                 },
@@ -325,14 +398,28 @@ def setup(py_params_dict):
         # Read blocks
         {
             "core_name": "iob_reg_re",
-            "instance_name": "read_sel_reg_re",
+            "instance_name": "active_transaction_read_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_transaction_read_reg_en_rst",
+                "data_i": "active_transaction_read_reg_data_i",
+                "data_o": "active_transaction_read_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_r",
+            "instance_name": "read_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "read_sel_reg_en_rst",
+                "rst_i": "read_sel_reg_rst",
                 "data_i": "read_sel_reg_data_i",
                 "data_o": "read_sel_reg_data_o",
             },
@@ -340,14 +427,42 @@ def setup(py_params_dict):
         # Write blocks
         {
             "core_name": "iob_reg_re",
-            "instance_name": "write_sel_reg_re",
+            "instance_name": "active_transaction_write_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_transaction_write_reg_en_rst",
+                "data_i": "active_transaction_write_reg_data_i",
+                "data_o": "active_transaction_write_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_re",
+            "instance_name": "data_burst_complete_write_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "data_burst_complete_write_reg_en_rst",
+                "data_i": "data_burst_complete_write_reg_data_i",
+                "data_o": "data_burst_complete_write_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_r",
+            "instance_name": "write_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "write_sel_reg_en_rst",
+                "rst_i": "write_sel_reg_rst",
                 "data_i": "write_sel_reg_data_i",
                 "data_o": "write_sel_reg_data_o",
             },
@@ -367,7 +482,7 @@ def setup(py_params_dict):
                         "N": NUM_MASTERS,
                     },
                     "connect": {
-                        "sel_i": f"m_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
@@ -384,7 +499,7 @@ def setup(py_params_dict):
                         "N": NUM_MASTERS,
                     },
                     "connect": {
-                        "sel_i": f"m_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },
@@ -396,10 +511,47 @@ def setup(py_params_dict):
     attributes_dict["snippets"] = [
         {
             "verilog_code": f"""
-   assign read_sel = read_sel_reg_en ? s_axi_araddr_i[{ADDR_W-1}-:{NBITS}] : read_sel_reg;
-   assign read_sel_reg_en = s_axi_arvalid_i;
-   assign write_sel = write_sel_reg_en ? s_axi_awaddr_i[{ADDR_W-1}-:{NBITS}] : write_sel_reg;
-   assign write_sel_reg_en = s_axi_awvalid_i;
+   //
+   // Read
+   //
+
+   // Only switch slaves when there is no current active transaction
+   assign read_sel = active_transaction_read_reg_o ? read_sel_reg : s_axi_araddr_i[{ADDR_W-1}-:{NBITS}];
+
+   // Block address valid/ready signals of current slave if there is still an active transaction
+   assign s_axi_arready_o = ~active_transaction_read_reg_o & mux_axi_arready_o;
+   assign demux_axi_arvalid_i = ~active_transaction_read_reg_o & s_axi_arvalid_i;
+
+   assign active_transaction_read_reg_en = s_axi_arvalid_i & s_axi_arready_o;
+   assign active_transaction_read_reg_rst = (s_axi_rlast_o & s_axi_rvalid_o & s_axi_rready_i) | rst_i;
+   assign active_transaction_read_reg_i = 1'b1;
+
+   //
+   // Write
+   //
+
+   // NOTE: Current logic does not allow wvalid to be asserted before awvalid!
+   //       If the wvalid comes before, the data will go to the currently selected slave_interface, and that may not be the intended destination (real destination will be given later by awvalid)
+
+   // Only switch slaves when there is no current active transaction
+   assign write_sel = active_transaction_write_reg_o ? write_sel_reg : s_axi_awaddr_i[{ADDR_W-1}-:{NBITS}];
+
+   // Block address valid/ready signals of current slave if there is still an active transaction
+   assign s_axi_awready_o = ~active_transaction_write_reg_o & mux_axi_awready_o;
+   assign demux_axi_awvalid_i = ~active_transaction_write_reg_o & s_axi_awvalid_i;
+
+   assign active_transaction_write_reg_en = s_axi_awvalid_i & s_axi_awready_o;
+   assign active_transaction_write_reg_rst = (s_axi_bvalid_o & s_axi_bready_i) | rst_i;
+   assign active_transaction_write_reg_i = 1'b1;
+
+   // Block data valid/ready signals of current slave if there is still an active transaction
+   assign s_axi_wready_o = ~data_burst_complete_write_reg_o & mux_axi_wready_o;
+   assign demux_axi_wvalid_i = ~data_burst_complete_write_reg_o & s_axi_wvalid_i;
+
+   assign data_burst_complete_write_reg_en = s_axi_wlast_i & s_axi_wvalid_i & s_axi_wready_o;
+   assign data_burst_complete_write_reg_rst = active_transaction_write_reg_rst;
+   assign data_burst_complete_write_reg_i = 1'b1;
+
 """,
         },
     ]

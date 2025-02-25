@@ -111,6 +111,10 @@ def setup(py_params_dict):
         "wires": [],
         "subblocks": [
             {
+                "core_name": "iob_functions",
+                "instantiate": False,
+            },
+            {
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_inst",
                 "instantiate": False,

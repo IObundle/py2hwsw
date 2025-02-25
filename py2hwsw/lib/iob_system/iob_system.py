@@ -36,7 +36,7 @@ def setup(py_params_dict):
         # Bootrom address width
         "bootrom_addr_w": 12,
         # Firmware base address
-        "fw_addr": 0,
+        "fw_baseaddr": 0,
         # Firmware address width
         "fw_addr_w": 18,
         # If should include a tester system
@@ -126,12 +126,12 @@ def setup(py_params_dict):
                 "max": "32",
             },
             {  # Needed for software
-                "name": "FW_ADDR",
-                "descr": "Firmware load address.",
+                "name": "FW_BASEADDR",
+                "descr": "Firmware address",
                 "type": "M",
-                "val": params["fw_addr"],
+                "val": params["fw_baseaddr"],
                 "min": "0",
-                "max": "32",
+                "max": "0x7FFFFFFF",
             },
             {  # Needed for software
                 "name": "FW_ADDR_W",

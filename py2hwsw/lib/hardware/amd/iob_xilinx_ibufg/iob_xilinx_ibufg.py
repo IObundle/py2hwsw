@@ -17,13 +17,28 @@ def setup(py_params_dict):
                 ],
             },
         ],
+        "wires": [
+            {
+                "name": "clk_buf",
+                "descr": "",
+                "signals": [
+                    {"name": "clk_buf", "width": "1"},
+                ],
+            },
+        ],
         "snippets": [
             {
                 "verilog_code": """
-    IBUFG ibufg_inst (
+    IBUF ibuf_inst (
       .I(i_i),
-      .O(o_o)
+      .O(clk_buf)
     );
+
+    BUFG bufg_inst (
+    .I(clk_buf),
+    .O(o_o)
+    );
+
 """,
             },
         ],

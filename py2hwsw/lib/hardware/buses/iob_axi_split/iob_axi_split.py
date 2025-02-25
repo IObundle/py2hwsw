@@ -482,7 +482,7 @@ def setup(py_params_dict):
                         "N": NUM_MASTERS,
                     },
                     "connect": {
-                        "sel_i": f"m_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
@@ -499,7 +499,7 @@ def setup(py_params_dict):
                         "N": NUM_MASTERS,
                     },
                     "connect": {
-                        "sel_i": f"m_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },

@@ -9,13 +9,13 @@ SIM_USER=$(VLT_USER)
 # top level module name and simulation object
 VTOP=iob_uut
 SIM_OBJ=V$(VTOP)
-
+SW_DIR=../../software/src
 # filter out the verilog testbench
-VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) ./src/iob_core_tb.c ./src/iob_vlt_tb.cpp ./src/$(NAME)_csrs.c
+VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) $(SW_DIR)/iob_core_tb.c $(SW_DIR)/iob_vlt_tb.cpp $(SW_DIR)/$(NAME)_csrs.c
 
 # include files
-VLTINCLUDES=$(addprefix -I, ./ ./src ../src ../../software/include ../../software/src)
-CPPINCLUDES=$(addprefix -I, ./ ../ ../src ../../src ../../../software/include ../../../software/src)
+VLTINCLUDES=$(addprefix -I, ./src ../src ../../software/src)
+CPPINCLUDES=$(addprefix -I, ../src ../../src ../../software/src)
 
 VFLAGS+=$(VLTINCLUDES) -CFLAGS "$(CPPINCLUDES) -g"
 

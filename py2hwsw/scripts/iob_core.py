@@ -820,18 +820,15 @@ class iob_core(iob_module, iob_instance):
         print(json.dumps(module.attributes_dict, indent=4))
 
     @staticmethod
-    def print_py2hwsw_attributes(core_name, **kwargs):
-        """Print the supported py2hw attributes of this core.
-        The attributes listed can be used in the 'attributes' dictionary of the
-        constructor. This defines the information supported by the py2hw interface.
+    def print_py2hwsw_attributes():
+        """Print the supported attributes of the py2hwsw interface.
+        The attributes listed can be used in the 'attributes' dictionary of cores.
         """
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_attributes"
-        # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name, **kwargs)
-        print(
-            f"Attributes supported by the '{module.name}' core's 'py2hwsw' interface:"
-        )
+        # Build a new dummy module instance, to obtain its attributes
+        module = __class__()
+        print("Attributes supported by the 'py2hwsw' core dictionary interface:")
         for name in module.ATTRIBUTE_PROPERTIES.keys():
             datatype = module.ATTRIBUTE_PROPERTIES[name].datatype
             descr = module.ATTRIBUTE_PROPERTIES[name].descr
@@ -905,6 +902,7 @@ class iob_core(iob_module, iob_instance):
             f.write("NAME=Py2HWSW\n")
         with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
             f.write(py2_version)
+        doc_gen.generate_tex_py2hwsw_attributes(__class__, f"{core.build_dir}/document/tsrc")
 
 
 def find_common_deep(path1, path2):

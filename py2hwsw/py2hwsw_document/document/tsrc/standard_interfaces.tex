@@ -2,14 +2,67 @@
 %
 % SPDX-License-Identifier: MIT
 
-The py2hwsw framework provides the following two standard interfaces:
-1) Core "setup" function receives information from py2hwsw via "Python Parameters".
-2) Core "setup" function returns a core description to py2hwsw via a python dictionary.
+The Py2HWSW framework provides the following two standard interfaces:
+\begin{enumerate}
+  \item \textbf{Python Parameters}: Core "setup" function receives information from Py2HWSW via a dictionary in its first argument, referred to as \textit{Python Parameters}.
+  \item \textbf{Core Dictionary}: Core "setup" function returns a core description dictionary to Py2HWSW, referred to as \textit{Core Dictionary}.
+\end{enumerate}
 
 The core's "setup" function is the python function defined by the user in the <core\_name>.py file.
 
-If the core is described by a JSON file, then the "Python Parameters" interface is not available.
-The JSON file gives a dictionary to py2hwsw, similar to the python dictionary of the "setup" function.
+If the core is described by a JSON file, then the \textit{Python Parameters} interface is not available.
+The JSON file gives a dictionary to Py2HWSW, similar to the python dictionary of the "setup" function.
 This allows the user to use external tools to generate cores in JSON format.
 
+%
+% Python parameters
+%
 
+The \textit{Python Parameters} received by the core's "setup" function is a dictionary containing both parameters passed by its instantiator and standard parameters passed by Py2HWSW.
+Each key, value pair in the dictionary is a \textit{Python Parameter}.
+The value of the python parameter may be of any data type.
+
+\begin{table}[H]
+  \centering
+  \begin{tabularx}{\textwidth}{|l|l|X|}
+
+    \hline
+    \rowcolor{iob-green}
+    % TODO: Exaustive list of standard Py2HWSW python parameters
+    {\bf Name} & {\bf Data Type} & {\bf Description}  \\ \hline \hline
+
+    %\input py2hwsw_py_params_tab %FIXME:
+
+  \end{tabularx}
+  \caption{Standard \textit{Python Parameters} passed by Py2HWSW to every core's "setup" function.}
+  \label{py2hwsw_py_params_tab}
+\end{table}
+
+The standard python parameters passed by Py2HWSW are listed in Table~\ref{py2hwsw_py_params_tab}.
+
+The python parameters supported by each core is available in the core's user guide.
+Instructions on how to build a core's user guide can be found in Section~\ref{sec:ug}. 
+
+
+%
+% Core dictionary
+%
+
+\begin{xltabular}{\textwidth}{|l|l|X|}
+  \hline
+  \rowcolor{iob-green}
+  % TODO: The "Data Type" column should specify what the user should input, instead of the internal object used by py2hwsw.
+  {\bf Name} & {\bf Data Type} & {\bf Description}  \\ \hline \hline
+  \endhead
+
+  \input py2hwsw_attributes_tab
+
+  \caption{Table of supported Py2HWSW attributes in the \textbf{Core Dictionary}. The \textit{Data Type} column specifies the type of internal object that the Py2HWSW will convert the attribute's value to (usually the user inputs a string, list, or dictionary value and then py2 converts it to an internal object).}
+  \label{py2hwsw_attributes_tab}
+\end{xltabular}
+
+The list of attributes supported by the Py2HWSW framework is given in Table~\ref{py2hwsw_attributes_tab}.
+If a core provides a dictionary with keys not listed in Table~\ref{py2hwsw_attributes_tab}, then the Py2HWSW framework will raise an error.
+Each key, value pair in the dictionary is a \textit{Core Attribute}.
+The data type of the core attribute may be of any data type, but are usually a string, list, or dictionary.
+If the data type is a string, it may also represent an object using Py2HWSW's \textit{Short Notation}~\ref{sec:short_notation}.

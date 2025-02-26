@@ -1123,6 +1123,13 @@ class csr_gen:
         fswhdr.write("\n// Base Address\n")
         fswhdr.write(f"void {core_prefix}INIT_BASEADDR(uint32_t addr);\n")
 
+        fswhdr.write("\n// IO read and write function prototypes\n")
+
+        fswhdr.write(
+            "void iob_write(uint32_t addr, uint32_t data_w, uint32_t value);\n"
+        )
+        fswhdr.write("uint32_t iob_read(uint32_t addr, uint32_t data_w);\n")
+
         fswhdr.write("\n// Core Setters and Getters\n")
         for row in table:
             name = row.name
@@ -1158,7 +1165,7 @@ class csr_gen:
         core_prefix = f"{top}_".upper()
         fsw.write(f'#include "{top}.h"\n\n')
         fsw.write("\n// Base Address\n")
-        fsw.write("extern int base;\n")
+        fsw.write("static uint32_t base;\n")
         fsw.write(f"void {core_prefix}INIT_BASEADDR(uint32_t addr) {{\n")
         fsw.write("  base = addr;\n")
         fsw.write("}\n")
@@ -1174,28 +1181,15 @@ class csr_gen:
             if n_bytes == 3:
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
+            addr = f"base + {core_prefix}{name_upper}_ADDR"
+            sw_type = self.csr_type(name, n_bytes)
             if "W" in row.type:
-                sw_type = self.csr_type(name, n_bytes)
-                addr_arg = ""
-                addr_arg = ""
-                addr_shift = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = ", int addr"
-                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(
-                    f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg}) {{\n"
-                )
-                fsw.write(f"  iob_write(addr_shift, n_bits, value);\n")
+                fsw.write(f"void {core_prefix}SET_{name_upper}({sw_type} value) {{\n")
+                fsw.write(f"  iob_write({addr}, {core_prefix}{name_upper}_W, value);\n")
                 fsw.write("}\n\n")
             if "R" in row.type:
-                sw_type = self.csr_type(name, n_bytes)
-                addr_arg = ""
-                addr_shift = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = "int addr"
-                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg}) {{\n")
-                fsw.write(f"  return iob_read(addr_shift, n_bits);\n")
+                fsw.write(f"{sw_type} {core_prefix}GET_{name_upper}() {{\n")
+                fsw.write(f"  return iob_read({addr}, {core_prefix}{name_upper}_W);\n")
                 fsw.write("}\n\n")
         fsw.close()
 

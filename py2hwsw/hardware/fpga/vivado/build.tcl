@@ -10,7 +10,8 @@ set VSRC [lindex $argv 3]
 set INCLUDE_DIRS [lindex $argv 4]
 set IS_FPGA [lindex $argv 5]
 set USE_EXTMEM [lindex $argv 6]
-set SDC_PREFIX [lindex $argv 7]
+set USE_ETHERNET [lindex $argv 7]
+set SDC_PREFIX [lindex $argv 8]
 
 #verilog sources, vivado IPs, use file extension
 foreach file [split $VSRC \ ] {

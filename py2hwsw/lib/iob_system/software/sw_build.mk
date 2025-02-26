@@ -35,7 +35,7 @@ UTARGETS+=build_iob_system_software
 
 TEMPLATE_LDS=src/$@.lds
 
-IOB_SYSTEM_INCLUDES=-Isrc -Iinclude
+IOB_SYSTEM_INCLUDES=-Isrc
 
 IOB_SYSTEM_LFLAGS=-Wl,-L,src,-Bstatic,-T,$(TEMPLATE_LDS),--strip-debug
 
@@ -85,6 +85,7 @@ iob_system_preboot:
 #         PC emulation targets          #
 #########################################
 # Local pc-emul makefile settings for custom pc emulation targets.
+EMUL_HDR+=iob_bsp
 
 # SOURCES
 EMUL_SRC+=src/iob_system_firmware.c

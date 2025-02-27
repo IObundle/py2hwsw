@@ -14,6 +14,8 @@ ifeq ($(USE_ETHERNET),1)
 VSRC+=./src/iob_eth_csrs_emb_verilator.c ./src/iob_eth_driver_tb.cpp
 endif
 
+CSRS = ../../software/src/iob_uart_csrs.c
+
 #replace iob_system_sim with iob_uut
 VSRC:= $(subst iob_system_sim,iob_uut,$(VSRC))
 ./src/iob_uut.v: ./src/iob_system_sim.v

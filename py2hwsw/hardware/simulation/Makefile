@@ -64,8 +64,13 @@ endif
 
 #compile C tb
 ifneq ($(wildcard ../../software/src/iob_core_tb.c),)
+
+ifneq ($(wildcard ../../software/src/$(NAME)_csrs.c),)
+CSRS ?= ../../software/src/$(NAME)_csrs.c
+endif
+
 CTB=tb
-tb: ../../software/src/iob_c_tb.c ../../software/src/iob_core_tb.c ../../software/src/$(NAME)_csrs.c
+tb: ../../software/src/iob_c_tb.c ../../software/src/iob_core_tb.c $(CSRS)
 	gcc -I../../software/src -g -o $@ $^
 endif
 

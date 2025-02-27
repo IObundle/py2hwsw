@@ -11,7 +11,7 @@ SYN_SCP_FLAGS=$(CADENCE_SCP_FLAGS)
 SYN_SYNC_FLAGS=$(CADENCE_SYNC_FLAGS)
 
 synth: $(VHDR) $(VSRC) config.tcl
-	genus -batch -files genus/build.tcl
+	echo "exit" | genus -batch -files genus/build.tcl
 
 config.tcl:
 	@echo "set NODE $(NODE)" > $@

@@ -5,6 +5,8 @@
 #
 #    doc_gen.py: generate documentation
 #
+import os
+
 import config_gen
 import io_gen
 import block_gen
@@ -45,3 +47,28 @@ def generate_tex_py2hwsw_attributes(iob_core_class, out_dir):
         )
 
     write_table(f"{out_dir}/py2hwsw_attributes", tex_table)
+
+
+def generate_tex_core_lib(out_dir):
+    """Generate TeX table of cores available in py2hwsw library.
+    :param out_dir: Path to the output directory
+    """
+    lib_path = os.path.join(os.path.dirname(__file__), "../lib")
+
+    tex_table = []
+    # Find all .py files under lib_path
+    for root, dirs, files in os.walk(lib_path):
+        # Skip specific directories
+        if os.path.basename(root) in ["scripts", "test", "document"]:
+            dirs[:] = []
+            continue
+        for file in files:
+            if file.endswith(".py"):
+                tex_table.append(
+                    [
+                        os.path.splitext(file)[0],
+                        os.path.relpath(root, lib_path),
+                    ]
+                )
+
+    write_table(f"{out_dir}/py2hwsw_core_lib", tex_table)

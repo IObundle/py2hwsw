@@ -512,8 +512,13 @@ class iob_core(iob_module, iob_instance):
         _signals.update(port.interface.widths)
         for p in instantiator.ports:
             if p.interface:
-                if p.interface.type == port.interface.type and p.interface.prefix == port.interface.prefix:
-                    p.interface.params = "_".join(filter(None, [p.interface.params, port.interface.params]))
+                if (
+                    p.interface.type == port.interface.type
+                    and p.interface.prefix == port.interface.prefix
+                ):
+                    p.interface.params = "_".join(
+                        filter(None, [p.interface.params, port.interface.params])
+                    )
                     port.connect_external(p, bit_slices=[])
                     return
         instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
@@ -775,14 +780,12 @@ class iob_core(iob_module, iob_instance):
         module = __class__.get_core_obj(core_name)
         # Don't try to deliver if build dir doesn't exist
         if not os.path.exists(module.build_dir):
-            #print error and exit 
+            # print error and exit
             print(
                 f"{iob_colors.FAIL}Build directory not found: {module.build_dir}{iob_colors.ENDC}"
-                )
-            exit(1)
-        print(
-            f"{iob_colors.INFO}Delivering core: {core_name} {iob_colors.ENDC}"
             )
+            exit(1)
+        print(f"{iob_colors.INFO}Delivering core: {core_name} {iob_colors.ENDC}")
         os.system(f"CORE={core_name} BUILD_DIR={module.build_dir} delivery.sh")
 
     @staticmethod
@@ -902,7 +905,10 @@ class iob_core(iob_module, iob_instance):
             f.write("NAME=Py2HWSW\n")
         with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
             f.write(py2_version)
-        doc_gen.generate_tex_py2hwsw_attributes(__class__, f"{core.build_dir}/document/tsrc")
+        doc_gen.generate_tex_py2hwsw_attributes(
+            __class__, f"{core.build_dir}/document/tsrc"
+        )
+        doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
 
 
 def find_common_deep(path1, path2):

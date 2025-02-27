@@ -14,6 +14,7 @@ from iob_signal import get_real_signal
 @dataclass
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
+
     code: str = ""
 
     def __post_init__(self):

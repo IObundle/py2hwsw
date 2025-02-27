@@ -98,7 +98,11 @@ def create_fsm(core, *args, **kwargs):
         kwargs,
         error_msg=f"Invalid {kwargs.get('name', '')} fsm attribute '[arg]'!",
     )
-    fsm = iob_fsm(type=type, default_assignments=default_assignments, state_descriptions=state_descriptions)
+    fsm = iob_fsm(
+        type=type,
+        default_assignments=default_assignments,
+        state_descriptions=state_descriptions,
+    )
 
     core.create_wire(
         name=fsm.state_reg_name,

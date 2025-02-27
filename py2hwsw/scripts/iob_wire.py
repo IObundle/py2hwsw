@@ -40,12 +40,12 @@ class iob_wire:
 
         if self.interface:
             self.signals += if_gen.get_signals(
-                name = self.interface.type,
-                if_type = "",
-                mult = self.interface.mult,
-                params = self.interface.params,
-                widths = self.interface.widths,
-                signal_prefix = self.interface.prefix,
+                name=self.interface.type,
+                if_type="",
+                mult=self.interface.mult,
+                params=self.interface.params,
+                widths=self.interface.widths,
+                signal_prefix=self.interface.prefix,
             )
 
             # Remove signal direction information

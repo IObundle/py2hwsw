@@ -11,7 +11,8 @@ void iob_write (uint32_t addr, uint32_t addr_w, uint32_t value) {
   else if (addr_w > 8)
     (*((volatile uint16_t *)(base + addr)) = (value));
   else
-    (*((volatile uint8_t *)(base + addr)) = (value));}
+    (*((volatile uint8_t *)(base + addr)) = (value));
+}
 
 uint32_t iob_read (uint32_t addr, uint32_t addr_w) {
   if (addr_w >16)
@@ -19,6 +20,6 @@ uint32_t iob_read (uint32_t addr, uint32_t addr_w) {
   else if (addr_w > 8)
     return (uint32_t) (*((volatile uint16_t *)(base + addr)));
   else
-    return (uint32_t) (*((volatile uint8_t *)(base + addr));}
+    return (uint32_t) (*((volatile uint8_t *)(base + addr)));
 }
 

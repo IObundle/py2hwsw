@@ -12,6 +12,7 @@ SYN_SYNC_FLAGS=$(CADENCE_SYNC_FLAGS)
 
 synth: $(VHDR) $(VSRC) config.tcl
 	echo "exit" | genus -batch -files genus/build.tcl
+	echo "exit"
 
 config.tcl:
 	@echo "set NODE $(NODE)" > $@

@@ -9,9 +9,32 @@ import os
 #
 
 
+def convert_params_dict(params):
+    """Convert values of given parameters dictionary from tuple to single value;
+    Also creates new "python_parameters" list to use as attribute of core (for py2 documentation).
+    :param dict params: dictionary to convert. Each value has original format: (default_val, description). New format: default_val
+    :returns: "python_parameters" list attribute
+    """
+    attribute_python_parametes = []
+    for name, tuple_item in params.items():
+        default_val, description = tuple_item
+        # Create entries in "python_parameters" list attribute (used by py2 for documentation)
+        attribute_python_parametes.append(
+            {
+                "name": name,
+                "val": default_val,
+                "descr": description,
+            }
+        )
+        # Covert values from original dicitonary from tuple into single value
+        params[name] = default_val
+
+    return attribute_python_parametes
+
+
 def update_params(params, py_params):
     """Update given `params` dictionary with values from `py_params` dictionary.
-    Paramters will be updated to have the same type as the default value.
+    Parameters will be updated to have the same type as the default value.
     :param dict params: dictionary to update. Contains default values and their types.
     :param dict py_params: dictionary to use as source. Contains new values.
                            Their types will be converted to match the corresponding default type.

@@ -72,3 +72,56 @@ def generate_tex_core_lib(out_dir):
                 )
 
     write_table(f"{out_dir}/py2hwsw_core_lib", tex_table)
+
+
+def generate_tex_py_params(core):
+    """Generate TeX section for python parameters of given core.
+    :param iob_core core: core object
+    """
+
+    py_params_file = open(f"{core.build_dir}/document/tsrc/py_params.tex", "w")
+
+    py_params_file.write(
+        """
+The following table describe the \\textit{Python Parameters} supported by the IP core.
+
+\\begin{table}[H]
+  \\centering
+  \\begin{tabularx}{\\textwidth}{|l|c|X|}
+
+    \\hline
+    \\rowcolor{iob-green}
+    {\\bf Name} & {\\bf Default Value} & {\\bf Description} \\\\ \\hline \\hline
+
+    \\input """
+        + core.original_name
+        + """_py_params_tab
+
+  \\end{tabularx}
+  \\caption{\\textit{Python Parameters} supported by this IP core.}
+  \\label{"""
+        + core.original_name
+        + """_py_params_tab:is}
+\\end{table}
+"""
+    )
+
+    py_params_file.write("\\clearpage")
+    py_params_file.close()
+
+    generate_tex_py_params_table(core)
+
+
+def generate_tex_py_params_table(core):
+    tex_table = []
+    for param in core.python_parameters:
+        tex_table.append(
+            [
+                param.name,
+                param.value,
+                param.description,
+            ]
+        )
+
+    out_dir = core.build_dir + "/document/tsrc"
+    write_table(f"{out_dir}/{core.original_name}_py_params", tex_table)

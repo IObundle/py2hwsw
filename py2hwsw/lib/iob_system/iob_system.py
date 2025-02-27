@@ -8,46 +8,36 @@ import os
 # Add iob-system scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
 
-from iob_system_utils import update_params, iob_system_scripts
+from iob_system_utils import convert_params_dict, update_params, iob_system_scripts
 
 
 def setup(py_params_dict):
     params = {
-        # Name of the generated System
-        "name": "iob_system",
-        # If should initialize memories from data in .hex files
-        "init_mem": True,
-        # If should include an internal memory
-        "use_intmem": True,
-        # If should use external memory (usually DDR)
-        "use_extmem": False,
-        # If should include a bootrom
-        "use_bootrom": True,
-        # If should include peripherals
-        "use_peripherals": True,
-        # If should setup ethernet ports and testbenches
-        "use_ethernet": False,
-        # CPU address width
-        "addr_w": 32,
-        # CPU data width
-        "data_w": 32,
-        # Memory address width
-        "mem_addr_w": 18,
-        # Bootrom address width
-        "bootrom_addr_w": 12,
-        # Firmware base address
-        "fw_baseaddr": 0,
-        # Firmware address width
-        "fw_addr_w": 18,
-        # If should include a tester system
-        "include_tester": True,
-        # CPU selection.
-        # If set to "none", the iob_system will export an `iob_s` port for an external
-        # CPU. This port will give direct access to the system's peripherals. The internal
-        # memories and crossbar will be removed.
-        "cpu": "iob_vexriscv",
+        "name": ("iob_system", "Name of the generated System"),
+        "init_mem": (True, "If should initialize memories from data in .hex files"),
+        "use_intmem": (True, "If should include an internal memory"),
+        "use_extmem": (False, "If should use external memory (usually DDR)"),
+        "use_bootrom": (True, "If should include a bootrom"),
+        "use_peripherals": (True, "If should include peripherals"),
+        "use_ethernet": (False, "If should setup ethernet ports and testbenches"),
+        "addr_w": (32, "CPU address width"),
+        "data_w": (32, "CPU data width"),
+        "mem_addr_w": (18, "Memory address width"),
+        "bootrom_addr_w": (12, "Bootrom address width"),
+        "fw_baseaddr": (0, "Firmware base address"),
+        "fw_addr_w": (18, "Firmware address width"),
+        "include_tester": (True, "If should include a tester system"),
+        "cpu": ("iob_vexriscv", """CPU selection.
+        If set to "none", the iob_system will export an `iob_s` port for an external
+        CPU. This port will give direct access to the system's peripherals. The internal
+        memories and crossbar will be removed."""),
     }
 
+    # Converts dictionary tuple values into single values without description
+    # And creates "python_parameters" list attribute for py2hwsw documentation
+    python_parameters_attribute = convert_params_dict(params)
+
+    # Update parameters values with ones given in python parameters
     update_params(params, py_params_dict)
 
     if params["cpu"] == "none":
@@ -67,6 +57,7 @@ def setup(py_params_dict):
         "version": "0.8",
         "is_system": True,
         "board_list": ["aes_ku040_db_g"],
+        "python_parameters": python_parameters_attribute,
         "confs": [
             # macros
             {  # Needed for testbench

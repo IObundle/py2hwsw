@@ -14,8 +14,8 @@ SIM_OBJ=V$(VTOP)
 VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) ./src/iob_core_tb.c ./src/iob_vlt_tb.cpp
 
 # include files
-VLTINCLUDES=$(addprefix -I, ./ ./src ../src ../../software/src)
-CPPINCLUDES=$(addprefix -I, ./ ../ ../src ../../src ../../../software/src)
+VLTINCLUDES=$(addprefix -I, . ./src ../src ../../software/src)
+CPPINCLUDES=$(addprefix -I, . .. ../src ../../src ../../../software/src)
 
 VFLAGS+=$(VLTINCLUDES) -CFLAGS "$(CPPINCLUDES) -g"
 

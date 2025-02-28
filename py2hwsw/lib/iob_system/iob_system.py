@@ -27,10 +27,13 @@ def setup(py_params_dict):
         "fw_baseaddr": (0, "Firmware base address"),
         "fw_addr_w": (18, "Firmware address width"),
         "include_tester": (True, "If should include a tester system"),
-        "cpu": ("iob_vexriscv", """CPU selection.
+        "cpu": (
+            "iob_vexriscv",
+            """CPU selection.
         If set to "none", the iob_system will export an `iob_s` port for an external
         CPU. This port will give direct access to the system's peripherals. The internal
-        memories and crossbar will be removed."""),
+        memories and crossbar will be removed.""",
+        ),
     }
 
     # Converts dictionary tuple values into single values without description

@@ -22,6 +22,9 @@ def generate_docs(core):
         block_gen.generate_subblocks_tex(
             core.subblocks, core.build_dir + "/document/tsrc"
         )
+        generate_py_params_tex(
+            core.python_parameters, core.build_dir + "/document/tsrc"
+        )
 
 
 def generate_tex_py2hwsw_attributes(iob_core_class, out_dir):
@@ -74,17 +77,23 @@ def generate_tex_core_lib(out_dir):
     write_table(f"{out_dir}/py2hwsw_core_lib", tex_table)
 
 
-def generate_tex_py_params(core):
+def generate_py_params_tex(python_parameters, out_dir):
     """Generate TeX section for python parameters of given core.
-    :param iob_core core: core object
+    :param list python_parameters: list of python parameter groups
+    :param str out_dir: path to output directory
     """
 
-    py_params_file = open(f"{core.build_dir}/document/tsrc/py_params.tex", "w")
+    py_params_file = open(f"{out_dir}/py_params.tex", "w")
 
     py_params_file.write(
         """
-The following table describe the \\textit{Python Parameters} supported by the IP core.
+The following tables describe the supported \\textit{Python parameters} of the IP core.
+"""
+    )
 
+    for group in python_parameters:
+        py_params_file.write(
+            """
 \\begin{table}[H]
   \\centering
   \\begin{tabularx}{\\textwidth}{|l|c|X|}
@@ -94,34 +103,44 @@ The following table describe the \\textit{Python Parameters} supported by the IP
     {\\bf Name} & {\\bf Default Value} & {\\bf Description} \\\\ \\hline \\hline
 
     \\input """
-        + core.original_name
-        + """_py_params_tab
+            + group.name
+            + """_py_params_tab
 
   \\end{tabularx}
-  \\caption{\\textit{Python Parameters} supported by this IP core.}
+  \\caption{"""
+            + group.descr.replace("_", "\\_")
+            + """}
   \\label{"""
-        + core.original_name
-        + """_py_params_tab:is}
+            + group.name
+            + """_py_params_tab:is}
 \\end{table}
 """
-    )
+        )
+        if group.doc_clearpage:
+            py_params_file.write("\\clearpage")
 
     py_params_file.write("\\clearpage")
     py_params_file.close()
 
-    generate_tex_py_params_table(core)
+    generate_py_params_tex_table(python_parameters, out_dir)
 
 
-def generate_tex_py_params_table(core):
-    tex_table = []
-    for param in core.python_parameters:
-        tex_table.append(
-            [
-                param.name,
-                param.value,
-                param.description,
-            ]
-        )
+def generate_py_params_tex_table(python_parameters, out_dir):
+    """Create TeX table for each python parameter group in given list.
+    :param list python_parameters: list of python parameter groups
+    :param str out_dir: path to output directory
+    """
 
-    out_dir = core.build_dir + "/document/tsrc"
-    write_table(f"{out_dir}/{core.original_name}_py_params", tex_table)
+    for group in python_parameters:
+        tex_table = []
+        for param in group.python_parameters:
+            tex_table.append(
+                [
+                    param.name,
+                    param.val,
+                    param.descr,
+                ]
+            )
+
+        # Write table with true parameters and macros
+        write_table(f"{out_dir}/{group.name}_py_params", tex_table)

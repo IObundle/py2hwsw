@@ -26,8 +26,9 @@ import doc_gen
 import verilog_gen
 import ipxact_gen
 
+from iob_python_parameter import create_python_parameter_group
 from if_gen import mem_if_names
-from iob_module import iob_module
+from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
     find_obj_in_list,
@@ -89,7 +90,7 @@ class iob_core(iob_module, iob_instance):
         is_parent = kwargs.get("is_parent", False)
 
         # Store kwargs to allow access to python parameters after object has been created
-        self.python_parameters = kwargs
+        self.received_python_parameters = kwargs
 
         # Create core based on 'parent' core (if applicable)
         if self.handle_parent(*args, **kwargs):
@@ -183,6 +184,14 @@ class iob_core(iob_module, iob_instance):
             False,
             bool,
             descr="Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).",
+        )
+        # List of core Python Parameters (for documentation)
+        self.set_default_attribute(
+            "python_parameters",
+            [],
+            list,
+            get_list_attr_handler(self.create_python_parameter_group),
+            "List of core Python Parameters. Used for documentation.",
         )
 
         self.attributes_dict = copy.deepcopy(attributes)
@@ -330,6 +339,9 @@ class iob_core(iob_module, iob_instance):
         ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
         # Lint and format sources
         self.lint_and_format()
+
+    def create_python_parameter_group(self, *args, **kwargs):
+        create_python_parameter_group(self, *args, **kwargs)
 
     def handle_parent(self, *args, **kwargs):
         """Create a new core based on parent core.

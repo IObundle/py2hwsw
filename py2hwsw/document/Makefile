@@ -67,11 +67,11 @@ ug.pdf: debug results figs ugtop.tex
 
 #ug top file containing the definition of sections to include
 ugtop.tex:
-	if [ -f py_params_tab.tex ]; then echo "\def\PYPARAMS{Y}" >> $@; fi
-	if [ -f confs_tab.tex ]; then echo "\def\CONFS{Y}" >> $@; fi
+	if [ -f *_py_params_tab.tex ]; then echo "\def\PYPARAMS{Y}" >> $@; fi
+	if [ -f *_confs_tab.tex ]; then echo "\def\CONFS{Y}" >> $@; fi
 	if [ -f td.tex ]; then echo "\def\TD{Y}" >> $@; fi
-	if ls *_csrs_tab.tex > /dev/null 2>&1; then echo "\def\CSRS{Y}" >> $@; fi
-	if ls mems_tab.tex > /dev/null 2>&1; then echo "\def\MEMS{Y}" >> $@; fi
+	if [ -f *_csrs_tab.tex ]; then echo "\def\CSRS{Y}" >> $@; fi
+	if [ -f mems_tab.tex ]; then echo "\def\MEMS{Y}" >> $@; fi
 	if [ $(ASICSYNTH) == 1 ]; then echo "\def\ASICSYNTH{Y}" >> $@; fi
 	if [ $(FPGACOMP) == 1 ]; then echo "\def\FPGACOMP{Y}" >> $@; fi
 	make doctop DOC=ug

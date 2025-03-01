@@ -85,9 +85,14 @@ def generate_py_params_tex(python_parameters, out_dir):
 
     py_params_file = open(f"{out_dir}/py_params.tex", "w")
 
+    # FIXME: These python parameters are only used during the setup process. So from the point of view of the build directory, they are not needed.
+    # Maybe we should have a user guide specific for the setup stage?
     py_params_file.write(
         """
-The following tables describe the supported \\textit{Python parameters} of the IP core.
+The following tables describe the supported \\textit{Python Parameters} for the setup of this IP core.
+Note that these \\textit{Python Parameters} are not used during the build process of this core from this build directory.
+They only serve a purpose during the setup process, to configure how the core build directory will be generated.
+See the \\textit{Python Parameters} section of the \\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/py2hwsw_document/document/ug.pdf}{Py2HWSW User Guide} for more details.
 """
     )
 

@@ -10,7 +10,6 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": params["name"] + "_basys3",
         "generate_hw": True,
-        "version": "0.1",
         #
         # Configuration
         #

@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         # Note: This core currently has a manual verilog source! The generate_hw is true only because of the generated csrs subblock.
         "generate_hw": True,
         "confs": [

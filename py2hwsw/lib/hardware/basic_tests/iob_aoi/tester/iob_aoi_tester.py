@@ -8,7 +8,6 @@ def setup(py_params_dict):
         # Set "is_tester" attribute to generate Makefile and flows allowing to run this core as top module
         "generate_hw": True,
         "is_tester": True,
-        "version": "0.1",
         "confs": [
             {
                 "name": "W",

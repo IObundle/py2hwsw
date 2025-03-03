@@ -57,7 +57,6 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": params["name"],
         "generate_hw": True,
-        "version": "0.8",
         "is_system": True,
         "board_list": ["aes_ku040_db_g"],
         "python_parameters": python_parameters_attribute,

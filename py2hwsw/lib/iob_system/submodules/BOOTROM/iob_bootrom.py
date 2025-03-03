@@ -6,13 +6,11 @@ import os
 
 
 def setup(py_params_dict):
-    VERSION = "0.1"
     BOOTROM_ADDR_W = (
         py_params_dict["bootrom_addr_w"] if "bootrom_addr_w" in py_params_dict else 12
     )
 
     attributes_dict = {
-        "version": VERSION,
         "generate_hw": True,
         "confs": [
             {
@@ -107,7 +105,6 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_csrs",
                 "instance_name": "iob_csrs",
-                "version": VERSION,
                 "csrs": [
                     {
                         "name": "rom",

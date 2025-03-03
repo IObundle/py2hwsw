@@ -26,6 +26,7 @@ import doc_gen
 import verilog_gen
 import ipxact_gen
 
+from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
 from if_gen import mem_if_names
 from iob_module import iob_module, get_list_attr_handler
@@ -103,9 +104,9 @@ class iob_core(iob_module, iob_instance):
         self.update_global_top_module(attributes)
         self.set_default_attribute(
             "version",
-            "",
+            PY2HWSW_VERSION,
             str,
-            descr="Core version.",
+            descr="Core version. By default is the same as Py2HWSW version.",
         )
         self.set_default_attribute(
             "previous_version",
@@ -369,7 +370,7 @@ class iob_core(iob_module, iob_instance):
         name = attributes.get("name", attributes["original_name"])
         # Update global build dir to match this module's name and version
         if is_first_module_called and not __class__.global_build_dir:
-            version = attributes.get("version", "1.0")
+            version = attributes.get("version", PY2HWSW_VERSION)
             __class__.global_build_dir = f"../{name}_V{version}"
 
         filtered_parent_py_params = dict(parent)
@@ -377,6 +378,7 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
         filtered_parent_py_params.pop("instantiator", None)
+        filtered_parent_py_params.pop("py2hwsw_version", None)
         filtered_parent_py_params.pop("connect", None)
         filtered_parent_py_params.pop("parameters", None)
         if "name" not in filtered_parent_py_params:
@@ -462,7 +464,7 @@ class iob_core(iob_module, iob_instance):
         if __class__.global_top_module == self:
             original_name = attributes.get("original_name", self.__class__.__name__)
             name = attributes.get("name", self.original_name)
-            version = attributes.get("version", "1.0")
+            version = attributes.get("version", PY2HWSW_VERSION)
             # Set attributes
             if not hasattr(self, "original_name") or not self.original_name:
                 self.original_name = original_name
@@ -880,6 +882,7 @@ class iob_core(iob_module, iob_instance):
                     "instantiator": (
                         instantiator.attributes_dict if instantiator else ""
                     ),
+                    "py2hwsw_version": PY2HWSW_VERSION,
                     **kwargs,
                 }
             )

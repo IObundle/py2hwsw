@@ -9,7 +9,6 @@ def setup(py_params_dict):
     - No Burst Support: burst-related signals (like AWLEN, AWSIZE, ARBURST, etc.) are ignored.
     """
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {

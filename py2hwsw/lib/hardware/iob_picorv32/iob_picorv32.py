@@ -22,7 +22,6 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": py_params_dict["name"],
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {

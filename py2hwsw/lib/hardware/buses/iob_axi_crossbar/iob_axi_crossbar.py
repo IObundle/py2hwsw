@@ -176,7 +176,6 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": params["name"],
         "generate_hw": False,
-        "version": "0.1",
     }
     #
     # Confs

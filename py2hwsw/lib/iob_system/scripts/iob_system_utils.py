@@ -163,7 +163,7 @@ def set_build_dir(attributes_dict, py_params):
     if "build_dir" in py_params and py_params["build_dir"]:
         build_dir = py_params["build_dir"]
     else:
-        build_dir = f"../{attributes_dict['name']}_V{attributes_dict['version']}"
+        build_dir = f"../{attributes_dict['name']}_V{attributes_dict.get('version', py_params['py2hwsw_version'])}"
 
     # If this system is a tester, set build dir based on dest_dir
     if attributes_dict.get("is_tester", False):

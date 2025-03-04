@@ -19,7 +19,6 @@ export LIB_DIR
 # Default lib module to setup. Can be overriden by the user.
 CORE ?=iob_ctls
 
-
 all: sim-test
 
 setup:

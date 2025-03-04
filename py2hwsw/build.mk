@@ -63,20 +63,22 @@ $(BSP_H): $(BSP_VH)
 # EMBEDDED SOFTWARE
 #
 SW_DIR=software
-fw-build: $(BSP_H)
+sw-build: $(BSP_H)
 	make -C $(SW_DIR) build
 
-fw-clean:
+sw-clean:
 	if [ -f "$(SW_DIR)/Makefile" ]; then make -C $(SW_DIR) clean; fi
 
-#this target is not the same as fw-build because iob_bsp.h is build for FPGA when fw-build is called
-#see $(BSP_H) target that uses $(MAKECMDGOALS) to check if fw-build is called for FPGA or simulation
-fpga-fw-build: fw-build
+
+
+#this target is not the same as sw-build because iob_bsp.h is build for FPGA when sw-build is called
+#see $(BSP_H) target that uses $(MAKECMDGOALS) to check if sw-build is called for FPGA or simulation
+fpga-sw-build: sw-build
 
 #
 # PC EMUL
 #
-pc-emul-build: fw-build
+pc-emul-build: sw-build
 	make -C $(SW_DIR) build_emul
 
 pc-emul-run: $(BSP_H)
@@ -112,10 +114,10 @@ lint-test:
 #
 # SIMULATE
 #
-sim-build: fw-build
+sim-build: sw-build
 	make -C $(SIM_DIR) -j1 build
 
-sim-run: fw-build
+sim-run: sw-build
 	make -C $(SIM_DIR) -j1 run
 
 sim-waves:
@@ -205,11 +207,11 @@ dtest: test syn-test
 # CLEAN
 #
 
-clean: fw-clean pc-emul-clean lint-clean sim-clean fpga-clean syn-clean doc-clean
+clean: sw-clean pc-emul-clean lint-clean sim-clean fpga-clean syn-clean doc-clean
 	rm -f $(BSP_H)
 
 
-.PHONY: fw-build fpga-fw-build fw-clean \
+.PHONY: sw-build fpga-sw-build sw-clean \
 	pc-emul-build pc-emul-run pc-emul-clean \
 	lint-test lint-run lint-clean \
 	sim-build sim-run sim-debug sim-clean \

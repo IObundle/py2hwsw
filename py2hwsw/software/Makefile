@@ -93,6 +93,18 @@ run_emul: test.log
 .PHONY: build_emul run_emul
 
 #########################################
+#            Simulation targets         #
+#########################################
+
+ifneq ($(wildcard ./src/$(NAME)_csrs.c),)
+CSRS ?= ./src/$(NAME)_csrs.c
+endif
+
+tb: ./src/iob_c_tb.c ./src/iob_core_tb.c $(CSRS)
+	gcc -I./src -g -o $@ $^
+
+
+#########################################
 #            General targets            #
 #########################################
 

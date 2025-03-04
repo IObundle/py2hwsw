@@ -57,24 +57,15 @@ ifneq ($(SIM_SERVER),)
 	rsync $(SIM_SYNC_FLAGS) -avz --force --delete ../.. $(SIM_USER)@$(SIM_SERVER):$(REMOTE_BUILD_DIR)
 endif
 
-#check for universal tb header
+#check universal testbench and include it
+
 ifeq ($(wildcard ./src/iob_v_tb.vh),)
 VSRC:=$(subst ./src/iob_v_tb.v, , $(VSRC))
+else
+CTB=1
 endif
 
-#compile C tb
-ifneq ($(wildcard ../../software/src/iob_core_tb.c),)
-
-ifneq ($(wildcard ../../software/src/$(NAME)_csrs.c),)
-CSRS ?= ../../software/src/$(NAME)_csrs.c
-endif
-
-CTB=tb
-tb: ../../software/src/iob_c_tb.c ../../software/src/iob_core_tb.c $(CSRS)
-	gcc -I../../software/src -g -o $@ $^
-endif
-
-build: $(VHDR) $(VSRC) $(HEX) $(CTB) remote_build_dir
+build: $(VHDR) $(VSRC) $(HEX) remote_build_dir
 ifeq ($(SIM_SERVER),)
 	make comp
 else
@@ -88,14 +79,14 @@ BOARD_GRAB_CMD=../../scripts/board_client.py grab $(GRAB_TIMEOUT)
 run: test.log
 	test "$$(cat test.log)" = "Test passed!"
 
-test.log: remote_build_dir $(CTB)
+test.log: remote_build_dir
 ifeq ($(SIM_SERVER),)
 ifneq ($(CONSOLE_CMD),)
 	$(BOARD_GRAB_CMD) -s 'make exec' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else
 ifneq ($(CTB),)
 ifneq ($(SIMULATOR), verilator)
-	./tb &
+	../../software/tb &
 endif
 endif
 	make exec && echo "Checking test log..." && sleep 2

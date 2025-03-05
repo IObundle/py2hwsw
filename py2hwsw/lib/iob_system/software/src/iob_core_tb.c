@@ -20,31 +20,31 @@ int iob_core_tb() {
 
   // UART init
   //  disable TX and RX
-  IOB_UART_SET_TXEN(0);
-  IOB_UART_SET_RXEN(0);
+  IOB_UART_CSRS_SET_TXEN(0);
+  IOB_UART_CSRS_SET_RXEN(0);
 
   // set the divisor
   int div = FREQ / BAUD;
-  IOB_UART_SET_DIV(div);
+  IOB_UART_CSRS_SET_DIV(div);
   printf("Baud rate set to %d\n", BAUD);
 
   // pulse soft reset
-  IOB_UART_SET_SOFTRESET(1);
-  IOB_UART_SET_SOFTRESET(0);
+  IOB_UART_CSRS_SET_SOFTRESET(1);
+  IOB_UART_CSRS_SET_SOFTRESET(0);
 
   // enable RX
-  IOB_UART_SET_RXEN(1);
+  IOB_UART_CSRS_SET_RXEN(1);
 
   unsigned int version;
 
   // read version 20 times to burn time
   for (int i = 0; i < 20; i++) {
-    version = IOB_UART_GET_VERSION();
+    version = IOB_UART_CSRS_GET_VERSION();
   }
   printf("Version is %d\n", version);
 
   // enable TX
-  IOB_UART_SET_TXEN(1);
+  IOB_UART_CSRS_SET_TXEN(1);
   printf("TX and RX enabled\n");
 
   ///////////////////////////////////////////////////////////////
@@ -69,12 +69,12 @@ int iob_core_tb() {
 
   while (1) {
     while (!rxread_reg && !txread_reg) {
-      rxread_reg = IOB_UART_GET_RXREADY();
-      txread_reg = IOB_UART_GET_TXREADY();
+      rxread_reg = IOB_UART_CSRS_GET_RXREADY();
+      txread_reg = IOB_UART_CSRS_GET_TXREADY();
     }
 
     if (rxread_reg) {
-      cpu_char = IOB_UART_GET_RXDATA();
+      cpu_char = IOB_UART_CSRS_GET_RXDATA();
       fwrite(&cpu_char, sizeof(char), 1, soc2cnsl_fd);
       fflush(soc2cnsl_fd);
       rxread_reg = 0;
@@ -86,7 +86,7 @@ int iob_core_tb() {
       }
       able2write = fread(&cpu_char, sizeof(char), 1, cnsl2soc_fd);
       if (able2write > 0) {
-        IOB_UART_SET_TXDATA(cpu_char);
+        IOB_UART_CSRS_SET_TXDATA(cpu_char);
         fclose(cnsl2soc_fd);
         cnsl2soc_fd = fopen("./cnsl2soc", "w");
       }

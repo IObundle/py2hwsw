@@ -74,6 +74,7 @@ int iob_core_tb() {
     }
 
     if (rxread_reg) {
+      //      printf("RX ready\n");
       cpu_char = IOB_UART_CSRS_GET_RXDATA();
       fwrite(&cpu_char, sizeof(char), 1, soc2cnsl_fd);
       fflush(soc2cnsl_fd);

@@ -58,7 +58,7 @@ def setup(py_params_dict):
         "name": params["name"],
         "generate_hw": True,
         "is_system": True,
-        "board_list": ["aes_ku040_db_g"],
+        "board_list": ["iob_aes_ku040_db_g"],
         "python_parameters": python_parameters_attribute,
         "confs": [
             # macros

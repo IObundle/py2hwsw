@@ -448,7 +448,7 @@ def setup(py_params_dict):
         assert py_params_dict["build_dir"], "build_dir not set!"
         fpga_folder = os.path.join(
             py_params_dict["build_dir"],
-            "hardware/fpga/vivado/aes_ku040_db_g",
+            "hardware/fpga/vivado/iob_aes_ku040_db_g",
         )
         os.makedirs(fpga_folder, exist_ok=True)
         with open(os.path.join(fpga_folder, "auto_board.sdc"), "w") as f:

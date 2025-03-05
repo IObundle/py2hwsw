@@ -9,7 +9,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": NAME,
         "generate_hw": True,
-        "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g"],
+        "board_list": ["iob_cyclonev_gt_dk", "iob_aes_ku040_db_g"],
         "confs": [
             {
                 "name": "DATA_W",

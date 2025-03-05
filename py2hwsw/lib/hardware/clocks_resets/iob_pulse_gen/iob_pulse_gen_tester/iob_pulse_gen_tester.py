@@ -17,7 +17,11 @@ def setup(py_params_dict):
                 # Set "is_tester" attribute to generate Makefile and flows allowing to run this core as top module
                 "is_tester": True,
                 # Every attribute in this dictionary will override/append to the ones of the iob_system parent core.
-                "board_list": ["aes_ku040_db_g", "cyclonev_gt_dk", "zybo_z7"],
+                "board_list": [
+                    "iob_aes_ku040_db_g",
+                    "iob_cyclonev_gt_dk",
+                    "iob_zybo_z7",
+                ],
                 "wires": [
                     {
                         "name": "gpio_input",

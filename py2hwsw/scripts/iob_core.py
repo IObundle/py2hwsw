@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import copy
 from types import SimpleNamespace
+import pathlib
 
 import iob_colors
 
@@ -964,6 +965,13 @@ def find_module_setup_dir(core_name):
         )
 
     file_ext = os.path.splitext(file_path)[1]
+
+    filepath = pathlib.Path(file_path)
+    if filepath.parent.name != core_name:
+        fail_with_msg(f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
+                        f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
+                        f"But found incorrect path:    '{filepath.resolve()}'.")
+
     # print("Found setup dir based on location of: " + file_path, file=sys.stderr)
     if file_ext == ".py" or file_ext == ".json":
         return os.path.dirname(file_path), file_ext

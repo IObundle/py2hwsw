@@ -90,10 +90,10 @@ def append_board_wrappers(attributes_dict, params):
     # FIXME: We should have a way for child cores to specify their board's tool (assuming child cores may add new unknown boards)
 
     tools = {
-        "aes_ku040_db_g": "vivado",
-        "cyclonev_gt_dk": "quartus",
-        "zybo_z7": "vivado",
-        "basys3": "vivado",
+        "iob_aes_ku040_db_g": "vivado",
+        "iob_cyclonev_gt_dk": "quartus",
+        "iob_zybo_z7": "vivado",
+        "iob_basys3": "vivado",
     }
     for board in attributes_dict.get("board_list", []):
         tool = tools[board]

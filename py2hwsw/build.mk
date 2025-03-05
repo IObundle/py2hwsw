@@ -8,7 +8,7 @@ SHELL:=bash
 
 export SIMULATOR ?= icarus
 export SYNTHESIZER ?= yosys
-export BOARD ?= cyclonev_gt_dk
+export BOARD ?= iob_cyclonev_gt_dk
 export LINTER ?= spyglass
 
 include config_build.mk

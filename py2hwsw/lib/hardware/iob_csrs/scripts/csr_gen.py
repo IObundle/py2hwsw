@@ -52,8 +52,8 @@ def eval_param_expression(param_expression, params_dict):
         # Evaluate $clog2 expressions
         param_expression = param_expression.replace("$clog2", "clog2")
         # Evaluate IOB_MAX and IOB_MIN expressions
-        param_expression = param_expression.replace("`IOB_MAX", "max")
-        param_expression = param_expression.replace("`IOB_MIN", "min")
+        param_expression = param_expression.replace("iob_max", "max")
+        param_expression = param_expression.replace("iob_min", "min")
 
         # Try to calculate string as it should only contain numeric values
         try:
@@ -563,6 +563,8 @@ class csr_gen:
         snippet = ""
         # macros
         snippet += """
+    // Include iob_functions for use in parameters
+    `include "iob_functions.vs"
     `define IOB_NBYTES (DATA_W/8)
     `define IOB_NBYTES_W $clog2(`IOB_NBYTES)
     `define IOB_WORD_ADDR(ADDR) ((ADDR>>`IOB_NBYTES_W)<<`IOB_NBYTES_W)\n

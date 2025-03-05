@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": False,
         "confs": [
             {
@@ -113,10 +112,15 @@ def setup(py_params_dict):
                 },
                 "descr": "AXI interface",
             },
-        ],
-        "subblocks": [
             {
-                "core_name": "iob_ram_t2p",
+                "name": "external_mem_bus_m",
+                "descr": "Port for connection to external 'iob_ram_t2p_be' memory",
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": "ADDR_WIDTH - 2",
+                    "DATA_W": "DATA_WIDTH",
+                },
             },
         ],
     }

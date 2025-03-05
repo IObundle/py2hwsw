@@ -8,7 +8,6 @@ import json
 
 def setup(py_params_dict):
     params = {
-        "version": "0.7",
         "internal_csr_if": "iob",
         "external_csr_if": "iob",
         # FIXME: Make ADDR_W automatic
@@ -66,20 +65,14 @@ def setup(py_params_dict):
 
     assert params["csrs"], "Error: Register list empty."
 
+    ports = []
     reg_wires = []
     external_reg_connections = {}
     internal_reg_connections = {}
+    snippets = ""
 
-    # Invert CSRS direction for internal CPU
-    csrs_inverted = copy.deepcopy(params["csrs"])
-    for csr_group in csrs_inverted:
+    for csr_group in params["csrs"]:
         for csr in csr_group["regs"]:
-            if csr["type"] == "W":
-                csr["type"] = "R"
-            elif csr["type"] == "R":
-                csr["type"] = "W"
-            # Do nothing for type "RW"
-
             if csr["autoreg"]:
                 # Create wire for reg
                 reg_wires.append(
@@ -107,10 +100,10 @@ def setup(py_params_dict):
                     )
 
                 # Connect register interfaces
-                if csr["type"] == "R":
+                if csr["type"] == "W":
                     external_reg_connections[csr["name"] + "_o"] = csr["name"]
                     internal_reg_connections[csr["name"] + "_i"] = csr["name"]
-                if csr["type"] == "W":
+                if csr["type"] == "R":
                     external_reg_connections[csr["name"] + "_i"] = csr["name"]
                     internal_reg_connections[csr["name"] + "_o"] = csr["name"]
                 elif csr["type"] == "RW":
@@ -127,9 +120,56 @@ def setup(py_params_dict):
                     "internal_" + csr["name"]
                 )
 
+            if "output" in csr:
+                if csr["output"]:
+                    # Create ports for output
+                    ports.append(
+                        {
+                            "name": csr["name"] + "_o",
+                            "descr": "",
+                            "signals": [
+                                {"name": csr["name"] + "_o", "width": csr["n_bits"]},
+                            ],
+                        },
+                    )
+
+                    if csr["type"] == "RW":
+                        ports[-1]["signals"].append(
+                            {"name": csr["name"] + "_2_o", "width": csr["n_bits"]},
+                        )
+
+                    # Assign wires to ports
+                    if csr["autoreg"]:
+                        snippets += f"assign {csr['name'] + '_o'} = {csr['name']};"
+                        if csr["type"] == "RW":
+                            snippets += (
+                                f"assign {csr['name'] + '_2_o'} = {csr['name'] + '_2'};"
+                            )
+                    else:
+                        if csr["type"] == "W":
+                            snippets += f"assign {csr['name'] + '_o'} = {'internal_' + csr['name']+ '_wdata_o'};"
+                        elif csr["type"] == "R":
+                            snippets += f"assign {csr['name'] + '_o'} = {'external_' + csr['name'] + '_wdata_o'};"
+                        elif csr["type"] == "RW":
+                            snippets += f"""assign {csr['name'] + '_o'} = {'internal_' + csr['name']+ '_wdata_o'};
+                            assign {csr['name'] + '_2_o'} = {'external_' + csr['name'] + '_wdata_o'};"""
+                csr.pop("output")
+
+    # Invert CSRS direction for internal CPU
+    csrs_inverted = copy.deepcopy(params["csrs"])
+    for csr_group in csrs_inverted:
+        for csr in csr_group["regs"]:
+            if csr["type"] == "W":
+                csr["type"] = "R"
+            elif csr["type"] == "R":
+                csr["type"] = "W"
+            # Do nothing for type "RW"
+
+    if "verilog-snippets" in py_params_dict:
+        snippets = snippets + py_params_dict["verilog-snippets"]
+
     attributes_dict = {
         "name": "iob_regfileif",
-        "version": "0.1",
         "generate_hw": True,
     }
     attributes_dict |= {
@@ -151,11 +191,12 @@ def setup(py_params_dict):
                 "descr": "Address bus width",
             },
         ],
-        "ports": [
+        "ports": ports
+        + [
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -206,11 +247,10 @@ def setup(py_params_dict):
                 "autoaddr": params["autoaddr"],
             },
         ],
+        "snippets": [
+            {"verilog_code": snippets},
+        ],
     }
-    if "verilog-snippets" in py_params_dict:
-        attributes_dict["snippets"] = [
-            {"verilog_code": py_params_dict["verilog-snippets"]},
-        ]
 
     # print(json.dumps(attributes_dict, indent=4))  # DEBUG
 
@@ -222,7 +262,7 @@ def create_manual_reg_wires(csr):
     internal_signals = []
     external_signals = []
 
-    if csr["type"] == "R":
+    if csr["type"] == "W":
         internal_signals = get_manual_signals(
             "internal_" + csr["name"], "W", csr["n_bits"]
         )
@@ -230,7 +270,7 @@ def create_manual_reg_wires(csr):
             "external_" + csr["name"], "R", csr["n_bits"]
         )
 
-    elif csr["type"] == "W":
+    elif csr["type"] == "R":
         internal_signals = get_manual_signals(
             "internal_" + csr["name"], "W", csr["n_bits"]
         )

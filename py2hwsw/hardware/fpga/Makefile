@@ -20,7 +20,7 @@ EMB_DIR = ../../software
 PYTHON_DIR = ../../scripts
 
 #default board
-BOARD ?= cyclonev_gt_dk
+BOARD ?= iob_cyclonev_gt_dk
 
 #fpga toolchain
 FPGA_TOOL:=$(shell find . -name $(BOARD) | cut -d"/" -f2)

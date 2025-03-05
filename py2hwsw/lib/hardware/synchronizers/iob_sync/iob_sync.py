@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -29,7 +28,8 @@ def setup(py_params_dict):
             {
                 "name": "clk_rst_s",
                 "signals": {
-                    "type": "clk_rst",
+                    "type": "iob_clk",
+                    "params": "arst",
                 },
                 "descr": "Clock and reset",
             },

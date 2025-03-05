@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -91,14 +90,6 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_div_slice",
                 "instantiate": False,
-            },
-        ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
             },
         ],
         "snippets": [

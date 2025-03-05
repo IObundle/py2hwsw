@@ -35,7 +35,6 @@ if __name__ == "__main__":
             "print_core_name",
             "print_core_version",
             "print_core_dict",
-            "print_py2hwsw_attributes",
             "deliver",
         ],
     )
@@ -95,12 +94,17 @@ if __name__ == "__main__":
         action="version",
         version=f"%(prog)s {PY2HWSW_VERSION}",
     )
-
     parser.add_argument(
         "--py2hwsw_docs",
         dest="py2hwsw_docs",
         action="store_true",
         help="Setup Py2HWSW documentation directory",
+    )
+    parser.add_argument(
+        "--print_py2hwsw_attributes",
+        dest="print_py2hwsw_attributes",
+        action="store_true",
+        help="Print supported Py2HWSW core dictionary attributes",
     )
     args = parser.parse_args()
 
@@ -115,6 +119,10 @@ if __name__ == "__main__":
 
     if args.py2hwsw_docs:
         iob_core.setup_py2_docs(PY2HWSW_VERSION)
+        exit(0)
+
+    if args.print_py2hwsw_attributes:
+        iob_core.print_py2hwsw_attributes()
         exit(0)
 
     if not args.core_name:
@@ -139,7 +147,5 @@ if __name__ == "__main__":
         iob_core.print_core_version(args.core_name, **py_params)
     elif args.target == "print_core_dict":
         iob_core.print_core_dict(args.core_name, **py_params)
-    elif args.target == "print_py2hwsw_attributes":
-        iob_core.print_py2hwsw_attributes(args.core_name, **py_params)
     elif args.target == "deliver":
         iob_core.deliver_core(args.core_name, **py_params)

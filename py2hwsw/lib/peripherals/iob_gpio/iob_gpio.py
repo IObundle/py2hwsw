@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import copy
+
 
 def setup(py_params_dict):
     NAME = py_params_dict["name"] if "name" in py_params_dict else "iob_gpio"
@@ -24,7 +26,6 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": NAME,
         "generate_hw": True,
-        "version": "0.1",
         "confs": [
             {
                 "name": "DATA_W",
@@ -64,7 +65,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -106,6 +107,35 @@ def setup(py_params_dict):
                     "descr": f"Output Enable interface bits can be used to tristate output {idx} on external module",
                 },
             )
+    verilog_snippet = ""
+    verilog_snippet_generate = ""
+    attributes_dict["wires"] = []
+    # Create wires based on copy of ports
+    for port in attributes_dict["ports"]:
+        if not port["name"].startswith("input") and not port["name"].startswith(
+            "output"
+        ):
+            continue
+        wire = copy.deepcopy(port)
+        # Remove port direction suffix
+        wire["name"] = wire["name"][:-2]
+        wire["signals"][0]["name"] = wire["signals"][0]["name"][:-2]
+        # Set correct width for connection with csrs
+        wire["signals"][0]["width"] = 32
+        attributes_dict["wires"].append(wire)
+
+        if port["name"].endswith("_i"):
+            verilog_snippet += f"""
+   assign {wire["signals"][0]["name"]}[INPUT_GPIO_W-1:0] = {port["signals"][0]["name"]};
+"""
+            verilog_snippet_generate += f"""
+   assign {wire["signals"][0]["name"]}[32-1:INPUT_GPIO_W] = {{32-INPUT_GPIO_W{{1'b0}}}};
+"""
+        else:
+            verilog_snippet += f"""
+   assign {port["signals"][0]["name"]} = {wire["signals"][0]["name"]}[OUTPUT_GPIO_W-1:0];
+"""
+
     regs = []
     reg_connections = {}
     # Create regs and reg connections for each input
@@ -123,7 +153,7 @@ def setup(py_params_dict):
             }
         )
         # Connect reg to port
-        reg_connections["input_" + str(idx) + "_i"] = "input_" + str(idx) + "_i"
+        reg_connections["input_" + str(idx) + "_i"] = "input_" + str(idx)
     # Create regs and reg connections for each output
     for idx in range(N_OUTPUTS):
         # Create Regs
@@ -151,10 +181,10 @@ def setup(py_params_dict):
                 }
             )
         # Connect regs to wires
-        reg_connections["output_" + str(idx) + "_o"] = "output_" + str(idx) + "_o"
+        reg_connections["output_" + str(idx) + "_o"] = "output_" + str(idx)
         if TRISTATE:
             reg_connections["output_enable_" + str(idx) + "_o"] = (
-                "output_enable_" + str(idx) + "_o"
+                "output_enable_" + str(idx)
             )
 
     attributes_dict["subblocks"] = [
@@ -176,5 +206,13 @@ def setup(py_params_dict):
             },
         },
     ]
+    verilog_snippet += f"""
+   generate
+      if (INPUT_GPIO_W < 32) begin : gen_if_input_less_than_32
+        {verilog_snippet_generate}
+      end
+   endgenerate
+"""
+    attributes_dict["snippets"] = [{"verilog_code": verilog_snippet}]
 
     return attributes_dict

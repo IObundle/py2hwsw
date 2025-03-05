@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "iob_bsp.h"
+#include "iob_system_conf.h"
 #include "iob_uart_csrs.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+#define FREQ 100000000
+#define BAUD 3000000
 
 #ifdef IOB_SYSTEM_USE_ETHERNET
 #include "iob_eth_driver_tb.h"

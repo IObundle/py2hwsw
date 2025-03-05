@@ -31,11 +31,14 @@ endif
 ifeq ($(USE_COMPRESSED),1)
 MFLAG_C=c
 endif
+ifeq ($(NO_HW_DRIVER),)
+EXTRA_SRC+=src/hw_driver.c
+endif
 
 #default compiler settings
 TOOLCHAIN_PREFIX ?=riscv64-unknown-elf-
 CFLAGS ?=-Os -nostdlib -march=$(MFLAGS) -mabi=ilp32 --specs=nano.specs -Wcast-align=strict $(USER_CFLAGS)
-LFLAGS ?= -Wl,-Bstatic,-T,$(TEMPLATE_LDS),--strip-debug
+LFLAGS ?= -Wl,-L,src,-Bstatic,-T,$(TEMPLATE_LDS),--strip-debug
 LLIBS ?=-lgcc -lc -lnosys
 INCLUDES ?=-I. -Isrc
 
@@ -48,15 +51,15 @@ EMUL_CFLAGS ?=-Os -std=gnu99 -Wl,--strip-debug
 
 CONSOLE_CMD ?=rm -f soc2cnsl cnsl2soc; ../scripts/console.py -L
 
-EMUL_INCLUDES ?=-I. -Isrc -Iinclude
+EMUL_INCLUDES ?=-I. -Isrc
 
 #########################################
 #            Embedded targets           #
 #########################################
 
 build: $(UTARGETS)
-%.elf: $(TEMPLATE_LDS) $(HDR) $(SRC)
-	$(TOOLCHAIN_PREFIX)gcc -o $@ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SRC) src/hw_driver.c $(LLIBS)
+%.elf: $(TEMPLATE_LDS) $(HDR) $(SRC) $(EXTRA_SRC)
+	$(TOOLCHAIN_PREFIX)gcc -o $@ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SRC) $(EXTRA_SRC) $(LLIBS)
 	$(TOOLCHAIN_PREFIX)objcopy -O binary $@ $(*F).bin
 
 ifneq ($(BOARD),)

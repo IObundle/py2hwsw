@@ -1,5 +1,4 @@
 {
-    "version": "0.1",
     "generate_hw": true,
     "confs": [
         {
@@ -42,6 +41,6 @@
         }
     ],
     "comb": {
-        "verilog_code": "if (sel_i)\n                    y_o = b_i;\n                else\n                    y_o = a_i;\n                "
+        "code": "if (sel_i)\n                    y_o = b_i;\n                else\n                    y_o = a_i;\n                "
     }
 }

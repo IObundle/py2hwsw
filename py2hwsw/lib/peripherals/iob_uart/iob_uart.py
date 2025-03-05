@@ -9,8 +9,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": NAME,
         "generate_hw": True,
-        "version": "0.1",
-        "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g"],
+        "board_list": ["iob_cyclonev_gt_dk", "iob_aes_ku040_db_g"],
         "confs": [
             {
                 "name": "DATA_W",
@@ -33,7 +32,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -211,14 +210,6 @@ def setup(py_params_dict):
             #    "instance_name": "iob_reg_re_inst",
             #    "instantiate": False,
             # },
-        ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
-            },
         ],
         "snippets": [
             {

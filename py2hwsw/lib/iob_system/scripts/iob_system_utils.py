@@ -9,9 +9,32 @@ import os
 #
 
 
+def convert_params_dict(params):
+    """Convert values of given parameters dictionary from tuple to single value;
+    Also creates new "python_parameters" list to use as attribute of core (for py2 documentation).
+    :param dict params: dictionary to convert. Each value has original format: (default_val, description). New format: default_val
+    :returns: "python_parameters" list attribute
+    """
+    attribute_python_parametes = []
+    for name, tuple_item in params.items():
+        default_val, description = tuple_item
+        # Create entries in "python_parameters" list attribute (used by py2 for documentation)
+        attribute_python_parametes.append(
+            {
+                "name": name,
+                "val": default_val,
+                "descr": description,
+            }
+        )
+        # Covert values from original dicitonary from tuple into single value
+        params[name] = default_val
+
+    return attribute_python_parametes
+
+
 def update_params(params, py_params):
     """Update given `params` dictionary with values from `py_params` dictionary.
-    Paramters will be updated to have the same type as the default value.
+    Parameters will be updated to have the same type as the default value.
     :param dict params: dictionary to update. Contains default values and their types.
     :param dict py_params: dictionary to use as source. Contains new values.
                            Their types will be converted to match the corresponding default type.
@@ -66,22 +89,15 @@ def append_board_wrappers(attributes_dict, params):
     """
     # FIXME: We should have a way for child cores to specify their board's tool (assuming child cores may add new unknown boards)
 
-    # Find memory wrapper dictionary
-    mwrap_dict = None
-    for block in attributes_dict["superblocks"]:
-        if block["instance_name"] == "iob_system_mwrap":
-            mwrap_dict = block
-            break
-
     tools = {
-        "aes_ku040_db_g": "vivado",
-        "cyclonev_gt_dk": "quartus",
-        "zybo_z7": "vivado",
-        "basys3": "vivado",
+        "iob_aes_ku040_db_g": "vivado",
+        "iob_cyclonev_gt_dk": "quartus",
+        "iob_zybo_z7": "vivado",
+        "iob_basys3": "vivado",
     }
     for board in attributes_dict.get("board_list", []):
         tool = tools[board]
-        mwrap_dict["superblocks"].append(
+        attributes_dict["superblocks"].append(
             {
                 "core_name": "iob_system_" + board,
                 "instance_name": "iob_system_" + board,
@@ -147,13 +163,11 @@ def set_build_dir(attributes_dict, py_params):
     if "build_dir" in py_params and py_params["build_dir"]:
         build_dir = py_params["build_dir"]
     else:
-        build_dir = f"../{attributes_dict['name']}_V{attributes_dict['version']}"
+        build_dir = f"../{attributes_dict['name']}_V{attributes_dict.get('version', py_params['py2hwsw_version'])}"
 
     # If this system is a tester, set build dir based on dest_dir
     if attributes_dict.get("is_tester", False):
-        build_dir = os.path.join(
-            build_dir, py_params.get("dest_dir", "submodules/tester")
-        )
+        build_dir = os.path.join(build_dir, py_params.get("dest_dir", "tester"))
 
     attributes_dict["build_dir"] = build_dir
 
@@ -286,7 +300,9 @@ def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
         )
 
     out_file = os.path.join(
-        attributes_dict["build_dir"], "software", f"{attributes_dict['name']}_mmap.h"
+        attributes_dict["build_dir"],
+        "software/src",
+        f"{attributes_dict['name']}_mmap.h",
     )
 
     os.makedirs(os.path.dirname(out_file), exist_ok=True)
@@ -295,20 +311,22 @@ def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
             f.write(f"#define {region_name.upper()}_BASE {hex(base_address)}\n")
     print(f"See '{out_file}' for complete list of memory regions.")
 
-    # Find CPU subblock
-    cpu_subblock = None
-    for subblock in attributes_dict["subblocks"]:
-        if subblock["instance_name"] == "cpu":
-            cpu_subblock = subblock
-            break
-    # Update reset address and uncached region passed via python parameters to the CPU
-    bootrom_addr = memory_map.get("bootrom", None)
-    if bootrom_addr is not None:
-        cpu_subblock["reset_addr"] = bootrom_addr
-    peripherals_addr = memory_map.get("peripherals", None)
-    if peripherals_addr is not None:
-        cpu_subblock["uncached_start_addr"] = peripherals_addr
-        cpu_subblock["uncached_size"] = 2**region_width
+    if params["cpu"] != "none":
+        # Find CPU subblock
+        cpu_subblock = None
+        for subblock in attributes_dict["subblocks"]:
+            if subblock["instance_name"] == "cpu":
+                cpu_subblock = subblock
+                break
+
+        # Update reset address and uncached region passed via python parameters to the CPU
+        bootrom_addr = memory_map.get("bootrom", None)
+        if bootrom_addr is not None:
+            cpu_subblock["reset_addr"] = bootrom_addr
+        peripherals_addr = memory_map.get("peripherals", None)
+        if peripherals_addr is not None:
+            cpu_subblock["uncached_start_addr"] = peripherals_addr
+            cpu_subblock["uncached_size"] = 2**region_width
 
 
 def generate_peripheral_base_addresses(
@@ -388,7 +406,6 @@ iob_eth_rmac.h:
 UTARGETS+=build_uut_software
 build_uut_software:
 	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software clean
-	cp $(ROOT_DIR)/software/src/iob_bsp.h $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software/src/
 	USER_CFLAGS=-DTESTER make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/software build
 
 .PHONY: build_uut_software
@@ -407,6 +424,8 @@ build_uut_software:
         # Set INIT_MEM variable
         file.write(f"INIT_MEM:={int(params['init_mem'])}\n")
         if params["use_ethernet"]:
+            # Set USE_ETHERNET variable
+            file.write("USE_ETHERNET=1\n")
             # Set custom ethernet CONSOLE_CMD
             file.write(
                 'CONSOLE_CMD=$(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -s $(BOARD_SERIAL_PORT) -c $(PYTHON_DIR)/console.py -m "$(RMAC_ADDR)" -i "$(ETH_IF)"\n',
@@ -454,7 +473,7 @@ HEX+=get_uut_hex
 
 get_uut_hex:
 	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation build_hex
-	cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation/*.hex .
+	-cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation/*.hex .
 
 .PHONY: get_uut_hex
 """
@@ -463,12 +482,12 @@ get_uut_hex:
     #
     # Create auto_iob_system_boot.lds and auto_iob_system_firmware.lds
     #
-    os.makedirs(f"{build_dir}/software", exist_ok=True)
-    with open(f"{build_dir}/software/auto_{name}_boot.lds", "w") as file:
+    os.makedirs(f"{build_dir}/software/src", exist_ok=True)
+    with open(f"{build_dir}/software/src/auto_{name}_boot.lds", "w") as file:
         file.write("/* This file was auto generated by iob_system_utils.py */\n")
         file.write(
             f". = {hex((1 << params['fw_addr_w']) - (1 << params['bootrom_addr_w']))};\n"
         )
-    with open(f"{build_dir}/software/auto_{name}_firmware.lds", "w") as file:
+    with open(f"{build_dir}/software/src/auto_{name}_firmware.lds", "w") as file:
         file.write("/* This file was auto generated by iob_system_utils.py */\n")
-        file.write(f". = {params['fw_addr']};\n")
+        file.write(f". = {params['fw_baseaddr']};\n")

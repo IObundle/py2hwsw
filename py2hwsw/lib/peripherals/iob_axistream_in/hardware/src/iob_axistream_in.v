@@ -267,7 +267,7 @@ module iob_axistream_in #(
       .DATA_W    (DATA_W),
       .AXIS_LEN_W(1)
    ) fifo2axis_inst (
-      `include "iob_axistream_in_clk_en_rst_s_s_portmap.vs"
+      `include "iob_axistream_in_iob_clk_s_s_portmap.vs"
       .rst_i        (soft_reset_wr),
       .en_i         (1'b1),
       .len_i        (1'b1),

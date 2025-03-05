@@ -103,7 +103,6 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": py_params_dict["name"],
         "generate_hw": True,
-        "version": "0.1",
         #
         # AXI Parameters
         #
@@ -133,7 +132,7 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "signals": {
-                "type": "clk_en_rst",
+                "type": "iob_clk",
             },
             "descr": "Clock, clock enable and async reset",
         },
@@ -195,7 +194,7 @@ def setup(py_params_dict):
     # Wires
     #
     attributes_dict["wires"] = [
-        # Active read transfer reg
+        # Busy read reg
         {
             "name": "busy_read_reg_en_rst",
             "descr": "Enable and reset signal for busy_read_reg",
@@ -216,6 +215,29 @@ def setup(py_params_dict):
             "descr": "Output of busy_read_reg",
             "signals": [
                 {"name": "busy_read_reg_o", "width": 1},
+            ],
+        },
+        # Active read transfer reg
+        {
+            "name": "active_transaction_read_reg_en_rst",
+            "descr": "Enable and reset signal for active_transaction_read_reg",
+            "signals": [
+                {"name": "active_transaction_read_reg_en", "width": 1},
+                {"name": "active_transaction_read_reg_rst", "width": 1},
+            ],
+        },
+        {
+            "name": "active_transaction_read_reg_data_i",
+            "descr": "Input of active_transaction_read_reg",
+            "signals": [
+                {"name": "active_transaction_read_reg_i", "width": 1},
+            ],
+        },
+        {
+            "name": "active_transaction_read_reg_data_o",
+            "descr": "Output of active_transaction_read_reg",
+            "signals": [
+                {"name": "active_transaction_read_reg_o", "width": 1},
             ],
         },
         # Read selection register signals
@@ -254,7 +276,7 @@ def setup(py_params_dict):
                 {"name": "read_sel_reg"},
             ],
         },
-        # Active write transfer reg
+        # Busy write reg
         {
             "name": "busy_write_reg_en_rst",
             "descr": "Enable and reset signal for busy_write_reg",
@@ -275,6 +297,52 @@ def setup(py_params_dict):
             "descr": "Output of busy_write_reg",
             "signals": [
                 {"name": "busy_write_reg_o", "width": 1},
+            ],
+        },
+        # Active write transfer reg
+        {
+            "name": "active_transaction_write_reg_en_rst",
+            "descr": "Enable and reset signal for active_transaction_write_reg",
+            "signals": [
+                {"name": "active_transaction_write_reg_en", "width": 1},
+                {"name": "active_transaction_write_reg_rst", "width": 1},
+            ],
+        },
+        {
+            "name": "active_transaction_write_reg_data_i",
+            "descr": "Input of active_transaction_write_reg",
+            "signals": [
+                {"name": "active_transaction_write_reg_i", "width": 1},
+            ],
+        },
+        {
+            "name": "active_transaction_write_reg_data_o",
+            "descr": "Output of active_transaction_write_reg",
+            "signals": [
+                {"name": "active_transaction_write_reg_o", "width": 1},
+            ],
+        },
+        # Data burst complete reg
+        {
+            "name": "data_burst_complete_write_reg_en_rst",
+            "descr": "Enable and reset signal for data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_en", "width": 1},
+                {"name": "data_burst_complete_write_reg_rst", "width": 1},
+            ],
+        },
+        {
+            "name": "data_burst_complete_write_reg_data_i",
+            "descr": "Input of data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_i", "width": 1},
+            ],
+        },
+        {
+            "name": "data_burst_complete_write_reg_data_o",
+            "descr": "Output of data_burst_complete_write_reg",
+            "signals": [
+                {"name": "data_burst_complete_write_reg_o", "width": 1},
             ],
         },
         # Write selection register signals
@@ -348,7 +416,7 @@ def setup(py_params_dict):
     for signal, direction, width, _, _ in axi_signals:
         if direction == "output":
             prefix = "m_"
-            if signal in ["axi_arready", "axi_awready"]:
+            if signal in ["axi_arready", "axi_awready", "axi_wready"]:
                 prefix = "demux_"
             # Demux signals
             attributes_dict["wires"] += [
@@ -374,7 +442,7 @@ def setup(py_params_dict):
             ]
         else:  # input direction
             prefix = "m_"
-            if signal in ["axi_arvalid", "axi_awvalid"]:
+            if signal in ["axi_arvalid", "axi_awvalid", "axi_wvalid"]:
                 prefix = "mux_"
             # Mux signals
             attributes_dict["wires"] += [
@@ -419,6 +487,20 @@ def setup(py_params_dict):
             },
         },
         {
+            "core_name": "iob_reg_re",
+            "instance_name": "active_transaction_read_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_transaction_read_reg_en_rst",
+                "data_i": "active_transaction_read_reg_data_i",
+                "data_o": "active_transaction_read_reg_data_o",
+            },
+        },
+        {
             "core_name": "iob_reg_r",
             "instance_name": "read_sel_reg_r",
             "parameters": {
@@ -457,6 +539,34 @@ def setup(py_params_dict):
                 "en_rst_i": "busy_write_reg_en_rst",
                 "data_i": "busy_write_reg_data_i",
                 "data_o": "busy_write_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_re",
+            "instance_name": "active_transaction_write_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_transaction_write_reg_en_rst",
+                "data_i": "active_transaction_write_reg_data_i",
+                "data_o": "active_transaction_write_reg_data_o",
+            },
+        },
+        {
+            "core_name": "iob_reg_re",
+            "instance_name": "data_burst_complete_write_reg_re",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "data_burst_complete_write_reg_en_rst",
+                "data_i": "data_burst_complete_write_reg_data_i",
+                "data_o": "data_burst_complete_write_reg_data_o",
             },
         },
         {
@@ -535,28 +645,48 @@ def setup(py_params_dict):
 
    // Only switch masters when there is no current active transaction
    assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o;
-   assign busy_read_reg_en = m_axi_arvalid_o & m_axi_arready_i & !busy_read_reg_o;
+
+   assign busy_read_reg_en = m_axi_arvalid_o & !busy_read_reg_o;
    assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
    assign busy_read_reg_i = 1'b1;
 
    // Block address valid/ready signals of current master if there is still an active transaction
-   assign m_axi_arvalid_o = ~busy_read_reg_o & mux_axi_arvalid_o;
-   assign demux_axi_arready_i = ~busy_read_reg_o & m_axi_arready_i;
+   assign m_axi_arvalid_o = ~active_transaction_read_reg_o & mux_axi_arvalid_o;
+   assign demux_axi_arready_i = ~active_transaction_read_reg_o & m_axi_arready_i;
+
+   assign active_transaction_read_reg_en = m_axi_arvalid_o & m_axi_arready_i;
+   assign active_transaction_read_reg_rst = busy_read_reg_rst;
+   assign active_transaction_read_reg_i = 1'b1;
 
    //
    // Write
    //
 
+   // NOTE: Current logic does not allow wvalid to be asserted before awvalid!
+   //       If the wvalid comes before, the data will go to the currently selected master_interface, and that may not be the intended destination (real destination will be given later by awvalid)
+
    // Only switch masters when there is no current active transaction
    assign write_sel = busy_write_reg_o ? write_sel_reg : write_sel_prio_enc_o;
-   assign busy_write_reg_en = m_axi_awvalid_o & m_axi_awready_i & !busy_write_reg_o;
+
+   assign busy_write_reg_en = m_axi_awvalid_o & !busy_write_reg_o;
    assign busy_write_reg_rst = (m_axi_bvalid_i & m_axi_bready_o) | rst_i;
    assign busy_write_reg_i = 1'b1;
 
    // Block address valid/ready signals of current master if there is still an active transaction
-   assign m_axi_awvalid_o = ~busy_write_reg_o & mux_axi_awvalid_o;
-   assign demux_axi_awready_i = ~busy_write_reg_o & m_axi_awready_i;
+   assign m_axi_awvalid_o = ~active_transaction_write_reg_o & mux_axi_awvalid_o;
+   assign demux_axi_awready_i = ~active_transaction_write_reg_o & m_axi_awready_i;
 
+   assign active_transaction_write_reg_en = m_axi_awvalid_o & m_axi_awready_i;
+   assign active_transaction_write_reg_rst = busy_write_reg_rst;
+   assign active_transaction_write_reg_i = 1'b1;
+
+   // Block data valid/ready signals of current master if there is still an active transaction
+   assign m_axi_wvalid_o = ~data_burst_complete_write_reg_o & mux_axi_wvalid_o;
+   assign demux_axi_wready_i = ~data_burst_complete_write_reg_o & m_axi_wready_i;
+
+   assign data_burst_complete_write_reg_en = m_axi_wlast_o & m_axi_wvalid_o & m_axi_wready_i;
+   assign data_burst_complete_write_reg_rst = busy_write_reg_rst;
+   assign data_burst_complete_write_reg_i = 1'b1;
 """,
         },
     ]

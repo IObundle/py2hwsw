@@ -10,7 +10,6 @@ def setup(py_params_dict):
     if "RST_POL" in py_params_dict:
         edge = py_params_dict["RST_POL"]
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -34,7 +33,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },

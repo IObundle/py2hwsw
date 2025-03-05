@@ -25,8 +25,8 @@ def setup(py_params_dict):
         # Use the same name as instantiator + the suffix "_csrs"
         "name": py_params_dict["instantiator"]["name"] + "_csrs",
         "dest_dir": py_params_dict["dest_dir"],
-        # Version of the CSRs module
-        "version": "1.0",
+        # Version of the CSRs module (by default use same version as py2hwsw)
+        "version": py_params_dict["py2hwsw_version"],
         # Type of interface for CSR bus
         "csr_if": "iob",
         # List of Control Status Registers (CSRs)
@@ -96,7 +96,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -113,6 +113,10 @@ def setup(py_params_dict):
         ],
         "wires": [],
         "subblocks": [
+            {
+                "core_name": "iob_functions",
+                "instantiate": False,
+            },
             {
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_inst",

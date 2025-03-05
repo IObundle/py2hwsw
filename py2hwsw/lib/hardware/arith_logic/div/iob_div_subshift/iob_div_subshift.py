@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -21,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -140,14 +139,6 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
-            },
-        ],
         "snippets": [
             {
                 "verilog_code": """
@@ -161,7 +152,7 @@ def setup(py_params_dict):
             },
         ],
         "comb": {
-            "verilog_code": """
+            "code": """
     pcnt_nxt    = pcnt + 1'b1;
     dqr_reg_nxt     = dqr_reg;
     divisor_reg_nxt = divisor_reg;

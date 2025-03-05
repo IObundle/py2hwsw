@@ -1,5 +1,4 @@
 {
-    "version": "0.1",
     "generate_hw": true,
     "confs": [
         {
@@ -42,13 +41,6 @@
                 }
             ]
         }
-    ],
-    "superblocks": [
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src"
-            }
     ],
     "snippets": [
         {

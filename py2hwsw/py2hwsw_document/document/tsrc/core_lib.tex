@@ -1,0 +1,27 @@
+% SPDX-FileCopyrightText: 2025 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+The Py2HWSW framework includes a library of cores ready for use.
+
+\begin{xltabular}{\textwidth}{|l|l|X|}
+  \hline
+  \rowcolor{iob-green}
+  {\bf Name} & {\bf Directory}  \\ \hline \hline
+  \endhead
+
+  \input py2hwsw_core_lib_tab
+
+  \caption{Table of cores available in the library of the Py2HWSW framework. The \textit{Directory} column is the path to the core's setup directory, relative to the Py2HWSW lib directory \texttt{py2hwsw/lib/}.}
+  \label{py2hwsw_core_lib_tab}
+\end{xltabular}
+
+Table~\ref{py2hwsw_core_lib_tab} lists the cores available in the Py2HWSW framework's core library.
+
+Each core contains its own user guide, which can be built using the following commands:
+
+\begin{lstlisting}
+py2hwsw <core_name> setup
+make -C ../<core_name>_V<core_version>/ doc-build
+xdg-open ../<core_name>_V<core_version>/document/ug.pdf
+\end{lstlisting}

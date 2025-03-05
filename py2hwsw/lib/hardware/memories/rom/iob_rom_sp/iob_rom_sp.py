@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -35,7 +34,7 @@ def setup(py_params_dict):
             {
                 "name": "MEM_INIT_FILE_INT",
                 "type": "F",
-                "val": "HEXFILE",
+                "val": '{HEXFILE, ".hex"}',
                 "min": "NA",
                 "max": "NA",
                 "descr": "",
@@ -45,15 +44,11 @@ def setup(py_params_dict):
             {
                 "name": "rom_sp_s",
                 "descr": "ROM interface",
-                "signals": {"type": "rom_sp"},
-            },
-        ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
+                "signals": {
+                    "type": "rom_sp",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
             },
         ],
         "snippets": [

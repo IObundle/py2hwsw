@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "ports": [
             {
@@ -17,7 +16,7 @@ def setup(py_params_dict):
             },
         ],
         "fsm": {
-            "verilog_code": """
+            "state_descriptions": """
 A: a_o = 0;
 
 B: a_o = 1;

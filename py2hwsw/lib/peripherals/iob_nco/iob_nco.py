@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         # Note: This core currently has a manual verilog source! The generate_hw is true only because of the generated csrs subblock.
         "generate_hw": True,
         "confs": [
@@ -38,7 +37,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "signals": {
-                    "type": "clk_en_rst",
+                    "type": "iob_clk",
                 },
                 "descr": "clock, clock enable and reset",
             },
@@ -197,14 +196,6 @@ def setup(py_params_dict):
                 "instance_name": "iob_tasks_inst",
                 "dest_dir": "hardware/simulation/src",
                 "instantiate": False,
-            },
-        ],
-        "superblocks": [
-            # Simulation wrapper
-            {
-                "core_name": "iob_sim",
-                "instance_name": "iob_sim",
-                "dest_dir": "hardware/simulation/src",
             },
         ],
         "snippets": [],

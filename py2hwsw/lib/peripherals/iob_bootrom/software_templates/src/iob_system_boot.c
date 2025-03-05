@@ -14,7 +14,7 @@
 int main() {
 
   // init uart
-  uart_init(UART0_BASE, FREQ / BAUD);
+  uart_init(UART0_BASE, IOB_BSP_FREQ / IOB_BSP_BAUD);
 
   // connect with console
   do {
@@ -32,7 +32,7 @@ int main() {
 #endif
 
   // address to copy firmware to
-  char *prog_start_addr = (char *)IOB_SYSTEM_FW_ADDR;
+  char *prog_start_addr = (char *)IOB_SYSTEM_FW_BASEADDR;
 
   while (uart_getc() != ACK) {
     uart_puts(PROGNAME);

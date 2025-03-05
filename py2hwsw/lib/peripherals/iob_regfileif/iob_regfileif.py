@@ -8,7 +8,6 @@ import json
 
 def setup(py_params_dict):
     params = {
-        "version": "0.7",
         "internal_csr_if": "iob",
         "external_csr_if": "iob",
         # FIXME: Make ADDR_W automatic
@@ -171,7 +170,6 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": "iob_regfileif",
-        "version": "0.1",
         "generate_hw": True,
     }
     attributes_dict |= {

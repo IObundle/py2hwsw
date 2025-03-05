@@ -53,12 +53,12 @@ class iob_port(iob_wire):
 
         if self.interface:
             self.signals += if_gen.get_signals(
-                name = self.interface.type,
-                if_type = _direction,
-                mult = self.interface.mult,
-                widths = self.interface.widths,
-                params = self.interface.params,
-                signal_prefix = self.interface.prefix,
+                name=self.interface.type,
+                if_type=_direction,
+                mult=self.interface.mult,
+                widths=self.interface.widths,
+                params=self.interface.params,
+                signal_prefix=self.interface.prefix,
             )
         elif _direction in ["slave", "master"]:
             fail_with_msg(

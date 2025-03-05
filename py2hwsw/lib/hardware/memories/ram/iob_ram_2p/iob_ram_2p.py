@@ -5,9 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
-        "version": "0.1",
         "confs": [
             {
                 "name": "HEXFILE",

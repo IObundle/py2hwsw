@@ -8,7 +8,6 @@ def setup(py_params_dict):
     DATA_W = py_params_dict["data_w"] if "data_w" in py_params_dict else 32
     MEM_ADDR_W = py_params_dict["mem_addr_w"] if "mem_addr_w" in py_params_dict else 32
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {

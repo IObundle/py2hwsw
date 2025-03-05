@@ -23,8 +23,8 @@ def setup(py_params_dict):
     params = {
         # Use the same name as instantiator + the suffix "_csrs"
         "name": py_params_dict["instantiator"]["name"] + "_csrs",
-        # Version of the CSRs module
-        "version": "1.0",
+        # Version of the CSRs module (by default use same version as py2hwsw)
+        "version": py_params_dict["py2hwsw_version"],
         # Type of interface for CSR bus
         "csr_if": "iob",
         # List of Control Status Registers (CSRs)

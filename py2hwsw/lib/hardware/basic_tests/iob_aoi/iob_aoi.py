@@ -12,7 +12,6 @@ def setup(py_params_dict):
     """
     # Dictionary that describes this core using the py2hw dictionary interface
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             """

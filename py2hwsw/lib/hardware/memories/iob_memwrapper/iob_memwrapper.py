@@ -21,7 +21,6 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": f"{attrs['name']}_mwrap",
         "generate_hw": True,
-        "version": "0.1",
         "confs": attrs["confs"]
         + [
             {

@@ -277,7 +277,7 @@ def get_mem_ports(
             iob_signal(
                 name="addr" + suffix + "_o",
                 width=ADDR_W,
-                descr="Address port {suffix}",
+                descr=f"Address port {suffix}",
             )
         )
     if enable:
@@ -285,7 +285,7 @@ def get_mem_ports(
             iob_signal(
                 name="en" + suffix + "_o",
                 width=1,
-                descr="Enable port {suffix}",
+                descr=f"Enable port {suffix}",
             )
         )
     return [
@@ -335,7 +335,7 @@ def get_mem_read_ports(
         iob_signal(
             name="r_data" + rd_suffix + "_i",
             width=DATA_W,
-            descr="Data port {suffix}",
+            descr=f"Data port {suffix}",
             isvar=True,
         ),
     ] + extra_signals
@@ -368,12 +368,12 @@ def get_mem_write_ports(
         iob_signal(
             name="w_data" + wr_suffix + "_o",
             width=DATA_W,
-            descr="Data port {suffix}",
+            descr=f"Data port {suffix}",
         ),
         iob_signal(
             name="w_strb" + suffix + "_o",
             width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
-            descr="Write strobe port {suffix}",
+            descr=f"Write strobe port {suffix}",
         ),
     ] + extra_signals
     return mem_write_ports

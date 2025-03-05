@@ -967,7 +967,8 @@ def find_module_setup_dir(core_name):
     file_ext = os.path.splitext(file_path)[1]
 
     filepath = pathlib.Path(file_path)
-    if filepath.parent.name != core_name:
+    # Force core file to be contained in a folder with the same name. Ignore "iob_core" case.
+    if filepath.parent.name != core_name and core_name != "iob_core":
         fail_with_msg(f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
                         f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
                         f"But found incorrect path:    '{filepath.resolve()}'.")

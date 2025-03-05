@@ -5,7 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "name": py_params_dict["instantiator"]["name"] + "_ku15p",
+        "name": py_params_dict["instantiator"]["name"] + "_iob_ku15p",
         "generate_hw": False,
         "confs": [
             {

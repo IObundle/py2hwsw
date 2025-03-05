@@ -5,7 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "name": py_params_dict["instantiator"]["name"] + "_aes_ku040_db_g",
+        "name": py_params_dict["instantiator"]["name"] + "_iob_aes_ku040_db_g",
         "generate_hw": False,
         "confs": [
             {

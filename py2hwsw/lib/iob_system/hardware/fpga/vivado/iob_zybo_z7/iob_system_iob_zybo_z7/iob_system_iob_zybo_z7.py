@@ -8,7 +8,7 @@ def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
 
     attributes_dict = {
-        "name": params["name"] + "_zybo_z7",
+        "name": params["name"] + "_iob_zybo_z7",
         "generate_hw": True,
         #
         # Configuration

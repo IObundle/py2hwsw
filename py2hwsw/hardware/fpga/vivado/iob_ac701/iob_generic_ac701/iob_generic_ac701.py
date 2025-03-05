@@ -5,7 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "name": py_params_dict["instantiator"]["name"] + "_ac701",
+        "name": py_params_dict["instantiator"]["name"] + "_iob_ac701",
         "generate_hw": False,
         "confs": [
             {

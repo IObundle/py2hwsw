@@ -49,12 +49,12 @@ xmvlog.log: $(VHDR) $(VSRC) $(HEX)
 	xmvlog $(VFLAGS) $(VSRC)
 
 xmelab.log : xmvlog.log xcelium.d/worklib
-	xmelab $(EFLAGS) $(COV_EFLAGS) worklib.$(NAME)_tb:module
+	xmelab $(EFLAGS) $(COV_EFLAGS) worklib.iob_v_tb:module
 
 comp: xmelab.log
 
 exec: comp
-	sync && sleep 2 && xmsim $(SFLAGS) $(COV_SFLAGS) worklib.$(NAME)_tb:module
+	sync && sleep 2 && xmsim $(SFLAGS) $(COV_SFLAGS) worklib.iob_v_tb:module
 ifeq ($(COV),1)
 	ls -d cov_work/scope/* > all_ucd_file
 	imc -execcmd "merge -runfile all_ucd_file -overwrite -out merge_all"

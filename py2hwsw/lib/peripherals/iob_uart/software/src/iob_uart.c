@@ -9,46 +9,46 @@
 
 // TX FUNCTIONS
 void uart_txwait() {
-  while (!IOB_UART_GET_TXREADY())
+  while (!IOB_UART_CSRS_GET_TXREADY())
     ;
 }
 
 void uart_putc(char c) {
-  while (!IOB_UART_GET_TXREADY())
+  while (!IOB_UART_CSRS_GET_TXREADY())
     ;
-  IOB_UART_SET_TXDATA(c);
+  IOB_UART_CSRS_SET_TXDATA(c);
 }
 
 // RX FUNCTIONS
 void uart_rxwait() {
-  while (!IOB_UART_GET_RXREADY())
+  while (!IOB_UART_CSRS_GET_RXREADY())
     ;
 }
 
 uint8_t uart_getc() {
-  while (!IOB_UART_GET_RXREADY())
+  while (!IOB_UART_CSRS_GET_RXREADY())
     ;
-  return IOB_UART_GET_RXDATA();
+  return IOB_UART_CSRS_GET_RXDATA();
 }
 
 // UART basic functions
 void uart_init(int base_address, uint16_t div) {
   // capture base address for good
-  IOB_UART_INIT_BASEADDR(base_address);
+  IOB_UART_CSRS_INIT_BASEADDR(base_address);
 
   // pulse soft reset
-  IOB_UART_SET_SOFTRESET(1);
-  IOB_UART_SET_SOFTRESET(0);
+  IOB_UART_CSRS_SET_SOFTRESET(1);
+  IOB_UART_CSRS_SET_SOFTRESET(0);
 
   // Set the division factor div
   // div should be equal to round (fclk/baudrate)
   // E.g for fclk = 100 Mhz for a baudrate of 115200 we should
-  // IOB_UART_SET_DIV(868)
-  IOB_UART_SET_DIV(div);
+  // IOB_UART_CSRS_SET_DIV(868)
+  IOB_UART_CSRS_SET_DIV(div);
 
   // enable TX and RX
-  IOB_UART_SET_TXEN(1);
-  IOB_UART_SET_RXEN(1);
+  IOB_UART_CSRS_SET_TXEN(1);
+  IOB_UART_CSRS_SET_RXEN(1);
 }
 
 void uart_finish() {

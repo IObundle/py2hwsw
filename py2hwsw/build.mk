@@ -25,20 +25,20 @@ endif
 # EMBEDDED SOFTWARE
 #
 SW_DIR=software
-fw-build:
+sw-build:
 	make -C $(SW_DIR) build USE_FPGA=$(USE_FPGA)
 
-fw-clean:
+sw-clean:
 	if [ -f "$(SW_DIR)/Makefile" ]; then make -C $(SW_DIR) clean; fi
 
-#this target is not the same as fw-build because this one will cause USE_FPGA=1 to be true (this will affect software compilation)
-fpga-fw-build: fw-build
+#this target is not the same as sw-build because this one will cause USE_FPGA=1 to be true (this will affect software compilation)
+fpga-sw-build: sw-build
 
 
 #
 # PC EMUL
 #
-pc-emul-build: fw-build
+pc-emul-build: sw-build
 	make -C $(SW_DIR) build_emul
 
 pc-emul-run:
@@ -74,10 +74,10 @@ lint-test:
 #
 # SIMULATE
 #
-sim-build: fw-build
+sim-build: sw-build
 	make -C $(SIM_DIR) -j1 build
 
-sim-run: fw-build
+sim-run: sw-build
 	make -C $(SIM_DIR) -j1 run
 
 sim-waves:
@@ -167,10 +167,10 @@ dtest: test syn-test
 # CLEAN
 #
 
-clean: fw-clean pc-emul-clean lint-clean sim-clean fpga-clean syn-clean doc-clean
+clean: sw-clean pc-emul-clean lint-clean sim-clean fpga-clean syn-clean doc-clean
 
 
-.PHONY: fw-build fw-clean \
+.PHONY: sw-build sw-clean \
 	pc-emul-build pc-emul-run pc-emul-clean \
 	lint-test lint-run lint-clean \
 	sim-build sim-run sim-debug sim-clean \

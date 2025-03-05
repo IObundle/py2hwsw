@@ -57,6 +57,14 @@ ifneq ($(SIM_SERVER),)
 	rsync $(SIM_SYNC_FLAGS) -avz --force --delete ../.. $(SIM_USER)@$(SIM_SERVER):$(REMOTE_BUILD_DIR)
 endif
 
+#check universal testbench and include it
+
+ifeq ($(wildcard ./src/iob_v_tb.vh),)
+VSRC:=$(subst ./src/iob_v_tb.v, , $(VSRC))
+else
+CTB:=1
+endif
+
 build: $(VHDR) $(VSRC) $(HEX) remote_build_dir
 ifeq ($(SIM_SERVER),)
 	make comp
@@ -72,7 +80,12 @@ run: test.log
 	test "$$(cat test.log)" = "Test passed!"
 
 test.log: remote_build_dir
-ifeq ($(SIM_SERVER),)
+ifeq ($(SIM_SERVER),) #is simulator in local machine?
+ifneq ($(CTB),) #is there a C testbench?
+ifneq ($(SIMULATOR), verilator) #is the simulator not verilator? if it is, then the C testbench has already been included in the verilator command
+	../../software/tb & #run the C testbench in background
+endif
+endif
 ifneq ($(CONSOLE_CMD),)
 	$(BOARD_GRAB_CMD) -s 'make exec' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else

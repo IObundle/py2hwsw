@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 #
-#    csr_gen.py: build Verilog software accessible registers and software getters and setters
+# csr_gen.py: build Verilog control and status registers and software bare-metal driver
 #
 import sys
 import os
@@ -13,6 +13,7 @@ from math import ceil, log, log2
 from latex import write_table
 import iob_colors
 import re
+from iob_csr import iob_csr, iob_csr_group
 
 
 def clog2(val):
@@ -76,7 +77,7 @@ def eval_param_expression_from_config(param_expression, confs, param_attribute):
     # Create parameter dictionary with correct values to be replaced in string
     params_dict = {}
     for param in confs:
-        params_dict[param["name"]] = param[param_attribute]
+        params_dict[param["name"]] = param.get(param_attribute, None)
 
     return eval_param_expression(param_expression, params_dict)
 
@@ -1054,49 +1055,9 @@ class csr_gen:
         core_attributes["subblocks"] += subblocks
         core_attributes["snippets"] += [{"verilog_code": snippet}]
 
-    def write_lparam_header(self, table, out_dir, top):
-        """Generate *_csrs_lparam.vs file. Macros from this file contain the default
-        values of the registers. These should not be used inside the instance of
-        the core/system.
-        """
-        os.makedirs(out_dir, exist_ok=True)
-        f_def = open(f"{out_dir}/{top}_csrs_lparam.vs", "w")
-        f_def.write("//used address space width\n")
-        addr_w_prefix = f"{top}_csrs".upper()
-        f_def.write(f"localparam {addr_w_prefix}_ADDR_W = {self.core_addr_w};\n\n")
-        f_def.write("//These macros only contain default values for the registers\n")
-        f_def.write("//address macros\n")
-        macro_prefix = f"{top}_".upper()
-        f_def.write("//addresses\n")
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            n_bytes = self.bceil(n_bits, 3) / 8
-            if n_bytes == 3:
-                n_bytes = 4
-            log2n_items = row.log2n_items
-            addr_w = int(
-                ceil(
-                    eval_param_expression_from_config(log2n_items, self.config, "val")
-                    + log(n_bytes, 2)
-                )
-            )
-            f_def.write(f"localparam {macro_prefix}{name}_ADDR = {row.addr};\n")
-            if eval_param_expression_from_config(log2n_items, self.config, "val") > 0:
-                f_def.write(f"localparam {macro_prefix}{name}_ADDR_W = {addr_w};\n")
-            f_def.write(
-                f"localparam {macro_prefix}{name}_W = {eval_param_expression_from_config(n_bits, self.config,'val')};\n\n"
-            )
-        f_def.close()
-
     def write_hwheader(self, table, out_dir, top):
-        """Generate *_csrs_def.vh file. Macros from this file should only be used
-        inside the instance of the core/system since they may contain parameters which
-        are only known by the instance.
-        """
         os.makedirs(out_dir, exist_ok=True)
-        f_def = open(f"{out_dir}/{top}_csrs_def.vh", "w")
-        f_def.write(f'`include "{top}_csrs_conf.vh"\n')
+        f_def = open(f"{out_dir}/{top}.vh", "w")
         f_def.write("//These macros may be dependent on instance parameters\n")
         f_def.write("//address macros\n")
         macro_prefix = f"{top}_".upper()
@@ -1134,7 +1095,7 @@ class csr_gen:
 
     def write_swheader(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        fswhdr = open(f"{out_dir}/{top}_csrs.h", "w")
+        fswhdr = open(f"{out_dir}/{top}.h", "w")
 
         core_prefix = f"{top}_".upper()
 
@@ -1163,6 +1124,13 @@ class csr_gen:
 
         fswhdr.write("\n// Base Address\n")
         fswhdr.write(f"void {core_prefix}INIT_BASEADDR(uint32_t addr);\n")
+
+        fswhdr.write("\n// IO read and write function prototypes\n")
+
+        fswhdr.write(
+            "void iob_write(uint32_t addr, uint32_t data_w, uint32_t value);\n"
+        )
+        fswhdr.write("uint32_t iob_read(uint32_t addr, uint32_t data_w);\n")
 
         fswhdr.write("\n// Core Setters and Getters\n")
         for row in table:
@@ -1195,11 +1163,11 @@ class csr_gen:
 
     def write_swcode(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
-        fsw = open(f"{out_dir}/{top}_csrs_emb.c", "w")
+        fsw = open(f"{out_dir}/{top}.c", "w")
         core_prefix = f"{top}_".upper()
-        fsw.write(f'#include "{top}_csrs.h"\n\n')
+        fsw.write(f'#include "{top}.h"\n\n')
         fsw.write("\n// Base Address\n")
-        fsw.write("static int base;\n")
+        fsw.write("static uint32_t base;\n")
         fsw.write(f"void {core_prefix}INIT_BASEADDR(uint32_t addr) {{\n")
         fsw.write("  base = addr;\n")
         fsw.write("}\n")
@@ -1215,200 +1183,17 @@ class csr_gen:
             if n_bytes == 3:
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
+            addr = f"base + {core_prefix}{name_upper}_ADDR"
+            sw_type = self.csr_type(name, n_bytes)
             if "W" in row.type:
-                sw_type = self.csr_type(name, n_bytes)
-                addr_arg = ""
-                addr_arg = ""
-                addr_shift = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = ", int addr"
-                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(
-                    f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg}) {{\n"
-                )
-                fsw.write(
-                    f"  (*( (volatile {sw_type} *) ( (base) + ({core_prefix}{name_upper}_ADDR){addr_shift}) ) = (value));\n"
-                )
+                fsw.write(f"void {core_prefix}SET_{name_upper}({sw_type} value) {{\n")
+                fsw.write(f"  iob_write({addr}, {core_prefix}{name_upper}_W, value);\n")
                 fsw.write("}\n\n")
             if "R" in row.type:
-                sw_type = self.csr_type(name, n_bytes)
-                addr_arg = ""
-                addr_shift = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = "int addr"
-                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg}) {{\n")
-                fsw.write(
-                    f"  return (*( (volatile {sw_type} *) ( (base) + ({core_prefix}{name_upper}_ADDR){addr_shift}) ));\n"
-                )
+                fsw.write(f"{sw_type} {core_prefix}GET_{name_upper}() {{\n")
+                fsw.write(f"  return iob_read({addr}, {core_prefix}{name_upper}_W);\n")
                 fsw.write("}\n\n")
         fsw.close()
-
-    def write_tbcode(self, table, out_dir, top):
-        # Write Verilator code as well
-        self.write_verilator_code(table, out_dir, top)
-
-        os.makedirs(out_dir, exist_ok=True)
-        fsw = open(f"{out_dir}/{top}_csrs_emb_tb.vs", "w")
-        core_prefix = f"{top}_".upper()
-        # fsw.write(f'`include "{top}_csrs_def.vh"\n\n')
-
-        fsw.write("\n// CSRS Core Setters and Getters\n")
-
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            log2n_items = row.log2n_items
-            n_bytes = self.bceil(n_bits, 3) / 8
-            if n_bytes == 3:
-                n_bytes = 4
-            addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            if "W" in row.type:
-                sw_type = f"[{int(n_bytes*8)}-1:0]"
-                addr_arg = ""
-                addr_arg = ""
-                addr_shift = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = ", input reg [ADDR_W-1:0] addr"
-                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(
-                    f"task static {core_prefix}SET_{name}(input reg {sw_type} value{addr_arg});\n"
-                )
-                fsw.write(
-                    f"  iob_write( (`{core_prefix}{name}_ADDR){addr_shift}, value, `{core_prefix}{name}_W);\n"
-                )
-                fsw.write("endtask\n\n")
-            if "R" in row.type:
-                sw_type = f"[{int(n_bytes*8)}-1:0]"
-                addr_arg = ""
-                addr_shift = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = "input reg [ADDR_W-1:0] addr, "
-                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(
-                    f"task static {core_prefix}GET_{name}({addr_arg}output reg {sw_type} rvalue);\n"
-                )
-                fsw.write(
-                    f"  iob_read( (`{core_prefix}{name}_ADDR){addr_shift}, rvalue, `{core_prefix}{name}_W);\n"
-                )
-                fsw.write("endtask\n\n")
-        fsw.close()
-
-    def write_verilator_code(self, table, out_dir, top):
-        self.write_swheader_verilator(table, out_dir, top)
-        os.makedirs(out_dir, exist_ok=True)
-        fsw = open(f"{out_dir}/{top}_csrs_emb_verilator.c", "w")
-        core_prefix = f"{top}_".upper()
-        fsw.write(f'#include "{top}_csrs_verilator.h"\n\n')
-
-        fsw.write("\n// Core Setters and Getters\n")
-
-        for row in table:
-            name = row.name
-            name_upper = name.upper()
-            n_bits = row.n_bits
-            log2n_items = row.log2n_items
-            n_bytes = self.bceil(n_bits, 3) / 8
-            if n_bytes == 3:
-                n_bytes = 4
-            addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            if "W" in row.type:
-                sw_type = self.csr_type(name, n_bytes)
-                addr_arg = ""
-                addr_arg = ""
-                addr_shift = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = ", int addr"
-                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(
-                    f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg}, iob_native_t *native_if) {{\n"
-                )
-                fsw.write(
-                    f"  iob_write(({core_prefix}{name_upper}_ADDR){addr_shift}, value, {core_prefix}{name_upper}_W, native_if);\n"
-                )
-                fsw.write("}\n\n")
-            if "R" in row.type:
-                sw_type = self.csr_type(name, n_bytes)
-                addr_arg = ""
-                addr_shift = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = "int addr, "
-                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
-                fsw.write(
-                    f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg}iob_native_t *native_if) {{\n"
-                )
-                fsw.write(
-                    f"  return ({sw_type})iob_read(({core_prefix}{name_upper}_ADDR){addr_shift}, native_if);\n"
-                )
-                fsw.write("}\n\n")
-        fsw.close()
-
-    def write_swheader_verilator(self, table, out_dir, top):
-        os.makedirs(out_dir, exist_ok=True)
-        fswhdr = open(f"{out_dir}/{top}_csrs_verilator.h", "w")
-
-        core_prefix = f"{top}_".upper()
-
-        fswhdr.write(f"#ifndef H_{core_prefix}CSRS_VERILATOR_H\n")
-        fswhdr.write(f"#define H_{core_prefix}CSRS_VERILATOR_H\n\n")
-        fswhdr.write("#include <stdint.h>\n\n")
-        fswhdr.write('#include "iob_tasks.h"\n\n')
-
-        fswhdr.write("//used address space width\n")
-        fswhdr.write(f"#define  {core_prefix}CSRS_ADDR_W {self.core_addr_w}\n\n")
-
-        fswhdr.write("//used address space width\n")
-        fswhdr.write(f"#define  {core_prefix}CSRS_ADDR_W {self.core_addr_w}\n\n")
-
-        fswhdr.write("//Addresses\n")
-        for row in table:
-            name = row.name.upper()
-            if "W" in row.type or "R" in row.type:
-                fswhdr.write(f"#define {core_prefix}{name}_ADDR {row.addr}\n")
-
-        fswhdr.write("\n//Data widths (bit)\n")
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            n_bytes = int(self.bceil(n_bits, 3) / 8)
-            if n_bytes == 3:
-                n_bytes = 4
-            if "W" in row.type or "R" in row.type:
-                fswhdr.write(f"#define {core_prefix}{name}_W {n_bytes*8}\n")
-
-        # fswhdr.write("\n// Base Address\n")
-        # fswhdr.write(f"void {core_prefix}INIT_BASEADDR(uint32_t addr);\n")
-
-        fswhdr.write("\n// Core Setters and Getters\n")
-        for row in table:
-            name = row.name
-            name_upper = name.upper()
-            n_bits = row.n_bits
-            log2n_items = row.log2n_items
-            n_bytes = self.bceil(n_bits, 3) / 8
-            if n_bytes == 3:
-                n_bytes = 4
-            addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            if "W" in row.type:
-                sw_type = self.csr_type(name, n_bytes)
-                addr_arg = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = ", int addr"
-                fswhdr.write(
-                    f"void {core_prefix}SET_{name_upper}({sw_type} value{addr_arg}, iob_native_t *native_if);\n"
-                )
-            if "R" in row.type:
-                sw_type = self.csr_type(name, n_bytes)
-                addr_arg = ""
-                if addr_w / n_bytes > 1:
-                    addr_arg = "int addr, "
-                fswhdr.write(
-                    f"{sw_type} {core_prefix}GET_{name_upper}({addr_arg}iob_native_t *native_if);\n"
-                )
-
-        fswhdr.write(f"\n#endif // H_{core_prefix}_CSRS_VERILATOR_H\n")
-
-        fswhdr.close()
 
     # check if address is aligned
     @staticmethod

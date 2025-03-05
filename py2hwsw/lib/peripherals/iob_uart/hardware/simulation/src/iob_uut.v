@@ -4,9 +4,9 @@
 
 `timescale 1ns / 1ps
 `include "iob_uart_conf.vh"
-`include "iob_uart_csrs_def.vh"
+`include "iob_uart_csrs_conf.vh"
 
-module iob_uart_sim #(
+module iob_uut #(
    parameter DATA_W = `IOB_UART_DATA_W
 ) (
    // clk_en_rst_s
@@ -22,7 +22,6 @@ module iob_uart_sim #(
    output                             iob_rvalid_o,
    output [               DATA_W-1:0] iob_rdata_o,
    output                             iob_ready_o
-   // clk_rst_s
 );
 
    wire tx2rx;

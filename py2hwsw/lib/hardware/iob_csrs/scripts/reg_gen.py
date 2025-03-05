@@ -94,36 +94,36 @@ def build_regs_table(core):
     return csr_gen_obj, reg_table
 
 
-def generate_reg_hw(core, csr_gen_obj, reg_table):
+def generate_csr_hw(core, csr_gen_obj, reg_table):
     """Generate reg hardware files"""
-    name = core["name"][: -len("_csrs")]
-    csr_gen_obj.write_hwheader(reg_table, core["build_dir"] + "/hardware/src", name)
-    csr_gen_obj.write_lparam_header(
-        reg_table, core["build_dir"] + "/hardware/simulation/src", name
+    name = core["name"]
+    csr_gen_obj.write_hwheader(
+        reg_table, core["build_dir"] + "/" + core["dest_dir"], name
     )
     csr_gen_obj.write_hwcode(
         reg_table,
         core,
     )
-    csr_gen_obj.write_tbcode(
-        reg_table,
-        core["build_dir"] + "/hardware/simulation/src",
-        name,
-    )
 
 
-def generate_reg_sw(core, csr_gen_obj, reg_table):
+def generate_csr_sw(core, csr_gen_obj, reg_table):
     """Generate reg software files"""
     os.makedirs(core["build_dir"] + "/software/src", exist_ok=True)
-    name = core["name"][: -len("_csrs")]
-    csr_gen_obj.write_swheader(reg_table, core["build_dir"] + "/software/src", name)
-    csr_gen_obj.write_swcode(reg_table, core["build_dir"] + "/software/src", name)
+    name = core["name"]
+
+    # if "hardware" in core["dest_dir"] replace it with "software"
+    if "hardware/src" in core["dest_dir"]:
+        sw_dest_dir = core["dest_dir"].replace("hardware", "software")
+        csr_gen_obj.write_swheader(
+            reg_table, core["build_dir"] + "/" + sw_dest_dir, name
+        )
+        csr_gen_obj.write_swcode(reg_table, core["build_dir"] + "/" + sw_dest_dir, name)
 
 
 def generate_csr(core):
     """Generate hw, sw and doc files"""
     csr_gen_obj, reg_table = build_regs_table(core)
-    generate_reg_hw(core, csr_gen_obj, reg_table)
-    generate_reg_sw(core, csr_gen_obj, reg_table)
+    generate_csr_hw(core, csr_gen_obj, reg_table)
+    generate_csr_sw(core, csr_gen_obj, reg_table)
     auto_setup_iob_ctls(core)
     return csr_gen_obj, reg_table

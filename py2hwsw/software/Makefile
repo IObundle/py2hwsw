@@ -56,7 +56,7 @@ EMUL_INCLUDES ?=-I. -Isrc
 
 build: $(UTARGETS)
 %.elf: $(TEMPLATE_LDS) $(HDR) $(SRC)
-	$(TOOLCHAIN_PREFIX)gcc -o $@ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SRC) $(LLIBS)
+	$(TOOLCHAIN_PREFIX)gcc -o $@ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SRC) src/hw_driver.c $(LLIBS)
 	$(TOOLCHAIN_PREFIX)objcopy -O binary $@ $(*F).bin
 
 ifneq ($(BOARD),)
@@ -91,6 +91,18 @@ run_emul: test.log
 	test "$$(cat test.log)" = "Test passed!"
 
 .PHONY: build_emul run_emul
+
+#########################################
+#            Simulation targets         #
+#########################################
+
+ifneq ($(wildcard ./src/$(NAME)_csrs.c),)
+CSRS ?= ./src/$(NAME)_csrs.c
+endif
+
+tb: ./src/iob_c_tb.c ./src/iob_core_tb.c $(CSRS)
+	gcc -I./src -g -o $@ $^
+
 
 #########################################
 #            General targets            #

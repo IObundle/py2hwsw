@@ -31,6 +31,9 @@ endif
 ifeq ($(USE_COMPRESSED),1)
 MFLAG_C=c
 endif
+ifeq ($(NO_HW_DRIVER),)
+EXTRA_SRC+=src/hw_driver.c
+endif
 
 #default compiler settings
 TOOLCHAIN_PREFIX ?=riscv64-unknown-elf-
@@ -55,8 +58,8 @@ EMUL_INCLUDES ?=-I. -Isrc
 #########################################
 
 build: $(UTARGETS)
-%.elf: $(TEMPLATE_LDS) $(HDR) $(SRC)
-	$(TOOLCHAIN_PREFIX)gcc -o $@ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SRC) src/hw_driver.c $(LLIBS)
+%.elf: $(TEMPLATE_LDS) $(HDR) $(SRC) $(EXTRA_SRC)
+	$(TOOLCHAIN_PREFIX)gcc -o $@ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SRC) $(EXTRA_SRC) $(LLIBS)
 	$(TOOLCHAIN_PREFIX)objcopy -O binary $@ $(*F).bin
 
 ifneq ($(BOARD),)

@@ -62,7 +62,7 @@ endif
 ifeq ($(wildcard ./src/iob_v_tb.vh),)
 VSRC:=$(subst ./src/iob_v_tb.v, , $(VSRC))
 else
-CTB=1
+CTB:=1
 endif
 
 build: $(VHDR) $(VSRC) $(HEX) remote_build_dir
@@ -80,15 +80,15 @@ run: test.log
 	test "$$(cat test.log)" = "Test passed!"
 
 test.log: remote_build_dir
-ifeq ($(SIM_SERVER),)
+ifeq ($(SIM_SERVER),) #is simulator in local machine?
+ifneq ($(CTB),) #is there a C testbench?
+ifneq ($(SIMULATOR), verilator) #is the simulator not verilator? if it is, then the C testbench has already been included in the verilator command
+	../../software/tb & #run the C testbench in background
+endif
+endif
 ifneq ($(CONSOLE_CMD),)
 	$(BOARD_GRAB_CMD) -s 'make exec' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else
-ifneq ($(CTB),)
-ifneq ($(SIMULATOR), verilator)
-	../../software/tb &
-endif
-endif
 	make exec && echo "Checking test log..." && sleep 2
 endif
 else

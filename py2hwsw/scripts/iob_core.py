@@ -117,7 +117,7 @@ class iob_core(iob_module, iob_instance):
         )
         self.set_default_attribute(
             "setup_dir",
-            "",
+            kwargs.get("setup_dir", ""),
             str,
             descr="Path to root setup folder of the core.",
         )
@@ -244,7 +244,6 @@ class iob_core(iob_module, iob_instance):
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
-        self.setup_dir = find_module_setup_dir(self.original_name)[0]
         # print(
         #     f"DEBUG: {self.name} {self.original_name} {self.build_dir} {self.is_top_module}",
         #     file=sys.stderr,
@@ -400,9 +399,10 @@ class iob_core(iob_module, iob_instance):
             parameters=kwargs.get("parameters", {}),
         )
 
-        # Copy parent attributes to child
+        # Copy (some) parent attributes to child
         self.__dict__.update(parent_module.__dict__)
-        self.setup_dir = find_module_setup_dir(attributes["original_name"])[0]
+        self.original_name = attributes["original_name"]
+        self.setup_dir = attributes["setup_dir"]
 
         if self.abort_reason:
             return True
@@ -763,7 +763,7 @@ class iob_core(iob_module, iob_instance):
             core_dict = json.load(f)
 
         default_core_name = os.path.splitext(os.path.basename(filepath))[0]
-        py2_core_dict = {"original_name": default_core_name, "name": default_core_name}
+        py2_core_dict = {"original_name": default_core_name, "name": default_core_name, "setup_dir": os.path.dirname(filepath)}
         py2_core_dict.update(core_dict)
 
         return cls.py2hw(py2_core_dict, **kwargs)
@@ -888,7 +888,7 @@ class iob_core(iob_module, iob_instance):
                     **kwargs,
                 }
             )
-            py2_core_dict = {"original_name": core_name, "name": core_name}
+            py2_core_dict = {"original_name": core_name, "name": core_name, "setup_dir": core_dir}
             py2_core_dict.update(core_dict)
             instance = __class__.py2hw(
                 py2_core_dict,
@@ -968,8 +968,9 @@ def find_module_setup_dir(core_name):
     file_ext = os.path.splitext(file_path)[1]
 
     filepath = pathlib.Path(file_path)
-    # Force core file to be contained in a folder with the same name. Ignore "iob_core" case.
-    if filepath.parent.name != core_name and core_name != "iob_core":
+    # Force core file to be contained in a folder with the same name.
+    # Skip this check if we are the top module (no top defined) or trying to setup the top module again (same name as previous defined top)
+    if filepath.parent.name != core_name and (iob_core.global_top_module and core_name != iob_core.global_top_module.original_name):
         fail_with_msg(f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
                         f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
                         f"But found incorrect path:    '{filepath.resolve()}'.")

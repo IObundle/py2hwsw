@@ -159,25 +159,6 @@ def setup(py_params_dict):
         attributes_with_csrs["build_dir"] + "/document/tsrc",
     )
 
-    # Auto-add VERSION macro
-    found_version_macro = False
-    if attributes_with_csrs["confs"]:
-        for macro in attributes_with_csrs["confs"]:
-            if macro["name"] == "VERSION":
-                found_version_macro = True
-    if not found_version_macro:
-        attributes_with_csrs["confs"].append(
-            {
-                "name": "VERSION",
-                "type": "M",
-                "val": "16'h"
-                + reg_gen.version_str_to_digits(attributes_with_csrs["version"]),
-                "min": "NA",
-                "max": "NA",
-                "descr": "Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
-            }
-        )
-
     # Add ports and internal wires for registers
     auto_ports, auto_wires, auto_snippet = csr_gen_obj.gen_ports_wires(reg_table)
     attributes_dict["ports"] += auto_ports

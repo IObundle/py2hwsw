@@ -12,10 +12,9 @@
 
 #include "Viob_uut.h" //user file that defins the dut
 
-#include "iob_bsp.h"
-
 #ifndef CLK_PERIOD
-#define CLK_PERIOD 1000000000 / IOB_BSP_FREQ // Example: 1/100MHz*10^9 = 10 ns
+#define FREQ 100000000
+#define CLK_PERIOD 1000000000 / FREQ // Example: 1/100MHz*10^9 = 10 ns
 #endif
 
 #if (VM_TRACE == 1)

@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ps
 `include "iob_axistream_in_conf.vh"
-`include "iob_axistream_in_csrs_def.vh"
+`include "iob_axistream_in_csrs.vh"
 
 module iob_axistream_in #(
    `include "iob_axistream_in_params.vs"

@@ -59,10 +59,15 @@ endif
 
 #check universal testbench and include it
 
-ifeq ($(wildcard ./src/iob_v_tb.vh),)
+ifneq ($(wildcard ./src/$(NAME)_tb.v),)
+VTB:=1
 VSRC:=$(subst ./src/iob_v_tb.v, , $(VSRC))
 else
+ifneq ($(wildcard ./src/iob_v_tb.vh),)
 CTB:=1
+else
+TB:=0
+endif
 endif
 
 build: $(VHDR) $(VSRC) $(HEX) remote_build_dir
@@ -80,6 +85,7 @@ run: test.log
 	test "$$(cat test.log)" = "Test passed!"
 
 test.log: remote_build_dir
+ifneq ($(TB),0)
 ifeq ($(SIM_SERVER),) #is simulator in local machine?
 ifneq ($(CTB),) #is there a C testbench?
 ifneq ($(SIMULATOR), verilator) #is the simulator not verilator? if it is, then the C testbench has already been included in the verilator command
@@ -108,7 +114,9 @@ endif
 ifeq ($(VCD),1)
 	make waves
 endif
-
+else
+	echo "Test passed!" > test.log
+endif
 
 
 waves:

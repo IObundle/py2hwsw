@@ -4,13 +4,25 @@
 
 
 def setup(py_params_dict):
-    
-    port_params = py_params_dict["port_params"] if "port_params" in py_params_dict else {"clk_s": "cke_arst"}
-    assert "clk_s" in port_params, "clk_s port is missing"
 
-    clk_s_params = [x for x in port_params["clk_s"].split("_") if x != ""] if "clk_s" in port_params else []
-    if all(x in clk_s_params for x in ["arst", "anrst"]) or all(x in clk_s_params for x in ["rst", "nrst"]):
-        raise ValueError("There can only be one type of reset signal for each synchronous and asynchronous reset")
+    port_params = (
+        py_params_dict["port_params"]
+        if "port_params" in py_params_dict
+        else {"clk_en_rst_s": "cke_arst"}
+    )
+    assert "clk_en_rst_s" in port_params, "clk_en_rst_s port is missing"
+
+    clk_s_params = (
+        [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
+        if "clk_en_rst_s" in port_params
+        else []
+    )
+    if all(x in clk_s_params for x in ["arst", "anrst"]) or all(
+        x in clk_s_params for x in ["rst", "nrst"]
+    ):
+        raise ValueError(
+            "There can only be one type of reset signal for each synchronous and asynchronous reset"
+        )
 
     rst_str = ""
     en_str = ""
@@ -23,11 +35,19 @@ def setup(py_params_dict):
         sensitivity_list = "posedge clk_i"
 
     if any([x in clk_s_params for x in ["arst", "anrst", "rst", "nrst"]]):
-        rst_con = ' | '.join([f"{'~' if 'n' in x else ''}{x}_i" for x in ["arst", "anrst", "rst", "nrst"] if x in clk_s_params])
-        rst_str = f"        if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
+        rst_con = " | ".join(
+            [
+                f"{'~' if 'n' in x else ''}{x}_i"
+                for x in ["arst", "anrst", "rst", "nrst"]
+                if x in clk_s_params
+            ]
+        )
+        rst_str = (
+            f"        if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
+        )
 
     if "cke" in clk_s_params or "en" in clk_s_params:
-        en_con = ' & '.join([f"{x}_i" for x in ["cke", "en"] if x in clk_s_params])
+        en_con = " & ".join([f"{x}_i" for x in ["cke", "en"] if x in clk_s_params])
         en_str = f"{'else ' if rst_str != '' else '        '}if ({en_con}) begin\n            data_o <= data_i;\n        end"
     else:
         en_str = f"{'else begin' if rst_str != '' else '        '}\n            data_o <= data_i;\n        {'end' if rst_str != '' else ''}"
@@ -55,10 +75,10 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_s",
+                "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
-                    "params": port_params["clk_s"],
+                    "params": port_params["clk_en_rst_s"],
                 },
                 "descr": "Clock, clock enable and reset",
             },

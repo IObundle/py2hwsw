@@ -345,6 +345,10 @@ class iob_core(iob_module, iob_instance):
         doc_gen.generate_docs(self)
         # Generate ipxact file
         ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
+        # Remove 'iob_v_tb.v' from build dir if 'iob_v_tb.vh' does not exist
+        sim_src_dir = "hardware/simulation/src"
+        if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
+            os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
         # Lint and format sources
         self.lint_and_format()
         print(f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}")

@@ -82,16 +82,18 @@ module iob_axi_ram #(
    wire [DATA_WIDTH-1:0] axi_rdata;
    reg axi_rlast_reg, axi_rlast_next;
    reg axi_rvalid_reg, axi_rvalid_next;
-   reg [ID_WIDTH-1:0] axi_rid_pipe_reg;
-   reg [DATA_WIDTH-1:0] axi_rdata_pipe_reg;
-   reg axi_rlast_pipe_reg;
-   reg axi_rvalid_pipe_reg;
+   reg  [        ID_WIDTH-1:0] axi_rid_pipe_reg;
+   reg  [      DATA_WIDTH-1:0] axi_rdata_pipe_reg;
+   reg                         axi_rlast_pipe_reg;
+   reg                         axi_rvalid_pipe_reg;
 
    // (* RAM_STYLE="BLOCK" *)
-   reg [DATA_WIDTH-1:0] mem[2**VALID_ADDR_WIDTH];
+   reg  [      DATA_WIDTH-1:0] mem                 [2**VALID_ADDR_WIDTH];
 
-   wire [VALID_ADDR_WIDTH-1:0] read_addr_valid = read_addr_reg[(ADDR_WIDTH - VALID_ADDR_WIDTH)+:VALID_ADDR_WIDTH];
-   wire [VALID_ADDR_WIDTH-1:0] write_addr_valid = write_addr_reg[(ADDR_WIDTH - VALID_ADDR_WIDTH)+:VALID_ADDR_WIDTH];
+   wire [VALID_ADDR_WIDTH-1:0] read_addr_valid;
+   wire [VALID_ADDR_WIDTH-1:0] write_addr_valid;
+   assign read_addr_valid  = read_addr_reg[(ADDR_WIDTH-VALID_ADDR_WIDTH)+:VALID_ADDR_WIDTH];
+   assign write_addr_valid = write_addr_reg[(ADDR_WIDTH-VALID_ADDR_WIDTH)+:VALID_ADDR_WIDTH];
 
    assign axi_awready_o    = axi_awready_reg;
    assign axi_wready_o     = axi_wready_reg;

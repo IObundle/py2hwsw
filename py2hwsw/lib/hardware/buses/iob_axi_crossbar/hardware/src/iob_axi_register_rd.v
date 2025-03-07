@@ -147,7 +147,8 @@ module iob_axi_register_rd #(
          assign m_axi_arvalid  = m_axi_arvalid_reg;
 
          // enable ready input next cycle if output is ready or the temp reg will not be filled on the next cycle (output reg empty or no input)
-         wire s_axi_arready_early = m_axi_arready | (~temp_m_axi_arvalid_reg & (~m_axi_arvalid_reg | ~s_axi_arvalid));
+         wire s_axi_arready_early;
+         assign s_axi_arready_early = m_axi_arready | (~temp_m_axi_arvalid_reg & (~m_axi_arvalid_reg | ~s_axi_arvalid));
 
          always @* begin
             // transfer sink ready state to source
@@ -268,7 +269,8 @@ module iob_axi_register_rd #(
          assign m_axi_arvalid  = m_axi_arvalid_reg;
 
          // enable ready input next cycle if output buffer will be empty
-         wire s_axi_arready_early = !m_axi_arvalid_next;
+         wire s_axi_arready_early;
+         assign s_axi_arready_early = !m_axi_arvalid_next;
 
          always @* begin
             // transfer sink ready state to source
@@ -365,7 +367,8 @@ module iob_axi_register_rd #(
          assign s_axi_rvalid = s_axi_rvalid_reg;
 
          // enable ready input next cycle if output is ready or the temp reg will not be filled on the next cycle (output reg empty or no input)
-         wire m_axi_rready_early = s_axi_rready | (~temp_s_axi_rvalid_reg & (~s_axi_rvalid_reg | ~m_axi_rvalid));
+         wire m_axi_rready_early;
+         assign m_axi_rready_early = s_axi_rready | (~temp_s_axi_rvalid_reg & (~s_axi_rvalid_reg | ~m_axi_rvalid));
 
          always @* begin
             // transfer sink ready state to source
@@ -456,7 +459,8 @@ module iob_axi_register_rd #(
          assign s_axi_rvalid = s_axi_rvalid_reg;
 
          // enable ready input next cycle if output buffer will be empty
-         wire m_axi_rready_early = !s_axi_rvalid_next;
+         wire m_axi_rready_early;
+         assign m_axi_rready_early = !s_axi_rvalid_next;
 
          always @* begin
             // transfer sink ready state to source

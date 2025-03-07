@@ -62,9 +62,9 @@ int iob_core_tb() {
   IOB_UART_CSRS_SET_RXEN(1);
 
   unsigned int version;
-
+  int i;
   // read version 20 times to burn time
-  for (int i = 0; i < 20; i++) {
+  for (i = 0; i < 20; i++) {
     version = IOB_UART_CSRS_GET_VERSION();
   }
   printf("Version is %d\n", version);
@@ -76,7 +76,7 @@ int iob_core_tb() {
 
   // data send/receive loop
   printf("Starting data send/receive loop\n");
-  for (int i = 0; i < 4; i++) {
+  for (i = 0; i < 4; i++) {
     // wait for tx ready
     while (!IOB_UART_CSRS_GET_TXREADY())
       ;

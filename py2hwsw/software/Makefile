@@ -112,7 +112,7 @@ tb: ./src/iob_c_tb.c ./src/iob_core_tb.c $(CSRS)
 #########################################
 
 clean:
-	@rm -rf *.bin *.elf *.map *.hex
+	@rm -rf *.bin *.elf *.map *.hex tb
 	@rm -rf fw_emul test.log soc2cnsl cnsl2soc
 	@rm -rf *.txt iob_soc_conf.h
 

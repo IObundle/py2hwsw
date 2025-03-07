@@ -74,6 +74,8 @@ lint-test:
 #
 # SIMULATE
 #
+
+TBTYPE ?= C
 sim-build: sw-build
 	make -C $(SIM_DIR) -j1 build
 
@@ -94,7 +96,6 @@ sim-clean:
 
 sim-cov: sim-clean
 	make -C $(SIM_DIR) -j1 run COV=1
-
 
 
 #

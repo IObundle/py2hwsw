@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h> // For memset
+#include <time.h>
 #include <unistd.h>
 
 // File names (adjust as needed)
@@ -22,6 +23,13 @@ static FILE *fpw;
 static FILE *fpr;
 
 static uint32_t req = 0;
+
+void my_usleep(int microseconds) {
+    struct timespec req = {0};
+    req.tv_sec = microseconds / 1000000;
+    req.tv_nsec = (microseconds % 1000000) * 1000;
+    nanosleep(&req, NULL);
+}
 
 // Function to write to the c2v file
 void iob_write(uint32_t address, uint32_t data_w, uint32_t data) {
@@ -38,7 +46,7 @@ void iob_write(uint32_t address, uint32_t data_w, uint32_t data) {
   fprintf(fpw, "%08x %08x %08x %08x %08x\n", req, W, address, data_w, data);
   fflush(fpw);
   fclose(fpw);
-  usleep(100);
+  my_usleep(100);
 
   int fscan_ret = -1;
   
@@ -46,7 +54,7 @@ void iob_write(uint32_t address, uint32_t data_w, uint32_t data) {
   do {
     fpr = fopen(V2C_FILE, "rb");
     if (fpr != NULL) {
-      usleep(100);
+      my_usleep(100);
       fscan_ret = fscanf(fpr, "%08x %08x %08x %08x %08x\n", &ack, &mode, &addr, &dat_w, &dat);
       if (fscan_ret == 4) {
         if (ack == req && mode == W && addr == address && dat == data) {
@@ -77,7 +85,7 @@ uint32_t iob_read(uint32_t address, uint32_t data_w) {
   fprintf(fpw, "%08x %08x %08x %08x %08x\n", req, R, address, data_w, 0);
   fflush(fpw);
   fclose(fpw);
-  usleep(100);
+  my_usleep(100);
   
   int fscan_ret = -1;
 
@@ -85,7 +93,7 @@ uint32_t iob_read(uint32_t address, uint32_t data_w) {
   do {
     fpr = fopen(V2C_FILE, "rb");
     if (fpr != NULL) {
-      usleep(100);
+      my_usleep(100);
       fscanf_ret = (fscanf (fpr, "%08x %08x %08x %08x %08x\n", &ack, &mode, &addr, &dat_w, &dat) != 0);
       if (fscan_ret == 4) {
         if (ack == req && mode == R && addr == address) {
@@ -113,7 +121,7 @@ void iob_finish() {
   fprintf(fpw, "%08x %08x %08x %08x %08x\n", req, F, 0, 0, 0);
   fflush(fpw);
   fclose(fpw);
-  usleep(1000);
+  my_usleep(1000);
 }
 
 // User-supplied testbench function (must be defined by the user)

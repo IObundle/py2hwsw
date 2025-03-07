@@ -19,6 +19,7 @@ PYTHON_DIR = ../../scripts
 #include simulation headers and sources
 VHDR+=$(wildcard ./src/*.vh)
 VSRC+=$(wildcard ./src/*.v)
+VSRC+=$(wildcard ./src/*.sv)
 
 ifeq ($(SYN),)
 #include the module's headers and sources
@@ -44,12 +45,14 @@ endif
 #
 include $(SIMULATOR).mk
 
+TBTYPE?=C
 
 UFLAGS+=VCD=$(VCD)
 UFLAGS+=COV=$(COV)
 UFLAGS+=SYN=$(SYN)
 UFLAGS+=NODE=$(NODE)
 UFLAGS+=COV_TEST=$(COV_TEST)
+UFLAGS+=TBTYPE=$(TBTYPE)
 
 remote_build_dir:
 ifneq ($(SIM_SERVER),)
@@ -57,18 +60,31 @@ ifneq ($(SIM_SERVER),)
 	rsync $(SIM_SYNC_FLAGS) -avz --force --delete ../.. $(SIM_USER)@$(SIM_SERVER):$(REMOTE_BUILD_DIR)
 endif
 
-#check universal testbench and include it
+#choose tetsbench type: C, verilog, uvm or none
+ifeq ($(TBTYPE),V)
+VSRC:=$(filter-out ./src/iob_v_tb.v, $(VSRC))
+VSRC:=$(filter-out ./src/iob_uvm_tb.sv, $(VSRC))
+endif
 
-ifneq ($(wildcard ./src/$(NAME)_tb.v),)
-VTB:=1
-VSRC:=$(subst ./src/iob_v_tb.v, , $(VSRC))
-else
-ifneq ($(wildcard ./src/iob_v_tb.vh),)
-CTB:=1
-else
-TB:=0
+ifeq ($(TBTYPE),UVM)
+VSRC:=$(filter-out ./src/iob_v_tb.v, $(VSRC))
+VSRC:=$(filter-out ./src/$(NAME)_tb.v, $(VSRC))
+SIMULATOR:=xcelium
+endif
+
+ifeq ($(TBTYPE),C)
+VSRC:=$(filter-out ./src/$(NAME)_tb.v, $(VSRC))
+VSRC:=$(filter-out ./src/iob_uvm_tb.sv, $(VSRC))
+endif
+
+ifeq ($(wildcard ./src/$(NAME)_tb.v),)
+ifeq ($(wildcard ./src/iob_v_tb.v),)
+ifeq ($(wildcard ./src/iob_uvm_tb.v),)
+TBTYPE:=none
 endif
 endif
+endif
+
 
 build: $(VHDR) $(VSRC) $(HEX) remote_build_dir
 ifeq ($(SIM_SERVER),)
@@ -85,13 +101,15 @@ run: test.log
 	test "$$(cat test.log)" = "Test passed!"
 
 test.log: remote_build_dir
-ifneq ($(TB),0)
+ifneq ($(TB),none)
 ifeq ($(SIM_SERVER),) #is simulator in local machine?
-ifneq ($(CTB),) #is there a C testbench?
-ifneq ($(SIMULATOR), verilator) #is the simulator not verilator? if it is, then the C testbench has already been included in the verilator command
-	../../software/tb & #run the C testbench in background
+
+ifeq ($(TBTYPE),C)
+ifneq ($(SIMULATOR), verilator) #if the simulator is not verilator, run the the C testbench separately
+	rm ../../software/tb && make -C ../../software build && make comp && ../../software/tb & #run the C testbench in background
 endif
 endif
+
 ifneq ($(CONSOLE_CMD),)
 	$(BOARD_GRAB_CMD) -s 'make exec' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else

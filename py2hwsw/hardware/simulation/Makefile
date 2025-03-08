@@ -104,9 +104,11 @@ test.log: remote_build_dir
 ifneq ($(TB),none)
 ifeq ($(SIM_SERVER),) #is simulator in local machine?
 
-ifeq ($(TBTYPE),C)
+ifneq ($(TBTYPE),none)
+ifneq ($(TBTYPE),V)
 ifneq ($(SIMULATOR), verilator) #if the simulator is not verilator, run the the C testbench separately
 	rm ../../software/tb && make -C ../../software build && make comp && ../../software/tb & #run the C testbench in background
+endif
 endif
 endif
 

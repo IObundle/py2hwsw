@@ -14,7 +14,9 @@ def setup(py_params_dict):
     )
     # Number of subordinate interfaces (number of managers to connect to)
     N_SUBORDINATES = (
-        int(py_params_dict["num_subordinates"]) if "num_subordinates" in py_params_dict else 1
+        int(py_params_dict["num_subordinates"])
+        if "num_subordinates" in py_params_dict
+        else 1
     )
 
     # Number of bits required for manager interface selection (each output of split)

@@ -58,7 +58,9 @@ def setup(py_params_dict):
     )
     # Number of subordinate interfaces (number of managers to connect to)
     N_SUBORDINATES = (
-        int(py_params_dict["num_subordinates"]) if "num_subordinates" in py_params_dict else 1
+        int(py_params_dict["num_subordinates"])
+        if "num_subordinates" in py_params_dict
+        else 1
     )
     # Dictionary with name and address width of each manager
     MANAGERS = (

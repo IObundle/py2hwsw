@@ -19,7 +19,7 @@ PYTHON_DIR = ../../scripts
 #include simulation headers and sources
 VHDR+=$(wildcard ./src/*.vh)
 VSRC+=$(wildcard ./src/*.v)
-VSRC+=$(wildcard ./src/*.sv)
+VSRC+=$(wildcard ./src/iob_uvm_tb.sv)
 
 ifeq ($(SYN),)
 #include the module's headers and sources

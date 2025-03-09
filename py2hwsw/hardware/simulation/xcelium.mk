@@ -47,8 +47,8 @@ endif
 
 xmvlog.log: $(VHDR) $(VSRC) $(HEX)
 ifeq ($(TBTYPE),UVM)
-	xrun -compile -sv_lib uvm_dpi $(UVM_HOME)/src/dpi/uvm_dpi.cc -cdslib .
-	xmvlog $(VFLAGS) -incdir $(UVM_HOME)/src +define+UVM $(UVM_HOME)/src/uvm_pkg.sv $(VSRC)
+	xrun -compile -sv_lib uvm_dpi $(UVM_HOME)/src/dpi/uvm_dpi.cc -cdslib . +UVM_TESTNAME=iob_test
+	xmvlog $(VFLAGS) -incdir $(UVM_HOME)/src +define+UVM  $(UVM_HOME)/src/uvm_pkg.sv $(VSRC)
 else
 	xmvlog $(VFLAGS) $(VSRC)
 endif

@@ -15,11 +15,11 @@
  * AXI4 crossbar address decode and admission control
  */
 module iob_axi_crossbar_addr #(
-   // Slave interface index
+   // Subordinate interface index
    parameter S            = 0,
-   // Number of AXI inputs (slave interfaces)
+   // Number of AXI inputs (subordinate interfaces)
    parameter S_COUNT      = 4,
-   // Number of AXI outputs (master interfaces)
+   // Number of AXI outputs (manager interfaces)
    parameter M_COUNT      = 4,
    // Width of address bus in bits
    parameter ADDR_WIDTH   = 32,
@@ -29,19 +29,19 @@ module iob_axi_crossbar_addr #(
    parameter S_THREADS    = 32'd2,
    // Number of concurrent operations
    parameter S_ACCEPT     = 32'd16,
-   // Number of regions per master interface
+   // Number of regions per manager interface
    parameter M_REGIONS    = 1,
-   // Master interface base addresses
+   // Manager interface base addresses
    // M_COUNT concatenated fields of M_REGIONS concatenated fields of ADDR_WIDTH bits
    // set to zero for default addressing based on M_ADDR_WIDTH
    parameter M_BASE_ADDR  = 0,
-   // Master interface address widths
+   // Manager interface address widths
    // M_COUNT concatenated fields of M_REGIONS concatenated fields of 32 bits
    parameter M_ADDR_WIDTH = {M_COUNT{{M_REGIONS{32'd24}}}},
    // Connections between interfaces
    // M_COUNT concatenated fields of S_COUNT bits
    parameter M_CONNECT    = {M_COUNT{{S_COUNT{1'b1}}}},
-   // Secure master (fail operations based on awprot/arprot)
+   // Secure manager (fail operations based on awprot/arprot)
    // M_COUNT bits
    parameter M_SECURE     = {M_COUNT{1'b0}},
    // Enable write command output

@@ -17,7 +17,7 @@
 `define IOB_GET_WSTRB(ADDR, WIDTH) (((1<<`IOB_GET_NBYTES(WIDTH))-1)<<`IOB_BYTE_OFFSET(ADDR))
 `define IOB_GET_RDATA(ADDR, DATA, WIDTH) ((DATA>>(8*`IOB_BYTE_OFFSET(ADDR)))&((1<<WIDTH)-1))
 
-// Write data to IOb Native slave
+// Write data to IOb Native subordinate
 task iob_write;
    input [ADDR_W-1:0] addr;
    input [DATA_W-1:0] data;
@@ -36,7 +36,7 @@ task iob_write;
    end
 endtask
 
-// Read data from IOb Native slave
+// Read data from IOb Native subordinate
 task iob_read;
    input [ADDR_W-1:0] addr;
    output [DATA_W-1:0] data;

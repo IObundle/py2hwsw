@@ -16,7 +16,7 @@ module iob_iob2axil #(
    input                           clk_i,
    input                           cke_i,
    input                           arst_i,
-   // AXI4 Lite master interface
+   // AXI4 Lite manager interface
    output wire                     axil_awvalid_o,
    input  wire                     axil_awready_i,
    output wire [  AXIL_ADDR_W-1:0] axil_awaddr_o,
@@ -37,7 +37,7 @@ module iob_iob2axil #(
    input  wire [  AXIL_DATA_W-1:0] axil_rdata_i,
    input  wire [              1:0] axil_rresp_i,
 
-   // IOb slave interface
+   // IOb subordinate interface
    input  wire                iob_valid_i,
    input  wire [  ADDR_W-1:0] iob_addr_i,
    input  wire [  DATA_W-1:0] iob_wdata_i,

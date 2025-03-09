@@ -39,7 +39,7 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "descr": "IOb native master interface",
+                "descr": "IOb native manager interface",
             },
             {
                 "name": "wb_s",
@@ -48,7 +48,7 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "descr": "Wishbone slave interface",
+                "descr": "Wishbone subordinate interface",
             },
         ],
         "wires": [

@@ -104,7 +104,7 @@ def setup(py_params_dict):
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                 },
-                "descr": "AXI master interface for external memory",
+                "descr": "AXI manager interface for external memory",
             },
         ],
     }

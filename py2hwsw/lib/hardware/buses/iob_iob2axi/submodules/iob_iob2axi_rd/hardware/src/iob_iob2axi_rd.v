@@ -30,12 +30,12 @@ module iob_iob2axi_rd #(
    output                 error_o,
 
    //
-   // AXI-4 Full Master Read I/F
+   // AXI-4 Full Manager Read I/F
    //
    `include "iob_iob2axi_rd_m_axi_read_m_port.vs"
 
    //
-   // Native Master Write I/F
+   // Native Manager Write I/F
    //
    output                m_iob_valid_o,
    output [  ADDR_W-1:0] m_iob_addr_o,

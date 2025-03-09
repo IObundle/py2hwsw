@@ -25,8 +25,8 @@ if setup.is_top_module(sys.modules[__name__]):
 confs = regfileif_core_module.confs
 
 ios = [
-    {"name": "iob_s_port", "descr": "Slave CPU native interface", "ports": []},
-    {"name": "iob_m_port", "descr": "Master CPU native interface", "ports": []},
+    {"name": "iob_s_port", "descr": "Subordinate CPU native interface", "ports": []},
+    {"name": "iob_m_port", "descr": "Manager CPU native interface", "ports": []},
 ]
 
 regs = [

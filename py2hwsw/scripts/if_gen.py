@@ -155,7 +155,7 @@ ADDR_W = 32
 
 #
 # below are functions that return interface ports for each interface type
-# the port direction is relative to the master module (driver)
+# the port direction is relative to the manager module (driver)
 #
 
 
@@ -569,7 +569,7 @@ def get_axil_write_ports():
         iob_signal(
             name="axil_awprot_o",
             width=PROT_W,
-            descr="Address write channel protection type. Set to 000 if master output; ignored if slave input.",
+            descr="Address write channel protection type. Set to 000 if manager output; ignored if subordinate input.",
         ),
         iob_signal(
             name="axil_awvalid_o",
@@ -630,7 +630,7 @@ def get_axil_read_ports():
         iob_signal(
             name="axil_arprot_o",
             width=PROT_W,
-            descr="Address read channel protection type. Set to 000 if master output; ignored if slave input.",
+            descr="Address read channel protection type. Set to 000 if manager output; ignored if subordinate input.",
         ),
         iob_signal(
             name="axil_arvalid_o",
@@ -706,7 +706,7 @@ def get_axi_write_ports():
         iob_signal(
             name="axi_awcache_o",
             width=CACHE_W,
-            descr="Address write channel memory type. Set to 0000 if master output; ignored if slave input.",
+            descr="Address write channel memory type. Set to 0000 if manager output; ignored if subordinate input.",
         ),
         iob_signal(
             name="axi_awqos_o",
@@ -762,7 +762,7 @@ def get_axi_read_ports():
         iob_signal(
             name="axi_arcache_o",
             width=CACHE_W,
-            descr="Address read channel memory type. Set to 0000 if master output; ignored if slave input.",
+            descr="Address read channel memory type. Set to 0000 if manager output; ignored if subordinate input.",
         ),
         iob_signal(
             name="axi_arqos_o",
@@ -829,7 +829,7 @@ def get_apb_ports():
         iob_signal(
             name="apb_sel_o",
             width=1,
-            descr="Slave select.",
+            descr="Subordinate select.",
         ),
         iob_signal(
             name="apb_enable_o",
@@ -1222,7 +1222,7 @@ def write_s_tb_wire(fout, prefix, wires):
 def get_signals(name, if_type="", mult=1, widths={}, params="None", signal_prefix=""):
     """Get list of signals for given interface
     param if_type: Type of interface.
-                   Examples: '' (unspecified), 'master', 'slave', ...
+                   Examples: '' (unspecified), 'manager', 'subordinate', ...
     param mult: Multiplication factor for all signal widths.
     param widths: Dictionary for configuration of specific signal widths.
     """
@@ -1231,7 +1231,7 @@ def get_signals(name, if_type="", mult=1, widths={}, params="None", signal_prefi
     signals = eval(eval_str)
 
     # Set direction according to if_type
-    if if_type == "slave":
+    if if_type == "subordinate":
         signals = reverse_signals_dir(signals)
     # TODO: Code to support other if_types
     # For example, the rs232 has not type.
@@ -1272,11 +1272,11 @@ def gen_if(interface):
         # get ports
         if if_type.startswith("s"):
             ports = get_signals(
-                name=name, if_type="slave", mult=mult, widths=widths, params=params
+                name=name, if_type="subordinate", mult=mult, widths=widths, params=params
             )
         else:
             ports = get_signals(
-                name=name, if_type="master", mult=mult, widths=widths, params=params
+                name=name, if_type="manager", mult=mult, widths=widths, params=params
             )
 
         eval_str = f"write_{if_type}(fout, prefix1,{prefix2_str} ports)"

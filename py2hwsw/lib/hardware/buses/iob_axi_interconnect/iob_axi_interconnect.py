@@ -37,7 +37,7 @@ def setup(py_params_dict):
                 "val": "{M_COUNT{{M_REGIONS{32'd24}}}}",
                 "min": "NA",
                 "max": "NA",
-                "descr": "Master address bus width",
+                "descr": "Manager address bus width",
             },
             {
                 "name": "S_COUNT",
@@ -45,7 +45,7 @@ def setup(py_params_dict):
                 "val": "4",
                 "min": "NA",
                 "max": "NA",
-                "descr": "Number of slave interfaces",
+                "descr": "Number of subordinate interfaces",
             },
             {
                 "name": "M_COUNT",
@@ -53,7 +53,7 @@ def setup(py_params_dict):
                 "val": "4",
                 "min": "NA",
                 "max": "NA",
-                "descr": "Number of master interfaces",
+                "descr": "Number of manager interfaces",
             },
         ],
         "ports": [
@@ -89,7 +89,7 @@ def setup(py_params_dict):
                     "LEN_W": "8",
                     "LOCK_W": 1,
                 },
-                "descr": "AXI slave interface",
+                "descr": "AXI subordinate interface",
             },
             {
                 "name": "m_axi_m",
@@ -103,7 +103,7 @@ def setup(py_params_dict):
                     "LEN_W": "8",
                     "LOCK_W": 1,
                 },
-                "descr": "AXI master interface",
+                "descr": "AXI manager interface",
             },
         ],
         "subblocks": [

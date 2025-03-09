@@ -36,8 +36,8 @@ class iob_port(iob_wire):
             "_i": "input",
             "_o": "output",
             "_io": "inout",
-            "_s": "slave",
-            "_m": "master",
+            "_s": "subordinate",
+            "_m": "manager",
         }
         _direction = None
         for sufix, d in _sufix_dict.items():
@@ -60,7 +60,7 @@ class iob_port(iob_wire):
                 params=self.interface.params,
                 signal_prefix=self.interface.prefix,
             )
-        elif _direction in ["slave", "master"]:
+        elif _direction in ["subordinate", "manager"]:
             fail_with_msg(
                 f"Port '{self.name}' is a '{_direction}' port but no interface is defined",
                 ValueError,

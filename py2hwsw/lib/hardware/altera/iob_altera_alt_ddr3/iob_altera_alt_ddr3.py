@@ -4,9 +4,9 @@
 
 
 def setup(py_params_dict):
-    # Number of slave interfaces (number of masters to connect to)
-    N_SLAVES = (
-        int(py_params_dict["num_slaves"]) if "num_slaves" in py_params_dict else 1
+    # Number of subordinate interfaces (number of managers to connect to)
+    N_SUBORDINATES = (
+        int(py_params_dict["num_subordinates"]) if "num_subordinates" in py_params_dict else 1
     )
 
     attributes_dict = {
@@ -86,7 +86,7 @@ def setup(py_params_dict):
             },
         ],
     }
-    for i in range(N_SLAVES):
+    for i in range(N_SUBORDINATES):
         attributes_dict["ports"] += [
             {
                 "name": f"s{i}_axi_s",
@@ -98,7 +98,7 @@ def setup(py_params_dict):
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                 },
-                "descr": f"Slave {i} interface",
+                "descr": f"Subordinate {i} interface",
             },
         ]
     attributes_dict["snippets"] = [
@@ -129,7 +129,7 @@ def setup(py_params_dict):
         },
     ]
 
-    for i in range(N_SLAVES):
+    for i in range(N_SUBORDINATES):
         attributes_dict["snippets"][-1][
             "verilog_code"
         ] += f"""

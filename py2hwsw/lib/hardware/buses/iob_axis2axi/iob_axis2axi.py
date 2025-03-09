@@ -121,7 +121,7 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "descr": "AXI master interface",
+                "descr": "AXI manager interface",
             },
             {
                 "name": "extmem_io",

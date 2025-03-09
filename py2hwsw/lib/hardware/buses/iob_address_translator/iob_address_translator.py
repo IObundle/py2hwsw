@@ -185,16 +185,16 @@ begin
         "confs": verilog_parameters,
         "ports": [
             {
-                "name": "slave_s",
-                "descr": "Slave interface (connects to master)",
+                "name": "subordinate_s",
+                "descr": "Subordinate interface (connects to manager)",
                 "signals": {
                     "type": INTERFACE,
                     **interface_parameters,
                 },
             },
             {
-                "name": "master_m",
-                "descr": "Master interface (connects to slave)",
+                "name": "manager_m",
+                "descr": "Manager interface (connects to subordinate)",
                 "signals": {
                     "type": INTERFACE,
                     **interface_parameters,

@@ -8,19 +8,19 @@ def setup(py_params_dict):
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated axi interconnect module."
     )
-    # Number of master interfaces (number of masters to connect to)
-    N_MASTERS = (
-        int(py_params_dict["num_masters"]) if "num_masters" in py_params_dict else 1
+    # Number of manager interfaces (number of managers to connect to)
+    N_MANAGERS = (
+        int(py_params_dict["num_managers"]) if "num_managers" in py_params_dict else 1
     )
-    # Number of slave interfaces (number of masters to connect to)
-    N_SLAVES = (
-        int(py_params_dict["num_slaves"]) if "num_slaves" in py_params_dict else 1
+    # Number of subordinate interfaces (number of managers to connect to)
+    N_SUBORDINATES = (
+        int(py_params_dict["num_subordinates"]) if "num_subordinates" in py_params_dict else 1
     )
 
-    # Number of bits required for master interface selection (each output of split)
-    M_SELECT_NBITS = (N_MASTERS - 1).bit_length()
-    # Number of bits required for slave interface selection (each input of merge)
-    S_SELECT_NBITS = (N_SLAVES - 1).bit_length()
+    # Number of bits required for manager interface selection (each output of split)
+    M_SELECT_NBITS = (N_MANAGERS - 1).bit_length()
+    # Number of bits required for subordinate interface selection (each input of merge)
+    S_SELECT_NBITS = (N_SUBORDINATES - 1).bit_length()
 
     axi_python_params = {
         "addr_w": 32,
@@ -144,11 +144,11 @@ def setup(py_params_dict):
             ],
         },
     ]
-    for i in range(N_MASTERS):
+    for i in range(N_MANAGERS):
         attributes_dict["ports"].append(
             {
                 "name": f"m{i}_axi_m",
-                "descr": f"Master {i} interface",
+                "descr": f"Manager {i} interface",
                 "signals": {
                     "type": "axi",
                     "prefix": f"m{i}_",
@@ -157,11 +157,11 @@ def setup(py_params_dict):
                 },
             }
         )
-    for i in range(N_SLAVES):
+    for i in range(N_SUBORDINATES):
         attributes_dict["ports"].append(
             {
                 "name": f"s{i}_axi_s",
-                "descr": f"Slave {i} interface",
+                "descr": f"Subordinate {i} interface",
                 "signals": {
                     "type": "axi",
                     "prefix": f"s{i}_",
@@ -174,12 +174,12 @@ def setup(py_params_dict):
     # Wires
     #
     attributes_dict["wires"] = []
-    for i in range(N_SLAVES):
-        for j in range(N_MASTERS):
+    for i in range(N_SUBORDINATES):
+        for j in range(N_MANAGERS):
             attributes_dict["wires"].append(
                 {
                     "name": f"connect_s{i}_m{j}",
-                    "descr": f"Connect split of slave {i} to merge of master {j}",
+                    "descr": f"Connect split of subordinate {i} to merge of manager {j}",
                     "signals": {
                         "type": "axi",
                         "prefix": f"s{i}_m{j}_",
@@ -190,7 +190,7 @@ def setup(py_params_dict):
                 }
             )
     # Wires for output for merges
-    for i in range(N_MASTERS):
+    for i in range(N_MANAGERS):
         attributes_dict["wires"].append(
             {
                 "name": f"merge_{i}_output",
@@ -208,47 +208,47 @@ def setup(py_params_dict):
     # Blocks
     #
     attributes_dict["subblocks"] = []
-    # Create axi_split blocks for each slave interface
-    for i in range(N_SLAVES):
-        split_master_port_connections = {}
-        for j in range(N_MASTERS):
-            split_master_port_connections[f"m_{j}_m"] = f"connect_s{i}_m{j}"
+    # Create axi_split blocks for each subordinate interface
+    for i in range(N_SUBORDINATES):
+        split_manager_port_connections = {}
+        for j in range(N_MANAGERS):
+            split_manager_port_connections[f"m_{j}_m"] = f"connect_s{i}_m{j}"
 
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_axi_split",
                 "name": f"{py_params_dict['name']}_split",
                 "instance_name": f"iob_axi_split_{i}",
-                "instance_description": f"AXI split for slave {i}",
+                "instance_description": f"AXI split for subordinate {i}",
                 "parameters": AXI_VERILOG_PARAMS_MAP,
-                "num_masters": N_MASTERS,
+                "num_managers": N_MANAGERS,
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "rst_i",
                     "s_s": f"s{i}_axi_s",
-                    **split_master_port_connections,
+                    **split_manager_port_connections,
                 },
                 **axi_python_params,
             }
         )
-    # Create axi_merge blocks for each master interface
-    for i in range(N_MASTERS):
-        merge_slave_port_connections = {}
-        for j in range(N_SLAVES):
-            merge_slave_port_connections[f"s_{j}_s"] = f"connect_s{j}_m{i}"
+    # Create axi_merge blocks for each manager interface
+    for i in range(N_MANAGERS):
+        merge_subordinate_port_connections = {}
+        for j in range(N_SUBORDINATES):
+            merge_subordinate_port_connections[f"s_{j}_s"] = f"connect_s{j}_m{i}"
 
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_axi_merge",
                 "name": f"{py_params_dict['name']}_merge",
                 "instance_name": f"iob_axi_merge_{i}",
-                "instance_description": f"AXI merge for master {i}",
+                "instance_description": f"AXI merge for manager {i}",
                 "parameters": AXI_VERILOG_PARAMS_MAP,
-                "num_slaves": N_SLAVES,
+                "num_subordinates": N_SUBORDINATES,
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "rst_i",
-                    **merge_slave_port_connections,
+                    **merge_subordinate_port_connections,
                     "m_m": f"merge_{i}_output",
                 },
                 **axi_python_params,
@@ -259,8 +259,8 @@ def setup(py_params_dict):
     # Snippets
     #
     snippet_code = ""
-    # Connect merge outputs to master interfaces
-    for i in range(N_MASTERS):
+    # Connect merge outputs to manager interfaces
+    for i in range(N_MANAGERS):
         # Connect all signals except for address ones
         for signal, direction, _, _ in axi_signals:
             if signal in ["axi_awaddr", "axi_araddr"]:

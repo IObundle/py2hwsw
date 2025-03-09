@@ -59,7 +59,7 @@ module iob_axis2axi_tb;
    wire delayed_axis_out_valid;
    reg delayed_axis_out_ready;
 
-   // AXI-4 full master I/F
+   // AXI-4 full manager I/F
    wire ddr_axi_awid;  //Address write channel ID
    wire [ADDR_W-1:0] ddr_axi_awaddr;  //Address write channel address
    wire [8-1:0] ddr_axi_awlen;  //Address write channel burst length
@@ -326,11 +326,11 @@ module iob_axis2axi_tb;
    axidelayRead #(
       .MAX_DELAY(DELAY_AXI_READ)
    ) delayRead (
-      // Connect directly to the same named axi read wires in the master interface
+      // Connect directly to the same named axi read wires in the manager interface
       .m_rvalid_o(m_rvalid),
       .m_rready_i(m_rready),
 
-      // Connect directly to the same named axi read wires in the slave interface
+      // Connect directly to the same named axi read wires in the subordinate interface
       .s_rvalid_i(s_rvalid),
       .s_rready_o(s_rready),
 
@@ -342,11 +342,11 @@ module iob_axis2axi_tb;
    axidelayWrite #(
       .MAX_DELAY(DELAY_AXI_WRITE)
    ) delayWrite (
-      // Connect directly to the same named axi write wires in the master interface
+      // Connect directly to the same named axi write wires in the manager interface
       .m_wvalid_i(m_wvalid),
       .m_wready_o(m_wready),
 
-      // Connect directly to the same named axi write wires in the slave interface
+      // Connect directly to the same named axi write wires in the subordinate interface
       .s_wvalid_o(s_wvalid),
       .s_wready_i(s_wready),
 
@@ -358,11 +358,11 @@ module iob_axis2axi_tb;
    axidelay #(
       .MAX_DELAY(DELAY_AXIS_IN)
    ) delayIn (
-      // Master interface. Connect to a slave interface
+      // Manager interface. Connect to a subordinate interface
       .m_valid_o(delayed_axis_in_valid),
       .m_ready_i(delayed_axis_in_ready),
 
-      // Slave interface. Connect to a master interface
+      // Subordinate interface. Connect to a manager interface
       .s_valid_i(axis_in_valid),
       .s_ready_o(axis_in_ready),
 
@@ -373,11 +373,11 @@ module iob_axis2axi_tb;
    axidelay #(
       .MAX_DELAY(DELAY_AXIS_OUT)
    ) delayOut (
-      // Master interface. Connect to a slave interface
+      // Manager interface. Connect to a subordinate interface
       .m_valid_o(delayed_axis_out_valid),
       .m_ready_i(delayed_axis_out_ready),
 
-      // Slave interface. Connect to a master interface
+      // Subordinate interface. Connect to a manager interface
       .s_valid_i(non_delayed_axis_out_valid),
       .s_ready_o(non_delayed_axis_out_ready),
 
@@ -423,7 +423,7 @@ module iob_axis2axi_tb;
       .axis_out_ready_i(non_delayed_axis_out_ready),
 
       //
-      // AXI-4 full master I/F
+      // AXI-4 full manager I/F
       //
       .axi_awid_o(ddr_axi_awid),  //Address write channel ID
       .axi_awaddr_o(ddr_axi_awaddr),  //Address write channel address
@@ -479,7 +479,7 @@ module iob_axis2axi_tb;
       .rst_i(rst),
 
       //
-      // AXI-4 full master interface
+      // AXI-4 full manager interface
       //
 
       // Address write

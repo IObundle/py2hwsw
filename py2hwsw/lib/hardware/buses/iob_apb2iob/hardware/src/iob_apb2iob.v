@@ -6,7 +6,7 @@
 
 
 //
-// APB slave port to IOb master interface
+// APB subordinate port to IOb manager interface
 
 module iob_apb2iob #(
    parameter APB_ADDR_W = 21,          // APB address bus width in bits

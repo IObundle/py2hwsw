@@ -346,13 +346,13 @@ def generate_peripheral_base_addresses(
         {"instance_name": "CLINT0"},
         {"instance_name": "PLIC0"},
     ]
-    n_slaves_w = (len(complete_peripherals_list) - 1).bit_length()
+    n_subordinates_w = (len(complete_peripherals_list) - 1).bit_length()
 
     peripherals_base_addresses = {}
     for idx, instance in enumerate(complete_peripherals_list):
         instance_name = instance["instance_name"]
         peripherals_base_addresses[instance_name] = pbus_base + (
-            idx << (region_width - n_slaves_w)
+            idx << (region_width - n_subordinates_w)
         )
     return peripherals_base_addresses
 

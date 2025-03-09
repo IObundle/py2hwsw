@@ -178,7 +178,7 @@ module iob_uart_tb;
       .iob_uart_csrs_iob_ready_o  (iob_ready_o)
    );
 
-// Write data to IOb Native slave
+// Write data to IOb Native subordinate
 task iob_write;
    input [`IOB_UART_CSRS_ADDR_W-1:0] addr;
    input [31:0] data;
@@ -197,7 +197,7 @@ task iob_write;
    end
 endtask
 
-// Read data from IOb Native slave
+// Read data from IOb Native subordinate
 task iob_read;
    input [`IOB_UART_CSRS_ADDR_W-1:0] addr;
    output [31:0] data;

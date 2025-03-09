@@ -18,9 +18,9 @@ Changes made (2023 Pedro Antunes):
  * AXI4 interconnect
  */
 module iob_axi_interconnect #(
-   // Number of AXI inputs (slave interfaces)
+   // Number of AXI inputs (subordinate interfaces)
    parameter S_COUNT         = 4,
-   // Number of AXI outputs (master interfaces)
+   // Number of AXI outputs (manager interfaces)
    parameter M_COUNT         = 4,
    // Width of data bus in bits
    parameter DATA_WIDTH      = 32,
@@ -52,13 +52,13 @@ module iob_axi_interconnect #(
    parameter RUSER_WIDTH     = 1,
    // Propagate ID field
    parameter FORWARD_ID      = 0,
-   // Number of regions per master interface
+   // Number of regions per manager interface
    parameter M_REGIONS       = 1,
-   // Master interface base addresses
+   // Manager interface base addresses
    // M_COUNT concatenated fields of M_REGIONS concatenated fields of ADDR_WIDTH bits
    // set to zero for default addressing based on M_ADDR_WIDTH
    parameter M_BASE_ADDR     = 0,
-   // Master interface address widths
+   // Manager interface address widths
    // M_COUNT concatenated fields of M_REGIONS concatenated fields of 32 bits
    parameter M_ADDR_WIDTH    = {M_COUNT{{M_REGIONS{32'd24}}}},
    // Read connections between interfaces
@@ -67,7 +67,7 @@ module iob_axi_interconnect #(
    // Write connections between interfaces
    // M_COUNT concatenated fields of S_COUNT bits
    parameter M_CONNECT_WRITE = {M_COUNT{{S_COUNT{1'b1}}}},
-   // Secure master (fail operations based on awprot/arprot)
+   // Secure manager (fail operations based on awprot/arprot)
    // M_COUNT bits
    parameter M_SECURE        = {M_COUNT{1'b0}}
 ) (
@@ -75,7 +75,7 @@ module iob_axi_interconnect #(
    input wire rst_i,
 
    /*
-     * AXI slave interfaces
+     * AXI subordinate interfaces
      */
    input  wire [   S_COUNT*ID_WIDTH-1:0] s_axi_awid_i,
    input  wire [ S_COUNT*ADDR_WIDTH-1:0] s_axi_awaddr_i,
@@ -118,7 +118,7 @@ module iob_axi_interconnect #(
    input  wire [            S_COUNT-1:0] s_axi_rready_i,
 
    /*
-     * AXI master interfaces
+     * AXI manager interfaces
      */
    output wire [    M_COUNT*ID_WIDTH-1:0] m_axi_awid_o,
    output wire [  M_COUNT*ADDR_WIDTH-1:0] m_axi_awaddr_o,
@@ -339,7 +339,7 @@ module iob_axi_interconnect #(
    assign m_axi_arvalid_o = m_axi_arvalid_reg;
    assign m_axi_rready_o = m_axi_rready_reg;
 
-   // slave side mux
+   // subordinate side mux
    wire [(CL_S_COUNT > 0 ? CL_S_COUNT-1 : 0):0] s_select;
 
    wire [ID_WIDTH-1:0] current_s_axi_awid = s_axi_awid_i[s_select*ID_WIDTH+:ID_WIDTH];
@@ -385,7 +385,7 @@ module iob_axi_interconnect #(
    wire current_s_axi_rvalid = s_axi_rvalid_o[s_select];
    wire current_s_axi_rready = s_axi_rready_i[s_select];
 
-   // master side mux
+   // manager side mux
    wire [ID_WIDTH-1:0] current_m_axi_awid = m_axi_awid_o[m_select_reg*ID_WIDTH+:ID_WIDTH];
    wire [ADDR_WIDTH-1:0] current_m_axi_awaddr = m_axi_awaddr_o[m_select_reg*ADDR_WIDTH+:ADDR_WIDTH];
    wire [7:0] current_m_axi_awlen = m_axi_awlen_o[m_select_reg*8+:8];
@@ -564,7 +564,7 @@ module iob_axi_interconnect #(
             end
          end
          STATE_DECODE: begin
-            // decode state; determine master interface
+            // decode state; determine manager interface
 
             match = 1'b0;
             for (i = 0; i < M_COUNT; i = i + 1) begin

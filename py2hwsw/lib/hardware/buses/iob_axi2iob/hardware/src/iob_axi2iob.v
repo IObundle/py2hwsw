@@ -11,9 +11,9 @@
 module iob_axi2iob #(
    // Width of address bus in bits
    parameter ADDR_WIDTH    = 32,
-   // Width of input (slave/master) AXI/IOb interface data bus in bits
+   // Width of input (subordinate/manager) AXI/IOb interface data bus in bits
    parameter DATA_WIDTH    = 32,
-   // Width of input (slave/master) AXI/IOb interface wstrb (width of data bus in words)
+   // Width of input (subordinate/manager) AXI/IOb interface wstrb (width of data bus in words)
    parameter STRB_WIDTH    = (DATA_WIDTH / 8),
    // Width of AXI ID signal
    parameter AXI_ID_WIDTH  = 8,
@@ -25,7 +25,7 @@ module iob_axi2iob #(
    input wire arst_i,
 
    /*
-     * AXI slave interface
+     * AXI subordinate interface
      */
    input  wire [ AXI_ID_WIDTH-1:0] s_axi_awid_i,
    input  wire [   ADDR_WIDTH-1:0] s_axi_awaddr_i,
@@ -66,7 +66,7 @@ module iob_axi2iob #(
    input  wire                     s_axi_rready_i,
 
    /*
-     * IOb-bus master interface
+     * IOb-bus manager interface
      */
    output wire                  iob_valid_o,
    output wire [ADDR_WIDTH-1:0] iob_addr_o,
@@ -93,7 +93,7 @@ module iob_axi2iob #(
    endgenerate
 
    /*
-  * AXI lite master interface (used as a middle ground from AXI4 to IOb)
+  * AXI lite manager interface (used as a middle ground from AXI4 to IOb)
   */
    wire [ADDR_WIDTH-1:0] m_axil_awaddr;
    wire                  m_axil_awvalid;
@@ -210,7 +210,7 @@ module iob_axi2iob #(
    reg [STRB_WIDTH-1:0] w_strb_reg, w_strb_next;
    reg [7:0] w_burst_reg, w_burst_next;
    reg [2:0] w_burst_size_reg, w_burst_size_next;
-   reg [2:0] w_master_burst_size_reg, w_master_burst_size_next;
+   reg [2:0] w_manager_burst_size_reg, w_manager_burst_size_next;
    reg w_burst_active_reg, w_burst_active_next;
    reg w_first_transfer_reg, w_first_transfer_next;
    reg w_last_segment_reg, w_last_segment_next;
@@ -253,7 +253,7 @@ module iob_axi2iob #(
       w_strb_next              = w_strb_reg;
       w_burst_next             = w_burst_reg;
       w_burst_size_next        = w_burst_size_reg;
-      w_master_burst_size_next = w_master_burst_size_reg;
+      w_manager_burst_size_next = w_manager_burst_size_reg;
       w_burst_active_next      = w_burst_active_reg;
       w_first_transfer_next    = w_first_transfer_reg;
       w_last_segment_next      = w_last_segment_reg;
@@ -323,13 +323,13 @@ module iob_axi2iob #(
                   s_axi_bresp_next = m_axil_bresp;
                end
                if (w_burst_active_reg) begin
-                  // burst on slave interface still active; start new AXI lite write
+                  // burst on subordinate interface still active; start new AXI lite write
                   m_axil_awaddr_next  = w_addr_reg;
                   m_axil_awvalid_next = 1'b1;
                   s_axi_wready_next   = ~m_axil_wvalid;
                   w_state_next        = STATE_DATA;
                end else begin
-                  // burst on slave interface finished; return to idle
+                  // burst on subordinate interface finished; return to idle
                   s_axi_bvalid_next  = 1'b1;
                   s_axi_awready_next = ~m_axil_awvalid;
                   w_state_next       = STATE_IDLE;
@@ -357,7 +357,7 @@ module iob_axi2iob #(
          w_strb_reg              <= {STRB_WIDTH{1'b0}};
          w_burst_reg             <= 8'd0;
          w_burst_size_reg        <= 3'd0;
-         w_master_burst_size_reg <= 3'd0;
+         w_manager_burst_size_reg <= 3'd0;
          w_burst_active_reg      <= 1'b0;
          w_first_transfer_reg    <= 1'b0;
          w_last_segment_reg      <= 1'b0;
@@ -383,7 +383,7 @@ module iob_axi2iob #(
          w_strb_reg              <= w_strb_next;
          w_burst_reg             <= w_burst_next;
          w_burst_size_reg        <= w_burst_size_next;
-         w_master_burst_size_reg <= w_master_burst_size_next;
+         w_manager_burst_size_reg <= w_manager_burst_size_next;
          w_burst_active_reg      <= w_burst_active_next;
          w_first_transfer_reg    <= w_first_transfer_next;
          w_last_segment_reg      <= w_last_segment_next;
@@ -408,8 +408,8 @@ module iob_axi2iob #(
    reg [1:0] r_resp_reg, r_resp_next;
    reg [7:0] r_burst_reg, r_burst_next;
    reg [2:0] r_burst_size_reg, r_burst_size_next;
-   reg [7:0] r_master_burst_reg, r_master_burst_next;
-   reg [2:0] r_master_burst_size_reg, r_master_burst_size_next;
+   reg [7:0] r_manager_burst_reg, r_manager_burst_next;
+   reg [2:0] r_manager_burst_size_reg, r_manager_burst_size_next;
 
    reg s_axi_arready_reg, s_axi_arready_next;
    reg [AXI_ID_WIDTH-1:0] s_axi_rid_reg, s_axi_rid_next;
@@ -443,8 +443,8 @@ module iob_axi2iob #(
       r_resp_next              = r_resp_reg;
       r_burst_next             = r_burst_reg;
       r_burst_size_next        = r_burst_size_reg;
-      r_master_burst_next      = r_master_burst_reg;
-      r_master_burst_size_next = r_master_burst_size_reg;
+      r_manager_burst_next      = r_manager_burst_reg;
+      r_manager_burst_size_next = r_manager_burst_size_reg;
 
       s_axi_arready_next       = 1'b0;
       s_axi_rid_next           = s_axi_rid_reg;
@@ -523,8 +523,8 @@ module iob_axi2iob #(
          r_resp_reg              <= 2'd0;
          r_burst_reg             <= 8'd0;
          r_burst_size_reg        <= 3'd0;
-         r_master_burst_reg      <= 8'd0;
-         r_master_burst_size_reg <= 3'd0;
+         r_manager_burst_reg      <= 8'd0;
+         r_manager_burst_size_reg <= 3'd0;
 
          s_axi_rid_reg           <= {AXI_ID_WIDTH{1'b0}};
          s_axi_rdata_reg         <= {DATA_WIDTH{1'b0}};
@@ -545,8 +545,8 @@ module iob_axi2iob #(
          r_resp_reg              <= r_resp_next;
          r_burst_reg             <= r_burst_next;
          r_burst_size_reg        <= r_burst_size_next;
-         r_master_burst_reg      <= r_master_burst_next;
-         r_master_burst_size_reg <= r_master_burst_size_next;
+         r_manager_burst_reg      <= r_manager_burst_next;
+         r_manager_burst_size_reg <= r_manager_burst_size_next;
 
          s_axi_rid_reg           <= s_axi_rid_next;
          s_axi_rdata_reg         <= s_axi_rdata_next;

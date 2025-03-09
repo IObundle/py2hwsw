@@ -6,9 +6,9 @@ To use Py2HWSW, you can run the following command:
 \begin{verbatim}
 nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params 'param1=param1_val:param2=param2_val"
 \end{verbatim}
-This command sets up a core using Py2HWSW, where (CORE) is the name of the core, (BUILD DIR) is the directory where the build files will be generated, and (param1=param1_val:param2=param2_val) are optional Python parameters that can be used to customize the core.
+This command sets up a core using Py2HWSW, where (CORE) is the name of the core, (BUILD DIR) is the directory where the build files will be generated, and (param1=param1\_val:param2=param2\_val) are optional Python parameters that can be used to customize the core.
 
-The --build_dir option allows you to specify the location of the generated build directory. If not specified, the build directory will be generated in the parent directory of where the Py2HWSW command is called.
+The --build\_dir option allows you to specify the location of the generated build directory. If not specified, the build directory will be generated in the parent directory of where the Py2HWSW command is called.
 
 You can also use the --help option to list all available options and a brief description of each:
 \begin{verbatim}
@@ -17,7 +17,7 @@ py2hwsw --help
 
 To create a new core, you will need to create a setup directory with the same name as the core. This directory should contain at least one file with the same name as the core, either with a .py or .json extension, that describes the core using attributes of the core dictionary. The setup directory may also contain other files and folders following a standard hierarchy, which is described in more detail in other sections of this document.
 
-For examples of simple cores, you can refer to the basic_tests folder in the Py2HWSW library: \url{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/basic_tests}. For creating System On Chips, you can use the iob-soc repository as a template: \url{https://github.com/IObundle/iob-soc/tree/main}.
+For examples of simple cores, you can refer to the basic\_tests folder in the Py2HWSW library: \url{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/basic_tests}. For creating System On Chips, you can use the iob-soc repository as a template: \url{https://github.com/IObundle/iob-soc/tree/main}.
 
 Some key concepts to understand when using Py2HWSW include:
 

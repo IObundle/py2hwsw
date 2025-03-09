@@ -21,7 +21,8 @@ module iob_uart_sim #(
    input  [             DATA_W/8-1:0] iob_wstrb_i,
    output                             iob_rvalid_o,
    output [               DATA_W-1:0] iob_rdata_o,
-   output                             iob_ready_o
+   output                             iob_ready_o,
+   input                              iob_rready_i
    // clk_rst_s
 );
 
@@ -45,7 +46,8 @@ module iob_uart_sim #(
       .iob_csrs_iob_wstrb_i (iob_wstrb_i),
       .iob_csrs_iob_rvalid_o(iob_rvalid_o),
       .iob_csrs_iob_rdata_o (iob_rdata_o),
-      .iob_csrs_iob_ready_o (iob_ready_o)
+      .iob_csrs_iob_ready_o (iob_ready_o),
+      .iob_csrs_iob_rready_i(iob_rready_i)
    );
 
 

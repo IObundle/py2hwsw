@@ -366,6 +366,7 @@ def setup(py_params_dict):
    assign iob_d_valid      = (~cpu_instr) & cpu_iob_valid;
 
    //cpu rdata and ready
+   // TODO: iob_rready
    assign cpu_rdata        = cpu_instr ? ibus_iob_rdata : dbus_iob_rdata;
    assign cpu_ready        = cpu_instr ? ibus_iob_rvalid : |cpu_wstrb ? dbus_iob_ready : dbus_iob_rvalid;
 
@@ -432,6 +433,7 @@ assign clint_iob_ready_o = 1'b0;
 //clint_iob_addr_i,
 //clint_iob_wdata_i,
 //clint_iob_wstrb_i
+//clint_iob_rready_i
 
 // Connect unused PLIC interface to zero
 assign plic_iob_rvalid_o = 1'b0;
@@ -441,6 +443,7 @@ assign plic_iob_ready_o = 1'b0;
 //plic_iob_addr_i,
 //plic_iob_wdata_i,
 //plic_iob_wstrb_i,
+//plic_iob_rready_i
 
 // Connect AXI-Lite to AXI
 

@@ -45,6 +45,7 @@ module iob_system_tb;
    wire [   `IOB_SYSTEM_DATA_W-1:0] iob_rdata_o;
    wire                             iob_ready_o;
    wire                             iob_rvalid_o;
+   reg                              iob_rready_i;
 
    //iterator
    integer i = 0, n = 0;
@@ -129,6 +130,7 @@ module iob_system_tb;
    wire [  `IOB_SYSTEM_DATA_W-1:0] ethernet_iob_rdata;
    wire                            ethernet_iob_ready;
    wire                            ethernet_iob_rvalid;
+   wire                            ethernet_iob_rready;
 
 
    iob_eth_driver_tb eth_driver (
@@ -139,7 +141,8 @@ module iob_system_tb;
       .iob_wstrb_o (ethernet_iob_wstrb),
       .iob_rdata_i (ethernet_iob_rdata),
       .iob_ready_i (ethernet_iob_ready),
-      .iob_rvalid_i(ethernet_iob_rvalid)
+      .iob_rvalid_i(ethernet_iob_rvalid),
+      .iob_rready_o(ethernet_iob_rready)
    );
 `endif
 
@@ -157,6 +160,7 @@ module iob_system_tb;
       .ethernet_iob_rdata_o (ethernet_iob_rdata),
       .ethernet_iob_ready_o (ethernet_iob_ready),
       .ethernet_iob_rvalid_o(ethernet_iob_rvalid),
+      .ethernet_iob_rready_i(ethernet_iob_rready),
 `endif
 
       //control interface
@@ -166,7 +170,8 @@ module iob_system_tb;
       .iob_wstrb_i (iob_wstrb_i),
       .iob_rdata_o (iob_rdata_o),
       .iob_ready_o (iob_ready_o),
-      .iob_rvalid_o(iob_rvalid_o)
+      .iob_rvalid_o(iob_rvalid_o),
+      .iob_rready_i(iob_rready_i)
    );
 
    task cpu_inituart;

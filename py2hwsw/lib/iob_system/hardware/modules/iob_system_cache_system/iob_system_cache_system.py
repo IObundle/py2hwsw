@@ -196,6 +196,7 @@ def setup(py_params_dict):
       .iob_rdata_o (i_iob_rdata_o),
       .iob_rvalid_o(i_iob_rvalid_o),
       .iob_ready_o (i_iob_ready_o),
+      .iob_rready_i (i_iob_rready_i)
       //Control IO
       .invalidate_i(1'b0),
       .invalidate_o(),
@@ -208,7 +209,8 @@ def setup(py_params_dict):
       .be_wstrb_o  (icache_be_iob_wstrb),
       .be_rdata_i  (icache_be_iob_rdata),
       .be_rvalid_i (icache_be_iob_rvalid),
-      .be_ready_i  (icache_be_iob_ready)
+      .be_ready_i  (icache_be_iob_ready),
+      .be_rready_o (icache_be_iob_rready)
   );
 
   //mem control signals
@@ -251,6 +253,7 @@ def setup(py_params_dict):
       .iob_rdata_o (d_iob_rdata_o),
       .iob_rvalid_o(d_iob_rvalid_o),
       .iob_ready_o (d_iob_ready_o),
+      .iob_rready_i (d_iob_rready_i),
       //Control IO
       .invalidate_i(1'b0),
       .invalidate_o(invalidate),
@@ -263,7 +266,8 @@ def setup(py_params_dict):
       .be_wstrb_o  (dcache_be_iob_wstrb),
       .be_rdata_i  (dcache_be_iob_rdata),
       .be_rvalid_i (dcache_be_iob_rvalid),
-      .be_ready_i  (dcache_be_iob_ready)
+      .be_ready_i  (dcache_be_iob_ready),
+      .be_rready_o  (dcache_be_iob_rready)
   );
 
   // L2 cache instance
@@ -288,6 +292,7 @@ def setup(py_params_dict):
       .iob_rdata_o (l2cache_iob_rdata),
       .iob_rvalid_o(l2cache_iob_rvalid),
       .iob_ready_o (l2cache_iob_ready),
+      .iob_rready_i (l2cache_iob_rready),
       //Control IO
       .invalidate_i(invalidate_reg & ~l2cache_iob_valid),
       .invalidate_o(),

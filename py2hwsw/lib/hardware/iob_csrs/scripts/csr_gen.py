@@ -675,10 +675,12 @@ class csr_gen:
    assign internal_iob_addr = {iob_addr_i, 2'b0};
    assign internal_iob_wdata = iob_wdata_i;
    assign internal_iob_wstrb = iob_wstrb_i;
+   assign internal_iob_rready = iob_rready_i;
    assign iob_rvalid_o = internal_iob_rvalid;
    assign iob_rdata_o = internal_iob_rdata;
    assign iob_ready_o = internal_iob_ready;
 """
+            # TODO:: Add internl_iob_rready handling
         elif core_attributes["csr_if"] == "apb":
             # "APB" CSR_IF
             subblocks.append(

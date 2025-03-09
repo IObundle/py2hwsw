@@ -44,7 +44,8 @@ module iob_iob2axil #(
    input  wire [DATA_W/8-1:0] iob_wstrb_i,
    output wire                iob_rvalid_o,
    output wire [  DATA_W-1:0] iob_rdata_o,
-   output wire                iob_ready_o
+   output wire                iob_ready_o,
+   input  wire                iob_rready_i
 );
 
    wire wvalid_reg_en = axil_awvalid_o;
@@ -99,6 +100,6 @@ module iob_iob2axil #(
    assign axil_arprot_o  = 3'd2;
 
    // read
-   assign axil_rready_o  = 1'b1;
+   assign axil_rready_o  = iob_rready_i;
 
 endmodule

@@ -50,6 +50,7 @@ module iob_nco_tb;
    wire [     `IOB_NCO_DATA_W-1:0] iob_rdata_o;
    wire                            iob_ready_o;
    wire                            iob_rvalid_o;
+   wire                            iob_rready_i;
 
    initial begin
 
@@ -98,6 +99,7 @@ module iob_nco_tb;
       .iob_csrs_iob_rdata_o (iob_rdata_o),
       .iob_csrs_iob_ready_o (iob_ready_o),
       .iob_csrs_iob_rvalid_o(iob_rvalid_o),
+      .iob_csrs_iob_rready_i(iob_rready_i),
       .clk_out_o            (clk_out)
    );
 

@@ -52,5 +52,7 @@ task iob_read;
 
       while (!iob_rvalid_o) #1;
       data = #1 `IOB_GET_RDATA(addr, iob_rdata_o, width);
+
+      // TODO: iob_rready
    end
 endtask

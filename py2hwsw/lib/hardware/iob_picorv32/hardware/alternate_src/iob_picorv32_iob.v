@@ -52,6 +52,7 @@ module iob_picorv32 #(
    assign iob_d_rvalid     = dbus_iob_rvalid_i;
    assign iob_i_rvalid     = ibus_iob_rvalid_i;
    assign iob_d_ready      = dbus_iob_ready_i;
+   // TODO: iob_rready
 
    //cpu rdata and ready
    assign cpu_rdata        = cpu_instr ? ibus_iob_rdata_i : dbus_iob_rdata_i;

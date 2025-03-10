@@ -112,6 +112,7 @@ let
     gcc
     libcap # Allows setting POSIX capabilities
     reuse
+    fusesoc
     py2hwsw
   ];
 

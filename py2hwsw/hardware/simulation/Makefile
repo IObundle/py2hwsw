@@ -45,6 +45,10 @@ endif
 include $(SIMULATOR).mk
 
 TBTYPE?=C
+ifeq ($(wildcard ./src/$(NAME)_tb.v),)
+TBTYPE:=V
+endif
+
 
 UFLAGS+=VCD=$(VCD)
 UFLAGS+=COV=$(COV)

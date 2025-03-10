@@ -43,7 +43,7 @@ ifneq ($(wildcard ./src/$(NAME)_tb.v),)
 TBTYPE?=V
 TB?=$(NAME)_tb
 else
-ifneq ($(wildcard ../../software/iob_core_tb.c),)
+ifneq ($(wildcard ../../software/src/iob_core_tb.c),)
 TBTYPE?=C
 TB?=iob_v_tb
 else

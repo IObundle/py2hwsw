@@ -234,6 +234,9 @@ class iob_core(iob_module, iob_instance):
             ):
                 superblocks = self.__create_memwrapper(superblocks=superblocks)
 
+        # Add 'VERSION' macro
+        self.create_conf_group(name="VERSION", type="M", val="16'h" + self.version_str_to_digits(self.version), descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.")
+
         # Ensure superblocks are set up last
         # and only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
@@ -699,7 +702,7 @@ class iob_core(iob_module, iob_instance):
         verilog_sources = []
         for path in Path(os.path.join(self.build_dir, "hardware")).rglob("*.vh"):
             # Skip specific Verilog headers
-            if path.name.endswith("version.vh") or "test_" in path.name:
+            if "test_" in path.name:
                 continue
             # Skip synthesis directory # TODO: Support this?
             if "/syn/" in str(path):
@@ -926,6 +929,14 @@ class iob_core(iob_module, iob_instance):
             __class__, f"{core.build_dir}/document/tsrc"
         )
         doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
+
+    @staticmethod
+    def version_str_to_digits(version_str):
+        """Given a version string (like "V0.12"), return a 4 digit string representing
+        the version (like "0012")"""
+        version_str = version_str.replace("V", "")
+        major_ver, minor_ver = version_str.split(".")
+        return f"{int(major_ver):02d}{int(minor_ver):02d}"
 
 
 def find_common_deep(path1, path2):

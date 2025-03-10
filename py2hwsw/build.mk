@@ -75,7 +75,6 @@ lint-test:
 # SIMULATE
 #
 
-TBTYPE ?= C
 sim-build: sw-build
 	make -C $(SIM_DIR) -j1 build
 

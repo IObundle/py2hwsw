@@ -39,15 +39,25 @@ ifneq ($(wildcard sim_build.mk),)
 include sim_build.mk
 endif
 
+ifneq ($(wildcard ./src/$(NAME)_tb.v),)
+TBTYPE?=V
+TB?=$(NAME)_tb
+else
+ifneq ($(wildcard ../../software/iob_core_tb.c),)
+TBTYPE?=C
+TB?=iob_v_tb
+else
+TBTYPE?=none
+endif
+endif
+
+$(info Testbench is $(TB).v)
+
 #
 # Include the simulator stub
 #
 include $(SIMULATOR).mk
 
-TBTYPE?=C
-ifeq ($(wildcard ./src/$(NAME)_tb.v),)
-TBTYPE:=V
-endif
 
 
 UFLAGS+=VCD=$(VCD)
@@ -76,14 +86,6 @@ endif
 
 ifeq ($(TBTYPE),C)
 VSRC:=$(filter-out ./src/$(NAME)_tb.v, $(VSRC))
-endif
-
-ifeq ($(wildcard ./src/$(NAME)_tb.v),)
-ifeq ($(wildcard ./src/iob_v_tb.v),)
-ifeq ($(wildcard ./src/iob_uvm_tb.v),)
-TBTYPE:=none
-endif
-endif
 endif
 
 

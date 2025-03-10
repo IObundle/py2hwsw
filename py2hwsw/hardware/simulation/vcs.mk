@@ -21,7 +21,7 @@ EFLAGS=-debug_access+nomemcbk+dmptf -licqueue -debug_region+cell -notice +bidir+
 #+lint=all
 
 comp: $(VHDR) $(VSRC) $(HEX)
-	vlogan $(SFLAGS) $(VSRC) && vcs $(EFLAGS) iob_v_tb
+	vlogan $(SFLAGS) $(VSRC) && vcs $(EFLAGS) $(TB)
 
 exec: comp
 	./simv

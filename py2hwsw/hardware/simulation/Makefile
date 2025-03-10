@@ -39,6 +39,8 @@ ifneq ($(wildcard sim_build.mk),)
 include sim_build.mk
 endif
 
+#selec testbench type
+ifneq ($(TBTYPE),UVM)
 ifneq ($(wildcard ./src/$(NAME)_tb.v),)
 TBTYPE?=V
 TB?=$(NAME)_tb
@@ -50,7 +52,9 @@ else
 TBTYPE?=none
 endif
 endif
-
+else
+TB?=iob_v_uvm_tb
+endif
 $(info Testbench is $(TB).v)
 
 #

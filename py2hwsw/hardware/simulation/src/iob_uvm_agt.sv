@@ -1,4 +1,12 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 class iob_agent extends uvm_agent;
+
+   `uvm_component_utils(iob_agent)
 
    uvm_analysis_port#(iob_transaction) agent_ap;
    

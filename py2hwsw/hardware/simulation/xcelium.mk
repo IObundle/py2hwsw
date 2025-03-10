@@ -28,7 +28,11 @@ VFLAGS+=-incdir ../common_src
 endif
 
 ifneq ($(wildcard src),)
-VFLAGS+=-incdir src
+VFLAGS+=-incdir ./src
+endif
+
+ifneq ($(wildcard hardware/src),)
+VFLAGS+=-incdir hardware/src
 endif
 
 ifneq ($(wildcard hardware/src),)
@@ -47,26 +51,25 @@ endif
 
 xmvlog.log: $(VHDR) $(VSRC) $(HEX)
 ifeq ($(TBTYPE),UVM)
-	xrun -compile -sv_lib uvm_dpi $(UVM_HOME)/src/dpi/uvm_dpi.cc -cdslib . +UVM_TESTNAME=iob_test
-	xmvlog $(VFLAGS) -incdir $(UVM_HOME)/src +define+UVM  $(UVM_HOME)/src/uvm_pkg.sv $(VSRC)
+	xrun -compile -uvm -sv -uvmhome $(UVM_HOME) -sv_lib $(UVM_HOME)/src/dpi/uvm_dpi $(VFLAGS) $(VSRC) src/iob_uvm_tb.sv +UVM_TESTNAME=iob_test
 else
-	xmvlog $(VFLAGS) $(VSRC)
+	xrun -compile $(VFLAGS) $(VSRC)
 endif
 
 xmelab.log : xmvlog.log xcelium.d/worklib
 ifeq ($(TBTYPE),UVM)
-	xmelab $(EFLAGS) $(COV_EFLAGS) worklib.iob_uvm_tb:module
+	xrun -elaborate -uvm -sv  -uvmhome $(UVM_HOME) $(VFLAGS) $(EFLAGS) -incdir ./src src/iob_uvm_tb.sv +UVM_TESTNAME=iob_test
 else
-	xmelab $(EFLAGS) $(COV_EFLAGS) worklib.iob_v_tb:module
+	xmelab $(EFLAGS) $(COV_EFLAGS) worklib.iob_v_tb:v
 endif
 
 comp: xmelab.log
 
 exec: comp
 ifeq ($(TBTYPE),UVM)
-	sync && sleep 2 && xmsim $(SFLAGS) -sv_lib ./xcelium.d/run.lnx8664.23.03.d/librun worklib.iob_uvm_tb:module
+	sync && sleep 2 && xrun -R $(SFLAGS) -sv_lib worklib.iob_uvm_tb:sv +UVM_TESTNAME=iob_test
 else
-	sync && sleep 2 && xmsim $(SFLAGS) $(COV_SFLAGS) worklib.iob_v_tb:module
+	sync && sleep 2 && xmsim $(SFLAGS) $(COV_SFLAGS) worklib.iob_v_tb:v
 endif
 ifeq ($(COV),1)
 	ls -d cov_work/scope/* > all_ucd_file

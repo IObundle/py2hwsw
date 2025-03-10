@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+
 class iob_monitor extends uvm_monitor;
 
    `uvm_component_utils(iob_monitor)
@@ -27,11 +34,11 @@ class iob_monitor extends uvm_monitor;
        
 
       forever begin
-         @(posedge vif.clk);
+         @(posedge vif.clk_i);
          if (vif.iob_rvalid_o) begin
             trans.rdata = vif.iob_rdata_o;
             ap.write(trans);
-            `uvm_info("MON", $sformatf("Monitored transaction: addr=%08x data=%08x", trans.rdata), UVM_LOW)
+            `uvm_info("MON", $sformatf("Monitored transaction: addr=%08x data=%08x", trans.addr, trans.rdata), UVM_LOW)
          end
       end
    endtask

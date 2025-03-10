@@ -1,6 +1,14 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 package iob_uvm_pkg;
-//`include "uvm_macros.svh"
-//import uvm_pkg::*;
+
+import uvm_pkg::*;
+`include "uvm_macros.svh"
+
 `include "iob_v_tb.vh"
 `include "iob_uvm_seq.sv"
 `include "iob_uvm_mon.sv"
@@ -8,7 +16,16 @@ package iob_uvm_pkg;
 `include "iob_uvm_agt.sv"
 `include "iob_uvm_scb.sv"
 
-// Define the environment
+
+class iob_configuration extends uvm_object;
+        `uvm_object_utils(iob_configuration)
+
+        function new(string name = "");
+                super.new(name);
+        endfunction: new
+endclass
+
+
 class iob_env extends uvm_env;
    `uvm_component_utils(iob_env)
 
@@ -21,7 +38,7 @@ class iob_env extends uvm_env;
 
    virtual function void build_phase(uvm_phase phase);
       super.build_phase(phase);
-      agent = iob_agent::type_id::create("agent", this);
+      agent = iob_agent::type_id::create("iob_agent", this);
       scoreboard = iob_scoreboard::type_id::create("scoreboard", this);
    endfunction
 
@@ -31,7 +48,6 @@ class iob_env extends uvm_env;
 
 endclass
 
-// Define the test
 class iob_test extends uvm_test;
    `uvm_component_utils(iob_test)
 
@@ -51,7 +67,6 @@ class iob_test extends uvm_test;
       
       phase.raise_objection(.obj(this));
       iob_seq = iob_sequence::type_id::create(.name("seq"), .contxt(get_full_name()));
-      assert(iob_seq.randomize());
       iob_seq.start(env.agent.iob_seqr);
       phase.drop_objection(.obj(this));
    endtask: run_phase

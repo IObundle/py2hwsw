@@ -19,7 +19,6 @@ PYTHON_DIR = ../../scripts
 #include simulation headers and sources
 VHDR+=$(wildcard ./src/*.vh)
 VSRC+=$(wildcard ./src/*.v)
-VSRC+=$(wildcard ./src/iob_uvm_tb.sv)
 
 ifeq ($(SYN),)
 #include the module's headers and sources
@@ -63,7 +62,6 @@ endif
 #choose tetsbench type: C, verilog, uvm or none
 ifeq ($(TBTYPE),V)
 VSRC:=$(filter-out ./src/iob_v_tb.v, $(VSRC))
-VSRC:=$(filter-out ./src/iob_uvm_tb.sv, $(VSRC))
 endif
 
 ifeq ($(TBTYPE),UVM)
@@ -74,7 +72,6 @@ endif
 
 ifeq ($(TBTYPE),C)
 VSRC:=$(filter-out ./src/$(NAME)_tb.v, $(VSRC))
-VSRC:=$(filter-out ./src/iob_uvm_tb.sv, $(VSRC))
 endif
 
 ifeq ($(wildcard ./src/$(NAME)_tb.v),)

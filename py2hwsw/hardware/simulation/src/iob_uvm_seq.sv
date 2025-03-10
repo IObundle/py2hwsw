@@ -1,4 +1,10 @@
-`define R 0
+`/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+define R 0
 `define W 1
 `define F 2
 
@@ -13,13 +19,13 @@
 
 // Define the transaction class
 class iob_transaction extends uvm_sequence_item;
-   rand bit [`IOB_CSRS_ADDR_W-1:0] valid;
-   rand bit [`IOB_CSRS_ADDR_W-1:0] addr;
-   rand bit [31:0]                 wdata;
-   rand bit [3:0]                  wstrb;
-   bit [31:0]                      rdata;
-   bit                             rvalid;
-   bit                             ready;
+   bit [`IOB_CSRS_ADDR_W-1:0] valid;
+   bit [`IOB_CSRS_ADDR_W-1:0] addr;
+   bit [31:0]                 wdata;
+   bit [3:0]                  wstrb;
+   bit [31:0]                 rdata;
+   bit                        rvalid;
+   bit                        ready;
 
    function new(string name = "iob_transaction");
       super.new(name);
@@ -60,11 +66,10 @@ class iob_sequence extends uvm_sequence #(iob_transaction);
          c2v_read_fp = $fopen("c2v.txt", "rb");
          if (c2v_read_fp != 0) begin
             if ($fscanf(c2v_read_fp, "%08x %08x %08x %08x %08x\n", req, mode, address, data_w, data)) begin
-               `uvm_info("SEQ", $sformatf("Read from file: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode, address, data_w, data), UVM_LOW)
                if (req == ack) begin
+                  `uvm_info("SEQ", $sformatf("Read c2v.txt file: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode, address, data_w, data), UVM_LOW)
                   v2c_write_fp = $fopen("v2c.txt", "wb");
                   if (v2c_write_fp != 0) begin
-                     $display("mode=%0d address=%08x data_w=%08x", mode, address, data_w);
                      if (mode == `F) begin // Finish request
                         `uvm_info("SEQ", "Finish request received", UVM_LOW)
                         $fclose(c2v_read_fp);
@@ -75,35 +80,33 @@ class iob_sequence extends uvm_sequence #(iob_transaction);
                         trans.valid = 1;
                         trans.addr =  `IOB_WORD_ADDRESS(address);
                         trans.wstrb = 0;
+                        `uvm_info("SEQ", $sformatf("Read request received: addr=%08x wstrb=%08x", trans.addr, trans.wstrb), UVM_LOW)
                         start_item(trans);
-                        assert(trans.randomize());
-                        `uvm_info("SEQ", "Item started", UVM_LOW)
+                        //`uvm_info("SEQ", "Item started", UVM_LOW)
                         finish_item(trans);
-                        `uvm_info("SEQ", "Item finished", UVM_LOW)
-                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w, data);
-                        `uvm_info("SEQ", $sformatf("Write to file: ack=%08x mode=%08x address=%08x data_w=%08x data=%08x", ack, mode, address, data_w, data), UVM_LOW)
+                        //`uvm_info("SEQ", "Item finished", UVM_LOW)
+                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w, `IOB_GET_RDATA(address, trans.rdata, data_w));
+                       `uvm_info("SEQ", $sformatf("Write v2c.txt file: ack=%08x mode=%08x address=%08x data_w=%08x data=%08x", ack, mode, address, data_w, trans.rdata), UVM_LOW)
                      end
                      else if (mode == `W) begin // Write request
                         trans.valid = 1;
                         trans.addr =  `IOB_WORD_ADDRESS(address);
                         trans.wdata = `IOB_GET_WDATA(address, data);
                         trans.wstrb = `IOB_GET_WSTRB(address, data_w);
+                        `uvm_info("SEQ", $sformatf("Write request received: addr=%08x wdata=%08x wstrb=%08x data_w=%08x", trans.addr, trans.wdata, trans.wstrb, data_w), UVM_LOW)
                         start_item(trans);
-                        assert(trans.randomize());
-                        `uvm_info("SEQ", "Item started", UVM_LOW)
+                        //`uvm_info("SEQ", "Item started", UVM_LOW)
                         finish_item(trans);
-                        `uvm_info("SEQ", "Item finished", UVM_LOW)
-                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w, `IOB_GET_RDATA(address, data, data_w));
-                        `uvm_info("SEQ", $sformatf("Write to file: ack=%08x mode=%08x address=%08x data_w=%08x data=%08x", ack, mode, address, data_w, data), UVM_LOW)
+                        //`uvm_info("SEQ", "Item finished", UVM_LOW)
+                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w, data);
+                        `uvm_info("SEQ", $sformatf("Write v2c.txt file: ack=%08x mode=%08x address=%08x data_w=%08x data=%08x", ack, mode, address, data_w, data), UVM_LOW)
                      end
                      $fclose(v2c_write_fp);
                   end // if (v2c_write_fp != 0)
-                  $display("Write to file failed");
                   ack = ack + 1;
                end
             end
             $fclose(c2v_read_fp);
-            `uvm_info("SEQ", "Read from file failed", UVM_LOW)
          end 
       end
    endtask

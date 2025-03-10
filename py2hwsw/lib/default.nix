@@ -7,7 +7,7 @@
 # > pip install -e path/to/py2hwsw_directory
 
 
-{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/24.05.tar.gz") {}, py2hwsw_pkg ? "none" }:
+{ pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/24.05.tar.gz") {}, py2hwsw_pkg ? "none", extra_pkgs ? [] }:
 # Py2HWSW uses the following dependencies from nixpkgs version 24.05:
 # bash-5.2p26
 # gnumake-4.4.1
@@ -36,6 +36,7 @@
 # yosys (commit 543faed9c8cd7c33bbb407577d56e4b7444ba61c)
 # gcc-wrapper-13.2.0
 # libcap-2.69
+# fusesoc-2.2.1
 # reuse-3.0.2
 
 
@@ -114,7 +115,7 @@ let
     reuse
     fusesoc
     py2hwsw
-  ];
+  ] ++ extra_pkgs;
 
   get_name = pkg:
     if pkg == null then

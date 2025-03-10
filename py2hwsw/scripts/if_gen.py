@@ -205,6 +205,8 @@ def get_iob_clk_ports(params: str = "None"):
     if params == "None":
         params = "cke_arst"
     params = params.split("_")
+    if all(x in params for x in ["arst","anrst"]) or all(x in params for x in ["rst","nrst"]):
+        raise ValueError("There can only be one type of reset signal for each synchronous and asynchronous reset")
     ports = [
         iob_signal(
             name="clk_o",
@@ -212,6 +214,7 @@ def get_iob_clk_ports(params: str = "None"):
             descr="Clock",
         )
     ]
+
     for port, descr in [
         ("cke", "Clock enable"),
         ("arst", "Asynchronous active-high reset"),

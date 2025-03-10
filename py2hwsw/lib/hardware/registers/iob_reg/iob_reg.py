@@ -17,12 +17,6 @@ def setup(py_params_dict):
         if "clk_en_rst_s" in port_params
         else []
     )
-    if all(x in clk_s_params for x in ["arst", "anrst"]) or all(
-        x in clk_s_params for x in ["rst", "nrst"]
-    ):
-        raise ValueError(
-            "There can only be one type of reset signal for each synchronous and asynchronous reset"
-        )
 
     rst_str = ""
     en_str = ""

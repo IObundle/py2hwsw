@@ -154,13 +154,20 @@ module picorv32 #(
    reg  [31:0] dbg_insn_opcode;
    reg  [31:0] dbg_insn_addr;
 
-   wire        dbg_mem_valid = mem_valid;
-   wire        dbg_mem_instr = mem_instr;
-   wire        dbg_mem_ready = mem_ready;
-   wire [31:0] dbg_mem_addr = mem_addr;
-   wire [31:0] dbg_mem_wdata = mem_wdata;
-   wire [ 3:0] dbg_mem_wstrb = mem_wstrb;
-   wire [31:0] dbg_mem_rdata = mem_rdata;
+   wire        dbg_mem_valid;
+   wire        dbg_mem_instr;
+   wire        dbg_mem_ready;
+   wire [31:0] dbg_mem_addr;
+   wire [31:0] dbg_mem_wdata;
+   wire [ 3:0] dbg_mem_wstrb;
+   wire [31:0] dbg_mem_rdata;
+   assign        dbg_mem_valid = mem_valid;
+   assign        dbg_mem_instr = mem_instr;
+   assign        dbg_mem_ready = mem_ready;
+   assign dbg_mem_addr = mem_addr;
+   assign dbg_mem_wdata = mem_wdata;
+   assign dbg_mem_wstrb = mem_wstrb;
+   assign dbg_mem_rdata = mem_rdata;
 
    assign pcpi_rs1 = reg_op1;
    assign pcpi_rs2 = reg_op2;
@@ -192,38 +199,71 @@ module picorv32 #(
    endtask
 
 `ifdef DEBUGREGS
-   wire [31:0] dbg_reg_x0 = 0;
-   wire [31:0] dbg_reg_x1 = cpuregs[1];
-   wire [31:0] dbg_reg_x2 = cpuregs[2];
-   wire [31:0] dbg_reg_x3 = cpuregs[3];
-   wire [31:0] dbg_reg_x4 = cpuregs[4];
-   wire [31:0] dbg_reg_x5 = cpuregs[5];
-   wire [31:0] dbg_reg_x6 = cpuregs[6];
-   wire [31:0] dbg_reg_x7 = cpuregs[7];
-   wire [31:0] dbg_reg_x8 = cpuregs[8];
-   wire [31:0] dbg_reg_x9 = cpuregs[9];
-   wire [31:0] dbg_reg_x10 = cpuregs[10];
-   wire [31:0] dbg_reg_x11 = cpuregs[11];
-   wire [31:0] dbg_reg_x12 = cpuregs[12];
-   wire [31:0] dbg_reg_x13 = cpuregs[13];
-   wire [31:0] dbg_reg_x14 = cpuregs[14];
-   wire [31:0] dbg_reg_x15 = cpuregs[15];
-   wire [31:0] dbg_reg_x16 = cpuregs[16];
-   wire [31:0] dbg_reg_x17 = cpuregs[17];
-   wire [31:0] dbg_reg_x18 = cpuregs[18];
-   wire [31:0] dbg_reg_x19 = cpuregs[19];
-   wire [31:0] dbg_reg_x20 = cpuregs[20];
-   wire [31:0] dbg_reg_x21 = cpuregs[21];
-   wire [31:0] dbg_reg_x22 = cpuregs[22];
-   wire [31:0] dbg_reg_x23 = cpuregs[23];
-   wire [31:0] dbg_reg_x24 = cpuregs[24];
-   wire [31:0] dbg_reg_x25 = cpuregs[25];
-   wire [31:0] dbg_reg_x26 = cpuregs[26];
-   wire [31:0] dbg_reg_x27 = cpuregs[27];
-   wire [31:0] dbg_reg_x28 = cpuregs[28];
-   wire [31:0] dbg_reg_x29 = cpuregs[29];
-   wire [31:0] dbg_reg_x30 = cpuregs[30];
-   wire [31:0] dbg_reg_x31 = cpuregs[31];
+   wire [31:0] dbg_reg_x0;
+   wire [31:0] dbg_reg_x1;
+   wire [31:0] dbg_reg_x2;
+   wire [31:0] dbg_reg_x3;
+   wire [31:0] dbg_reg_x4;
+   wire [31:0] dbg_reg_x5;
+   wire [31:0] dbg_reg_x6;
+   wire [31:0] dbg_reg_x7;
+   wire [31:0] dbg_reg_x8;
+   wire [31:0] dbg_reg_x9;
+   wire [31:0] dbg_reg_x10;
+   wire [31:0] dbg_reg_x11;
+   wire [31:0] dbg_reg_x12;
+   wire [31:0] dbg_reg_x13;
+   wire [31:0] dbg_reg_x14;
+   wire [31:0] dbg_reg_x15;
+   wire [31:0] dbg_reg_x16;
+   wire [31:0] dbg_reg_x17;
+   wire [31:0] dbg_reg_x18;
+   wire [31:0] dbg_reg_x19;
+   wire [31:0] dbg_reg_x20;
+   wire [31:0] dbg_reg_x21;
+   wire [31:0] dbg_reg_x22;
+   wire [31:0] dbg_reg_x23;
+   wire [31:0] dbg_reg_x24;
+   wire [31:0] dbg_reg_x25;
+   wire [31:0] dbg_reg_x26;
+   wire [31:0] dbg_reg_x27;
+   wire [31:0] dbg_reg_x28;
+   wire [31:0] dbg_reg_x29;
+   wire [31:0] dbg_reg_x30;
+   wire [31:0] dbg_reg_x31;
+
+   assign dbg_reg_x0 = 0;
+   assign dbg_reg_x1 = cpuregs[1];
+   assign dbg_reg_x2 = cpuregs[2];
+   assign dbg_reg_x3 = cpuregs[3];
+   assign dbg_reg_x4 = cpuregs[4];
+   assign dbg_reg_x5 = cpuregs[5];
+   assign dbg_reg_x6 = cpuregs[6];
+   assign dbg_reg_x7 = cpuregs[7];
+   assign dbg_reg_x8 = cpuregs[8];
+   assign dbg_reg_x9 = cpuregs[9];
+   assign dbg_reg_x10 = cpuregs[10];
+   assign dbg_reg_x11 = cpuregs[11];
+   assign dbg_reg_x12 = cpuregs[12];
+   assign dbg_reg_x13 = cpuregs[13];
+   assign dbg_reg_x14 = cpuregs[14];
+   assign dbg_reg_x15 = cpuregs[15];
+   assign dbg_reg_x16 = cpuregs[16];
+   assign dbg_reg_x17 = cpuregs[17];
+   assign dbg_reg_x18 = cpuregs[18];
+   assign dbg_reg_x19 = cpuregs[19];
+   assign dbg_reg_x20 = cpuregs[20];
+   assign dbg_reg_x21 = cpuregs[21];
+   assign dbg_reg_x22 = cpuregs[22];
+   assign dbg_reg_x23 = cpuregs[23];
+   assign dbg_reg_x24 = cpuregs[24];
+   assign dbg_reg_x25 = cpuregs[25];
+   assign dbg_reg_x26 = cpuregs[26];
+   assign dbg_reg_x27 = cpuregs[27];
+   assign dbg_reg_x28 = cpuregs[28];
+   assign dbg_reg_x29 = cpuregs[29];
+   assign dbg_reg_x30 = cpuregs[30];
+   assign dbg_reg_x31 = cpuregs[31];
 `endif
 
    // Internal PCPI Cores
@@ -332,8 +372,10 @@ module picorv32 #(
 
    wire        mem_xfer;
    reg mem_la_secondword, mem_la_firstword_reg, last_mem_valid;
-   wire       mem_la_firstword = COMPRESSED_ISA && (mem_do_prefetch || mem_do_rinst) && next_pc[1] && !mem_la_secondword;
-   wire       mem_la_firstword_xfer = COMPRESSED_ISA && mem_xfer && (!last_mem_valid ? mem_la_firstword : mem_la_firstword_reg);
+   wire       mem_la_firstword;
+   assign       mem_la_firstword = COMPRESSED_ISA && (mem_do_prefetch || mem_do_rinst) && next_pc&& !mem_la_secondword;
+   wire       mem_la_firstword_xfer;
+   assign       mem_la_firstword_xfer = COMPRESSED_ISA && mem_xfer && (!last_mem_valid ? mem_la_firstword : mem_la_firstword_reg);
 
    reg prefetched_high_word;
    reg clear_prefetched_high_word;
@@ -342,11 +384,14 @@ module picorv32 #(
    wire [31:0] mem_rdata_latched_noshuffle;
    wire [31:0] mem_rdata_latched;
 
-   wire        mem_la_use_prefetched_high_word = COMPRESSED_ISA && mem_la_firstword && prefetched_high_word && !clear_prefetched_high_word;
+   wire        mem_la_use_prefetched_high_word;
+   assign        mem_la_use_prefetched_high_word = COMPRESSED_ISA && mem_la_firstword && prefetched_high_word && !clear_prefetched_high_word;
    assign mem_xfer = (mem_valid && mem_ready) || (mem_la_use_prefetched_high_word && mem_do_rinst);
 
-   wire mem_busy = |{mem_do_prefetch, mem_do_rinst, mem_do_rdata, mem_do_wdata};
-   wire        mem_done = resetn && ((mem_xfer && |mem_state && (mem_do_rinst || mem_do_rdata || mem_do_wdata)) || (&mem_state && mem_do_rinst)) &&
+   wire mem_busy;
+   assign mem_busy = |{mem_do_prefetch, mem_do_rinst, mem_do_rdata, mem_do_wdata};
+   wire        mem_done;
+   assign        mem_done = resetn && ((mem_xfer && |mem_state && (mem_do_rinst || mem_do_rdata || mem_do_wdata)) || (&mem_state && mem_do_rinst)) &&
            (!mem_la_firstword || (~&mem_rdata_latched[1:0] && mem_xfer));
 
    assign mem_la_write = resetn && !mem_state && mem_do_wdata;
@@ -2103,13 +2148,18 @@ module picorv32_pcpi_mul #(
    output reg        pcpi_ready
 );
    reg instr_mul, instr_mulh, instr_mulhsu, instr_mulhu;
-   wire instr_any_mul = |{instr_mul, instr_mulh, instr_mulhsu, instr_mulhu};
-   wire instr_any_mulh = |{instr_mulh, instr_mulhsu, instr_mulhu};
-   wire instr_rs1_signed = |{instr_mulh, instr_mulhsu};
-   wire instr_rs2_signed = |{instr_mulh};
+   wire instr_any_mul;
+   wire instr_any_mulh;
+   wire instr_rs1_signed;
+   wire instr_rs2_signed;
+   assign instr_any_mul = |{instr_mul, instr_mulh, instr_mulhsu, instr_mulhu};
+   assign instr_any_mulh = |{instr_mulh, instr_mulhsu, instr_mulhu};
+   assign instr_rs1_signed = |{instr_mulh, instr_mulhsu};
+   assign instr_rs2_signed = |{instr_mulh};
 
    reg  pcpi_wait_q;
-   wire mul_start = pcpi_wait && !pcpi_wait_q;
+   wire mul_start;
+   assign mul_start = pcpi_wait && !pcpi_wait_q;
 
    always @(posedge clk) begin
       instr_mul    <= 0;
@@ -2222,17 +2272,22 @@ module picorv32_pcpi_fast_mul #(
    output        pcpi_ready
 );
    reg instr_mul, instr_mulh, instr_mulhsu, instr_mulhu;
-   wire       instr_any_mul = |{instr_mul, instr_mulh, instr_mulhsu, instr_mulhu};
-   wire       instr_any_mulh = |{instr_mulh, instr_mulhsu, instr_mulhu};
-   wire       instr_rs1_signed = |{instr_mulh, instr_mulhsu};
-   wire       instr_rs2_signed = |{instr_mulh};
+   wire       instr_any_mul;
+   wire       instr_any_mulh;
+   wire       instr_rs1_signed;
+   wire       instr_rs2_signed;
+   assign       instr_any_mul = |{instr_mul, instr_mulh, instr_mulhsu, instr_mulhu};
+   assign       instr_any_mulh = |{instr_mulh, instr_mulhsu, instr_mulhu};
+   assign       instr_rs1_signed = |{instr_mulh, instr_mulhsu};
+   assign       instr_rs2_signed = |{instr_mulh};
 
    reg        shift_out;
    reg  [3:0] active;
    reg [32:0] rs1, rs2, rs1_q, rs2_q;
    reg [63:0] rd, rd_q;
 
-   wire                                          pcpi_insn_valid = pcpi_valid && pcpi_insn[6:0] == 7'b0110011 && pcpi_insn[31:25] == 7'b0000001;
+   wire                                          pcpi_insn_valid;
+   assign                                          pcpi_insn_valid = pcpi_valid && pcpi_insn== 7'b0110011 && pcpi_insn[31:25] == 7'b0000001;
    reg pcpi_insn_valid_q;
 
    always @* begin
@@ -2317,10 +2372,12 @@ module picorv32_pcpi_div (
    output reg        pcpi_ready
 );
    reg instr_div, instr_divu, instr_rem, instr_remu;
-   wire instr_any_div_rem = |{instr_div, instr_divu, instr_rem, instr_remu};
+   wire instr_any_div_rem;
+   assign instr_any_div_rem = |{instr_div, instr_divu, instr_rem, instr_remu};
 
    reg  pcpi_wait_q;
-   wire start = pcpi_wait && !pcpi_wait_q;
+   wire start;
+   assign start = pcpi_wait && !pcpi_wait_q;
 
    always @(posedge clk) begin
       instr_div  <= 0;

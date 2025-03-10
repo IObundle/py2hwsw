@@ -47,9 +47,12 @@ module iob_iob2axil #(
    output wire                iob_ready_o
 );
 
-   wire wvalid_reg_en = axil_awvalid_o;
-   wire wvalid_reg_rst = axil_wready_i;
-   wire wvalid_reg_i = 1'b1;
+   wire wvalid_reg_en;
+   wire wvalid_reg_rst;
+   wire wvalid_reg_i;
+   assign wvalid_reg_en  = axil_awvalid_o;
+   assign wvalid_reg_rst = axil_wready_i;
+   assign wvalid_reg_i   = 1'b1;
    wire wvalid_reg_o;
 
    iob_reg_re #(

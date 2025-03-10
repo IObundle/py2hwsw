@@ -115,7 +115,8 @@ module iob_iob2axi_wr #(
    end
 
    // Compute awvalid
-   wire rst_valid_int = (state_nxt == ADDR_HS) ? 1'b1 : 1'b0;
+   wire rst_valid_int;
+   assign rst_valid_int = (state_nxt == ADDR_HS) ? 1'b1 : 1'b0;
    reg awvalid_int, wvalid_int;
 
    always @(posedge clk_i, posedge rst_i) begin

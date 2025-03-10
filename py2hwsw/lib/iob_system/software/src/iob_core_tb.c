@@ -41,7 +41,8 @@ int iob_core_tb() {
   unsigned int version;
 
   // read version 20 times to burn time
-  for (int i = 0; i < 20; i++) {
+  int i;
+  for (i = 0; i < 20; i++) {
     version = IOB_UART_CSRS_GET_VERSION();
   }
   printf("Version is %d\n", version);

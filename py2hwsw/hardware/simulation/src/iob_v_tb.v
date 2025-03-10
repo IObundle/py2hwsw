@@ -64,12 +64,20 @@ module iob_v_tb;
       while(1) begin
          //read request
          c2v_read_fp = $fopen("c2v.txt", "rb");
+         if(c2v_read_fp == 0) begin
+            $display("Error: Could not open c2v.txt");
+            $finish;
+         end
          if (c2v_read_fp != 0) begin
             if ($fscanf(c2v_read_fp, "%08x %08x %08x %08x %08x\n", req, mode, address, data_w, data)) begin 
                //$display("V: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode, address, data_w, data);
                //check if request number matches with ack number
                if(req == ack) begin
                   v2c_write_fp = $fopen("v2c.txt", "wb");
+                  if (v2c_write_fp == 0) begin
+                     $display("Error: Could not open v2c.txt");
+                     $finish;
+                  end
                   if (v2c_write_fp != 0) begin
                      //process request
                      if(mode == `F) begin //finish request

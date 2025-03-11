@@ -229,26 +229,27 @@ module iob_axi_crossbar_addr #(
    assign m_rc_decerr   = m_decerr_reg;
    assign m_rc_valid    = m_rc_valid_reg;
 
-   reg match;
-   reg trans_start;
-   reg trans_complete;
+   reg                           match;
+   reg                           trans_start;
+   reg                           trans_complete;
 
-   reg [$clog2(S_ACCEPT+1)-1:0] trans_count_reg = 0;
-   wire trans_limit = trans_count_reg >= S_ACCEPT && !trans_complete;
+   reg  [$clog2(S_ACCEPT+1)-1:0] trans_count_reg = 0;
+   wire                          trans_limit;
+   assign trans_limit = trans_count_reg >= S_ACCEPT && !trans_complete;
 
    // transfer ID thread tracking
-   reg [ID_WIDTH-1:0] thread_id_reg[S_INT_THREADS-1:0];
-   reg [CL_M_COUNT-1:0] thread_m_reg[S_INT_THREADS-1:0];
-   reg [3:0] thread_region_reg[S_INT_THREADS-1:0];
-   reg [$clog2(S_ACCEPT+1)-1:0] thread_count_reg[S_INT_THREADS-1:0];
+   reg  [          ID_WIDTH-1:0] thread_id_reg            [S_INT_THREADS-1:0];
+   reg  [        CL_M_COUNT-1:0] thread_m_reg             [S_INT_THREADS-1:0];
+   reg  [                   3:0] thread_region_reg        [S_INT_THREADS-1:0];
+   reg  [$clog2(S_ACCEPT+1)-1:0] thread_count_reg         [S_INT_THREADS-1:0];
 
-   wire [S_INT_THREADS-1:0] thread_active;
-   wire [S_INT_THREADS-1:0] thread_match;
-   wire [S_INT_THREADS-1:0] thread_match_dest;
-   wire [S_INT_THREADS-1:0] thread_cpl_match;
-   wire [S_INT_THREADS-1:0] thread_trans_start;
-   wire [S_INT_THREADS-1:0] thread_trans_complete;
-   wire [S_INT_THREADS-1:0] lower_thread_trans_start;
+   wire [     S_INT_THREADS-1:0] thread_active;
+   wire [     S_INT_THREADS-1:0] thread_match;
+   wire [     S_INT_THREADS-1:0] thread_match_dest;
+   wire [     S_INT_THREADS-1:0] thread_cpl_match;
+   wire [     S_INT_THREADS-1:0] thread_trans_start;
+   wire [     S_INT_THREADS-1:0] thread_trans_complete;
+   wire [     S_INT_THREADS-1:0] lower_thread_trans_start;
 
    generate
       genvar n;

@@ -211,6 +211,12 @@ def setup(py_params_dict):
             #    "instantiate": False,
             # },
         ],
+        "superblocks": [
+            {
+                "core_name": "iob_uart_tester",
+                "dest_dir": "iob_uart_tester",
+            },
+        ],
         "snippets": [
             {
                 "verilog_code": """

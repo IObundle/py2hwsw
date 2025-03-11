@@ -46,7 +46,8 @@ module iob_regfile_at2p #(
       end
    endgenerate
 
-   wire [DATA_W-1:0] r_data = regfile_in[r_addr_i*DATA_W+:DATA_W];
+   wire [DATA_W-1:0] r_data;
+   assign r_data = regfile_in[r_addr_i*DATA_W+:DATA_W];
 
    //read
    iob_reg #(

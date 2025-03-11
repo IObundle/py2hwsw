@@ -48,22 +48,29 @@ module iob_axis2axi_in #(
    wire [AXI_DATA_W-1:0] fifo_data;
    wire fifo_empty, fifo_full;
    wire [BUFFER_W:0] fifo_level;
-   wire [BURST_W:0] awlen_int;
+   wire [ BURST_W:0] awlen_int;
 
    // Logical wires
-   wire doing_transfer = (state != WAIT_DATA);
-   wire normal_burst_possible = (fifo_level >= BURST_SIZE);
-   wire last_burst_possible = (fifo_level > 0 && fifo_level < BURST_SIZE && !axis_in_valid_i);
-   wire start_transfer = (normal_burst_possible || last_burst_possible) && !doing_transfer;
-   wire transfer = axi_wready_i && axi_wvalid_o;
-   wire read_next = (transfer && !axi_wlast_o);
-   wire last_transfer = (transfer_count == axi_awlen_o);
-   wire fifo_read_enable = (read_next || start_transfer)
-       ;  // Start_transfer puts the first valid data on r_data and offsets fifo read by one cycle which lines up perfectly with the way the m_axi_wready signal works
+   wire              doing_transfer;
+   wire              normal_burst_possible;
+   wire              last_burst_possible;
+   wire              start_transfer;
+   wire              transfer;
+   wire              read_next;
+   wire              last_transfer;
+   wire              fifo_read_enable;
+   assign doing_transfer = (state != WAIT_DATA);
+   assign normal_burst_possible = (fifo_level >= BURST_SIZE);
+   assign last_burst_possible = (fifo_level > 0 && fifo_level < BURST_SIZE && !axis_in_valid_i);
+   assign start_transfer = (normal_burst_possible || last_burst_possible) && !doing_transfer;
+   assign transfer = axi_wready_i && axi_wvalid_o;
+   assign read_next = (transfer && !axi_wlast_o);
+   assign last_transfer = (transfer_count == axi_awlen_o);
+   assign fifo_read_enable = (read_next || start_transfer); // Start_transfer puts the first valid data on r_data and offsets fifo read by one cycle which lines up perfectly with the way the m_axi_wready signal works
 
    wire [BURST_W:0] burst_size;
 
-   reg [BURST_W:0] non_boundary_burst_size;
+   reg  [BURST_W:0] non_boundary_burst_size;
    always @* begin
       non_boundary_burst_size = 0;
 
@@ -76,9 +83,10 @@ module iob_axis2axi_in #(
    generate
       if (AXI_ADDR_W >= 13) begin  // 4k boundary can only happen to LEN higher or equal to 13
 
-         wire [     12:0] boundary_transfer_len = (13'h1000 - current_address[11:0]) >> 2;
+         wire [12:0] boundary_transfer_len;
+         assign boundary_transfer_len = (13'h1000 - current_address[11:0]) >> 2;
 
-         reg  [BURST_W:0] boundary_burst_size;
+         reg [BURST_W:0] boundary_burst_size;
          always @* begin
             boundary_burst_size = non_boundary_burst_size;
 
@@ -93,7 +101,8 @@ module iob_axis2axi_in #(
       end
    endgenerate
 
-   wire [BURST_W:0] transfer_len = burst_size - 1;
+   wire [BURST_W:0] transfer_len;
+   assign transfer_len      = burst_size - 1;
 
    // Assignment to outputs
    assign axi_awvalid_o     = awvalid_int;

@@ -61,17 +61,28 @@ module iob_fp_fpu # (
    reg                              int2float, uint2float;
    reg                              float2int, float2uint;
    reg                              madd, msub, nmadd, nmsub;
-   wire                             any_add = |{add, sub};
-   wire                             any_mul = mul;
-   wire                             any_div = div;
-   wire                             any_sqrt = fsqrt;
-   wire                             any_min_max = min_max;
-   wire                             any_cmp = cmp;
-   wire                             any_int2float = int2float;
-   wire                             any_uint2float = uint2float;
-   wire                             any_float2int = float2int;
-   wire                             any_float2uint = float2uint;
-   wire                             any_madd = |{madd, msub, nmadd, nmsub};
+   wire                             any_add;
+   wire                             any_mul;
+   wire                             any_div;
+   wire                             any_sqrt;
+   wire                             any_min_max;
+   wire                             any_cmp;
+   wire                             any_int2float;
+   wire                             any_uint2float;
+   wire                             any_float2int;
+   wire                             any_float2uint;
+   wire                             any_madd;
+   assign                           any_add = |{add, sub};
+   assign                           any_mul = mul;
+   assign                           any_div = div;
+   assign                           any_sqrt = fsqrt;
+   assign                           any_min_max = min_max;
+   assign                           any_cmp = cmp;
+   assign                           any_int2float = int2float;
+   assign                           any_uint2float = uint2float;
+   assign                           any_float2int = float2int;
+   assign                           any_float2uint = float2uint;
+   assign                           any_madd = |{madd, msub, nmadd, nmsub};
    reg                              any_add_reg, any_mul_reg, any_div_reg, any_sqrt_reg, any_min_max_reg, any_cmp_reg, any_int2float_reg, any_uint2float_reg, any_float2int_reg, any_float2uint_reg;
 
    wire [DATA_W-1:0]                add_res;
@@ -91,20 +102,33 @@ module iob_fp_fpu # (
 
    reg                              ready_reg;
 
-   wire                             add_start = any_add & ~(any_add_reg & ~ready_reg);
-   wire                             mul_start = any_mul & ~(any_mul_reg & ~ready_reg);
-   wire                             div_start = any_div & ~(any_div_reg & ~ready_reg);
-   wire                             sqrt_start = any_sqrt & ~(any_sqrt_reg & ~ready_reg);
-   wire                             min_max_start = any_min_max & ~(any_min_max_reg & ~ready_reg);
-   wire                             cmp_start = any_cmp & ~(any_cmp_reg & ~ready_reg);
-   wire                             int2float_start = any_int2float & ~(any_int2float_reg & ~ready_reg);
-   wire                             uint2float_start = any_uint2float & ~(any_uint2float_reg & ~ready_reg);
-   wire                             float2int_start = any_float2int & ~(any_float2int_reg & ~ready_reg);
-   wire                             float2uint_start = any_float2uint & ~(any_float2uint_reg & ~ready_reg);
-   wire                             start_int = |{add_start, mul_start, div_start, sqrt_start, min_max_start, cmp_start, int2float_start, uint2float_start, float2int_start, float2uint_start};
+   wire                             add_start;
+   wire                             mul_start;
+   wire                             div_start;
+   wire                             sqrt_start;
+   wire                             min_max_start;
+   wire                             cmp_start;
+   wire                             int2float_start;
+   wire                             uint2float_start;
+   wire                             float2int_start;
+   wire                             float2uint_start;
+   wire                             start_int;
+   assign                           add_start = any_add & ~(any_add_reg & ~ready_reg);
+   assign                           mul_start = any_mul & ~(any_mul_reg & ~ready_reg);
+   assign                           div_start = any_div & ~(any_div_reg & ~ready_reg);
+   assign                           sqrt_start = any_sqrt & ~(any_sqrt_reg & ~ready_reg);
+   assign                           min_max_start = any_min_max & ~(any_min_max_reg & ~ready_reg);
+   assign                           cmp_start = any_cmp & ~(any_cmp_reg & ~ready_reg);
+   assign                           int2float_start = any_int2float & ~(any_int2float_reg & ~ready_reg);
+   assign                           uint2float_start = any_uint2float & ~(any_uint2float_reg & ~ready_reg);
+   assign                           float2int_start = any_float2int & ~(any_float2int_reg & ~ready_reg);
+   assign                           float2uint_start = any_float2uint & ~(any_float2uint_reg & ~ready_reg);
+   assign                           start_int = |{add_start, mul_start, div_start, sqrt_start, min_max_start, cmp_start, int2float_start, uint2float_start, float2int_start, float2uint_start};
 
-   wire                             fpu_wait = start_int | ~done_o;
-   wire                             ready = done_o & ~done_reg;
+   wire                             fpu_wait;
+   wire                             ready;
+   assign                             fpu_wait = start_int | ~done_o;
+   assign                             ready = done_o & ~done_reg;
 
    always @* begin
       add = 0;
@@ -191,9 +215,12 @@ module iob_fp_fpu # (
       end
    end
 
-   wire [DATA_W-1:0] op_a_add = any_madd? mul_res: rs1_i;
-   wire [DATA_W-1:0] op_b_add_int = any_madd? rs3_i: rs2_i;
-   wire [DATA_W-1:0] op_b_add = sub? {~op_b_add_int[DATA_W-1], op_b_add_int[DATA_W-2:0]}: op_b_add_int;
+   wire [DATA_W-1:0] op_a_add;
+   wire [DATA_W-1:0] op_b_add_int;
+   wire [DATA_W-1:0] op_b_add;
+   assign op_a_add = any_madd? mul_res: rs1_i;
+   assign op_b_add_int = any_madd? rs3_i: rs2_i;
+   assign op_b_add = sub? {~op_b_add_int[DATA_W-1], op_b_add_int[DATA_W-2:0]}: op_b_add_int;
 
    iob_fp_add #(
             .DATA_W (DATA_W),

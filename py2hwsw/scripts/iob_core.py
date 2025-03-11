@@ -117,7 +117,7 @@ class iob_core(iob_module, iob_instance):
         )
         self.set_default_attribute(
             "setup_dir",
-            "",
+            kwargs.get("setup_dir", ""),
             str,
             descr="Path to root setup folder of the core.",
         )
@@ -234,6 +234,9 @@ class iob_core(iob_module, iob_instance):
             ):
                 superblocks = self.__create_memwrapper(superblocks=superblocks)
 
+        # Add 'VERSION' macro
+        self.create_conf_group(name="VERSION", type="M", val="16'h" + self.version_str_to_digits(self.version), descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.")
+
         # Ensure superblocks are set up last
         # and only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
@@ -244,7 +247,6 @@ class iob_core(iob_module, iob_instance):
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
-        self.setup_dir = find_module_setup_dir(self.original_name)[0]
         # print(
         #     f"DEBUG: {self.name} {self.original_name} {self.build_dir} {self.is_top_module}",
         #     file=sys.stderr,
@@ -400,9 +402,10 @@ class iob_core(iob_module, iob_instance):
             parameters=kwargs.get("parameters", {}),
         )
 
-        # Copy parent attributes to child
+        # Copy (some) parent attributes to child
         self.__dict__.update(parent_module.__dict__)
-        self.setup_dir = find_module_setup_dir(attributes["original_name"])[0]
+        self.original_name = attributes["original_name"]
+        self.setup_dir = attributes["setup_dir"]
 
         if self.abort_reason:
             return True
@@ -699,7 +702,7 @@ class iob_core(iob_module, iob_instance):
         verilog_sources = []
         for path in Path(os.path.join(self.build_dir, "hardware")).rglob("*.vh"):
             # Skip specific Verilog headers
-            if path.name.endswith("version.vh") or "test_" in path.name:
+            if "test_" in path.name:
                 continue
             # Skip synthesis directory # TODO: Support this?
             if "/syn/" in str(path):
@@ -763,7 +766,7 @@ class iob_core(iob_module, iob_instance):
             core_dict = json.load(f)
 
         default_core_name = os.path.splitext(os.path.basename(filepath))[0]
-        py2_core_dict = {"original_name": default_core_name, "name": default_core_name}
+        py2_core_dict = {"original_name": default_core_name, "name": default_core_name, "setup_dir": os.path.dirname(filepath)}
         py2_core_dict.update(core_dict)
 
         return cls.py2hw(py2_core_dict, **kwargs)
@@ -888,7 +891,7 @@ class iob_core(iob_module, iob_instance):
                     **kwargs,
                 }
             )
-            py2_core_dict = {"original_name": core_name, "name": core_name}
+            py2_core_dict = {"original_name": core_name, "name": core_name, "setup_dir": core_dir}
             py2_core_dict.update(core_dict)
             instance = __class__.py2hw(
                 py2_core_dict,
@@ -926,6 +929,14 @@ class iob_core(iob_module, iob_instance):
             __class__, f"{core.build_dir}/document/tsrc"
         )
         doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
+
+    @staticmethod
+    def version_str_to_digits(version_str):
+        """Given a version string (like "V0.12"), return a 4 digit string representing
+        the version (like "0012")"""
+        version_str = version_str.replace("V", "")
+        major_ver, minor_ver = version_str.split(".")
+        return f"{int(major_ver):02d}{int(minor_ver):02d}"
 
 
 def find_common_deep(path1, path2):
@@ -968,8 +979,9 @@ def find_module_setup_dir(core_name):
     file_ext = os.path.splitext(file_path)[1]
 
     filepath = pathlib.Path(file_path)
-    # Force core file to be contained in a folder with the same name. Ignore "iob_core" case.
-    if filepath.parent.name != core_name and core_name != "iob_core":
+    # Force core file to be contained in a folder with the same name.
+    # Skip this check if we are the top module (no top defined) or trying to setup the top module again (same name as previous defined top)
+    if filepath.parent.name != core_name and (iob_core.global_top_module and core_name != iob_core.global_top_module.original_name):
         fail_with_msg(f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
                         f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
                         f"But found incorrect path:    '{filepath.resolve()}'.")

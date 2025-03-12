@@ -249,17 +249,17 @@ Superblocks are only used if they are superblocks of the project's top module or
 \label{sec:sim}
 \input{sim}
 
-% \ifdefined\ASICSYNTH
-% \subsection{ASIC Synthesis}
-% \label{sec:synth}
-% \input{synth}
-% \fi
-% 
-% \ifdefined\FPGACOMP
-% \subsection{FPGA Compilation}
-% \label{sec:fpga}
-% \input{fpga}
-% \fi
+\ifdefined\ASICSYNTH
+\subsection{ASIC Synthesis}
+\label{sec:synth}
+\input{synth}
+\fi
+
+\ifdefined\FPGACOMP
+\subsection{FPGA Compilation}
+\label{sec:fpga}
+\input{fpga}
+\fi
 
 % \ifdefined\SECTIONCLEARPAGE
 % \clearpage

@@ -173,6 +173,10 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
                         e_signal_name = real_e_signal.name
                         port_name = signal.name
                         break
+                    elif e_signal is port.e_connect.signals[-1]:
+                        for bit_slice in port.e_connect_bit_slices:
+                            if signal.name in bit_slice:
+                                e_signal_name = bit_slice.split(":")[1]
                 port_name = signal.name
             else:
                 real_e_signal = get_real_signal(port.e_connect.signals[idx])
@@ -180,7 +184,7 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
 
 
             for bit_slice in port.e_connect_bit_slices:
-                if e_signal_name in bit_slice:
+                if e_signal_name in bit_slice and f'{signal.name}:' not in bit_slice:
                     e_signal_name = bit_slice
                     break
 

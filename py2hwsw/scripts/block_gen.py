@@ -158,8 +158,6 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
             if not isinstance(signal, iob_signal):
                 continue
             port_name = signal.name
-            real_e_signal = get_real_signal(port.e_connect.signals[idx])
-            e_signal_name = real_e_signal.name
             # Connect interface signals by name and not by order
             if port.interface and port.e_connect.interface:
                 port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
@@ -175,6 +173,11 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
                         e_signal_name = real_e_signal.name
                         port_name = signal.name
                         break
+                port_name = signal.name
+            else:
+                real_e_signal = get_real_signal(port.e_connect.signals[idx])
+                e_signal_name = real_e_signal.name
+
 
             for bit_slice in port.e_connect_bit_slices:
                 if e_signal_name in bit_slice:

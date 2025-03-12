@@ -11,9 +11,9 @@ Py2HWSW also provides a universal Verilator testbench that can be used to simula
 
 You can customize the simulation process by modifying the testbench and simulation parameters, such as the simulation time, input stimuli, and output signals to be monitored. Additionally, you can use other simulators, such as VCS or QuestaSim, by specifying the corresponding simulator variable.
 
-Some cores in the Py2HWSW library also include a tester that can be used to verify their functionality. Examples of such cores include \texttt{iob_aoi}, \texttt{iob_pulse_gen}, and \texttt{iob_system}. These testers can be run along with the core to test its behavior and ensure that it is working as expected.
+Some cores in the Py2HWSW library also include a tester that can be used to verify their functionality. Examples of such cores include \texttt{iob\_aoi}, \texttt{iob\_pulse\_gen}, and \texttt{iob\_system}. These testers can be run along with the core to test its behavior and ensure that it is working as expected.
 
-To run the tester, simply navigate to the tester's build directory, usually located inside the core's build directory in a folder named \texttt{<core_name>_tester/}, and run the command \texttt{make sim-run}.
+To run the tester, simply navigate to the tester's build directory, usually located inside the core's build directory in a folder named \texttt{<core\_name>\_tester/}, and run the command \texttt{make sim-run}.
 This will compile and run the tester, allowing you to verify the core's functionality and debug any issues that may arise.
 By providing these testers, Py2HWSW makes it easier to develop and test complex hardware components, and ensures that the cores in the library are reliable and functional.
 

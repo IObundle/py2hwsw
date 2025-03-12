@@ -34,6 +34,7 @@ def setup(py_params_dict):
         CPU. This port will give direct access to the system's peripherals. The internal
         memories and crossbar will be removed.""",
         ),
+        "system_attributes": ({}, "Core dictionary with attributes to override/append to the ones of iob_system. Usually passed by child cores to add their own components."),
     }
 
     # Converts dictionary tuple values into single values without description

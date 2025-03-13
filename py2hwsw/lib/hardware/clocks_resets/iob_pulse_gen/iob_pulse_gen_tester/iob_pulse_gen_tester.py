@@ -58,7 +58,7 @@ def setup(py_params_dict):
                         # Instantiate a GPIO core to verify pulse_gen
                         "core_name": "iob_gpio",
                         "instance_name": "GPIO0",
-                        "instance_description": "GPIO verification tool",
+                        "instance_description": "GPIO verification instrument",
                         "is_peripheral": True,
                         "parameters": {
                             "INPUT_GPIO_W": 1,
@@ -71,7 +71,7 @@ def setup(py_params_dict):
                             "output_0_o": "gpio_output",
                         },
                     },
-                    # NOTE: Add other verification tools (tester peripherals) here.
+                    # NOTE: Add other verification instruments (tester peripherals) here.
                 ],
             },
         },

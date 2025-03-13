@@ -42,10 +42,10 @@ int main() {
   IOB_GPIO_SET_OUTPUT_0(0);
 
   // Check that output of iob_pulse_gen is enabled
-  // NOTE: GPIO is not the best verification tool for iob_pulse_gen, since it is
-  // not very precise in the timing for sampling its output. Ideally we should
-  // use a dedicated verification tool that measures the timing of the output of
-  // iob_pulse_gen.
+  // NOTE: GPIO is not the best verification instrument for iob_pulse_gen, since
+  // it is not very precise in the timing for sampling its output. Ideally we
+  // should use a dedicated verification instrument that measures the timing of
+  // the output of iob_pulse_gen.
   gpio_output = IOB_GPIO_GET_INPUT_0();
   if (gpio_output != 1) {
     uart_puts("ERROR: iob_pulse_gen did not generate output!\n");

@@ -12,11 +12,26 @@ def setup(py_params_dict):
     )
     assert "clk_en_rst_s" in port_params, "clk_en_rst_s port is missing"
 
-    clk_s_params = (
-        [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
-        if "clk_en_rst_s" in port_params
-        else []
+    clk_s_params = [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
+
+    clk_suff_dict = {
+        "cke": "ce",
+        "arst": "ar",
+        "anrst": "anr",
+    }
+
+    sync_suff_dict = {
+        "rst": "r",
+        "nrst": "nr",
+        "en": "e",
+    }
+
+    clk_suffix = "".join([clk_suff_dict[x] for x in clk_s_params if x in clk_suff_dict])
+    sync_suffix = "".join(
+        [sync_suff_dict[x] for x in clk_s_params if x in sync_suff_dict]
     )
+
+    reg_name = "_".join(filter(lambda x: x != "", ["iob_reg", clk_suffix, sync_suffix]))
 
     rst_str = ""
     en_str = ""
@@ -47,6 +62,7 @@ def setup(py_params_dict):
         en_str = f"{'else begin' if rst_str != '' else '        '}\n            data_o <= data_i;\n        {'end' if rst_str != '' else ''}"
 
     attributes_dict = {
+        "name": reg_name,
         "generate_hw": True,
         "version": "0.1",
         "confs": [

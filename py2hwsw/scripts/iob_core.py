@@ -921,10 +921,14 @@ class iob_core(iob_module, iob_instance):
             f.write("NAME=Py2HWSW\n")
         with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
             f.write(py2_version)
+        # Build a new dummy module instance, to obtain its attributes
+        __class__.global_special_target = "print_attributes"
+        dummy_module = __class__()
         doc_gen.generate_tex_py2hwsw_attributes(
-            __class__, f"{core.build_dir}/document/tsrc"
+            dummy_module, f"{core.build_dir}/document/tsrc"
         )
         doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
+        doc_gen.generate_tex_py2hwsw_standard_py_params(f"{core.build_dir}/document/tsrc")
 
 
 def find_common_deep(path1, path2):

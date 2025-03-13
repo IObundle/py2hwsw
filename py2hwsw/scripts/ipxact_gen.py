@@ -6,7 +6,6 @@
 
 # TODO: account for log2n_items in the memory map
 import math
-import if_gen
 import re
 import os
 import sys
@@ -122,6 +121,10 @@ class SwRegister:
     ):
         self.name = name
         self.address = address
+
+        if type(hw_size) is str and hw_size.isnumeric():
+            hw_size = int(hw_size)
+
         self.hw_size = hw_size
 
         max_size = hw_size

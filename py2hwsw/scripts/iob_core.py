@@ -913,7 +913,7 @@ class iob_core(iob_module, iob_instance):
             original_name="py2hwsw",
             name="py2hwsw",
             setup_dir=os.path.join(os.path.dirname(__file__), "../py2hwsw_document"),
-            build_dir="py2hwsw_docs",
+            build_dir="py2hwsw_generated_docs",
         )
         copy_srcs.doc_setup(core)
         copy_srcs.copy_rename_setup_subdir(core, "document")

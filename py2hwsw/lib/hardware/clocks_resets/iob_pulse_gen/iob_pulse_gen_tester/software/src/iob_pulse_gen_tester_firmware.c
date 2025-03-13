@@ -7,8 +7,8 @@
 #include "iob_bsp.h"
 #include "iob_gpio_csrs.h"
 #include "iob_printf.h"
-#include "iob_system_conf.h"
-#include "iob_system_mmap.h"
+#include "iob_pulse_gen_tester_conf.h"
+#include "iob_pulse_gen_tester_mmap.h"
 #include "iob_uart.h"
 #include <string.h>
 

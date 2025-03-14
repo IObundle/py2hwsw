@@ -16,8 +16,8 @@ sys.path.append(
 )
 from iob_csrs import static_reg_tables
 
-# Generates IP-XACT for the given core
 #
+# Generates IP-XACT for the given core
 #
 
 
@@ -621,6 +621,7 @@ def generate_ipxact_xml(core, dest_dir):
 			<kactus2:kts_implementation>HW</kactus2:kts_implementation>
 			<kactus2:kts_firmness>Mutable</kactus2:kts_firmness>
 		</kactus2:kts_attributes>
+		<kactus2:license>{core.license.name} License, Copyright (c) {core.license.year} {core.license.author}</kactus2:license>
 	</ipxact:vendorExtensions>
 </ipxact:component>"""
 

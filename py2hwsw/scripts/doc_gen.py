@@ -27,29 +27,62 @@ def generate_docs(core):
         )
 
 
-def generate_tex_py2hwsw_attributes(iob_core_class, out_dir):
+def generate_tex_py2hwsw_attributes(iob_core_instance, out_dir):
     """Generate TeX table of supported attributes of the py2hwsw interface.
     The attributes listed can be used in the 'attributes' dictionary of cores.
-    :param iob_core_class: Reference to the IOb core class. Used to instantiate dummy module.
+    :param iob_core_instance: Dummy instance of the iob_core class. Used to obtain attributes of iob_core.
     :param out_dir: Path to the output directory
     """
 
-    # Set project wide special target (will prevent normal setup)
-    iob_core_class.global_special_target = "print_attributes"
-    # Build a new dummy module instance, to obtain its attributes
-    module = iob_core_class()
-
     tex_table = []
-    for name in module.ATTRIBUTE_PROPERTIES.keys():
+    for name in iob_core_instance.ATTRIBUTE_PROPERTIES.keys():
         tex_table.append(
             [
                 name,
-                module.ATTRIBUTE_PROPERTIES[name].datatype,
-                module.ATTRIBUTE_PROPERTIES[name].descr,
+                iob_core_instance.ATTRIBUTE_PROPERTIES[name].datatype,
+                iob_core_instance.ATTRIBUTE_PROPERTIES[name].descr,
             ]
         )
 
     write_table(f"{out_dir}/py2hwsw_attributes", tex_table)
+
+
+def generate_tex_py2hwsw_standard_py_params(out_dir):
+    """Generate TeX table of standard Python Parameters given by py2hwsw to every core.
+    The Python Parameters listed are always received in the argument of the core's setup() function.
+    :param iob_core_instance: Dummy instance of the iob_core class. Used to obtain python parameters of iob_core.
+    :param out_dir: Path to the output directory
+    """
+
+    tex_table = [
+        [
+            "core_name",
+            str,
+            "Name of current core (determined by the core's file name).",
+        ],
+        [
+            "build_dir",
+            str,
+            "Build directory of this core. Usually defined by `--build-dir` flag or instantiator.",
+        ],
+        [
+            "py2hwsw_target",
+            str,
+            "The reason why py2hwsw is invoked. Usually `setup` meaning the Py2HWSW is calling the core's script to obtain information on how to generate the core. May also be other targets like `clean`, `print_attributes`, or `deliver`. These are usually to obtain information about the core for various purposes, but not to generate the build directory.",
+        ],
+        [
+            "instantiator",
+            dict,
+            "Core dictionary with attributes of the instantiator core (if any). Allows subblocks to obtain information about their instantiator core.",
+        ],
+        [
+            "py2hwsw_version",
+            str,
+            "Version of Py2HWSW.",
+        ],
+    ]
+
+    write_table(f"{out_dir}/py2hwsw_py_params", tex_table)
 
 
 def generate_tex_core_lib(out_dir):

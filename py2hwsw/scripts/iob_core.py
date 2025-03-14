@@ -917,7 +917,7 @@ class iob_core(iob_module, iob_instance):
             original_name="py2hwsw",
             name="py2hwsw",
             setup_dir=os.path.join(os.path.dirname(__file__), "../py2hwsw_document"),
-            build_dir="py2hwsw_docs",
+            build_dir="py2hwsw_generated_docs",
         )
         copy_srcs.doc_setup(core)
         copy_srcs.copy_rename_setup_subdir(core, "document")
@@ -925,10 +925,14 @@ class iob_core(iob_module, iob_instance):
             f.write("NAME=Py2HWSW\n")
         with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
             f.write(py2_version)
+        # Build a new dummy module instance, to obtain its attributes
+        __class__.global_special_target = "print_attributes"
+        dummy_module = __class__()
         doc_gen.generate_tex_py2hwsw_attributes(
-            __class__, f"{core.build_dir}/document/tsrc"
+            dummy_module, f"{core.build_dir}/document/tsrc"
         )
         doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
+        doc_gen.generate_tex_py2hwsw_standard_py_params(f"{core.build_dir}/document/tsrc")
 
     @staticmethod
     def version_str_to_digits(version_str):

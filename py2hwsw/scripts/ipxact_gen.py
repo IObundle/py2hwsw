@@ -614,14 +614,14 @@ def generate_ipxact_xml(core, dest_dir):
 	<ipxact:description>{core.description}</ipxact:description>
 	{parameters_xml}
 	<ipxact:vendorExtensions>
-		<kactus2:author>IObundle, Lda</kactus2:author>
+		<kactus2:author>{core.license.author}</kactus2:author>
 		<kactus2:version>3,10,15,0</kactus2:version>
 		<kactus2:kts_attributes>
 			<kactus2:kts_productHier>Flat</kactus2:kts_productHier>
 			<kactus2:kts_implementation>HW</kactus2:kts_implementation>
 			<kactus2:kts_firmness>Mutable</kactus2:kts_firmness>
 		</kactus2:kts_attributes>
-		<kactus2:license>{core.license.name} License, Copyright (c) {core.license.year} {core.license.author}</kactus2:license>
+		<kactus2:license>{core.license.name} License, Copyright (c) {core.license.year}</kactus2:license>
 	</ipxact:vendorExtensions>
 </ipxact:component>"""
 

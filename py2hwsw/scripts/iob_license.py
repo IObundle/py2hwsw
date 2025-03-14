@@ -17,7 +17,7 @@ class iob_license:
     # Year of the license.
     year: int = date.today().year
     # Author of the license.
-    author: str = "IObundle"
+    author: str = "IObundle, Lda"
 
 
 def update_license(core, *args, **kwargs):

@@ -61,6 +61,8 @@ class iob_core(iob_module, iob_instance):
     global_special_target: str = ""
     # Clang format rules
     global_clang_format_rules_filepath: str = None
+    # List of callbacks to run at post setup stage
+    global_post_setup_callbacks: list = []
 
     def __init__(self, *args, **kwargs):
         """Build a core (includes module and instance attributes)
@@ -327,16 +329,22 @@ class iob_core(iob_module, iob_instance):
         # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
         self._remove_duplicate_sources()
         if self.is_tester:
-            # Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
-            self._remove_duplicate_sources(
-                main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
-                subfolders=[
-                    "hardware/src",
-                    "hardware/simulation/src",
-                    "hardware/fpga/src",
-                    "hardware/common_src",
-                ],
+            # Add callback to: Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
+            __class__.global_post_setup_callbacks.append(
+                lambda: self._remove_duplicate_sources(
+                    main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
+                    subfolders=[
+                        "hardware/src",
+                        "hardware/simulation/src",
+                        "hardware/fpga/src",
+                        "hardware/common_src",
+                    ],
+                )
             )
+        else:  # Not tester
+            # Run post setup callbacks
+            for callback in __class__.global_post_setup_callbacks:
+                callback()
         # Generate docs
         doc_gen.generate_docs(self)
         # Generate ipxact file

@@ -9,7 +9,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
 
 import reg_gen
-from iob_csr import create_csr_group
+from csr_classes import create_csr_group
 from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
 

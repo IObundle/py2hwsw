@@ -41,6 +41,7 @@ from iob_base import (
     add_traceback_msg,
     debug,
 )
+from iob_license import iob_license, update_license
 import sw_tools
 import verilog_format
 import verilog_lint
@@ -195,7 +196,14 @@ class iob_core(iob_module, iob_instance):
             [],
             list,
             get_list_attr_handler(self.create_python_parameter_group),
-            "List of core Python Parameters. Used for documentation.",
+            descr="List of core Python Parameters. Used for documentation.",
+        )
+        self.set_default_attribute(
+            "license",
+            iob_license(),  # Create a default license
+            iob_license,
+            lambda y: update_license(self, **y),
+            descr="License for the core.",
         )
 
         self.attributes_dict = copy.deepcopy(attributes)

@@ -336,7 +336,6 @@ def get_mem_read_ports(
             name="r_data" + rd_suffix + "_i",
             width=DATA_W,
             descr=f"Data port {suffix}",
-            isvar=True,
         ),
     ] + extra_signals
     return mem_read_ports

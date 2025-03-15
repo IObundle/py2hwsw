@@ -10,6 +10,7 @@ import re
 import os
 import sys
 from iob_signal import iob_signal
+from if_gen import if_details
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "../lib/hardware/iob_csrs")
@@ -221,15 +222,14 @@ class SwRegister:
 class Port:
     """
     Port class
-
-
     """
 
-    def __init__(self, name, direction, n_bits, description):
+    def __init__(self, name, direction, n_bits, description, tag):
         self.name = name
         self.direction = direction
         self.n_bits = n_bits
         self.description = description
+        self.tag = tag
 
     def gen_xml(self, parameters_list):
         """
@@ -254,6 +254,8 @@ class Port:
         else:
             left_bit = self.n_bits - 1
 
+        tag = self.tag
+
         # Generate the xml code
         xml_code = f"""<ipxact:port>
 				<ipxact:name>{self.name}</ipxact:name>
@@ -267,6 +269,9 @@ class Port:
 						</ipxact:vector>
 					</ipxact:vectors>
 				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>{tag}</kactus2:portTags>
+				</ipxact:vendorExtensions>
 			</ipxact:port>"""
 
         return xml_code
@@ -286,6 +291,10 @@ def gen_ports_list(core):
         if group.doc_only:
             continue
 
+        tag = ""
+        if group.interface:
+            tag = group.name
+
         for signal in group.signals:
             if not isinstance(signal, iob_signal):
                 continue
@@ -299,10 +308,31 @@ def gen_ports_list(core):
                     signal.direction,
                     n_bits,
                     signal.descr,
+                    tag,
                 )
             )
 
     return ports_list
+
+
+def gen_bus_interfaces_list(core):
+    """
+    Generate the bus interfaces list for the given core
+    @param core: core object
+    return: bus interfaces list with tuples of (port name, interface_obj)
+    """
+
+    bus_interfaces_list = []
+
+    for group in core.ports:
+        # Skip doc_only interfaces
+        if group.doc_only:
+            continue
+
+        if group.interface:
+            bus_interfaces_list.append((group.name, group.interface))
+
+    return bus_interfaces_list
 
 
 def gen_ports_xml(ports_list, parameters_list):
@@ -325,6 +355,58 @@ def gen_ports_xml(ports_list, parameters_list):
     xml_code = f"""<ipxact:ports>
 			{ports_xml}
 		</ipxact:ports>"""
+
+    return xml_code
+
+
+def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
+    """
+    Generate the bus interfaces xml code
+    @param bus_interfaces_list: list of bus interfaces tuples with format (port name, interface_obj)
+    @param ports_list: list of ports objects
+    return: xml code
+    """
+
+    if_ports = {}
+    # Generate port_list (signal list) of each interface (py2 port)
+    for port in ports_list:
+        if port.tag:
+            if port.tag not in if_ports:
+                if_ports[port.tag] = []
+            if_ports[port.tag].append(port)
+
+    # Generate the xml code for the bus interfaces
+    bus_interfaces_xml = ""
+    for port_name, bus_interface in bus_interfaces_list:
+        portmap_xml = ""
+        for port in if_ports[port_name]:
+            portmap_xml += f"""\
+			<portMap>
+				<logicalPort>{port.name}</logicalPort>
+				<physicalPort>{port.name}</physicalPort>
+			</portMap>
+"""
+
+        # Find interface details
+        bus_details = next(i for i in if_details if i["name"] == bus_interface.type)
+        if_mode = "master" if port_name.endswith("_m") else "slave"
+        bus_interfaces_xml += f"""\
+		<ipxact:busInterface>
+			<ipxact:name>{port_name}</ipxact:name>
+			<ipxact:displayName>{bus_details["full_name"]}</ipxact:displayName>
+			<ipxact:busType vendor="{bus_details["vendor"]}" library="{bus_details["lib"]}" name="{bus_details["full_name"]}" version="{bus_details["version"]}"/>
+			<ipxact:{if_mode}/>
+			<ipxact:connectionRequired>true</ipxact:connectionRequired>
+{portmap_xml}
+		</ipxact:busInterface>
+"""
+
+    # Generate the xml code for the bus interfaces
+    xml_code = f"""\
+<ipxact:busInterfaces>
+{bus_interfaces_xml}
+	</ipxact:busInterfaces>
+"""
 
     return xml_code
 
@@ -578,6 +660,14 @@ def generate_ipxact_xml(core, dest_dir):
     # Generate ports xml code
     ports_xml = gen_ports_xml(ports_list, parameters_list)
 
+    # Generate bus interfaces list
+    bus_interfaces_list = gen_bus_interfaces_list(core)
+
+    # Generate bus interfaces xml code
+    bus_interfaces_xml = gen_bus_interfaces_xml(
+        bus_interfaces_list, ports_list, parameters_list
+    )
+
     # Generate resets xml code
     resets_xml = gen_resets_xml(ports_list)
 
@@ -598,6 +688,7 @@ def generate_ipxact_xml(core, dest_dir):
 	<ipxact:library>{core_library}</ipxact:library>
 	<ipxact:name>{core_name_display}</ipxact:name>
 	<ipxact:version>{core.version}</ipxact:version>
+	{bus_interfaces_xml}
 	{memory_map_xml}
 	<ipxact:model>
 		<ipxact:views>

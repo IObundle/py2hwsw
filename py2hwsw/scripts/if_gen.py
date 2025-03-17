@@ -342,7 +342,7 @@ def get_mem_read_ports(
 
 
 def get_mem_write_ports(
-    suffix: str, ready: bool = False, addr: bool = False, true: bool = False
+    suffix: str, ready: bool = False, addr: bool = False, true: bool = False, byte_enable: bool = False
 ):
     suffix = f"_{suffix}" if suffix else ""
     wr_suffix = suffix if true else ""
@@ -363,16 +363,29 @@ def get_mem_write_ports(
                 descr=f"Write address port {suffix}",
             )
         )
+    if byte_enable:
+        extra_signals.append(
+            iob_signal(
+                name="w_strb" + suffix + "_o",
+                width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
+                descr=f"Write strobe port {suffix}",
+            )
+        )
+    else:  # No byte enable
+        extra_signals.append(
+            iob_signal(
+                name="w_en" + suffix + "_o",
+                width=1,
+                descr=f"Write enable port {suffix}",
+            )
+        )
+
+
     mem_write_ports = [
         iob_signal(
             name="w_data" + wr_suffix + "_o",
             width=DATA_W,
             descr=f"Data port {suffix}",
-        ),
-        iob_signal(
-            name="w_strb" + suffix + "_o",
-            width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
-            descr=f"Write strobe port {suffix}",
         ),
     ] + extra_signals
     return mem_write_ports
@@ -461,7 +474,15 @@ def get_ram_atdp_ports():
 
 @parse_widths
 def get_ram_atdp_be_ports():
-    return get_ram_atdp_ports()
+    ports = (
+        get_mem_ports("a", async_clk=True)
+        + get_mem_ports("b", async_clk=True)
+        + get_mem_read_ports("a", true=True)
+        + get_mem_read_ports("b", true=True)
+        + get_mem_write_ports("a", true=True, byte_enable=True)
+        + get_mem_write_ports("b", true=True, byte_enable=True)
+    )
+    return remove_duplicates(ports)
 
 
 @parse_widths
@@ -472,7 +493,8 @@ def get_ram_sp_ports():
 
 @parse_widths
 def get_ram_sp_be_ports():
-    return get_ram_sp_ports()
+    ports = get_mem_ports("") + get_mem_read_ports("") + get_mem_write_ports("", byte_enable=True)
+    return remove_duplicates(ports)
 
 
 @parse_widths
@@ -492,7 +514,12 @@ def get_ram_t2p_ports():
 
 @parse_widths
 def get_ram_t2p_be_ports():
-    return get_ram_t2p_ports()
+    ports = (
+        get_mem_ports("", addr=False, enable=False)
+        + get_mem_read_ports("", enable=True, addr=True)
+        + get_mem_write_ports("", addr=True, byte_enable=True)
+    )
+    return remove_duplicates(ports)
 
 
 @parse_widths
@@ -520,12 +547,20 @@ def get_ram_tdp_ports():
 
 @parse_widths
 def get_ram_tdp_be_ports():
-    return get_ram_tdp_ports()
+    ports = (
+        get_mem_ports("a")
+        + get_mem_ports("b")
+        + get_mem_read_ports("a")
+        + get_mem_read_ports("b")
+        + get_mem_write_ports("a", byte_enable=True)
+        + get_mem_write_ports("b", byte_enable=True)
+    )
+    return remove_duplicates(ports)
 
 
 @parse_widths
 def get_ram_tdp_be_xil_ports():
-    return get_ram_tdp_ports()
+    return get_ram_tdp_be_ports()
 
 
 @parse_widths

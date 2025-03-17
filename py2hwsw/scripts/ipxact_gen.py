@@ -319,7 +319,7 @@ def gen_bus_interfaces_list(core):
     """
     Generate the bus interfaces list for the given core
     @param core: core object
-    return: bus interfaces list with tuples of (port name, interface_obj)
+    return: bus interfaces list with grouped signals (py2 ports)
     """
 
     bus_interfaces_list = []
@@ -330,7 +330,7 @@ def gen_bus_interfaces_list(core):
             continue
 
         if group.interface:
-            bus_interfaces_list.append((group.name, group.interface))
+            bus_interfaces_list.append(group)
 
     return bus_interfaces_list
 
@@ -362,7 +362,7 @@ def gen_ports_xml(ports_list, parameters_list):
 def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
     """
     Generate the bus interfaces xml code
-    @param bus_interfaces_list: list of bus interfaces tuples with format (port name, interface_obj)
+    @param bus_interfaces_list: list of bus interfaces with grouped signals (py2 ports)
     @param ports_list: list of ports objects
     return: xml code
     """
@@ -377,8 +377,10 @@ def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
 
     # Generate the xml code for the bus interfaces
     bus_interfaces_xml = ""
-    for port_name, bus_interface in bus_interfaces_list:
+    for group in bus_interfaces_list:
         portmap_xml = ""
+        port_name = group.name
+        bus_interface = group.interface
         for port in if_ports[port_name]:
             portmap_xml += f"""\
 			<portMap>
@@ -387,14 +389,15 @@ def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
 			</portMap>
 """
 
-        # Find interface details
+        # Find interface details (including VLNV)
         bus_details = next(i for i in if_details if i["name"] == bus_interface.type)
         if_mode = "master" if port_name.endswith("_m") else "slave"
         bus_interfaces_xml += f"""\
 		<ipxact:busInterface>
 			<ipxact:name>{port_name}</ipxact:name>
 			<ipxact:displayName>{bus_details["full_name"]}</ipxact:displayName>
-			<ipxact:busType vendor="{bus_details["vendor"]}" library="{bus_details["lib"]}" name="{bus_details["full_name"]}" version="{bus_details["version"]}"/>
+			<ipxact:description>{group.descr}</ipxact:description>
+			<ipxact:busType vendor="{bus_details["vendor"]}" library="{bus_details["lib"]}" name="{bus_details["name"]}" version="{bus_details["version"]}"/>
 			<ipxact:{if_mode}/>
 			<ipxact:connectionRequired>true</ipxact:connectionRequired>
 {portmap_xml}
@@ -410,6 +413,53 @@ def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
 
     return xml_code
 
+def gen_bus_interface_xml_file(bus_interface, dest_dir):
+    """
+    Generate the IPXACT XML file for given bus interface.
+    @param bus_interface: bus interface object (if_gen.py 'interface' object)
+    @param dest_dir: destination directory
+    """
+    # Find interface details (including VLNV)
+    bus_details = next(i for i in if_details if i["name"] == bus_interface.type)
+
+    # Create the destination directory if it doesn't exist
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
+
+    # Create the Bus Definition file for the interface
+    with open(f"{dest_dir}/interface_{bus_interface.type}.{bus_details['version']}.xml", "w") as f:
+        f.write(f"""\
+<?xml version="1.0" encoding="UTF-8"?>
+<ipxact:busDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
+	<ipxact:vendor>{bus_details["vendor"]}</ipxact:vendor>
+	<ipxact:library>{bus_details["lib"]}</ipxact:library>
+	<ipxact:name>{bus_details["name"]}</ipxact:name>
+	<ipxact:version>{bus_details["version"]}</ipxact:version>
+	<ipxact:displayName>{bus_details["full_name"]}</ipxact:displayName>
+	<ipxact:shortDescription>{""}</ipxact:shortDescription>
+	<ipxact:description>{""}</ipxact:description>
+	<ipxact:directConnection>true</ipxact:directConnection>
+	<ipxact:vendorExtensions>
+		<kactus2:version>3,13,308,0</kactus2:version>
+	</ipxact:vendorExtensions>
+</ipxact:busDefinition>
+""")
+
+#    # Create the Abstraction Definition file for the interface
+#    with open(f"{dest_dir}/interface_{bus_interface.type}.{bus_details['version']}.absDef.xml", "w") as f:
+#        f.write(f"""\
+#<?xml version="1.0" encoding="UTF-8"?>
+#<ipxact:abstractionDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
+#	<ipxact:vendor>{bus_details["vendor"]}</ipxact:vendor>
+#	<ipxact:library>{bus_details["lib"]}</ipxact:library>
+#	<ipxact:name>{bus_details["name"]}.absDef</ipxact:name>
+#	<ipxact:version>{bus_details["version"]}</ipxact:version>
+#	<ipxact:busType vendor="{bus_details["vendor"]}" library="{bus_details["lib"]}" name="{bus_details["name"]}" version="{bus_details["version"]}"/>
+#	<ipxact:vendorExtensions>
+#		<kactus2:version>3,13,308,0</kactus2:version>
+#	</ipxact:vendorExtensions>
+#</ipxact:abstractionDefinition>
+#""")
 
 def gen_memory_map_xml(sw_regs, parameters_list):
     """
@@ -663,6 +713,9 @@ def generate_ipxact_xml(core, dest_dir):
     # Generate bus interfaces list
     bus_interfaces_list = gen_bus_interfaces_list(core)
 
+    for bus_interface in bus_interfaces_list:
+        gen_bus_interface_xml_file(bus_interface.interface, dest_dir)
+
     # Generate bus interfaces xml code
     bus_interfaces_xml = gen_bus_interfaces_xml(
         bus_interfaces_list, ports_list, parameters_list
@@ -718,3 +771,4 @@ def generate_ipxact_xml(core, dest_dir):
 
     # Write the xml code to the file
     xml_file.write(xml_text)
+    xml_file.close()

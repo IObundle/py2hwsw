@@ -41,6 +41,7 @@ from iob_base import (
     add_traceback_msg,
     debug,
 )
+from iob_license import iob_license, update_license
 import sw_tools
 import verilog_format
 import verilog_lint
@@ -61,6 +62,8 @@ class iob_core(iob_module, iob_instance):
     global_special_target: str = ""
     # Clang format rules
     global_clang_format_rules_filepath: str = None
+    # List of callbacks to run at post setup stage
+    global_post_setup_callbacks: list = []
 
     def __init__(self, *args, **kwargs):
         """Build a core (includes module and instance attributes)
@@ -193,7 +196,14 @@ class iob_core(iob_module, iob_instance):
             [],
             list,
             get_list_attr_handler(self.create_python_parameter_group),
-            "List of core Python Parameters. Used for documentation.",
+            descr="List of core Python Parameters. Used for documentation.",
+        )
+        self.set_default_attribute(
+            "license",
+            iob_license(),  # Create a default license
+            iob_license,
+            lambda y: update_license(self, **y),
+            descr="License for the core.",
         )
 
         self.attributes_dict = copy.deepcopy(attributes)
@@ -327,16 +337,22 @@ class iob_core(iob_module, iob_instance):
         # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
         self._remove_duplicate_sources()
         if self.is_tester:
-            # Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
-            self._remove_duplicate_sources(
-                main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
-                subfolders=[
-                    "hardware/src",
-                    "hardware/simulation/src",
-                    "hardware/fpga/src",
-                    "hardware/common_src",
-                ],
+            # Add callback to: Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
+            __class__.global_post_setup_callbacks.append(
+                lambda: self._remove_duplicate_sources(
+                    main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
+                    subfolders=[
+                        "hardware/src",
+                        "hardware/simulation/src",
+                        "hardware/fpga/src",
+                        "hardware/common_src",
+                    ],
+                )
             )
+        else:  # Not tester
+            # Run post setup callbacks
+            for callback in __class__.global_post_setup_callbacks:
+                callback()
         # Generate docs
         doc_gen.generate_docs(self)
         # Generate ipxact file
@@ -920,7 +936,7 @@ class iob_core(iob_module, iob_instance):
             original_name="py2hwsw",
             name="py2hwsw",
             setup_dir=os.path.join(os.path.dirname(__file__), "../py2hwsw_document"),
-            build_dir="py2hwsw_docs",
+            build_dir="py2hwsw_generated_docs",
         )
         copy_srcs.doc_setup(core)
         copy_srcs.copy_rename_setup_subdir(core, "document")
@@ -928,10 +944,14 @@ class iob_core(iob_module, iob_instance):
             f.write("NAME=Py2HWSW\n")
         with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
             f.write(py2_version)
+        # Build a new dummy module instance, to obtain its attributes
+        __class__.global_special_target = "print_attributes"
+        dummy_module = __class__()
         doc_gen.generate_tex_py2hwsw_attributes(
-            __class__, f"{core.build_dir}/document/tsrc"
+            dummy_module, f"{core.build_dir}/document/tsrc"
         )
         doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
+        doc_gen.generate_tex_py2hwsw_standard_py_params(f"{core.build_dir}/document/tsrc")
 
     @staticmethod
     def version_str_to_digits(version_str):

@@ -1,0 +1,12 @@
+% SPDX-FileCopyrightText: 2025 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+To synthesize a core for an Application-Specific Integrated Circuit (ASIC) using Py2HWSW, you can use the \texttt{make asic} command in the generated build directory. This command will run the ASIC synthesis tools, such as Synopsys Design Compiler or Cadence Genus, to generate a netlist for the specified ASIC process.
+
+Before running the \texttt{make asic} command, you'll need to specify the ASIC synthesizer that you want to use. You can do this by setting the \texttt{SYNTHESIZER} environment variable or by passing it as a command-line argument.
+
+For example, to synthesize the core with yosys, you can run the command \texttt{make asic SYNTHESIZER=yosys}. This will generate a netlist that can be used as input for further ASIC design and verification tools, such as place and route, static timing analysis, and physical verification.
+
+Py2HWSW supports a range of ASIC processes and libraries, and provides a set of pre-configured process files that make it easy to get started with ASIC synthesis. By using Py2HWSW to synthesize your cores, you can take advantage of the high performance and low power consumption of ASICs, while minimizing the complexity and effort required to develop and deploy your designs.
+The list of available synthesis tools can be found in the subdirectories of the Py2HWSW repository syn folder \url{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/hardware/syn}.

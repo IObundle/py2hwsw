@@ -8,29 +8,6 @@ FAIL = "\033[91mError: "  # Red
 ENDC = "\033[0m"  # White
 
 
-def fail_with_msg(msg, exception_type=Exception):
-    """Raise an error with a given message
-    param msg: message to print
-    param exception_type: type of python exception to raise
-    """
-    raise exception_type(FAIL + msg + ENDC)
-
-
-def convert_dict2obj_list(dict_list: dict, obj_class):
-    """Convert a list of dictionaries to a list of objects
-    If list contains elements that are not dictionaries, they are left as is
-    param dict_list: list of dictionaries
-    param obj_class: class of the objects to create
-    """
-    obj_list = []
-    for dict_obj in dict_list:
-        if isinstance(dict_obj, dict):
-            obj_list.append(obj_class(**dict_obj))
-        else:
-            obj_list.append(dict_obj)
-    return obj_list
-
-
 @dataclass
 class iob_csr:
     """Class to represent a Control/Status Register."""
@@ -52,6 +29,29 @@ class iob_csr:
 
         if self.type not in ["R", "W", "RW"]:
             fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
+
+
+def fail_with_msg(msg, exception_type=Exception):
+    """Raise an error with a given message
+    param msg: message to print
+    param exception_type: type of python exception to raise
+    """
+    raise exception_type(FAIL + msg + ENDC)
+
+
+def convert_dict2obj_list(dict_list: dict, obj_class):
+    """Convert a list of dictionaries to a list of objects
+    If list contains elements that are not dictionaries, they are left as is
+    param dict_list: list of dictionaries
+    param obj_class: class of the objects to create
+    """
+    obj_list = []
+    for dict_obj in dict_list:
+        if isinstance(dict_obj, dict):
+            obj_list.append(obj_class(**dict_obj))
+        else:
+            obj_list.append(dict_obj)
+    return obj_list
 
 
 @dataclass

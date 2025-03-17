@@ -6,7 +6,6 @@
 
 # TODO: account for log2n_items in the memory map
 import math
-import if_gen
 import re
 import os
 import sys
@@ -17,8 +16,8 @@ sys.path.append(
 )
 from iob_csrs import static_reg_tables
 
-# Generates IP-XACT for the given core
 #
+# Generates IP-XACT for the given core
 #
 
 
@@ -122,6 +121,10 @@ class SwRegister:
     ):
         self.name = name
         self.address = address
+
+        if type(hw_size) is str and hw_size.isnumeric():
+            hw_size = int(hw_size)
+
         self.hw_size = hw_size
 
         max_size = hw_size
@@ -611,13 +614,14 @@ def generate_ipxact_xml(core, dest_dir):
 	<ipxact:description>{core.description}</ipxact:description>
 	{parameters_xml}
 	<ipxact:vendorExtensions>
-		<kactus2:author>IObundle, Lda</kactus2:author>
+		<kactus2:author>{core.license.author}</kactus2:author>
 		<kactus2:version>3,10,15,0</kactus2:version>
 		<kactus2:kts_attributes>
 			<kactus2:kts_productHier>Flat</kactus2:kts_productHier>
 			<kactus2:kts_implementation>HW</kactus2:kts_implementation>
 			<kactus2:kts_firmness>Mutable</kactus2:kts_firmness>
 		</kactus2:kts_attributes>
+		<kactus2:license>{core.license.name} License, Copyright (c) {core.license.year}</kactus2:license>
 	</ipxact:vendorExtensions>
 </ipxact:component>"""
 

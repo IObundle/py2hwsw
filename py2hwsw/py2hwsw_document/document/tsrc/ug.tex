@@ -131,6 +131,14 @@ User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
 \label{sec:setup_build}
 \input{setup_build}
 
+\subsection{Installation}
+\label{sec:installation}
+\input{installation}
+
+\subsection{Basic Usage}
+\label{sec:basic_usage}
+\input{basic_usage}
+
 %
 % How It Works
 %
@@ -141,6 +149,14 @@ User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
 \label{sec:how_it_works}
 
 This section gives a detailed description of the Py2HWSW framework.
+
+\subsection{Overview}
+\label{sec:py2_overview}
+\input{overview}
+
+\subsection{Technical Details}
+\label{sec:py2_technical_details}
+\input{technical_details}
 
 \subsection{Setup Flow Chart}
 \label{sec:py2_flow_chart}
@@ -212,83 +228,145 @@ Superblocks are only used if they are superblocks of the project's top module or
 \label{sec:special_cases}
 \input{special_cases}
 
-
-
-% \subsection{Short Notation}
-% \label{sec:short_notation}
-% \input{short_notation}
-
 \subsection{Core library}
 \label{sec:core_lib}
 \input{core_lib}
 
-% % Move this to how-to-use
-% \subsection{Integrate non-py2hwsw cores}
-% \label{sec:non_py2_cores}
-% \input{non_py2_cores}
-% 
-% \subsection{Integrate py2hwsw cores in non-py2hwsw ecosystems}
-% \label{sec:non_py2_ecosystems}
-% \input{non_py2_ecosystems}
+%
+% How To Use
+%
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
+\section{How To Use}
+\label{sec:usage}
 
-% TODO: Subsections below
-% %
-% % How To Use
-% %
-% \ifdefined\SECTIONCLEARPAGE
-% \clearpage
-% \fi
-% \section{How To Use}
-% \label{sec:usage}
-% 
-% \subsection{Setup}
-% \label{sec:setup}
-% \input{setup}
-% 
-% \subsection{Simulation}
-% \label{sec:tbbd}
-% \input{sim}
-% 
-% \ifdefined\ASICSYNTH
-% \subsection{ASIC Synthesis}
-% \label{sec:synth}
-% \input{synth}
-% \fi
-% 
-% \ifdefined\FPGACOMP
-% \subsection{FPGA Compilation}
-% \label{sec:fpga}
-% \input{fpga}
-% \fi
-% 
-% %
-% % Configuration
-% %
+\subsection{Setup}
+\label{sec:setup}
+\input{setup}
+
+\subsection{Simulation}
+\label{sec:sim}
+\input{sim}
+
+\ifdefined\ASICSYNTH
+\subsection{ASIC Synthesis}
+\label{sec:synth}
+\input{synth}
+\fi
+
+\ifdefined\FPGACOMP
+\subsection{FPGA Compilation}
+\label{sec:fpga}
+\input{fpga}
+\fi
+
+\ifdefined\SECTIONCLEARPAGE
+\clearpage
+\fi
+\subsection{End to End Examples}
+\label{sec:examples}
+\input{examples}
+
+\subsection{Customizing Py2HWSW}
+\label{sec:customizing_py2}
+\input{customizing_py2}
+
+\subsection{Troubleshooting}
+\label{sec:troubleshooting}
+\input{troubleshooting}
+
+%
+% Configuration
+%
 % \ifdefined\SECTIONCLEARPAGE
 % \clearpage
 % \fi
 % \section{Configuration}
 % \label{sec:config}
 % \input{config}
-% 
-% %
-% % End to End Examples
-% %
+
+% \subsection{Configuration Files}
+% \label{sec:config_files}
+% \input{config_files}
+
+% \subsection{Command Line Options}
+% \label{sec:command_line_options}
+% \input{command_line_options}
+
+% \subsection{Environment Variables}
+% \label{sec:environment_vars}
+% \input{environment_vars}
+
+%
+% Advanced Topics
+%
 % \ifdefined\SECTIONCLEARPAGE
 % \clearpage
 % \fi
-% \section{End to End Examples}
-% \label{sec:examples}
-% \input{examples}
-% 
-% %
-% % FAQ
-% %
+% \section{Advanced Topics}
+% \label{sec:advanced_topics}
+% \input{advanced_topics}
+
+% \subsection{Customizing the Framework}
+% \label{sec:customizing_framework}
+% \input{customizing_framework}
+
+% \subsection{Creating Custom Classes}
+% \label{sec:creating_custom_classes}
+% \input{creating_custom_classes}
+
+
+%
+% Integrate Py2HWSW with external tools
+%
+% \section{Integrating with Other Tools}
+% \label{sec:integrating_external_tools}
+% \input{integrating_external_tools}
+
+% \subsection{Integrate non-py2hwsw cores}
+% \label{sec:non_py2_cores}
+% \input{non_py2_cores}
+
+% \subsection{Integrate py2hwsw cores in non-py2hwsw ecosystems}
+% \label{sec:non_py2_ecosystems}
+% \input{non_py2_ecosystems}
+
+%
+% Short Notation
+%
+% \section{Short Notation}
+% \label{sec:short_notation}
+% \input{short_notation}
+
+%
+% Appendices
+%
 % \ifdefined\SECTIONCLEARPAGE
 % \clearpage
 % \fi
-% \section{FAQ}
-% \label{sec:faq}
-% \input{faq}
+% \section{Appendices}
+% \label{sec:appendices}
+% \input{appendices}
+
+%\subsection{Glossary}
+%\label{sec:glossary}
+%\input{glossary}
+
+%\subsection{Release Notes}
+%\label{sec:release_notes}
+%\input{release_notes}
+
+%\subsection{Contributing}
+%\label{sec:contributing}
+%\input{contributing}
+
+%\subsection{FAQ}
+%\label{sec:faq}
+%\input{faq}
+
+%\subsection{Troubleshooting Guide}
+%\label{sec:troubleshooting_guide}
+%\input{troubleshooting_guide}
 
 \end{document}

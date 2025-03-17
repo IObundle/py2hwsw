@@ -1,0 +1,17 @@
+% SPDX-FileCopyrightText: 2025 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+Py2HWSW uses a Nix-shell environment to handle dependencies. The full list of dependencies is available as Nix packages in the \texttt{default.nix} file, which can be found at \url{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/default.nix}.
+
+The recommended way to install Py2HWSW is by using Nix-shell. Most Makefiles in IObundle projects call Nix-shell by default, so it is expected that a user will install Py2HWSW via Nix-shell. To do this, simply install Nix by following the instructions at \url{https://nixos.org/download.html#nix-install-linux}. Then, navigate to a directory that contains the Py2HWSW \texttt{default.nix} file and run \texttt{nix-shell}. Py2HWSW will self-install, and all dependencies will be installed automatically.
+
+Alternatively, it is possible to install Py2HWSW manually by removing the Nix-shell commands from the Makefiles and installing the dependencies manually. After doing so, the user can call Py2HWSW by adding the \texttt{py2hwsw} file from the \texttt{bin/} folder to the \texttt{PATH} environment variable. The \texttt{py2hwsw} file can be found at \url{https://github.com/IObundle/py2hwsw/blob/main/bin/py2hwsw}.
+
+Another option is to install Py2HWSW using pip with the following command:
+\begin{verbatim}
+pip install -e path/to/py2hwsw_directory
+\end{verbatim}
+However, please note that this method is not officially supported, and dependencies will still need to be handled manually or by using Nix.
+
+Py2HWSW is primarily maintained and tested on Linux, but it should also work on macOS and Windows Subsystem for Linux (WSL) since Nix is supported on these platforms.

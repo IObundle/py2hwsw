@@ -9,6 +9,7 @@
 The \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_signal.py}{iob\_signal} class is used to represent a signal for a hardware wire or port.
 This class contains a set of attributes, each preceded by a comment describing the purpose of the attribute.
 
+% Show attributes of iob_signal
 \lstinputlisting[firstline=11,lastline=30,language=Python]{iob_signal.py}
 \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_signal.py}{View Source}
 
@@ -18,6 +19,7 @@ This class contains a set of attributes, each preceded by a comment describing t
 
 The py2hwsw tool uses the `get\_verilog\_wire`/`get\_verilog\_port` methods from the `iob\_signal` class to generate the Verilog code for the hardware wire/port based on the attributes from the corresponding instance of the `iob\_signal` class.
 
+% Show functions that generate verilog for wire and port
 \lstinputlisting[firstline=43,lastline=47,language=Python]{iob_signal.py}
 \lstinputlisting[firstline=53,lastline=59,language=Python]{iob_signal.py}
 \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_signal.py}{View Source}

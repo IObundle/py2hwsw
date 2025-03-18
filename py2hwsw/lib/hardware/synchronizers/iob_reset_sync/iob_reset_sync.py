@@ -60,8 +60,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_rst_s",
-                    "iob_r_data_i": "data_int",
-                    "iob_r_data_o": "sync",
+                    "data_i": "data_int",
+                    "data_o": "sync",
                 },
             },
         ],

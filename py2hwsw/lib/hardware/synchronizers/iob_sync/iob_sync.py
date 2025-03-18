@@ -76,8 +76,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_rst_s",
-                    "iob_r_data_i": "signal_i",
-                    "iob_r_data_o": "synchronizer",
+                    "data_i": "signal_i",
+                    "data_o": "synchronizer",
                 },
             },
             {
@@ -92,8 +92,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_rst_s",
-                    "iob_r_data_i": "synchronizer",
-                    "iob_r_data_o": "signal_o",
+                    "data_i": "synchronizer",
+                    "data_o": "signal_o",
                 },
             },
         ],

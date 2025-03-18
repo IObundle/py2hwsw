@@ -611,7 +611,7 @@ def setup(py_params_dict):
                         "en_i:data_burst_complete_write_reg_en",
                         "rst_i:data_burst_complete_write_reg_rst",
                     ],
-                )
+                ),
                 "data_i": "data_burst_complete_write_reg_data_i",
                 "data_o": "data_burst_complete_write_reg_data_o",
             },

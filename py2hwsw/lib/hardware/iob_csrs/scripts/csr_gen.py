@@ -653,7 +653,7 @@ class csr_gen:
                         "clk_en_rst_s",
                         [
                             "en_i:internal_iob_addr_reg_en",
-                        ]
+                        ],
                     ),
                     "data_i": "internal_iob_addr",
                     "data_o": "internal_iob_addr_reg",

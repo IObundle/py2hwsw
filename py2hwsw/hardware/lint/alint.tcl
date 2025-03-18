@@ -4,6 +4,7 @@
 
 set TOP [lindex $argv 0]
 set CSR_IF [lindex $argv 1]
+set NODE [lindex $argv 2]
 set INCLUDE_DIRS [lindex $argv 3]
 
 puts "TOP: $TOP"
@@ -37,10 +38,10 @@ workspace.file.add -destination $PRJ -f $TOP\_files.list
 
 # List of SDC files to open
 set sdcFiles {
-    "../syn/umc130/$TOP_dev.sdc"
+    "../syn/$NODE/$TOP\_dev.sdc"
+    "../src/$TOP.sdc"
     "../syn/src/$TOP.sdc"
-    "../syn/src/$TOP_$CSR_IF.sdc"
-    "../syn/$TOP_tool.sdc"
+    "../src/$TOP\_$CSR_IF.sdc"
 }
 
 # Open the output file for writing
@@ -99,4 +100,5 @@ project.report.violations -format simple_text -report alint_violations.txt
 project.report.violations -format pdf -report alint_violations.pdf
 project.report.quality -report alint_qor.txt
 
-file delete $outfile
+#file delete $outfile
+exit 

@@ -8,11 +8,10 @@ SHELL:=bash
 
 include ../../config_build.mk
 
-LINTER ?=verilator
-
 REMOTE_BUILD_DIR=$(USER)/$(BUILD_DIR_NAME)
 REMOTE_LINT_DIR=$(REMOTE_BUILD_DIR)/hardware/lint
 
+LINTER ?=verilator
 LINT_TOP=$(NAME)
 
 INCLUDE_DIRS+=.

@@ -30,8 +30,15 @@ name.tex:
 	 @echo $(NAME) | sed 's/_/\\_/g' > $@
 
 TSRC+=signature.tex
-signature.tex:
-	 @echo `cat name.tex`-USG-`cat version.tex`-`cat shortHash.tex` > signature.tex
+signature.tex: $(DOC)_signature.tex
+       mv $< $@
+
+ug_signature.tex pb_signature.tex:
+       @echo `cat name.tex`-USG-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+
+rn_signature.tex:
+       @echo `cat name.tex`-REL-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+
 
 #make figures
 figs:

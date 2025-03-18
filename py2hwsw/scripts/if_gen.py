@@ -12,46 +12,50 @@ from dataclasses import dataclass, field
 from typing import Dict
 from iob_signal import iob_signal, iob_signal_reference
 
-mem_if_names = [
-    "rom_2p",
-    "rom_atdp",
-    "rom_sp",
-    "rom_tdp",
-    "ram_2p",
-    "ram_at2p",
-    "ram_atdp",
-    "ram_atdp_be",
-    "ram_sp",
-    "ram_sp_be",
-    "ram_sp_se",
-    "ram_t2p",
-    "ram_t2p_be",
-    "ram_t2p_tiled",
-    "ram_tdp",
-    "ram_tdp_be",
-    "ram_tdp_be_xil",
-    "regfile_2p",
-    "regfile_at2p",
-    "regfile_sp",
+mem_if_details = [
+    {"name": "rom_2p",         "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "ROM 2 Port"},
+    {"name": "rom_atdp",       "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "ROM Asynchronous True Dual Port"},
+    {"name": "rom_sp",         "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "ROM Single Port"},
+    {"name": "rom_tdp",        "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "ROM True Dual Port"},
+    {"name": "ram_2p",         "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM 2 Port"},
+    {"name": "ram_at2p",       "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Asynchronous True 2 Port"},
+    {"name": "ram_atdp",       "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Asynchronous True Dual Port"},
+    {"name": "ram_atdp_be",    "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Asynchronous True Dual Port with Byte Enable"},
+    {"name": "ram_sp",         "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Single Port"},
+    {"name": "ram_sp_be",      "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Single Port with Byte Enable"},
+    {"name": "ram_sp_se",      "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Single Port with Single Enable"},
+    {"name": "ram_t2p",        "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True 2 Port"},
+    {"name": "ram_t2p_be",     "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True 2 Port with Byte Enable"},
+    {"name": "ram_t2p_tiled",  "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True 2 Port Tiled"},
+    {"name": "ram_tdp",        "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True Dual Port"},
+    {"name": "ram_tdp_be",     "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True Dual Port with Byte Enable"},
+    {"name": "ram_tdp_be_xil", "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True Dual Port with Byte Enable Xilinx"},
+    {"name": "regfile_2p",     "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "Register File 2 Port"},
+    {"name": "regfile_at2p",   "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "Register File Asynchronous True 2 Port"},
+    {"name": "regfile_sp",     "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "Register File Single Port"},
 ]
 
-if_names = [
-    "clk_en_rst",
-    "clk_rst",
-    "iob_clk",
-    "iob",
-    "axil_read",
-    "axil_write",
-    "axil",
-    "axi_read",
-    "axi_write",
-    "axi",
-    "apb",
-    "axis",
-    "rs232",
-    "wb",
-    "wb_full",
-] + mem_if_names
+mem_if_names = [item["name"] for item in mem_if_details]
+
+if_details = [
+    {"name": "clk_en_rst", "vendor": "IObundle",  "lib": "CLK",      "version": "1.0", "full_name": "Clock, Clock Enable, Reset"},
+    {"name": "clk_rst",    "vendor": "IObundle",  "lib": "CLK",      "version": "1.0", "full_name": "Clock, Reset"},
+    {"name": "iob_clk",    "vendor": "IObundle",  "lib": "CLK",      "version": "1.0", "full_name": "Clock (configurable)"},
+    {"name": "iob",        "vendor": "IObundle",  "lib": "IOb",      "version": "1.0", "full_name": "IOb"},
+    {"name": "axil_read",  "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI-Lite Read"},
+    {"name": "axil_write", "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI-Lite Write"},
+    {"name": "axil",       "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI-Lite"},
+    {"name": "axi_read",   "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI Read"},
+    {"name": "axi_write",  "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI Write"},
+    {"name": "axi",        "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI"},
+    {"name": "apb",        "vendor": "ARM",       "lib": "APB",      "version": "4.0", "full_name": "APB"},
+    {"name": "axis",       "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI Stream"},
+    {"name": "rs232",      "vendor": "Generic",   "lib": "RS232",    "version": "1.0", "full_name": "RS232"},
+    {"name": "wb",         "vendor": "OPENCORES", "lib": "Wishbone", "version": "B4",  "full_name": "Wishbone"},
+    {"name": "wb_full",    "vendor": "OPENCORES", "lib": "Wishbone", "version": "B4",  "full_name": "Wishbone Full"},
+] + mem_if_details
+
+if_names = [item["name"] for item in if_details]
 
 if_types = [
     "m_port",
@@ -89,7 +93,7 @@ def dict2interface(interface_dict):
     """Convert dictionary to 'interface' class instance.
     Example interface dict:
     {
-        "name": "cpu_i",
+        "name": "cpu_m",
         "signals": {
             "type": "iob",
             "params": "",

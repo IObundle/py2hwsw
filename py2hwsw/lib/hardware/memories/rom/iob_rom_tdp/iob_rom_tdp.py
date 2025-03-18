@@ -44,7 +44,11 @@ def setup(py_params_dict):
             {
                 "name": "rom_tdp_s",
                 "descr": "ROM TDP",
-                "signals": {"type": "rom_tdp"},
+                "signals": {
+                    "type": "rom_tdp",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
             },
         ],
         "snippets": [
@@ -53,6 +57,8 @@ def setup(py_params_dict):
    localparam INIT_RAM = (MEM_INIT_FILE_INT != "none") ? 1 : 0;
             // Declare the ROM
    reg [DATA_W-1:0] rom[(2**ADDR_W)-1:0];
+   reg [DATA_W-1:0] r_data_a_int;
+   reg [DATA_W-1:0] r_data_b_int;
 
    // Initialize the ROM
    generate
@@ -63,15 +69,18 @@ def setup(py_params_dict):
 
    always @(posedge clk_i) begin  // Port A
       if (r_en_a_i) begin
-         r_data_a_o <= rom[r_addr_a_i];
+         r_data_a_int <= rom[r_addr_a_i];
       end
    end
 
    always @(posedge clk_i) begin  // Port B
       if (r_en_b_i) begin
-         r_data_b_o <= rom[r_addr_b_i];
+         r_data_b_int <= rom[r_addr_b_i];
       end
    end
+
+   assign r_data_a_o = r_data_a_int;
+   assign r_data_b_o = r_data_b_int;
             """,
             },
         ],

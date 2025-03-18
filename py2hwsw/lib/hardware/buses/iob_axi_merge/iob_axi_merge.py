@@ -473,43 +473,66 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         # Read blocks
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "busy_read_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "busy_read_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:busy_read_reg_en",
+                        "rst_i:busy_read_reg_rst",
+                    ],
+                ),
                 "data_i": "busy_read_reg_data_i",
                 "data_o": "busy_read_reg_data_o",
             },
         },
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "active_transaction_read_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "active_transaction_read_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:active_transaction_read_reg_en",
+                        "rst_i:active_transaction_read_reg_rst",
+                    ],
+                ),
                 "data_i": "active_transaction_read_reg_data_i",
                 "data_o": "active_transaction_read_reg_data_o",
             },
         },
         {
-            "core_name": "iob_reg_r",
+            "core_name": "iob_reg",
             "instance_name": "read_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": "read_sel_reg_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "read_sel_reg_data_i",
                 "data_o": "read_sel_reg_data_o",
             },
@@ -528,57 +551,88 @@ def setup(py_params_dict):
         },
         # Write blocks
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "busy_write_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "busy_write_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:busy_write_reg_en",
+                        "rst_i:busy_write_reg_rst",
+                    ],
+                ),
                 "data_i": "busy_write_reg_data_i",
                 "data_o": "busy_write_reg_data_o",
             },
         },
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "active_transaction_write_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "active_transaction_write_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:active_transaction_write_reg_en",
+                        "rst_i:active_transaction_write_reg_rst",
+                    ],
+                ),
                 "data_i": "active_transaction_write_reg_data_i",
                 "data_o": "active_transaction_write_reg_data_o",
             },
         },
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "data_burst_complete_write_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "data_burst_complete_write_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:data_burst_complete_write_reg_en",
+                        "rst_i:data_burst_complete_write_reg_rst",
+                    ],
+                )
                 "data_i": "data_burst_complete_write_reg_data_i",
                 "data_o": "data_burst_complete_write_reg_data_o",
             },
         },
         {
-            "core_name": "iob_reg_r",
+            "core_name": "iob_reg",
             "instance_name": "write_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": "write_sel_reg_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "write_sel_reg_data_i",
                 "data_o": "write_sel_reg_data_o",
             },

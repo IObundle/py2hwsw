@@ -47,19 +47,29 @@ def setup(py_params_dict):
         sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
 
     if any([x in clk_s_params for x in ["arst", "arstn", "rst", "rstn"]]):
-        rst_con = " | ".join(
-            [
-                f"{x}_i"
-                for x in ["arst", "arstn", "rst", "rstn"]
-                if x in clk_s_params
-            ]
-        ).replace("arstn", "~arst_n").replace("rstn", "~rst_n")
+        rst_con = (
+            " | ".join(
+                [
+                    f"{x}_i"
+                    for x in ["arst", "arstn", "rst", "rstn"]
+                    if x in clk_s_params
+                ]
+            )
+            .replace("arstn", "~arst_n")
+            .replace("rstn", "~rst_n")
+        )
         rst_str = (
             f"        if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
         )
 
     if any([x in clk_s_params for x in ["cke", "cken", "en", "enn"]]):
-        en_con = " & ".join([f"{x}_i" for x in ["cke", "cken", "en", "enn"] if x in clk_s_params]).replace("cken", "~cke_n").replace("enn", "~en_n")
+        en_con = (
+            " & ".join(
+                [f"{x}_i" for x in ["cke", "cken", "en", "enn"] if x in clk_s_params]
+            )
+            .replace("cken", "~cke_n")
+            .replace("enn", "~en_n")
+        )
         en_str = f"{'else ' if rst_str != '' else '        '}if ({en_con}) begin\n            data_o <= data_i;\n        end"
     else:
         en_str = f"{'else begin' if rst_str != '' else '        '}\n            data_o <= data_i;\n        {'end' if rst_str != '' else ''}"

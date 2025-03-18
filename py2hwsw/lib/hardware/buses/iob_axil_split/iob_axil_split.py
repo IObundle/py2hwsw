@@ -231,30 +231,46 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         # Read blocks
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "read_sel_reg_re",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "read_sel_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:read_sel_reg_en",
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "read_sel_reg_data_i",
                 "data_o": "read_sel_reg_data_o",
             },
         },
         # Write blocks
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "write_sel_reg_re",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "write_sel_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:write_sel_reg_en",
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "write_sel_reg_data_i",
                 "data_o": "write_sel_reg_data_o",
             },

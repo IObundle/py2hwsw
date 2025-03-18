@@ -213,8 +213,11 @@ def setup(py_params_dict):
             #                "instantiate": False,
             #            },
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_re_inst",
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
                 "instantiate": False,
             },
         ],

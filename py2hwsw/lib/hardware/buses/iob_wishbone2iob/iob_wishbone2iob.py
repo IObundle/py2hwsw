@@ -155,29 +155,45 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_wack",
                 "parameters": {
                     "DATA_W": 1,
                     "RST_VAL": 0,
                 },
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "int",
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:reg_wack_int_1",
+                            "rst_i:reg_wack_int",
+                        ],
+                    ),
                     "data_i": "wack",
                     "data_o": "wack_r",
                 },
             },
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_valid",
                 "parameters": {
                     "DATA_W": 1,
                     "RST_VAL": 0,
                 },
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "int_2",
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:valid",
+                            "rst_i:rst_valid",
+                        ],
+                    ),
                     "data_i": "valid",
                     "data_o": "valid_r",
                 },

@@ -65,27 +65,33 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_r",
+                "core_name": "iob_reg",
                 "instance_name": "reg1",
                 "parameters": {
                     "DATA_W": "DATA_W",
                     "RST_VAL": "RST_VAL",
                 },
+                "port_params": {
+                    "clk_en_rst_s": "arst",
+                },
                 "connect": {
-                    "clk_rst_s": "clk_rst_s",
+                    "clk_en_rst_s": "clk_rst_s",
                     "iob_r_data_i": "signal_i",
                     "iob_r_data_o": "synchronizer",
                 },
             },
             {
-                "core_name": "iob_r",
+                "core_name": "iob_reg",
                 "instance_name": "reg2",
                 "parameters": {
                     "DATA_W": "DATA_W",
                     "RST_VAL": "RST_VAL",
                 },
+                "port_params": {
+                    "clk_en_rst_s": "arst",
+                },
                 "connect": {
-                    "clk_rst_s": "clk_rst_s",
+                    "clk_en_rst_s": "clk_rst_s",
                     "iob_r_data_i": "synchronizer",
                     "iob_r_data_o": "signal_o",
                 },

@@ -40,7 +40,7 @@ module iob_bus_demux #(
    //
 
    wire [NB-1:0] f_sel_r;
-   iob_reg_e #(
+   iob_reg_cear_e #(
       .DATA_W (NB),
       .RST_VAL(0)
    ) reg_f_sel (

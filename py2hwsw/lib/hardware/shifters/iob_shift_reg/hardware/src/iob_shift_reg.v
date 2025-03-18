@@ -78,7 +78,7 @@ module iob_shift_reg #(
       .data_o(addr_w)
   );
 
-  iob_reg #(
+  iob_reg_cear #(
       .DATA_W (1),
       .RST_VAL(0)
   ) out_enable (

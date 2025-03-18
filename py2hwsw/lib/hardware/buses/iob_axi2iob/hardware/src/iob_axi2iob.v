@@ -147,7 +147,7 @@ module iob_axi2iob #(
    assign iob_wdata_o = m_axil_wdata;
    assign iob_wstrb_o = m_axil_arvalid ? {STRB_WIDTH{1'b0}} : m_axil_wstrb;
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (ADDR_WIDTH),
       .RST_VAL({ADDR_WIDTH{1'b0}})
    ) iob_reg_awaddr (
@@ -160,7 +160,7 @@ module iob_axi2iob #(
       .data_o(m_axil_awaddr_q)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) iob_reg_rvalid (
@@ -173,7 +173,7 @@ module iob_axi2iob #(
       .data_o(iob_rvalid_q)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (DATA_WIDTH),
       .RST_VAL({DATA_WIDTH{1'b0}})
    ) iob_reg_rdata (
@@ -186,7 +186,7 @@ module iob_axi2iob #(
       .data_o(iob_rdata_q)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) iob_reg_bvalid (

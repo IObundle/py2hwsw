@@ -233,11 +233,13 @@ class csr_gen:
             if n_items > 1 and isinstance(addr, int) and isinstance(addr_w, int):
                 for idx in range(n_items):
                     name_idx = f"{name}_{idx}"
-                    lines += f"    wire {name_idx}_addressed_w = (waddr >= {addr+idx*addr_w}) && (waddr < ({addr+(idx+1)*addr_w}));\n"
+                    lines += f"    wire {name_idx}_addressed_w;\n"
+                    lines += f"    assign {name_idx}_addressed_w = (waddr >= {addr+idx*addr_w}) && (waddr < ({addr+(idx+1)*addr_w}));\n"
             elif n_items > 1:
                 for idx in range(n_items):
                     name_idx = f"{name}_{idx}"
-                    lines += f"    wire {name_idx}_addressed_w = (waddr >= {addr}+{idx}*{addr_w}) && (waddr < ({addr}+({idx+1})*{addr_w}));\n"
+                    lines += f"    wire {name_idx}_addressed_w;\n"
+                    lines += f"    assign {name_idx}_addressed_w = (waddr >= {addr}+{idx}*{addr_w}) && (waddr < ({addr}+({idx+1})*{addr_w}));\n"
 
             # fill remaining bits with 0s
             if isinstance(n_bits, str):
@@ -935,9 +937,13 @@ class csr_gen:
                 if name == "version":
                     pass
                 elif auto:
-                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}{suffix} = {name}{suffix};\n"
+                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}{suffix};\n"
+                    snippet += f"assign byte_aligned_{name}{suffix} = {name}{suffix};\n"
                 else:
-                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata{suffix} = {name}_rdata{suffix};\n"
+                    snippet += (
+                        f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata{suffix};\n"
+                    )
+                    snippet += f"assign byte_aligned_{name}_rdata{suffix} = {name}_rdata{suffix};\n"
 
         snippet += f"""
     always @* begin

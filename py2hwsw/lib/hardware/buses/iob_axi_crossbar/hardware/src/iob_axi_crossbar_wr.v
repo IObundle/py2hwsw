@@ -375,10 +375,14 @@ module iob_axi_crossbar_wr #(
          );
 
          // write response mux
-         wire [S_ID_WIDTH-1:0]  m_axi_bid_mux    = {decerr_m_axi_bid_reg, int_m_axi_bid} >> b_grant_encoded*M_ID_WIDTH;
-         wire [1:0] m_axi_bresp_mux = {2'b11, int_m_axi_bresp} >> b_grant_encoded * 2;
-         wire [BUSER_WIDTH-1:0] m_axi_buser_mux  = {{BUSER_WIDTH{1'b0}}, int_m_axi_buser} >> b_grant_encoded*BUSER_WIDTH;
-         wire                   m_axi_bvalid_mux = ({decerr_m_axi_bvalid_reg, int_m_axi_bvalid} >> b_grant_encoded) & b_grant_valid;
+         wire [ S_ID_WIDTH-1:0] m_axi_bid_mux;
+         wire [            1:0] m_axi_bresp_mux;
+         wire [BUSER_WIDTH-1:0] m_axi_buser_mux;
+         wire                   m_axi_bvalid_mux;
+         assign m_axi_bid_mux    = {decerr_m_axi_bid_reg, int_m_axi_bid} >> b_grant_encoded*M_ID_WIDTH;
+         assign m_axi_bresp_mux = {2'b11, int_m_axi_bresp} >> b_grant_encoded * 2;
+         assign m_axi_buser_mux  = {{BUSER_WIDTH{1'b0}}, int_m_axi_buser} >> b_grant_encoded*BUSER_WIDTH;
+         assign m_axi_bvalid_mux = ({decerr_m_axi_bvalid_reg, int_m_axi_bvalid} >> b_grant_encoded) & b_grant_valid;
          wire m_axi_bready_mux;
 
          assign int_axi_bready[m*M_COUNT +: M_COUNT] = (b_grant_valid && m_axi_bready_mux) << b_grant_encoded;
@@ -466,11 +470,12 @@ module iob_axi_crossbar_wr #(
 
       for (n = 0; n < M_COUNT; n = n + 1) begin : m_ifaces
          // in-flight transaction count
-         wire trans_start;
-         wire trans_complete;
-         reg [$clog2(M_ISSUE[n*32 +: 32]+1)-1:0] trans_count_reg = 0;
+         wire                                     trans_start;
+         wire                                     trans_complete;
+         reg  [$clog2(M_ISSUE[n*32 +: 32]+1)-1:0] trans_count_reg = 0;
 
-         wire trans_limit = trans_count_reg >= M_ISSUE[n*32+:32] && !trans_complete;
+         wire                                     trans_limit;
+         assign trans_limit = trans_count_reg >= M_ISSUE[n*32+:32] && !trans_complete;
 
          always @(posedge clk) begin
             if (rst) begin
@@ -511,18 +516,30 @@ module iob_axi_crossbar_wr #(
          );
 
          // address mux
-         wire [M_ID_WIDTH-1:0]   s_axi_awid_mux     = int_s_axi_awid[a_grant_encoded*S_ID_WIDTH +: S_ID_WIDTH] | (a_grant_encoded << S_ID_WIDTH);
-         wire [ADDR_WIDTH-1:0]   s_axi_awaddr_mux   = int_s_axi_awaddr[a_grant_encoded*ADDR_WIDTH +: ADDR_WIDTH];
-         wire [7:0] s_axi_awlen_mux = int_s_axi_awlen[a_grant_encoded*8+:8];
-         wire [2:0] s_axi_awsize_mux = int_s_axi_awsize[a_grant_encoded*3+:3];
-         wire [1:0] s_axi_awburst_mux = int_s_axi_awburst[a_grant_encoded*2+:2];
-         wire s_axi_awlock_mux = int_s_axi_awlock[a_grant_encoded];
-         wire [3:0] s_axi_awcache_mux = int_s_axi_awcache[a_grant_encoded*4+:4];
-         wire [2:0] s_axi_awprot_mux = int_s_axi_awprot[a_grant_encoded*3+:3];
-         wire [3:0] s_axi_awqos_mux = int_s_axi_awqos[a_grant_encoded*4+:4];
-         wire [3:0] s_axi_awregion_mux = int_s_axi_awregion[a_grant_encoded*4+:4];
-         wire [AWUSER_WIDTH-1:0] s_axi_awuser_mux   = int_s_axi_awuser[a_grant_encoded*AWUSER_WIDTH +: AWUSER_WIDTH];
-         wire s_axi_awvalid_mux = int_axi_awvalid[a_grant_encoded*M_COUNT+n] && a_grant_valid;
+         wire [  M_ID_WIDTH-1:0] s_axi_awid_mux;
+         wire [  ADDR_WIDTH-1:0] s_axi_awaddr_mux;
+         wire [             7:0] s_axi_awlen_mux;
+         wire [             2:0] s_axi_awsize_mux;
+         wire [             1:0] s_axi_awburst_mux;
+         wire                    s_axi_awlock_mux;
+         wire [             3:0] s_axi_awcache_mux;
+         wire [             2:0] s_axi_awprot_mux;
+         wire [             3:0] s_axi_awqos_mux;
+         wire [             3:0] s_axi_awregion_mux;
+         wire [AWUSER_WIDTH-1:0] s_axi_awuser_mux;
+         wire                    s_axi_awvalid_mux;
+         assign   s_axi_awid_mux     = int_s_axi_awid[a_grant_encoded*S_ID_WIDTH +: S_ID_WIDTH] | (a_grant_encoded << S_ID_WIDTH);
+         assign s_axi_awaddr_mux = int_s_axi_awaddr[a_grant_encoded*ADDR_WIDTH+:ADDR_WIDTH];
+         assign s_axi_awlen_mux = int_s_axi_awlen[a_grant_encoded*8+:8];
+         assign s_axi_awsize_mux = int_s_axi_awsize[a_grant_encoded*3+:3];
+         assign s_axi_awburst_mux = int_s_axi_awburst[a_grant_encoded*2+:2];
+         assign s_axi_awlock_mux = int_s_axi_awlock[a_grant_encoded];
+         assign s_axi_awcache_mux = int_s_axi_awcache[a_grant_encoded*4+:4];
+         assign s_axi_awprot_mux = int_s_axi_awprot[a_grant_encoded*3+:3];
+         assign s_axi_awqos_mux = int_s_axi_awqos[a_grant_encoded*4+:4];
+         assign s_axi_awregion_mux = int_s_axi_awregion[a_grant_encoded*4+:4];
+         assign s_axi_awuser_mux = int_s_axi_awuser[a_grant_encoded*AWUSER_WIDTH+:AWUSER_WIDTH];
+         assign s_axi_awvalid_mux = int_axi_awvalid[a_grant_encoded*M_COUNT+n] && a_grant_valid;
          wire s_axi_awready_mux;
 
          assign int_axi_awready[n*S_COUNT +: S_COUNT] = (a_grant_valid && s_axi_awready_mux) << a_grant_encoded;
@@ -535,11 +552,16 @@ module iob_axi_crossbar_wr #(
          assign trans_start = s_axi_awvalid_mux && s_axi_awready_mux && a_grant_valid;
 
          // write data mux
-         wire [DATA_WIDTH-1:0]  s_axi_wdata_mux   = int_s_axi_wdata[w_select_reg*DATA_WIDTH +: DATA_WIDTH];
-         wire [STRB_WIDTH-1:0]  s_axi_wstrb_mux   = int_s_axi_wstrb[w_select_reg*STRB_WIDTH +: STRB_WIDTH];
-         wire s_axi_wlast_mux = int_s_axi_wlast[w_select_reg];
-         wire [WUSER_WIDTH-1:0] s_axi_wuser_mux   = int_s_axi_wuser[w_select_reg*WUSER_WIDTH +: WUSER_WIDTH];
-         wire s_axi_wvalid_mux = int_axi_wvalid[w_select_reg*M_COUNT+n] && w_select_valid_reg;
+         wire [ DATA_WIDTH-1:0] s_axi_wdata_mux;
+         wire [ STRB_WIDTH-1:0] s_axi_wstrb_mux;
+         wire                   s_axi_wlast_mux;
+         wire [WUSER_WIDTH-1:0] s_axi_wuser_mux;
+         wire                   s_axi_wvalid_mux;
+         assign s_axi_wdata_mux  = int_s_axi_wdata[w_select_reg*DATA_WIDTH+:DATA_WIDTH];
+         assign s_axi_wstrb_mux  = int_s_axi_wstrb[w_select_reg*STRB_WIDTH+:STRB_WIDTH];
+         assign s_axi_wlast_mux  = int_s_axi_wlast[w_select_reg];
+         assign s_axi_wuser_mux  = int_s_axi_wuser[w_select_reg*WUSER_WIDTH+:WUSER_WIDTH];
+         assign s_axi_wvalid_mux = int_axi_wvalid[w_select_reg*M_COUNT+n] && w_select_valid_reg;
          wire s_axi_wready_mux;
 
          assign int_axi_wready[n*S_COUNT +: S_COUNT] = (w_select_valid_reg && s_axi_wready_mux) << w_select_reg;
@@ -570,12 +592,13 @@ module iob_axi_crossbar_wr #(
          end
 
          // write response forwarding
-         wire [CL_S_COUNT-1:0] b_select = m_axi_bid[n*M_ID_WIDTH+:M_ID_WIDTH] >> S_ID_WIDTH;
+         wire [CL_S_COUNT-1:0] b_select;
+         assign b_select = m_axi_bid[n*M_ID_WIDTH+:M_ID_WIDTH] >> S_ID_WIDTH;
 
          assign int_axi_bvalid[n*S_COUNT+:S_COUNT] = int_m_axi_bvalid[n] << b_select;
-         assign int_m_axi_bready[n]                = int_axi_bready[b_select*M_COUNT+n];
+         assign int_m_axi_bready[n] = int_axi_bready[b_select*M_COUNT+n];
 
-         assign trans_complete                     = int_m_axi_bvalid[n] && int_m_axi_bready[n];
+         assign trans_complete = int_m_axi_bvalid[n] && int_m_axi_bready[n];
 
          // M side register
          iob_axi_register_wr #(

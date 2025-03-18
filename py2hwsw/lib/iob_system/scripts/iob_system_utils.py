@@ -440,11 +440,11 @@ BUILD_DEPS+=get_uut_build_deps
 
 get_uut_build_deps:
 	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga build_deps
-	cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga/*.hex .
+	-cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga/*.hex .
 
 get_uut_run_deps:
 	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga run_deps
-	cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga/*.hex .
+	-cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/fpga/*.hex .
 
 .PHONY: get_uut_build_deps get_uut_run_deps
 """

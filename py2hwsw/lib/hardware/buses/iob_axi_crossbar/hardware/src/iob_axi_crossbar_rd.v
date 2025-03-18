@@ -325,12 +325,18 @@ module iob_axi_crossbar_rd #(
          );
 
          // read response mux
-         wire [S_ID_WIDTH-1:0]  m_axi_rid_mux    = {decerr_m_axi_rid_reg, int_m_axi_rid} >> r_grant_encoded*M_ID_WIDTH;
-         wire [DATA_WIDTH-1:0]  m_axi_rdata_mux  = {{DATA_WIDTH{1'b0}}, int_m_axi_rdata} >> r_grant_encoded*DATA_WIDTH;
-         wire [1:0] m_axi_rresp_mux = {2'b11, int_m_axi_rresp} >> r_grant_encoded * 2;
-         wire m_axi_rlast_mux = {decerr_m_axi_rlast_reg, int_m_axi_rlast} >> r_grant_encoded;
-         wire [RUSER_WIDTH-1:0] m_axi_ruser_mux  = {{RUSER_WIDTH{1'b0}}, int_m_axi_ruser} >> r_grant_encoded*RUSER_WIDTH;
-         wire                   m_axi_rvalid_mux = ({decerr_m_axi_rvalid_reg, int_m_axi_rvalid} >> r_grant_encoded) & r_grant_valid;
+         wire [ S_ID_WIDTH-1:0] m_axi_rid_mux;
+         wire [ DATA_WIDTH-1:0] m_axi_rdata_mux;
+         wire [            1:0] m_axi_rresp_mux;
+         wire                   m_axi_rlast_mux;
+         wire [RUSER_WIDTH-1:0] m_axi_ruser_mux;
+         wire                   m_axi_rvalid_mux;
+         assign m_axi_rid_mux    = {decerr_m_axi_rid_reg, int_m_axi_rid} >> r_grant_encoded*M_ID_WIDTH;
+         assign m_axi_rdata_mux  = {{DATA_WIDTH{1'b0}}, int_m_axi_rdata} >> r_grant_encoded*DATA_WIDTH;
+         assign m_axi_rresp_mux = {2'b11, int_m_axi_rresp} >> r_grant_encoded * 2;
+         assign m_axi_rlast_mux = {decerr_m_axi_rlast_reg, int_m_axi_rlast} >> r_grant_encoded;
+         assign m_axi_ruser_mux  = {{RUSER_WIDTH{1'b0}}, int_m_axi_ruser} >> r_grant_encoded*RUSER_WIDTH;
+         assign m_axi_rvalid_mux = ({decerr_m_axi_rvalid_reg, int_m_axi_rvalid} >> r_grant_encoded) & r_grant_valid;
          wire m_axi_rready_mux;
 
          assign int_axi_rready[m*M_COUNT +: M_COUNT] = (r_grant_valid && m_axi_rready_mux) << r_grant_encoded;
@@ -407,11 +413,12 @@ module iob_axi_crossbar_rd #(
 
       for (n = 0; n < M_COUNT; n = n + 1) begin : m_ifaces
          // in-flight transaction count
-         wire trans_start;
-         wire trans_complete;
-         reg [$clog2(M_ISSUE[n*32 +: 32]+1)-1:0] trans_count_reg = 0;
+         wire                                     trans_start;
+         wire                                     trans_complete;
+         reg  [$clog2(M_ISSUE[n*32 +: 32]+1)-1:0] trans_count_reg = 0;
 
-         wire trans_limit = trans_count_reg >= M_ISSUE[n*32+:32] && !trans_complete;
+         wire                                     trans_limit;
+         assign trans_limit = trans_count_reg >= M_ISSUE[n*32+:32] && !trans_complete;
 
          always @(posedge clk) begin
             if (rst) begin
@@ -448,18 +455,31 @@ module iob_axi_crossbar_rd #(
          );
 
          // address mux
-         wire [M_ID_WIDTH-1:0]   s_axi_arid_mux     = int_s_axi_arid[a_grant_encoded*S_ID_WIDTH +: S_ID_WIDTH] | (a_grant_encoded << S_ID_WIDTH);
-         wire [ADDR_WIDTH-1:0]   s_axi_araddr_mux   = int_s_axi_araddr[a_grant_encoded*ADDR_WIDTH +: ADDR_WIDTH];
-         wire [7:0] s_axi_arlen_mux = int_s_axi_arlen[a_grant_encoded*8+:8];
-         wire [2:0] s_axi_arsize_mux = int_s_axi_arsize[a_grant_encoded*3+:3];
-         wire [1:0] s_axi_arburst_mux = int_s_axi_arburst[a_grant_encoded*2+:2];
-         wire s_axi_arlock_mux = int_s_axi_arlock[a_grant_encoded];
-         wire [3:0] s_axi_arcache_mux = int_s_axi_arcache[a_grant_encoded*4+:4];
-         wire [2:0] s_axi_arprot_mux = int_s_axi_arprot[a_grant_encoded*3+:3];
-         wire [3:0] s_axi_arqos_mux = int_s_axi_arqos[a_grant_encoded*4+:4];
-         wire [3:0] s_axi_arregion_mux = int_s_axi_arregion[a_grant_encoded*4+:4];
-         wire [ARUSER_WIDTH-1:0] s_axi_aruser_mux   = int_s_axi_aruser[a_grant_encoded*ARUSER_WIDTH +: ARUSER_WIDTH];
-         wire s_axi_arvalid_mux = int_axi_arvalid[a_grant_encoded*M_COUNT+n] && a_grant_valid;
+         wire [  M_ID_WIDTH-1:0] s_axi_arid_mux;
+         wire [  ADDR_WIDTH-1:0] s_axi_araddr_mux;
+         wire [             7:0] s_axi_arlen_mux;
+         wire [             2:0] s_axi_arsize_mux;
+         wire [             1:0] s_axi_arburst_mux;
+         wire                    s_axi_arlock_mux;
+         wire [             3:0] s_axi_arcache_mux;
+         wire [             2:0] s_axi_arprot_mux;
+         wire [             3:0] s_axi_arqos_mux;
+         wire [             3:0] s_axi_arregion_mux;
+         wire [ARUSER_WIDTH-1:0] s_axi_aruser_mux;
+         wire                    s_axi_arvalid_mux;
+
+         assign s_axi_arid_mux     = int_s_axi_arid[a_grant_encoded*S_ID_WIDTH +: S_ID_WIDTH] | (a_grant_encoded << S_ID_WIDTH);
+         assign s_axi_araddr_mux = int_s_axi_araddr[a_grant_encoded*ADDR_WIDTH+:ADDR_WIDTH];
+         assign s_axi_arlen_mux = int_s_axi_arlen[a_grant_encoded*8+:8];
+         assign s_axi_arsize_mux = int_s_axi_arsize[a_grant_encoded*3+:3];
+         assign s_axi_arburst_mux = int_s_axi_arburst[a_grant_encoded*2+:2];
+         assign s_axi_arlock_mux = int_s_axi_arlock[a_grant_encoded];
+         assign s_axi_arcache_mux = int_s_axi_arcache[a_grant_encoded*4+:4];
+         assign s_axi_arprot_mux = int_s_axi_arprot[a_grant_encoded*3+:3];
+         assign s_axi_arqos_mux = int_s_axi_arqos[a_grant_encoded*4+:4];
+         assign s_axi_arregion_mux = int_s_axi_arregion[a_grant_encoded*4+:4];
+         assign s_axi_aruser_mux = int_s_axi_aruser[a_grant_encoded*ARUSER_WIDTH+:ARUSER_WIDTH];
+         assign s_axi_arvalid_mux = int_axi_arvalid[a_grant_encoded*M_COUNT+n] && a_grant_valid;
          wire s_axi_arready_mux;
 
          assign int_axi_arready[n*S_COUNT +: S_COUNT] = (a_grant_valid && s_axi_arready_mux) << a_grant_encoded;
@@ -472,7 +492,8 @@ module iob_axi_crossbar_rd #(
          assign trans_start = s_axi_arvalid_mux && s_axi_arready_mux && a_grant_valid;
 
          // read response forwarding
-         wire [CL_S_COUNT-1:0] r_select = m_axi_rid[n*M_ID_WIDTH+:M_ID_WIDTH] >> S_ID_WIDTH;
+         wire [CL_S_COUNT-1:0] r_select;
+         assign r_select = m_axi_rid[n*M_ID_WIDTH+:M_ID_WIDTH] >> S_ID_WIDTH;
 
          assign int_axi_rvalid[n*S_COUNT+:S_COUNT] = int_m_axi_rvalid[n] << r_select;
          assign int_m_axi_rready[n] = int_axi_rready[r_select*M_COUNT+n];

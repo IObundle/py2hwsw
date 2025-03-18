@@ -50,7 +50,8 @@ module iob_fifo2axis #(
 
    //FIFO tlast
    wire                  axis_tlast_nxt;
-   wire [AXIS_LEN_W-1:0] len_int = len_i - 1;
+   wire [AXIS_LEN_W-1:0] len_int;
+   assign len_int        = len_i - 1;
    assign axis_tlast_nxt = (axis_word_count == len_int);
 
    iob_reg_re #(

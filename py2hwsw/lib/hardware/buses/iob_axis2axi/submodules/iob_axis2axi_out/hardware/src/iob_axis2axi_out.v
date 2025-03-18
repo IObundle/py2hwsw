@@ -44,14 +44,19 @@ module iob_axis2axi_out #(
 
    // Instantiation wires
    wire [AXI_ADDR_W-1:0] current_address, current_length;
-   wire [      1:0] state;
+   wire [ 1:0] state;
 
    // Logical wires and combinatorial regs
-   wire             doing_global_transfer = (state != 2'h0);
-   wire             doing_local_transfer = (state == 2'h3);
-   wire [     15:0] boundary_transfer_len = (16'h1000 - current_address[11:0]) >> 2;
-   wire             normal_burst_possible = (current_length >= BURST_SIZE);
-   wire             last_burst_possible = (current_length < BURST_SIZE);
+   wire        doing_global_transfer;
+   wire        doing_local_transfer;
+   wire [15:0] boundary_transfer_len;
+   wire        normal_burst_possible;
+   wire        last_burst_possible;
+   assign doing_global_transfer = (state != 2'h0);
+   assign doing_local_transfer  = (state == 2'h3);
+   assign boundary_transfer_len = (16'h1000 - current_address[11:0]) >> 2;
+   assign normal_burst_possible = (current_length >= BURST_SIZE);
+   assign last_burst_possible   = (current_length < BURST_SIZE);
 
    wire [BURST_W:0] burst_size;
 
@@ -68,9 +73,10 @@ module iob_axis2axi_out #(
    generate
       if (AXI_ADDR_W >= 13) begin  // 4k boundary can only happen to LEN higher or equal to 13
 
-         wire [     12:0] boundary_transfer_len = (13'h1000 - current_address[11:0]) >> 2;
+         wire [12:0] boundary_transfer_len;
+         assign boundary_transfer_len = (13'h1000 - current_address[11:0]) >> 2;
 
-         reg  [BURST_W:0] boundary_burst_size;
+         reg [BURST_W:0] boundary_burst_size;
          always @* begin
             boundary_burst_size = non_boundary_burst_size;
 
@@ -85,7 +91,8 @@ module iob_axis2axi_out #(
       end
    endgenerate
 
-   wire [BURST_W:0] transfer_len = burst_size - 1;
+   wire [BURST_W:0] transfer_len;
+   assign transfer_len       = burst_size - 1;
 
    // Assignment to outputs
    assign axis_out_data_o    = axi_rdata_i;

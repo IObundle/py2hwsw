@@ -41,5 +41,6 @@ RUN echo "source $HOME/.nix-profile/etc/profile.d/nix.sh" >> "$HOME/.bashrc"
 RUN git clone https://github.com/IObundle/py2hwsw.git
 RUN cd py2hwsw/py2hwsw/lib && \ 
     source $HOME/.nix-profile/etc/profile.d/nix.sh && \ 
-    nix-shell --run "echo 'Dependencies Installed'"
-RUN rm -rf py2hwsw
+    nix-shell --run "echo 'Dependencies Installed'" && \
+    rm -rf py2hwsw && \
+    rm -rf /tmp/*

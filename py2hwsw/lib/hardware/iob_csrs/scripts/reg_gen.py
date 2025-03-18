@@ -9,7 +9,7 @@
 import os
 
 import csr_gen
-from iob_csr import iob_csr, iob_csr_group
+from csr_classes import iob_csr, iob_csr_group
 
 
 def find_obj_in_list(obj_list, obj_name, process_func=lambda o: o):

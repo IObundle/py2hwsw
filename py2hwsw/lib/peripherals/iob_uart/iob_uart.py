@@ -10,6 +10,7 @@ def setup(py_params_dict):
         "name": NAME,
         "generate_hw": True,
         "board_list": ["iob_cyclonev_gt_dk", "iob_aes_ku040_db_g"],
+        "description": "The IObundle UART is a RISC-V-based Peripheral written in Verilog, which users can download for free, modify, simulate and implement in FPGA or ASIC. It is written in Verilog and includes a C software driver. The IObundle UART is a very compact IP that works at high clock rates if needed. It supports full-duplex operation and a configurable baud rate. The IObundle UART has a fixed configuration for the Start and Stop bits. More flexible licensable commercial versions are available upon request.",
         "confs": [
             {
                 "name": "DATA_W",
@@ -215,6 +216,12 @@ def setup(py_params_dict):
                 "core_name": "iob_reg_re",
                 "instance_name": "iob_reg_re_inst",
                 "instantiate": False,
+            },
+        ],
+        "superblocks": [
+            {
+                "core_name": "iob_uart_tester",
+                "dest_dir": "tester",
             },
         ],
         "snippets": [

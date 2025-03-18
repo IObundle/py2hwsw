@@ -2,43 +2,9 @@
 `timescale 1ns / 1ps
 
 module iob_dma_read #(
-   // parameter AXI_ADDR_W = 0,
-   // parameter AXI_LEN_W  = 8,
-   // parameter AXI_DATA_W = 32,
-   // parameter AXI_ID_W   = 1,
-   // parameter DMA_RLEN_W = 0
-   `include "iob_dma_read_params.vs
+   `include "iob_dma_read_params.vs"
 ) (
    `include "iob_dma_read_io.vs"
-   // // Global signals
-   // input clk_i,
-   // input cke_i,
-   // input arst_i,
-   // input rst_i,
-   //
-   // // Configuration IO's
-   // input      [   AXI_ADDR_W-1:0] r_addr_i,
-   // input      [   DMA_RLEN_W-1:0] r_length_i,
-   // input                          r_start_transfer_i,
-   // input      [(AXI_LEN_W+1)-1:0] r_max_len_i,
-   // output     [   DMA_RLEN_W-1:0] r_remaining_data_o,
-   // output reg                     r_busy_o,
-   //
-   // // AXIS Master Interface
-   // output [AXI_DATA_W-1:0] axis_out_tdata_o,
-   // output                  axis_out_tvalid_o,
-   // input                   axis_out_tready_i,
-   //
-   // // External memory interface
-   // output                  ext_mem_clk_o,
-   // output                  ext_mem_w_en_o,
-   // output [AXI_LEN_W-1:0] ext_mem_w_addr_o,
-   // output [AXI_DATA_W-1:0] ext_mem_w_data_o,
-   // output                  ext_mem_r_en_o,
-   // output [AXI_LEN_W-1:0] ext_mem_r_addr_o,
-   // input  [AXI_DATA_W-1:0] ext_mem_r_data_i,
-   //
-   // // AXI Master (read only) Interface
 );
 
    localparam WAIT_START = 1'd0, WAIT_SPACE_IN_FIFO = 1'd1;

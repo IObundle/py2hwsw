@@ -60,13 +60,15 @@ module iob_dma_core #(
       .axis_out_tvalid_o(axis_out_valid_o),
       .axis_out_tready_i(axis_out_ready_i),
 
-      .ext_mem_clk_o   (r_ext_mem_clk_o),
-      .ext_mem_w_en_o  (r_ext_mem_w_en_o),
-      .ext_mem_w_addr_o(r_ext_mem_w_addr_o),
-      .ext_mem_w_data_o(r_ext_mem_w_data_o),
-      .ext_mem_r_en_o  (r_ext_mem_r_en_o),
-      .ext_mem_r_addr_o(r_ext_mem_r_addr_o),
-      .ext_mem_r_data_i(r_ext_mem_r_data_i),
+      .dma_read_clk_o(dma_read_clk_o),
+      .dma_read_r_data_i(dma_read_r_data_i),
+      .dma_read_r_en_o(dma_read_r_en_o),
+      .dma_read_r_ready_i(dma_read_r_ready_i),
+      .dma_read_r_addr_o(dma_read_r_addr_o),
+      .dma_read_w_data_o(dma_read_w_data_o),
+      .dma_read_w_ready_i(dma_read_w_ready_i),
+      .dma_read_w_addr_o(dma_read_w_addr_o),
+      .dma_read_w_en_o(dma_read_w_en_o),
 
       `include "iob_dma_read_m_axi_read_m_m_portmap.vs"
 
@@ -96,13 +98,15 @@ module iob_dma_core #(
       .axis_in_valid_i(axis_in_valid_i),
       .axis_in_ready_o(axis_in_ready_o),
 
-      .ext_mem_clk_o   (w_ext_mem_clk_o),
-      .ext_mem_w_en_o  (w_ext_mem_w_en_o),
-      .ext_mem_w_addr_o(w_ext_mem_w_addr_o),
-      .ext_mem_w_data_o(w_ext_mem_w_data_o),
-      .ext_mem_r_en_o  (w_ext_mem_r_en_o),
-      .ext_mem_r_addr_o(w_ext_mem_r_addr_o),
-      .ext_mem_r_data_i(w_ext_mem_r_data_i),
+      .dma_write_clk_o(dma_write_clk_o),
+      .dma_write_r_data_i(dma_write_r_data_i),
+      .dma_write_r_en_o(dma_write_r_en_o),
+      .dma_write_r_ready_i(dma_write_r_ready_i),
+      .dma_write_r_addr_o(dma_write_r_addr_o),
+      .dma_write_w_data_o(dma_write_w_data_o),
+      .dma_write_w_ready_i(dma_write_w_ready_i),
+      .dma_write_w_addr_o(dma_write_w_addr_o),
+      .dma_write_w_en_o(dma_write_w_en_o),
 
       `include "iob_dma_write_m_axi_write_m_m_portmap.vs"
 

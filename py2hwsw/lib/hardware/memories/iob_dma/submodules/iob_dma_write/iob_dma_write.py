@@ -90,7 +90,7 @@ def setup(py_params_dict):
                 "name": "axi_write_m",
                 "signals": {
                     "type": "axi_write",
-                    "prefix": "m_",
+                    "portmap_port_prefix": "m_",
                     "file_prefix": "iob_dma_write_m_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",

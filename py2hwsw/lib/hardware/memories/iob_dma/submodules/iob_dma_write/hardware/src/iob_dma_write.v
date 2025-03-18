@@ -1,33 +1,9 @@
 `timescale 1ns / 1ps
 
 module iob_dma_write #(
-   // parameter AXI_ADDR_W = 0,
-   // parameter AXI_LEN_W  = 8,
-   // parameter AXI_DATA_W = 32,
-   // parameter AXI_ID_W   = 1,
-   // parameter DMA_WLEN_W = 0
    `include "iob_dma_write_params.vs"
 ) (
    `include "iob_dma_write_io.vs"
-   // // Global signals
-   // input clk_i,
-   // input cke_i,
-   // input arst_i,
-   // input rst_i,
-   //
-   // // Configuration IO's
-   // input      [   AXI_ADDR_W-1:0] w_addr_i,
-   // input      [   DMA_WLEN_W-1:0] w_length_i,
-   // input                          w_start_transfer_i,
-   // input      [(AXI_LEN_W+1)-1:0] w_max_len_i,
-   // output     [   DMA_WLEN_W-1:0] w_remaining_data_o,
-   // output reg                     w_busy_o,
-   //
-   // // AXIS Slave Interface
-   // input  [AXI_DATA_W-1:0] axis_in_data_i,
-   // input                   axis_in_valid_i,
-   // output                  axis_in_ready_o,
-   //
    // // External memory interface
    // output                  ext_mem_clk_o,
    // output                  ext_mem_w_en_o,

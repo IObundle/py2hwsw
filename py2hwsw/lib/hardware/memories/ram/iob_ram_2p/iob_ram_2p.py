@@ -42,70 +42,23 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "clk_i", "width": 1},
-                ],
-            },
-            {
-                "name": "w_en_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "w_en_i", "width": 1},
-                ],
-            },
-            {
-                "name": "w_addr_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "w_addr_i", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "w_data_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "w_data_i", "width": "DATA_W"},
-                ],
-            },
-            {
-                "name": "w_ready_o",
-                "descr": "Output port",
-                "signals": [
-                    {"name": "w_ready_o", "width": 1},
-                ],
-            },
-            {
-                "name": "r_en_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_en_i", "width": 1},
-                ],
-            },
-            {
-                "name": "r_addr_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_addr_i", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "r_data_o",
-                "descr": "Output port",
-                "signals": [
-                    {"name": "r_data_o", "width": "DATA_W"},
-                ],
-            },
-            {
-                "name": "r_ready_o",
-                "descr": "Output port",
-                "signals": [
-                    {"name": "r_ready_o", "width": 1},
-                ],
+                "name": "ram_2p_s",
+                "descr": "RAM interface",
+                "signals": {
+                    "type": "ram_2p",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
             },
         ],
         "wires": [
+            {
+                "name": "clk",
+                "descr": "Input port",
+                "signals": [
+                    {"name": "clk_i"},
+                ],
+            },
             {
                 "name": "en_int",
                 "descr": "en wire",
@@ -127,6 +80,20 @@ def setup(py_params_dict):
                     {"name": "addr_int", "width": "ADDR_W"},
                 ],
             },
+            {
+                "name": "w_data",
+                "descr": "Input port",
+                "signals": [
+                    {"name": "w_data_i"},
+                ],
+            },
+            {
+                "name": "r_data",
+                "descr": "Output port",
+                "signals": [
+                    {"name": "r_data_o"},
+                ],
+            },
         ],
         "subblocks": [
             {
@@ -138,12 +105,12 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                 },
                 "connect": {
-                    "clk_i": "clk_i",
+                    "clk_i": "clk",
                     "en_i": "en_int",
                     "we_i": "we_int",
                     "addr_i": "addr_int",
-                    "d_i": "w_data_i",
-                    "d_o": "r_data_o",
+                    "d_i": "w_data",
+                    "d_o": "r_data",
                 },
             },
         ],

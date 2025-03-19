@@ -171,6 +171,11 @@ def setup(py_params_dict):
                 "dest_dir": "hardware/simulation/src",
             },
         ],
+        "superblocks": [
+            {"core_name": "iob_axistream_in"},
+            {"core_name": "iob_axistream_out"},
+            {"core_name": "iob_axi_ram"},
+        ],
     }
 
     return attributes_dict

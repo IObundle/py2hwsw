@@ -273,7 +273,7 @@ class csr_gen:
                         ],
                     },
                 )
-                lines += f"    assign {name_idx}_wen = (internal_iob_valid & internal_iob_ready) & ((|internal_iob_wstrb) & {name_idx}_addressed_w);\n"
+                lines += f"    assign {name_idx}_wen = internal_iob_valid & (write_en & {name_idx}_addressed_w);\n"
                 lines += "    iob_reg_e #(\n"
                 lines += f"      .DATA_W({n_bits}),\n"
                 lines += f"      .RST_VAL({rst_val_str})\n"
@@ -288,7 +288,7 @@ class csr_gen:
             if n_items > 1:
                 lines += self.gen_regfile_read_addr_logic(row)
         else:  # not auto: compute wen
-            lines += f"    assign {name}_wen{suffix} = ({name}_addressed_w & internal_iob_valid)? |internal_iob_wstrb: 1'b0;\n"
+            lines += f"    assign {name}_wen{suffix} = (internal_iob_valid & internal_iob_ready) & (write_en & {name}_addressed_w);\n"
             if suffix:
                 lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
 
@@ -313,7 +313,8 @@ class csr_gen:
         if not auto:  # output read enable
             lines += f"    wire {name}_addressed_r;\n"
             lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable >= {addr}) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
-            lines += f"    assign {name}_ren{suffix} = {name}_addressed_r & internal_iob_valid & (~|internal_iob_wstrb);\n"
+            lines += f"    assign {name}_ren{suffix} = {name}_addressed_r & (internal_iob_valid & internal_iob_ready) & (~write_en);\n"
+            lines += f"    assign {name}_rready{suffix} = {name}_addressed_r & rready_int;\n"
 
         return lines
 
@@ -351,7 +352,7 @@ class csr_gen:
                             f"    wire [{self.verilog_max(n_bits,1)}-1:0] {name}_wdata_wr;\n"
                         )
                         f.write(f"    wire {name}_wen_wr;\n")
-                        f.write(f"    wire {name}_wready_wr;\n")
+                        f.write(f"    wire {name}_ready_wr;\n")
                 if "R" in row.type:
                     if auto:
                         f.write(
@@ -364,6 +365,7 @@ class csr_gen:
     wire {name}_rvalid_rd;
     wire {name}_ren_rd;
     wire {name}_rready_rd;
+    wire {name}_ready_rd;
 """
                         )
         f.write("\n")
@@ -382,7 +384,7 @@ class csr_gen:
                     else:
                         f.write(f"    .{name}_wdata_o({name}_wdata_wr),\n")
                         f.write(f"    .{name}_wen_o({name}_wen_wr),\n")
-                        f.write(f"    .{name}_wready_i({name}_wready_wr),\n")
+                        f.write(f"    .{name}_ready_i({name}_ready_wr),\n")
                 if "R" in row.type:
                     if auto:
                         f.write(f"    .{name}_i({name}_rd),\n")
@@ -391,8 +393,9 @@ class csr_gen:
                             f"""
     .{name}_rdata_i({name}_rdata_rd),
     .{name}_rvalid_i({name}_rvalid_rd),
+    .{name}_rready_o({name}_rready_rd),
     .{name}_ren_o({name}_ren_rd),
-    .{name}_rready_i({name}_rready_rd),
+    .{name}_ready_i({name}_ready_rd),
 """
                         )
 
@@ -466,7 +469,7 @@ class csr_gen:
                             "width": 1,
                         },
                         {
-                            "name": f"{name}_wready_i",
+                            "name": f"{name}_ready_i",
                             "width": 1,
                         },
                     ]
@@ -504,11 +507,15 @@ class csr_gen:
                             "width": 1,
                         },
                         {
+                            "name": f"{name}_rready_o",
+                            "width": 1,
+                        },
+                        {
                             "name": f"{name}_ren_o",
                             "width": 1,
                         },
                         {
-                            "name": f"{name}_rready_i",
+                            "name": f"{name}_ready_i",
                             "width": 1,
                         },
                     ]
@@ -604,6 +611,13 @@ class csr_gen:
                 ],
             },
             {
+                "name": "write_en",
+                "descr": "",
+                "signals": [
+                    {"name": "write_en", "width": 1},
+                ],
+            },
+            {
                 "name": "internal_iob_addr",
                 "descr": "",
                 "signals": [
@@ -635,7 +649,33 @@ class csr_gen:
         snippet += """
     assign internal_iob_addr_reg_en = (state == WAIT_REQ);
     assign internal_iob_addr_stable = (state == WAIT_RVALID) ? internal_iob_addr_reg : internal_iob_addr;
+
+    assign write_en = |internal_iob_wstrb;
 """
+        # check if all registers are auto and add rready_int if not
+        all_auto = True
+        all_reads_auto = True
+        for row in table:
+            if not row["autoreg"]:
+                all_auto = False
+                if "R" in row["type"]:
+                    all_reads_auto = False
+                    break
+
+        if not all_reads_auto:
+            wires.append(
+                {
+                    "name": "rready_int",
+                    "descr": "",
+                    "signals": [
+                        {"name": "rready_int", "width": 1},
+                    ],
+                }
+            )
+            snippet += """
+    assign rready_int = (state == WAIT_RVALID) & iob_rready_i;
+        """
+
         subblocks.append(
             {
                 "core_name": "iob_reg_e",
@@ -792,78 +832,73 @@ class csr_gen:
 
         # use variables to compute response
         snippet += """
-    assign internal_iob_rvalid = rvalid;
-    assign internal_iob_rdata = rdata;
-    assign internal_iob_ready = ready;
+    assign internal_iob_rvalid = iob_rvalid_out;
+    assign internal_iob_rdata = iob_rdata_out;
+    assign internal_iob_ready = iob_ready_out;
 
 """
         wires += [
             # iob_regs
             {
-                "name": "rvalid",
+                "name": "iob_rvalid_out",
                 "descr": "",
                 "signals": [
-                    {"name": "rvalid", "width": 1},
+                    {"name": "iob_rvalid_out", "width": 1},
                 ],
             },
             {
-                "name": "rvalid_nxt",
+                "name": "iob_rvalid_nxt",
                 "descr": "",
                 "signals": [
-                    {"name": "rvalid_nxt", "width": 1, "isreg": True},
+                    {"name": "iob_rvalid_nxt", "width": 1, "isreg": True},
                 ],
             },
             {
-                "name": "rdata",
+                "name": "iob_rdata_out",
                 "descr": "",
                 "signals": [
-                    {"name": "rdata", "width": 8 * self.cpu_n_bytes},
+                    {"name": "iob_rdata_out", "width": 8 * self.cpu_n_bytes},
                 ],
             },
             {
-                "name": "rdata_nxt",
+                "name": "iob_rdata_nxt",
                 "descr": "",
                 "signals": [
-                    {"name": "rdata_nxt", "width": 8 * self.cpu_n_bytes, "isreg": True},
+                    {"name": "iob_rdata_nxt", "width": 8 * self.cpu_n_bytes, "isreg": True},
                 ],
             },
             {
-                "name": "ready",
+                "name": "iob_ready_out",
                 "descr": "",
                 "signals": [
-                    {"name": "ready", "width": 1},
+                    {"name": "iob_ready_out", "width": 1},
                 ],
             },
             {
-                "name": "ready_nxt",
+                "name": "iob_ready_nxt",
                 "descr": "",
                 "signals": [
-                    {"name": "ready_nxt", "width": 1, "isreg": True},
-                ],
-            },
-            # Wires of type "reg"
-            {
-                "name": "rvalid_int",
-                "descr": "",
-                "signals": [
-                    {"name": "rvalid_int", "width": 1, "isvar": True},
-                ],
-            },
-            {
-                "name": "wready_int",
-                "descr": "",
-                "signals": [
-                    {"name": "wready_int", "width": 1, "isvar": True},
-                ],
-            },
-            {
-                "name": "rready_int",
-                "descr": "",
-                "signals": [
-                    {"name": "rready_int", "width": 1, "isvar": True},
+                    {"name": "iob_ready_nxt", "width": 1, "isreg": True},
                 ],
             },
         ]
+        if not all_auto:
+            wires += [
+                {
+                    "name": "rvalid_int",
+                    "descr": "",
+                    "signals": [
+                        {"name": "rvalid_int", "width": 1, "isvar": True},
+                    ],
+                },
+                {
+                    "name": "ready_int",
+                    "descr": "",
+                    "signals": [
+                        {"name": "ready_int", "width": 1, "isvar": True},
+                    ],
+                },
+            ]
         subblocks += [
             {
                 "core_name": "iob_reg",
@@ -875,8 +910,8 @@ class csr_gen:
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "data_i": "rvalid_nxt",
-                    "data_o": "rvalid",
+                    "data_i": "iob_rvalid_nxt",
+                    "data_o": "iob_rvalid_out",
                 },
             },
             {
@@ -889,8 +924,8 @@ class csr_gen:
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "data_i": "rdata_nxt",
-                    "data_o": "rdata",
+                    "data_i": "iob_rdata_nxt",
+                    "data_o": "iob_rdata_out",
                 },
             },
             {
@@ -903,8 +938,8 @@ class csr_gen:
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "data_i": "ready_nxt",
-                    "data_o": "ready",
+                    "data_i": "iob_ready_nxt",
+                    "data_o": "iob_ready_out",
                 },
             },
         ]
@@ -947,11 +982,12 @@ class csr_gen:
 
         snippet += f"""
     always @* begin
-        rdata_nxt = {8*self.cpu_n_bytes}'d0;
-        rvalid_int = (internal_iob_valid & internal_iob_ready) & (~(|internal_iob_wstrb));
-        rready_int = 1'b1;
-        wready_int = 1'b1;
-
+        iob_rdata_nxt = {8*self.cpu_n_bytes}'d0;
+"""
+        if not all_auto:
+            snippet += f"""
+        rvalid_int = 1'b1;
+        ready_int = 1'b1;
 """
 
         # read register response
@@ -994,16 +1030,16 @@ class csr_gen:
                 snippet += "begin\n"
                 if name == "version":
                     rst_val = row.rst_val
-                    snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {8*n_bytes}'h{rst_val}|{8*n_bytes}'d0;\n"
+                    snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {8*n_bytes}'h{rst_val}|{8*n_bytes}'d0;\n"
                 elif auto:
-                    snippet += f"            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}{suffix}|{8*n_bytes}'d0;\n"
+                    snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}{suffix}|{8*n_bytes}'d0;\n"
                 else:
                     snippet += f"""
-            rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}_rdata{suffix}|{8*n_bytes}'d0;
+            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}_rdata{suffix}|{8*n_bytes}'d0;
             rvalid_int = {name}_rvalid{suffix};
 """
                 if not auto:
-                    snippet += f"            rready_int = {name}_rready{suffix};\n"
+                    snippet += f"            ready_int = {name}_ready{suffix};\n"
                 snippet += "        end\n\n"
 
         # write register response
@@ -1021,35 +1057,55 @@ class csr_gen:
 
             if "W" in row.type:
                 if not auto:
-                    # get wready
+                    # get ready
                     snippet += f"        if((waddr >= {addr}) && (waddr < {addr + 2**addr_w})) begin\n"
-                    snippet += f"            wready_int = {name}_wready{suffix};\n        end\n"
+                    snippet += f"            ready_int = {name}_ready{suffix};\n        end\n"
 
         snippet += """
 
         // ######  FSM  #############
 
         //FSM default values
-        ready_nxt = 1'b0;
-        rvalid_nxt = 1'b0;
+        iob_ready_nxt = 1'b0;
+        iob_rvalid_nxt = 1'b0;
         state_nxt = state;
 
         //FSM state machine
         case(state)
             WAIT_REQ: begin
                 if(internal_iob_valid & (!internal_iob_ready)) begin // Wait for a valid request
-                    ready_nxt = |internal_iob_wstrb ? wready_int : rready_int;
+"""
+        if not all_auto:
+            snippet += """
+                    iob_ready_nxt = ready_int;
+"""
+        else:
+            snippet += """
+                    iob_ready_nxt = 1'b1;
+"""
+        snippet += """
                     // If is read and ready, go to WAIT_RVALID
-                    if (ready_nxt && (!(|internal_iob_wstrb))) begin
+                    if (iob_ready_nxt && (!write_en)) begin
                         state_nxt = WAIT_RVALID;
                     end
                 end
             end
 
             default: begin  // WAIT_RVALID
-                if(rvalid_int) begin
-                    rvalid_nxt = 1'b1;
+                if (iob_rready_i & iob_rvalid_o) begin // Transfer done
+                    iob_rvalid_nxt = 1'b0;
                     state_nxt = WAIT_REQ;
+                end else begin
+"""
+        if not all_reads_auto:
+            snippet += """
+                    iob_rvalid_nxt = rvalid_int;
+"""
+        else:
+            snippet += """
+                    iob_rvalid_nxt = 1'b1;
+"""
+        snippet += """
                 end
             end
         endcase

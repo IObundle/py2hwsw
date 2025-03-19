@@ -8,12 +8,37 @@ def setup(py_params_dict):
         "generate_hw": True,
         "confs": [
             {
-                "name": "DATA_W",
+                "name": "DIVIDEND_W",
                 "type": "P",
                 "val": "32",
                 "min": "NA",
                 "max": "NA",
-                "descr": "Data bus width",
+                "descr": "Dividend width",
+            },
+            {
+                "name": "DIVISOR_W",
+                "type": "P",
+                "val": "DIVIDEND_W",
+                "min": "NA",
+                "max": "NA",
+                "descr": "Divisor width",
+            },
+            {
+                "name": "QUOTIENT_W",
+                "type": "P",
+                "val": "DIVIDEND_W",
+                "min": "NA",
+                "max": "NA",
+                "descr": "Quotient width",
+            },
+            # Localparam
+            {
+                "name": "DQR_W",
+                "type": "F",
+                "val": "(DIVISOR_W+DIVIDEND_W)+1",
+                "min": "NA",
+                "max": "NA",
+                "descr": "",
             },
         ],
         "ports": [
@@ -46,22 +71,22 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "dividend_i",
-                        "width": "DATA_W",
+                        "width": "DIVIDEND_W",
                         "descr": "",
                     },
                     {
                         "name": "divisor_i",
-                        "width": "DATA_W",
+                        "width": "DIVISOR_W",
                         "descr": "",
                     },
                     {
                         "name": "quotient_o",
-                        "width": "DATA_W",
+                        "width": "QUOTIENT_W",
                         "descr": "",
                     },
                     {
                         "name": "remainder_o",
-                        "width": "DATA_W",
+                        "width": "DIVISOR_W",
                         "descr": "",
                     },
                 ],
@@ -72,63 +97,56 @@ def setup(py_params_dict):
             #     "name": "dqr_reg_nxt",
             #     "descr": "dqr_reg_nxt wire",
             #     "signals": [
-            #         {"name": "dqr_reg_nxt", "width": "2*DATA_W+1"},
+            #         {"name": "dqr_reg_nxt", "width": "DQR_W"},
             #     ],
             # },
             {
                 "name": "dqr_reg",
                 "descr": "dqr_reg wire",
                 "signals": [
-                    {"name": "dqr_reg", "width": "2*DATA_W+1"},
+                    {"name": "dqr_reg", "width": "DQR_W"},
                 ],
             },
             # { # NOTE: This wire is implicitly create by py2
             #    "name": "divisor_reg_nxt",
             #    "descr": "divisor_reg_nxt wire",
             #    "signals": [
-            #        {"name": "divisor_reg_nxt", "width": "DATA_W"},
+            #        {"name": "divisor_reg_nxt", "width": "DIVISOR_W"},
             #    ],
             # },
             {
                 "name": "divisor_reg",
                 "descr": "divisor_reg wire",
                 "signals": [
-                    {"name": "divisor_reg", "width": "DATA_W"},
+                    {"name": "divisor_reg", "width": "DIVISOR_W"},
                 ],
             },
             {
                 "name": "subtraend",
                 "descr": "subtraend wire",
                 "signals": [
-                    {"name": "subtraend", "width": "DATA_W"},
+                    {"name": "subtraend", "width": "DIVISOR_W"},
                 ],
             },
             {
                 "name": "tmp",
                 "descr": "tmp wire",
                 "signals": [
-                    {"name": "tmp", "width": "DATA_W+1"},
+                    {"name": "tmp", "width": "DIVISOR_W+1"},
                 ],
             },
             # { # NOTE: This wire is implicitly create by py2
             #    "name": "pcnt_nxt",
             #    "descr": "pcnt_nxt wire",
             #    "signals": [
-            #        {"name": "pcnt_nxt", "width": "$clog2(DATA_W+1)"},
+            #        {"name": "pcnt_nxt", "width": "$clog2(DIVIDEND_W+1)"},
             #    ],
             # },
             {
                 "name": "pcnt",
                 "descr": "pcnt wire",
                 "signals": [
-                    {"name": "pcnt", "width": "$clog2(DATA_W+1)"},
-                ],
-            },
-            {
-                "name": "last_stage",
-                "descr": "last_stage wire",
-                "signals": [
-                    {"name": "last_stage", "width": "$clog2(DATA_W+1)"},
+                    {"name": "pcnt", "width": "$clog2(DIVIDEND_W+1)"},
                 ],
             },
             {
@@ -142,10 +160,9 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-            assign subtraend = dqr_reg[(2*DATA_W)-2-:DATA_W];
-            assign quotient_o = dqr_reg[DATA_W-1:0];
-            assign remainder_o = dqr_reg[(2*DATA_W)-1:DATA_W];
-            assign tmp = {1'b0, subtraend} - {1'b0, divisor_reg};
+            assign subtraend = dqr_reg[(DQR_W-2)-:(DIVISOR_W+1)];
+            assign quotient_o  = dqr_reg[QUOTIENT_W-1:0];
+            assign remainder_o = dqr_reg[(DQR_W-2)-:DIVISOR_W];
             assign last_stage = DATA_W + 1;
             assign done_o = done_reg;
          """,
@@ -153,6 +170,7 @@ def setup(py_params_dict):
         ],
         "comb": {
             "code": """
+    tmp = {1'b0, subtraend} - {1'b0, divisor_reg};
     pcnt_nxt    = pcnt + 1'b1;
     dqr_reg_nxt     = dqr_reg;
     divisor_reg_nxt = divisor_reg;
@@ -163,16 +181,16 @@ def setup(py_params_dict):
         pcnt_nxt = pcnt;
       end else begin
         divisor_reg_nxt = divisor_i;
-        dqr_reg_nxt     = {1'b0, {DATA_W{1'b0}}, dividend_i};
+        dqr_reg_nxt     = {{(DIVISOR_W+1){1'b0}}, dividend_i};
       end
-    end else if (pcnt == last_stage) begin
+    end else if (pcnt == (DIVIDEND_W+1)) begin
       pcnt_nxt = 0;
     end else begin  //shift and subtract
       done_reg = 1'b0;
-      if (~tmp[DATA_W]) begin
-        dqr_reg_nxt = {tmp, dqr_reg[DATA_W-2 : 0], 1'b1};
+      if (~tmp[DIVISOR_W+1]) begin
+        dqr_reg_nxt = {tmp[DIVISOR_W:0], dqr_reg[DIVIDEND_W-2 : 0], 1'b1};
       end else begin
-        dqr_reg_nxt = {1'b0, dqr_reg[(2*DATA_W)-2 : 0], 1'b0};
+        dqr_reg_nxt = {1'b0,dqr_reg[DQR_W-3 : 0], 1'b0};
       end
     end
 """,

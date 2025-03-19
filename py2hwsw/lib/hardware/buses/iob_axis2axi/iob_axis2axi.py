@@ -128,6 +128,11 @@ def setup(py_params_dict):
                 "descr": "External memory interface",
                 "signals": [
                     {
+                        "name": "ext_mem_clk_o",
+                        "width": 1,
+                        "descr": "Memory clock output",
+                    },
+                    {
                         "name": "ext_mem_w_en_o",
                         "width": 1,
                         "descr": "Memory write enable",

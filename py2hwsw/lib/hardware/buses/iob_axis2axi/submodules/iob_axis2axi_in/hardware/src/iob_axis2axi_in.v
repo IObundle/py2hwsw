@@ -191,6 +191,7 @@ module iob_axis2axi_in #(
       .R_DATA_W(AXI_DATA_W),
       .ADDR_W  (BUFFER_W)
    ) fifo (
+      .ext_mem_clk_o   (ext_mem_clk_o),
       //write port
       .ext_mem_w_en_o  (ext_mem_w_en_o),
       .ext_mem_w_data_o(ext_mem_w_data_o),

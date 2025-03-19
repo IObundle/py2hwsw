@@ -51,8 +51,7 @@ module iob_axil2iob #(
    assign iob_addr_o = axil_arvalid_i ? axil_araddr_i : axil_awvalid_i ? axil_awaddr_i : iob_addr;
    assign iob_wdata_o = axil_wdata_i;
    assign iob_wstrb_o = axil_wvalid_i ? axil_wstrb_i : {WSTRB_W{1'b0}};
-   // TODO: Fix iob_rready
-   assign iob_rready_o = 1'b1;
+   assign iob_rready_o = axil_rready_i;
 
    assign iob_addr_en = axil_arvalid_i | axil_awvalid_i;
 

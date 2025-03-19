@@ -7,11 +7,11 @@ module iob_prio_enc_tb;
 
    localparam W = 8;
 
-   reg     [        W-1:0] data_i = 1;
-   wire    [$clog2(W)-1:0] data_o;
+   reg     [          W-1:0] data_i = 1;
+   wire    [$clog2(W+1)-1:0] data_o;
 
-   integer                 i;
-   integer                 fd;
+   integer                   i;
+   integer                   fd;
 
    initial begin
 `ifdef VCD
@@ -23,8 +23,7 @@ module iob_prio_enc_tb;
       for (i = 0; i < 2 ** W; i = i + 1) begin
          #10 data_i = i;
       end
-      #10 
-      $display("%c[1;34m", 27);
+      #10 $display("%c[1;34m", 27);
       $display("Test completed successfully.");
       $display("%c[0m", 27);
       fd = $fopen("test.log", "w");

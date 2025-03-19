@@ -16,6 +16,14 @@ def setup(py_params_dict):
                 "descr": "Data bus width",
             },
             {
+                "name": "INCR_W",
+                "type": "P",
+                "val": "DATA_W",
+                "min": "NA",
+                "max": "NA",
+                "descr": "Increment value width",
+            },
+            {
                 "name": "RST_VAL",
                 "type": "P",
                 "val": "{DATA_W{1'b0}}",
@@ -54,7 +62,7 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "incr_i",
-                        "width": "DATA_W",
+                        "width": "INCR_W",
                     },
                 ],
             },

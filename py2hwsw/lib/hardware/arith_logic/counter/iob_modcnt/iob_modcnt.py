@@ -72,17 +72,17 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "ld_val",
-                "descr": "ld_val wire",
+                "name": "data",
+                "descr": "data wire",
                 "signals": [
-                    {"name": "ld_val", "width": "DATA_W"},
+                    {"name": "data", "width": "DATA_W"},
                 ],
             },
         ],
         "subblocks": [
             {
-                "core_name": "iob_counter_ld",
-                "instance_name": "cnt0",
+                "core_name": "iob_reg_re",
+                "instance_name": "reg0",
                 "parameters": {
                     "DATA_W": "DATA_W",
                     "RST_VAL": "RST_VAL",
@@ -90,8 +90,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "en_rst_i": "en_rst_i",
-                    "ld_i": "ld_count",
-                    "ld_val_i": "ld_val",
+                    "data_i": "data",
                     "data_o": "data_o",
                 },
             },
@@ -100,7 +99,7 @@ def setup(py_params_dict):
             {
                 "verilog_code": """
         assign ld_count = (data_o >= mod_i);
-        assign ld_val = {DATA_W{1'b0}};
+        assign data = ld_count ? {DATA_W{1'b0}} : data_o + 1'b1;
             """,
             },
         ],

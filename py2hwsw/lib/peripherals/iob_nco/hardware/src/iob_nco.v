@@ -101,8 +101,8 @@ module iob_nco #(
 
 
    // PERIOD Manual logic
-   assign period_int_wready_wr  = 1'b1;
-   assign period_frac_wready_wr = 1'b1;
+   assign period_int_ready_wr  = 1'b1;
+   assign period_frac_ready_wr = 1'b1;
 
    reg [DATA_W-1:0] quant;
 

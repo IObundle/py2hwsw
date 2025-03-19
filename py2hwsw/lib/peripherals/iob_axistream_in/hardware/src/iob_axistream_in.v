@@ -62,7 +62,7 @@ module iob_axistream_in #(
    wire tlast_detected_reg;
 
    //CPU INTERFACE
-   assign data_rready_rd = int_tvalid;
+   assign data_ready_rd  = int_tvalid;
    assign interrupt_o    = fifo_level_rd >= fifo_threshold_wr;
    assign data_rvalid_rd = int_tvalid & (~mode_wr);
    assign data_rdata_rd  = int_tdata;
@@ -72,7 +72,7 @@ module iob_axistream_in #(
    assign sys_tvalid_o   = int_tvalid & mode_wr;
    assign sys_tdata_o    = int_tdata;
 
-   assign int_tready     = (mode_wr) ? sys_tready_i : data_ren_rd;
+   assign int_tready     = (mode_wr) ? sys_tready_i : data_rready_rd;
 
    // empty = fifo empty + no data in fifo2axis
    assign fifo_empty_rd  = fifo_empty & (~int_tvalid);
@@ -140,14 +140,14 @@ module iob_axistream_in #(
    // received words counter - count in gray code to use in CDC
    wire [DATA_W-1:0] axis_gray_word_count;
    iob_gray_counter #(
-       .W(DATA_W)
+      .W(DATA_W)
    ) word_gray_counter_inst (
-       .clk_i (axis_clk_i),
-       .cke_i (axis_cke_i),
-       .arst_i(axis_arst_i),
-       .rst_i (axis_sw_rst),
-       .en_i  (axis_word_count_en),
-       .data_o(axis_gray_word_count)
+      .clk_i (axis_clk_i),
+      .cke_i (axis_cke_i),
+      .arst_i(axis_arst_i),
+      .rst_i (axis_sw_rst),
+      .en_i  (axis_word_count_en),
+      .data_o(axis_gray_word_count)
    );
 
    iob_gray2bin #(
@@ -271,6 +271,7 @@ module iob_axistream_in #(
       .rst_i        (soft_reset_wr),
       .en_i         (1'b1),
       .len_i        (1'b1),
+      .level_o      (),
       // FIFO I/F
       .fifo_empty_i (fifo_empty),
       .fifo_read_o  (fifo_read),

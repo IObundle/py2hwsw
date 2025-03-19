@@ -60,11 +60,12 @@ module iob_nco_tb;
 `endif
 
       //init cpu bus signals
-      iob_valid_i = 0;
-      iob_wstrb_i = 0;
+      iob_valid_i  = 0;
+      iob_wstrb_i  = 0;
+      iob_rready_i = 0;
 
       // Reset signal
-      arst        = 0;
+      arst         = 0;
       #100 arst = 1;
       #1_000 arst = 0;
       #100;

@@ -36,7 +36,7 @@ module iob_iob2axil #(
    input  [              1:0] axil_rresp_i,
 
    // IOb subordinate interface
-   `include "iob_s_port.vs"
+   `include "iob_iob2axil_iob_s_port.vs"
 );
 
    wire wvalid_reg_en;

@@ -314,7 +314,9 @@ class csr_gen:
             lines += f"    wire {name}_addressed_r;\n"
             lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable >= {addr}) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
             lines += f"    assign {name}_ren{suffix} = {name}_addressed_r & (internal_iob_valid & internal_iob_ready) & (~write_en);\n"
-            lines += f"    assign {name}_rready{suffix} = {name}_addressed_r & rready_int;\n"
+            lines += (
+                f"    assign {name}_rready{suffix} = {name}_addressed_r & rready_int;\n"
+            )
 
         return lines
 
@@ -656,9 +658,9 @@ class csr_gen:
         all_auto = True
         all_reads_auto = True
         for row in table:
-            if not row["autoreg"]:
+            if not row.autoreg:
                 all_auto = False
-                if "R" in row["type"]:
+                if "R" in row.type:
                     all_reads_auto = False
                     break
 
@@ -863,7 +865,11 @@ class csr_gen:
                 "name": "iob_rdata_nxt",
                 "descr": "",
                 "signals": [
-                    {"name": "iob_rdata_nxt", "width": 8 * self.cpu_n_bytes, "isreg": True},
+                    {
+                        "name": "iob_rdata_nxt",
+                        "width": 8 * self.cpu_n_bytes,
+                        "isreg": True,
+                    },
                 ],
             },
             {
@@ -1058,7 +1064,9 @@ class csr_gen:
                 if not auto:
                     # get ready
                     snippet += f"        if((waddr >= {addr}) && (waddr < {addr + 2**addr_w})) begin\n"
-                    snippet += f"            ready_int = {name}_ready{suffix};\n        end\n"
+                    snippet += (
+                        f"            ready_int = {name}_ready{suffix};\n        end\n"
+                    )
 
         snippet += """
 

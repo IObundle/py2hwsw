@@ -103,6 +103,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "rxdata_rdata_rd", "width": 8},
                     {"name": "rxdata_rvalid_rd", "width": 1},
+                    {"name": "rxdata_rready_rd", "width": 1},
                     {"name": "rxdata_ren_rd", "width": 1},
                     {"name": "rxdata_ready_rd", "width": 1},
                 ],

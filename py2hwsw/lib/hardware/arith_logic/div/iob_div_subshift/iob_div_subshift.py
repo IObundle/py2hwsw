@@ -163,7 +163,6 @@ def setup(py_params_dict):
             assign subtraend = dqr_reg[(DQR_W-2)-:(DIVISOR_W+1)];
             assign quotient_o  = dqr_reg[QUOTIENT_W-1:0];
             assign remainder_o = dqr_reg[(DQR_W-2)-:DIVISOR_W];
-            assign last_stage = DATA_W + 1;
             assign done_o = done_reg;
          """,
             },

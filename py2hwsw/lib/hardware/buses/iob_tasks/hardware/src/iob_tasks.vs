@@ -31,7 +31,7 @@ task iob_write;
 
       #1 while (!iob_ready_o) #1;
 
-      @(posedge clk) iob_valid_i = 0;
+      @(posedge clk) #1 iob_valid_i = 0;
       iob_wstrb_i = 0;
    end
 endtask
@@ -44,6 +44,7 @@ task iob_read;
 
    begin
       @(posedge clk) #1 iob_valid_i = 1;
+      @(posedge clk) #1 iob_rready_i = 1;
       iob_addr_i = `IOB_WORD_ADDR(addr);
       iob_wstrb_i = 0;
 
@@ -52,7 +53,7 @@ task iob_read;
 
       while (!iob_rvalid_o) #1;
       data = #1 `IOB_GET_RDATA(addr, iob_rdata_o, width);
+      @(posedge clk) #1 iob_rready_i = 0;
 
-      // TODO: iob_rready
    end
 endtask

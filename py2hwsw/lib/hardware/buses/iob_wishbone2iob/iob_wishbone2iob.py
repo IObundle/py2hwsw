@@ -199,7 +199,7 @@ def setup(py_params_dict):
         assign wb_data_mask = {{8{wb_sel_i[3]}}, {8{wb_sel_i[2]}}, {8{wb_sel_i[1]}}, {8{wb_sel_i[0]}}};
         assign reg_wack_int= 1'b0; 
         assign reg_wack_int_1= 1'b1;   
-        // TODO: iob_rready
+        assign iob_rready = 1'b1;
                 """,
             },
         ],

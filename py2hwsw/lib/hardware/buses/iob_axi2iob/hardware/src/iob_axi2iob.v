@@ -147,7 +147,6 @@ module iob_axi2iob #(
    assign iob_addr_o = m_axil_arvalid ? m_axil_araddr : (m_axil_awvalid ? m_axil_awaddr : m_axil_awaddr_q);
    assign iob_wdata_o = m_axil_wdata;
    assign iob_wstrb_o = m_axil_arvalid ? {STRB_WIDTH{1'b0}} : m_axil_wstrb;
-   // TODO: fix iob_rready_o
    assign iob_rready_o = 1'b1;
 
    iob_reg_re #(

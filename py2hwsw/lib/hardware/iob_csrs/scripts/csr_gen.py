@@ -673,7 +673,7 @@ class csr_gen:
                 }
             )
             snippet += """
-    assign rready_int = (state == WAIT_RVALID) & iob_rready_i;
+    assign rready_int = (state == WAIT_RVALID) & internal_iob_rready;
         """
 
         subblocks.append(
@@ -722,7 +722,6 @@ class csr_gen:
    assign iob_rdata_o = internal_iob_rdata;
    assign iob_ready_o = internal_iob_ready;
 """
-            # TODO:: Add internl_iob_rready handling
         elif core_attributes["csr_if"] == "apb":
             # "APB" CSR_IF
             subblocks.append(
@@ -1092,7 +1091,7 @@ class csr_gen:
             end
 
             default: begin  // WAIT_RVALID
-                if (iob_rready_i & iob_rvalid_o) begin // Transfer done
+                if (internal_iob_rready & internal_iob_rvalid) begin // Transfer done
                     iob_rvalid_nxt = 1'b0;
                     state_nxt = WAIT_REQ;
                 end else begin

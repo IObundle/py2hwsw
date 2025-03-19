@@ -4,16 +4,6 @@ module iob_dma_write #(
    `include "iob_dma_write_params.vs"
 ) (
    `include "iob_dma_write_io.vs"
-   // // External memory interface
-   // output                  ext_mem_clk_o,
-   // output                  ext_mem_w_en_o,
-   // output [AXI_LEN_W-1:0] ext_mem_w_addr_o,
-   // output [AXI_DATA_W-1:0] ext_mem_w_data_o,
-   // output                  ext_mem_r_en_o,
-   // output [AXI_LEN_W-1:0] ext_mem_r_addr_o,
-   // input  [AXI_DATA_W-1:0] ext_mem_r_data_i,
-   //
-   // // AXI Master (write only) Interface
 );
 
    localparam WAIT_START = 1'd0, WAIT_DATA_IN_FIFO = 1'd1;
@@ -180,7 +170,7 @@ module iob_dma_write #(
       .data_o(burst_addr)
    );
 
-   iob_axis2axi #(
+   iob_dma_write_axis2axi #(
       .AXI_ADDR_W(AXI_ADDR_W),
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_LEN_W (AXI_LEN_W),
@@ -191,7 +181,7 @@ module iob_dma_write #(
       .arst_i(arst_i),
       .rst_i(rst_i),
 
-      //TODO: axi write portmap
+      `include "iob_dma_write_m_axi_write_m_m_portmap.vs"
 
       .w_addr_i          (burst_addr),
       .w_length_i        (burst_length),

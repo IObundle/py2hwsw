@@ -90,7 +90,6 @@ def setup(py_params_dict):
                 "name": "axi_write_m",
                 "signals": {
                     "type": "axi_write",
-                    "portmap_port_prefix": "m_",
                     "file_prefix": "iob_dma_write_m_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -108,8 +107,9 @@ def setup(py_params_dict):
         "subblocks": [
             {"core_name": "iob_fifo_sync"},
             {"core_name": "iob_fifo2axis"},
-            {"core_name": "iob_axis2axi"},
             {"core_name": "iob_reg_r"},
+            {"core_name": "iob_reg_re"},
+            {"core_name": "iob_counter"},
         ],
     }
     return attributes_dict

@@ -60,6 +60,8 @@ module iob_dma_core #(
       .axis_out_tvalid_o(axis_out_valid_o),
       .axis_out_tready_i(axis_out_ready_i),
 
+      `include "iob_dma_read_m_axi_read_m_m_portmap.vs"
+
       .dma_read_clk_o(dma_read_clk_o),
       .dma_read_r_data_i(dma_read_r_data_i),
       .dma_read_r_en_o(dma_read_r_en_o),
@@ -68,9 +70,7 @@ module iob_dma_core #(
       .dma_read_w_data_o(dma_read_w_data_o),
       .dma_read_w_ready_i(dma_read_w_ready_i),
       .dma_read_w_addr_o(dma_read_w_addr_o),
-      .dma_read_w_en_o(dma_read_w_en_o),
-
-      `include "iob_dma_read_m_axi_read_m_m_portmap.vs"
+      .dma_read_w_en_o(dma_read_w_en_o)
 
    );
 
@@ -98,6 +98,8 @@ module iob_dma_core #(
       .axis_in_valid_i(axis_in_valid_i),
       .axis_in_ready_o(axis_in_ready_o),
 
+      `include "iob_dma_write_m_axi_write_m_m_portmap.vs"
+
       .dma_write_clk_o(dma_write_clk_o),
       .dma_write_r_data_i(dma_write_r_data_i),
       .dma_write_r_en_o(dma_write_r_en_o),
@@ -106,9 +108,7 @@ module iob_dma_core #(
       .dma_write_w_data_o(dma_write_w_data_o),
       .dma_write_w_ready_i(dma_write_w_ready_i),
       .dma_write_w_addr_o(dma_write_w_addr_o),
-      .dma_write_w_en_o(dma_write_w_en_o),
-
-      `include "iob_dma_write_m_axi_write_m_m_portmap.vs"
+      .dma_write_w_en_o(dma_write_w_en_o)
 
    );
 

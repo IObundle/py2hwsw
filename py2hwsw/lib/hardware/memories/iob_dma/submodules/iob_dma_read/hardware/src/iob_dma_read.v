@@ -168,7 +168,7 @@ module iob_dma_read #(
       .data_o(burst_addr)
    );
 
-   iob_axi2axis #(
+   iob_dma_read_axi2axis #(
       .AXI_ADDR_W(AXI_ADDR_W),
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_LEN_W (AXI_LEN_W),
@@ -179,7 +179,7 @@ module iob_dma_read #(
       .arst_i(arst_i),
       .rst_i(rst_i),
 
-      // TODO axi read portmap
+      `include "iob_dma_read_m_axi_read_m_m_portmap.vs"
 
       .r_addr_i          (burst_addr),
       .r_length_i        (burst_length),

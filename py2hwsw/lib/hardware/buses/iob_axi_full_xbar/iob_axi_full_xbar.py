@@ -32,7 +32,7 @@ def setup(py_params_dict):
         "burst_w": 2,
         "lock_w": 2,
         "cache_w": 4,
-        "prot_w": 3,
+        # "prot_w": 3,
         "qos_w": 4,
         "resp_w": 2,
         # "len_w": 8,
@@ -59,7 +59,7 @@ def setup(py_params_dict):
     axi_signals = [
         # AXI-Lite Write
         ("axi_awaddr", "input", axi_python_params["addr_w"], "write"),
-        ("axi_awprot", "input", axi_python_params["prot_w"], "write"),
+        # ("axi_awprot", "input", axi_python_params["prot_w"], "write"),
         ("axi_awvalid", "input", 1, "write"),
         ("axi_awready", "output", 1, "write"),
         ("axi_wdata", "input", axi_python_params["data_w"], "write"),
@@ -86,7 +86,7 @@ def setup(py_params_dict):
         ("axi_bid", "output", "ID_W", "write"),
         # AXI-Lite Read
         ("axi_araddr", "input", axi_python_params["addr_w"], "read"),
-        ("axi_arprot", "input", axi_python_params["prot_w"], "read"),
+        # ("axi_arprot", "input", axi_python_params["prot_w"], "read"),
         ("axi_arvalid", "input", 1, "read"),
         ("axi_arready", "output", 1, "read"),
         ("axi_rdata", "output", axi_python_params["data_w"], "read"),

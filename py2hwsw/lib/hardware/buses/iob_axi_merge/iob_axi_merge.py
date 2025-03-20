@@ -22,7 +22,7 @@ def setup(py_params_dict):
     BURST_W = int(py_params_dict["burst_w"]) if "burst_w" in py_params_dict else 2
     LOCK_W = int(py_params_dict["lock_w"]) if "lock_w" in py_params_dict else 2
     CACHE_W = int(py_params_dict["cache_w"]) if "cache_w" in py_params_dict else 4
-    PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
+    # PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
     QOS_W = int(py_params_dict["qos_w"]) if "qos_w" in py_params_dict else 4
     RESP_W = int(py_params_dict["resp_w"]) if "resp_w" in py_params_dict else 2
     # LEN_W = int(py_params_dict["len_w"]) if "len_w" in py_params_dict else 8
@@ -42,7 +42,7 @@ def setup(py_params_dict):
         #
         # AW Channel
         ("axi_awaddr",  "input",  ADDR_W,                       "write", False),
-        ("axi_awprot",  "input",  PROT_W,                       "write", False),
+        # ("axi_awprot",  "input",  PROT_W,                       "write", False),
         ("axi_awvalid", "input",  1,                            "write", False),
         ("axi_awready", "output", 1,                            "write", False),
         # W Channel
@@ -75,7 +75,7 @@ def setup(py_params_dict):
         #
         # AR Channel
         ("axi_araddr",  "input",  ADDR_W,                        "read", False),
-        ("axi_arprot",  "input",  PROT_W,                        "read", False),
+        # ("axi_arprot",  "input",  PROT_W,                        "read", False),
         ("axi_arvalid", "input",  1,                             "read", False),
         ("axi_arready", "output", 1,                             "read", False),
         # R Channel
@@ -159,7 +159,7 @@ def setup(py_params_dict):
                 "BURST_W": BURST_W,
                 "LOCK_W": LOCK_W,
                 "CACHE_W": CACHE_W,
-                "PROT_W": PROT_W,
+                # "PROT_W": PROT_W,
                 "QOS_W": QOS_W,
                 "RESP_W": RESP_W,
                 "LEN_W": "LEN_W",
@@ -182,7 +182,7 @@ def setup(py_params_dict):
                     "BURST_W": BURST_W,
                     "LOCK_W": LOCK_W,
                     "CACHE_W": CACHE_W,
-                    "PROT_W": PROT_W,
+                    # "PROT_W": PROT_W,
                     "QOS_W": QOS_W,
                     "RESP_W": RESP_W,
                     "LEN_W": "LEN_W",
@@ -393,7 +393,10 @@ def setup(py_params_dict):
             "name": "read_sel_prio_enc_o",
             "descr": "Output of read priority encoder",
             "signals": [
-                {"name": "read_sel_prio_enc_o", "width": NBITS},
+                {
+                    "name": "read_sel_prio_enc_o",
+                    "width": f"$clog2({NUM_SUBORDINATES}+1)",
+                },
             ],
         },
         # Write priority encoder signals
@@ -408,7 +411,10 @@ def setup(py_params_dict):
             "name": "write_sel_prio_enc_o",
             "descr": "Output of write priority encoder",
             "signals": [
-                {"name": "write_sel_prio_enc_o", "width": NBITS},
+                {
+                    "name": "write_sel_prio_enc_o",
+                    "width": f"$clog2({NUM_SUBORDINATES}+1)",
+                },
             ],
         },
     ]
@@ -638,13 +644,13 @@ def setup(py_params_dict):
     #
     attributes_dict["snippets"] = [
         {
-            "verilog_code": """
+            "verilog_code": f"""
    //
    // Read
    //
 
    // Only switch managers when there is no current active transaction
-   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o;
+   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o[{NUM_SUBORDINATES}-1:0];
 
    assign busy_read_reg_en = m_axi_arvalid_o & !busy_read_reg_o;
    assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
@@ -666,7 +672,7 @@ def setup(py_params_dict):
    //       If the wvalid comes before, the data will go to the currently selected manager_interface, and that may not be the intended destination (real destination will be given later by awvalid)
 
    // Only switch managers when there is no current active transaction
-   assign write_sel = busy_write_reg_o ? write_sel_reg : write_sel_prio_enc_o;
+   assign write_sel = busy_write_reg_o ? write_sel_reg : write_sel_prio_enc_o[{NUM_SUBORDINATES}-1:0];
 
    assign busy_write_reg_en = m_axi_awvalid_o & !busy_write_reg_o;
    assign busy_write_reg_rst = (m_axi_bvalid_i & m_axi_bready_o) | rst_i;

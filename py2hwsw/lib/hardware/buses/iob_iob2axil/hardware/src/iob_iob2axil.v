@@ -3,40 +3,12 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
-
-
+`include "iob_iob2axil_conf.vh"
 
 module iob_iob2axil #(
-   parameter AXIL_ADDR_W = 21,           // AXI Lite address bus width in bits
-   parameter AXIL_DATA_W = 21,           // AXI Lite data bus width in bits
-   parameter ADDR_W      = AXIL_ADDR_W,  // IOb address bus width in bits
-   parameter DATA_W      = AXIL_DATA_W   // IOb data bus width in bits
+   `include "iob_iob2axil_params.vs"
 ) (
-   // clk_en_rst_s
-   input                      clk_i,
-   input                      cke_i,
-   input                      arst_i,
-   // AXI4 Lite manager interface
-   output                     axil_awvalid_o,
-   input                      axil_awready_i,
-   output [  AXIL_ADDR_W-1:0] axil_awaddr_o,
-   output                     axil_wvalid_o,
-   input                      axil_wready_i,
-   output [  AXIL_DATA_W-1:0] axil_wdata_o,
-   output [AXIL_DATA_W/8-1:0] axil_wstrb_o,
-   input                      axil_bvalid_i,
-   output                     axil_bready_o,
-   input  [              1:0] axil_bresp_i,
-   output                     axil_arvalid_o,
-   input                      axil_arready_i,
-   output [  AXIL_ADDR_W-1:0] axil_araddr_o,
-   input                      axil_rvalid_i,
-   output                     axil_rready_o,
-   input  [  AXIL_DATA_W-1:0] axil_rdata_i,
-   input  [              1:0] axil_rresp_i,
-
-   // IOb subordinate interface
-   `include "iob_iob2axil_iob_s_port.vs"
+   `include "iob_iob2axil_io.vs"
 );
 
    wire wvalid_reg_en;

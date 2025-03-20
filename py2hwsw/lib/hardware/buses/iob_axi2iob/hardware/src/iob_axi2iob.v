@@ -35,7 +35,7 @@ module iob_axi2iob #(
    input  wire                     s_axi_awlock_i,
    input  wire [              3:0] s_axi_awcache_i,
    input  wire [              3:0] s_axi_awqos_i,
-   input  wire [              2:0] s_axi_awprot_i,
+   // input  wire [              2:0] s_axi_awprot_i,
    input  wire                     s_axi_awvalid_i,
    output wire                     s_axi_awready_o,
    input  wire [   DATA_WIDTH-1:0] s_axi_wdata_i,
@@ -55,7 +55,7 @@ module iob_axi2iob #(
    input  wire                     s_axi_arlock_i,
    input  wire [              3:0] s_axi_arcache_i,
    input  wire [              3:0] s_axi_arqos_i,
-   input  wire [              2:0] s_axi_arprot_i,
+   // input  wire [              2:0] s_axi_arprot_i,
    input  wire                     s_axi_arvalid_i,
    output wire                     s_axi_arready_o,
    output wire [ AXI_ID_WIDTH-1:0] s_axi_rid_o,
@@ -224,7 +224,7 @@ module iob_axi2iob #(
    reg s_axi_bvalid_reg, s_axi_bvalid_next;
 
    reg [ADDR_WIDTH-1:0] m_axil_awaddr_reg, m_axil_awaddr_next;
-   reg [2:0] m_axil_awprot_reg, m_axil_awprot_next;
+   // reg [2:0] m_axil_awprot_reg, m_axil_awprot_next;
    reg m_axil_awvalid_reg, m_axil_awvalid_next;
    reg [DATA_WIDTH-1:0] m_axil_wdata_reg, m_axil_wdata_next;
    reg [STRB_WIDTH-1:0] m_axil_wstrb_reg, m_axil_wstrb_next;
@@ -266,7 +266,7 @@ module iob_axi2iob #(
       s_axi_bresp_next          = s_axi_bresp_reg;
       s_axi_bvalid_next         = s_axi_bvalid_reg & ~s_axi_bready_i;
       m_axil_awaddr_next        = m_axil_awaddr_reg;
-      m_axil_awprot_next        = m_axil_awprot_reg;
+      // m_axil_awprot_next        = m_axil_awprot_reg;
       m_axil_awvalid_next       = m_axil_awvalid_reg & ~m_axil_awready;
       m_axil_wdata_next         = m_axil_wdata_reg;
       m_axil_wstrb_next         = m_axil_wstrb_reg;
@@ -287,7 +287,7 @@ module iob_axi2iob #(
                w_burst_next        = s_axi_awlen_int;
                w_burst_size_next   = s_axi_awsize_i;
                w_burst_active_next = 1'b1;
-               m_axil_awprot_next  = s_axi_awprot_i;
+               // m_axil_awprot_next  = s_axi_awprot_i;
                m_axil_awvalid_next = 1'b1;
                s_axi_wready_next   = ~m_axil_wvalid;
                w_state_next        = STATE_DATA;
@@ -367,7 +367,7 @@ module iob_axi2iob #(
          s_axi_bid_reg            <= {AXI_ID_WIDTH{1'b0}};
          s_axi_bresp_reg          <= 2'd0;
          m_axil_awaddr_reg        <= {ADDR_WIDTH{1'b0}};
-         m_axil_awprot_reg        <= 3'd0;
+         // m_axil_awprot_reg        <= 3'd0;
          m_axil_wdata_reg         <= {DATA_WIDTH{1'b0}};
          m_axil_wstrb_reg         <= {STRB_WIDTH{1'b0}};
       end else begin
@@ -393,7 +393,7 @@ module iob_axi2iob #(
          s_axi_bid_reg            <= s_axi_bid_next;
          s_axi_bresp_reg          <= s_axi_bresp_next;
          m_axil_awaddr_reg        <= m_axil_awaddr_next;
-         m_axil_awprot_reg        <= m_axil_awprot_next;
+         // m_axil_awprot_reg        <= m_axil_awprot_next;
          m_axil_wdata_reg         <= m_axil_wdata_next;
          m_axil_wstrb_reg         <= m_axil_wstrb_next;
       end
@@ -421,7 +421,7 @@ module iob_axi2iob #(
    reg s_axi_rvalid_reg, s_axi_rvalid_next;
 
    reg [ADDR_WIDTH-1:0] m_axil_araddr_reg, m_axil_araddr_next;
-   reg [2:0] m_axil_arprot_reg, m_axil_arprot_next;
+   // reg [2:0] m_axil_arprot_reg, m_axil_arprot_next;
    reg m_axil_arvalid_reg, m_axil_arvalid_next;
    reg m_axil_rready_reg, m_axil_rready_next;
 
@@ -455,7 +455,7 @@ module iob_axi2iob #(
       s_axi_rlast_next          = s_axi_rlast_reg;
       s_axi_rvalid_next         = s_axi_rvalid_reg & ~s_axi_rready_i;
       m_axil_araddr_next        = m_axil_araddr_reg;
-      m_axil_arprot_next        = m_axil_arprot_reg;
+      // m_axil_arprot_next        = m_axil_arprot_reg;
       m_axil_arvalid_next       = m_axil_arvalid_reg & ~m_axil_arready;
       m_axil_rready_next        = 1'b0;
 
@@ -471,7 +471,7 @@ module iob_axi2iob #(
                r_addr_next         = s_axi_araddr_i;
                r_burst_next        = s_axi_arlen_int;
                r_burst_size_next   = s_axi_arsize_i;
-               m_axil_arprot_next  = s_axi_arprot_i;
+               // m_axil_arprot_next  = s_axi_arprot_i;
                m_axil_arvalid_next = 1'b1;
                m_axil_rready_next  = 1'b0;
                r_state_next        = STATE_DATA;
@@ -533,7 +533,7 @@ module iob_axi2iob #(
          s_axi_rresp_reg          <= 2'd0;
          s_axi_rlast_reg          <= 1'b0;
          m_axil_araddr_reg        <= {ADDR_WIDTH{1'b0}};
-         m_axil_arprot_reg        <= 3'd0;
+         // m_axil_arprot_reg        <= 3'd0;
       end else begin
          r_state_reg              <= r_state_next;
          s_axi_arready_reg        <= s_axi_arready_next;
@@ -555,7 +555,7 @@ module iob_axi2iob #(
          s_axi_rresp_reg          <= s_axi_rresp_next;
          s_axi_rlast_reg          <= s_axi_rlast_next;
          m_axil_araddr_reg        <= m_axil_araddr_next;
-         m_axil_arprot_reg        <= m_axil_arprot_next;
+         // m_axil_arprot_reg        <= m_axil_arprot_next;
       end
    end
 

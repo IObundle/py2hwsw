@@ -23,7 +23,7 @@ void pc_emul_error(char *s) {
 }
 
 static int base;
-void IOB_UART_INIT_BASEADDR(uint32_t addr) {
+void iob_uart_init_baseaddr(uint32_t addr) {
 
   // wait for console to create communication files
   while ((cnsl2soc_fd = fopen("./cnsl2soc", "rb")) == NULL)
@@ -35,17 +35,17 @@ void IOB_UART_INIT_BASEADDR(uint32_t addr) {
   return;
 }
 
-void IOB_UART_SET_SOFTRESET(uint8_t value) {
+void iob_uart_set_softreset(uint8_t value) {
   div_value = 0;
   return;
 }
 
-void IOB_UART_SET_DIV(uint16_t value) {
+void iob_uart_set_div(uint16_t value) {
   div_value = value;
   return;
 }
 
-void IOB_UART_SET_TXDATA(uint8_t value) {
+void iob_uart_set_txdata(uint8_t value) {
   // send byte to console
   char aux_char;
   int nbytes;
@@ -54,13 +54,13 @@ void IOB_UART_SET_TXDATA(uint8_t value) {
   fflush(soc2cnsl_fd);
 }
 
-void IOB_UART_SET_TXEN(uint8_t value) { return; }
+void iob_uart_set_txen(uint8_t value) { return; }
 
-void IOB_UART_SET_RXEN(uint8_t value) { return; }
+void iob_uart_set_rxen(uint8_t value) { return; }
 
-uint8_t IOB_UART_GET_TXREADY() { return 1; }
+uint8_t iob_uart_get_txready() { return 1; }
 
-uint8_t IOB_UART_GET_RXDATA() {
+uint8_t iob_uart_get_rxdata() {
   // get byte from console
   uint8_t c;
   int nbytes;
@@ -85,4 +85,4 @@ uint8_t IOB_UART_GET_RXDATA() {
   return c;
 }
 
-uint8_t IOB_UART_GET_RXREADY() { return 1; }
+uint8_t iob_uart_get_rxready() { return 1; }

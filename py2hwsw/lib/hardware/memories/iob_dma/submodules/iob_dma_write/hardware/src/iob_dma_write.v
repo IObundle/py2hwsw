@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+`include "iob_dma_write_conf.vh"
+
 module iob_dma_write #(
    `include "iob_dma_write_params.vs"
 ) (

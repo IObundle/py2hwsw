@@ -30,7 +30,7 @@ Note: if the transfer goes over the maximum size, given by AXI_ADDR_W,
 
 `include "iob_dma_conf.vh"
 
-module iob_dma_core #(
+module iob_dma #(
    `include "iob_dma_params.vs"
 ) (
    `include "iob_dma_io.vs"

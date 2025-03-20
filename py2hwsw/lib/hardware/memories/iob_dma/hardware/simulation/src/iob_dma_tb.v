@@ -4,8 +4,8 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_axistream_in_conf.vh"
-`include "iob_axistream_out_conf.vh"
+`include "iob_axistream_in_csrs_conf.vh"
+`include "iob_axistream_out_csrs_conf.vh"
 
 `define IOB_NBYTES (DATA_W/8)
 `define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))
@@ -70,6 +70,8 @@ module dma_tb;
    wire ram_axi_wid;  //Write channel ID
    wire [DATA_W-1:0] ram_axi_wdata;  //Write channel data
    wire [(DATA_W/8)-1:0] ram_axi_wstrb;  //Write channel write strobe
+   wire ram_axi_wvalid;  //Write channel write valid
+   wire ram_axi_wready;  //Write channel write ready
    wire ram_axi_wlast;  //Write channel last word flag
    wire ram_axi_bid;  //Write response channel ID
    wire [2-1:0] ram_axi_bresp;  //Write response channel response
@@ -92,6 +94,8 @@ module dma_tb;
    wire ram_axi_rid;  //Read channel ID
    wire [DATA_W-1:0] ram_axi_rdata;  //Read channel data
    wire [2-1:0] ram_axi_rresp;  //Read channel response
+   wire ram_axi_rvalid;  //Read channel read valid
+   wire ram_axi_rready;  //Read channel read ready
    wire ram_axi_rlast;  //Read channel last word
 
    // AXIS OUT -> AXIS IN connection
@@ -241,15 +245,15 @@ module dma_tb;
         .r_max_len_i(r_max_len),
         .r_remaining_data_o(r_remaining_data),
         .r_busy_o(r_busy),
-        .// axis_in_io
+        // axis_in_io
         .axis_in_data_i(dma_axis_in_tdata),
         .axis_in_valid_i(dma_axis_in_tvalid),
         .axis_in_ready_o(dma_axis_in_tready),
-        .// axis_out_io
+        // axis_out_io
         .axis_out_data_o(dma_axis_out_tdata),
         .axis_out_valid_o(dma_axis_out_tvalid),
         .axis_out_ready_i(dma_axis_out_tready),
-        .// write_ext_mem_m
+        // write_ext_mem_m
         .dma_write_clk_o(dma_write_clk),
         .dma_write_r_data_i(dma_write_r_data),
         .dma_write_r_en_o(dma_write_r_en),
@@ -259,7 +263,7 @@ module dma_tb;
         .dma_write_w_ready_i(dma_write_w_ready),
         .dma_write_w_addr_o(dma_write_w_addr),
         .dma_write_w_en_o(dma_write_w_en),
-        .// read_ext_mem_m
+        // read_ext_mem_m
         .dma_read_clk_o(dma_read_clk),
         .dma_read_r_data_i(dma_read_r_data),
         .dma_read_r_en_o(dma_read_r_en),
@@ -269,7 +273,7 @@ module dma_tb;
         .dma_read_w_ready_i(dma_read_w_ready),
         .dma_read_w_addr_o(dma_read_w_addr),
         .dma_read_w_en_o(dma_read_w_en),
-        .// axi_m
+        // axi_m
         .axi_araddr_o(ram_axi_araddr),
         .axi_arprot_o(ram_axi_arprot),
         .axi_arvalid_o(ram_axi_arvalid),

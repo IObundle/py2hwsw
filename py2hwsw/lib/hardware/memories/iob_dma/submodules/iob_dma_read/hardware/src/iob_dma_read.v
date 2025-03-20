@@ -1,6 +1,8 @@
 
 `timescale 1ns / 1ps
 
+`include "iob_dma_read_conf.vh"
+
 module iob_dma_read #(
    `include "iob_dma_read_params.vs"
 ) (

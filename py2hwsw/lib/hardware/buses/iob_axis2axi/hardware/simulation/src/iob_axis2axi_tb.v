@@ -69,8 +69,8 @@ module iob_axis2axi_tb;
    wire [2-1:0] ddr_axi_awlock;  //Address write channel lock type
    wire [4-1:0] ddr_axi_awcache
        ;  //Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-   wire [3-1:0] ddr_axi_awprot
-       ;  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+   // wire [3-1:0] ddr_axi_awprot
+   ;  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
    wire [4-1:0] ddr_axi_awqos;  //Address write channel quality of service
    wire ddr_axi_awvalid;  //Address write channel valid
    wire ddr_axi_awready;  //Address write channel ready
@@ -91,28 +91,28 @@ module iob_axis2axi_tb;
    wire [2-1:0] ddr_axi_arlock;  //Address read channel lock type
    wire [4-1:0] ddr_axi_arcache
        ;  //Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-   wire [3-1:0] ddr_axi_arprot
-       ;  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-   wire [4-1:0] ddr_axi_arqos;  //Address read channel quality of service
-   wire ddr_axi_arvalid;  //Address read channel valid
-   wire ddr_axi_arready;  //Address read channel ready
-   wire ddr_axi_rid;  //Read channel ID
-   wire [DATA_W-1:0] ddr_axi_rdata;  //Read channel data
-   wire [2-1:0] ddr_axi_rresp;  //Read channel response
-   wire ddr_axi_rlast;  //Read channel last word
+   // wire [3-1:0] ddr_axi_arprot
+   ;  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+   wire    [       4-1:0] ddr_axi_arqos;  //Address read channel quality of service
+   wire                   ddr_axi_arvalid;  //Address read channel valid
+   wire                   ddr_axi_arready;  //Address read channel ready
+   wire                   ddr_axi_rid;  //Read channel ID
+   wire    [  DATA_W-1:0] ddr_axi_rdata;  //Read channel data
+   wire    [       2-1:0] ddr_axi_rresp;  //Read channel response
+   wire                   ddr_axi_rlast;  //Read channel last word
 
    // axi_ram_mem
-   wire axi_ram_ext_mem_clk;
-   wire [32-1:0] axi_ram_ext_mem_r_data;
-   wire axi_ram_ext_mem_r_en;
-   wire [32-1:0] axi_ram_ext_mem_r_addr;
-   wire [32-1:0] axi_ram_ext_mem_w_data;
-   wire [4-1:0] axi_ram_ext_mem_w_strb;
-   wire [32-1:0] axi_ram_ext_mem_w_addr;
+   wire                   axi_ram_ext_mem_clk;
+   wire    [      32-1:0] axi_ram_ext_mem_r_data;
+   wire                   axi_ram_ext_mem_r_en;
+   wire    [ADDR_W-2-1:0] axi_ram_ext_mem_r_addr;
+   wire    [      32-1:0] axi_ram_ext_mem_w_data;
+   wire    [       4-1:0] axi_ram_ext_mem_w_strb;
+   wire    [ADDR_W-2-1:0] axi_ram_ext_mem_w_addr;
 
    // Iterators
-   integer i;
-   integer fd;
+   integer                i;
+   integer                fd;
 
    initial begin
 
@@ -432,7 +432,7 @@ module iob_axis2axi_tb;
       .axi_awburst_o(ddr_axi_awburst),  //Address write channel burst type
       .axi_awlock_o(ddr_axi_awlock),  //Address write channel lock type
       .axi_awcache_o(ddr_axi_awcache),  //Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-      .axi_awprot_o(ddr_axi_awprot),  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+      // .axi_awprot_o(ddr_axi_awprot),  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       .axi_awqos_o(ddr_axi_awqos),  //Address write channel quality of service
       .axi_awvalid_o(ddr_axi_awvalid),  //Address write channel valid
       .axi_awready_i(ddr_axi_awready),  //Address write channel ready
@@ -453,7 +453,7 @@ module iob_axis2axi_tb;
       .axi_arburst_o(ddr_axi_arburst),  //Address read channel burst type
       .axi_arlock_o(ddr_axi_arlock),  //Address read channel lock type
       .axi_arcache_o(ddr_axi_arcache),  //Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-      .axi_arprot_o(ddr_axi_arprot),  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+      // .axi_arprot_o(ddr_axi_arprot),  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       .axi_arqos_o(ddr_axi_arqos),  //Address read channel quality of service
       .axi_arvalid_o(ddr_axi_arvalid),  //Address read channel valid
       .axi_arready_i(ddr_axi_arready),  //Address read channel ready
@@ -489,7 +489,7 @@ module iob_axis2axi_tb;
       .axi_awsize_i (ddr_axi_awsize),
       .axi_awburst_i(ddr_axi_awburst),
       .axi_awlock_i (ddr_axi_awlock),
-      .axi_awprot_i (ddr_axi_awprot),
+      // .axi_awprot_i (ddr_axi_awprot),
       .axi_awqos_i  (ddr_axi_awqos),
       .axi_awcache_i(ddr_axi_awcache),
       .axi_awvalid_i(ddr_axi_awvalid),
@@ -516,7 +516,7 @@ module iob_axis2axi_tb;
       .axi_arburst_i(ddr_axi_arburst),
       .axi_arlock_i (ddr_axi_arlock),
       .axi_arcache_i(ddr_axi_arcache),
-      .axi_arprot_i (ddr_axi_arprot),
+      // .axi_arprot_i (ddr_axi_arprot),
       .axi_arqos_i  (ddr_axi_arqos),
       .axi_arvalid_i(ddr_axi_arvalid),
       .axi_arready_o(ddr_axi_arready),

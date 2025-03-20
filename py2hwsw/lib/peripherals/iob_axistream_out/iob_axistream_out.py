@@ -155,7 +155,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "data_wdata_wr", "width": 32},
                     {"name": "data_wen_wr", "width": 1},
-                    {"name": "data_wready_wr", "width": 1},
+                    {"name": "data_ready_wr", "width": 1},
                 ],
             },
             {

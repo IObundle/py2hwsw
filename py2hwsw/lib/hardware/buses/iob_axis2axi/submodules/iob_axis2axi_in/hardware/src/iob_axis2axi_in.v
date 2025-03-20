@@ -30,7 +30,7 @@ module iob_axis2axi_in #(
    assign axi_awburst_o = 1;
    assign axi_awlock_o  = 0;
    assign axi_awcache_o = 2;
-   assign axi_awprot_o  = 2;
+   // assign axi_awprot_o  = 2;
    assign axi_awqos_o   = 0;
    assign axi_wstrb_o   = 4'b1111;
    assign axi_bready_o  = 1'b1;

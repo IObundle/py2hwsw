@@ -47,10 +47,10 @@ module iob_nco_tb;
    reg  [`IOB_NCO_CSRS_ADDR_W-1:0] iob_addr_i;
    reg  [     `IOB_NCO_DATA_W-1:0] iob_wdata_i;
    reg  [                     3:0] iob_wstrb_i;
+   reg                             iob_rready_i;
    wire [     `IOB_NCO_DATA_W-1:0] iob_rdata_o;
    wire                            iob_ready_o;
    wire                            iob_rvalid_o;
-   wire                            iob_rready_i;
 
    initial begin
 

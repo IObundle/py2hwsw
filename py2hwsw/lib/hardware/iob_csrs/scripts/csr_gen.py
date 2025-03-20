@@ -670,13 +670,10 @@ class csr_gen:
                     "name": "rready_int",
                     "descr": "",
                     "signals": [
-                        {"name": "rready_int", "width": 1},
+                        {"name": "rready_int", "width": 1, "isvar": True},
                     ],
                 }
             )
-            snippet += """
-    assign rready_int = (state == WAIT_RVALID) & internal_iob_rready;
-        """
 
         subblocks.append(
             {
@@ -1076,6 +1073,12 @@ class csr_gen:
         iob_ready_nxt = 1'b0;
         iob_rvalid_nxt = 1'b0;
         state_nxt = state;
+"""
+        if not all_reads_auto:
+            snippet += """
+        rready_int = 1'b0;
+"""
+        snippet += """
 
         //FSM state machine
         case(state)
@@ -1100,6 +1103,12 @@ class csr_gen:
 
             default: begin  // WAIT_RVALID
                 if (internal_iob_rready & internal_iob_rvalid) begin // Transfer done
+"""
+        if not all_reads_auto:
+            snippet += """
+                    rready_int = 1'b1;
+"""
+        snippet += """
                     iob_rvalid_nxt = 1'b0;
                     state_nxt = WAIT_REQ;
                 end else begin

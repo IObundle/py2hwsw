@@ -125,14 +125,14 @@ def setup(py_params_dict):
                 "name": "subtraend",
                 "descr": "subtraend wire",
                 "signals": [
-                    {"name": "subtraend", "width": "DIVISOR_W"},
+                    {"name": "subtraend", "width": "DIVISOR_W+1"},
                 ],
             },
             {
                 "name": "tmp",
                 "descr": "tmp wire",
                 "signals": [
-                    {"name": "tmp", "width": "DIVISOR_W+1"},
+                    {"name": "tmp", "width": "DIVISOR_W+2"},
                 ],
             },
             # { # NOTE: This wire is implicitly create by py2

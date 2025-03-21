@@ -81,9 +81,9 @@ def setup(py_params_dict):
                 "name": "axis_in_io",
                 "descr": "",
                 "signals": [
-                    {"name": "axis_in_data_i", "width": "AXI_DATA_W"},
-                    {"name": "axis_in_valid_i", "width": "1"},
-                    {"name": "axis_in_ready_o", "width": "1"},
+                    {"name": "axis_in_tdata_i", "width": "AXI_DATA_W"},
+                    {"name": "axis_in_tvalid_i", "width": "1"},
+                    {"name": "axis_in_tready_o", "width": "1"},
                 ],
             },
             {

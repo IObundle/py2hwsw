@@ -175,6 +175,7 @@ def setup(py_params_dict):
             {"core_name": "iob_axistream_in"},
             {"core_name": "iob_axistream_out"},
             {"core_name": "iob_axi_ram"},
+            {"core_name": "iob_ram_t2p_be"},
         ],
     }
 

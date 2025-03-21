@@ -13,7 +13,7 @@ module iob_dma_write #(
 
    wire [(AXI_LEN_W+1)-1:0] fifo_level;
    wire                     fifo_full;
-   assign axis_in_ready_o = ~fifo_full;
+   assign axis_in_tready_o = ~fifo_full;
    wire                  fifo_ren;
    wire [AXI_DATA_W-1:0] fifo_rdata;
    wire                  fifo_empty;
@@ -30,21 +30,21 @@ module iob_dma_write #(
       .arst_i          (arst_i),
       .rst_i           (rst_i),
       // Write port
-      .w_en_i          (axis_in_valid_i),
-      .w_data_i        (axis_in_data_i),
+      .w_en_i          (axis_in_tvalid_i),
+      .w_data_i        (axis_in_tdata_i),
       .w_full_o        (fifo_full),
       // Read port
       .r_en_i          (fifo_ren),
       .r_data_o        (fifo_rdata),
       .r_empty_o       (fifo_empty),
       // External memory interface
-      .ext_mem_clk_o   (ext_mem_clk_o),
-      .ext_mem_w_en_o  (ext_mem_w_en_o),
-      .ext_mem_w_addr_o(ext_mem_w_addr_o),
-      .ext_mem_w_data_o(ext_mem_w_data_o),
-      .ext_mem_r_en_o  (ext_mem_r_en_o),
-      .ext_mem_r_addr_o(ext_mem_r_addr_o),
-      .ext_mem_r_data_i(ext_mem_r_data_i),
+      .ext_mem_clk_o   (dma_write_clk_o),
+      .ext_mem_w_en_o  (dma_write_w_en_o),
+      .ext_mem_w_addr_o(dma_write_w_addr_o),
+      .ext_mem_w_data_o(dma_write_w_data_o),
+      .ext_mem_r_en_o  (dma_write_r_en_o),
+      .ext_mem_r_addr_o(dma_write_r_addr_o),
+      .ext_mem_r_data_i(dma_write_r_data_i),
       // FIFO level
       .level_o         (fifo_level)
    );

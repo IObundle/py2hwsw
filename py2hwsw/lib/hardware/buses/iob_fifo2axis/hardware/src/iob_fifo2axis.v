@@ -37,7 +37,7 @@ module iob_fifo2axis #(
                            & en_i;
 
    // valid_int register
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) valid_int_reg (
@@ -54,7 +54,7 @@ module iob_fifo2axis #(
    assign len_int        = len_i - 1;
    assign axis_tlast_nxt = (axis_word_count == len_int);
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) axis_tlast_reg (
@@ -78,7 +78,7 @@ module iob_fifo2axis #(
    );
 
    //tdata pipe register
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'd0}})
    ) axis_tdata_reg (
@@ -90,7 +90,7 @@ module iob_fifo2axis #(
    );
 
    //tvalid pipe register
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) axis_tvalid_reg (

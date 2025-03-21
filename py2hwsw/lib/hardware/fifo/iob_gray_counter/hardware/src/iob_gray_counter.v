@@ -30,7 +30,7 @@ module iob_gray_counter #(
     end
   endgenerate
 
-  iob_reg_re #(
+  iob_reg_cear_re #(
       .DATA_W (W),
       .RST_VAL({{(W - 1) {1'd0}}, 1'd1})
   ) bin_counter_reg (
@@ -43,7 +43,7 @@ module iob_gray_counter #(
       .data_o(bin_counter)
   );
 
-  iob_reg_re #(
+  iob_reg_cear_re #(
       .DATA_W (W),
       .RST_VAL({W{1'd0}})
   ) gray_counter_reg (

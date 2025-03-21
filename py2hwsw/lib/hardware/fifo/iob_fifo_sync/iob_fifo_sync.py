@@ -196,8 +196,11 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg_r",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_r_inst",
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst",
+                },
             },
             {
                 "core_name": "iob_reg",

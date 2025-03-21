@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_ADDR_W",
                 "type": "P",
-                "val": "0",
+                "val": "1",
                 "min": "NA",
                 "max": "NA",
                 "descr": "AXI address width",
@@ -42,7 +42,7 @@ def setup(py_params_dict):
             {
                 "name": "DMA_RLEN_W",
                 "type": "P",
-                "val": "0",
+                "val": "1",
                 "min": "NA",
                 "max": "NA",
                 "descr": "DMA read length width",

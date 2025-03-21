@@ -62,7 +62,7 @@ module iob_iob2wishbone #(
    assign iob_ready_o  = (~iob_valid_r) | wb_ack_r;
    // TODO: iob_rready
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(0)
    ) iob_reg_valid (
@@ -72,7 +72,7 @@ module iob_iob2wishbone #(
       .data_i(iob_valid_i),
       .data_o(iob_valid_r)
    );
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (ADDR_W),
       .RST_VAL(0)
    ) iob_reg_addr (
@@ -82,7 +82,7 @@ module iob_iob2wishbone #(
       .data_i(iob_addr_i),
       .data_o(iob_address_r)
    );
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (DATA_W),
       .RST_VAL(0)
    ) iob_reg_iob_data (
@@ -92,7 +92,7 @@ module iob_iob2wishbone #(
       .data_i(iob_wdata_i),
       .data_o(iob_wdata_r)
    );
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(0)
    ) iob_reg_we (
@@ -102,7 +102,7 @@ module iob_iob2wishbone #(
       .data_i(wb_we),
       .data_o(wb_we_r)
    );
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (DATA_W / 8),
       .RST_VAL(0)
    ) iob_reg_strb (
@@ -112,7 +112,7 @@ module iob_iob2wishbone #(
       .data_i(wb_select),
       .data_o(wb_select_r)
    );
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (DATA_W),
       .RST_VAL(0)
    ) iob_reg_wb_data (
@@ -122,7 +122,7 @@ module iob_iob2wishbone #(
       .data_i(wb_data_i),
       .data_o(wb_data_r)
    );
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(0)
    ) iob_reg_wb_ack (

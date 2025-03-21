@@ -55,7 +55,7 @@ module iob_axil2iob #(
 
    assign iob_addr_en = axil_arvalid_i | axil_awvalid_i;
 
-   iob_reg #(
+   iob_reg_cear #(
       .DATA_W (1),
       .RST_VAL(0)
    ) iob_reg_bvalid (
@@ -66,7 +66,7 @@ module iob_axil2iob #(
       .data_o(axil_bvalid_o)
    );
 
-   iob_reg_e #(
+   iob_reg_cear_e #(
       .DATA_W (ADDR_W),
       .RST_VAL(0)
    ) iob_reg_addr (

@@ -27,7 +27,7 @@ module iob_regfile_sp #(
       for (i = 0; i < 2 ** ADDR_W; i = i + 1) begin : g_regfile
          wire reg_en_i;
          assign reg_en_i = we_i & (addr_i == i);
-         iob_reg_re #(
+         iob_reg_cear_re #(
             .DATA_W(DATA_W)
          ) regfile_sp_inst (
             `include "iob_regfile_sp_iob_clk_s_s_portmap.vs"

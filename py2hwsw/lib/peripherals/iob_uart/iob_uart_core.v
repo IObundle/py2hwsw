@@ -46,7 +46,7 @@ module iob_uart_core (
    assign txen = tx_en_i & cts_int;
 
    wire [7:0] tx_data_int;
-   iob_reg_e #(
+   iob_reg_cear_e #(
       .DATA_W (8),
       .RST_VAL(8'b0)
    ) txdata_reg (
@@ -77,7 +77,7 @@ module iob_uart_core (
 
    reg         tx_ready_nxt;
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(2)
    ) tx_pc_reg (
       .clk_i (clk_i),
@@ -89,7 +89,7 @@ module iob_uart_core (
       .data_o(tx_pc)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(1)
    ) tx_ready_reg (
       .clk_i (clk_i),
@@ -101,7 +101,7 @@ module iob_uart_core (
       .data_o(tx_ready_o)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(10)
    ) tx_pattern_reg (
       .clk_i (clk_i),
@@ -113,7 +113,7 @@ module iob_uart_core (
       .data_o(tx_pattern)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(4)
    ) tx_bitcnt_reg (
       .clk_i (clk_i),
@@ -125,7 +125,7 @@ module iob_uart_core (
       .data_o(tx_bitcnt)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(16)
    ) tx_cyclecnt_reg (
       .clk_i (clk_i),
@@ -191,7 +191,7 @@ module iob_uart_core (
 
    reg         rx_ready_nxt;
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(3)
    ) rx_pc_reg (
       .clk_i (clk_i),
@@ -206,7 +206,7 @@ module iob_uart_core (
    wire rxready_rst;
    assign rxready_rst = rst_soft_i | data_read_en_i;
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(1)
    ) rx_ready_reg (
       .clk_i (clk_i),
@@ -218,7 +218,7 @@ module iob_uart_core (
       .data_o(rx_ready_o)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(8)
    ) rx_pattern_reg (
       .clk_i (clk_i),
@@ -230,7 +230,7 @@ module iob_uart_core (
       .data_o(rx_pattern)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(4)
    ) rx_bitcnt_reg (
       .clk_i (clk_i),
@@ -242,7 +242,7 @@ module iob_uart_core (
       .data_o(rx_bitcnt)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(16)
    ) rx_cyclecnt_reg (
       .clk_i (clk_i),
@@ -257,7 +257,7 @@ module iob_uart_core (
 
    reg rs232_rts_nxt;
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(1)
    ) rts_reg (
       .clk_i (clk_i),
@@ -271,7 +271,7 @@ module iob_uart_core (
 
    reg [7:0] rx_data_nxt;
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(8)
    ) rx_data_reg (
       .clk_i (clk_i),

@@ -114,7 +114,7 @@ module iob_axistream_in #(
             endcase
          end
 
-         iob_reg_re #(
+         iob_reg_cear_re #(
             .DATA_W (1),
             .RST_VAL(1'd0)
          ) fifo_write_state_reg (
@@ -231,7 +231,7 @@ module iob_axistream_in #(
       .detected_o(axis_tlast_detected)
    );
 
-   iob_reg #(
+   iob_reg_cear #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) tlast_detect_reg (

@@ -38,8 +38,7 @@ mem_if_details = [
 mem_if_names = [item["name"] for item in mem_if_details]
 
 if_details = [
-    {"name": "clk_en_rst", "vendor": "IObundle",  "lib": "CLK",      "version": "1.0", "full_name": "Clock, Clock Enable, Reset"},
-    {"name": "clk_rst",    "vendor": "IObundle",  "lib": "CLK",      "version": "1.0", "full_name": "Clock, Reset"},
+    
     {"name": "iob_clk",    "vendor": "IObundle",  "lib": "CLK",      "version": "1.0", "full_name": "Clock (configurable)"},
     {"name": "iob",        "vendor": "IObundle",  "lib": "IOb",      "version": "1.0", "full_name": "IOb"},
     {"name": "axil_read",  "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI-Lite Read"},
@@ -214,6 +213,8 @@ def get_iob_clk_ports(params: str = None):
     if params is None:
         params = "cke_arst"
     params = params.split("_")
+    if all(x in params for x in ["arst","arstn"]) or all(x in params for x in ["rst","rstn"]) or all(x in params for x in ["en","enn"]) or all(x in params for x in ["cke","cken"]):
+        raise ValueError("All signals are mutually exclusive with their negated version")
     ports = [
         iob_signal(
             name="clk_o",
@@ -221,15 +222,20 @@ def get_iob_clk_ports(params: str = None):
             descr="Clock",
         )
     ]
+
     for port, descr in [
         ("cke", "Clock enable"),
+        ("cken", "Active-low clock enable"),
         ("arst", "Asynchronous active-high reset"),
-        ("anrst", "Asynchronous active-low reset"),
+        ("arstn", "Asynchronous active-low reset"),
         ("rst", "Synchronous active-high reset"),
-        ("nrst", "Synchronous active-low reset"),
+        ("rstn", "Synchronous active-low reset"),
         ("en", "Enable"),
+        ("enn", "Active-low enable"),
     ]:
         if port in params:
+            if "low" in descr:
+               port = port[:-1] + "_n"
             ports.append(
                 iob_signal(
                     name=port + "_o",
@@ -238,41 +244,6 @@ def get_iob_clk_ports(params: str = None):
                 )
             )
     return ports
-
-
-@parse_widths
-def get_clk_rst_ports():
-    # deprecated
-    raise NotImplementedError("CLK_RST interface deprecateed in favor of IOB_CLK")
-    # return [
-    # iob_signal(
-    # name="clk_o",
-    # width=1,
-    # descr="Clock",
-    # ),
-    # iob_signal(
-    # name="arst_o",
-    # width=1,
-    # descr="Asynchronous active-high reset",
-    # ),
-    # ]
-
-
-@parse_widths
-def get_clk_en_rst_ports():
-    raise NotImplementedError("CLK_EN_RST interface deprecateed in favor of IOB_CLK")
-
-
-# clk_rst_ports = get_clk_rst_ports()
-# return [
-# clk_rst_ports[0],
-# iob_signal(
-# name="cke_o",
-# width=1,
-# descr="Enable",
-# ),
-# clk_rst_ports[1],
-# ]
 
 
 def get_mem_ports(

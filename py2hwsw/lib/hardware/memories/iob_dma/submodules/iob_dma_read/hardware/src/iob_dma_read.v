@@ -68,7 +68,7 @@ module iob_dma_read #(
       .r_empty_o       (fifo_empty),
       // External memory interface
       .ext_mem_clk_o   (dma_read_clk_o),
-      .ext_mem_w_en_o  (dma_read_w_en_o),
+      .ext_mem_w_en_o  (dma_read_w_strb_o),
       .ext_mem_w_addr_o(dma_read_w_addr_o),
       .ext_mem_w_data_o(dma_read_w_data_o),
       .ext_mem_r_en_o  (dma_read_r_en_o),

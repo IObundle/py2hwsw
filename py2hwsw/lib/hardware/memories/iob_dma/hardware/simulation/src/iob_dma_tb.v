@@ -114,28 +114,6 @@ module dma_tb;
    wire dma_axis_in_tvalid;
    wire dma_axis_in_tready;
 
-   // DMA Read FIFO Ext Memory connection
-   wire dma_read_clk;
-   wire [DATA_W-1:0] dma_read_r_data;
-   wire dma_read_r_en;
-   wire dma_read_r_ready;
-   wire [ADDR_W-1:0] dma_read_r_addr;
-   wire [DATA_W-1:0] dma_read_w_data;
-   wire dma_read_w_ready;
-   wire [ADDR_W-1:0] dma_read_w_addr;
-   wire dma_read_w_en;
-
-   // DMA Read FIFO Ext Memory connection
-   wire dma_write_clk;
-   wire [DATA_W-1:0] dma_write_r_data;
-   wire dma_write_r_en;
-   wire dma_write_r_ready;
-   wire [ADDR_W-1:0] dma_write_r_addr;
-   wire [DATA_W-1:0] dma_write_w_data;
-   wire dma_write_w_ready;
-   wire [ADDR_W-1:0] dma_write_w_addr;
-   wire dma_write_w_en;
-
    // Config Write 
    reg [ADDR_W-1:0] w_addr;
    reg [DMA_WLEN_W-1:0] w_length;
@@ -217,7 +195,7 @@ module dma_tb;
    end
 
    //instantiate dma core
-   iob_dma #(
+   iob_dma_mwrap #(
         .AXI_ADDR_W(ADDR_W),
         .AXI_LEN_W(AXI_LEN_W),
         .AXI_DATA_W(DATA_W),
@@ -253,26 +231,6 @@ module dma_tb;
         .axis_out_data_o(dma_axis_out_tdata),
         .axis_out_valid_o(dma_axis_out_tvalid),
         .axis_out_ready_i(dma_axis_out_tready),
-        // write_ext_mem_m
-        .dma_write_clk_o(dma_write_clk),
-        .dma_write_r_data_i(dma_write_r_data),
-        .dma_write_r_en_o(dma_write_r_en),
-        .dma_write_r_ready_i(dma_write_r_ready),
-        .dma_write_r_addr_o(dma_write_r_addr),
-        .dma_write_w_data_o(dma_write_w_data),
-        .dma_write_w_ready_i(dma_write_w_ready),
-        .dma_write_w_addr_o(dma_write_w_addr),
-        .dma_write_w_en_o(dma_write_w_en),
-        // read_ext_mem_m
-        .dma_read_clk_o(dma_read_clk),
-        .dma_read_r_data_i(dma_read_r_data),
-        .dma_read_r_en_o(dma_read_r_en),
-        .dma_read_r_ready_i(dma_read_r_ready),
-        .dma_read_r_addr_o(dma_read_r_addr),
-        .dma_read_w_data_o(dma_read_w_data),
-        .dma_read_w_ready_i(dma_read_w_ready),
-        .dma_read_w_addr_o(dma_read_w_addr),
-        .dma_read_w_en_o(dma_read_w_en),
         // axi_m
         .axi_araddr_o(ram_axi_araddr),
         .axi_arprot_o(ram_axi_arprot),
@@ -453,46 +411,9 @@ module dma_tb;
       .w_addr_i(axi_ram_ext_mem_w_addr)
    );
 
-   // DMA Read FIFO Ext Mem
-   iob_ram_2p #(
-      .WRITE_FIRST(1),
-      .DATA_W(DATA_W),
-      .ADDR_W(ADDR_W)
-   ) dma_read_fifo0 (
-      .clk_i(dma_read_clk),
-
-      .w_en_i  (dma_read_w_en),
-      .w_addr_i(dma_read_w_addr),
-      .w_data_i(dma_read_w_data),
-      .w_ready_o(dma_read_w_ready),
-
-      .r_en_i  (dma_read_r_en),
-      .r_addr_i(dma_read_r_addr),
-      .r_data_o(dma_read_r_data),
-      .r_ready_o(dma_read_r_ready)
-   );
-
-   // DMA Write FIFO Ext Mem
-   iob_ram_2p #(
-      .WRITE_FIRST(1),
-      .DATA_W(DATA_W),
-      .ADDR_W(ADDR_W)
-   ) dma_write_fifo0 (
-      .clk_i(dma_write_clk),
-
-      .w_en_i  (dma_write_w_en),
-      .w_addr_i(dma_write_w_addr),
-      .w_data_i(dma_write_w_data),
-      .w_ready_o(dma_write_w_ready),
-
-      .r_en_i  (dma_write_r_en),
-      .r_addr_i(dma_write_r_addr),
-      .r_data_o(dma_write_r_data),
-      .r_ready_o(dma_write_r_ready)
-   );
-
-
-   // Custom Tasks
+//
+// Custom Tasks
+//
 // Write data to AXIS IN IOb Native slave
 task axis_in_iob_write;
    input [`IOB_AXISTREAM_IN_CSRS_ADDR_W-1:0] addr;

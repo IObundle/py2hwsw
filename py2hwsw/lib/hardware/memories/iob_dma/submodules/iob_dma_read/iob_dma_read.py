@@ -101,7 +101,7 @@ def setup(py_params_dict):
             {
                 "name": "ext_mem_m",
                 "descr": "External memory interface",
-                "signals": {"type": "ram_2p", "prefix": "dma_read_"},
+                "signals": {"type": "ram_t2p_be", "prefix": "dma_read_"},
             },
         ],
         "subblocks": [

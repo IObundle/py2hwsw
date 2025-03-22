@@ -47,6 +47,7 @@ module iob_nco_tb;
    reg  [`IOB_NCO_CSRS_ADDR_W-1:0] iob_addr_i;
    reg  [     `IOB_NCO_DATA_W-1:0] iob_wdata_i;
    reg  [                     3:0] iob_wstrb_i;
+   reg                             iob_rready_i;
    wire [     `IOB_NCO_DATA_W-1:0] iob_rdata_o;
    wire                            iob_ready_o;
    wire                            iob_rvalid_o;
@@ -59,11 +60,12 @@ module iob_nco_tb;
 `endif
 
       //init cpu bus signals
-      iob_valid_i = 0;
-      iob_wstrb_i = 0;
+      iob_valid_i  = 0;
+      iob_wstrb_i  = 0;
+      iob_rready_i = 0;
 
       // Reset signal
-      arst        = 0;
+      arst         = 0;
       #100 arst = 1;
       #1_000 arst = 0;
       #100;
@@ -98,6 +100,7 @@ module iob_nco_tb;
       .iob_csrs_iob_rdata_o (iob_rdata_o),
       .iob_csrs_iob_ready_o (iob_ready_o),
       .iob_csrs_iob_rvalid_o(iob_rvalid_o),
+      .iob_csrs_iob_rready_i(iob_rready_i),
       .clk_out_o            (clk_out)
    );
 

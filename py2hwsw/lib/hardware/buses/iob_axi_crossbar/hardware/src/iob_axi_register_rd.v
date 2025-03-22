@@ -42,7 +42,7 @@ module iob_axi_register_rd #(
    input wire rst,
 
    /*
-     * AXI slave interface
+     * AXI subordinate interface
      */
    input  wire [    ID_WIDTH-1:0] s_axi_arid,
    input  wire [  ADDR_WIDTH-1:0] s_axi_araddr,
@@ -66,7 +66,7 @@ module iob_axi_register_rd #(
    input  wire                    s_axi_rready,
 
    /*
-     * AXI master interface
+     * AXI manager interface
      */
    output wire [    ID_WIDTH-1:0] m_axi_arid,
    output wire [  ADDR_WIDTH-1:0] m_axi_araddr,

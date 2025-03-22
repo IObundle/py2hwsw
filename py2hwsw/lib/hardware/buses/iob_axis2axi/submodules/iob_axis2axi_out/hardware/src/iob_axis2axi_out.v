@@ -30,7 +30,7 @@ module iob_axis2axi_out #(
    assign axi_arburst_o = 1;
    assign axi_arlock_o  = 0;
    assign axi_arcache_o = 2;
-   assign axi_arprot_o  = 2;
+   // assign axi_arprot_o  = 2;
    assign axi_arqos_o   = 0;
 
    // Regs to assign to outputs

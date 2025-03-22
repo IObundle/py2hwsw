@@ -40,7 +40,7 @@ axis2fifo_tb.uut.minAddr[21:0]
 @200
 -
 @201
--Native Slave I/F
+-Native Subordinate I/F
 @28
 axis2fifo_tb.uut.s_valid
 @24
@@ -54,7 +54,7 @@ axis2fifo_tb.uut.s_rdata[31:0]
 axis2fifo_tb.uut.s_ready
 @200
 -
--AXI-4 Full Write Master I/F
+-AXI-4 Full Write Manager I/F
 @28
 axis2fifo_tb.uut.m_axi_awvalid
 @c00022
@@ -109,7 +109,7 @@ axis2fifo_tb.uut.m_axi_bresp[1:0]
 axis2fifo_tb.uut.m_axi_bready
 @200
 -
--AXI-4 Full Read Master I/F
+-AXI-4 Full Read Manager I/F
 @28
 axis2fifo_tb.uut.axis2fifo_rd0.state
 axis2fifo_tb.uut.m_axi_arvalid

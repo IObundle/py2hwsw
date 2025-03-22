@@ -39,7 +39,7 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "descr": "IOb native master interface",
+                "descr": "IOb native manager interface",
             },
             {
                 "name": "wb_s",
@@ -48,7 +48,7 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "descr": "Wishbone slave interface",
+                "descr": "Wishbone subordinate interface",
             },
         ],
         "wires": [
@@ -215,6 +215,7 @@ def setup(py_params_dict):
         assign wb_data_mask = {{8{wb_sel_i[3]}}, {8{wb_sel_i[2]}}, {8{wb_sel_i[1]}}, {8{wb_sel_i[0]}}};
         assign reg_wack_int= 1'b0; 
         assign reg_wack_int_1= 1'b1;   
+        assign iob_rready = 1'b1;
                 """,
             },
         ],

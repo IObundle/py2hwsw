@@ -50,7 +50,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_s",
-                "descr": "Slave AXI interface",
+                "descr": "Subordinate AXI interface",
                 "signals": {
                     "type": "axi",
                     "prefix": "s_",
@@ -60,7 +60,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "iob_m",
-                "descr": "Master IOb interface",
+                "descr": "Manager IOb interface",
                 "signals": {
                     "type": "iob",
                     "ADDR_W": "ADDR_WIDTH",

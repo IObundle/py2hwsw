@@ -35,7 +35,7 @@ module iob_iob2axi_tb;
    wire                ready;
    wire                error;
 
-   // Native slave I/F
+   // Native subordinate I/F
    reg                 s_valid;
    reg  [  ADDR_W-1:0] s_addr;
    reg  [  DATA_W-1:0] s_wdata;
@@ -43,7 +43,7 @@ module iob_iob2axi_tb;
    wire [  DATA_W-1:0] s_rdata;
    wire                s_ready;
 
-   // AXI-4 full master I/F
+   // AXI-4 full manager I/F
    `include "ddr_axi_wire.vs"
 
    // Iterators
@@ -156,12 +156,12 @@ module iob_iob2axi_tb;
       .error_o    (error),
 
       //
-      // AXI-4 full master I/F
+      // AXI-4 full manager I/F
       //
       `include "m_ddr_axi_portmap.vs"
 
       //
-      // Native slave I/F
+      // Native subordinate I/F
       //
       .s_valid_i(s_valid),
       .s_addr_i (s_addr),
@@ -190,7 +190,7 @@ module iob_iob2axi_tb;
       .rst_i(rst),
 
       //
-      // AXI-4 full master interface
+      // AXI-4 full manager interface
       //
 
       // Address write

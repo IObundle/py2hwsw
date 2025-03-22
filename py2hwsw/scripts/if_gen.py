@@ -77,7 +77,7 @@ class interface:
     file_prefix: str = ""
     prefix: str = ""
     mult: str | int = 1
-    params: str = "None"
+    params: str = None
     widths: Dict[str, str] = field(default_factory=dict)
     # For ports only:
     # For portmaps .vs only:
@@ -121,7 +121,7 @@ def dict2interface(interface_dict):
 def parse_widths(func):
     """Decorator to temporarily change values of global variables based on `widths` dictionary."""
 
-    def inner(widths={}, params="None"):
+    def inner(widths={}, params=None):
         vars_backup = {}
         interface_name = func.__name__[4:-6]
         # Backup global variables
@@ -132,7 +132,7 @@ def parse_widths(func):
             vars_backup[k] = globals()[k]
             globals()[k] = v
         # Call the function
-        if params != "None":
+        if params is not None:
             return_obj = func(params)
         else:
             return_obj = func()
@@ -158,7 +158,7 @@ ADDR_W = 32
 
 #
 # below are functions that return interface ports for each interface type
-# the port direction is relative to the master module (driver)
+# the port direction is relative to the manager module (driver)
 #
 
 
@@ -200,12 +200,17 @@ def get_iob_ports():
             width=1,
             descr="Interface ready.",
         ),
+        iob_signal(
+            name="iob_rready_o",
+            width=1,
+            descr="Read data ready.",
+        ),
     ]
 
 
 @parse_widths
-def get_iob_clk_ports(params: str = "None"):
-    if params == "None":
+def get_iob_clk_ports(params: str = None):
+    if params is None:
         params = "cke_arst"
     params = params.split("_")
     if all(x in params for x in ["arst","arstn"]) or all(x in params for x in ["rst","rstn"]) or all(x in params for x in ["en","enn"]) or all(x in params for x in ["cke","cken"]):
@@ -568,18 +573,27 @@ LEN_W = 8
 
 
 @parse_widths
-def get_axil_write_ports():
-    return [
+def get_axil_write_ports(params: str = None):
+    if params is None:
+        params = ""
+    params = params.split("_")
+
+    signals = [
         iob_signal(
             name="axil_awaddr_o",
             width=ADDR_W,
             descr="Address write channel address.",
         ),
-        iob_signal(
-            name="axil_awprot_o",
-            width=PROT_W,
-            descr="Address write channel protection type. Set to 000 if master output; ignored if slave input.",
-        ),
+    ]
+    if "prot" in signals:
+        signals += [
+            iob_signal(
+                name="axil_awprot_o",
+                width=PROT_W,
+                descr="Address write channel protection type. Set to 000 if manager output; ignored if subordinate input.",
+            ),
+        ]
+    signals += [
         iob_signal(
             name="axil_awvalid_o",
             width=1,
@@ -626,21 +640,31 @@ def get_axil_write_ports():
             descr="Write response channel ready.",
         ),
     ]
+    return signals
 
 
 @parse_widths
-def get_axil_read_ports():
-    return [
+def get_axil_read_ports(params: str = None):
+    if params is None:
+        params = ""
+    params = params.split("_")
+
+    signals = [
         iob_signal(
             name="axil_araddr_o",
             width=ADDR_W,
             descr="Address read channel address.",
         ),
-        iob_signal(
-            name="axil_arprot_o",
-            width=PROT_W,
-            descr="Address read channel protection type. Set to 000 if master output; ignored if slave input.",
-        ),
+    ]
+    if "prot" in signals:
+        signals += [
+            iob_signal(
+                name="axil_arprot_o",
+                width=PROT_W,
+                descr="Address read channel protection type. Set to 000 if manager output; ignored if subordinate input.",
+            ),
+        ]
+    signals += [
         iob_signal(
             name="axil_arvalid_o",
             width=1,
@@ -672,16 +696,17 @@ def get_axil_read_ports():
             descr="Read channel ready.",
         ),
     ]
+    return signals
 
 
 @parse_widths
-def get_axil_ports():
-    return get_axil_read_ports() + get_axil_write_ports()
+def get_axil_ports(params: str = None):
+    return get_axil_read_ports(params=params) + get_axil_write_ports(params=params)
 
 
 @parse_widths
-def get_axi_write_ports():
-    axil_write = get_axil_write_ports()
+def get_axi_write_ports(params: str = None):
+    axil_write = get_axil_write_ports(params=params)
 
     for port in axil_write:
         port.name = port.name.replace("axil", "axi")
@@ -715,7 +740,7 @@ def get_axi_write_ports():
         iob_signal(
             name="axi_awcache_o",
             width=CACHE_W,
-            descr="Address write channel memory type. Set to 0000 if master output; ignored if slave input.",
+            descr="Address write channel memory type. Set to 0000 if manager output; ignored if subordinate input.",
         ),
         iob_signal(
             name="axi_awqos_o",
@@ -736,8 +761,8 @@ def get_axi_write_ports():
 
 
 @parse_widths
-def get_axi_read_ports():
-    axil_read = get_axil_read_ports()
+def get_axi_read_ports(params: str = None):
+    axil_read = get_axil_read_ports(params=params)
 
     for port in axil_read:
         port.name = port.name.replace("axil", "axi")
@@ -771,7 +796,7 @@ def get_axi_read_ports():
         iob_signal(
             name="axi_arcache_o",
             width=CACHE_W,
-            descr="Address read channel memory type. Set to 0000 if master output; ignored if slave input.",
+            descr="Address read channel memory type. Set to 0000 if manager output; ignored if subordinate input.",
         ),
         iob_signal(
             name="axi_arqos_o",
@@ -792,8 +817,8 @@ def get_axi_read_ports():
 
 
 @parse_widths
-def get_axi_ports():
-    return get_axi_read_ports() + get_axi_write_ports()
+def get_axi_ports(params: str = None):
+    return get_axi_read_ports(params=params) + get_axi_write_ports(params=params)
 
 
 @parse_widths
@@ -838,7 +863,7 @@ def get_apb_ports():
         iob_signal(
             name="apb_sel_o",
             width=1,
-            descr="Slave select.",
+            descr="Subordinate select.",
         ),
         iob_signal(
             name="apb_enable_o",
@@ -1228,10 +1253,10 @@ def write_s_tb_wire(fout, prefix, wires):
 #
 
 
-def get_signals(name, if_type="", mult=1, widths={}, params="None", signal_prefix=""):
+def get_signals(name, if_type="", mult=1, widths={}, params=None, signal_prefix=""):
     """Get list of signals for given interface
     param if_type: Type of interface.
-                   Examples: '' (unspecified), 'master', 'slave', ...
+                   Examples: '' (unspecified), 'manager', 'subordinate', ...
     param mult: Multiplication factor for all signal widths.
     param widths: Dictionary for configuration of specific signal widths.
     """
@@ -1240,7 +1265,7 @@ def get_signals(name, if_type="", mult=1, widths={}, params="None", signal_prefi
     signals = eval(eval_str)
 
     # Set direction according to if_type
-    if if_type == "slave":
+    if if_type == "subordinate":
         signals = reverse_signals_dir(signals)
     # TODO: Code to support other if_types
     # For example, the rs232 has not type.
@@ -1281,11 +1306,11 @@ def gen_if(interface):
         # get ports
         if if_type.startswith("s"):
             ports = get_signals(
-                name=name, if_type="slave", mult=mult, widths=widths, params=params
+                name=name, if_type="subordinate", mult=mult, widths=widths, params=params
             )
         else:
             ports = get_signals(
-                name=name, if_type="master", mult=mult, widths=widths, params=params
+                name=name, if_type="manager", mult=mult, widths=widths, params=params
             )
 
         eval_str = f"write_{if_type}(fout, prefix1,{prefix2_str} ports)"

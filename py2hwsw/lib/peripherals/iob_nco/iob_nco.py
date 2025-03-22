@@ -90,7 +90,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "period_int_wdata_wr", "width": 32},
                     {"name": "period_int_wen_wr", "width": 1},
-                    {"name": "period_int_wready_wr", "width": 1},
+                    {"name": "period_int_ready_wr", "width": 1},
                 ],
             },
             {
@@ -99,7 +99,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "period_frac_wdata_wr", "width": 32},
                     {"name": "period_frac_wen_wr", "width": 1},
-                    {"name": "period_frac_wready_wr", "width": 1},
+                    {"name": "period_frac_ready_wr", "width": 1},
                 ],
             },
         ],

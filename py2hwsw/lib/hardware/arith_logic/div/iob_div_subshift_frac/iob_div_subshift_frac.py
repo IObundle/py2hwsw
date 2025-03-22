@@ -154,7 +154,7 @@ def setup(py_params_dict):
                 "core_name": "iob_div_subshift",
                 "instance_name": "div_subshift0",
                 "parameters": {
-                    "DATA_W": "DATA_W",
+                    "DIVIDEND_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",

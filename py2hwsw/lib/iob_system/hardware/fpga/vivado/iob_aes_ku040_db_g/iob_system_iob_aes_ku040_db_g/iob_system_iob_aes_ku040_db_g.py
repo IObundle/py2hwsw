@@ -186,7 +186,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "intercon_s0_clk_rst",
-                "descr": "Interconnect slave 0 clock reset interface",
+                "descr": "Interconnect subordinate 0 clock reset interface",
                 "signals": [
                     {"name": "clk"},
                     {"name": "intercon_s0_arstn", "width": "1"},
@@ -194,7 +194,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "intercon_m0_clk_rst",
-                "descr": "Interconnect master 0 clock and reset",
+                "descr": "Interconnect manager 0 clock and reset",
                 "signals": [
                     {"name": "ddr4_axi_clk" if params["use_extmem"] else "clk"},
                     {"name": "intercon_m0_arstn", "width": "1"},
@@ -332,7 +332,7 @@ def setup(py_params_dict):
                     "s0_clk_rst_io": "intercon_s0_clk_rst",
                     "s0_axi_s": "axi",
                 },
-                "num_slaves": 1,
+                "num_subordinates": 1,
             },
             {
                 "core_name": "iob_xilinx_ddr4_ctrl",

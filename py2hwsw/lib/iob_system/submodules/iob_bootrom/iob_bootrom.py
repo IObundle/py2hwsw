@@ -79,8 +79,9 @@ def setup(py_params_dict):
                     {"name": "rom_raddr_rd", "width": BOOTROM_ADDR_W - 2},
                     {"name": "rom_rdata_rd", "width": "DATA_W"},
                     {"name": "rom_rvalid_rd", "width": 1},
-                    {"name": "rom_ren_rd", "width": 1},
                     {"name": "rom_rready_rd", "width": 1},
+                    {"name": "rom_ren_rd", "width": 1},
+                    {"name": "rom_ready_rd", "width": 1},
                 ],
             },
             {
@@ -160,7 +161,7 @@ def setup(py_params_dict):
    assign ext_rom_en_o   = rom_ren_rd;
    assign ext_rom_addr_o = rom_raddr_rd;
    assign rom_rdata_rd   = ext_rom_r_data_i;
-   assign rom_rready_rd  = 1'b1;  // ROM is always ready
+   assign rom_ready_rd  = 1'b1;  // ROM is always ready
 """,
             },
         ],

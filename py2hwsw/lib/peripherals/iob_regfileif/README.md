@@ -84,7 +84,7 @@ However, to connect using the portmap, the IOb-native bus signals of the Tester 
 
 To do this, we use the peripheral **IOBNATIVEBRIDGEIF**, located inside the `nativebridgeif_wrappper` directory of this repository.
 This peripheral also has two IOb-native interfaces, one internal and one external.
-However, unlike REGFILEIF, the external interface of this peripheral is a master interface. This allows it to be connected to the slave IOb-native interface of another module, such as the REGFILEIF.
+However, unlike REGFILEIF, the external interface of this peripheral is a manager interface. This allows it to be connected to the subordinate IOb-native interface of another module, such as the REGFILEIF.
 The IOBNATIVEBRIDGEIF, allows the peripheral bus signals of the system to be accessed externally.
 
 We use the IOBNATIVEBRIDGEIF as a peripheral of the Tester to allow its peripheral bus signals to be accessed externally, and therefore be port mapped.
@@ -101,7 +101,7 @@ In the `iob_soc_sut_setup.py` script, the IOBNATIVEBRIDGEIF is a peripheral of t
     ],
 ```
 
-To connect the external IOb-native (slave) interface of the REGFILEIF of the SUT to the external IOb-native (master) interface of the IOBNATIVEBRIDGEIF of the Tester, the `iob_soc_sut_setup.py` script contains the following configuration in the `peripheral_portmap` list of the Tester module parameters:
+To connect the external IOb-native (subordinate) interface of the REGFILEIF of the SUT to the external IOb-native (manager) interface of the IOBNATIVEBRIDGEIF of the Tester, the `iob_soc_sut_setup.py` script contains the following configuration in the `peripheral_portmap` list of the Tester module parameters:
 ```Python
     'peripheral_portmap':
     [
@@ -112,6 +112,7 @@ To connect the external IOb-native (slave) interface of the REGFILEIF of the SUT
         ({'corename':'SUT0', 'if_name':'REGFILEIF0', 'port':'external_iob_rvalid_o', 'bits':[]}, {'corename':'IOBNATIVEBRIDGEIF0', 'if_name':'iob_m_port', 'port':'iob_rvalid_i', 'bits':[]}),
         ({'corename':'SUT0', 'if_name':'REGFILEIF0', 'port':'external_iob_rdata_o', 'bits':[]}, {'corename':'IOBNATIVEBRIDGEIF0', 'if_name':'iob_m_port', 'port':'iob_rdata_i', 'bits':[]}),
         ({'corename':'SUT0', 'if_name':'REGFILEIF0', 'port':'external_iob_ready_o', 'bits':[]}, {'corename':'IOBNATIVEBRIDGEIF0', 'if_name':'iob_m_port', 'port':'iob_ready_i', 'bits':[]}),
+        ({'corename':'SUT0', 'if_name':'REGFILEIF0', 'port':'external_iob_rready_i', 'bits':[]}, {'corename':'IOBNATIVEBRIDGEIF0', 'if_name':'iob_m_port', 'port':'iob_rready_o', 'bits':[]}),
 
         # Other portmap entries here...
     ],

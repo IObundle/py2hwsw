@@ -255,9 +255,9 @@ module iob_iob2axi #(
       .ready_o (ready_rd),
       .error_o (error_rd),
 
-      // AXI-4 full read master I/F
+      // AXI-4 full read manager I/F
       `include "iob_iob2axi_rd_m_axi_read_m_m_portmap.vs"
-      // Native Master Write I/F
+      // Native Manager Write I/F
       .m_iob_valid_o(rd_valid),
       .m_iob_addr_o (rd_addr),
       .m_iob_wdata_o(rd_wdata),
@@ -282,10 +282,10 @@ module iob_iob2axi #(
       .ready_o (ready_wr),
       .error_o (error_wr),
 
-      // AXI-4 full write master I/F
+      // AXI-4 full write manager I/F
       `include "iob_iob2axi_wr_m_axi_write_m_m_portmap.vs"
 
-      // Native Master Read I/F
+      // Native Manager Read I/F
       .m_iob_valid_o(wr_valid),
       .m_iob_addr_o (wr_addr),
       .m_iob_rdata_i(wr_rdata),

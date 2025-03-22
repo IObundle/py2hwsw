@@ -12,7 +12,7 @@ LINT_SYNC_FLAGS=$(ALINT_SYNC_FLAGS)
 
 run-lint:
 ifeq ($(LINT_SERVER),)
-	echo exit | alintcon -do alint.tcl $(NAME) $(CSR_IF) " $(INCLUDE_DIRS)"
+	alintcon -do alint.tcl $(NAME) $(CSR_IF) $(NODE) " $(INCLUDE_DIRS)"
 else
 	ssh $(LINT_SSH_FLAGS) $(LINT_USER)@$(LINT_SERVER) "if [ ! -d $(REMOTE_BUILD_DIR) ]; then mkdir -p $(REMOTE_BUILD_DIR); fi"
 	rsync -avz --delete --exclude .git $(LINT_SYNC_FLAGS) $(RSYNC_ROOT_DIR) $(LINT_USER)@$(LINT_SERVER):$(REMOTE_BUILD_DIR)

@@ -30,7 +30,7 @@ module iob_axis2axi_in #(
    assign axi_awburst_o = 1;
    assign axi_awlock_o  = 0;
    assign axi_awcache_o = 2;
-   assign axi_awprot_o  = 2;
+   // assign axi_awprot_o  = 2;
    assign axi_awqos_o   = 0;
    assign axi_wstrb_o   = 4'b1111;
    assign axi_bready_o  = 1'b1;
@@ -191,6 +191,7 @@ module iob_axis2axi_in #(
       .R_DATA_W(AXI_DATA_W),
       .ADDR_W  (BUFFER_W)
    ) fifo (
+      .ext_mem_clk_o   (ext_mem_clk_o),
       //write port
       .ext_mem_w_en_o  (ext_mem_w_en_o),
       .ext_mem_w_data_o(ext_mem_w_data_o),

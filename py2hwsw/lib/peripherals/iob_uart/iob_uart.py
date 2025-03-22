@@ -66,7 +66,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "txdata_wdata_wr", "width": 8},
                     {"name": "txdata_wen_wr", "width": 1},
-                    {"name": "txdata_wready_wr", "width": 1},
+                    {"name": "txdata_ready_wr", "width": 1},
                 ],
             },
             {
@@ -103,8 +103,9 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "rxdata_rdata_rd", "width": 8},
                     {"name": "rxdata_rvalid_rd", "width": 1},
-                    {"name": "rxdata_ren_rd", "width": 1},
                     {"name": "rxdata_rready_rd", "width": 1},
+                    {"name": "rxdata_ren_rd", "width": 1},
+                    {"name": "rxdata_ready_rd", "width": 1},
                 ],
             },
             # RXDATA reg
@@ -231,10 +232,10 @@ def setup(py_params_dict):
             {
                 "verilog_code": """
     // txdata Manual logic
-    assign txdata_wready_wr = 1'b1;
+    assign txdata_ready_wr = 1'b1;
 
     // rxdata Manual logic
-    assign rxdata_rready_rd = 1'b1;
+    assign rxdata_ready_rd = 1'b1;
 
     // rxdata rvalid is iob_valid registered
     assign rxdata_rvalid_nxt = rxdata_ren_rd;

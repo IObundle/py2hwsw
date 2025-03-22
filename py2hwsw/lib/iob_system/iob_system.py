@@ -52,11 +52,11 @@ def setup(py_params_dict):
         params["use_extmem"] = False
         params["use_bootrom"] = False
 
-    num_xbar_masters = 0
+    num_xbar_managers = 0
     for param_name in ["use_intmem", "use_extmem", "use_bootrom", "use_peripherals"]:
         if params[param_name]:
-            num_xbar_masters += 1
-    xbar_sel_w = (num_xbar_masters - 1).bit_length()
+            num_xbar_managers += 1
+    xbar_sel_w = (num_xbar_managers - 1).bit_length()
 
     attributes_dict = {
         "name": params["name"],
@@ -249,7 +249,7 @@ def setup(py_params_dict):
         attributes_dict["ports"] += [
             {
                 "name": "axi_m",
-                "descr": "AXI master interface for DDR memory",
+                "descr": "AXI manager interface for DDR memory",
                 "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
@@ -276,7 +276,7 @@ def setup(py_params_dict):
         attributes_dict["ports"] += [
             {
                 "name": "iob_s",
-                "descr": "IOb slave interface for external CPU. Gives direct access to system peripherals",
+                "descr": "IOb subordinate interface for external CPU. Gives direct access to system peripherals",
                 "signals": {
                     "type": "iob",
                     "ADDR_W": "AXI_ADDR_W-2",
@@ -374,7 +374,7 @@ def setup(py_params_dict):
         attributes_dict["wires"] += [
             {
                 "name": "int_mem_axi",
-                "descr": "AXI master interface for internal memory",
+                "descr": "AXI manager interface for internal memory",
                 "signals": {
                     "type": "axi",
                     "prefix": "int_mem_",
@@ -506,15 +506,15 @@ def setup(py_params_dict):
                     "rst_i": "rst",
                     "s0_axi_s": "cpu_ibus",
                     "s1_axi_s": "cpu_dbus",
-                    # Master interfaces connected below
+                    # Manager interfaces connected below
                 },
                 "addr_w": params["addr_w"] - 2,
                 "data_w": params["data_w"],
                 "lock_w": 1,
-                "num_slaves": 2,
+                "num_subordinates": 2,
             },
         ]
-        full_xbar_master_interfaces = {
+        full_xbar_manager_interfaces = {
             "use_intmem": (
                 "int_mem_axi",
                 [
@@ -546,15 +546,15 @@ def setup(py_params_dict):
                 ],
             ),
         }
-        # Connect xbar master interfaces
-        num_masters = 0
-        for param_name, interface_connection in full_xbar_master_interfaces.items():
+        # Connect xbar manager interfaces
+        num_managers = 0
+        for param_name, interface_connection in full_xbar_manager_interfaces.items():
             if params[param_name]:
                 attributes_dict["subblocks"][-1]["connect"] |= {
-                    f"m{num_masters}_axi_m": interface_connection
+                    f"m{num_managers}_axi_m": interface_connection
                 }
-                num_masters += 1
-        attributes_dict["subblocks"][-1]["num_masters"] = num_masters
+                num_managers += 1
+        attributes_dict["subblocks"][-1]["num_managers"] = num_managers
 
     if params["use_intmem"]:
         attributes_dict["subblocks"] += [

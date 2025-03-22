@@ -18,6 +18,7 @@ typedef Viob_system_sim dut_t;
 
 #define csrs_iob_rdata_o uart_iob_rdata_o
 #define csrs_iob_rvalid_o uart_iob_rvalid_o
+#define csrs_iob_rready_i uart_iob_rready_i
 
 #ifdef IOB_SYSTEM_USE_ETHERNET
 #define csrs_iob_valid_i ethernet_iob_valid_i
@@ -30,4 +31,5 @@ typedef Viob_system_sim dut_t;
 
 #define csrs_iob_rdata_o ethernet_iob_rdata_o
 #define csrs_iob_rvalid_o ethernet_iob_rvalid_o
+#define csrs_iob_rready_i ethernet_iob_rready_i
 #endif

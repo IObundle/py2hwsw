@@ -75,9 +75,9 @@ module {{name}} #
     parameter ADDR_WIDTH = 32,
     // Width of wstrb (width of data bus in words)
     parameter STRB_WIDTH = (DATA_WIDTH/8),
-    // Input ID field width (from AXI masters)
+    // Input ID field width (from AXI managers)
     parameter S_ID_WIDTH = 8,
-    // Output ID field width (towards AXI slaves)
+    // Output ID field width (towards AXI subordinates)
     // Additional bits required for response routing
     parameter M_ID_WIDTH = S_ID_WIDTH+$clog2(S_COUNT),
     // Propagate awuser signal
@@ -106,13 +106,13 @@ module {{name}} #
     // Number of concurrent operations
     parameter S{{'%02d'%p}}_ACCEPT = 16,
 {%- endfor %}
-    // Number of regions per master interface
+    // Number of regions per manager interface
     parameter M_REGIONS = 1,
 {%- for p in range(n) %}
-    // Master interface base addresses
+    // Manager interface base addresses
     // M_REGIONS concatenated fields of ADDR_WIDTH bits
     parameter M{{'%02d'%p}}_BASE_ADDR = 0,
-    // Master interface address widths
+    // Manager interface address widths
     // M_REGIONS concatenated fields of 32 bits
     parameter M{{'%02d'%p}}_ADDR_WIDTH = {M_REGIONS{32'd24}},
     // Read connections between interfaces
@@ -121,42 +121,42 @@ module {{name}} #
     // Write connections between interfaces
     // S_COUNT bits
     parameter M{{'%02d'%p}}_CONNECT_WRITE = {{m}}'b{% for p in range(m) %}1{% endfor %},
-    // Number of concurrent operations for each master interface
+    // Number of concurrent operations for each manager interface
     parameter M{{'%02d'%p}}_ISSUE = 4,
-    // Secure master (fail operations based on awprot/arprot)
+    // Secure manager (fail operations based on awprot/arprot)
     parameter M{{'%02d'%p}}_SECURE = 0,
 {%- endfor %}
 {%- for p in range(m) %}
-    // Slave interface AW channel register type (input)
+    // Subordinate interface AW channel register type (input)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter S{{'%02d'%p}}_AW_REG_TYPE = 0,
-    // Slave interface W channel register type (input)
+    // Subordinate interface W channel register type (input)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter S{{'%02d'%p}}_W_REG_TYPE = 0,
-    // Slave interface B channel register type (output)
+    // Subordinate interface B channel register type (output)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter S{{'%02d'%p}}_B_REG_TYPE = 1,
-    // Slave interface AR channel register type (input)
+    // Subordinate interface AR channel register type (input)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter S{{'%02d'%p}}_AR_REG_TYPE = 0,
-    // Slave interface R channel register type (output)
+    // Subordinate interface R channel register type (output)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter S{{'%02d'%p}}_R_REG_TYPE = 2,
 {%- endfor %}
 {%- for p in range(n) %}
-    // Master interface AW channel register type (output)
+    // Manager interface AW channel register type (output)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter M{{'%02d'%p}}_AW_REG_TYPE = 1,
-    // Master interface W channel register type (output)
+    // Manager interface W channel register type (output)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter M{{'%02d'%p}}_W_REG_TYPE = 2,
-    // Master interface B channel register type (input)
+    // Manager interface B channel register type (input)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter M{{'%02d'%p}}_B_REG_TYPE = 0,
-    // Master interface AR channel register type (output)
+    // Manager interface AR channel register type (output)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter M{{'%02d'%p}}_AR_REG_TYPE = 1,
-    // Master interface R channel register type (input)
+    // Manager interface R channel register type (input)
     // 0 to bypass, 1 for simple buffer, 2 for skid buffer
     parameter M{{'%02d'%p}}_R_REG_TYPE = 0{% if not loop.last %},{% endif %}
 {%- endfor %}
@@ -166,7 +166,7 @@ module {{name}} #
     input  wire                     rst_i,
 
     /*
-     * AXI slave interface
+     * AXI subordinate interface
      */
 {%- for p in range(m) %}
     input  wire [S_ID_WIDTH-1:0]    s{{'%02d'%p}}_axi_awid_i,
@@ -213,7 +213,7 @@ module {{name}} #
     input  wire                     s{{'%02d'%p}}_axi_rready_i,
 {% endfor %}
     /*
-     * AXI master interface
+     * AXI manager interface
      */
 {%- for p in range(n) %}
     output wire [M_ID_WIDTH-1:0]    m{{'%02d'%p}}_axi_awid_o,

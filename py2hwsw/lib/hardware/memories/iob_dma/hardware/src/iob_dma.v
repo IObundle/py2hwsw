@@ -68,7 +68,7 @@ module iob_dma #(
       .dma_read_r_addr_o(dma_read_r_addr_o),
       .dma_read_w_data_o(dma_read_w_data_o),
       .dma_read_w_addr_o(dma_read_w_addr_o),
-      .dma_read_w_strb_o(dma_read_w_strb_o)
+      .dma_read_w_en_o(dma_read_w_en_o)
    );
 
    // AXIS Out (DMA Write)
@@ -103,7 +103,7 @@ module iob_dma #(
       .dma_write_r_addr_o(dma_write_r_addr_o),
       .dma_write_w_data_o(dma_write_w_data_o),
       .dma_write_w_addr_o(dma_write_w_addr_o),
-      .dma_write_w_strb_o(dma_write_w_strb_o)
+      .dma_write_w_en_o(dma_write_w_en_o)
    );
 
 endmodule

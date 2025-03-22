@@ -202,7 +202,7 @@ module dma_tb;
         .AXI_ID_W(1),
         .DMA_WLEN_W(DMA_WLEN_W),
         .DMA_RLEN_W(DMA_RLEN_W)
-   ) dma0 (
+   ) dma_mwrap0 (
         // clk_en_rst_s
         .clk_i(clk),
         .cke_i(cke),
@@ -426,7 +426,7 @@ task axis_in_iob_write;
       axis_in_iob_wdata = `IOB_GET_WDATA(addr, data);
       axis_in_iob_wstrb = `IOB_GET_WSTRB(addr, width);
 
-      #1 while (!axis_in_iob_ready_o) #1;
+      #1 while (!axis_in_iob_ready) #1;
 
       @(posedge clk) axis_in_iob_valid = 0;
       axis_in_iob_wstrb = 0;
@@ -444,11 +444,11 @@ task axis_in_iob_read;
       axis_in_iob_addr = `IOB_WORD_ADDR(addr);
       axis_in_iob_wstrb = 0;
 
-      #1 while (!axis_in_iob_ready_o) #1;
+      #1 while (!axis_in_iob_ready) #1;
       @(posedge clk) #1 axis_in_iob_valid = 0;
 
-      while (!axis_in_iob_rvalid_o) #1;
-      data = #1 `IOB_GET_RDATA(addr, axis_in_iob_rdata_o, width);
+      while (!axis_in_iob_rvalid) #1;
+      data = #1 `IOB_GET_RDATA(addr, axis_in_iob_rdata, width);
    end
 endtask
 

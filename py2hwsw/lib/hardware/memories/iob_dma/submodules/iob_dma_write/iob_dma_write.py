@@ -107,8 +107,11 @@ def setup(py_params_dict):
         "subblocks": [
             {"core_name": "iob_fifo_sync"},
             {"core_name": "iob_fifo2axis"},
-            {"core_name": "iob_reg_r"},
-            {"core_name": "iob_reg_re"},
+            {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "cke_arst_rst"}},
+            {
+                "core_name": "iob_reg",
+                "port_params": {"clk_en_rst_s": "cke_arst_rst_en"},
+            },
             {"core_name": "iob_counter"},
         ],
     }

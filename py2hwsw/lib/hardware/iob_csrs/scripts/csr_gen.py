@@ -1280,6 +1280,62 @@ class csr_gen:
 
         fswhdr.close()
 
+    def write_utb_code(self, table, out_dir, top):
+        os.makedirs(out_dir, exist_ok=True)
+        ftb = open(f"{out_dir}/{top}_csrs.c", "w")
+        core_prefix = f"{top}_"
+        core_prefix_upper = core_prefix.upper()
+        ftb.write(f'#include "{top}_csrs.h"\n\n')
+        ftb.write("\n// Base Address\n")
+        ftb.write("static int base;\n")
+        ftb.write(f"void {core_prefix}set_baseaddr(uint32_t value) {{\n")
+        ftb.write("  base = value;\n")
+        ftb.write("}\n")
+        ftb.write(f"uint32_t {core_prefix}get_baseaddr() {{\n")
+        ftb.write("  return base;\n")
+        ftb.write("}\n")
+        ftb.write("\n// Core Setters and Getters\n")
+
+        for row in table:
+            name = row.name
+            name_upper = row.name.upper()
+            n_bits = row.n_bits
+            log2n_items = row.log2n_items
+            n_bytes = self.bceil(n_bits, 3) / 8
+            if n_bytes == 3:
+                n_bytes = 4
+            addr_w = self.calc_addr_w(log2n_items, n_bytes)
+            if "W" in row.type:
+                sw_type = self.csr_type(name, n_bytes)
+                addr_arg = ""
+                addr_arg = ""
+                addr_shift = ""
+                if addr_w / n_bytes > 1:
+                    addr_arg = ", int addr"
+                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
+                ftb.write(
+                    f"void {core_prefix}set_{name}({sw_type} value{addr_arg}) {{\n"
+                )
+                ftb.write(
+                    f"  iob_write({core_prefix_upper}{name_upper}_ADDR, {core_prefix_upper}{name_upper}_W, value);\n"
+                )
+                ftb.write("}\n\n")
+            if "R" in row.type:
+                sw_type = self.csr_type(name, n_bytes)
+                addr_arg = ""
+                addr_shift = ""
+                if addr_w / n_bytes > 1:
+                    addr_arg = "int addr"
+                    addr_shift = f" + (addr << {int(log(n_bytes, 2))})"
+                ftb.write(f"{sw_type} {core_prefix}get_{name}({addr_arg}) {{\n")
+                ftb.write(
+                    f"  return ({sw_type})iob_read({core_prefix_upper}{name_upper}_ADDR, {core_prefix_upper}{name_upper}_W);\n"
+                )
+                ftb.write("}\n\n")
+        ftb.close()
+
+    # TODO: Deprecate this function (use universal testbench only)
+    # https://github.com/IObundle/py2hwsw/issues/154
     def write_swcode(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
         fsw = open(f"{out_dir}/{top}_csrs_emb.c", "w")
@@ -1332,6 +1388,8 @@ class csr_gen:
                 fsw.write("}\n\n")
         fsw.close()
 
+    # TODO: Deprecate this function (use universal testbench only)
+    # https://github.com/IObundle/py2hwsw/issues/154
     def write_tbcode(self, table, out_dir, top):
         # Write Verilator code as well
         self.write_verilator_code(table, out_dir, top)
@@ -1384,6 +1442,8 @@ class csr_gen:
                 fsw.write("endtask\n\n")
         fsw.close()
 
+    # TODO: Deprecate this function (use universal testbench only)
+    # https://github.com/IObundle/py2hwsw/issues/154
     def write_verilator_code(self, table, out_dir, top):
         self.write_swheader_verilator(table, out_dir, top)
         os.makedirs(out_dir, exist_ok=True)

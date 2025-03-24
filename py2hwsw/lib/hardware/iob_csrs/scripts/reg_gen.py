@@ -118,6 +118,15 @@ def generate_reg_sw(core, csr_gen_obj, reg_table):
     name = core["name"][: -len("_csrs")]
     csr_gen_obj.write_swheader(reg_table, core["build_dir"] + "/software/src", name)
     csr_gen_obj.write_swcode(reg_table, core["build_dir"] + "/software/src", name)
+    csr_gen_obj.write_utb_code(reg_table, core["build_dir"] + "/software/src", name)
+    os.symlink(
+        os.path.join(core["build_dir"], f"software/src/{name}_csrs.h"),
+        os.path.join(core["build_dir"], f"hardware/simulation/src/{name}_csrs.h"),
+    )
+    os.symlink(
+        os.path.join(core["build_dir"], f"software/src/{name}_csrs.c"),
+        os.path.join(core["build_dir"], f"hardware/simulation/src/{name}_csrs.c"),
+    )
 
 
 def generate_csr(core):

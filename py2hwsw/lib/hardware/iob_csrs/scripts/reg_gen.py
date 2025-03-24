@@ -119,14 +119,13 @@ def generate_reg_sw(core, csr_gen_obj, reg_table):
     csr_gen_obj.write_swheader(reg_table, core["build_dir"] + "/software/src", name)
     csr_gen_obj.write_swcode(reg_table, core["build_dir"] + "/software/src", name)
     csr_gen_obj.write_utb_code(reg_table, core["build_dir"] + "/software/src", name)
-    os.symlink(
-        os.path.join(core["build_dir"], f"software/src/{name}_csrs.h"),
-        os.path.join(core["build_dir"], f"hardware/simulation/src/{name}_csrs.h"),
-    )
-    os.symlink(
-        os.path.join(core["build_dir"], f"software/src/{name}_csrs.c"),
-        os.path.join(core["build_dir"], f"hardware/simulation/src/{name}_csrs.c"),
-    )
+    sim_src = os.path.join(core["build_dir"], f"hardware/simulation/src")
+    if os.path.exists(f"{sim_src}/{name}_csrs.h"):
+        os.remove(f"{sim_src}/{name}_csrs.h")
+    os.symlink(f"../../../software/src/{name}_csrs.h", f"{sim_src}/{name}_csrs.h")
+    if os.path.exists(f"{sim_src}/{name}_csrs.c"):
+        os.remove(f"{sim_src}/{name}_csrs.c")
+    os.symlink(f"../../../software/src/{name}_csrs.c", f"{sim_src}/{name}_csrs.c")
 
 
 def generate_csr(core):

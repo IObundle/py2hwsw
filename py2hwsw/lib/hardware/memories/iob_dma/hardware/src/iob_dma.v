@@ -43,7 +43,7 @@ module iob_dma #(
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_ID_W  (AXI_ID_W),
       .DMA_RLEN_W(DMA_RLEN_W)
-   ) ac97_dma_read (
+   ) dma_read0 (
       .clk_i(clk_i),
       .cke_i(cke_i),
       .arst_i(arst_i),
@@ -56,9 +56,9 @@ module iob_dma #(
       .r_remaining_data_o(r_remaining_data_o),
       .r_busy_o          (r_busy_o),
 
-      .axis_out_tdata_o (axis_out_data_o),
-      .axis_out_tvalid_o(axis_out_valid_o),
-      .axis_out_tready_i(axis_out_ready_i),
+      .axis_out_tdata_o (axis_out_tdata_o),
+      .axis_out_tvalid_o(axis_out_tvalid_o),
+      .axis_out_tready_i(axis_out_tready_i),
 
       `include "iob_dma_read_m_axi_read_m_m_portmap.vs"
 
@@ -78,7 +78,7 @@ module iob_dma #(
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_ID_W  (AXI_ID_W),
       .DMA_WLEN_W(DMA_WLEN_W)
-   ) ac97_dma_write (
+   ) dma_write0 (
       .clk_i(clk_i),
       .cke_i(cke_i),
       .arst_i(arst_i),
@@ -91,9 +91,9 @@ module iob_dma #(
       .w_remaining_data_o(w_remaining_data_o),
       .w_busy_o          (w_busy_o),
 
-      .axis_in_data_i (axis_in_data_i),
-      .axis_in_valid_i(axis_in_valid_i),
-      .axis_in_ready_o(axis_in_ready_o),
+      .axis_in_tdata_i (axis_in_tdata_i),
+      .axis_in_tvalid_i(axis_in_tvalid_i),
+      .axis_in_tready_o(axis_in_tready_o),
 
       `include "iob_dma_write_m_axi_write_m_m_portmap.vs"
 

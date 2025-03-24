@@ -62,8 +62,6 @@ module dma_tb;
    wire [2-1:0] ram_axi_awlock;  //Address write channel lock type
    wire [4-1:0] ram_axi_awcache
        ;  //Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-   wire [3-1:0] ram_axi_awprot
-       ;  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
    wire [4-1:0] ram_axi_awqos;  //Address write channel quality of service
    wire ram_axi_awvalid;  //Address write channel valid
    wire ram_axi_awready;  //Address write channel ready
@@ -86,8 +84,6 @@ module dma_tb;
    wire [2-1:0] ram_axi_arlock;  //Address read channel lock type
    wire [4-1:0] ram_axi_arcache
        ;  //Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-   wire [3-1:0] ram_axi_arprot
-       ;  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
    wire [4-1:0] ram_axi_arqos;  //Address read channel quality of service
    wire ram_axi_arvalid;  //Address read channel valid
    wire ram_axi_arready;  //Address read channel ready
@@ -224,16 +220,15 @@ module dma_tb;
         .r_remaining_data_o(r_remaining_data),
         .r_busy_o(r_busy),
         // axis_in_io
-        .axis_in_data_i(dma_axis_in_tdata),
-        .axis_in_valid_i(dma_axis_in_tvalid),
-        .axis_in_ready_o(dma_axis_in_tready),
+        .axis_in_tdata_i(dma_axis_in_tdata),
+        .axis_in_tvalid_i(dma_axis_in_tvalid),
+        .axis_in_tready_o(dma_axis_in_tready),
         // axis_out_io
-        .axis_out_data_o(dma_axis_out_tdata),
-        .axis_out_valid_o(dma_axis_out_tvalid),
-        .axis_out_ready_i(dma_axis_out_tready),
+        .axis_out_tdata_o(dma_axis_out_tdata),
+        .axis_out_tvalid_o(dma_axis_out_tvalid),
+        .axis_out_tready_i(dma_axis_out_tready),
         // axi_m
         .axi_araddr_o(ram_axi_araddr),
-        .axi_arprot_o(ram_axi_arprot),
         .axi_arvalid_o(ram_axi_arvalid),
         .axi_arready_i(ram_axi_arready),
         .axi_rdata_i(ram_axi_rdata),
@@ -250,7 +245,6 @@ module dma_tb;
         .axi_rid_i(ram_axi_rid),
         .axi_rlast_i(ram_axi_rlast),
         .axi_awaddr_o(ram_axi_awaddr),
-        .axi_awprot_o(ram_axi_awprot),
         .axi_awvalid_o(ram_axi_awvalid),
         .axi_awready_i(ram_axi_awready),
         .axi_wdata_o(ram_axi_wdata),
@@ -350,7 +344,6 @@ module dma_tb;
         .rst_i(rst),
         // axi_s
         .axi_araddr_i(ram_axi_araddr),
-        .axi_arprot_i(ram_axi_arprot),
         .axi_arvalid_i(ram_axi_arvalid),
         .axi_arready_o(ram_axi_arready),
         .axi_rdata_o(ram_axi_rdata),
@@ -367,7 +360,6 @@ module dma_tb;
         .axi_rid_o(ram_axi_rid),
         .axi_rlast_o(ram_axi_rlast),
         .axi_awaddr_i(ram_axi_awaddr),
-        .axi_awprot_i(ram_axi_awprot),
         .axi_awvalid_i(ram_axi_awvalid),
         .axi_awready_o(ram_axi_awready),
         .axi_wdata_i(ram_axi_wdata),

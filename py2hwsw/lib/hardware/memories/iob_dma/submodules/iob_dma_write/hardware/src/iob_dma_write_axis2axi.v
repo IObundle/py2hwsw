@@ -47,7 +47,6 @@ module iob_dma_write_axis2axi #(
    assign axi_awburst_o   = 2'd1;
    assign axi_awlock_o    = 2'd0;
    assign axi_awcache_o   = 4'd2;
-   assign axi_awprot_o    = 3'd2;
    assign axi_awqos_o     = 4'd0;
    assign axi_wstrb_o     = 4'b1111;
    assign axi_bready_o    = 1'b1;
@@ -159,7 +158,7 @@ module iob_dma_write_axis2axi #(
       .data_o(transf_data_count)
    );
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W ((AXI_LEN_W + 1)),
       .RST_VAL(0)
    ) length_reg (
@@ -171,7 +170,7 @@ module iob_dma_write_axis2axi #(
       .data_o(length)
    );
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (2),
       .RST_VAL(0)
    ) state_reg (
@@ -184,7 +183,7 @@ module iob_dma_write_axis2axi #(
    );
 
    // AXI Interface registers
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (AXI_LEN_W),
       .RST_VAL(0)
    ) axi_awlen_reg (
@@ -196,7 +195,7 @@ module iob_dma_write_axis2axi #(
       .data_o(axi_awlen_o)
    );
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (AXI_ADDR_W),
       .RST_VAL(0)
    ) axi_awaddr_reg (
@@ -208,7 +207,7 @@ module iob_dma_write_axis2axi #(
       .data_o(axi_awaddr_o)
    );
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_awvalid_reg (
@@ -220,7 +219,7 @@ module iob_dma_write_axis2axi #(
       .data_o(axi_awvalid_o)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (AXI_DATA_W),
       .RST_VAL(0)
    ) axi_wdata_reg (
@@ -233,7 +232,7 @@ module iob_dma_write_axis2axi #(
       .data_o(axi_wdata_o)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_wvalid_reg (
@@ -246,7 +245,7 @@ module iob_dma_write_axis2axi #(
       .data_o(axi_wvalid_o)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_wlast_reg (

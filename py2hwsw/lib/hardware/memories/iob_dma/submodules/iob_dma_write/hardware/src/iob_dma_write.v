@@ -86,11 +86,14 @@ module iob_dma_write #(
    wire [   AXI_ADDR_W-1:0] burst_addr;
    reg                      start_burst;
    wire                     busy;
+   reg                      w_busy_int;
+
+   assign w_busy_o = w_busy_int;
 
    always @* begin
       // FSM
       // Default assignments
-      w_busy_o             = 1'b1;
+      w_busy_int             = 1'b1;
       w_state_nxt          = w_state;
       w_remaining_data_nxt = w_remaining_data_o;
       w_addr_int_nxt       = burst_addr;
@@ -99,7 +102,7 @@ module iob_dma_write #(
 
       case (w_state)
          WAIT_START: begin
-            w_busy_o = 1'b0;
+            w_busy_int = 1'b0;
             if (w_start_transfer_i) begin
                w_remaining_data_nxt = w_length_i;
                w_addr_int_nxt       = w_addr_i;
@@ -134,7 +137,7 @@ module iob_dma_write #(
    end
 
    // State register
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) w_state_reg (
@@ -147,7 +150,7 @@ module iob_dma_write #(
    );
 
    // Length registers
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (DMA_WLEN_W),
       .RST_VAL({DMA_WLEN_W{1'b0}})
    ) w_length_reg (
@@ -160,7 +163,7 @@ module iob_dma_write #(
    );
 
    // Address registers
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (AXI_ADDR_W),
       .RST_VAL({AXI_ADDR_W{1'b0}})
    ) w_addr_reg (

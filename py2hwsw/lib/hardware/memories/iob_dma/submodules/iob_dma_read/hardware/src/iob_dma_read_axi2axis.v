@@ -48,7 +48,6 @@ module iob_dma_read_axi2axis #(
    assign axi_arburst_o    = 2'd1;
    assign axi_arlock_o     = 2'd0;
    assign axi_arcache_o    = 4'd2;
-   assign axi_arprot_o     = 3'd2;
    assign axi_arqos_o      = 4'd0;
 
    // AXI Stream ready signal
@@ -124,7 +123,7 @@ module iob_dma_read_axi2axis #(
       endcase
    end
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W ((AXI_LEN_W + 1)),
       .RST_VAL(0)
    ) length_reg (
@@ -136,7 +135,7 @@ module iob_dma_read_axi2axis #(
       .data_o(length)
    );
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (2),
       .RST_VAL(0)
    ) state_reg (
@@ -149,7 +148,7 @@ module iob_dma_read_axi2axis #(
    );
 
    // AXI interface registers
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (AXI_LEN_W),
       .RST_VAL(0)
    ) axi_arlen_reg (
@@ -161,7 +160,7 @@ module iob_dma_read_axi2axis #(
       .data_o(axi_arlen_o)
    );
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (AXI_ADDR_W),
       .RST_VAL(0)
    ) axi_araddr_reg (
@@ -173,7 +172,7 @@ module iob_dma_read_axi2axis #(
       .data_o(axi_araddr_o)
    );
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_arvalid_reg (
@@ -185,7 +184,7 @@ module iob_dma_read_axi2axis #(
       .data_o(axi_arvalid_o)
    );
 
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_rready_reg (
@@ -197,7 +196,7 @@ module iob_dma_read_axi2axis #(
       .data_o(axi_rready_o)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (AXI_DATA_W),
       .RST_VAL(0)
    ) axi_rdata_reg_inst (
@@ -210,7 +209,7 @@ module iob_dma_read_axi2axis #(
       .data_o(axi_rdata_reg)
    );
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_rvalid_reg_inst (

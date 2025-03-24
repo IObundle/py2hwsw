@@ -120,18 +120,18 @@ def setup(py_params_dict):
                 "name": "axis_in_io",
                 "descr": "",
                 "signals": [
-                    {"name": "axis_in_data_i", "width": "AXI_DATA_W"},
-                    {"name": "axis_in_valid_i", "width": "1"},
-                    {"name": "axis_in_ready_o", "width": "1"},
+                    {"name": "axis_in_tdata_i", "width": "AXI_DATA_W"},
+                    {"name": "axis_in_tvalid_i", "width": "1"},
+                    {"name": "axis_in_tready_o", "width": "1"},
                 ],
             },
             {
                 "name": "axis_out_io",
                 "descr": "",
                 "signals": [
-                    {"name": "axis_out_data_o", "width": "AXI_DATA_W"},
-                    {"name": "axis_out_valid_o", "width": "1"},
-                    {"name": "axis_out_ready_i", "width": "1"},
+                    {"name": "axis_out_tdata_o", "width": "AXI_DATA_W"},
+                    {"name": "axis_out_tvalid_o", "width": "1"},
+                    {"name": "axis_out_tready_i", "width": "1"},
                 ],
             },
             # TODO external memory interfaces

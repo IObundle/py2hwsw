@@ -24,7 +24,7 @@ module iob_asym_converter #(
 
    //Data is valid after read enable
    wire r_data_valid_reg;
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) r_data_valid_reg_inst (
@@ -36,7 +36,7 @@ module iob_asym_converter #(
 
    //Register read data from the memory
    wire [MAXDATA_W-1:0] r_data_reg;
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (MAXDATA_W),
       .RST_VAL({MAXDATA_W{1'd0}})
    ) r_data_reg_inst (
@@ -66,7 +66,7 @@ module iob_asym_converter #(
 
          //register to hold the LSBs of r_addr
          wire [$clog2(R)-1:0] r_addr_lsbs_reg;
-         iob_reg_e #(
+         iob_reg_cear_e #(
             .DATA_W ($clog2(R)),
             .RST_VAL({$clog2(R) {1'd0}})
          ) r_addr_reg_inst (

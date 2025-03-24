@@ -274,7 +274,7 @@ class csr_gen:
                     },
                 )
                 lines += f"    assign {name_idx}_wen = internal_iob_valid & (write_en & {name_idx}_addressed_w);\n"
-                lines += "    iob_reg_e #(\n"
+                lines += "    iob_reg_cear_e #(\n"
                 lines += f"      .DATA_W({n_bits}),\n"
                 lines += f"      .RST_VAL({rst_val_str})\n"
                 lines += f"    ) {name_idx}_datareg (\n"
@@ -677,18 +677,25 @@ class csr_gen:
 
         subblocks.append(
             {
-                "core_name": "iob_reg_e",
+                "core_name": "iob_reg",
                 "instance_name": "internal_addr_reg",
                 "instance_description": "store iob addr",
                 "parameters": {
                     "DATA_W": "ADDR_W",
                     "RST_VAL": "{ADDR_W{1'b0}}",
                 },
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_en",
+                },
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:internal_iob_addr_reg_en",
+                        ],
+                    ),
                     "data_i": "internal_iob_addr",
                     "data_o": "internal_iob_addr_reg",
-                    "en_i": "internal_iob_addr_reg_en",
                 },
             }
         )

@@ -106,7 +106,7 @@ module iob_axistream_out #(
    end
 
    // program counter
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) tvalid_reg (

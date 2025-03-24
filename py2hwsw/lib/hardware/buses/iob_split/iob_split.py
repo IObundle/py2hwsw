@@ -221,15 +221,23 @@ def setup(py_params_dict):
     ]
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "sel_reg_re",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "sel_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:input_iob_valid_i",
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "sel_reg_data_i",
                 "data_o": "sel_reg_data_o",
             },

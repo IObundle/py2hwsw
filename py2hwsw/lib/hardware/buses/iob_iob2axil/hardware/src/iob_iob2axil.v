@@ -19,7 +19,7 @@ module iob_iob2axil #(
    assign wvalid_reg_i   = 1'b1;
    wire wvalid_reg_o;
 
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) wvalid_re (

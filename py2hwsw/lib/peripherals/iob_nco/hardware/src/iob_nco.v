@@ -32,7 +32,7 @@ module iob_nco #(
    wire [(2*DATA_W)-1:0] period_full_wdata;
    wire                  period_full_wen;
    // integer period value register
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(DATA_W)
    ) int_reg (
       .clk_i (clk_i),
@@ -44,7 +44,7 @@ module iob_nco #(
       .data_o(period_full_wdata[DATA_W+:DATA_W])
    );
    // fractional period value register
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(DATA_W)
    ) frac_reg (
       .clk_i (clk_i),
@@ -63,7 +63,7 @@ module iob_nco #(
    assign per_valid_en  = period_int_wen_wr | period_frac_wen_wr;
    assign per_valid_rst = soft_reset_wr | (&per_valid);
    assign per_valid_nxt = per_valid | ({period_int_wen_wr, period_frac_wen_wr});
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(2)
    ) valid_reg (
       .clk_i (clk_i),
@@ -117,7 +117,7 @@ module iob_nco #(
    end
 
    //fractional period value register
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(PERIOD_W)
    ) per_reg (
       .clk_i (clk_in_i),
@@ -130,7 +130,7 @@ module iob_nco #(
    );
 
    //output clock register
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W(1)
    ) clk_out_reg (
       .clk_i (clk_in_i),

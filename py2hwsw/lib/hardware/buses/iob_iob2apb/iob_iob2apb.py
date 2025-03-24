@@ -129,15 +129,22 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg_e",
+                "core_name": "iob_reg",
                 "instance_name": "iob_rdata_reg",
                 "parameters": {
                     "DATA_W": "DATA_W",
                     "RST_VAL": 0,
                 },
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_en",
+                },
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "en_i": "apb_ready_i",
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:apb_ready_i",
+                        ],
+                    ),
                     "data_i": "apb_rdata_i",
                     "data_o": "iob_rdata_o",
                 },

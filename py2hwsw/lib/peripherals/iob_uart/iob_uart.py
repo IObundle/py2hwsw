@@ -6,19 +6,6 @@
 def setup(py_params_dict):
     CSR_IF = py_params_dict["csr_if"] if "csr_if" in py_params_dict else "iob"
     NAME = py_params_dict["name"] if "name" in py_params_dict else "iob_uart"
-    # define csr_if macro
-    csr_macro = {
-        "name": f"CSR_IF_{CSR_IF.upper()}",
-        "type": "M",
-        "val": "1",
-        "min": "0",
-        "max": "1",
-        "descr": "CSR interface macro.",
-    }
-    csr_converter = {}
-    if CSR_IF != "iob":
-        csr_converter = {"core_name": f"iob_iob2{CSR_IF}"}
-
     attributes_dict = {
         "name": NAME,
         "generate_hw": True,
@@ -41,7 +28,6 @@ def setup(py_params_dict):
                 "max": "1",
                 "descr": "Reset polarity.",
             },
-            csr_macro,
         ],
         "ports": [
             {
@@ -248,7 +234,6 @@ def setup(py_params_dict):
                 "core_name": "iob_uart_sim",
                 "dest_dir": "hardware/simulation/src",
             },
-            csr_converter if csr_converter else None,
         ],
         "snippets": [
             {

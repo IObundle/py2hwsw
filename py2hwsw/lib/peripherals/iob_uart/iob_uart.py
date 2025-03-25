@@ -227,12 +227,12 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_uart_tester",
                 "dest_dir": "tester",
-                "csr_if": CSR_IF,
             },
             # Simulation wrapper
             {
                 "core_name": "iob_uart_sim",
                 "dest_dir": "hardware/simulation/src",
+                "csr_if": CSR_IF,
             },
         ],
         "snippets": [

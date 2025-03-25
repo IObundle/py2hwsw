@@ -62,7 +62,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": params["csr_if"],
                 "prefix": "internal_",
-                "ADDR_W": 3 - 2,
+                "ADDR_W": 3 - 2,  # Does not include 2 LSBs
             },
         },
     ]
@@ -90,7 +90,7 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2wishbone_coverter",
                 "instance_description": "Convert IOb port into Wishbone interface for uart CSRs bus",
                 "parameters": {
-                    "APB_ADDR_W": "ADDR_W",
+                    "APB_ADDR_W": 3 - 2,
                     "APB_DATA_W": "DATA_W",
                 },
                 "connect": {
@@ -113,7 +113,7 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2apb_coverter",
                 "instance_description": "Convert IOb port into APB interface for uart CSRs bus",
                 "parameters": {
-                    "APB_ADDR_W": "ADDR_W",
+                    "APB_ADDR_W": 3 - 2,
                     "APB_DATA_W": "DATA_W",
                 },
                 "connect": {
@@ -136,12 +136,12 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2axil_coverter",
                 "instance_description": "Convert IOb port into AXI_Lite interface for uart CSRs bus",
                 "parameters": {
-                    "AXIL_ADDR_W": "ADDR_W",
+                    "AXIL_ADDR_W": 3 - 2,
                     "AXIL_DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "axilms": "uart_cbus",
+                    "axil_m": "uart_cbus",
                     "iob_s": (
                         "uart_s",
                         [
@@ -159,7 +159,7 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2axi_coverter",
                 "instance_description": "Convert IOb port into AXI interface for uart CSRs bus",
                 "parameters": {
-                    "ADDR_WIDTH": "ADDR_W",
+                    "ADDR_WIDTH": 3 - 2,
                     "DATA_WIDTH": "DATA_W",
                     "AXI_ID_WIDTH": "AXI_ID_W",
                     "AXI_LEN_WIDTH": "AXI_LEN_W",

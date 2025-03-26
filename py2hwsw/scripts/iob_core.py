@@ -952,6 +952,7 @@ class iob_core(iob_module, iob_instance):
         )
         doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
         doc_gen.generate_tex_py2hwsw_standard_py_params(f"{core.build_dir}/document/tsrc")
+        doc_gen.process_tex_macros(f"{core.build_dir}/document/tsrc")
 
     @staticmethod
     def version_str_to_digits(version_str):

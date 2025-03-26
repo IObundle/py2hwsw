@@ -1,0 +1,135 @@
+% SPDX-FileCopyrightText: 2025 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+%
+% Main classes
+%
+
+The Py2HWSW tool uses the \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/if_gen.py}{if\_gen.py} script to generate the signals of standard interfaces.
+
+The currently supported interfaces are listed below.
+
+% py2_macro: listing mem_if_details from if_gen.py
+% py2_macro: listing if_details from if_gen.py
+
+When a user specifies a standard interface for a port~\ref{sec:iob_port} or a wire~{sec:iob_wire}, a new instance of the `interface` class is created to represent it.
+
+% py2_macro: class_attributes interface from if_gen.py
+
+This class stores the interface properties which will then be used by interface specific functions to generate the signals.
+Each attribute of the interface class is preceded by a comment describing the purpose of the attribute.
+
+Each interface supported by if\_gen.py contains its own `get\_<interface>\_ports` function, and returns a list of signals for the interface.
+
+%
+% AXI Stream
+%
+
+The AXI Stream interface uses the `get\_axis\_ports` function.
+
+% py2_macro: listing get_axis_ports from if_gen.py
+
+It has the configurable width: `DATA_W`
+
+%
+% AXI Lite
+%
+
+The AXI Lite interface uses the `get\_axil\_ports` function.
+
+% py2_macro: listing get_axil_ports from if_gen.py
+% py2_macro: listing get_axil_read_ports from if_gen.py
+% py2_macro: listing get_axil_write_ports from if_gen.py
+
+It has the configurable widths: 
+\begin{itemize}
+  \item ADDR_W
+  \item DATA_W
+  \item PROT_W
+  \item RESP_W
+\end{itemize}
+
+The AXI Lite interface also supports the the following 'params':
+\begin{itemize}
+  \item prot: Include "prot" signal
+\end{itemize}
+
+%
+% AXI
+%
+
+The AXI interface uses the `get\_axi\_ports` function.
+
+% py2_macro: listing get_axi_ports from if_gen.py
+% py2_macro: listing get_axi_read_ports from if_gen.py
+% py2_macro: listing get_axi_write_ports from if_gen.py
+
+The AXI interface extends configurable widths of the AXI Lite interface, with the following additions:
+\begin{itemize}
+  \item ID_W
+  \item SIZE_W
+  \item BURST_W
+  \item LOCK_W
+  \item CACHE_W
+  \item QOS_W
+  \item LEN_W
+\end{itemize}
+
+The AXI interface supports the same 'params' as the AXI Lite interface.
+
+%
+% APB
+%
+
+The APB interface uses the `get\_apb\_ports` function.
+
+% py2_macro: listing get_apb_ports from if_gen.py
+
+The APB interface has the configurable widths:
+\begin{itemize}
+  \item ADDR_W
+  \item DATA_W
+\end{itemize}
+
+%
+% AHB
+%
+
+The AHB interface uses the `get\_ahb\_ports` function.
+
+% py2_macro: listing get_ahb_ports from if_gen.py
+
+The AHB interface has the configurable widths:
+\begin{itemize}
+  \item ADDR_W
+  \item DATA_W
+\end{itemize}
+
+%
+% Wishbone
+%
+
+The Wishbone interface uses the `get\_wb\_ports` function.
+
+% py2_macro: listing get_wb_ports from if_gen.py
+
+The Wishbone interface has the configurable widths:
+\begin{itemize}
+  \item ADDR_W
+  \item DATA_W
+\end{itemize}
+
+%
+% IOB
+%
+
+The IOb interface uses the `get\_iob\_ports` function.
+
+% py2_macro: listing get_iob_ports from if_gen.py
+
+The IOb interface has the configurable widths:
+\begin{itemize}
+  \item ADDR_W
+  \item DATA_W
+\end{itemize}

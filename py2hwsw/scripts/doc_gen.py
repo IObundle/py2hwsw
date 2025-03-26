@@ -12,6 +12,7 @@ import io_gen
 import block_gen
 
 from latex import write_table
+from iob_base import fail_with_msg, find_file
 
 
 def generate_docs(core):
@@ -182,3 +183,91 @@ def generate_py_params_tex_table(python_parameters, out_dir):
 
         # Write table with true parameters and macros
         write_table(f"{out_dir}/{group.name}_py_params", tex_table)
+
+
+def process_tex_macros(tex_src_dir):
+    """Search for special macros in TeX sources and replace them with appropriate values.
+    :param tex_src_dir: Path to directory with TeX sources to be processed
+    """
+    tex_files = [f for f in os.listdir(tex_src_dir) if f.endswith(".tex")]
+
+    for file in tex_files:
+        with open("file.txt", "r") as file:
+            lines = file.readlines()
+
+        for idx, line in enumerate(lines):
+            if line.strip().startswith("% py2_macro:"):
+                lines[idx] = process_tex_macro(line)
+
+        with open("file.txt", "w") as file:
+            file.writelines(lines)
+
+
+def process_tex_macro(line):
+    macro = line.strip().split(":")[1].strip().split()
+    macro_command = macro[0]
+    listing_content = ""
+
+    def _find_file(file):
+        filename, extension = file.split(".")
+        file = find_file(
+            os.pwath.join(os.path.dirname(__file__), ".."),
+            filename,
+            filter_extensions=[extension],
+        )
+        if not file:
+            fail_with_msg(f"File '{filename}' not found! From macro line '{line}'.")
+        return file
+
+    if macro_command == "listing":
+        # Search for given attribute/class/method, and print its body
+        code_obj_name = macro[1]
+        file = _find_file(macro[macro.index("from") + 1])
+        with open(file, "r") as f:
+            # Search for start line and print lines after it
+            _lines = f.readlines()
+            for _line in _lines:
+                if _line.strip().startswith("def " + code_obj_name):
+                    # Copy method body
+                    # TODO:
+                    break
+                elif _line.strip().startswith(code_obj_name):
+                    # Copy attribute body
+                    # TODO:
+                    break
+                elif _line.strip().startswith("class " + code_obj_name):
+                    # Copy class body
+                    # TODO:
+                    break
+    elif macro_command == "class_attributes":
+        # Search for given class, and print only its attributes (not methods)
+        class_name = macro[1]
+        file = _find_file(macro[macro.index("from") + 1])
+        # Copy class attributes
+        # TODO:
+    elif macro_command == "file":
+        # Replace with content of given file
+        file = _find_file(macro[1])
+        # Copy file contents
+        with open(file, "r") as f:
+            listing_content = f.read()
+    elif macro_command == "start_line":
+        # Search for start line and print lines after it
+        start_line = macro[1]
+        file = _find_file(macro[macro.index("from") + 1])
+        end_line = None
+        if "end_line" in macro:
+            end_line = macro[macro.index("end_line") + 1]
+        # Find start line
+        # Copy lines until end line
+        # TODO:
+    else:
+        fail_with_msg(f"Unknown macro command '{macro_command}' in line '{line}'!")
+
+    return """
+\\begin{tiny}
+  \\begin{lstlisting}
+{listing_content}
+  \\end{lstlisting}
+\\end{tiny}
+"""

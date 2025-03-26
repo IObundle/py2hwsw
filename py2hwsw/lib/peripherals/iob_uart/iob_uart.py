@@ -110,6 +110,14 @@ def setup(py_params_dict):
             },
             # RXDATA reg
             {
+                "name": "iob_reg_rvalid_en_rst",
+                "descr": "",
+                "signals": [
+                    {"name": "rxdata_rvalid_en", "width": 1},
+                    {"name": "rxdata_rvalid_rst", "width": 1},
+                ],
+            },
+            {
                 "name": "iob_reg_rvalid_data_i",
                 "descr": "",
                 "signals": [
@@ -185,8 +193,15 @@ def setup(py_params_dict):
                     "DATA_W": 1,
                     "RST_VAL": "1'b0",
                 },
+                "port_params": {"clk_en_rst_s": "cke_arst_rst_en"},
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:rxdata_rvalid_en",
+                            "rst_i:rxdata_rvalid_rst",
+                        ],
+                    ),
                     "data_i": "iob_reg_rvalid_data_i",
                     "data_o": "iob_reg_rvalid_data_o",
                 },
@@ -244,7 +259,9 @@ def setup(py_params_dict):
     // rxdata Manual logic
     assign rxdata_ready_rd = 1'b1;
 
-    // rxdata rvalid is iob_valid registered
+    // set rxdata on read enable, reset on (rready and rvalid)
+    assign rxdata_rvalid_en = rxdata_ren_rd;
+    assign rxdata_rvalid_rst = rxdata_rvalid_rd & rxdata_rready_rd;
     assign rxdata_rvalid_nxt = rxdata_ren_rd;
 """,
             },

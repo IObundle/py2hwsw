@@ -115,6 +115,8 @@ def setup(py_params_dict):
                 "parameters": {
                     "APB_ADDR_W": 3 - 2,
                     "APB_DATA_W": "DATA_W",
+                    "ADDR_W": 3 - 2,
+                    "DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",

@@ -992,7 +992,7 @@ def get_wb_ports():
             descr="Data input.",
         ),
         iob_signal(
-            name="wb_dat_o",
+            name="wb_datout_o",
             width=DATA_W,
             descr="Data output.",
         ),

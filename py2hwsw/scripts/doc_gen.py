@@ -204,11 +204,13 @@ def process_tex_macros(tex_src_dir):
 
 
 def process_tex_macro(line):
+    """Given a TeX macro line, return a new (multi)line with appropriate value."""
     macro = line.strip().split(":")[1].strip().split()
     macro_command = macro[0]
     listing_content = ""
 
     def _find_file(file):
+        """Local function to find file, and print error otherwise"""
         filename, extension = file.split(".")
         file = find_file(
             os.pwath.join(os.path.dirname(__file__), ".."),

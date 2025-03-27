@@ -293,8 +293,16 @@ def setup(py_params_dict):
                 "DATA_W": "DATA_W",
                 "RST_VAL": 0,
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:wb_ack_i",
+                    ],
+                ),
                 "data_i": "wb_data_data_i",
                 "data_o": "wb_data_data_o",
             },
@@ -330,16 +338,16 @@ def setup(py_params_dict):
             "verilog_code": """
    // Logic
    assign wb_adr_o     = iob_valid_i ? iob_addr_i : iob_address_r;
+   assign wb_cyc_o     = iob_valid_i ? iob_valid_i : iob_valid_r;
+   assign wb_stb_o     = wb_cyc_o;
    assign wb_datout_o  = iob_valid_i ? iob_wdata_i : iob_wdata_r;
    assign wb_sel_o     = iob_valid_i ? wb_select : wb_select_r;
    assign wb_we_o      = iob_valid_i ? wb_we : wb_we_r;
-   assign wb_cyc_o     = iob_valid_i ? iob_valid_i : iob_valid_r;
-   assign wb_stb_o     = wb_cyc_o;
 
    assign wb_select    = wb_we ? iob_wstrb_i : {READ_BYTES{1'b1}};
    assign wb_we        = |iob_wstrb_i;
 
-   assign iob_rvalid_o = wb_ack_i ? wb_ack_i & (~wb_we_r) : wb_ack_r ;
+   assign iob_rvalid_o = wb_ack_i ? wb_ack_i & (~wb_we_r) : wb_ack_r & (~wb_we_r);
    assign iob_rdata_o  = wb_ack_i ? wb_dat_i : wb_data_r;
    assign iob_ready_o  = wb_ack_i;
 """,

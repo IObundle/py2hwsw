@@ -142,7 +142,7 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-   assign iob_valid_o = valid_int;
+   assign iob_valid_o = valid_r;
    assign iob_addr_o = wb_adr_i;
    assign iob_wdata_o = wb_datout_i;
    assign iob_wstrb_o = wstrb;

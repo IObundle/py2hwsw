@@ -124,7 +124,7 @@ class iob_comb(iob_snippet):
                         bit_slices.append(f"rst_i:{signal.name}_rst")
                         port_params = port_params + "_rst"
 
-                    if  any(x in port_params for x in ['_rst','_en']):
+                    if any(x in port_params for x in ["_rst", "_en"]):
                         if not any(
                             wire.name == f"{signal.name}_reg_signals"
                             for wire in core.wires
@@ -136,7 +136,7 @@ class iob_comb(iob_snippet):
                     if not any(port.name == "clk_en_rst_s" for port in core.ports):
                         core.create_port(
                             name="clk_en_rst_s",
-                            signals={"type": "iob_clk","params": self.clk_if},
+                            signals={"type": "iob_clk", "params": self.clk_if},
                             descr="Clock interface signals",
                         )
 
@@ -154,7 +154,7 @@ class iob_comb(iob_snippet):
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},
                             connect=connect,
-                            port_params={"clk_en_rst_s":self.clk_if},
+                            port_params={"clk_en_rst_s": self.clk_if},
                             instance_description=f"Infered register for {signal.name}",
                         )
 

@@ -62,7 +62,7 @@ module iob_fifo2axis #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) saved_reg (
-      `include "clk_en_rst_s_s_portmap.vs"
+      `include "iob_fifo2axis_iob_clk_s_s_portmap.vs"
       .rst_i (saved_rst),
       .data_i(saved_nxt),
       .data_o(saved)

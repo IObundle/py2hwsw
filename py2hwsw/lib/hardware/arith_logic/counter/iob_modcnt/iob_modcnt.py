@@ -98,7 +98,6 @@ def setup(py_params_dict):
                             "rst_i:rst_i",
                         ],
                     ),
-                    "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "data",
                     "data_o": "data_o",
                 },

@@ -7,15 +7,15 @@
 #include "iob-axistream-out.h"
 
 void iob_axis_out_reset() {
-  IOB_AXISTREAM_OUT_SET_SOFT_RESET(1);
-  IOB_AXISTREAM_OUT_SET_SOFT_RESET(0);
+  iob_axistream_out_set_soft_reset(1);
+  iob_axistream_out_set_soft_reset(0);
 }
 
 uint32_t iob_axis_write(uint32_t value) {
-  if (IOB_AXISTREAM_OUT_GET_FIFO_FULL()) {
+  if (iob_axistream_out_get_fifo_full()) {
     return 0;
   } else {
-    IOB_AXISTREAM_OUT_SET_DATA(value);
+    iob_axistream_out_set_data(value);
     return 1;
   }
 }

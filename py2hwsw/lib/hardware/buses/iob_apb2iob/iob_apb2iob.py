@@ -18,6 +18,8 @@ def setup(py_params_dict):
                 "name": "apb_s",
                 "signals": {
                     "type": "apb",
+                    "ADDR_W": "APB_ADDR_W",
+                    "DATA_W": "APB_DATA_W",
                 },
                 "descr": "APB interface",
             },
@@ -25,6 +27,8 @@ def setup(py_params_dict):
                 "name": "iob_m",
                 "signals": {
                     "type": "iob",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
                 },
                 "descr": "CPU native interface",
             },

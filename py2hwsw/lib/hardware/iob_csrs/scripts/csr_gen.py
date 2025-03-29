@@ -803,6 +803,29 @@ class csr_gen:
                     },
                 }
             )
+        elif core_attributes["csr_if"] == "wb":
+            # "wb" CSR_IF
+            subblocks.append(
+                {
+                    "core_name": "iob_wishbone2iob",
+                    "instance_name": "iob_wishbone2iob_coverter",
+                    "instance_description": "Convert Wishbone port into internal IOb interface",
+                    "parameters": {
+                        "ADDR_W": "ADDR_W",
+                        "DATA_W": "DATA_W",
+                    },
+                    "connect": {
+                        "clk_en_rst_s": "clk_en_rst_s",
+                        "wb_s": (
+                            "control_if_s",
+                            [
+                                "{wb_adr_i,2'b0}",
+                            ],
+                        ),
+                        "iob_m": "internal_iob",
+                    },
+                }
+            )
 
         # write address
         snippet += "\n    //write address\n"

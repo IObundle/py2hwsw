@@ -1,1 +1,0 @@
-../../../scripts/wire_gen.py

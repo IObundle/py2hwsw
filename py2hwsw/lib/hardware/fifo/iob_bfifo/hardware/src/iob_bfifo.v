@@ -82,7 +82,7 @@ module iob_bfifo #(
   end
 
   //data register
-  iob_reg_r #(
+  iob_reg_cear_r #(
       .DATA_W (BUFFER_SIZE),
       .RST_VAL({BUFFER_SIZE{1'b0}})
   ) data_reg_inst (
@@ -93,7 +93,7 @@ module iob_bfifo #(
   );
 
   //read pointer
-  iob_reg_r #(
+  iob_reg_cear_r #(
       .DATA_W ($clog2(BUFFER_SIZE)),
       .RST_VAL({$clog2(BUFFER_SIZE) {1'b0}})
   ) rptr_reg (
@@ -104,7 +104,7 @@ module iob_bfifo #(
   );
 
   //write pointer
-  iob_reg_r #(
+  iob_reg_cear_r #(
       .DATA_W ($clog2(BUFFER_SIZE)),
       .RST_VAL({$clog2(BUFFER_SIZE) {1'b0}})
   ) wptr_reg (
@@ -115,7 +115,7 @@ module iob_bfifo #(
   );
 
   //fifo level
-  iob_reg_r #(
+  iob_reg_cear_r #(
       .DATA_W ($clog2(BUFFER_SIZE) + 1),
       .RST_VAL({$clog2(BUFFER_SIZE) + 1{1'b0}})
   ) level_reg (

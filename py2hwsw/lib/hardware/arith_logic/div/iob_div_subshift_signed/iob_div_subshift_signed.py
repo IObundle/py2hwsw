@@ -162,7 +162,7 @@ def setup(py_params_dict):
                 "verilog_code": """
             assign quotient_o  = rq[DATA_W-1:0];
             assign remainder_o = rq[2*DATA_W-1:DATA_W];
-            assign subtraend = rq[2*DATA_W-2-:DATA_W]; 
+            assign subtraend = rq[2*DATA_W-2-:DATA_W];
 
    always @(posedge clk_i) begin
       if (en_i) begin
@@ -187,30 +187,30 @@ def setup(py_params_dict):
                if (sign_i) divisor_reg <= divisor_reg[DATA_W-1] ? -divisor_reg : divisor_reg;
             end
 
-            PC_W'(DATA_W + 2): begin  
+            PC_W'(DATA_W + 2): begin
                rq[DATA_W-1:0] <= (divident_sign^divisor_sign)? -{rq[DATA_W-2], rq[DATA_W-2 : 0]}: {rq[DATA_W-2], rq[DATA_W-2 : 0]};
             end
 
-            PC_W'(DATA_W + 3): begin  
+            PC_W'(DATA_W + 3): begin
                done_o <= 1'b1;
                rq[2*DATA_W-1:DATA_W] <= divident_sign? -rq[2*DATA_W-1 -: DATA_W] : rq[2*DATA_W-1 -: DATA_W];
             end
 
-            PC_W'(DATA_W + 4): pc <= pc;  
+            PC_W'(DATA_W + 4): pc <= pc;
 
             default: begin  //shift and subtract
                tmp = {1'b0, subtraend} - {1'b0, divisor_reg};
                if (~tmp[DATA_W]) rq <= {tmp, rq[DATA_W-2 : 0], 1'b1};
                else rq <= {rq[2*DATA_W-1 : 0], 1'b0};
             end
-         endcase  
+         endcase
 
       end else begin  // if (en)
          rq     <= 0;
          done_o <= 1'b0;
          pc     <= 0;
       end
-   end  
+   end
             """,
             },
         ],

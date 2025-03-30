@@ -81,6 +81,11 @@ def setup(py_params_dict):
                 "descr": "External memory interface",
                 "signals": [
                     {
+                        "name": "ext_mem_clk_o",
+                        "width": 1,
+                        "descr": "Memory clock output",
+                    },
+                    {
                         "name": "ext_mem_w_en_o",
                         "width": 1,
                         "descr": "Memory write enable",
@@ -121,10 +126,16 @@ def setup(py_params_dict):
                 "core_name": "iob_counter",
             },
             {
-                "core_name": "iob_reg_r",
+                "core_name": "iob_reg",
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst",
+                },
             },
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
             },
         ],
     }

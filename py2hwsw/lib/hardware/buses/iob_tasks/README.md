@@ -14,16 +14,16 @@ provided in C for use with the Verilator simulator. Two tasks are provided:
 from the IP core, respectively.
 
 The IOb Native Interface, or IOb interface shortly, has the following signals
-from the slave perspective. (Note that the `_i` and `_o` suffixes denote input
+from the subordinate perspective. (Note that the `_i` and `_o` suffixes denote input
 and output, respectively.)
 - `clk_i`: interface input clock
-- `valid_i`: source signal valid transaction from master input
+- `valid_i`: source signal valid transaction from manager input
 - `addr_i`: address for read or write access input
 - `wdata_i`: data to write
 - `wstrb_i`: byte write strobe input
 - `rdata_o`: read data
 - `rvalid_o`: valid read data
-- `ready_o`: slave ready for transaction output
+- `ready_o`: subordinate ready for transaction output
 
 Transactions occur when both `valid_i` and `ready_o` are HIGH for one `clk_i`
 period.

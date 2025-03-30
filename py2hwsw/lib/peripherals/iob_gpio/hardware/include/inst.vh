@@ -17,10 +17,10 @@
       .gpio_output_enable (gpio_output_enable),
 
       // CPU interface
-      .valid   (slaves_req[`valid(`GPIO)]),
-      .address (slaves_req[`address(`GPIO,`iob_gpio_csrs_ADDR_W+2)-2]),
-      .wdata   (slaves_req[`wdata(`GPIO)]),
-      .wstrb   (slaves_req[`wstrb(`GPIO)]),
-      .rdata   (slaves_resp[`rdata(`GPIO)]),
-      .ready   (slaves_resp[`ready(`GPIO)])
+      .valid   (subordinates_req[`valid(`GPIO)]),
+      .address (subordinates_req[`address(`GPIO,`iob_gpio_csrs_ADDR_W+2)-2]),
+      .wdata   (subordinates_req[`wdata(`GPIO)]),
+      .wstrb   (subordinates_req[`wstrb(`GPIO)]),
+      .rdata   (subordinates_resp[`rdata(`GPIO)]),
+      .ready   (subordinates_resp[`ready(`GPIO)])
       );

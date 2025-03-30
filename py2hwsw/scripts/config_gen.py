@@ -130,8 +130,8 @@ def generate_config_tex(confs, out_dir):
 The following tables describe the IP core configuration. The core may be configured using macros or parameters:
 
 \\begin{description}
-\\item \\textbf{'M'} Macro: a Verilog macro or ``\\`define'' directive is used to include or exclude code segments, to create core configurations that are valid for all instances of the core.
-\\item \\textbf{'P'} Parameter: a Verilog parameter is passed to each instance of the core and defines the configuration of that particular instance.
+    \\item \\textbf{'M'} Macro: a Verilog macro or \\texttt{define} directive is used to include or exclude code segments, to create core configurations that are valid for all instances of the core.
+    \\item \\textbf{'P'} Parameter: a Verilog parameter is passed to each instance of the core and defines the configuration of that particular instance.
 \\end{description}
 """
     )

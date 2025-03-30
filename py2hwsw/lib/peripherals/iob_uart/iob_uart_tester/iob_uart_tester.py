@@ -22,19 +22,11 @@ def setup(py_params_dict):
                     "iob_cyclonev_gt_dk",
                 ],
                 "subblocks": [
-                    {
-                        "core_name": "iob_uart",
-                        "instance_name": "UART0",
-                        "instance_description": "UART peripheral",
-                        "is_peripheral": True,
-                        "parameters": {},
-                        "connect": {
-                            # "clk_en_rst_s": "clk_en_rst_s",
-                            # Cbus connected automatically
-                            "rs232_m": "rs232_m",
-                        },
-                    },
-                    # NOTE: Add other test instruments here
+                    # Since Tester already contains one iob_uart peripheral by default
+                    # to communicate with the testbench/console, we will use it as the
+                    # UUT and verify it by checking that the Tester messages are
+                    # printed correctly. So there is no need for other verification
+                    # instruments.
                 ],
             },
         },

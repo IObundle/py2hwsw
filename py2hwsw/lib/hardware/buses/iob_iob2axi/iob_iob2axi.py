@@ -82,7 +82,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_m",
-                "descr": "Master AXI interface",
+                "descr": "Manager AXI interface",
                 "signals": {
                     "type": "axi",
                     "prefix": "m_",
@@ -94,7 +94,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "iob_s",
-                "descr": "Slave IOb interface",
+                "descr": "Subordinate IOb interface",
                 "signals": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",

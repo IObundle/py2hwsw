@@ -70,7 +70,7 @@ void iob_hard_reset() {
   clk_tick(100);
 }
 
-// Write data to IOb Native slave
+// Write data to IOb Native subordinate
 void iob_write(unsigned int address, unsigned data_w,
                unsigned int data) {
 
@@ -100,7 +100,7 @@ void iob_write(unsigned int address, unsigned data_w,
   dut->iob_wstrb_i = 0;
 }
 
-// Read data from IOb Native slave
+// Read data from IOb Native subordinate
 unsigned int iob_read(unsigned int address, unsigned int data_w) {
 
   unsigned int nbytes = data_w / 8 + (data_w % 8 ? 1 : 0);
@@ -108,9 +108,11 @@ unsigned int iob_read(unsigned int address, unsigned int data_w) {
 
   dut->iob_addr_i = address; // remove byte address
   dut->iob_valid_i = 1;
+  dut->iob_rready_i = 1;
   while (dut->iob_ready_o == 0) {
     clk_tick();
   }
+  // FIXME: This seems to be missing the wait for iob_rvalid
   switch (nbytes) {
   case 1:
     data = (dut->iob_rdata_o >> ((address & 0x3) * 8)) & 0xFF;
@@ -124,6 +126,7 @@ unsigned int iob_read(unsigned int address, unsigned int data_w) {
   }
   clk_tick();
   dut->iob_valid_i = 0;
+  dut->iob_rready_i = 0;
   return data;
 }
 

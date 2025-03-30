@@ -90,7 +90,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "period_int_wdata_wr", "width": 32},
                     {"name": "period_int_wen_wr", "width": 1},
-                    {"name": "period_int_wready_wr", "width": 1},
+                    {"name": "period_int_ready_wr", "width": 1},
                 ],
             },
             {
@@ -99,7 +99,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "period_frac_wdata_wr", "width": 32},
                     {"name": "period_frac_wen_wr", "width": 1},
-                    {"name": "period_frac_wready_wr", "width": 1},
+                    {"name": "period_frac_ready_wr", "width": 1},
                 ],
             },
         ],
@@ -175,8 +175,11 @@ def setup(py_params_dict):
                 "instantiate": False,
             },
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
                 "instantiate": False,
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
             },
             {
                 "core_name": "iob_sync",

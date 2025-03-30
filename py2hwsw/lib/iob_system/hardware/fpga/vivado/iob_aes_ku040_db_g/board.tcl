@@ -7,12 +7,12 @@ set_property part $PART [current_project]
 
 if { $USE_EXTMEM > 0 } {
 
-    proc generate_slave_config_lines {num_slaves} {
-        for {set i 0} {$i < $num_slaves} {incr i} {
-            set slave_number [format "%02d" $i]
-            set_property "CONFIG.S${slave_number}_AXI_IS_ACLK_ASYNC" 1 [get_ips axi_interconnect_0]
-            set_property "CONFIG.S${slave_number}_AXI_READ_FIFO_DEPTH" 32 [get_ips axi_interconnect_0]
-            set_property "CONFIG.S${slave_number}_AXI_WRITE_FIFO_DEPTH" 32 [get_ips axi_interconnect_0]
+    proc generate_subordinate_config_lines {num_subordinates} {
+        for {set i 0} {$i < $num_subordinates} {incr i} {
+            set subordinate_number [format "%02d" $i]
+            set_property "CONFIG.S${subordinate_number}_AXI_IS_ACLK_ASYNC" 1 [get_ips axi_interconnect_0]
+            set_property "CONFIG.S${subordinate_number}_AXI_READ_FIFO_DEPTH" 32 [get_ips axi_interconnect_0]
+            set_property "CONFIG.S${subordinate_number}_AXI_WRITE_FIFO_DEPTH" 32 [get_ips axi_interconnect_0]
         }
     }
 
@@ -30,7 +30,7 @@ if { $USE_EXTMEM > 0 } {
 
         create_ip -name axi_interconnect -vendor xilinx.com -library ip -version 1.7 -module_name axi_interconnect_0 -dir ./ip -force
 
-        set_property CONFIG.NUM_SLAVE_PORTS 1 [get_ips axi_interconnect_0]
+        set_property CONFIG.NUM_SUBORDINATE_PORTS 1 [get_ips axi_interconnect_0]
         set_property CONFIG.AXI_ADDR_WIDTH 28 [get_ips axi_interconnect_0]
         set_property CONFIG.ACLK_PERIOD 5000 [get_ips axi_interconnect_0]
         set_property CONFIG.INTERCONNECT_DATA_WIDTH 32 [get_ips axi_interconnect_0]
@@ -38,7 +38,7 @@ if { $USE_EXTMEM > 0 } {
         set_property CONFIG.M00_AXI_WRITE_FIFO_DEPTH 32 [get_ips axi_interconnect_0]
         set_property CONFIG.M00_AXI_READ_FIFO_DEPTH 32 [get_ips axi_interconnect_0]
 
-        generate_slave_config_lines 1
+        generate_subordinate_config_lines 1
 
         generate_target all [get_files ./ip/axi_interconnect_0/axi_interconnect_0.xci]
 

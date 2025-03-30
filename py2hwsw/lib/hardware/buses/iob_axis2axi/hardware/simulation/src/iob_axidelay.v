@@ -10,11 +10,11 @@
 module axidelay #(
    parameter MAX_DELAY = 3
 ) (
-   // Master interface. Connect to a slave interface
+   // Manager interface. Connect to a subordinate interface
    output reg m_valid_o,
    input      m_ready_i,
 
-   // Slave interface. Connect to a master interface
+   // Subordinate interface. Connect to a manager interface
    input      s_valid_i,
    output reg s_ready_o,
 
@@ -57,15 +57,15 @@ module axidelay #(
 endmodule
 
 // A simple interface change, make it easier to figure out the connections for the AXI Read case
-// An AXI read is controlled by the slave. The AXI slave is the master of the Read channel
+// An AXI read is controlled by the subordinate. The AXI subordinate is the manager of the Read channel
 module axidelayRead #(
    parameter MAX_DELAY = 3
 ) (
-   // Connect directly to the same named axi read wires in the master interface
+   // Connect directly to the same named axi read wires in the manager interface
    output m_rvalid_o,
    input  m_rready_i,
 
-   // Connect directly to the same named axi read wires in the slave interface
+   // Connect directly to the same named axi read wires in the subordinate interface
    input  s_rvalid_i,
    output s_rready_o,
 
@@ -89,15 +89,15 @@ module axidelayRead #(
 endmodule
 
 // A simple interface change, make it easier to figure out the connections for the AXI Write case
-// An AXI write is controlled by the master. No change to the default handshake
+// An AXI write is controlled by the manager. No change to the default handshake
 module axidelayWrite #(
    parameter MAX_DELAY = 3
 ) (
-   // Connect directly to the same named axi write wires in the master interface
+   // Connect directly to the same named axi write wires in the manager interface
    input  m_wvalid_i,
    output m_wready_o,
 
-   // Connect directly to the same named axi write wires in the slave interface
+   // Connect directly to the same named axi write wires in the subordinate interface
    output s_wvalid_o,
    input  s_wready_i,
 

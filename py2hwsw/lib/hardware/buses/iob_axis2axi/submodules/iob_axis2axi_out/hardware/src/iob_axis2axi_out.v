@@ -30,7 +30,7 @@ module iob_axis2axi_out #(
    assign axi_arburst_o = 1;
    assign axi_arlock_o  = 0;
    assign axi_arcache_o = 2;
-   assign axi_arprot_o  = 2;
+   // assign axi_arprot_o  = 2;
    assign axi_arqos_o   = 0;
 
    // Regs to assign to outputs
@@ -44,14 +44,19 @@ module iob_axis2axi_out #(
 
    // Instantiation wires
    wire [AXI_ADDR_W-1:0] current_address, current_length;
-   wire [      1:0] state;
+   wire [ 1:0] state;
 
    // Logical wires and combinatorial regs
-   wire             doing_global_transfer = (state != 2'h0);
-   wire             doing_local_transfer = (state == 2'h3);
-   wire [     15:0] boundary_transfer_len = (16'h1000 - current_address[11:0]) >> 2;
-   wire             normal_burst_possible = (current_length >= BURST_SIZE);
-   wire             last_burst_possible = (current_length < BURST_SIZE);
+   wire        doing_global_transfer;
+   wire        doing_local_transfer;
+   wire [15:0] boundary_transfer_len;
+   wire        normal_burst_possible;
+   wire        last_burst_possible;
+   assign doing_global_transfer = (state != 2'h0);
+   assign doing_local_transfer  = (state == 2'h3);
+   assign boundary_transfer_len = (16'h1000 - current_address[11:0]) >> 2;
+   assign normal_burst_possible = (current_length >= BURST_SIZE);
+   assign last_burst_possible   = (current_length < BURST_SIZE);
 
    wire [BURST_W:0] burst_size;
 
@@ -68,9 +73,10 @@ module iob_axis2axi_out #(
    generate
       if (AXI_ADDR_W >= 13) begin  // 4k boundary can only happen to LEN higher or equal to 13
 
-         wire [     12:0] boundary_transfer_len = (13'h1000 - current_address[11:0]) >> 2;
+         wire [12:0] boundary_transfer_len;
+         assign boundary_transfer_len = (13'h1000 - current_address[11:0]) >> 2;
 
-         reg  [BURST_W:0] boundary_burst_size;
+         reg [BURST_W:0] boundary_burst_size;
          always @* begin
             boundary_burst_size = non_boundary_burst_size;
 
@@ -85,7 +91,8 @@ module iob_axis2axi_out #(
       end
    endgenerate
 
-   wire [BURST_W:0] transfer_len = burst_size - 1;
+   wire [BURST_W:0] transfer_len;
+   assign transfer_len       = burst_size - 1;
 
    // Assignment to outputs
    assign axis_out_data_o    = axi_rdata_i;
@@ -129,26 +136,26 @@ module iob_axis2axi_out #(
       endcase
    end
 
-   iob_reg_re #(BURST_W + 1, 0) axi_length_reg (
+   iob_reg_cear_re #(BURST_W + 1, 0) axi_length_reg (
       `include "iob_axis2axi_out_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .en_i  (state == BEGIN_LOCAL),
       .data_i(transfer_len),
       .data_o(arlen_int)
    );
-   iob_reg_r #(AXI_ADDR_W, 0) address_reg (
+   iob_reg_cear_r #(AXI_ADDR_W, 0) address_reg (
       `include "iob_axis2axi_out_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .data_i(next_address),
       .data_o(current_address)
    );
-   iob_reg_r #(AXI_ADDR_W, 0) length_reg (
+   iob_reg_cear_r #(AXI_ADDR_W, 0) length_reg (
       `include "iob_axis2axi_out_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .data_i(next_length),
       .data_o(current_length)
    );
-   iob_reg_r #(2, 0) state_reg (
+   iob_reg_cear_r #(2, 0) state_reg (
       `include "iob_axis2axi_out_iob_clk_s_s_portmap.vs"
       .rst_i (rst_i),
       .data_i(state_nxt),

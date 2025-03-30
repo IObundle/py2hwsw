@@ -59,7 +59,7 @@ module iob_axis2axi_tb;
    wire delayed_axis_out_valid;
    reg delayed_axis_out_ready;
 
-   // AXI-4 full master I/F
+   // AXI-4 full manager I/F
    wire ddr_axi_awid;  //Address write channel ID
    wire [ADDR_W-1:0] ddr_axi_awaddr;  //Address write channel address
    wire [8-1:0] ddr_axi_awlen;  //Address write channel burst length
@@ -69,8 +69,8 @@ module iob_axis2axi_tb;
    wire [2-1:0] ddr_axi_awlock;  //Address write channel lock type
    wire [4-1:0] ddr_axi_awcache
        ;  //Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-   wire [3-1:0] ddr_axi_awprot
-       ;  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+   // wire [3-1:0] ddr_axi_awprot
+   ;  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
    wire [4-1:0] ddr_axi_awqos;  //Address write channel quality of service
    wire ddr_axi_awvalid;  //Address write channel valid
    wire ddr_axi_awready;  //Address write channel ready
@@ -91,28 +91,28 @@ module iob_axis2axi_tb;
    wire [2-1:0] ddr_axi_arlock;  //Address read channel lock type
    wire [4-1:0] ddr_axi_arcache
        ;  //Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-   wire [3-1:0] ddr_axi_arprot
-       ;  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
-   wire [4-1:0] ddr_axi_arqos;  //Address read channel quality of service
-   wire ddr_axi_arvalid;  //Address read channel valid
-   wire ddr_axi_arready;  //Address read channel ready
-   wire ddr_axi_rid;  //Read channel ID
-   wire [DATA_W-1:0] ddr_axi_rdata;  //Read channel data
-   wire [2-1:0] ddr_axi_rresp;  //Read channel response
-   wire ddr_axi_rlast;  //Read channel last word
+   // wire [3-1:0] ddr_axi_arprot
+   ;  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+   wire    [       4-1:0] ddr_axi_arqos;  //Address read channel quality of service
+   wire                   ddr_axi_arvalid;  //Address read channel valid
+   wire                   ddr_axi_arready;  //Address read channel ready
+   wire                   ddr_axi_rid;  //Read channel ID
+   wire    [  DATA_W-1:0] ddr_axi_rdata;  //Read channel data
+   wire    [       2-1:0] ddr_axi_rresp;  //Read channel response
+   wire                   ddr_axi_rlast;  //Read channel last word
 
    // axi_ram_mem
-   wire axi_ram_ext_mem_clk;
-   wire [32-1:0] axi_ram_ext_mem_r_data;
-   wire axi_ram_ext_mem_r_en;
-   wire [32-1:0] axi_ram_ext_mem_r_addr;
-   wire [32-1:0] axi_ram_ext_mem_w_data;
-   wire [4-1:0] axi_ram_ext_mem_w_strb;
-   wire [32-1:0] axi_ram_ext_mem_w_addr;
+   wire                   axi_ram_ext_mem_clk;
+   wire    [      32-1:0] axi_ram_ext_mem_r_data;
+   wire                   axi_ram_ext_mem_r_en;
+   wire    [ADDR_W-2-1:0] axi_ram_ext_mem_r_addr;
+   wire    [      32-1:0] axi_ram_ext_mem_w_data;
+   wire    [       4-1:0] axi_ram_ext_mem_w_strb;
+   wire    [ADDR_W-2-1:0] axi_ram_ext_mem_w_addr;
 
    // Iterators
-   integer i;
-   integer fd;
+   integer                i;
+   integer                fd;
 
    initial begin
 
@@ -326,11 +326,11 @@ module iob_axis2axi_tb;
    axidelayRead #(
       .MAX_DELAY(DELAY_AXI_READ)
    ) delayRead (
-      // Connect directly to the same named axi read wires in the master interface
+      // Connect directly to the same named axi read wires in the manager interface
       .m_rvalid_o(m_rvalid),
       .m_rready_i(m_rready),
 
-      // Connect directly to the same named axi read wires in the slave interface
+      // Connect directly to the same named axi read wires in the subordinate interface
       .s_rvalid_i(s_rvalid),
       .s_rready_o(s_rready),
 
@@ -342,11 +342,11 @@ module iob_axis2axi_tb;
    axidelayWrite #(
       .MAX_DELAY(DELAY_AXI_WRITE)
    ) delayWrite (
-      // Connect directly to the same named axi write wires in the master interface
+      // Connect directly to the same named axi write wires in the manager interface
       .m_wvalid_i(m_wvalid),
       .m_wready_o(m_wready),
 
-      // Connect directly to the same named axi write wires in the slave interface
+      // Connect directly to the same named axi write wires in the subordinate interface
       .s_wvalid_o(s_wvalid),
       .s_wready_i(s_wready),
 
@@ -358,11 +358,11 @@ module iob_axis2axi_tb;
    axidelay #(
       .MAX_DELAY(DELAY_AXIS_IN)
    ) delayIn (
-      // Master interface. Connect to a slave interface
+      // Manager interface. Connect to a subordinate interface
       .m_valid_o(delayed_axis_in_valid),
       .m_ready_i(delayed_axis_in_ready),
 
-      // Slave interface. Connect to a master interface
+      // Subordinate interface. Connect to a manager interface
       .s_valid_i(axis_in_valid),
       .s_ready_o(axis_in_ready),
 
@@ -373,11 +373,11 @@ module iob_axis2axi_tb;
    axidelay #(
       .MAX_DELAY(DELAY_AXIS_OUT)
    ) delayOut (
-      // Master interface. Connect to a slave interface
+      // Manager interface. Connect to a subordinate interface
       .m_valid_o(delayed_axis_out_valid),
       .m_ready_i(delayed_axis_out_ready),
 
-      // Slave interface. Connect to a master interface
+      // Subordinate interface. Connect to a manager interface
       .s_valid_i(non_delayed_axis_out_valid),
       .s_ready_o(non_delayed_axis_out_ready),
 
@@ -423,7 +423,7 @@ module iob_axis2axi_tb;
       .axis_out_ready_i(non_delayed_axis_out_ready),
 
       //
-      // AXI-4 full master I/F
+      // AXI-4 full manager I/F
       //
       .axi_awid_o(ddr_axi_awid),  //Address write channel ID
       .axi_awaddr_o(ddr_axi_awaddr),  //Address write channel address
@@ -432,7 +432,7 @@ module iob_axis2axi_tb;
       .axi_awburst_o(ddr_axi_awburst),  //Address write channel burst type
       .axi_awlock_o(ddr_axi_awlock),  //Address write channel lock type
       .axi_awcache_o(ddr_axi_awcache),  //Address write channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-      .axi_awprot_o(ddr_axi_awprot),  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+      // .axi_awprot_o(ddr_axi_awprot),  //Address write channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       .axi_awqos_o(ddr_axi_awqos),  //Address write channel quality of service
       .axi_awvalid_o(ddr_axi_awvalid),  //Address write channel valid
       .axi_awready_i(ddr_axi_awready),  //Address write channel ready
@@ -453,7 +453,7 @@ module iob_axis2axi_tb;
       .axi_arburst_o(ddr_axi_arburst),  //Address read channel burst type
       .axi_arlock_o(ddr_axi_arlock),  //Address read channel lock type
       .axi_arcache_o(ddr_axi_arcache),  //Address read channel memory type. Transactions set with Normal Non-cacheable Modifiable and Bufferable (0011).
-      .axi_arprot_o(ddr_axi_arprot),  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
+      // .axi_arprot_o(ddr_axi_arprot),  //Address read channel protection type. Transactions set with Normal, Secure, and Data attributes (000).
       .axi_arqos_o(ddr_axi_arqos),  //Address read channel quality of service
       .axi_arvalid_o(ddr_axi_arvalid),  //Address read channel valid
       .axi_arready_i(ddr_axi_arready),  //Address read channel ready
@@ -479,7 +479,7 @@ module iob_axis2axi_tb;
       .rst_i(rst),
 
       //
-      // AXI-4 full master interface
+      // AXI-4 full manager interface
       //
 
       // Address write
@@ -489,7 +489,7 @@ module iob_axis2axi_tb;
       .axi_awsize_i (ddr_axi_awsize),
       .axi_awburst_i(ddr_axi_awburst),
       .axi_awlock_i (ddr_axi_awlock),
-      .axi_awprot_i (ddr_axi_awprot),
+      // .axi_awprot_i (ddr_axi_awprot),
       .axi_awqos_i  (ddr_axi_awqos),
       .axi_awcache_i(ddr_axi_awcache),
       .axi_awvalid_i(ddr_axi_awvalid),
@@ -516,7 +516,7 @@ module iob_axis2axi_tb;
       .axi_arburst_i(ddr_axi_arburst),
       .axi_arlock_i (ddr_axi_arlock),
       .axi_arcache_i(ddr_axi_arcache),
-      .axi_arprot_i (ddr_axi_arprot),
+      // .axi_arprot_i (ddr_axi_arprot),
       .axi_arqos_i  (ddr_axi_arqos),
       .axi_arvalid_i(ddr_axi_arvalid),
       .axi_arready_o(ddr_axi_arready),

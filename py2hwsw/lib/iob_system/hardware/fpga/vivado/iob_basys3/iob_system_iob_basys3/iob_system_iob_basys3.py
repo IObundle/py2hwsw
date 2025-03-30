@@ -168,7 +168,7 @@ def setup(py_params_dict):
                 "s0_clk_rst_io": "intercon_s0_clk_rst",
                 "s0_axi_s": "axi",
             },
-            "num_slaves": 1,
+            "num_subordinates": 1,
         },
         {
             "core_name": "iob_axi_ram",

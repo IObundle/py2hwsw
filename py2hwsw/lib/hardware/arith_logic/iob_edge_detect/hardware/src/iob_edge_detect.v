@@ -19,7 +19,7 @@ module iob_edge_detect #(
   generate
     if (EDGE_TYPE == "falling") begin : gen_falling
       assign bit_int = ~bit_i;
-      iob_reg_r #(
+      iob_reg_cear_r #(
           .DATA_W (1),
           .RST_VAL(1'b0)
       ) bit_reg (
@@ -32,7 +32,7 @@ module iob_edge_detect #(
     end else begin : gen_default_rising
       assign bit_int = bit_i;
 
-      iob_reg_r #(
+      iob_reg_cear_r #(
           .DATA_W (1),
           .RST_VAL(1'b1)
       ) bit_reg (
@@ -49,7 +49,7 @@ module iob_edge_detect #(
       assign detected_o = bit_int & ~bit_int_q;
     end else begin : gen_step
       wire detected_prev;
-      iob_reg_r #(
+      iob_reg_cear_r #(
           .DATA_W(1)
       ) detected_reg (
           `include "iob_edge_detect_iob_clk_s_s_portmap.vs"

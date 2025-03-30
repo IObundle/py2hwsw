@@ -121,12 +121,17 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "descr": "AXI master interface",
+                "descr": "AXI manager interface",
             },
             {
                 "name": "extmem_io",
                 "descr": "External memory interface",
                 "signals": [
+                    {
+                        "name": "ext_mem_clk_o",
+                        "width": 1,
+                        "descr": "Memory clock output",
+                    },
                     {
                         "name": "ext_mem_w_en_o",
                         "width": 1,

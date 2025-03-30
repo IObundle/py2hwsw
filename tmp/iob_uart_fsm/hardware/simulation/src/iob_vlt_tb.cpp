@@ -76,7 +76,7 @@ void iob_hard_reset() {
 #endif
 }
 
-// Write data to IOb Native slave
+// Write data to IOb Native subordinate
 void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
                unsigned int cpu_data) {
 
@@ -106,7 +106,7 @@ void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
   clk_tick();
 }
 
-// Read data from IOb Native slave
+// Read data from IOb Native subordinate
 unsigned int iob_read(unsigned int cpu_address, unsigned int cpu_data_w) {
 
   unsigned int nbytes = cpu_data_w / 8 + (cpu_data_w % 8 ? 1 : 0);

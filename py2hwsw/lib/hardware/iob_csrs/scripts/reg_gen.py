@@ -9,7 +9,7 @@
 import os
 
 import csr_gen
-from iob_csr import iob_csr, iob_csr_group
+from csr_classes import iob_csr, iob_csr_group
 
 
 def find_obj_in_list(obj_list, obj_name, process_func=lambda o: o):
@@ -118,6 +118,15 @@ def generate_csr_sw(core, csr_gen_obj, reg_table):
             reg_table, core["build_dir"] + "/" + sw_dest_dir, name
         )
         csr_gen_obj.write_swcode(reg_table, core["build_dir"] + "/" + sw_dest_dir, name)
+        # FIXME: Below may not longer be needed due to change in line above
+        # csr_gen_obj.write_utb_code(reg_table, core["build_dir"] + "/software/src", name)
+        # sim_src = os.path.join(core["build_dir"], "hardware/simulation/src")
+        # if os.path.exists(f"{sim_src}/{name}_csrs.h"):
+        #     os.remove(f"{sim_src}/{name}_csrs.h")
+        # os.symlink(f"../../../software/src/{name}_csrs.h", f"{sim_src}/{name}_csrs.h")
+        # if os.path.exists(f"{sim_src}/{name}_csrs.c"):
+        #     os.remove(f"{sim_src}/{name}_csrs.c")
+        # os.symlink(f"../../../software/src/{name}_csrs.c", f"{sim_src}/{name}_csrs.c")
 
 
 def generate_csr(core):

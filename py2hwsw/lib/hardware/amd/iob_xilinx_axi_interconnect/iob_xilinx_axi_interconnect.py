@@ -4,13 +4,15 @@
 
 
 def setup(py_params_dict):
-    # Number of slave interfaces (number of masters to connect to)
-    N_SLAVES = (
-        int(py_params_dict["num_slaves"]) if "num_slaves" in py_params_dict else 1
+    # Number of subordinate interfaces (number of managers to connect to)
+    N_SUBORDINATES = (
+        int(py_params_dict["num_subordinates"])
+        if "num_subordinates" in py_params_dict
+        else 1
     )
-    # Number of master interfaces (number of slaves to connect to)
-    N_MASTERS = (
-        int(py_params_dict["num_masters"]) if "num_masters" in py_params_dict else 1
+    # Number of manager interfaces (number of subordinates to connect to)
+    N_MANAGERS = (
+        int(py_params_dict["num_managers"]) if "num_managers" in py_params_dict else 1
     )
 
     attributes_dict = {
@@ -66,11 +68,11 @@ def setup(py_params_dict):
             },
         ],
     }
-    for i in range(N_SLAVES):
+    for i in range(N_SUBORDINATES):
         attributes_dict["ports"] += [
             {
                 "name": f"s{i}_clk_rst_io",
-                "descr": f"Slave {i} clock reset interface",
+                "descr": f"Subordinate {i} clock reset interface",
                 "signals": [
                     {"name": f"s{i}_clk_i", "width": "1"},
                     {"name": f"s{i}_arstn_o", "width": "1"},
@@ -86,14 +88,14 @@ def setup(py_params_dict):
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                 },
-                "descr": f"Slave {i} interface",
+                "descr": f"Subordinate {i} interface",
             },
         ]
-    for i in range(N_MASTERS):
+    for i in range(N_MANAGERS):
         attributes_dict["ports"] += [
             {
                 "name": f"m{i}_clk_rst_io",
-                "descr": f"Master {i} clock reset output interface",
+                "descr": f"Manager {i} clock reset output interface",
                 "signals": [
                     {"name": f"m{i}_clk_i", "width": "1"},
                     {"name": f"m{i}_arstn_o", "width": "1"},
@@ -110,7 +112,7 @@ def setup(py_params_dict):
                     "DATA_W": "AXI_DATA_W",
                     "LOCK_W": 1,
                 },
-                "descr": f"Master {i} axi interface",
+                "descr": f"Manager {i} axi interface",
             },
         ]
     #
@@ -124,12 +126,12 @@ def setup(py_params_dict):
         },
     ]
 
-    for i in range(N_SLAVES):
+    for i in range(N_SUBORDINATES):
         attributes_dict["snippets"][-1][
             "verilog_code"
         ] += f"""
         //
-        // Slave interface {i}
+        // Subordinate interface {i}
         //
         .S{i:02d}_AXI_ARESET_OUT_N(s{i}_arstn_o),
         .S{i:02d}_AXI_ACLK        (s{i}_clk_i),
@@ -182,12 +184,12 @@ def setup(py_params_dict):
         .S{i:02d}_AXI_RREADY(s{i}_axi_rready_i),
 """
 
-    for i in range(N_MASTERS):
+    for i in range(N_MANAGERS):
         attributes_dict["snippets"][-1][
             "verilog_code"
         ] += f"""
         //
-        // Master interface {i}
+        // Manager interface {i}
         //
 
         .M{i:02d}_AXI_ARESET_OUT_N(m{i}_arstn_o),

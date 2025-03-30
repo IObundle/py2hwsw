@@ -9,14 +9,16 @@
 The \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_conf.py}{iob\_conf} class is used to represent a configuration option of the core.
 This class contains a set of attributes, each preceded by a comment describing the purpose of the attribute.
 
-\lstinputlisting[firstline=17,lastline=37,language=Python]{iob_conf.py}
+% Show iob_conf attributes
+% py2_macro: class_attributes iob_conf from iob_conf.py
 \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_conf.py}{View Source}
 
 
 The \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_conf.py}{iob\_conf\_group} class is used to represent a group of configuration options.
 This class contains a set of attributes, each preceded by a comment describing the purpose of the attribute.
 
-\lstinputlisting[firstline=60,lastline=72,language=Python]{iob_conf.py}
+% Show iob_conf_group attributes
+% py2_macro: class_attributes iob_conf_group from iob_conf.py
 \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_conf.py}{View Source}
 
 %
@@ -27,7 +29,8 @@ The py2hwsw tool uses methods from the \href{https://github.com/IObundle/py2hwsw
 
 Each generated Verilog macro is based on the attributes from the corresponding instance of the `iob\_conf` class.
 
-\lstinputlisting[firstline=30,lastline=51,language=Python]{config_gen.py}
+% Show group generation of conf_vh
+% py2_macro: listing conf_vh from config_gen.py
 \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/config_gen.py}{View Source}
 
 
@@ -35,5 +38,6 @@ The py2hwsw tool uses methods from the \href{https://github.com/IObundle/py2hwsw
 
 Each generated Verilog parameter is based on the attributes from the corresponding instance of the `iob\_conf` class.
 
-\lstinputlisting[firstline=33,lastline=48,language=Python]{param_gen.py}
+% Show verilog param generation
+% py2_macro: listing generate_params from param_gen.py
 \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/param_gen.py}{View Source}

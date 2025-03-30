@@ -35,7 +35,7 @@ module iob_uart_core (
    always @(posedge clk_i) cts_int <= {cts_int[0], rs232_cts_i};
 
    wire [7:0] tx_data_int;
-   iob_reg_e #(
+   iob_reg_cear_e #(
       .DATA_W (8),
       .RST_VAL(8'b0)
    ) txdata_reg (

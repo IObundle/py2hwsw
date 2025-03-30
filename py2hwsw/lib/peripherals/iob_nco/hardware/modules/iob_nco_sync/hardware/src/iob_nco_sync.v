@@ -106,7 +106,7 @@ module iob_nco_sync #(
    );
 
    //fractional period value register
-   iob_reg_r #(
+   iob_reg_cear_r #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) period_wen_reg (

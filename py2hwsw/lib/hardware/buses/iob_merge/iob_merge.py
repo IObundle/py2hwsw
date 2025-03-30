@@ -160,6 +160,20 @@ def setup(py_params_dict):
                 {"name": "output_iob_wstrb_o"},
             ],
         },
+        {
+            "name": "mux_rready_data_i",
+            "descr": "Input of rready mux",
+            "signals": [
+                {"name": "mux_rready_input", "width": NUM_INPUTS},
+            ],
+        },
+        {
+            "name": "mux_rready_data_o",
+            "descr": "Output of rready mux",
+            "signals": [
+                {"name": "output_iob_rready_o"},
+            ],
+        },
         # Demux signals
         {
             "name": "demux_rdata_data_i",
@@ -221,15 +235,22 @@ def setup(py_params_dict):
     ]
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_reg_r",
+            "core_name": "iob_reg",
             "instance_name": "sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": "sel_reg_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "sel_reg_data_i",
                 "data_o": "sel_reg_data_o",
             },
@@ -285,6 +306,19 @@ def setup(py_params_dict):
                 "sel_i": "input_sel",
                 "data_i": "mux_wstrb_data_i",
                 "data_o": "mux_wstrb_data_o",
+            },
+        },
+        {
+            "core_name": "iob_mux",
+            "instance_name": "iob_mux_rready",
+            "parameters": {
+                "DATA_W": 1,
+                "N": NUM_INPUTS,
+            },
+            "connect": {
+                "sel_i": "input_sel",
+                "data_i": "mux_rready_data_i",
+                "data_o": "mux_rready_data_o",
             },
         },
         # demuxers
@@ -357,7 +391,7 @@ def setup(py_params_dict):
         verilog_outputs.append(f"input{port_idx}_iob_ready")
     verilog_code += "\n"
     # Connect muxer inputs
-    for signal in ["valid", "addr", "wdata", "wstrb"]:
+    for signal in ["valid", "addr", "wdata", "wstrb", "rready"]:
         verilog_code += f"    assign mux_{signal}_input = {{"
         for port_idx in range(NUM_INPUTS - 1, -1, -1):
             # Include padding bits for address

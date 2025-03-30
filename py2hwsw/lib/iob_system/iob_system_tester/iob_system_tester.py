@@ -74,7 +74,7 @@ def setup(py_params_dict):
                             "rs232_m": "sut_rs232_inverted",
                         },
                     },
-                    # NOTE: Add other verification tools (tester peripherals) here.
+                    # NOTE: Add other verification instruments (tester peripherals) here.
                 ],
             },
         },

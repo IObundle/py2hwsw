@@ -32,7 +32,7 @@ module iob_timer_core #(
    );
 
    //time counter register
-   iob_reg_re #(
+   iob_reg_cear_re #(
       .DATA_W (2 * DATA_W),
       .RST_VAL(0)
    ) time_counter_reg (

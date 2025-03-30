@@ -18,9 +18,9 @@ int main() {
 
   // connect with console
   do {
-    if (IOB_UART_CSRS_GET_TXREADY())
+    if (iob_uart_csrs_get_txready())
       uart_putc((char)ENQ);
-  } while (!IOB_UART_CSRS_GET_RXREADY());
+  } while (!iob_uart_csrs_get_rxready());
 
   // welcome message
   uart_puts(PROGNAME);

@@ -6,8 +6,8 @@
 
 #include "iob_bsp.h"
 #include "iob_printf.h"
-#include "iob_system_conf.h"
-#include "iob_system_mmap.h"
+#include "iob_system_tester_conf.h"
+#include "iob_system_tester_mmap.h"
 #include "iob_timer.h"
 #include "iob_uart.h"
 #include <string.h>
@@ -44,15 +44,15 @@ int main() {
   // Wait for ENQ signal from SUT
   while ((c = uart_getc()) != ENQ)
     if (DEBUG) {
-      IOB_UART_INIT_BASEADDR(UART0_BASE);
+      iob_uart_init_baseaddr(UART0_BASE);
       uart_putc(c);
-      IOB_UART_INIT_BASEADDR(UART1_BASE);
+      iob_uart_init_baseaddr(UART1_BASE);
     };
 
   // Send ack to sut
   uart_puts("\nTester ACK");
 
-  IOB_UART_INIT_BASEADDR(UART0_BASE);
+  iob_uart_init_baseaddr(UART0_BASE);
   uart_puts("[Tester]: Received SUT UART enquiry and sent acknowledge.\n");
 
   //
@@ -60,7 +60,7 @@ int main() {
   //
 
   uart_puts("\n[Tester]: Reading SUT messages...\n");
-  IOB_UART_INIT_BASEADDR(UART1_BASE);
+  iob_uart_init_baseaddr(UART1_BASE);
 
   // Delay to ensure SUT is waiting for ack
   for (unsigned int i = 0; i < 100; i++)
@@ -73,9 +73,9 @@ int main() {
   while ((c = uart_getc()) != EOT) {
     buffer[i] = c;
     if (DEBUG) {
-      IOB_UART_INIT_BASEADDR(UART0_BASE);
+      iob_uart_init_baseaddr(UART0_BASE);
       uart_putc(c);
-      IOB_UART_INIT_BASEADDR(UART1_BASE);
+      iob_uart_init_baseaddr(UART1_BASE);
     }
     i++;
   }
@@ -86,7 +86,7 @@ int main() {
   //
 
   // Switch back to UART0
-  IOB_UART_INIT_BASEADDR(UART0_BASE);
+  iob_uart_init_baseaddr(UART0_BASE);
 
   // Send messages previously stored from SUT
   uart_puts("[Tester]: #### Messages received from SUT: ####\n\n");

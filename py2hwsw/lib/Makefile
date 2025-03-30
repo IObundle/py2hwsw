@@ -19,6 +19,8 @@ export LIB_DIR
 # Default lib module to setup. Can be overriden by the user.
 CORE ?=iob_ctls
 
+PY_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM)"
+
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi
 
@@ -30,7 +32,7 @@ endif
 all: sim-test
 
 setup:
-	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params 'init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM)' $(SETUP_ARGS)"
+	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params '$(PY_PARAMS)' $(SETUP_ARGS)"
 
 sim-build:
 	nix-shell --run "scripts/test.sh build $(CORE)"
@@ -55,10 +57,10 @@ doc-build:
 	nix-shell --run "make clean setup CORE=$(CORE) && make -C $(BUILD_DIR) doc-build"
 
 py2-doc-build:
-	nix-shell --run "py2hwsw --py2hwsw_docs && make -C py2hwsw_docs/document/ build"
+	nix-shell --run "py2hwsw --py2hwsw_docs && make -C py2hwsw_generated_docs/document/ build"
 
 py2-doc-update:
-	cp py2hwsw_docs/document/ug.pdf ../py2hwsw_document/document/ug.pdf
+	cp py2hwsw_generated_docs/document/ug.pdf ../py2hwsw_document/document/ug.pdf
 
 
 delivery:
@@ -93,7 +95,7 @@ board_server_status:
 
 clean:
 	nix-shell --run "py2hwsw $(CORE) clean --build_dir '$(BUILD_DIR)'"
-	@rm -rf ../*.summary ../*.rpt py2hwsw_docs
+	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs
 	@find . -name \*~ -delete
 
 .PHONY: clean

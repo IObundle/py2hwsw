@@ -17,7 +17,7 @@ def setup(py_params_dict):
 
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
-    PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
+    # PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
     RESP_W = int(py_params_dict["resp_w"]) if "resp_w" in py_params_dict else 2
     DATA_SECTION_W = (
         int(py_params_dict["data_section_w"])
@@ -27,7 +27,7 @@ def setup(py_params_dict):
 
     axil_signals = [
         ("axil_araddr", "input", ADDR_W, "read"),
-        ("axil_arprot", "input", PROT_W, "read"),
+        # ("axil_arprot", "input", PROT_W, "read"),
         ("axil_arvalid", "input", 1, "read"),
         ("axil_arready", "output", 1, "read"),
         ("axil_rdata", "output", DATA_W, "read"),
@@ -35,7 +35,7 @@ def setup(py_params_dict):
         ("axil_rvalid", "output", 1, "read"),
         ("axil_rready", "input", 1, "read"),
         ("axil_awaddr", "input", ADDR_W, "write"),
-        ("axil_awprot", "input", PROT_W, "write"),
+        # ("axil_awprot", "input", PROT_W, "write"),
         ("axil_awvalid", "input", 1, "write"),
         ("axil_awready", "output", 1, "write"),
         ("axil_wdata", "input", DATA_W, "write"),
@@ -231,30 +231,46 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         # Read blocks
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "read_sel_reg_re",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "read_sel_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:read_sel_reg_en",
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "read_sel_reg_data_i",
                 "data_o": "read_sel_reg_data_o",
             },
         },
         # Write blocks
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "write_sel_reg_re",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "write_sel_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:write_sel_reg_en",
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "write_sel_reg_data_i",
                 "data_o": "write_sel_reg_data_o",
             },

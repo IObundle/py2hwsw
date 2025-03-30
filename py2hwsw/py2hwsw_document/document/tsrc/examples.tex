@@ -1,0 +1,52 @@
+% SPDX-FileCopyrightText: 2025 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+This section provides three end-to-end examples of using Py2HWSW to generate and verify digital hardware cores. The examples cover the iob\_aoi, iob\_pulse\_gen, and iob\_soc cores, showcasing the automation of Verilog module generation from attributes.
+
+\subsubsection{iob\_aoi Example}
+
+The iob\_aoi core is a simple example that combines an AND, OR, and invert logic gates. The core's attributes are defined in the iob\_aoi.py file, available at \url{https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/basic_tests/iob_aoi}. To generate the iob\_aoi core, follow these steps:
+
+\begin{enumerate}
+\item Create or modify the iob\_aoi.py file to set the attributes of the core, describing how it should be generated using the Py2HWSW standard core dictionary interface.
+\item Optionally, add more files to the setup directory as needed, such as manual Verilog sources or templates, scripts, or software.
+\item Call the Py2HWSW setup process using the command:
+\begin{verbatim}
+nix-shell --run "py2hwsw iob_aoi setup --build_dir '$(BUILD_DIR)'"
+\end{verbatim}
+\item The generated build directory contains all the Verilog sources, Makefile, and configurations to run the core in various flows (simulation, FPGA).
+\item To run the core in simulation, call the command: \texttt{make sim-run} from the build directory.
+\end{enumerate}
+
+\subsubsection{iob\_pulse\_gen Example}
+
+The iob\_pulse\_gen core is used to generate signal pulses with configurable start and duration. The core's attributes are defined in the iob\_pulse\_gen.py file, available at \url{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/hardware/clocks_resets/iob_pulse_gen/iob_pulse_gen.py}. To generate the iob\_pulse\_gen core, follow these steps:
+
+\begin{enumerate}
+\item Create or modify the iob\_pulse\_gen.py file to set the attributes of the core, describing how it should be generated using the Py2HWSW standard core dictionary interface.
+\item Optionally, add more files to the setup directory as needed, such as manual Verilog sources or templates, scripts, or software.
+\item Call the Py2HWSW setup process using the command:
+\begin{verbatim}
+nix-shell --run "py2hwsw iob_pulse_gen setup --build_dir '$(BUILD_DIR)'"
+\end{verbatim}
+\item The generated build directory contains all the Verilog sources, Makefile, and configurations to run the core in various flows (simulation, FPGA).
+\item To run the core in simulation, call the command: \texttt{make sim-run} from the build directory.
+\end{enumerate}
+
+\subsubsection{iob\_soc Example}
+
+The iob\_soc core is a more complex example used to create a system on chip. The core's attributes are defined in the iob\_soc.py file, available at \url{https://github.com/IObundle/iob-soc}. The iob\_soc.py file supports high-level Python parameters that allow configuring main SoC components like the CPU, memories, and peripherals. To generate the iob\_soc core, follow these steps:
+
+\begin{enumerate}
+\item Create or modify the iob\_soc.py file to set the attributes of the core, describing how it should be generated using the Py2HWSW standard core dictionary interface.
+\item Optionally, add more files to the setup directory as needed, such as manual Verilog sources or templates, scripts, or software.
+\item Call the Py2HWSW setup process using the command:
+\begin{verbatim}
+nix-shell --run "py2hwsw iob_soc setup --build_dir '$(BUILD_DIR)'"
+\end{verbatim}
+\item The generated build directory contains all the Verilog sources, Makefile, and configurations to run the core in various flows (simulation, FPGA).
+\item To run the core in simulation, call the command: \texttt{make sim-run} from the build directory.
+\end{enumerate}
+
+These examples demonstrate the automation of Verilog module generation from attributes using Py2HWSW, showcasing the flexibility and ease of use of the framework.

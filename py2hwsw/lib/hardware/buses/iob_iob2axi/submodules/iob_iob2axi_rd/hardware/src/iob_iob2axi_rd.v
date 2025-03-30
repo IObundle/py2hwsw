@@ -30,12 +30,12 @@ module iob_iob2axi_rd #(
    output                 error_o,
 
    //
-   // AXI-4 Full Master Read I/F
+   // AXI-4 Full Manager Read I/F
    //
    `include "iob_iob2axi_rd_m_axi_read_m_port.vs"
 
    //
-   // Native Master Write I/F
+   // Native Manager Write I/F
    //
    output                m_iob_valid_o,
    output [  ADDR_W-1:0] m_iob_addr_o,
@@ -65,7 +65,8 @@ module iob_iob2axi_rd #(
 
    // Hold
    reg                  m_iob_valid_reg;
-   wire                 hold = m_iob_valid_reg & ~m_iob_ready_i;
+   wire                 hold;
+   assign hold = m_iob_valid_reg & ~m_iob_ready_i;
    always @(posedge clk_i, posedge rst_i) begin
       if (rst_i) begin
          m_iob_valid_reg <= 1'b0;
@@ -129,8 +130,9 @@ module iob_iob2axi_rd #(
       end
    end
 
-   wire rst_valid_int = (state_nxt == ADDR_HS) ? 1'b1 : 1'b0;
-   reg  arvalid_int;
+   wire rst_valid_int;
+   assign rst_valid_int = (state_nxt == ADDR_HS) ? 1'b1 : 1'b0;
+   reg arvalid_int;
 
    always @(posedge clk_i, posedge rst_i) begin
       if (rst_i) begin

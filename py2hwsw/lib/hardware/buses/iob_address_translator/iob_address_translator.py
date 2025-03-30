@@ -14,7 +14,7 @@ interfaces = {
     ],
     "axil": [
         ("awaddr", "output", "ADDR_W", 32),
-        ("awprot", "output", "PROT_W", 3),
+        # ("awprot", "output", "PROT_W", 3),
         ("awvalid", "output", 1),
         ("awready", "input", 1),
         ("wdata", "output", "DATA_W", 32),
@@ -25,7 +25,7 @@ interfaces = {
         ("bvalid", "input", 1),
         ("bready", "output", 1),
         ("araddr", "output", "ADDR_W", 32),
-        ("arprot", "output", "PROT_W", 3),
+        # ("arprot", "output", "PROT_W", 3),
         ("arvalid", "output", 1),
         ("arready", "input", 1),
         ("rdata", "input", "DATA_W", 32),
@@ -35,7 +35,7 @@ interfaces = {
     ],
     "axi": [
         ("awaddr", "output", "ADDR_W", 32),
-        ("awprot", "output", "PROT_W", 3),
+        # ("awprot", "output", "PROT_W", 3),
         ("awvalid", "output", 1),
         ("awready", "input", 1),
         ("wdata", "output", "DATA_W", 32),
@@ -46,7 +46,7 @@ interfaces = {
         ("bvalid", "input", 1),
         ("bready", "output", 1),
         ("araddr", "output", "ADDR_W", 32),
-        ("arprot", "output", "PROT_W", 3),
+        # ("arprot", "output", "PROT_W", 3),
         ("arvalid", "output", 1),
         ("arready", "input", 1),
         ("rdata", "input", "DATA_W", 32),
@@ -185,16 +185,16 @@ begin
         "confs": verilog_parameters,
         "ports": [
             {
-                "name": "slave_s",
-                "descr": "Slave interface (connects to master)",
+                "name": "subordinate_s",
+                "descr": "Subordinate interface (connects to manager)",
                 "signals": {
                     "type": INTERFACE,
                     **interface_parameters,
                 },
             },
             {
-                "name": "master_m",
-                "descr": "Master interface (connects to slave)",
+                "name": "manager_m",
+                "descr": "Manager interface (connects to subordinate)",
                 "signals": {
                     "type": INTERFACE,
                     **interface_parameters,

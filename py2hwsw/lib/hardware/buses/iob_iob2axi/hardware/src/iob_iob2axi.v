@@ -13,7 +13,8 @@ module iob_iob2axi #(
 
    `include "iob_functions.vs"
 
-   wire rst_i = arst_i;
+   wire rst_i;
+   assign rst_i = arst_i;
 
    wire run_int;
    wire run_wr, run_rd;
@@ -38,11 +39,14 @@ module iob_iob2axi #(
    // Input FIFO
    //
    wire                       in_fifo_full;
-   wire                       in_fifo_wr = iob_valid_i & |iob_wstrb_i & ~in_fifo_full;
-   wire [DATA_W+DATA_W/8-1:0] in_fifo_wdata = {iob_wdata_i, iob_wstrb_i};
+   wire                       in_fifo_wr;
+   assign                       in_fifo_wr = iob_valid_i & |iob_wstrb_i & ~in_fifo_full;
+   wire [DATA_W+DATA_W/8-1:0] in_fifo_wdata;
+   assign in_fifo_wdata = {iob_wdata_i, iob_wstrb_i};
 
    wire                       in_fifo_empty;
-   wire                       in_fifo_rd = wr_valid;
+   wire                       in_fifo_rd;
+   assign                       in_fifo_rd = wr_valid;
    wire [DATA_W+DATA_W/8-1:0] in_fifo_rdata;
 
    wire [       AXI_LEN_W:0] in_fifo_level;
@@ -105,15 +109,19 @@ module iob_iob2axi #(
    // Output FIFO
    //
    wire                out_fifo_full;
-   wire                out_fifo_wr = rd_valid & |rd_wstrb & ~out_fifo_full;
-   wire [  DATA_W-1:0] out_fifo_wdata = rd_wdata;
+   wire                out_fifo_wr;
+   assign                out_fifo_wr = rd_valid & |rd_wstrb & ~out_fifo_full;
+   wire [  DATA_W-1:0] out_fifo_wdata;
+   assign out_fifo_wdata = rd_wdata;
 
    wire                out_fifo_empty;
-   wire                out_fifo_rd = iob_valid_i & ~|iob_wstrb_i & ~out_fifo_empty;
+   wire                out_fifo_rd;
+   assign                out_fifo_rd = iob_valid_i & ~|iob_wstrb_i & ~out_fifo_empty;
    wire [  DATA_W-1:0] out_fifo_rdata;
 
    wire [AXI_LEN_W:0] out_fifo_level;
-   wire [AXI_LEN_W:0] out_fifo_capacity = {1'b1, AXI_LEN_W'd0} - out_fifo_level;
+   wire [AXI_LEN_W:0] out_fifo_capacity;
+   assign out_fifo_capacity = {1'b1, AXI_LEN_W'd0} - out_fifo_level;
 
    reg                 out_fifo_empty_reg;
    always @(posedge clk_i, posedge rst_i) begin
@@ -171,10 +179,12 @@ module iob_iob2axi #(
    //
    // Compute next run
    //
-   wire [  AXI_LEN_W:0] length_int = direction ? in_fifo_level : out_fifo_capacity;
+   wire [  AXI_LEN_W:0] length_int;
+   assign length_int = direction ? in_fifo_level : out_fifo_capacity;
 
    reg  [AXI_LEN_W-1:0] count;
-   wire                  count_en = ~&count & |length_int;
+   wire                  count_en;
+   assign                  count_en = ~&count & |length_int;
 
    assign run_int   = ready_int & |length_int & (length_int[AXI_LEN_W] | &count);
    assign run_wr    = direction ? run_int : 1'b0;
@@ -201,9 +211,12 @@ module iob_iob2axi #(
 
    reg  [    ADDR_W-1:0] addr_int;
    reg  [   WADDR_W-1:0] addr_int_next;
-   wire [   WADDR_W-1:0] addr4k = {addr_int[ADDR_W-1:12], {(12 - (ADDR_W - WADDR_W)) {1'b1}}};
-   wire [   WADDR_W-1:0] addrRem = addr_int[ADDR_W-1-:WADDR_W] + length_int - 1'b1;
-   wire [   WADDR_W-1:0] minAddr = iob_min(addr4k, addrRem);
+   wire [   WADDR_W-1:0] addr4k;
+   wire [   WADDR_W-1:0] addrRem;
+   wire [   WADDR_W-1:0] minAddr;
+   assign addr4k = {addr_int[ADDR_W-1:12], {(12 - (ADDR_W - WADDR_W)) {1'b1}}};
+   assign addrRem = addr_int[ADDR_W-1-:WADDR_W] + length_int - 1'b1;
+   assign minAddr = iob_min(addr4k, addrRem);
 
    always @(posedge clk_i, posedge rst_i) begin
       if (rst_i) begin
@@ -242,9 +255,9 @@ module iob_iob2axi #(
       .ready_o (ready_rd),
       .error_o (error_rd),
 
-      // AXI-4 full read master I/F
+      // AXI-4 full read manager I/F
       `include "iob_iob2axi_rd_m_axi_read_m_m_portmap.vs"
-      // Native Master Write I/F
+      // Native Manager Write I/F
       .m_iob_valid_o(rd_valid),
       .m_iob_addr_o (rd_addr),
       .m_iob_wdata_o(rd_wdata),
@@ -269,10 +282,10 @@ module iob_iob2axi #(
       .ready_o (ready_wr),
       .error_o (error_wr),
 
-      // AXI-4 full write master I/F
+      // AXI-4 full write manager I/F
       `include "iob_iob2axi_wr_m_axi_write_m_m_portmap.vs"
 
-      // Native Master Read I/F
+      // Native Manager Read I/F
       .m_iob_valid_o(wr_valid),
       .m_iob_addr_o (wr_addr),
       .m_iob_rdata_i(wr_rdata),

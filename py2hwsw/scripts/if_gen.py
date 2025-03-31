@@ -270,14 +270,19 @@ if_types = [
 class interface:
     """Class to represent an interface for generation"""
 
+    # Type/Name of interface to generate
     type: str = ""
-    file_prefix: str = ""
+    # Prefix for signals of the interface
     prefix: str = ""
+    # Width multiplier. Used when concatenating multiple instances of the interface.
     mult: str | int = 1
+    # Generic string parameter that is passed to "get_<interface>_ports" function
     params: str = None
+    # Dictionary of width properties of interface
     widths: Dict[str, str] = field(default_factory=dict)
-    # For ports only:
-    # For portmaps .vs only:
+    # Prefix for generated "Verilog Snippets" of this interface
+    file_prefix: str = ""
+    # Prefix for "Verilog snippets" of portmaps of this interface:
     portmap_port_prefix: str = ""
 
     def __post_init__(self):
@@ -290,14 +295,15 @@ def dict2interface(interface_dict):
     Example interface dict:
     {
         "name": "cpu_m",
+        "descr": "cpu instruction bus",
         "signals": {
             "type": "iob",
+            # Generic string parameter
             "params": "",
             # Widths/Other parameters
             "DATA_W": "DATA_W",
             "ADDR_W": "ADDR_W",
         },
-        "descr": "cpu instruction bus",
     },
     """
     if not interface_dict:
@@ -1197,7 +1203,7 @@ def get_wb_ports():
             descr="Data input.",
         ),
         iob_signal(
-            name="wb_dat_o",
+            name="wb_datout_o",
             width=DATA_W,
             descr="Data output.",
         ),

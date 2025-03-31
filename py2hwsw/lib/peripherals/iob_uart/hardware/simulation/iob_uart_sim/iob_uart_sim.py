@@ -90,12 +90,12 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2wishbone_coverter",
                 "instance_description": "Convert IOb port into Wishbone interface for uart CSRs bus",
                 "parameters": {
-                    "APB_ADDR_W": 3 - 2,
-                    "APB_DATA_W": "DATA_W",
+                    "ADDR_W": 3 - 2,
+                    "DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "apb_m": "uart_cbus",
+                    "wb_m": "uart_cbus",
                     "iob_s": (
                         "uart_s",
                         [

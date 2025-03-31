@@ -78,11 +78,13 @@ def setup(py_params_dict):
         "name": reg_name,
         "generate_hw": True,
         "description": f"Generated register module.",
-        "python_parameters": {
-            "name": "port_params",
-            "val": port_params,
-            "descr": "Port parameters are passed to if_gen interfaces to generate different interfaces based on the parameters.",
-        },
+        "python_parameters": [
+            {
+                "name": "port_params",
+                "val": port_params,
+                "descr": "Port parameters are passed to if_gen interfaces to generate different interfaces based on the parameters.",
+            },
+        ],
         "version": "0.1",
         "confs": [
             {

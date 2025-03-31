@@ -252,22 +252,24 @@ def str_to_kwargs(attrs: list):
         args = parser.parse_args(args)
         kwargs = vars(args)
         try:
-            for arg in kwargs:
+            for arg in list(kwargs.keys()):
                 if arg in dicts and kwargs[arg] is not None:
                     if isinstance(dicts[arg], str):
                         if dicts[arg] == "pairs":
-                            kwargs[arg] = dict(pair.split(":") for pair in kwargs[arg])
+                            kwargs[arg.split("&")[0]] = dict(pair.split(":") for pair in kwargs[arg])
                     elif isinstance(dicts[arg], list):
                         _keys = [key for item in dicts[arg] for key in item.split(":")]
                         _values = [
                             value for item in kwargs[arg] for value in item.split(":")
                         ]
-                        kwargs[arg] = [
+                        kwargs[arg.split("&")[0]] = [
                             dict(zip(_keys, _values[i:]))
                             for i in range(0, len(_values), len(_keys))
                         ]
                     elif isinstance(dicts[arg], tuple):
-                        kwargs[arg] = dict(zip(dicts[arg], kwargs[arg]))
+                        kwargs[arg.split("&")[0]] = dict(zip(dicts[arg], kwargs[arg]))
+                    if '&' in arg:
+                        kwargs.pop(arg)
             for key, value in list(kwargs.items()):
                 if ":" in key:
                     kwargs.pop(key)
@@ -280,6 +282,7 @@ def str_to_kwargs(attrs: list):
                         values = value.split(":")
                         for i in range(len(keys)):
                             kwargs[keys[i]] = values[i]
+                
         except Exception as e:
             print(
                 iob_colors.FAIL
@@ -350,11 +353,12 @@ def str_to_kwargs(attrs: list):
                     sub_lists = sub_lists[0]
                 output = parse_args(parser_dict, sub_lists)
             for key in output.keys():
-                for i in range(len(output[key])):
-                    if "core_name" in output[key][i]:
-                        output[key][i]["instance_description"] = output[key][i].pop(
-                            "descr"
-                        )
+                if isinstance(output[key], list):
+                    for i in range(len(output[key])):
+                        if "core_name" in output[key][i]:
+                            output[key][i]["instance_description"] = output[key][i].pop(
+                                    "descr"
+                            )
             return {k: v for k, v in output.items() if v != []}
 
         kwargs = make_hierarchy(lists, "main")

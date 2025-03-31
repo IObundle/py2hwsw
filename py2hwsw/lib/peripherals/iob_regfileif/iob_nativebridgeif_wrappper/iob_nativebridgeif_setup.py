@@ -59,9 +59,9 @@ def main():
     os.remove(f"{build_dir}/hardware/src/{name}_csrs_inst.vs")
     os.remove(f"{build_dir}/hardware/src/{name}_csrs_gen.v")
 
-    # Modify iob_nativebridgeif_csrs_def.vh
-    with open(f"{build_dir}/hardware/src/{name}_csrs_def.vh", "w") as file:
-        file.write('`include "iob_regfileif_csrs_def.vh"\n')
+    # Modify iob_nativebridgeif_csrs.vh
+    with open(f"{build_dir}/hardware/src/{name}_csrs.vh", "w") as file:
+        file.write('`include "iob_regfileif_csrs.vh"\n')
         file.write(
             "`define IOB_NATIVEBRIDGEIF_csrs_ADDR_W `IOB_REGFILEIF_csrs_ADDR_W\n"
         )

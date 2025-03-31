@@ -34,7 +34,7 @@ uint8_t uart_getc() {
 // UART basic functions
 void uart_init(int base_address, uint16_t div) {
   // capture base address for good
-  IOB_UART_CSRS_INIT_BASEADDR(base_address);
+  iob_uart_csrs_init_baseaddr(base_address);
 
   // pulse soft reset
   iob_uart_csrs_set_softreset(1);

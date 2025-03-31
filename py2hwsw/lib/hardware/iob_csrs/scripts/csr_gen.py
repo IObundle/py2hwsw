@@ -13,7 +13,7 @@ from math import ceil, log, log2
 from latex import write_table
 import iob_colors
 import re
-from iob_csr import iob_csr, iob_csr_group
+from csr_classes import iob_csr, iob_csr_group
 
 
 def clog2(val):
@@ -1349,19 +1349,19 @@ class csr_gen:
             if n_bytes == 3:
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            addr = f"base + {core_prefix}{name_upper}_ADDR"
+            addr = f"base + {core_prefix_upper}{name_upper}_ADDR"
             sw_type = self.csr_type(name, n_bytes)
             if "W" in row.type:
-                fsw.write(
-                    f"void {core_prefix}set_{name}({sw_type} value) {{\n"
-                )
+                fsw.write(f"void {core_prefix}set_{name}({sw_type} value) {{\n")
                 fsw.write(
                     f"  iob_write({addr}, {core_prefix_upper}{name_upper}_W, value);\n"
                 )
                 fsw.write("}\n\n")
             if "R" in row.type:
                 fsw.write(f"{sw_type} {core_prefix}get_{name}() {{\n")
-                fsw.write(f"  return iob_read({addr}, {core_prefix_upper}{name_upper}_W);\n")
+                fsw.write(
+                    f"  return iob_read({addr}, {core_prefix_upper}{name_upper}_W);\n"
+                )
                 fsw.write("}\n\n")
         fsw.close()
 

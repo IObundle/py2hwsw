@@ -34,7 +34,7 @@ module iob_v_tb;
    reg     [                31:0] iob_wdata_i;
    reg     [`IOB_CSRS_ADDR_W-1:0] iob_addr_i;
    reg     [                 3:0] iob_wstrb_i;
-   wire                           iob_rready_i;
+   reg                            iob_rready_i;
    wire                           iob_rvalid_o;
    wire    [                31:0] iob_rdata_o;
    wire                           iob_ready_o;

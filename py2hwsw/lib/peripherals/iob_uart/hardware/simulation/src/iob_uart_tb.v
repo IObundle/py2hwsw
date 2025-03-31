@@ -57,6 +57,12 @@ module iob_uart_tb;
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
+      iob_valid_i = 0;
+      iob_wdata_i = 0;
+      iob_addr_i = 0;
+      iob_wstrb_i = 0;
+      iob_rready_i = 0;
+
       //apply async reset
       `IOB_RESET(clk, arst, 100, 1_000, 100);
 

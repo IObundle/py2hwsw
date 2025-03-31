@@ -24,20 +24,24 @@ TSRC = $(patsubst tsrc/%, ./%, $(wildcard tsrc/*))
 	cp $< $@
 %.py: tsrc/%.py
 	cp $< $@
+%.h: tsrc/%.h
+	cp $< $@
+%.c: tsrc/%.c
+	cp $< $@
 
 TSRC+=name.tex
 name.tex:
-	 @echo $(NAME) | sed 's/_/\\_/g' > $@
+	@echo $(NAME) | sed 's/_/\\_/g' > $@
 
 TSRC+=signature.tex
 signature.tex: $(DOC)_signature.tex
-       mv $< $@
+	mv $< $@
 
 ug_signature.tex pb_signature.tex:
-       @echo `cat name.tex`-USG-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+	@echo `cat name.tex`-USG-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
 
 rn_signature.tex:
-       @echo `cat name.tex`-REL-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+	@echo `cat name.tex`-REL-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
 
 
 #make figures

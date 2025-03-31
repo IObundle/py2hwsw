@@ -71,12 +71,12 @@ module iob_nco_tb;
       #100;
       @(posedge clk) #1;
 
-      IOB_NCO_SET_SOFT_RESET(1'b1);
-      IOB_NCO_SET_SOFT_RESET(1'b0);
+      iob_nco_set_soft_reset(1'b1);
+      iob_nco_set_soft_reset(1'b0);
 
-      IOB_NCO_SET_PERIOD_INT(32'h12);
-      IOB_NCO_SET_PERIOD_FRAC(32'h80000000);
-      IOB_NCO_SET_ENABLE(1'b1);
+      iob_nco_set_period_int(32'h12);
+      iob_nco_set_period_frac(32'h80000000);
+      iob_nco_set_enable(1'b1);
 
       $display("%c[1;34m", 27);
       $display("Test completed successfully.");

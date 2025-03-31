@@ -1,0 +1,15 @@
+% SPDX-FileCopyrightText: 2025 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+Py2HWSW supports \textit{Universal Test Bench}.
+
+Create iob\_vlt\_tb.h verilator file and define the dut\_t type as the top module for simulation of the core.
+For example, for the iob\_uart core, we use the iob\_uart\_sim.v as the top module for simulation, so we define the Viob\_uart\_sim as the dut\_t type.
+\lstinputlisting[language=Python]{iob_vlt_tb.h}
+\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/peripherals/iob_uart/hardware/simulation/src/iob_vlt_tb.h}{View Source}
+
+Create the iob\_core\_tb.c source to drive the verification instruments (usually instantiated in the simulation wrapper).
+For example, the iob\_uart core is also used as a verification instrument to test itself. It is instantiated in the iob\_uart\_sim.v file, and its RS232 ports are connected in loopback. The tesbench then drives this core, writing data to it, and reading back the data received from the loopback.
+\lstinputlisting[language=Python]{iob_core_tb.c}
+\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/peripherals/iob_uart/hardware/simulation/src/iob_core_tb.c}{View Source}

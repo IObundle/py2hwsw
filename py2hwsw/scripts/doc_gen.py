@@ -292,6 +292,7 @@ def process_tex_macro(line):
     macro = line.strip().split(":")[1].strip().split()
     macro_command = macro[0]
     listing_content = ""
+    file_path = None
     file_extension = None
 
     def _find_file(file):
@@ -307,8 +308,10 @@ def process_tex_macro(line):
             fail_with_msg(
                 f"File '{filename}{extension}' not found! From macro line '{line}'."
             )
-        # Update file extension for use in TeX
+        # Update file path and extension for use in TeX
+        nonlocal file_path
         nonlocal file_extension
+        file_path = file[len(os.path.join(os.path.dirname(__file__), ".."))+1:]
         file_extension = extension
         return file
 
@@ -386,9 +389,13 @@ def process_tex_macro(line):
     lang_snippet = ""
     if file_extension in languages:
         lang_snippet = f"[language={languages[file_extension]}]"
+    source_link = ""
+    if file_path:
+        source_link = f"\href{{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/{file_path}}}{{View Source}}"
 
     return f"""
 \\begin{{lstlisting}}{lang_snippet}
 {listing_content}
 \\end{{lstlisting}}
+{source_link}
 """

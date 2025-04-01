@@ -5,15 +5,15 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "generate_hw": False,
+        "generate_hw": True,
         "confs": [
             {
                 "name": "ADDR_WIDTH",
                 "descr": "",
                 "type": "P",
-                "val": "32",
+                "val": "31",
                 "min": "1",
-                "max": "32",
+                "max": "31",
             },
             {
                 "name": "DATA_WIDTH",
@@ -29,6 +29,7 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
+                    "params": "arstn",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -41,6 +42,35 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_WIDTH",
                     "DATA_W": "DATA_WIDTH",
                 },
+            },
+        ],
+        "snippets": [
+            {
+                "verilog_code": """
+   AHB2MEM #(
+      .MEMWIDTH(ADDR_WIDTH)
+   ) ahb2bram_inst (
+      // Subordinate Select Signals
+      .HSEL     (s_ahb_sel_i),
+      // Global Signals
+      .HCLK     (clk_i),
+      .HRESETn  (arst_n_i),
+      // Address, Control & Write Data
+      .HREADY   (1'b1),
+      .HADDR    (s_ahb_addr_i),
+      .HTRANS   (s_ahb_trans_i),
+      .HWRITE   (s_ahb_write_i),
+      .HSIZE    (s_ahb_size_i),
+      .HWDATA   (s_ahb_wdata_i),
+      // Transfer Response & Read Data
+      .HREADYOUT(s_ahb_readyout_o),
+      .HRDATA   (s_ahb_rdata_o)
+   );
+
+    // Transfer Response always okay
+    assign s_ahb_resp_o = 1'b0;
+
+""",
             },
         ],
     }

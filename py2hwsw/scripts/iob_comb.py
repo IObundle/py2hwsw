@@ -89,8 +89,13 @@ class iob_comb(iob_snippet):
             for signal_ref in wire.signals:
                 signal = get_real_signal(signal_ref)
                 if signal.isreg:
+                    clk_if_name = "clk_en_rst_s"
+                    for port in core.ports:
+                        if port.interface:
+                            if port.interface.type == "iob_clk":
+                               clk_if_name = port.name 
                     connect = {
-                        "clk_en_rst_s": "clk_en_rst_s",
+                        "clk_en_rst_s": clk_if_name,
                         "data_i": f"{signal.name}_nxt",
                         "data_o": f"{signal.name}",
                     }
@@ -108,6 +113,10 @@ class iob_comb(iob_snippet):
                                     }
                                 ],
                             )
+                        core.create_wire(
+                            name=signal.name,
+                            signals=[{"name": signal.name}],
+                        )
                     _reg_signals = []
                     bit_slices = []
                     port_params = self.clk_if
@@ -142,7 +151,7 @@ class iob_comb(iob_snippet):
 
                     # if bit_slices is not empty, add it to the connect dictionary
                     if bit_slices:
-                        connect["clk_en_rst_s"] = ("clk_en_rst_s", bit_slices)
+                        connect["clk_en_rst_s"] = (clk_if_name, bit_slices)
 
                     if not any(
                         block.instance_name == f"{signal.name}_reg"

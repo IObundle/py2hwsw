@@ -180,6 +180,10 @@ The AHB interface has the configurable widths:
 \begin{itemize}
   \item ADDR\_W
   \item DATA\_W
+  \item BURST\_W
+  \item PROT\_W
+  \item SIZE\_W
+  \item TRANS\_W
 \end{itemize}
 
 For example, to add an AHB port to a core, add the following python dictionary to the core's ports list:
@@ -191,6 +195,10 @@ For example, to add an AHB port to a core, add the following python dictionary t
 		"type": "axil",
 		"ADDR_W": 32,
 		"DATA_W": 32,
+		"BURST_W": 3,
+		"PROT_W": 4,
+		"SIZE_W": 3,
+		"TRANS_W": 2,
 	},
 },
 \end{lstlisting}

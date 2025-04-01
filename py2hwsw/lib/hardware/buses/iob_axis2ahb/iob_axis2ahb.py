@@ -117,7 +117,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "ahb_m",
-                "descr": "Master AHB interface",
+                "descr": "Manager AHB interface",
                 "signals": {
                     "type": "ahb",
                     "prefix": "m_",
@@ -135,6 +135,7 @@ def setup(py_params_dict):
         "superblocks": [
             {"core_name": "iob_axistream_in"},
             {"core_name": "iob_axistream_out"},
+            {"core_name": "iob_ahb_ram"},
         ],
     }
 

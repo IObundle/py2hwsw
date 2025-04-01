@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "confs": [
             {
                 "name": "ADDR_WIDTH",
-                "descr": "",
+                "descr": "Width of address bus in bits",
                 "type": "P",
                 "val": "32",
                 "min": "1",
@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "DATA_WIDTH",
-                "descr": "",
+                "descr": "Width of input (subordinate/manager) AXIS/AHB interface data bus in bits",
                 "type": "P",
                 "val": "32",
                 "min": "1",
@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "STRB_WIDTH",
-                "descr": "",
+                "descr": "Width of input (subordinate/manager) AXIS/AHB interface wstrb (width of data bus in words)",
                 "type": "P",
                 "val": "(DATA_WIDTH / 8)",
                 "min": "1",
@@ -33,7 +33,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "AXI_ID_WIDTH",
-                "descr": "",
+                "descr": "Width of AXI ID signal",
                 "type": "P",
                 "val": "8",
                 "min": "1",

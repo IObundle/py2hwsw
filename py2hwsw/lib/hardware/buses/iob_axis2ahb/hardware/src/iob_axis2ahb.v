@@ -4,19 +4,13 @@
 
 // Language: Verilog 2001
 `timescale 1ns / 1ps
+`include "iob_axis2ahb_conf.vh"
 
 /*
  * AXIS to AHB adapter
  */
 module iob_axis2ahb #(
-   // Width of address bus in bits
-   parameter ADDR_WIDTH   = 32,
-   // Width of input (subordinate/manager) AXIS/AHB interface data bus in bits
-   parameter DATA_WIDTH   = 32,
-   // Width of input (subordinate/manager) AXIS/AHB interface wstrb (width of data bus in words)
-   parameter STRB_WIDTH   = (DATA_WIDTH / 8),
-   // Width of AXI ID signal
-   parameter AXI_ID_WIDTH = 8
+   `include "iob_axis2ahb_params.vs"
 ) (
    `include "iob_axis2ahb_io.vs"
 );

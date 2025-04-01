@@ -115,7 +115,7 @@ class iob_comb(iob_snippet):
                             )
                         core.create_wire(
                             name=signal.name,
-                            signals=[{"name": signal.name}],#, "width": signal.width, "descr": signal.descr, "isvar": signal.isvar, "isreg": signal.isreg, "reg_signals": signal.reg_signals}],
+                            signals=[{"name": signal.name}],
                         )
                     _reg_signals = []
                     bit_slices = []

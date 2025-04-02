@@ -70,12 +70,12 @@ module AHB2MEM #(
          APhase_HSIZE                <= 3'b000;
          APhase_HRADDR[MEMWIDTH-2:0] <= {(MEMWIDTH - 1) {1'b0}};
       end else if (HREADY) begin
-         APhase_HSEL                   <= HSEL;
-         APhase_HWRITE                 <= HWRITE;
-         APhase_HTRANS                 <= HTRANS;
-         APhase_HWADDR                 <= HADDR;
-         APhase_HSIZE                  <= HSIZE;
-         APhase_HRADDR[MEMWIDTH-1-2:0] <= HADDR[MEMWIDTH-1:2];
+         APhase_HSEL                 <= HSEL;
+         APhase_HWRITE               <= HWRITE;
+         APhase_HTRANS               <= HTRANS;
+         APhase_HWADDR               <= HADDR;
+         APhase_HSIZE                <= HSIZE;
+         APhase_HRADDR[MEMWIDTH-2:0] <= HADDR[MEMWIDTH:2];
       end
    end
 
@@ -108,7 +108,7 @@ module AHB2MEM #(
          if (byte3) memory[APhase_HWADDR[MEMWIDTH:2]][31:24] <= HWDATA[31:24];
       end
 
-      HRDATA = memory[HADDR[MEMWIDTH-1:2]];
+      HRDATA = memory[HADDR[MEMWIDTH:2]];
    end
 
 endmodule

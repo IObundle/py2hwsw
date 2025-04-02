@@ -115,8 +115,21 @@ module iob_axis2ahb_tb;
       $dumpvars();
 `endif
 
-      config_in_valid  = 0;
-      config_out_valid = 0;
+      config_in_valid     = 0;
+      config_out_valid    = 0;
+      config_out_length   = 0;
+
+      axis_in_iob_valid   = 0;
+      axis_in_iob_wdata   = 0;
+      axis_in_iob_addr    = 0;
+      axis_in_iob_wstrb   = 0;
+      axis_in_iob_rready  = 0;
+
+      axis_out_iob_valid  = 0;
+      axis_out_iob_wdata  = 0;
+      axis_out_iob_addr   = 0;
+      axis_out_iob_wstrb  = 0;
+      axis_out_iob_rready = 0;
 
       //apply async reset
       `IOB_RESET(clk, arst, 100, 1_000, 100);

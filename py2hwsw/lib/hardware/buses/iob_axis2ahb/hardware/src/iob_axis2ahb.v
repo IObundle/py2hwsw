@@ -151,13 +151,13 @@ module iob_axis2ahb #(
       .data_o(state)
    );
 
-   reg                in_axis_tready_int;
-   reg                out_axis_tvalid_int;
-   reg [DATA_WIDTH-1] out_axis_tdata_int;
-   reg                out_axis_tlast_int;
+   reg                  in_axis_tready_int;
+   reg                  out_axis_tvalid_int;
+   reg [DATA_WIDTH-1:0] out_axis_tdata_int;
+   reg                  out_axis_tlast_int;
 
-   reg                config_in_ready_int;
-   reg                config_out_ready_int;
+   reg                  config_in_ready_int;
+   reg                  config_out_ready_int;
 
    // AXIS OUTPUTS
    assign in_axis_tready_o   = in_axis_tready_int;
@@ -209,17 +209,17 @@ module iob_axis2ahb #(
          end
          // wait for data from AXIS (write only)
          WAIT_DATA: begin
-            if (m_ahb_write_o) begin
-               in_axis_tready_int = 1'b1;
-               if (in_axis_tvalid_i) begin
-                  htrans_nxt = TRANS_NONSEQ;
-                  hwdata_nxt = in_axis_tdata_i;
-                  hwstrb_nxt = {STRB_WIDTH{1'b1}};
-                  hwrite_nxt = 1'b1;
+            //if (m_ahb_write_o) begin
+            in_axis_tready_int = 1'b1;
+            if (in_axis_tvalid_i) begin
+               htrans_nxt = TRANS_NONSEQ;
+               hwdata_nxt = in_axis_tdata_i;
+               hwstrb_nxt = {STRB_WIDTH{1'b1}};
+               hwrite_nxt = 1'b1;
 
-                  state_nxt  = TRANSFER;
-               end
+               state_nxt  = TRANSFER;
             end
+            //end
          end
          TRANSFER: begin
             if (m_ahb_write_o) begin  // write access

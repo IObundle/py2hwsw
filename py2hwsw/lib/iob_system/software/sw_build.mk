@@ -64,7 +64,7 @@ build_iob_system_software: iob_system_firmware iob_system_boot iob_system_preboo
 ifneq ($(USE_FPGA),)
 WRAPPER_CONFS_PREFIX=iob_system_$(BOARD)
 else
-WRAPPER_CONFS_PREFIX=iob_system_sim
+WRAPPER_CONFS_PREFIX=iob_uut
 endif
 
 iob_bsp:

@@ -16,12 +16,6 @@ endif
 
 CSRS = ../../software/src/iob_uart_csrs.c
 
-#replace iob_system_sim with iob_uut
-VSRC:= $(subst iob_system_sim,iob_uut,$(VSRC))
-./src/iob_uut.v: ./src/iob_system_sim.v
-	mv ./src/iob_system_sim_conf.vh ./src/iob_uut_conf.vh
-	mv $< $@ && sed -i 's/iob_system_sim/iob_uut/g' $@
-
 CONSOLE_CMD ?=rm -f soc2cnsl cnsl2soc; ../../scripts/console.py -L
 
 GRAB_TIMEOUT ?= 3600

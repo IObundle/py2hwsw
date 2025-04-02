@@ -155,7 +155,6 @@ module iob_axis2ahb #(
       .data_o(state)
    );
 
-   reg                  out_axis_tvalid_int;
    reg [DATA_WIDTH-1:0] out_axis_tdata_int;
    reg                  out_axis_tlast_int;
 
@@ -163,7 +162,6 @@ module iob_axis2ahb #(
    reg                  config_out_ready_int;
 
    // AXIS OUTPUTS
-   assign out_axis_tvalid_o  = out_axis_tvalid_int;
    assign out_axis_tdata_o   = out_axis_tdata_int;
    assign out_axis_tlast_o   = out_axis_tlast_int;
 
@@ -180,6 +178,18 @@ module iob_axis2ahb #(
       .data_o(in_axis_tready_o)
    );
 
+   // axis in tvalid register
+   reg out_axis_tvalid_nxt;
+   iob_reg_cear #(
+      .DATA_W (1),
+      .RST_VAL(0)
+   ) out_axis_tvalid_reg (
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+      .data_i(out_axis_tvalid_nxt),
+      .data_o(out_axis_tvalid_o)
+   );
 
 
 
@@ -199,7 +209,7 @@ module iob_axis2ahb #(
 
       in_axis_tready_nxt    = 1'b0;
       out_axis_tdata_int    = 1'b0;
-      out_axis_tvalid_int   = 1'b0;
+      out_axis_tvalid_nxt   = 1'b0;
       out_axis_tlast_int    = 1'b0;
 
       config_in_ready_int   = 1'b0;
@@ -263,7 +273,7 @@ module iob_axis2ahb #(
             end else begin  // read access
                // wait for hready
                if (m_ahb_readyout_i) begin
-                  out_axis_tvalid_int = 1'b1;
+                  out_axis_tvalid_nxt = 1'b1;
                   out_axis_tdata_int  = m_ahb_rdata_i;
 
                   if (m_ahb_trans_o != TRANS_BUSY) begin
@@ -282,7 +292,6 @@ module iob_axis2ahb #(
                      config_out_length_nxt = config_out_length_int - 1'b1;
                      htrans_nxt            = TRANS_SEQ;
                   end
-
                end
             end
          end

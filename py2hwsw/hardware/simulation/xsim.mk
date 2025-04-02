@@ -39,7 +39,7 @@ xvlog.log: $(VHDR) $(VSRC) $(HEX)
 	xvlog $(VFLAGS) $(VSRC)
 
 xelab.log : xvlog.log 
-	xelab $(EFLAGS) worklib $(NAME)_tb
+	xelab $(EFLAGS) worklib iob_v_tb
 
 comp: xelab.log
 

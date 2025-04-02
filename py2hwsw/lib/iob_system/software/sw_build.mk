@@ -31,7 +31,8 @@ iob_system_firmware.bin: ../../software/iob_system_firmware.bin
 ../../software/%.bin:
 	make -C ../../ fw-build
 
-UTARGETS+=build_iob_system_software
+UTARGETS+=build_iob_system_software tb
+CSRS=./src/iob_uart_csrs.c
 
 TEMPLATE_LDS=src/$@.lds
 
@@ -47,13 +48,13 @@ IOB_SYSTEM_FW_SRC+=src/iob_printf.c
 DRIVERS=$(addprefix src/,$(addsuffix .c,$(PERIPHERALS)))
 # Only add driver files if they exist
 IOB_SYSTEM_FW_SRC+=$(foreach file,$(DRIVERS),$(wildcard $(file)*))
-IOB_SYSTEM_FW_SRC+=$(addprefix src/,$(addsuffix _csrs_emb.c,$(PERIPHERALS)))
+IOB_SYSTEM_FW_SRC+=$(addprefix src/,$(addsuffix _csrs.c,$(PERIPHERALS)))
 
 # BOOTLOADER SOURCES
 IOB_SYSTEM_BOOT_SRC+=src/iob_system_boot.S
 IOB_SYSTEM_BOOT_SRC+=src/iob_system_boot.c
 IOB_SYSTEM_BOOT_SRC+=src/iob_uart.c
-IOB_SYSTEM_BOOT_SRC+=src/iob_uart_csrs_emb.c
+IOB_SYSTEM_BOOT_SRC+=src/iob_uart_csrs.c
 
 # PREBOOT SOURCES
 IOB_SYSTEM_PREBOOT_SRC=src/iob_system_preboot.S
@@ -76,7 +77,7 @@ iob_system_boot: iob_bsp
 	make $@.elf INCLUDES="$(IOB_SYSTEM_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_BOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"
 
 iob_system_preboot:
-	make $@.elf INCLUDES="$(IOB_SYSTEM_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_PREBOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"
+	make $@.elf INCLUDES="$(IOB_SYSTEM_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_PREBOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)" NO_HW_DRIVER=1
 
 
 .PHONY: build_iob_system_software iob_bsp iob_system_firmware iob_system_boot iob_system_preboot

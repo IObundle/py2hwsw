@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
-`include "iob_timer_csrs_def.vh"
+`include "iob_timer_csrs.vh"
 
-module timer_tb;
+module iob_timer_tb;
 
    localparam PER = 10;
    localparam DATA_W = 32;

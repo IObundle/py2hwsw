@@ -3,18 +3,18 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
-`include "iob_timer_csrs_def.vh"
+`include "iob_timer_csrs.vh"
 
 module iob_timer_core #(
    parameter DATA_W = 32
 ) (
-   input                                                     clk_i,
-   input                                                     cke_i,
-   input                                                     arst_i,
-   input                                                     en_i,
-   input                                                     rst_i,
-   input                                                     rstrb_i,
-   output [`IOB_TIMER_DATA_LOW_W+`IOB_TIMER_DATA_HIGH_W-1:0] time_o
+   input                                                               clk_i,
+   input                                                               cke_i,
+   input                                                               arst_i,
+   input                                                               en_i,
+   input                                                               rst_i,
+   input                                                               rstrb_i,
+   output [`IOB_TIMER_CSRS_DATA_LOW_W+`IOB_TIMER_CSRS_DATA_HIGH_W-1:0] time_o
 );
 
    wire [2*DATA_W-1:0] time_counter;

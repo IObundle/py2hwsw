@@ -21,7 +21,6 @@ CORE ?=iob_ctls
 
 PY_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM)"
 
-
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi
 

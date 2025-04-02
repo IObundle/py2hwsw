@@ -4,7 +4,8 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_uart_csrs_def.vh"
+`include "iob_uart_csrs.vh"
+`include "iob_uart_csrs_conf.vh"
 `include "iob_uart_conf.vh"
 
 `define IOB_NBYTES (32/8)
@@ -66,24 +67,24 @@ module iob_uart_tb;
 
       $display("Starting testbench");
 
-      iob_write(`IOB_UART_SOFTRESET_ADDR, 0, `IOB_UART_SOFTRESET_W);
-      iob_write(`IOB_UART_TXEN_ADDR, 0, `IOB_UART_TXEN_W);
-      iob_write(`IOB_UART_RXEN_ADDR, 0, `IOB_UART_RXEN_W);
+      iob_write(`IOB_UART_CSRS_SOFTRESET_ADDR, 0, `IOB_UART_CSRS_SOFTRESET_W);
+      iob_write(`IOB_UART_CSRS_TXEN_ADDR, 0, `IOB_UART_CSRS_TXEN_W);
+      iob_write(`IOB_UART_CSRS_RXEN_ADDR, 0, `IOB_UART_CSRS_RXEN_W);
 
       $display("Softreset done");
 
-      iob_write(`IOB_UART_DIV_ADDR, clk_frequency / baud_rate, `IOB_UART_DIV_W);
+      iob_write(`IOB_UART_CSRS_DIV_ADDR, clk_frequency / baud_rate, `IOB_UART_CSRS_DIV_W);
 
       $display("Baudrate set");
 
 
-      iob_read(`IOB_UART_RXREADY_ADDR, word, `IOB_UART_RXREADY_W);
+      iob_read(`IOB_UART_CSRS_RXREADY_ADDR, word, `IOB_UART_CSRS_RXREADY_W);
       if (word != 0) begin
          $display("Error: RX ready initially");
          failed = failed + 1;
       end
 
-      iob_read(`IOB_UART_TXREADY_ADDR, word, `IOB_UART_TXREADY_W);
+      iob_read(`IOB_UART_CSRS_TXREADY_ADDR, word, `IOB_UART_CSRS_TXREADY_W);
       if (word != 0) begin
          $display("Error: TX ready initially");
          failed = failed + 1;
@@ -92,13 +93,13 @@ module iob_uart_tb;
       $display("Ready signals checked");
 
       //pulse soft reset
-      iob_write(`IOB_UART_SOFTRESET_ADDR, 1, `IOB_UART_SOFTRESET_W);
-      iob_write(`IOB_UART_SOFTRESET_ADDR, 0, `IOB_UART_SOFTRESET_W);
+      iob_write(`IOB_UART_CSRS_SOFTRESET_ADDR, 1, `IOB_UART_CSRS_SOFTRESET_W);
+      iob_write(`IOB_UART_CSRS_SOFTRESET_ADDR, 0, `IOB_UART_CSRS_SOFTRESET_W);
 
 
       //enable rx and tx
-      iob_write(`IOB_UART_RXEN_ADDR, 1, `IOB_UART_RXEN_W);
-      iob_write(`IOB_UART_TXEN_ADDR, 1, `IOB_UART_TXEN_W);
+      iob_write(`IOB_UART_CSRS_RXEN_ADDR, 1, `IOB_UART_CSRS_RXEN_W);
+      iob_write(`IOB_UART_CSRS_TXEN_ADDR, 1, `IOB_UART_CSRS_TXEN_W);
 
 
       $display("TX and RX enabled");
@@ -110,20 +111,20 @@ module iob_uart_tb;
          //wait for tx ready
          word = 0;
          while (word != 1) begin
-            iob_read(`IOB_UART_TXREADY_ADDR, word, `IOB_UART_TXREADY_W);
+            iob_read(`IOB_UART_CSRS_TXREADY_ADDR, word, `IOB_UART_CSRS_TXREADY_W);
          end
 
          //send data
-         iob_write(`IOB_UART_TXDATA_ADDR, i, `IOB_UART_TXDATA_W);
+         iob_write(`IOB_UART_CSRS_TXDATA_ADDR, i, `IOB_UART_CSRS_TXDATA_W);
 
          //wait for rx ready
          word = 0;
          while (word != 1) begin
-            iob_read(`IOB_UART_RXREADY_ADDR, word, `IOB_UART_RXREADY_W);
+            iob_read(`IOB_UART_CSRS_RXREADY_ADDR, word, `IOB_UART_CSRS_RXREADY_W);
          end
 
          //read data
-         iob_read(`IOB_UART_RXDATA_ADDR, word, `IOB_UART_RXDATA_W);
+         iob_read(`IOB_UART_CSRS_RXDATA_ADDR, word, `IOB_UART_CSRS_RXDATA_W);
 
          //check data
          if (word != i) begin

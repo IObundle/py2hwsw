@@ -11,9 +11,9 @@ def setup(py_params_dict):
                 "name": "ADDR_WIDTH",
                 "descr": "",
                 "type": "P",
-                "val": "31",
+                "val": "14",
                 "min": "1",
-                "max": "31",
+                "max": "32",
             },
             {
                 "name": "DATA_WIDTH",

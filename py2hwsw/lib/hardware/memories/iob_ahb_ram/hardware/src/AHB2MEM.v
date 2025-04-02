@@ -56,26 +56,26 @@ module AHB2MEM #(
    reg        APhase_HSEL;
    reg        APhase_HWRITE;
    reg [ 1:0] APhase_HTRANS;
-   reg [31:0] APhase_HRADDR;
+   //reg [31:0] APhase_HRADDR;
    reg [31:0] APhase_HWADDR;
    reg [ 2:0] APhase_HSIZE;
 
    // Sample the Address Phase   
    always @(posedge HCLK or negedge HRESETn) begin
       if (!HRESETn) begin
-         APhase_HSEL                 <= 1'b0;
-         APhase_HWRITE               <= 1'b0;
-         APhase_HTRANS               <= 2'b00;
-         APhase_HWADDR               <= 32'h0;
-         APhase_HSIZE                <= 3'b000;
-         APhase_HRADDR[MEMWIDTH-2:0] <= {(MEMWIDTH - 1) {1'b0}};
+         APhase_HSEL   <= 1'b0;
+         APhase_HWRITE <= 1'b0;
+         APhase_HTRANS <= 2'b00;
+         APhase_HWADDR <= 32'h0;
+         APhase_HSIZE  <= 3'b000;
+         //APhase_HRADDR <= 32'h0;
       end else if (HREADY) begin
-         APhase_HSEL                 <= HSEL;
-         APhase_HWRITE               <= HWRITE;
-         APhase_HTRANS               <= HTRANS;
-         APhase_HWADDR               <= HADDR;
-         APhase_HSIZE                <= HSIZE;
-         APhase_HRADDR[MEMWIDTH-2:0] <= HADDR[MEMWIDTH:2];
+         APhase_HSEL   <= HSEL;
+         APhase_HWRITE <= HWRITE;
+         APhase_HTRANS <= HTRANS;
+         APhase_HWADDR <= HADDR;
+         APhase_HSIZE  <= HSIZE;
+         //APhase_HRADDR[MEMWIDTH-1-2:0] <= HADDR[MEMWIDTH-1:2];
       end
    end
 
@@ -102,13 +102,13 @@ module AHB2MEM #(
 
    always @(posedge HCLK) begin
       if (APhase_HSEL & APhase_HWRITE & APhase_HTRANS[1]) begin
-         if (byte0) memory[APhase_HWADDR[MEMWIDTH:2]][7:0] <= HWDATA[7:0];
-         if (byte1) memory[APhase_HWADDR[MEMWIDTH:2]][15:8] <= HWDATA[15:8];
-         if (byte2) memory[APhase_HWADDR[MEMWIDTH:2]][23:16] <= HWDATA[23:16];
-         if (byte3) memory[APhase_HWADDR[MEMWIDTH:2]][31:24] <= HWDATA[31:24];
+         if (byte0) memory[APhase_HWADDR[MEMWIDTH-1:2]][7:0] <= HWDATA[7:0];
+         if (byte1) memory[APhase_HWADDR[MEMWIDTH-1:2]][15:8] <= HWDATA[15:8];
+         if (byte2) memory[APhase_HWADDR[MEMWIDTH-1:2]][23:16] <= HWDATA[23:16];
+         if (byte3) memory[APhase_HWADDR[MEMWIDTH-1:2]][31:24] <= HWDATA[31:24];
       end
 
-      HRDATA = memory[HADDR[MEMWIDTH:2]];
+      HRDATA = memory[HADDR[MEMWIDTH-1:2]];
    end
 
 endmodule

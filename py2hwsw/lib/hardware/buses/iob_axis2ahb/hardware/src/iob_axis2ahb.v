@@ -20,7 +20,7 @@ module iob_axis2ahb #(
 
    localparam STATE_W = 2;
    localparam [STATE_W-1:0] WAIT_CONFIG = 0, WAIT_DATA = 1;
-   localparam [STATE_W-1:0] TRANSFER = 3, LAST_DATA = 4;
+   localparam [STATE_W-1:0] TRANSFER = 2, LAST_DATA = 3;
    localparam [1:0] TRANS_IDLE = 2'd0, TRANS_BUSY = 2'd1, TRANS_NONSEQ = 2'd2, TRANS_SEQ = 2'd3;
 
    // Constant Outputs
@@ -62,18 +62,18 @@ module iob_axis2ahb #(
    );
 
    // hwdata
-   reg  [DATA_WIDTH-1:0] hwdata_nxt;
-   wire [DATA_WIDTH-1:0] hwdata_pipe;
-   iob_reg_cear #(
-      .DATA_W (DATA_WIDTH),
-      .RST_VAL(0)
-   ) hwdata_pipe_reg (
-      .clk_i (clk_i),
-      .arst_i(arst_i),
-      .cke_i (cke_i),
-      .data_i(hwdata_nxt),
-      .data_o(hwdata_pipe)
-   );
+   reg [DATA_WIDTH-1:0] hwdata_nxt;
+   //wire [DATA_WIDTH-1:0] hwdata_pipe;
+   //iob_reg_cear #(
+   //   .DATA_W (DATA_WIDTH),
+   //   .RST_VAL(0)
+   //) hwdata_pipe_reg (
+   //   .clk_i (clk_i),
+   //   .arst_i(arst_i),
+   //   .cke_i (cke_i),
+   //   .data_i(hwdata_nxt),
+   //   .data_o(hwdata_pipe)
+   //);
    iob_reg_cear #(
       .DATA_W (DATA_WIDTH),
       .RST_VAL(0)
@@ -81,7 +81,8 @@ module iob_axis2ahb #(
       .clk_i (clk_i),
       .arst_i(arst_i),
       .cke_i (cke_i),
-      .data_i(hwdata_pipe),
+      //.data_i(hwdata_pipe),
+      .data_i(hwdata_nxt),
       .data_o(m_ahb_wdata_o)
    );
 
@@ -175,7 +176,7 @@ module iob_axis2ahb #(
 
       haddr_nxt             = m_ahb_addr_o;
       htrans_nxt            = m_ahb_trans_o;
-      hwdata_nxt            = hwdata_pipe;
+      //hwdata_nxt            = hwdata_pipe;
       hwstrb_nxt            = hwstrb_pipe;
       hwrite_nxt            = m_ahb_write_o;
 
@@ -279,7 +280,7 @@ module iob_axis2ahb #(
                   hwstrb_nxt = {STRB_WIDTH{1'b0}};
                   hwrite_nxt = 1'b0;
 
-                  state_nxt  = LAST_DATA;
+                  state_nxt  = WAIT_CONFIG;
                end
             end
          end

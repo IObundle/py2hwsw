@@ -31,9 +31,9 @@ module iob_axis2ahb_tb;
 
    localparam DATA_W = 32;
    localparam ADDR_W = 10;
-   localparam MEM_ADDR_W = 8;
    localparam AXIS_FIFO_ADDR_W = 10;
    localparam NWORDS = 256;
+   localparam MEM_ADDR_W = $clog2(NWORDS) + 2;
 
    //iterator
    integer i, fd;

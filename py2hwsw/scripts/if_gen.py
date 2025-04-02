@@ -907,12 +907,9 @@ def get_apb_ports():
 #
 # AHB
 #
-# ADDR_W = 32
-# DATA_W = 32
-# BURST_W = 3
-# PROT_W = 4
-# SIZE_W = 3
-TRANS_W = 2
+AHB_PROT_W = 4
+AHB_BURST_W = 3
+AHB_TRANS_W = 2
 
 
 @parse_widths
@@ -925,7 +922,7 @@ def get_ahb_ports():
         ),
         iob_signal(
             name="ahb_burst_o",
-            width=BURST_W,
+            width=AHB_BURST_W,
             descr="Burst size.",
         ),
         iob_signal(
@@ -935,7 +932,7 @@ def get_ahb_ports():
         ),
         iob_signal(
             name="ahb_prot_o",
-            width=PROT_W,
+            width=AHB_PROT_W,
             descr="Byte address of the transfer.",
         ),
         iob_signal(
@@ -945,7 +942,7 @@ def get_ahb_ports():
         ),
         iob_signal(
             name="ahb_trans_o",
-            width=TRANS_W,
+            width=AHB_TRANS_W,
             descr="Transfer type.",
         ),
         iob_signal(

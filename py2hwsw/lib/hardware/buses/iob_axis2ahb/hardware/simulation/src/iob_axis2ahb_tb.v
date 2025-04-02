@@ -94,7 +94,7 @@ module iob_axis2ahb_tb;
 
    // AHB memory bus
    wire    [                    MEM_ADDR_W-1:0] ahb_addr;
-   wire    [                             2-1:0] ahb_burst;
+   wire    [                             3-1:0] ahb_burst;
    wire                                         ahb_mastlock;
    wire    [                             3-1:0] ahb_prot;
    wire    [                             3-1:0] ahb_size;
@@ -139,13 +139,12 @@ module iob_axis2ahb_tb;
       $display("Configure AXIStream IN");
       axis_in_iob_write(`IOB_AXISTREAM_IN_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_IN_SOFT_RESET_W);
       axis_in_iob_write(`IOB_AXISTREAM_IN_MODE_ADDR, 0, `IOB_AXISTREAM_IN_MODE_W);
-      axis_in_iob_write(`IOB_AXISTREAM_IN_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_IN_NWORDS_W);
       axis_in_iob_write(`IOB_AXISTREAM_IN_ENABLE_ADDR, 1, `IOB_AXISTREAM_IN_ENABLE_W);
 
       $display("Configure AXIStream OUT");
       axis_out_iob_write(`IOB_AXISTREAM_OUT_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_OUT_SOFT_RESET_W);
       axis_out_iob_write(`IOB_AXISTREAM_OUT_MODE_ADDR, 0, `IOB_AXISTREAM_OUT_MODE_W);
-      axis_out_iob_write(`IOB_AXISTREAM_IN_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_IN_NWORDS_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_IN_NWORDS_W);
       axis_out_iob_write(`IOB_AXISTREAM_OUT_ENABLE_ADDR, 1, `IOB_AXISTREAM_OUT_ENABLE_W);
 
       $display("Configure AXIS2AHB to write data to memory");

@@ -89,13 +89,12 @@ module iob_axistream_in_tb;
       $display("Configure AXIStream IN");
       axis_in_iob_write(`IOB_AXISTREAM_IN_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_IN_SOFT_RESET_W);
       axis_in_iob_write(`IOB_AXISTREAM_IN_MODE_ADDR, 0, `IOB_AXISTREAM_IN_MODE_W);
-      axis_in_iob_write(`IOB_AXISTREAM_IN_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_IN_NWORDS_W);
       axis_in_iob_write(`IOB_AXISTREAM_IN_ENABLE_ADDR, 1, `IOB_AXISTREAM_IN_ENABLE_W);
 
       $display("Configure AXIStream OUT");
       axis_out_iob_write(`IOB_AXISTREAM_OUT_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_OUT_SOFT_RESET_W);
       axis_out_iob_write(`IOB_AXISTREAM_OUT_MODE_ADDR, 0, `IOB_AXISTREAM_OUT_MODE_W);
-      axis_out_iob_write(`IOB_AXISTREAM_IN_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_IN_NWORDS_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_OUT_NWORDS_W);
       axis_out_iob_write(`IOB_AXISTREAM_OUT_ENABLE_ADDR, 1, `IOB_AXISTREAM_OUT_ENABLE_W);
 
       $display("Write data to AXIStream OUT");

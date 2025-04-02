@@ -19,8 +19,8 @@ module iob_axis2ahb #(
    localparam [DATA_WIDTH-1:0] ADDR_STEP = DATA_WIDTH / 8;  // byte addressable memory
 
    localparam STATE_W = 2;
-   localparam [STATE_W-1:0] WAIT_CONFIG = 0, WAIT_DATA = 1;
-   localparam [STATE_W-1:0] TRANSFER = 2, LAST_DATA = 3;
+   localparam [STATE_W-1:0] WAIT_CONFIG = 2'd0, WAIT_DATA = 2'd1;
+   localparam [STATE_W-1:0] TRANSFER = 2'd2, LAST_DATA = 2'd3;
    localparam [1:0] TRANS_IDLE = 2'd0, TRANS_BUSY = 2'd1, TRANS_NONSEQ = 2'd2, TRANS_SEQ = 2'd3;
 
    // Constant Outputs
@@ -36,14 +36,17 @@ module iob_axis2ahb #(
    // COMPUTE AHB OUTPUTS
 
    // haddr
+   wire [ADDR_WIDTH-1:0] addr_add_step;
+   assign addr_add_step = m_ahb_addr_o + ADDR_STEP;
+
    reg [ADDR_WIDTH-1:0] haddr_nxt;
    iob_reg_cear #(
       .DATA_W (ADDR_WIDTH),
       .RST_VAL(0)
    ) iob_reg_haddr (
       .clk_i (clk_i),
-      .arst_i(arst_i),
       .cke_i (cke_i),
+      .arst_i(arst_i),
       .data_i(haddr_nxt),
       .data_o(m_ahb_addr_o)
    );
@@ -55,8 +58,8 @@ module iob_axis2ahb #(
       .RST_VAL(0)
    ) iob_reg_htrans (
       .clk_i (clk_i),
-      .arst_i(arst_i),
       .cke_i (cke_i),
+      .arst_i(arst_i),
       .data_i(htrans_nxt),
       .data_o(m_ahb_trans_o)
    );
@@ -79,8 +82,8 @@ module iob_axis2ahb #(
       .RST_VAL(0)
    ) hwdata_reg (
       .clk_i (clk_i),
-      .arst_i(arst_i),
       .cke_i (cke_i),
+      .arst_i(arst_i),
       //.data_i(hwdata_pipe),
       .data_i(hwdata_nxt),
       .data_o(m_ahb_wdata_o)
@@ -94,8 +97,8 @@ module iob_axis2ahb #(
       .RST_VAL(0)
    ) hwstrb_pipe_reg (
       .clk_i (clk_i),
-      .arst_i(arst_i),
       .cke_i (cke_i),
+      .arst_i(arst_i),
       .data_i(hwstrb_nxt),
       .data_o(hwstrb_pipe)
    );
@@ -104,8 +107,8 @@ module iob_axis2ahb #(
       .RST_VAL(0)
    ) hwstrb_reg (
       .clk_i (clk_i),
-      .arst_i(arst_i),
       .cke_i (cke_i),
+      .arst_i(arst_i),
       .data_i(hwstrb_pipe),
       .data_o(m_ahb_wstrb_o)
    );
@@ -117,8 +120,8 @@ module iob_axis2ahb #(
       .RST_VAL(0)
    ) hwrite_reg (
       .clk_i (clk_i),
-      .arst_i(arst_i),
       .cke_i (cke_i),
+      .arst_i(arst_i),
       .data_i(hwrite_nxt),
       .data_o(m_ahb_write_o)
    );
@@ -131,8 +134,8 @@ module iob_axis2ahb #(
       .RST_VAL(0)
    ) config_out_length_reg (
       .clk_i (clk_i),
-      .arst_i(arst_i),
       .cke_i (cke_i),
+      .arst_i(arst_i),
       .data_i(config_out_length_nxt),
       .data_o(config_out_length_int)
    );
@@ -146,13 +149,12 @@ module iob_axis2ahb #(
       .RST_VAL(0)
    ) state_reg (
       .clk_i (clk_i),
-      .arst_i(arst_i),
       .cke_i (cke_i),
+      .arst_i(arst_i),
       .data_i(state_nxt),
       .data_o(state)
    );
 
-   reg                  in_axis_tready_int;
    reg                  out_axis_tvalid_int;
    reg [DATA_WIDTH-1:0] out_axis_tdata_int;
    reg                  out_axis_tlast_int;
@@ -161,10 +163,25 @@ module iob_axis2ahb #(
    reg                  config_out_ready_int;
 
    // AXIS OUTPUTS
-   assign in_axis_tready_o   = in_axis_tready_int;
    assign out_axis_tvalid_o  = out_axis_tvalid_int;
    assign out_axis_tdata_o   = out_axis_tdata_int;
    assign out_axis_tlast_o   = out_axis_tlast_int;
+
+   // axis out tready register
+   reg in_axis_tready_nxt;
+   iob_reg_cear #(
+      .DATA_W (1),
+      .RST_VAL(0)
+   ) in_axis_tready_reg (
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+      .data_i(in_axis_tready_nxt),
+      .data_o(in_axis_tready_o)
+   );
+
+
+
 
    // CONFIG OUTPUTS
    assign config_in_ready_o  = config_in_ready_int;
@@ -176,11 +193,12 @@ module iob_axis2ahb #(
 
       haddr_nxt             = m_ahb_addr_o;
       htrans_nxt            = m_ahb_trans_o;
-      //hwdata_nxt            = hwdata_pipe;
+      hwdata_nxt            = m_ahb_wdata_o;
       hwstrb_nxt            = hwstrb_pipe;
       hwrite_nxt            = m_ahb_write_o;
 
-      in_axis_tready_int    = 1'b0;
+      in_axis_tready_nxt    = 1'b0;
+      out_axis_tdata_int    = 1'b0;
       out_axis_tvalid_int   = 1'b0;
       out_axis_tlast_int    = 1'b0;
 
@@ -198,6 +216,7 @@ module iob_axis2ahb #(
                config_in_ready_int = 1'b1;
 
                haddr_nxt           = config_in_addr_i;
+               in_axis_tready_nxt  = 1'b1;
                state_nxt           = WAIT_DATA;
             end else if (config_out_valid_i) begin  // read access
                config_out_ready_int  = 1'b1;
@@ -211,7 +230,6 @@ module iob_axis2ahb #(
          // wait for data from AXIS (write only)
          WAIT_DATA: begin
             //if (m_ahb_write_o) begin
-            in_axis_tready_int = 1'b1;
             if (in_axis_tvalid_i) begin
                htrans_nxt = TRANS_NONSEQ;
                hwdata_nxt = in_axis_tdata_i;
@@ -223,25 +241,25 @@ module iob_axis2ahb #(
             //end
          end
          TRANSFER: begin
-            if (m_ahb_write_o) begin  // write access
-               // wait for hready
-               if (m_ahb_readyout_i) begin
-                  // get next data
-                  in_axis_tready_int = 1'b1;
-                  if (m_ahb_trans_o != TRANS_BUSY) begin
-                     haddr_nxt = haddr_nxt + ADDR_STEP;
-                  end
-                  if (in_axis_tvalid_i) begin
-                     htrans_nxt = TRANS_SEQ;
-                     hwdata_nxt = in_axis_tdata_i;
-                     hwstrb_nxt = {STRB_WIDTH{1'b1}};
+            if (m_ahb_write_o & m_ahb_readyout_i) begin  // write access
+               // get next data
+               if (m_ahb_trans_o != TRANS_BUSY) begin
+                  in_axis_tready_nxt = 1'b1;
+                  haddr_nxt = addr_add_step;
+               end else begin
+                  in_axis_tready_nxt = 1'b0;
+               end
 
-                     if (in_axis_tlast_i) begin
-                        state_nxt = LAST_DATA;
-                     end
-                  end else begin
-                     htrans_nxt = TRANS_BUSY;
+               if (in_axis_tvalid_i) begin
+                  htrans_nxt = TRANS_SEQ;
+                  hwdata_nxt = in_axis_tdata_i;
+                  hwstrb_nxt = {STRB_WIDTH{1'b1}};
+
+                  if (in_axis_tlast_i) begin
+                     state_nxt = LAST_DATA;
                   end
+               end else begin
+                  htrans_nxt = TRANS_BUSY;
                end
             end else begin  // read access
                // wait for hready
@@ -250,39 +268,37 @@ module iob_axis2ahb #(
                   out_axis_tdata_int  = m_ahb_rdata_i;
 
                   if (m_ahb_trans_o != TRANS_BUSY) begin
-                     haddr_nxt = haddr_nxt + ADDR_STEP;
+                     haddr_nxt = addr_add_step;
                   end
 
                   // busy until AXIS OUT reads data
                   if (~out_axis_tready_i) begin
                      htrans_nxt = TRANS_BUSY;
-                  end else begin
-                     config_out_length_nxt = config_out_length_nxt - 1'b1;
-                     htrans_nxt            = TRANS_SEQ;
-                  end
-
-
-                  if (config_out_length_nxt == 0) begin
+                  end else if (config_out_length_int == 0) begin
                      out_axis_tlast_int = 1'b1;
 
                      htrans_nxt         = TRANS_IDLE;
                      state_nxt          = WAIT_CONFIG;
+                  end else begin
+                     config_out_length_nxt = config_out_length_int - 1'b1;
+                     htrans_nxt            = TRANS_SEQ;
                   end
+
                end
             end
          end
          // no address and control, last data (write only)
          LAST_DATA: begin
-            if (m_ahb_write_o) begin
-               // wait for hready
-               if (m_ahb_readyout_i) begin
-                  htrans_nxt = TRANS_IDLE;
-                  hwstrb_nxt = {STRB_WIDTH{1'b0}};
-                  hwrite_nxt = 1'b0;
+            if (m_ahb_write_o & m_ahb_readyout_i) begin
+               htrans_nxt = TRANS_IDLE;
+               hwstrb_nxt = {STRB_WIDTH{1'b0}};
+               hwrite_nxt = 1'b0;
 
-                  state_nxt  = WAIT_CONFIG;
-               end
+               state_nxt  = WAIT_CONFIG;
             end
+         end
+         default: begin
+             state_nxt = WAIT_CONFIG;
          end
       endcase
    end

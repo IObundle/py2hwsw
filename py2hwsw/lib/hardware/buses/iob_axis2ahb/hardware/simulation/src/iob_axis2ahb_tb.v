@@ -96,7 +96,7 @@ module iob_axis2ahb_tb;
    wire    [                    MEM_ADDR_W-1:0] ahb_addr;
    wire    [                             3-1:0] ahb_burst;
    wire                                         ahb_mastlock;
-   wire    [                             3-1:0] ahb_prot;
+   wire    [                             4-1:0] ahb_prot;
    wire    [                             3-1:0] ahb_size;
    wire    [                             2-1:0] ahb_trans;
    wire    [                        DATA_W-1:0] ahb_wdata;

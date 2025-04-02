@@ -230,6 +230,7 @@ module iob_axis2ahb #(
          // wait for data from AXIS (write only)
          WAIT_DATA: begin
             //if (m_ahb_write_o) begin
+            in_axis_tready_nxt = 1'b1;
             if (in_axis_tvalid_i) begin
                htrans_nxt = TRANS_NONSEQ;
                hwdata_nxt = in_axis_tdata_i;
@@ -243,11 +244,9 @@ module iob_axis2ahb #(
          TRANSFER: begin
             if (m_ahb_write_o & m_ahb_readyout_i) begin  // write access
                // get next data
+               in_axis_tready_nxt = 1'b1;
                if (m_ahb_trans_o != TRANS_BUSY) begin
-                  in_axis_tready_nxt = 1'b1;
                   haddr_nxt = addr_add_step;
-               end else begin
-                  in_axis_tready_nxt = 1'b0;
                end
 
                if (in_axis_tvalid_i) begin

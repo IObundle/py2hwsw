@@ -907,9 +907,6 @@ def get_apb_ports():
 #
 # AHB
 #
-# ADDR_W = 32
-# DATA_W = 32
-# SIZE_W = 3
 AHB_PROT_W = 4
 AHB_BURST_W = 3
 AHB_TRANS_W = 2

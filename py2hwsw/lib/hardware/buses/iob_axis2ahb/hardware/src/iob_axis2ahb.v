@@ -66,17 +66,6 @@ module iob_axis2ahb #(
 
    // hwdata
    reg [DATA_WIDTH-1:0] hwdata_nxt;
-   //wire [DATA_WIDTH-1:0] hwdata_pipe;
-   //iob_reg_cear #(
-   //   .DATA_W (DATA_WIDTH),
-   //   .RST_VAL(0)
-   //) hwdata_pipe_reg (
-   //   .clk_i (clk_i),
-   //   .arst_i(arst_i),
-   //   .cke_i (cke_i),
-   //   .data_i(hwdata_nxt),
-   //   .data_o(hwdata_pipe)
-   //);
    iob_reg_cear #(
       .DATA_W (DATA_WIDTH),
       .RST_VAL(0)

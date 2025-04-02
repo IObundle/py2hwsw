@@ -47,11 +47,6 @@ module AHB2MEM #(
    // Memory Array
    reg [31:0] memory        [0:(2**(MEMWIDTH-2)-1)];
 
-   // initial
-   // begin
-   //   $readmemh("C:/Users/lovek/Desktop/arm keil hex file/sigleportram.hex", memory);
-   // end
-
    // Registers to store Adress Phase Signals
    reg        APhase_HSEL;
    reg        APhase_HWRITE;

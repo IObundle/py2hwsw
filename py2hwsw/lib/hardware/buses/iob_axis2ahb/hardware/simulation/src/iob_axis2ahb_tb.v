@@ -71,11 +71,9 @@ module iob_axis2ahb_tb;
    // AXIS2AHB config
 
    // config_in_io
-   //reg     [                    MEM_ADDR_W-1:0] config_in_addr;
    reg                                          config_in_valid;
    wire                                         config_in_ready;
    // config_out_io
-   //reg     [                    MEM_ADDR_W-1:0] config_out_addr;
    reg     [                    MEM_ADDR_W-1:0] config_out_length;
    reg                                          config_out_valid;
    wire                                         config_out_ready;

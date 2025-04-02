@@ -8,4 +8,5 @@
   {name: 'rdata_o', wave: 'x.....===x=x', data: ['D0', 'D1', 'D2', 'D3']},
   {name: 'rvalid_o', wave: '0.....1..010'},
   {name: 'ready_o', wave: '0....1..01..'},
+  {name: 'rready_i', wave: '0.....1..010'},
 ]}

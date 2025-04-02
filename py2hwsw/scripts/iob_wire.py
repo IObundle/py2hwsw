@@ -62,8 +62,8 @@ class iob_wire:
 
 attrs = [
     "name",
-    ["-i", "signals", {"nargs": 1}, ("type",)],
-    ["-s", "signals", {"nargs": "+"}, ["name:width"]],
+    ["-i", "signals&i", {"nargs": 1}, ("type",)],
+    ["-s", "signals&s", {"nargs": "+"}, ["name:width"]],
 ]
 
 

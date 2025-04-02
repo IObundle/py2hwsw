@@ -1114,6 +1114,87 @@ def get_apb_ports():
         ),
     ]
 
+#
+# AHB
+#
+# ADDR_W = 32
+# DATA_W = 32
+# BURST_W = 3
+# PROT_W = 4
+# SIZE_W = 3
+TRANS_W = 2
+
+
+@parse_widths
+def get_ahb_ports():
+    return [
+        iob_signal(
+            name="ahb_addr_o",
+            width=ADDR_W,
+            descr="Byte address of the transfer.",
+        ),
+        iob_signal(
+            name="ahb_burst_o",
+            width=BURST_W,
+            descr="Burst size.",
+        ),
+        iob_signal(
+            name="ahb_mastlock_o",
+            width=1,
+            descr="Current transfer is locked sequence.",
+        ),
+        iob_signal(
+            name="ahb_prot_o",
+            width=PROT_W,
+            descr="Byte address of the transfer.",
+        ),
+        iob_signal(
+            name="ahb_size_o",
+            width=SIZE_W,
+            descr="Size of transfer.",
+        ),
+        iob_signal(
+            name="ahb_trans_o",
+            width=TRANS_W,
+            descr="Transfer type.",
+        ),
+        iob_signal(
+            name="ahb_wdata_o",
+            width=DATA_W,
+            descr="Write data.",
+        ),
+        iob_signal(
+            name="ahb_wstrb_o",
+            width=try_math_eval(f"{DATA_W}/{8}"),
+            descr="Write strobe.",
+        ),
+        iob_signal(
+            name="ahb_write_o",
+            width=1,
+            descr="Transfer direction: (1) Write; (0) Read.",
+        ),
+        iob_signal(
+            name="ahb_rdata_i",
+            width=DATA_W,
+            descr="Read data.",
+        ),
+        iob_signal(
+            name="ahb_readyout_i",
+            width=1,
+            descr="Transfer finished on the bus.",
+        ),
+        iob_signal(
+            name="ahb_resp_i",
+            width=1,
+            descr="Transfer response: (0) Okay; (1) Error.",
+        ),
+        iob_signal(
+            name="ahb_sel_o",
+            width=1,
+            descr="Subordinate select.",
+        ),
+    ]
+
 
 #
 # RS232

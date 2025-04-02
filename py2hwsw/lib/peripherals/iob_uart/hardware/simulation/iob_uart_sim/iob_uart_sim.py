@@ -73,7 +73,7 @@ def setup(py_params_dict):
         {
             "core_name": "iob_uart",
             "instance_name": "uart_inst",
-            "instance_description": "UUT UART instance",
+            "instance_description": f"Unit Under Test (UUT) UART instance with '{params['csr_if']}' interface.",
             "csr_if": params["csr_if"],
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
@@ -88,7 +88,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_iob2wishbone",
                 "instance_name": "iob_iob2wishbone_coverter",
-                "instance_description": "Convert IOb port into Wishbone interface for uart CSRs bus",
+                "instance_description": "Convert IOb port from testbench into Wishbone interface for UART CSRs bus",
                 "parameters": {
                     "ADDR_W": 3 - 2,
                     "DATA_W": "DATA_W",
@@ -111,7 +111,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_iob2apb",
                 "instance_name": "iob_iob2apb_coverter",
-                "instance_description": "Convert IOb port into APB interface for uart CSRs bus",
+                "instance_description": "Convert IOb port from testbench into APB interface for UART CSRs bus",
                 "parameters": {
                     "APB_ADDR_W": 3 - 2,
                     "APB_DATA_W": "DATA_W",
@@ -136,7 +136,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_iob2axil",
                 "instance_name": "iob_iob2axil_coverter",
-                "instance_description": "Convert IOb port into AXI_Lite interface for uart CSRs bus",
+                "instance_description": "Convert IOb port from testbench into AXI-Lite interface for UART CSRs bus",
                 "parameters": {
                     "AXIL_ADDR_W": 3 - 2,
                     "AXIL_DATA_W": "DATA_W",
@@ -159,7 +159,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_iob2axi",
                 "instance_name": "iob_iob2axi_coverter",
-                "instance_description": "Convert IOb port into AXI interface for uart CSRs bus",
+                "instance_description": "Convert IOb port from testbench into AXI interface for UART CSRs bus",
                 "parameters": {
                     "ADDR_WIDTH": 3 - 2,
                     "DATA_WIDTH": "DATA_W",

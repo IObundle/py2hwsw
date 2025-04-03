@@ -151,7 +151,7 @@ def setup(py_params_dict):
                 "descr": "Port for connection to external iob_ram_t2p memory",
                 "signals": {
                     "type": "ram_t2p",
-                    "prefix": "write_fifo_",
+                    "prefix": "write_fifo_ext_mem_",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                 },

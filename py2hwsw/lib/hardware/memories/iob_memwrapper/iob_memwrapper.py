@@ -22,17 +22,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": f"{attrs['name']}_mwrap",
         "generate_hw": True,
-        "confs": attrs["confs"]
-        + [
-            {
-                "name": "MEM_NO_READ_ON_WRITE",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "1",
-                "descr": "No simultaneous read/write",
-            },
-        ],
+        "confs": attrs["confs"],
     }
 
     mwrap_wires = []
@@ -64,6 +54,7 @@ def setup(py_params_dict):
     ]
 
     list_of_mems = []
+    has_mem_no_read_on_write = False
     for wire in mwrap_wires:
         if wire["signals"].get("prefix", None):
             prefix_str = wire["signals"]["prefix"]
@@ -110,6 +101,7 @@ def setup(py_params_dict):
             mem_dict = mem_module.setup({})
             if "MEM_NO_READ_ON_WRITE" in mem_dict["confs"]:
                 extra_params["MEM_NO_READ_ON_WRITE"] = mem_dict["MEM_NO_READ_ON_WRITE"]
+                has_mem_no_read_on_write = True
 
         # Add memory instace to subblocks list
         attributes_dict["subblocks"].append(
@@ -130,6 +122,27 @@ def setup(py_params_dict):
 
     if "superblocks" in attrs:
         attributes_dict["superblocks"] = attrs["superblocks"]
+
+    # Add MEM_NO_READ_ON_WRITE to the attributes dictionary
+    # if the memory module has it and the user has not set it
+    has_mem_no_read_on_write_in_attrs = False
+    for conf in attrs["confs"]:
+        if conf["name"] == "MEM_NO_READ_ON_WRITE":
+            has_mem_no_read_on_write_in_attrs = True
+            break
+    if has_mem_no_read_on_write and not has_mem_no_read_on_write_in_attrs:
+        attributes_dict["confs"] += (
+            [
+                {
+                    "name": "MEM_NO_READ_ON_WRITE",
+                    "type": "P",
+                    "val": "0",
+                    "min": "0",
+                    "max": "1",
+                    "descr": "No simultaneous read/write",
+                },
+            ],
+        )
 
     # Generate LaTeX table of memories
     # But don't create files for other targets (like clean)

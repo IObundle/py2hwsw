@@ -4,8 +4,11 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_axistream_in_csrs_conf.vh"
-`include "iob_axistream_out_csrs_conf.vh"
+`include "iob_axistream_in_csrs_def.vh"
+`include "iob_axistream_in_conf.vh"
+`include "iob_axistream_out_csrs_def.vh"
+`include "iob_axistream_out_conf.vh"
+
 
 `define IOB_NBYTES (DATA_W/8)
 `define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))
@@ -32,6 +35,7 @@ module dma_tb;
    localparam DMA_RLEN_W = 12;
    localparam DMA_WLEN_W = 12;
    localparam AXIS_FIFO_ADDR_W = 10;
+   localparam NWORDS = 256;
 
    integer fd;
 
@@ -42,6 +46,10 @@ module dma_tb;
    reg cke;
    reg arst;
    reg rst;
+
+   reg [DATA_W-1:0] word;
+   integer failed = 0;
+   integer i;
 
    // axi_ram_mem
    wire axi_ram_ext_mem_clk;
@@ -147,14 +155,14 @@ module dma_tb;
    wire axis_out_iob_ready;
 
    // TODO review simulation loop program
-   // [ ] 1. IOb write data to AXIS OUT
-   // [ ] 2. AXIS OUT -> AXIS IN
+   // [x] 1. IOb write data to AXIS OUT
+   // [x] 2. AXIS OUT -> AXIS IN
    // [ ] 3. DMA WRITE operation (AXIS IN -> AXI RAM)
-   // [ ] 4. Reset AXIS OUT / AXIS IN
+   // [x] 4. Reset AXIS OUT / AXIS IN
    // [ ] 5. DMA READ operation (AXI RAM -> AXIS OUT)
-   // [ ] 6. AXIS OUT -> AXIS IN
-   // [ ] 7. IOb read data from AXIS IN
-   // [ ] 8. Compare data for test passed
+   // [x] 6. AXIS OUT -> AXIS IN
+   // [x] 7. IOb read data from AXIS IN
+   // [x] 8. Compare data for test passed
 
    initial begin
 `ifdef VCD
@@ -171,22 +179,88 @@ module dma_tb;
       @(posedge clk) #1 rst = 0;
 
       $display("DMA TEST!");
-      $finish();
 
-      // TODO: check results
-      if (TIMER_VALUE == 1003) begin
-         $display("%c[1;34m", 27);
-         $display("Test completed successfully.");
-         $display("%c[0m", 27);
-         fd = $fopen("test.log", "w");
+      $display("Configure AXIStream IN");
+      axis_in_iob_write(`IOB_AXISTREAM_IN_SOFT_RESET_ADDR, 1, `IOB_AXISTREAM_IN_SOFT_RESET_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_IN_SOFT_RESET_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_MODE_ADDR, 1, `IOB_AXISTREAM_IN_MODE_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_ENABLE_ADDR, 1, `IOB_AXISTREAM_IN_ENABLE_W);
+
+      $display("Configure AXIStream OUT");
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_SOFT_RESET_ADDR, 1, `IOB_AXISTREAM_OUT_SOFT_RESET_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_OUT_SOFT_RESET_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_MODE_ADDR, 0, `IOB_AXISTREAM_OUT_MODE_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_OUT_NWORDS_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_ENABLE_ADDR, 1, `IOB_AXISTREAM_OUT_ENABLE_W);
+
+      $display("Write data to AXIStream OUT -> AXIStream IN");
+
+      // write data loop
+      for (i = 0; i < 256; i = i + 1) begin
+         axis_out_iob_write(`IOB_AXISTREAM_OUT_DATA_ADDR, i, `IOB_AXISTREAM_OUT_DATA_W);
+      end
+
+
+      // TODO
+      $display("Configure DMA: write operation AXIStream IN -> DMA -> AXI RAM");
+      w_addr = 100;
+      w_length = 256;
+      w_max_len = 256;
+      w_start_transfer = 1;
+      @(posedge clk) #1 w_start_transfer = 0;
+
+      // wait for write operation to complete
+      while(w_busy) begin
+         @(posedge clk);
+      end
+
+      $display("Reset and reconfigure AXIStream IN / OUT");
+      axis_in_iob_write(`IOB_AXISTREAM_IN_SOFT_RESET_ADDR, 1, `IOB_AXISTREAM_IN_SOFT_RESET_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_IN_SOFT_RESET_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_MODE_ADDR, 0, `IOB_AXISTREAM_IN_MODE_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_ENABLE_ADDR, 1, `IOB_AXISTREAM_IN_ENABLE_W);
+
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_SOFT_RESET_ADDR, 1, `IOB_AXISTREAM_OUT_SOFT_RESET_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_OUT_SOFT_RESET_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_MODE_ADDR, 1, `IOB_AXISTREAM_OUT_MODE_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_OUT_NWORDS_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_ENABLE_ADDR, 1, `IOB_AXISTREAM_OUT_ENABLE_W);
+
+      // TODO
+      $display("Configure DMA: read operation AXIStream OUT <- DMA <- AXI RAM");
+      r_addr = 100;
+      r_length = 256;
+      r_max_len = 256;
+      r_start_transfer = 1;
+      @(posedge clk) #1 r_start_transfer = 0;
+
+      // wait for write operation to complete
+      while(r_busy) begin
+         @(posedge clk);
+      end
+
+      $display("Read data from AXIStream IN");
+      // read data loop
+      for (i = 0; i < 256; i = i + 1) begin
+         axis_in_iob_read(`IOB_AXISTREAM_IN_DATA_ADDR, word, `IOB_AXISTREAM_IN_DATA_W);
+
+         //check data
+         if (word != i) begin
+            $display("Error: expected %d, got %d", i, word);
+            failed = failed + 1;
+         end
+      end
+
+      $display("%c[1;34m", 27);
+      $display("%c[0m", 27);
+      fd = $fopen("test.log", "w");
+
+      if (failed == 0) begin
+         $display("All tests passed");
          $fdisplay(fd, "Test passed!");
-         $fclose(fd);
-
       end else begin
-         $display("Test failed: expecting timer value 1003 but got %d", TIMER_VALUE);
-         fd = $fopen("test.log", "w");
-         $fdisplay(fd, "Test failed: expecting timer value 1003 but got %d", TIMER_VALUE);
-         $fclose(fd);
+         $display("Failed tests: %d", failed);
+         $fdisplay(fd, "Test failed!");
       end
 
       $finish();

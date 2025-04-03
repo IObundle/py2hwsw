@@ -134,16 +134,25 @@ def setup(py_params_dict):
                     {"name": "axis_out_tready_i", "width": "1"},
                 ],
             },
-            # TODO external memory interfaces
             {
                 "name": "write_ext_mem_m",
                 "descr": "External memory interface",
-                "signals": {"type": "ram_t2p", "prefix": "dma_write_"},
+                "signals": {
+                    "type": "ram_t2p",
+                    "prefix": "dma_write_",
+                    "ADDR_W": "AXI_ADDR_W",
+                    "DATA_W": "AXI_DATA_W",
+                },
             },
             {
                 "name": "read_ext_mem_m",
                 "descr": "External memory interface",
-                "signals": {"type": "ram_t2p", "prefix": "dma_read_"},
+                "signals": {
+                    "type": "ram_t2p",
+                    "prefix": "dma_read_",
+                    "ADDR_W": "AXI_ADDR_W",
+                    "DATA_W": "AXI_DATA_W",
+                },
             },
             {
                 "name": "axi_m",

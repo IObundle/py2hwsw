@@ -27,8 +27,8 @@ module dma_tb;
 
    localparam PER = 10;
    localparam DATA_W = 32;
-   localparam ADDR_W = 10;
-   localparam AXI_LEN_W = 4;
+   localparam ADDR_W = 14;
+   localparam AXI_LEN_W = 8;
    localparam DMA_RLEN_W = 12;
    localparam DMA_WLEN_W = 12;
    localparam AXIS_FIFO_ADDR_W = 10;
@@ -47,10 +47,10 @@ module dma_tb;
    wire axi_ram_ext_mem_clk;
    wire [DATA_W-1:0] axi_ram_ext_mem_r_data;
    wire axi_ram_ext_mem_r_en;
-   wire [ADDR_W-1:0] axi_ram_ext_mem_r_addr;
+   wire [(ADDR_W-2)-1:0] axi_ram_ext_mem_r_addr;
    wire [DATA_W-1:0] axi_ram_ext_mem_w_data;
    wire [(DATA_W/8)-1:0] axi_ram_ext_mem_w_strb;
-   wire [ADDR_W-1:0] axi_ram_ext_mem_w_addr;
+   wire [(ADDR_W-2)-1:0] axi_ram_ext_mem_w_addr;
 
    // AXI-4 full master I/F
    wire ram_axi_awid;  //Address write channel ID
@@ -133,6 +133,7 @@ module dma_tb;
    reg [(DATA_W/8)-1:0] axis_in_iob_wstrb;
    wire axis_in_iob_rvalid;
    wire [DATA_W-1:0] axis_in_iob_rdata;
+   reg axis_in_iob_rready;
    wire axis_in_iob_ready;
 
    // AXIS OUT IOb
@@ -142,6 +143,7 @@ module dma_tb;
    reg [(DATA_W/8)-1:0] axis_out_iob_wstrb;
    wire axis_out_iob_rvalid;
    wire [DATA_W-1:0] axis_out_iob_rdata;
+   reg axis_out_iob_rready;
    wire axis_out_iob_ready;
 
    // TODO review simulation loop program
@@ -291,11 +293,12 @@ module dma_tb;
        .sys_tready_i(dma_axis_in_tready),
        // iob_csrs_cbus_s
        .iob_csrs_iob_valid_i(axis_in_iob_valid),
-       .iob_csrs_iob_addr_i(axis_in_iob_addr),
+       .iob_csrs_iob_addr_i(axis_in_iob_addr[`IOB_AXISTREAM_IN_CSRS_ADDR_W-1:2]),
        .iob_csrs_iob_wdata_i(axis_in_iob_wdata),
        .iob_csrs_iob_wstrb_i(axis_in_iob_wstrb),
        .iob_csrs_iob_rvalid_o(axis_in_iob_rvalid),
        .iob_csrs_iob_rdata_o(axis_in_iob_rdata),
+       .iob_csrs_iob_rready_i(axis_in_iob_rready),
        .iob_csrs_iob_ready_o(axis_in_iob_ready)
    );
 
@@ -325,11 +328,12 @@ module dma_tb;
        .sys_tready_o(dma_axis_out_tready),
        // iob_csrs_cbus_s
        .iob_csrs_iob_valid_i(axis_out_iob_valid),
-       .iob_csrs_iob_addr_i(axis_out_iob_addr),
+       .iob_csrs_iob_addr_i(axis_out_iob_addr[`IOB_AXISTREAM_OUT_CSRS_ADDR_W-1:2]),
        .iob_csrs_iob_wdata_i(axis_out_iob_wdata),
        .iob_csrs_iob_wstrb_i(axis_out_iob_wstrb),
        .iob_csrs_iob_rvalid_o(axis_out_iob_rvalid),
        .iob_csrs_iob_rdata_o(axis_out_iob_rdata),
+       .iob_csrs_iob_rready_i(axis_out_iob_rready),
        .iob_csrs_iob_ready_o(axis_out_iob_ready)
    );
 
@@ -390,7 +394,7 @@ module dma_tb;
 
    // Memory for iob_axi_ram
    iob_ram_t2p_be #(
-      .ADDR_W(ADDR_W),
+      .ADDR_W(ADDR_W-2),
       .DATA_W(DATA_W)
    ) iob_ram_t2p_be_inst (
       // ram_t2p_be_s port
@@ -438,9 +442,11 @@ task axis_in_iob_read;
 
       #1 while (!axis_in_iob_ready) #1;
       @(posedge clk) #1 axis_in_iob_valid = 0;
+      @(posedge clk) #1 axis_in_iob_rready = 1;
 
       while (!axis_in_iob_rvalid) #1;
       data = #1 `IOB_GET_RDATA(addr, axis_in_iob_rdata, width);
+      @(posedge clk) #1 axis_in_iob_rready = 0;
    end
 endtask
 
@@ -476,9 +482,11 @@ task axis_out_iob_read;
 
       #1 while (!axis_out_iob_ready) #1;
       @(posedge clk) #1 axis_out_iob_valid = 0;
+      @(posedge clk) #1 axis_out_iob_rready = 1;
 
       while (!axis_out_iob_rvalid) #1;
       data = #1 `IOB_GET_RDATA(addr, axis_out_iob_rdata, width);
+      @(posedge clk) #1 axis_out_iob_rready = 0;
    end
 endtask
 

@@ -11,7 +11,7 @@ module iob_dma_write #(
    localparam WAIT_START = 1'd0, WAIT_DATA_IN_FIFO = 1'd1;
    localparam LEN_DIFF = DMA_WLEN_W - (AXI_LEN_W+1);
 
-   wire [(AXI_LEN_W+1)-1:0] fifo_level;
+   wire [(AXI_ADDR_W+1)-1:0] fifo_level;
    wire                     fifo_full;
    assign axis_in_tready_o = ~fifo_full;
    wire                  fifo_ren;
@@ -22,7 +22,7 @@ module iob_dma_write #(
    iob_fifo_sync #(
       .W_DATA_W(AXI_DATA_W),
       .R_DATA_W(AXI_DATA_W),
-      .ADDR_W  (AXI_LEN_W)
+      .ADDR_W  (AXI_ADDR_W)
    ) buffer_inst (
       // Global signals
       .clk_i           (clk_i),

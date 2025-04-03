@@ -201,9 +201,6 @@ def generate_verilog(core):
     if core.wires:
         module_body_lines += wire_gen.generate_wires(core) + "\n\n"
 
-    if core.subblocks:
-        module_body_lines += block_gen.generate_subblocks(core) + "\n\n"
-
     if core.comb:
         module_body_lines += comb_gen.generate_comb(core) + "\n\n"
 
@@ -212,6 +209,9 @@ def generate_verilog(core):
 
     if core.snippets:
         module_body_lines += snippet_gen.generate_snippets(core) + "\n\n"
+
+    if core.subblocks:
+        module_body_lines += block_gen.generate_subblocks(core) + "\n\n"
 
     f_module.write(
         f"""`timescale 1ns / 1ps

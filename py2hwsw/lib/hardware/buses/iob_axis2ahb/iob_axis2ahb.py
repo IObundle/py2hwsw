@@ -116,6 +116,17 @@ def setup(py_params_dict):
                 ],
             },
             {
+                "name": "general_o",
+                "descr": "Generic interface",
+                "signals": [
+                    {
+                        "name": "busy_o",
+                        "width": 1,
+                        "descr": "Module busy: (0) waiting for configuration; (1) during operation.",
+                    },
+                ],
+            },
+            {
                 "name": "ahb_m",
                 "descr": "Manager AHB interface",
                 "signals": {

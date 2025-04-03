@@ -18,9 +18,10 @@ module iob_axis2ahb #(
    localparam [2:0] BURST_SINGLE = 3'b0, BURST_INCR = 3'b1;
    localparam [DATA_WIDTH-1:0] ADDR_STEP = DATA_WIDTH / 8;  // byte addressable memory
 
-   localparam STATE_W = 2;
-   localparam [STATE_W-1:0] WAIT_CONFIG = 2'd0, WAIT_DATA = 2'd1;
-   localparam [STATE_W-1:0] TRANSFER = 2'd2, LAST_DATA = 2'd3;
+   localparam STATE_W = 3;
+   localparam [STATE_W-1:0] WAIT_CONFIG = 3'd0, WAIT_DATA = 3'd1;
+   localparam [STATE_W-1:0] TRANSFER = 3'd2, LAST_DATA = 3'd3;
+   localparam [STATE_W-1:0] ERROR = 3'd4;
    localparam [1:0] TRANS_IDLE = 2'd0, TRANS_BUSY = 2'd1, TRANS_NONSEQ = 2'd2, TRANS_SEQ = 2'd3;
 
    // Constant Outputs
@@ -32,6 +33,9 @@ module iob_axis2ahb #(
    // Managers can perform single transfers using:
    // undefined length burst (INCR) with length of 1.
    assign m_ahb_burst_o    = 3'b1;
+
+   // General Outputs
+   assign busy_o = (state != WAIT_CONFIG);
 
    // COMPUTE AHB OUTPUTS
 
@@ -241,7 +245,13 @@ module iob_axis2ahb #(
             //end
          end
          TRANSFER: begin
-            if (m_ahb_write_o & m_ahb_readyout_i) begin  // write access
+            // check for error response
+            if (m_ahb_resp_i) begin
+                state_nxt = ERROR;
+                if (m_ahb_readyout_i) begin
+                    state_nxt = WAIT_CONFIG;
+                end
+            end else if (m_ahb_write_o & m_ahb_readyout_i) begin  // write access
                // get next data
                in_axis_tready_nxt = 1'b1;
                if (m_ahb_trans_o != TRANS_BUSY) begin
@@ -286,12 +296,24 @@ module iob_axis2ahb #(
          end
          // no address and control, last data (write only)
          LAST_DATA: begin
-            if (m_ahb_write_o & m_ahb_readyout_i) begin
+            // check for error response
+            if (m_ahb_resp_i) begin
+                state_nxt = ERROR;
+                if (m_ahb_readyout_i) begin
+                    state_nxt = WAIT_CONFIG;
+                end
+            end else if (m_ahb_write_o & m_ahb_readyout_i) begin
                htrans_nxt = TRANS_IDLE;
                hwstrb_nxt = {STRB_WIDTH{1'b0}};
                hwrite_nxt = 1'b0;
 
                state_nxt  = WAIT_CONFIG;
+            end
+         end
+         ERROR: begin
+            // wait for transfer finish condition
+            if (m_ahb_resp_i & m_ahb_readyout_i) begin
+              state_nxt = WAIT_CONFIG;
             end
          end
          default: begin

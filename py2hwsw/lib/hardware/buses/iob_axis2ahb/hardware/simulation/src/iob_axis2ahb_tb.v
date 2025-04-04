@@ -295,6 +295,8 @@ module iob_axis2ahb_tb;
       .config_out_length_i(config_out_length),
       .config_out_valid_i (config_out_valid),
       .config_out_ready_o (config_out_ready),
+      // General io
+      .busy_o             (),
       // ahb_m
       .m_ahb_addr_o       (ahb_addr),
       .m_ahb_burst_o      (ahb_burst),

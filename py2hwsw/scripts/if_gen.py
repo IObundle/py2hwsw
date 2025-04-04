@@ -222,6 +222,13 @@ if_details = [
         "full_name": "APB",
     },
     {
+        "name": "ahb",
+        "vendor": "ARM",
+        "lib": "AHB",
+        "version": "4.0",
+        "full_name": "AHB",
+    },
+    {
         "name": "axis",
         "vendor": "ARM",
         "lib": "AXI",
@@ -1113,6 +1120,7 @@ def get_apb_ports():
             descr="Ready. Indicates the end of a transfer.",
         ),
     ]
+
 
 #
 # AHB

@@ -36,6 +36,7 @@ module dma_tb;
    localparam DMA_WLEN_W = 12;
    localparam AXIS_FIFO_ADDR_W = 10;
    localparam NWORDS = 256;
+   localparam START_ADDR = 4000; // cross 4kB boundary
 
    integer fd;
 
@@ -154,16 +155,6 @@ module dma_tb;
    reg axis_out_iob_rready;
    wire axis_out_iob_ready;
 
-   // TODO review simulation loop program
-   // [x] 1. IOb write data to AXIS OUT
-   // [x] 2. AXIS OUT -> AXIS IN
-   // [ ] 3. DMA WRITE operation (AXIS IN -> AXI RAM)
-   // [x] 4. Reset AXIS OUT / AXIS IN
-   // [ ] 5. DMA READ operation (AXI RAM -> AXIS OUT)
-   // [x] 6. AXIS OUT -> AXIS IN
-   // [x] 7. IOb read data from AXIS IN
-   // [x] 8. Compare data for test passed
-
    initial begin
 `ifdef VCD
       $dumpfile("dma.vcd");
@@ -202,16 +193,14 @@ module dma_tb;
       $display("Write data to AXIStream OUT -> AXIStream IN");
 
       // write data loop
-      for (i = 0; i < 256; i = i + 1) begin
+      for (i = 0; i < NWORDS; i = i + 1) begin
          axis_out_iob_write(`IOB_AXISTREAM_OUT_DATA_ADDR, i, `IOB_AXISTREAM_OUT_DATA_W);
       end
 
-
-      // TODO
       $display("Configure DMA: write operation AXIStream IN -> DMA -> AXI RAM");
-      w_addr = 100;
-      w_length = 256;
-      w_max_len = 256;
+      w_addr = START_ADDR;
+      w_length = NWORDS;
+      w_max_len = NWORDS;
       w_start_transfer = 1;
       @(posedge clk) #1 w_start_transfer = 0;
 
@@ -238,11 +227,10 @@ module dma_tb;
       axis_out_iob_write(`IOB_AXISTREAM_OUT_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_OUT_NWORDS_W);
       axis_out_iob_write(`IOB_AXISTREAM_OUT_ENABLE_ADDR, 1, `IOB_AXISTREAM_OUT_ENABLE_W);
 
-      // TODO
       $display("Configure DMA: read operation AXIStream OUT <- DMA <- AXI RAM");
-      r_addr = 100;
-      r_length = 256;
-      r_max_len = 256;
+      r_addr = START_ADDR;
+      r_length = NWORDS;
+      r_max_len = NWORDS;
       r_start_transfer = 1;
       @(posedge clk) #1 r_start_transfer = 0;
 
@@ -253,7 +241,7 @@ module dma_tb;
 
       $display("Read data from AXIStream IN");
       // read data loop
-      for (i = 0; i < 256; i = i + 1) begin
+      for (i = 0; i < NWORDS; i = i + 1) begin
          axis_in_iob_read(`IOB_AXISTREAM_IN_DATA_ADDR, word, `IOB_AXISTREAM_IN_DATA_W);
 
          //check data

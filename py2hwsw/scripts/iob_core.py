@@ -245,7 +245,12 @@ class iob_core(iob_module, iob_instance):
                 superblocks = self.__create_memwrapper(superblocks=superblocks)
 
         # Add 'VERSION' macro
-        self.create_conf_group(name="VERSION", type="M", val="16'h" + self.version_str_to_digits(self.version), descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.")
+        self.create_conf_group(
+            name="VERSION",
+            type="M",
+            val="16'h" + self.version_str_to_digits(self.version),
+            descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
+        )
 
         # Ensure superblocks are set up last
         # and only for top module (or wrappers of it)
@@ -359,7 +364,9 @@ class iob_core(iob_module, iob_instance):
         ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
         # Lint and format sources
         self.lint_and_format()
-        print(f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}")
+        print(
+            f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
+        )
 
     def create_python_parameter_group(self, *args, **kwargs):
         create_python_parameter_group(self, *args, **kwargs)
@@ -553,7 +560,10 @@ class iob_core(iob_module, iob_instance):
                 ):
                     if p.interface.params != port.interface.params:
                         p.interface.params = "_".join(
-                            filter(lambda x: x != "None", [p.interface.params, port.interface.params])
+                            filter(
+                                lambda x: x != "None",
+                                [p.interface.params, port.interface.params],
+                            )
                         )
                         p.signals = []
                         p.__post_init__()
@@ -785,7 +795,11 @@ class iob_core(iob_module, iob_instance):
             core_dict = json.load(f)
 
         default_core_name = os.path.splitext(os.path.basename(filepath))[0]
-        py2_core_dict = {"original_name": default_core_name, "name": default_core_name, "setup_dir": os.path.dirname(filepath)}
+        py2_core_dict = {
+            "original_name": default_core_name,
+            "name": default_core_name,
+            "setup_dir": os.path.dirname(filepath),
+        }
         py2_core_dict.update(core_dict)
 
         return cls.py2hw(py2_core_dict, **kwargs)
@@ -910,7 +924,11 @@ class iob_core(iob_module, iob_instance):
                     **kwargs,
                 }
             )
-            py2_core_dict = {"original_name": core_name, "name": core_name, "setup_dir": core_dir}
+            py2_core_dict = {
+                "original_name": core_name,
+                "name": core_name,
+                "setup_dir": core_dir,
+            }
             py2_core_dict.update(core_dict)
             instance = __class__.py2hw(
                 py2_core_dict,
@@ -951,8 +969,9 @@ class iob_core(iob_module, iob_instance):
             dummy_module, f"{core.build_dir}/document/tsrc"
         )
         doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
-        doc_gen.generate_tex_py2hwsw_standard_py_params(f"{core.build_dir}/document/tsrc")
-        doc_gen.process_tex_macros(f"{core.build_dir}/document/tsrc")
+        doc_gen.generate_tex_py2hwsw_standard_py_params(
+            f"{core.build_dir}/document/tsrc"
+        )
 
     @staticmethod
     def version_str_to_digits(version_str):
@@ -1005,10 +1024,15 @@ def find_module_setup_dir(core_name):
     filepath = pathlib.Path(file_path)
     # Force core file to be contained in a folder with the same name.
     # Skip this check if we are the top module (no top defined) or trying to setup the top module again (same name as previous defined top)
-    if filepath.parent.name != core_name and (iob_core.global_top_module and core_name != iob_core.global_top_module.original_name):
-        fail_with_msg(f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
-                        f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
-                        f"But found incorrect path:    '{filepath.resolve()}'.")
+    if filepath.parent.name != core_name and (
+        iob_core.global_top_module
+        and core_name != iob_core.global_top_module.original_name
+    ):
+        fail_with_msg(
+            f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
+            f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
+            f"But found incorrect path:    '{filepath.resolve()}'."
+        )
 
     # print("Found setup dir based on location of: " + file_path, file=sys.stderr)
     if file_ext == ".py" or file_ext == ".json":

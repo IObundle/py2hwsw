@@ -413,6 +413,7 @@ def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
 
     return xml_code
 
+
 def gen_bus_interface_xml_file(bus_interface, dest_dir):
     """
     Generate the IPXACT XML file for given bus interface.
@@ -427,8 +428,11 @@ def gen_bus_interface_xml_file(bus_interface, dest_dir):
         os.makedirs(dest_dir)
 
     # Create the Bus Definition file for the interface
-    with open(f"{dest_dir}/interface_{bus_interface.type}.{bus_details['version']}.xml", "w") as f:
-        f.write(f"""\
+    with open(
+        f"{dest_dir}/interface_{bus_interface.type}.{bus_details['version']}.xml", "w"
+    ) as f:
+        f.write(
+            f"""\
 <?xml version="1.0" encoding="UTF-8"?>
 <ipxact:busDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
 	<ipxact:vendor>{bus_details["vendor"]}</ipxact:vendor>
@@ -443,23 +447,26 @@ def gen_bus_interface_xml_file(bus_interface, dest_dir):
 		<kactus2:version>3,13,308,0</kactus2:version>
 	</ipxact:vendorExtensions>
 </ipxact:busDefinition>
-""")
+"""
+        )
+
 
 #    # Create the Abstraction Definition file for the interface
 #    with open(f"{dest_dir}/interface_{bus_interface.type}.{bus_details['version']}.absDef.xml", "w") as f:
 #        f.write(f"""\
-#<?xml version="1.0" encoding="UTF-8"?>
-#<ipxact:abstractionDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
-#	<ipxact:vendor>{bus_details["vendor"]}</ipxact:vendor>
-#	<ipxact:library>{bus_details["lib"]}</ipxact:library>
-#	<ipxact:name>{bus_details["name"]}.absDef</ipxact:name>
-#	<ipxact:version>{bus_details["version"]}</ipxact:version>
-#	<ipxact:busType vendor="{bus_details["vendor"]}" library="{bus_details["lib"]}" name="{bus_details["name"]}" version="{bus_details["version"]}"/>
-#	<ipxact:vendorExtensions>
-#		<kactus2:version>3,13,308,0</kactus2:version>
-#	</ipxact:vendorExtensions>
-#</ipxact:abstractionDefinition>
-#""")
+# <?xml version="1.0" encoding="UTF-8"?>
+# <ipxact:abstractionDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
+# 	<ipxact:vendor>{bus_details["vendor"]}</ipxact:vendor>
+# 	<ipxact:library>{bus_details["lib"]}</ipxact:library>
+# 	<ipxact:name>{bus_details["name"]}.absDef</ipxact:name>
+# 	<ipxact:version>{bus_details["version"]}</ipxact:version>
+# 	<ipxact:busType vendor="{bus_details["vendor"]}" library="{bus_details["lib"]}" name="{bus_details["name"]}" version="{bus_details["version"]}"/>
+# 	<ipxact:vendorExtensions>
+# 		<kactus2:version>3,13,308,0</kactus2:version>
+# 	</ipxact:vendorExtensions>
+# </ipxact:abstractionDefinition>
+# """)
+
 
 def gen_memory_map_xml(sw_regs, parameters_list):
     """

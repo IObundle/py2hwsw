@@ -5,43 +5,10 @@
 `timescale 1ns / 1ps
 
 
-module iob_iob2axi_rd #(
-   parameter ADDR_W      = 0,
-   parameter DATA_W      = 0,
-   // AXI-4 Full I/F parameters
-   parameter AXI_ADDR_W  = ADDR_W,
-   parameter AXI_DATA_W  = DATA_W,
-   parameter AXI_LEN_W   = 8,
-   parameter AXI_ID_W    = 1,
-   parameter AXI_BURST_W = 2,
-   parameter AXI_LOCK_W  = 1,
-   parameter AXI_QOS_W   = 4
+module iob_iob2axi_read #(
+   `include "iob_iob2axi_read_params.vs"
 ) (
-   input clk_i,
-   input rst_i,
-
-   //
-   // Control I/F
-   //
-   input                  run_i,
-   input  [   ADDR_W-1:0] addr_i,
-   input  [AXI_LEN_W-1:0] length_i,
-   output                 ready_o,
-   output                 error_o,
-
-   //
-   // AXI-4 Full Manager Read I/F
-   //
-   `include "iob_iob2axi_rd_m_axi_read_m_port.vs"
-
-   //
-   // Native Manager Write I/F
-   //
-   output                m_iob_valid_o,
-   output [  ADDR_W-1:0] m_iob_addr_o,
-   output [  DATA_W-1:0] m_iob_wdata_o,
-   output [DATA_W/8-1:0] m_iob_wstrb_o,
-   input                 m_iob_ready_i
+   `include "iob_iob2axi_read_io.vs"
 );
 
    localparam axi_arsize = $clog2(DATA_W / 8);

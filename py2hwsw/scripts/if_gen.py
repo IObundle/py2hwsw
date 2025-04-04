@@ -13,46 +13,249 @@ from typing import Dict
 from iob_signal import iob_signal, iob_signal_reference
 
 mem_if_details = [
-    {"name": "rom_2p",         "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "ROM 2 Port"},
-    {"name": "rom_atdp",       "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "ROM Asynchronous True Dual Port"},
-    {"name": "rom_sp",         "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "ROM Single Port"},
-    {"name": "rom_tdp",        "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "ROM True Dual Port"},
-    {"name": "ram_2p",         "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM 2 Port"},
-    {"name": "ram_at2p",       "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Asynchronous True 2 Port"},
-    {"name": "ram_atdp",       "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Asynchronous True Dual Port"},
-    {"name": "ram_atdp_be",    "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Asynchronous True Dual Port with Byte Enable"},
-    {"name": "ram_sp",         "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Single Port"},
-    {"name": "ram_sp_be",      "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Single Port with Byte Enable"},
-    {"name": "ram_sp_se",      "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM Single Port with Single Enable"},
-    {"name": "ram_t2p",        "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True 2 Port"},
-    {"name": "ram_t2p_be",     "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True 2 Port with Byte Enable"},
-    {"name": "ram_t2p_tiled",  "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True 2 Port Tiled"},
-    {"name": "ram_tdp",        "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True Dual Port"},
-    {"name": "ram_tdp_be",     "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True Dual Port with Byte Enable"},
-    {"name": "ram_tdp_be_xil", "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "RAM True Dual Port with Byte Enable Xilinx"},
-    {"name": "regfile_2p",     "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "Register File 2 Port"},
-    {"name": "regfile_at2p",   "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "Register File Asynchronous True 2 Port"},
-    {"name": "regfile_sp",     "vendor": "IObundle", "lib": "MEM", "version": "1.0", "full_name": "Register File Single Port"},
+    {
+        "name": "rom_2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "ROM 2 Port",
+    },
+    {
+        "name": "rom_atdp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "ROM Asynchronous True Dual Port",
+    },
+    {
+        "name": "rom_sp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "ROM Single Port",
+    },
+    {
+        "name": "rom_tdp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "ROM True Dual Port",
+    },
+    {
+        "name": "ram_2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM 2 Port",
+    },
+    {
+        "name": "ram_at2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Asynchronous True 2 Port",
+    },
+    {
+        "name": "ram_atdp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Asynchronous True Dual Port",
+    },
+    {
+        "name": "ram_atdp_be",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Asynchronous True Dual Port with Byte Enable",
+    },
+    {
+        "name": "ram_sp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Single Port",
+    },
+    {
+        "name": "ram_sp_be",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Single Port with Byte Enable",
+    },
+    {
+        "name": "ram_sp_se",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Single Port with Single Enable",
+    },
+    {
+        "name": "ram_t2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True 2 Port",
+    },
+    {
+        "name": "ram_t2p_be",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True 2 Port with Byte Enable",
+    },
+    {
+        "name": "ram_t2p_tiled",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True 2 Port Tiled",
+    },
+    {
+        "name": "ram_tdp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True Dual Port",
+    },
+    {
+        "name": "ram_tdp_be",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True Dual Port with Byte Enable",
+    },
+    {
+        "name": "ram_tdp_be_xil",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True Dual Port with Byte Enable Xilinx",
+    },
+    {
+        "name": "regfile_2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "Register File 2 Port",
+    },
+    {
+        "name": "regfile_at2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "Register File Asynchronous True 2 Port",
+    },
+    {
+        "name": "regfile_sp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "Register File Single Port",
+    },
 ]
 
 mem_if_names = [item["name"] for item in mem_if_details]
 
 if_details = [
-    
-    {"name": "iob_clk",    "vendor": "IObundle",  "lib": "CLK",      "version": "1.0", "full_name": "Clock (configurable)"},
-    {"name": "iob",        "vendor": "IObundle",  "lib": "IOb",      "version": "1.0", "full_name": "IOb"},
-    {"name": "axil_read",  "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI-Lite Read"},
-    {"name": "axil_write", "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI-Lite Write"},
-    {"name": "axil",       "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI-Lite"},
-    {"name": "axi_read",   "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI Read"},
-    {"name": "axi_write",  "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI Write"},
-    {"name": "axi",        "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI"},
-    {"name": "apb",        "vendor": "ARM",       "lib": "APB",      "version": "4.0", "full_name": "APB"},
-    {"name": "ahb",        "vendor": "ARM",       "lib": "AHB",      "version": "4.0", "full_name": "AHB"},
-    {"name": "axis",       "vendor": "ARM",       "lib": "AXI",      "version": "4.0", "full_name": "AXI Stream"},
-    {"name": "rs232",      "vendor": "Generic",   "lib": "RS232",    "version": "1.0", "full_name": "RS232"},
-    {"name": "wb",         "vendor": "OPENCORES", "lib": "Wishbone", "version": "B4",  "full_name": "Wishbone"},
-    {"name": "wb_full",    "vendor": "OPENCORES", "lib": "Wishbone", "version": "B4",  "full_name": "Wishbone Full"},
+    {
+        "name": "iob_clk",
+        "vendor": "IObundle",
+        "lib": "CLK",
+        "version": "1.0",
+        "full_name": "Clock (configurable)",
+    },
+    {
+        "name": "iob",
+        "vendor": "IObundle",
+        "lib": "IOb",
+        "version": "1.0",
+        "full_name": "IOb",
+    },
+    {
+        "name": "axil_read",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI-Lite Read",
+    },
+    {
+        "name": "axil_write",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI-Lite Write",
+    },
+    {
+        "name": "axil",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI-Lite",
+    },
+    {
+        "name": "axi_read",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI Read",
+    },
+    {
+        "name": "axi_write",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI Write",
+    },
+    {
+        "name": "axi",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI",
+    },
+    {
+        "name": "apb",
+        "vendor": "ARM",
+        "lib": "APB",
+        "version": "4.0",
+        "full_name": "APB",
+    },
+    {
+        "name": "ahb",
+        "vendor": "ARM",
+        "lib": "AHB",
+        "version": "4.0",
+        "full_name": "AHB",
+    },
+    {
+        "name": "axis",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI Stream",
+    },
+    {
+        "name": "rs232",
+        "vendor": "Generic",
+        "lib": "RS232",
+        "version": "1.0",
+        "full_name": "RS232",
+    },
+    {
+        "name": "wb",
+        "vendor": "OPENCORES",
+        "lib": "Wishbone",
+        "version": "B4",
+        "full_name": "Wishbone",
+    },
+    {
+        "name": "wb_full",
+        "vendor": "OPENCORES",
+        "lib": "Wishbone",
+        "version": "B4",
+        "full_name": "Wishbone Full",
+    },
 ] + mem_if_details
 
 if_names = [item["name"] for item in if_details]
@@ -220,8 +423,15 @@ def get_iob_clk_ports(params: str = None):
     if params is None:
         params = "cke_arst"
     params = params.split("_")
-    if all(x in params for x in ["arst","arstn"]) or all(x in params for x in ["rst","rstn"]) or all(x in params for x in ["en","enn"]) or all(x in params for x in ["cke","cken"]):
-        raise ValueError("All signals are mutually exclusive with their negated version")
+    if (
+        all(x in params for x in ["arst", "arstn"])
+        or all(x in params for x in ["rst", "rstn"])
+        or all(x in params for x in ["en", "enn"])
+        or all(x in params for x in ["cke", "cken"])
+    ):
+        raise ValueError(
+            "All signals are mutually exclusive with their negated version"
+        )
     ports = [
         iob_signal(
             name="clk_o",
@@ -242,7 +452,7 @@ def get_iob_clk_ports(params: str = None):
     ]:
         if port in params:
             if "low" in descr:
-               port = port[:-1] + "_n"
+                port = port[:-1] + "_n"
             ports.append(
                 iob_signal(
                     name=port + "_o",
@@ -329,7 +539,11 @@ def get_mem_read_ports(
 
 
 def get_mem_write_ports(
-    suffix: str, ready: bool = False, addr: bool = False, true: bool = False, byte_enable: bool = False
+    suffix: str,
+    ready: bool = False,
+    addr: bool = False,
+    true: bool = False,
+    byte_enable: bool = False,
 ):
     suffix = f"_{suffix}" if suffix else ""
     wr_suffix = suffix if true else ""
@@ -366,7 +580,6 @@ def get_mem_write_ports(
                 descr=f"Write enable port {suffix}",
             )
         )
-
 
     mem_write_ports = [
         iob_signal(
@@ -480,7 +693,11 @@ def get_ram_sp_ports():
 
 @parse_widths
 def get_ram_sp_be_ports():
-    ports = get_mem_ports("") + get_mem_read_ports("") + get_mem_write_ports("", byte_enable=True)
+    ports = (
+        get_mem_ports("")
+        + get_mem_read_ports("")
+        + get_mem_write_ports("", byte_enable=True)
+    )
     return remove_duplicates(ports)
 
 
@@ -903,6 +1120,7 @@ def get_apb_ports():
             descr="Ready. Indicates the end of a transfer.",
         ),
     ]
+
 
 #
 # AHB
@@ -1391,7 +1609,11 @@ def gen_if(interface):
         # get ports
         if if_type.startswith("s"):
             ports = get_signals(
-                name=name, if_type="subordinate", mult=mult, widths=widths, params=params
+                name=name,
+                if_type="subordinate",
+                mult=mult,
+                widths=widths,
+                params=params,
             )
         else:
             ports = get_signals(

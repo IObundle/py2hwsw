@@ -108,11 +108,15 @@ unsigned int iob_read(unsigned int address, unsigned int data_w) {
 
   dut->iob_addr_i = address; // remove byte address
   dut->iob_valid_i = 1;
-  dut->iob_rready_i = 1;
   while (dut->iob_ready_o == 0) {
     clk_tick();
   }
-  // FIXME: This seems to be missing the wait for iob_rvalid
+  clk_tick();
+  dut->iob_valid_i = 0;
+  dut->iob_rready_i = 1;
+  while (dut->iob_rvalid_o == 0) {
+    clk_tick();
+  }
   switch (nbytes) {
   case 1:
     data = (dut->iob_rdata_o >> ((address & 0x3) * 8)) & 0xFF;
@@ -125,7 +129,6 @@ unsigned int iob_read(unsigned int address, unsigned int data_w) {
     break;
   }
   clk_tick();
-  dut->iob_valid_i = 0;
   dut->iob_rready_i = 0;
   return data;
 }

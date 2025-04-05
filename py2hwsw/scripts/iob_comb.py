@@ -89,8 +89,13 @@ class iob_comb(iob_snippet):
             for signal_ref in wire.signals:
                 signal = get_real_signal(signal_ref)
                 if signal.isreg:
+                    clk_if_name = "clk_en_rst_s"
+                    for port in core.ports:
+                        if port.interface:
+                            if port.interface.type == "iob_clk":
+                               clk_if_name = port.name 
                     connect = {
-                        "clk_en_rst_s": "clk_en_rst_s",
+                        "clk_en_rst_s": clk_if_name,
                         "data_i": f"{signal.name}_nxt",
                         "data_o": f"{signal.name}",
                     }
@@ -108,6 +113,10 @@ class iob_comb(iob_snippet):
                                     }
                                 ],
                             )
+                        core.create_wire(
+                            name=signal.name,
+                            signals=[{"name": signal.name}],
+                        )
                     _reg_signals = []
                     bit_slices = []
                     port_params = self.clk_if
@@ -124,7 +133,7 @@ class iob_comb(iob_snippet):
                         bit_slices.append(f"rst_i:{signal.name}_rst")
                         port_params = port_params + "_rst"
 
-                    if  any(x in port_params for x in ['_rst','_en']):
+                    if any(x in port_params for x in ["_rst", "_en"]):
                         if not any(
                             wire.name == f"{signal.name}_reg_signals"
                             for wire in core.wires
@@ -136,13 +145,13 @@ class iob_comb(iob_snippet):
                     if not any(port.name == "clk_en_rst_s" for port in core.ports):
                         core.create_port(
                             name="clk_en_rst_s",
-                            signals={"type": "iob_clk","params": self.clk_if},
+                            signals={"type": "iob_clk", "params": self.clk_if},
                             descr="Clock interface signals",
                         )
 
                     # if bit_slices is not empty, add it to the connect dictionary
                     if bit_slices:
-                        connect["clk_en_rst_s"] = ("clk_en_rst_s", bit_slices)
+                        connect["clk_en_rst_s"] = (clk_if_name, bit_slices)
 
                     if not any(
                         block.instance_name == f"{signal.name}_reg"
@@ -154,7 +163,7 @@ class iob_comb(iob_snippet):
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},
                             connect=connect,
-                            port_params={"clk_en_rst_s":self.clk_if},
+                            port_params={"clk_en_rst_s": self.clk_if},
                             instance_description=f"Infered register for {signal.name}",
                         )
 

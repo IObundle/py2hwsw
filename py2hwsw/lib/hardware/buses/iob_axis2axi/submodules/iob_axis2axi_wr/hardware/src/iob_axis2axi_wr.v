@@ -4,16 +4,16 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_dma_write_conf.vh"
+`include "iob_axis2axi_wr_conf.vh"
 
-module iob_dma_write #(
-   `include "iob_dma_write_params.vs"
+module iob_axis2axi_wr #(
+   `include "iob_axis2axi_wr_params.vs"
 ) (
-   `include "iob_dma_write_io.vs"
+   `include "iob_axis2axi_wr_io.vs"
 );
 
    localparam WAIT_START = 1'd0, WAIT_DATA_IN_FIFO = 1'd1;
-   localparam LEN_DIFF = DMA_WLEN_W - (AXI_LEN_W+1);
+   localparam LEN_DIFF = WLEN_W - (AXI_LEN_W+1);
 
    wire [(AXI_ADDR_W+1)-1:0] fifo_level;
    wire                     fifo_full;
@@ -42,13 +42,13 @@ module iob_dma_write #(
       .r_data_o        (fifo_rdata),
       .r_empty_o       (fifo_empty),
       // External memory interface
-      .ext_mem_clk_o   (dma_write_clk_o),
-      .ext_mem_w_en_o  (dma_write_w_en_o),
-      .ext_mem_w_addr_o(dma_write_w_addr_o),
-      .ext_mem_w_data_o(dma_write_w_data_o),
-      .ext_mem_r_en_o  (dma_write_r_en_o),
-      .ext_mem_r_addr_o(dma_write_r_addr_o),
-      .ext_mem_r_data_i(dma_write_r_data_i),
+      .ext_mem_clk_o   (ext_mem_write_clk_o),
+      .ext_mem_w_en_o  (ext_mem_write_w_en_o),
+      .ext_mem_w_addr_o(ext_mem_write_w_addr_o),
+      .ext_mem_w_data_o(ext_mem_write_w_data_o),
+      .ext_mem_r_en_o  (ext_mem_write_r_en_o),
+      .ext_mem_r_addr_o(ext_mem_write_r_addr_o),
+      .ext_mem_r_data_i(ext_mem_write_r_data_i),
       // FIFO level
       .level_o         (fifo_level)
    );
@@ -84,7 +84,7 @@ module iob_dma_write #(
 
    reg                      w_state_nxt;
    wire                     w_state;
-   reg  [   DMA_WLEN_W-1:0] w_remaining_data_nxt;
+   reg  [   WLEN_W-1:0]     w_remaining_data_nxt;
    reg  [(AXI_LEN_W+1)-1:0] burst_length;
    reg  [   AXI_ADDR_W-1:0] w_addr_int_nxt;
    wire [   AXI_ADDR_W-1:0] burst_addr;
@@ -155,8 +155,8 @@ module iob_dma_write #(
 
    // Length registers
    iob_reg_cear_r #(
-      .DATA_W (DMA_WLEN_W),
-      .RST_VAL({DMA_WLEN_W{1'b0}})
+      .DATA_W (WLEN_W),
+      .RST_VAL({WLEN_W{1'b0}})
    ) w_length_reg (
       .clk_i(clk_i),
       .cke_i(cke_i),
@@ -179,7 +179,7 @@ module iob_dma_write #(
       .data_o(burst_addr)
    );
 
-   iob_dma_write_axis2axi #(
+   iob_axis2axi_wr_int #(
       .AXI_ADDR_W(AXI_ADDR_W),
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_LEN_W (AXI_LEN_W),
@@ -190,7 +190,7 @@ module iob_dma_write #(
       .arst_i(arst_i),
       .rst_i(rst_i),
 
-      `include "iob_dma_write_m_axi_write_m_m_portmap.vs"
+      `include "iob_axis2axi_wr_m_axi_write_m_m_portmap.vs"
 
       .w_addr_i          (burst_addr),
       .w_length_i        (burst_length),

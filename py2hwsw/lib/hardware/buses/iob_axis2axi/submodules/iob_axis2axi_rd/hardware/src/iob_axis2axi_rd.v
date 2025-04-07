@@ -4,12 +4,12 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_dma_read_conf.vh"
+`include "iob_axis2axi_rd_conf.vh"
 
-module iob_dma_read #(
-   `include "iob_dma_read_params.vs"
+module iob_axis2axi_rd #(
+   `include "iob_axis2axi_rd_params.vs"
 ) (
-   `include "iob_dma_read_io.vs"
+   `include "iob_axis2axi_rd_io.vs"
 );
 
    localparam WAIT_START = 1'd0, WAIT_SPACE_IN_FIFO = 1'd1;
@@ -70,20 +70,20 @@ module iob_dma_read #(
       .r_data_o        (fifo_rdata),
       .r_empty_o       (fifo_empty),
       // External memory interface
-      .ext_mem_clk_o   (dma_read_clk_o),
-      .ext_mem_w_en_o  (dma_read_w_en_o),
-      .ext_mem_w_addr_o(dma_read_w_addr_o),
-      .ext_mem_w_data_o(dma_read_w_data_o),
-      .ext_mem_r_en_o  (dma_read_r_en_o),
-      .ext_mem_r_addr_o(dma_read_r_addr_o),
-      .ext_mem_r_data_i(dma_read_r_data_i),
+      .ext_mem_clk_o   (ext_mem_read_clk_o),
+      .ext_mem_w_en_o  (ext_mem_read_w_en_o),
+      .ext_mem_w_addr_o(ext_mem_read_w_addr_o),
+      .ext_mem_w_data_o(ext_mem_read_w_data_o),
+      .ext_mem_r_en_o  (ext_mem_read_r_en_o),
+      .ext_mem_r_addr_o(ext_mem_read_r_addr_o),
+      .ext_mem_r_data_i(ext_mem_read_r_data_i),
       // FIFO level
       .level_o         (fifo_level)
    );
 
    reg                      r_state_nxt;
    wire                     r_state;
-   reg  [   DMA_RLEN_W-1:0] r_remaining_data_nxt;
+   reg  [   RLEN_W-1:0]     r_remaining_data_nxt;
    reg  [(AXI_LEN_W+1)-1:0] burst_length;
    reg  [   AXI_ADDR_W-1:0] r_addr_int_nxt;
    wire [   AXI_ADDR_W-1:0] burst_addr;
@@ -115,8 +115,8 @@ module iob_dma_read #(
          default: begin  // WAIT_SPACE_IN_FIFO
             if (!busy) begin
                if (r_remaining_data_o > 0) begin
-                  if (({{DMA_RLEN_W-(AXI_LEN_W+1){1'b0}}, space_in_fifo} >= r_remaining_data_o)
-                        && (r_remaining_data_o <= {{DMA_RLEN_W-(AXI_LEN_W+1){1'b0}}, r_max_len_i}))
+                  if (({{RLEN_W-(AXI_LEN_W+1){1'b0}}, space_in_fifo} >= r_remaining_data_o)
+                        && (r_remaining_data_o <= {{RLEN_W-(AXI_LEN_W+1){1'b0}}, r_max_len_i}))
                   begin
                      // TX FIFO has enough space left to transfer the remaining data
                      burst_length = r_remaining_data_o[0+:(AXI_LEN_W+1)];
@@ -153,8 +153,8 @@ module iob_dma_read #(
    );
 
    iob_reg_cear_r #(
-      .DATA_W (DMA_RLEN_W),
-      .RST_VAL({DMA_RLEN_W{1'b0}})
+      .DATA_W (RLEN_W),
+      .RST_VAL({RLEN_W{1'b0}})
    ) r_length_reg (
       .clk_i(clk_i),
       .cke_i(cke_i),
@@ -176,7 +176,7 @@ module iob_dma_read #(
       .data_o(burst_addr)
    );
 
-   iob_dma_read_axi2axis #(
+   iob_axis2axi_rd_int #(
       .AXI_ADDR_W(AXI_ADDR_W),
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_LEN_W (AXI_LEN_W),
@@ -187,7 +187,7 @@ module iob_dma_read #(
       .arst_i(arst_i),
       .rst_i(rst_i),
 
-      `include "iob_dma_read_m_axi_read_m_m_portmap.vs"
+      `include "iob_axis2axi_rd_m_axi_read_m_m_portmap.vs"
 
       .r_addr_i          (burst_addr),
       .r_length_i        (burst_length),

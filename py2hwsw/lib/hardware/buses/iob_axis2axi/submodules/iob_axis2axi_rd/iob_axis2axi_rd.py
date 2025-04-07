@@ -40,12 +40,12 @@ def setup(py_params_dict):
                 "descr": "AXI ID width",
             },
             {
-                "name": "DMA_RLEN_W",
+                "name": "RLEN_W",
                 "type": "P",
                 "val": "1",
                 "min": "NA",
                 "max": "NA",
-                "descr": "DMA read length width",
+                "descr": "Read length width",
             },
         ],
         "ports": [
@@ -69,10 +69,10 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "r_addr_i", "width": "AXI_ADDR_W"},
-                    {"name": "r_length_i", "width": "DMA_RLEN_W"},
+                    {"name": "r_length_i", "width": "RLEN_W"},
                     {"name": "r_start_transfer_i", "width": "1"},
                     {"name": "r_max_len_i", "width": "(AXI_LEN_W+1)"},
-                    {"name": "r_remaining_data_o", "width": "DMA_RLEN_W"},
+                    {"name": "r_remaining_data_o", "width": "RLEN_W"},
                     {"name": "r_busy_o", "width": "1"},
                 ],
             },
@@ -90,7 +90,7 @@ def setup(py_params_dict):
                 "name": "axi_read_m",
                 "signals": {
                     "type": "axi_read",
-                    "file_prefix": "iob_dma_read_m_",
+                    "file_prefix": "iob_axis2axi_rd_m_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -103,7 +103,7 @@ def setup(py_params_dict):
                 "descr": "External memory interface",
                 "signals": {
                     "type": "ram_t2p",
-                    "prefix": "dma_read_",
+                    "prefix": "ext_mem_read_",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                 },

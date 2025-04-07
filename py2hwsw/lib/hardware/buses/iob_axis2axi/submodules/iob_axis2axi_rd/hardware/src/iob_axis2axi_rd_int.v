@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ps
 
-module iob_dma_read_axi2axis #(
+module iob_axis2axi_rd_int #(
    parameter AXI_ADDR_W = 0,
    parameter AXI_DATA_W = 32,  // We currently only support 4 byte transfers
    parameter AXI_LEN_W  = 8,
@@ -17,7 +17,7 @@ module iob_dma_read_axi2axis #(
    input rst_i,
 
    // Axi master interface
-   `include "iob_dma_read_m_axi_read_m_port.vs"
+   `include "iob_axis2axi_rd_m_axi_read_m_port.vs"
 
    // Configuration
    input  [   AXI_ADDR_W-1:0] r_addr_i,

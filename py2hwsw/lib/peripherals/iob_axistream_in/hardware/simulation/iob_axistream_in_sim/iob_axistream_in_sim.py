@@ -47,7 +47,7 @@ def setup(py_params_dict):
                 "descr": "Testbench peripherals CSRs interface",
                 "signals": {
                     "type": "iob",
-                    "ADDR_W": TODO,
+                    "ADDR_W": 6,  # Includes 2 LSBs
                 },
             },
         ],
@@ -91,7 +91,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "axis_tdata",
-                        "width": "TDATA_W",
+                        "width": "DATA_W",
                         "descr": "Data.",
                     },
                     {
@@ -133,10 +133,12 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "axistream_in_csrs_s",
+                "name": "axistream_in_csrs",
                 "descr": "axistream_in CSRs interface",
                 "signals": {
                     "type": "iob",
+                    "prefix": "axistream_in_csrs_",
+                    "ADDR_W": 5 - 2,
                 },
             },
             # AXISTREAM OUT
@@ -171,7 +173,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "axis_tdata",
-                        "width": "TDATA_W",
+                        "width": "DATA_W",
                         "descr": "Data.",
                     },
                     {
@@ -213,10 +215,12 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "axistream_out_csrs_s",
+                "name": "axistream_out_csrs",
                 "descr": "axistream_out CSRs interface",
                 "signals": {
                     "type": "iob",
+                    "prefix": "axistream_out_csrs_",
+                    "ADDR_W": 5 - 2,
                 },
             },
         ],
@@ -236,7 +240,7 @@ def setup(py_params_dict):
                     "interrupt_o": "axistream_in_interrupt",
                     "axistream_io": "axistream_in_axis",
                     "sys_axis_io": "axistream_in_sys_axis",
-                    "iob_csrs_cbus_s": "axistream_in_cbus",
+                    "iob_csrs_cbus_s": "axistream_in_csrs",
                 },
             },
             {
@@ -254,7 +258,7 @@ def setup(py_params_dict):
                     "interrupt_o": "axistream_out_interrupt",
                     "axistream_io": "axistream_out_axis",
                     "sys_axis_io": "axistream_out_sys_axis",
-                    "iob_csrs_cbus_s": "axistream_out_cbus",
+                    "iob_csrs_cbus_s": "axistream_out_csrs",
                 },
             },
             {
@@ -265,12 +269,26 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": "pbus_s",
-                    "output_0_m": "axistream_in_cbus",
-                    "output_1_m": "axistream_out_cbus",
+                    "input_s": ("pbus_s", ["iob_addr_i[5:2]"]),  # Ignore 2 LSBs
+                    "output_0_m": "axistream_in_csrs",
+                    "output_1_m": "axistream_out_csrs",
                 },
                 "num_outputs": 2,
-                "addr_w": TODO,
+                "addr_w": 6 - 2,
+            },
+        ],
+        "snippets": [
+            {
+                "verilog_code": """
+    assign axis_clk = clk_i;
+    assign axis_cke = cke_i;
+    assign axis_arst = arst_i;
+
+    // Connect unused inputs to zero
+    assign axistream_in_sys_tready = 1'b0;
+    assign axistream_out_sys_tvalid = 1'b0;
+    assign axistream_out_sys_tdata = {DATA_W{1'b0}};
+""",
             },
         ],
     }

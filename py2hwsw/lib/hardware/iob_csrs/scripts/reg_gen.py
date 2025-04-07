@@ -112,12 +112,10 @@ def generate_csr_sw(core, csr_gen_obj, reg_table):
     name = core["name"]
 
     # if "hardware" in core["dest_dir"] replace it with "software"
-    if "hardware/src" in core["dest_dir"]:
-        sw_dest_dir = core["dest_dir"].replace("hardware", "software")
-        csr_gen_obj.write_swheader(
-            reg_table, core["build_dir"] + "/" + sw_dest_dir, name
-        )
-        csr_gen_obj.write_swcode(reg_table, core["build_dir"] + "/" + sw_dest_dir, name)
+    sw_dest_dir = core["dest_dir"].replace("hardware", "software")
+
+    csr_gen_obj.write_swheader(reg_table, core["build_dir"] + "/" + sw_dest_dir, name)
+    csr_gen_obj.write_swcode(reg_table, core["build_dir"] + "/" + sw_dest_dir, name)
 
 
 def generate_csr(core):

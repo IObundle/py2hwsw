@@ -2,4 +2,4 @@
 //
 // SPDX-License-Identifier: MIT
 
-`define IOB_CSRS_ADDR_W axistream_in_csrs_w + axistream_out_csrs_w
+`define IOB_CSRS_ADDR_W 6

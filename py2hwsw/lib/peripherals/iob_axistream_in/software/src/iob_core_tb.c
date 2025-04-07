@@ -11,6 +11,8 @@
 #define FREQ 100000000
 #define BAUD 3000000
 
+#define NWORDS 256
+
 int iob_core_tb() {
   int failed = 0;
   uint32_t i, word;
@@ -21,37 +23,38 @@ int iob_core_tb() {
   // print the reset message
   printf("Reset complete\n");
 
-  iob_axistream_in_init_baseaddr(0);
-  iob_axistream_out_init_baseaddr(TODO);
+  // axistream_in connected to first master of split
+  iob_axistream_in_csrs_init_baseaddr(0);
+  // axistream_out connected to second master of split
+  iob_axistream_out_csrs_init_baseaddr(1 << 5);
 
-  printf("Configure AXIStream IN");
-  iob_axistream_in_csrs_set_softreset(0);
+  printf("Configure AXIStream IN\n");
+  iob_axistream_in_csrs_set_soft_reset(0);
   iob_axistream_in_csrs_set_mode(0);
-  // iob_axistream_in_csrs_set_nwords(NWORDS);
-  iob_axistream_in_csrs_enable(1);
+  iob_axistream_in_csrs_set_enable(1);
 
-  printf("Configure AXIStream OUT");
-  iob_axistream_out_csrs_set_softreset(0);
+  printf("Configure AXIStream OUT\n");
+  iob_axistream_out_csrs_set_soft_reset(0);
   iob_axistream_out_csrs_set_mode(0);
   iob_axistream_out_csrs_set_nwords(NWORDS);
-  iob_axistream_out_csrs_enable(1);
+  iob_axistream_out_csrs_set_enable(1);
 
-  printf("Write data to AXIStream OUT");
+  printf("Write data to AXIStream OUT\n");
 
   // write data loop
-  for (i = 0; i < 256; i = i + 1) {
+  for (i = 0; i < NWORDS; i = i + 1) {
     iob_axistream_out_csrs_set_data(i);
   }
 
-  printf("Read data from AXIStream IN");
+  printf("Read data from AXIStream IN\n");
 
   // read data loop
-  for (i = 0; i < 256; i = i + 1) {
+  for (i = 0; i < NWORDS; i = i + 1) {
     word = iob_axistream_in_csrs_get_data();
 
     // check data
     if (word != i) {
-      printf("Error: expected %d, got %d", i, word);
+      printf("Error: expected %d, got %d\n", i, word);
       failed = failed + 1;
     }
   }

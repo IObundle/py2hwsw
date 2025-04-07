@@ -370,7 +370,11 @@ def setup(py_params_dict):
             },
         ],
         "superblocks": [
-            {"core_name": "iob_axistream_out"},
+            # Simulation wrapper
+            {
+                "core_name": "iob_axistream_in_sim",
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
     }
 

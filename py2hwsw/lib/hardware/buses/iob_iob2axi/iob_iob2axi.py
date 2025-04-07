@@ -91,7 +91,7 @@ def setup(py_params_dict):
         {
             "name": "control_io",
             "descr": "Control interface",
-            "signals": {
+            "signals": [
                 {
                     "name": "length_i",
                     "width": "AXI_LEN_W",
@@ -107,17 +107,27 @@ def setup(py_params_dict):
                     "width": "AXI_LEN_W",
                     "descr": "Read FIFO level",
                 },
-            },
+            ],
         },
         {
             "name": "write_fifo_ext_mem_m",
             "descr": "External memory interface for write fifo",
-            "signals": {"type": "ram_t2p", "prefix": "write_fifo_"},
+            "signals": {
+                "type": "ram_t2p",
+                "prefix": "write_fifo_",
+                "ADDR_W": "AXI_ADDR_W",
+                "DATA_W": "AXI_DATA_W",
+            },
         },
         {
             "name": "read_fifo_ext_mem_m",
             "descr": "External memory interface for read fifo",
-            "signals": {"type": "ram_t2p", "prefix": "read_fifo_"},
+            "signals": {
+                "type": "ram_t2p",
+                "prefix": "read_fifo_",
+                "ADDR_W": "AXI_ADDR_W",
+                "DATA_W": "AXI_DATA_W",
+            },
         },
     ]
 

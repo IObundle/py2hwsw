@@ -99,8 +99,8 @@ module iob_axistream_in_tb;
       axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_SOFT_RESET_ADDR, 0,
                          `IOB_AXISTREAM_OUT_CSRS_SOFT_RESET_W);
       axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_MODE_ADDR, 0, `IOB_AXISTREAM_OUT_CSRS_MODE_W);
-      axis_out_iob_write(`IOB_AXISTREAM_IN_CSRS_NWORDS_ADDR, NWORDS,
-                         `IOB_AXISTREAM_IN_CSRS_NWORDS_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_NWORDS_ADDR, NWORDS,
+                         `IOB_AXISTREAM_OUT_CSRS_NWORDS_W);
       axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_ENABLE_ADDR, 1, `IOB_AXISTREAM_OUT_CSRS_ENABLE_W);
 
       $display("Write data to AXIStream OUT");

@@ -809,7 +809,7 @@ def get_axil_write_ports(params: str = None):
             descr="Address write channel address.",
         ),
     ]
-    if "prot" in signals:
+    if "prot" in params:
         signals += [
             iob_signal(
                 name="axil_awprot_o",
@@ -880,7 +880,7 @@ def get_axil_read_ports(params: str = None):
             descr="Address read channel address.",
         ),
     ]
-    if "prot" in signals:
+    if "prot" in params:
         signals += [
             iob_signal(
                 name="axil_arprot_o",
@@ -1046,8 +1046,12 @@ def get_axi_ports(params: str = None):
 
 
 @parse_widths
-def get_axis_ports():
-    return [
+def get_axis_ports(params: str = None):
+    if params is None:
+        params = ""
+    params = params.split("_")
+
+    signals = [
         iob_signal(
             name="axis_tvalid_o",
             width=1,
@@ -1063,12 +1067,17 @@ def get_axis_ports():
             width=DATA_W,
             descr="axis stream data.",
         ),
-        iob_signal(
+        
+    ]
+    if "tlast" in params:
+        signals += [
+            iob_signal(
             name="axis_tlast_o",
             width=1,
             descr="axis stream last.",
         ),
     ]
+    return signals
 
 
 #

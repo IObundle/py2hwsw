@@ -93,7 +93,7 @@ class iob_comb(iob_snippet):
                     for port in core.ports:
                         if port.interface:
                             if port.interface.type == "iob_clk":
-                               clk_if_name = port.name 
+                                clk_if_name = port.name 
                     connect = {
                         "clk_en_rst_s": clk_if_name,
                         "data_i": f"{signal.name}_nxt",
@@ -164,7 +164,7 @@ class iob_comb(iob_snippet):
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},
                             connect=connect,
                             port_params={"clk_en_rst_s": self.clk_if},
-                            instance_description=f"Infered register for {signal.name}",
+                            instance_description=f"{signal.name} register",
                         )
 
 

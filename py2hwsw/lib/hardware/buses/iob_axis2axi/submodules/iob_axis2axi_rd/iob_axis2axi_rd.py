@@ -40,39 +40,12 @@ def setup(py_params_dict):
                 "descr": "AXI ID width",
             },
             {
-                "name": "WLEN_W",
-                "type": "P",
-                "val": "1",
-                "min": "NA",
-                "max": "NA",
-                "descr": "Write length width",
-            },
-            {
                 "name": "RLEN_W",
                 "type": "P",
                 "val": "1",
                 "min": "NA",
                 "max": "NA",
                 "descr": "Read length width",
-            },
-            #
-            # False-parameters for external memories
-            #
-            {
-                "name": "WRITE_HEXFILE",
-                "descr": "Write hexfile",
-                "type": "F",
-                "val": '"none"',
-                "min": "NA",
-                "max": "NA",
-            },
-            {
-                "name": "READ_HEXFILE",
-                "descr": "Read hexfile",
-                "type": "F",
-                "val": '"none"',
-                "min": "NA",
-                "max": "NA",
             },
         ],
         "ports": [
@@ -92,18 +65,6 @@ def setup(py_params_dict):
             },
             # Configuration IO's
             {
-                "name": "config_write_io",
-                "descr": "",
-                "signals": [
-                    {"name": "w_addr_i", "width": "AXI_ADDR_W"},
-                    {"name": "w_length_i", "width": "WLEN_W"},
-                    {"name": "w_start_transfer_i", "width": "1"},
-                    {"name": "w_max_len_i", "width": "(AXI_LEN_W+1)"},
-                    {"name": "w_remaining_data_o", "width": "WLEN_W"},
-                    {"name": "w_busy_o", "width": "1"},
-                ],
-            },
-            {
                 "name": "config_read_io",
                 "descr": "",
                 "signals": [
@@ -115,16 +76,7 @@ def setup(py_params_dict):
                     {"name": "r_busy_o", "width": "1"},
                 ],
             },
-            # AXIS Interfaces - without last
-            {
-                "name": "axis_in_io",
-                "descr": "",
-                "signals": [
-                    {"name": "axis_in_tdata_i", "width": "AXI_DATA_W"},
-                    {"name": "axis_in_tvalid_i", "width": "1"},
-                    {"name": "axis_in_tready_o", "width": "1"},
-                ],
-            },
+            # AXIS Interface - without last
             {
                 "name": "axis_out_io",
                 "descr": "",
@@ -135,17 +87,19 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "write_ext_mem_m",
-                "descr": "External memory interface",
+                "name": "axi_read_m",
                 "signals": {
-                    "type": "ram_t2p",
-                    "prefix": "ext_mem_write_",
+                    "type": "axi_read",
+                    "file_prefix": "iob_axis2axi_rd_m_",
+                    "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
+                    "LEN_W": "AXI_LEN_W",
                 },
+                "descr": "AXI interface",
             },
             {
-                "name": "read_ext_mem_m",
+                "name": "ext_mem_m",
                 "descr": "External memory interface",
                 "signals": {
                     "type": "ram_t2p",
@@ -154,38 +108,15 @@ def setup(py_params_dict):
                     "DATA_W": "AXI_DATA_W",
                 },
             },
-            {
-                "name": "axi_m",
-                "signals": {
-                    "type": "axi",
-                    "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W",
-                    "DATA_W": "AXI_DATA_W",
-                    "LEN_W": "AXI_LEN_W",
-                },
-                "descr": "AXI interface",
-            },
         ],
         "subblocks": [
-            {"core_name": "iob_axis2axi_rd"},
-            {"core_name": "iob_axis2axi_wr"},
+            {"core_name": "iob_fifo2axis"},
+            {"core_name": "iob_fifo_sync"},
+            {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "cke_arst_rst"}},
             {
-                "core_name": "iob_axistream_in",
-                "instantiante": False,
-                "dest_dir": "hardware/simulation/src",
+                "core_name": "iob_reg",
+                "port_params": {"clk_en_rst_s": "cke_arst_rst_en"},
             },
-            {
-                "core_name": "iob_axistream_in",
-                "instantiante": False,
-                "dest_dir": "hardware/simulation/src",
-            },
-        ],
-        "superblocks": [
-            {"core_name": "iob_axistream_in"},
-            {"core_name": "iob_axistream_out"},
-            {"core_name": "iob_axi_ram"},
-            {"core_name": "iob_ram_t2p_be"},
         ],
     }
-
     return attributes_dict

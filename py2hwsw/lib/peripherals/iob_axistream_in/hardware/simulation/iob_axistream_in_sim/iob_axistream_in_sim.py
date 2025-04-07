@@ -47,7 +47,7 @@ def setup(py_params_dict):
                 "descr": "Testbench peripherals CSRs interface",
                 "signals": {
                     "type": "iob",
-                    "ADDR_W": "`IOB_CSRS_ADDR_W",
+                    "ADDR_W": TODO,
                 },
             },
         ],
@@ -270,7 +270,7 @@ def setup(py_params_dict):
                     "output_1_m": "axistream_out_cbus",
                 },
                 "num_outputs": 2,
-                "addr_w": "`IOB_CSRS_ADDR_W",
+                "addr_w": TODO,
             },
         ],
     }

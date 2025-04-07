@@ -3,17 +3,17 @@
 % SPDX-License-Identifier: MIT
 
 To use Py2HWSW, you can run the following command:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params 'param1=param1_val:param2=param2_val"
-\end{verbatim}
+\end{lstlisting}
 This command sets up a core using Py2HWSW, where (CORE) is the name of the core, (BUILD DIR) is the directory where the build files will be generated, and (param1=param1\_val:param2=param2\_val) are optional Python parameters that can be used to customize the core.
 
 The --build\_dir option allows you to specify the location of the generated build directory. If not specified, the build directory will be generated in the parent directory of where the Py2HWSW command is called.
 
 You can also use the --help option to list all available options and a brief description of each:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 py2hwsw --help
-\end{verbatim}
+\end{lstlisting}
 
 To create a new core, you will need to create a setup directory with the same name as the core. This directory should contain at least one file with the same name as the core, either with a .py or .json extension, that describes the core using attributes of the core dictionary. The setup directory may also contain other files and folders following a standard hierarchy, which is described in more detail in other sections of this document.
 

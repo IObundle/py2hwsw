@@ -427,6 +427,23 @@ def hardcoded_find_file(name_without_ext, filter_extensions=[]):
     return None
 
 
+def find_path(search_directory, path):
+    """Find a path inside the search_directory
+    param search_directory: directory to search
+    param path: path to find. Examples: "submodules/ethernet", "iob_uart.py", "iob_uart/hardware/simulation/src/iob_vlt_tb.vh"
+    """
+    for root, dirs, files in os.walk(search_directory):
+        for dir in dirs:
+            dir_path = os.path.join(root, dir)
+            if dir_path.endswith(path):
+                return dir_path
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file_path.endswith(path):
+                return file_path
+    return None
+
+
 def import_python_module(module_path, module_name=None):
     """Import a python module from a given filepath
     param module_path: path of the module's python file

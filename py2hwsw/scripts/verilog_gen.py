@@ -199,19 +199,19 @@ def generate_verilog(core):
 
     module_body_lines = ""
     if core.wires:
-        module_body_lines += wire_gen.generate_wires(core) + "\n\n"
+        module_body_lines += wire_gen.generate_wires(core) + "\n"
 
     if core.comb:
-        module_body_lines += comb_gen.generate_comb(core) + "\n\n"
+        module_body_lines += comb_gen.generate_comb(core) + "\n"
 
     if core.fsm:
-        module_body_lines += fsm_gen.generate_fsm(core) + "\n\n"
+        module_body_lines += fsm_gen.generate_fsm(core) + "\n"
 
     if core.snippets:
-        module_body_lines += snippet_gen.generate_snippets(core) + "\n\n"
+        module_body_lines += snippet_gen.generate_snippets(core) + "\n"
 
     if core.subblocks:
-        module_body_lines += block_gen.generate_subblocks(core) + "\n\n"
+        module_body_lines += block_gen.generate_subblocks(core)
 
     f_module.write(
         f"""`timescale 1ns / 1ps
@@ -220,6 +220,7 @@ def generate_verilog(core):
 module {core.name} {params_line}
 {io_gen.generate_ports(core)}\
 );
+
 {module_body_lines}
 endmodule
 """

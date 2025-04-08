@@ -111,7 +111,8 @@ def create_fsm(core, *args, **kwargs):
     ):
         core.create_wire(
             name=fsm.state_reg_name,
-            signals=[{"name": fsm.state_reg_name, "descr": "FSM state register wire", "width": fsm.state_reg_width}],
+            descr = "FSM state",
+            signals=[{"name": fsm.state_reg_name, "width": fsm.state_reg_width}],
         )
 
     fsm.set_needed_reg(core)

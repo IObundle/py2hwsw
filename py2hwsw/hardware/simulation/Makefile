@@ -108,11 +108,12 @@ BOARD_GRAB_CMD=../../scripts/board_client.py grab $(GRAB_TIMEOUT)
 run: test.log
 	@if ! grep -q "Test passed!" test.log; then echo "Test failed!"; exit 1; fi
 
+SIM_CMD=make exec
 ifneq ($(TBTYPE),none)
 ifneq ($(TBTYPE),V)
 ifneq ($(SIMULATOR), verilator) #if the simulator is not verilator, run the the C testbench separately
-#run the C testbench in background
-TB_CMD=../../software/tb &
+#run the C testbench in background and kill it when simulator exits
+SIM_CMD=../../software/tb & make exec; kill $$!
 endif
 endif
 endif
@@ -124,7 +125,7 @@ ifneq ($(TB),none)
 ifeq ($(SIM_SERVER),) #is simulator in local machine?
 
 ifneq ($(CONSOLE_CMD),)
-	$(BOARD_GRAB_CMD) -s '$(TB_CMD) make exec' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
+	$(BOARD_GRAB_CMD) -s '$(SIM_CMD)' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else
 	make exec && echo "Checking test log..." && sleep 2
 endif

@@ -479,3 +479,18 @@ def assert_attributes(
     for arg in kwargs:
         if arg not in inspect.signature(func).parameters:
             fail_with_msg(error_msg.replace("[func]", str(func)).replace("[arg]", arg))
+
+def validate_verilog_const(value: str, direction: str):
+    """Validate if constant is a valid Verilog constant and if it is compatible with the direction
+    :param value: constant to validate
+    :param direction: direction of the constant (input or output)"""
+    _bases = {"b":"01z","d":"0123456789z", "h":"0123456789abcdefz"}
+    _, _v = value.split("'")
+    if _v[0] not in _bases:
+        fail_with_msg(f"Invalid base for wire '{wire_name}'! Expected b, d or h, got {_v[0]}.")
+    elif not all(c in _bases[_v[0]] for c in _v[1:]):
+        fail_with_msg(f"Invalid value for wire '{wire_name}'! Expected [{_bases[_v[0]]}], got {_v[1:]}.")
+    if "z" in _v[1:] and direction == "input":
+        fail_with_msg(f"Invalid value for wire '{wire_name}'! Cannot have high impedance on input.")
+    if not all(c == "z" for c in _v[1:]) and direction == "output":
+        fail_with_msg(f"Invalid value for wire '{wire_name}'! Output cannot be driven.")

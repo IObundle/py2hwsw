@@ -31,6 +31,9 @@ endif
 ifeq ($(USE_COMPRESSED),1)
 MFLAG_C=c
 endif
+ifeq ($(NO_HW_DRIVER),)
+EXTRA_SRC+=src/hw_driver.c
+endif
 
 #default compiler settings
 TOOLCHAIN_PREFIX ?=riscv64-unknown-elf-
@@ -55,8 +58,8 @@ EMUL_INCLUDES ?=-I. -Isrc
 #########################################
 
 build: $(UTARGETS)
-%.elf: $(TEMPLATE_LDS) $(HDR) $(SRC)
-	$(TOOLCHAIN_PREFIX)gcc -o $@ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SRC) $(LLIBS)
+%.elf: $(TEMPLATE_LDS) $(HDR) $(SRC) $(EXTRA_SRC)
+	$(TOOLCHAIN_PREFIX)gcc -o $@ $(CFLAGS) $(LFLAGS) $(INCLUDES) $(SRC) $(EXTRA_SRC) $(LLIBS)
 	$(TOOLCHAIN_PREFIX)objcopy -O binary $@ $(*F).bin
 
 ifneq ($(BOARD),)
@@ -93,11 +96,25 @@ run_emul: test.log
 .PHONY: build_emul run_emul
 
 #########################################
+#            Simulation targets         #
+#########################################
+
+ifneq ($(wildcard ./src/$(NAME)_csrs.c),)
+CSRS ?= ./src/$(NAME)_csrs.c
+endif
+
+TB_INCLUDES ?=-I./src
+
+tb: ./src/iob_c_tb.c ./src/iob_core_tb.c $(CSRS)
+	gcc $(TB_INCLUDES) -g -o $@ $^
+
+
+#########################################
 #            General targets            #
 #########################################
 
 clean:
-	@rm -rf *.bin *.elf *.map *.hex
+	@rm -rf *.bin *.elf *.map *.hex tb
 	@rm -rf fw_emul test.log soc2cnsl cnsl2soc
 	@rm -rf *.txt iob_soc_conf.h
 

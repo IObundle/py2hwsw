@@ -97,14 +97,39 @@ def setup(py_params_dict):
             },
         ],
         "subblocks": [
-            """
-            iob_reg_re reg0 -p DATA_W:DATA_W RST_VAL:RST_VAL -c
-            clk_en_rst_s:clk_en_rst_s
-            en_rst_i:en_rst_i
-            data_i:data_int
-            data_o:data_o
-            -d 'Accomulator register with synchronous reset and enable'
-            """
+            # FIXME: iob_reg_re no longer exists, but short notation does not seem to support python parameters (like "port_params")
+            # """
+            # iob_reg_re reg0 -p DATA_W:DATA_W RST_VAL:RST_VAL -c
+            # clk_en_rst_s:clk_en_rst_s
+            # en_rst_i:en_rst_i
+            # data_i:data_int
+            # data_o:data_o
+            # -d 'Accomulator register with synchronous reset and enable'
+            # """,
+            # So, as an alternative, we dont use short notation and use the following:
+            {
+                "core_name": "iob_reg",
+                "instance_name": "reg0",
+                "instance_descr": "Accomulator register with synchronous reset and enable",
+                "parameters": {
+                    "DATA_W": "DATA_W",
+                    "RST_VAL": "RST_VAL",
+                },
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
+                "connect": {
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:en_i",
+                            "rst_i:rst_i",
+                        ],
+                    ),
+                    "data_i": "data_int",
+                    "data_o": "data_o",
+                },
+            },
         ],
         "snippets": [
             {

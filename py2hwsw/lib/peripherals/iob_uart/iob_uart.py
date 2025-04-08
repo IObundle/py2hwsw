@@ -216,26 +216,12 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
-            {
-                "core_name": "iob_clock",
-                "instance_name": "iob_clk_inst",
-                "dest_dir": "hardware/simulation/src",
-                "instantiate": False,
-            },
             # uncomment the following block to reveal a bug in py2hwsw
             #            {
             #                "core_name": "iob_sync",
             #                "instance_name": "iob_sync_inst",
             #                "instantiate": False,
             #            },
-            {
-                "core_name": "iob_reg",
-                "instance_name": "iob_reg_re_inst",
-                "port_params": {
-                    "clk_en_rst_s": "cke_arst_rst_en",
-                },
-                "instantiate": False,
-            },
         ],
         "superblocks": [
             # Tester

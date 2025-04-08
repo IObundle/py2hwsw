@@ -12,9 +12,9 @@ The iob\_aoi core is a simple example that combines an AND, OR, and invert logic
 \item Create or modify the iob\_aoi.py file to set the attributes of the core, describing how it should be generated using the Py2HWSW standard core dictionary interface.
 \item Optionally, add more files to the setup directory as needed, such as manual Verilog sources or templates, scripts, or software.
 \item Call the Py2HWSW setup process using the command:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 nix-shell --run "py2hwsw iob_aoi setup --build_dir '$(BUILD_DIR)'"
-\end{verbatim}
+\end{lstlisting}
 \item The generated build directory contains all the Verilog sources, Makefile, and configurations to run the core in various flows (simulation, FPGA).
 \item To run the core in simulation, call the command: \texttt{make sim-run} from the build directory.
 \end{enumerate}
@@ -27,9 +27,9 @@ The iob\_pulse\_gen core is used to generate signal pulses with configurable sta
 \item Create or modify the iob\_pulse\_gen.py file to set the attributes of the core, describing how it should be generated using the Py2HWSW standard core dictionary interface.
 \item Optionally, add more files to the setup directory as needed, such as manual Verilog sources or templates, scripts, or software.
 \item Call the Py2HWSW setup process using the command:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 nix-shell --run "py2hwsw iob_pulse_gen setup --build_dir '$(BUILD_DIR)'"
-\end{verbatim}
+\end{lstlisting}
 \item The generated build directory contains all the Verilog sources, Makefile, and configurations to run the core in various flows (simulation, FPGA).
 \item To run the core in simulation, call the command: \texttt{make sim-run} from the build directory.
 \end{enumerate}
@@ -42,9 +42,9 @@ The iob\_soc core is a more complex example used to create a system on chip. The
 \item Create or modify the iob\_soc.py file to set the attributes of the core, describing how it should be generated using the Py2HWSW standard core dictionary interface.
 \item Optionally, add more files to the setup directory as needed, such as manual Verilog sources or templates, scripts, or software.
 \item Call the Py2HWSW setup process using the command:
-\begin{verbatim}
+\begin{lstlisting}[language=bash]
 nix-shell --run "py2hwsw iob_soc setup --build_dir '$(BUILD_DIR)'"
-\end{verbatim}
+\end{lstlisting}
 \item The generated build directory contains all the Verilog sources, Makefile, and configurations to run the core in various flows (simulation, FPGA).
 \item To run the core in simulation, call the command: \texttt{make sim-run} from the build directory.
 \end{enumerate}

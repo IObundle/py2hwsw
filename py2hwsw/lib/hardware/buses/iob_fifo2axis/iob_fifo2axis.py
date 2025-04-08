@@ -19,6 +19,7 @@ def setup(py_params_dict):
                 "name": "AXIS_LEN_W",
                 "descr": "AXIS length bus width",
                 "type": "P",
+                "val": "1",
                 "min": "1",
                 "max": "NA",
             },
@@ -102,7 +103,6 @@ def setup(py_params_dict):
                 "descr": "AXIS master interface",
                 "signals": {
                     "type": "axis",
-                    "prefix": "m_",
                     "params": "tlast",
                     "DATA_W": "DATA_W",
                 },

@@ -609,7 +609,7 @@ class csr_gen:
                 "name": "state_nxt",
                 "descr": "",
                 "signals": [
-                    {"name": "state_nxt", "width": 1, "isreg": True},
+                    {"name": "state_nxt", "width": 1, "isvar": True, "isreg": True},
                 ],
             },
             {
@@ -878,7 +878,12 @@ class csr_gen:
                 "name": "iob_rvalid_nxt",
                 "descr": "",
                 "signals": [
-                    {"name": "iob_rvalid_nxt", "width": 1, "isreg": True},
+                    {
+                        "name": "iob_rvalid_nxt",
+                        "width": 1,
+                        "isvar": True,
+                        "isreg": True,
+                    },
                 ],
             },
             {
@@ -895,6 +900,7 @@ class csr_gen:
                     {
                         "name": "iob_rdata_nxt",
                         "width": 8 * self.cpu_n_bytes,
+                        "isvar": True,
                         "isreg": True,
                     },
                 ],
@@ -910,7 +916,7 @@ class csr_gen:
                 "name": "iob_ready_nxt",
                 "descr": "",
                 "signals": [
-                    {"name": "iob_ready_nxt", "width": 1, "isreg": True},
+                    {"name": "iob_ready_nxt", "width": 1, "isvar": True, "isreg": True},
                 ],
             },
         ]

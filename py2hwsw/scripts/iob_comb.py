@@ -79,9 +79,7 @@ class iob_comb(iob_snippet):
             else:
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name)
 
-            if signal is not None:
-                signal.isvar = True
-            else:
+            if signal is None:
                 fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
 
     def infer_registers(self, core):
@@ -108,6 +106,7 @@ class iob_comb(iob_snippet):
                                 signals=[
                                     {
                                         "name": f"{signal.name}_nxt",
+                                        "descr": f"{signal.name} next value",
                                         "width": signal.width,
                                         "isvar": True,
                                     }
@@ -122,13 +121,13 @@ class iob_comb(iob_snippet):
                     port_params = self.clk_if
                     if any(reg_signal == "_en" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                            {"name": f"{signal.name}_en", "width": 1, "isvar": True}
+                            {"name": f"{signal.name}_en", "descr": f"{signal.name} enable", "width": 1, "isvar": True}
                         )
                         bit_slices.append(f"en_i:{signal.name}_en")
                         port_params = port_params + "_en"
                     if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                            {"name": f"{signal.name}_rst", "width": 1, "isvar": True}
+                            {"name": f"{signal.name}_rst", "descr": f"{signal.name} reset", "width": 1, "isvar": True}
                         )
                         bit_slices.append(f"rst_i:{signal.name}_rst")
                         port_params = port_params + "_rst"

@@ -24,8 +24,8 @@ class iob_fsm(iob_comb):
             self.state_reg_name = "state"
             update_statement = "state_nxt = state;"
         else:
-            self.state_reg_name = "pc"
-            update_statement = "pc_nxt = pc + 1;"
+            self.state_reg_name = "pcnt"
+            update_statement = "pcnt_nxt = pcnt + 1;"
         update_statement += f"{self.default_assignments}\n"
         _states = self.state_descriptions.split("\n\n")
         self.state_names = {}
@@ -104,10 +104,15 @@ def create_fsm(core, *args, **kwargs):
         state_descriptions=state_descriptions,
     )
 
-    core.create_wire(
-        name=fsm.state_reg_name,
-        signals=[{"name": fsm.state_reg_name, "width": fsm.state_reg_width}],
-    )
+    # Check if the FSM wire is already created, if not create it
+    if not any(
+        wire.name == fsm.state_reg_name
+        for wire in core.wires
+    ):
+        core.create_wire(
+            name=fsm.state_reg_name,
+            signals=[{"name": fsm.state_reg_name, "descr": "FSM state register wire", "width": fsm.state_reg_width}],
+        )
 
     fsm.set_needed_reg(core)
 

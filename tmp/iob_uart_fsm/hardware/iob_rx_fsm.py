@@ -53,23 +53,23 @@ rx_ready_o = 0;
 rx_bitcnt_nxt = 0;
 rx_cyclecnt_nxt = 1;
 if (!rs232_rxd_i)  //line is low, wait until it is high
-    pc_nxt = pc;                    
+    pcnt_nxt = pcnt;                    
 
 rx_cyclecnt_nxt = rx_cyclecnt + 1;
 if (rx_cyclecnt != bit_duration_i) 
-   pc_nxt = pc;
+   pcnt_nxt = pcnt;
 if (rs232_rxd_i)
-   pc_nxt = pc;
+   pcnt_nxt = pcnt;
 
 rx_cyclecnt_nxt = 1;
 if (rs232_rxd_i)  //start bit (low) has not arrived, wait
-   pc_nxt = pc;
+   pcnt_nxt = pcnt;
 
 rx_cyclecnt_nxt = rx_cyclecnt + 1;
 if (rx_cyclecnt != bit_duration_i / 2)  // wait half bit period
-   pc_nxt = pc;
+   pcnt_nxt = pcnt;
 else if (rs232_rxd_i)  //error: line returned to high unexpectedly 
-   pc_nxt = 0;  //go back and resync
+   pcnt_nxt = 0;  //go back and resync
 else 
    rx_cyclecnt_nxt = 1;
 

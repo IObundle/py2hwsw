@@ -152,7 +152,7 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
         # If port has only non-iob signals, skip it
         if not any(isinstance(signal, iob_signal) for signal in port.signals):
             continue
-        instance_portmap += f"        // {port.name} port\n"
+        instance_portmap += f"        // {port.name} port: {port.descr}\n"
         # Connect individual signals
         for idx, signal in enumerate(port.signals):
             if not isinstance(signal, iob_signal):

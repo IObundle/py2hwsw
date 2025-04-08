@@ -1,9 +1,10 @@
 // SPDX-FileCopyrightText: 2025 IObundle
 //
 // SPDX-License-Identifier: MIT
-`include "iob_fifo2axis_conf.vh"
 
 `timescale 1ns / 1ps
+
+`include "iob_fifo2axis_conf.vh"
 
 module iob_fifo2axis #(
    `include "iob_fifo2axis_params.vs"

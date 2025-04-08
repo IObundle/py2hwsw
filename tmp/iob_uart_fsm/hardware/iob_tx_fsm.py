@@ -50,17 +50,17 @@ tx_bitcnt_nxt = 0;
 tx_cyclecnt_nxt = 1;
 tx_pattern_nxt = 0;
 if (!data_write_en_i) 
-    pc_nxt = pc;                    
+    pcnt_nxt = pcnt;                    
 else
     tx_ready_o = 1'b0;
 
 tx_pattern_nxt = {1'b1, tx_data_int[7:0], 1'b0};
 
-pc_nxt = pc;
+pcnt_nxt = pcnt;
 tx_cyclecnt_nxt = tx_cyclecnt + 1;
 if (tx_cyclecnt == bit_duration_i)
     if (tx_bitcnt == 4'd9) begin
-        pc_nxt = 0;
+        pcnt_nxt = 0;
     end else begin
         tx_pattern_nxt = tx_pattern >> 1;
         tx_bitcnt = tx_bitcnt + 4'd1;

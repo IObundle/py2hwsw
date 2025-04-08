@@ -136,10 +136,10 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "pc",
-                "descr": "pc wire",
+                "name": "pcnt",
+                "descr": "pcnt wire",
                 "signals": [
-                    {"name": "pc", "width": "PC_W"},
+                    {"name": "pcnt", "width": "PC_W"},
                 ],
             },
             {
@@ -166,9 +166,9 @@ def setup(py_params_dict):
 
    always @(posedge clk_i) begin
       if (en_i) begin
-         pc <= pc + 1'b1;
+         pcnt <= pcnt + 1'b1;
 
-         case (pc)
+         case (pcnt)
             0: begin  //load operands and result sign
                if (sign_i) begin
                   divisor_reg    <= divisor_i;
@@ -196,7 +196,7 @@ def setup(py_params_dict):
                rq[2*DATA_W-1:DATA_W] <= divident_sign? -rq[2*DATA_W-1 -: DATA_W] : rq[2*DATA_W-1 -: DATA_W];
             end
 
-            PC_W'(DATA_W + 4): pc <= pc;
+            PC_W'(DATA_W + 4): pcnt <= pcnt;
 
             default: begin  //shift and subtract
                tmp = {1'b0, subtraend} - {1'b0, divisor_reg};
@@ -208,7 +208,7 @@ def setup(py_params_dict):
       end else begin  // if (en)
          rq     <= 0;
          done_o <= 1'b0;
-         pc     <= 0;
+         pcnt     <= 0;
       end
    end
             """,

@@ -8,7 +8,7 @@ import os
 # Add csrs scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
 
-import reg_gen
+from reg_gen import generate_csr
 from csr_classes import create_csr_group
 from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
@@ -23,6 +23,8 @@ def setup(py_params_dict):
     params = {
         # Use the same name as instantiator + the suffix "_csrs"
         "name": py_params_dict["instantiator"]["name"] + "_csrs",
+        # Destination directory
+        "dest_dir": py_params_dict["dest_dir"],
         # Version of the CSRs module (by default use same version as py2hwsw)
         "version": py_params_dict["py2hwsw_version"],
         # Type of interface for CSR bus
@@ -87,6 +89,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": params["name"],
         "generate_hw": True,
+        "dest_dir": params["dest_dir"],
         "version": params["version"],
         "confs": confs,
         "ports": [
@@ -149,7 +152,7 @@ def setup(py_params_dict):
     }
 
     # Generate snippets
-    csr_gen_obj, reg_table = reg_gen.generate_csr(attributes_with_csrs)
+    csr_gen_obj, reg_table = generate_csr(attributes_with_csrs)
 
     # Store reg_table in static dict
     global static_reg_tables

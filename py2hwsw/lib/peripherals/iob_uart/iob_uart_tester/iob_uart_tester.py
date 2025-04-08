@@ -20,7 +20,6 @@ def setup(py_params_dict):
                 "board_list": [
                     "iob_aes_ku040_db_g",
                     "iob_cyclonev_gt_dk",
-                    "iob_zybo_z7",
                 ],
                 "subblocks": [
                     # Since Tester already contains one iob_uart peripheral by default

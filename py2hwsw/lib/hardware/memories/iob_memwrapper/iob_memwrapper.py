@@ -76,7 +76,7 @@ def setup(py_params_dict):
         hexfile_obj = find_obj_in_list(attrs["confs"], hexfile_param)
         if hexfile_obj is None:
             hexfile = "none"
-            hexfile_param = "none"
+            hexfile_param = '"none"'
         else:
             hexfile = hexfile_obj["val"]
 

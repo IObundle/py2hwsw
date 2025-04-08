@@ -131,6 +131,12 @@ class iob_core(iob_module, iob_instance):
             descr="Path to folder of build directory to be generated for this project.",
         )
         self.set_default_attribute(
+            "instance_name",
+            "",
+            str,
+            descr="Name of an instance of this class.",
+        )
+        self.set_default_attribute(
             "use_netlist",
             False,
             bool,
@@ -362,6 +368,10 @@ class iob_core(iob_module, iob_instance):
         doc_gen.generate_docs(self)
         # Generate ipxact file
         ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
+        # Remove 'iob_v_tb.v' from build dir if 'iob_v_tb.vh' does not exist
+        sim_src_dir = "hardware/simulation/src"
+        if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
+            os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
         # Lint and format sources
         self.lint_and_format()
         print(
@@ -972,6 +982,7 @@ class iob_core(iob_module, iob_instance):
         doc_gen.generate_tex_py2hwsw_standard_py_params(
             f"{core.build_dir}/document/tsrc"
         )
+        doc_gen.process_tex_macros(f"{core.build_dir}/document/tsrc")
 
     @staticmethod
     def version_str_to_digits(version_str):

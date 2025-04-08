@@ -20,8 +20,8 @@ def setup(py_params_dict):
             {
                 "name": "ADDR_W",
                 "type": "P",
-                "val": "`IOB_AXISTREAM_IN_CSRS_ADDR_W",
-                # "val": "5",
+                # "val": "`IOB_AXISTREAM_IN_CSRS_ADDR_W",
+                "val": "5",
                 "min": "NA",
                 "max": "NA",
                 "descr": "Address bus width",
@@ -370,7 +370,11 @@ def setup(py_params_dict):
             },
         ],
         "superblocks": [
-            {"core_name": "iob_axistream_out"},
+            # Simulation wrapper
+            {
+                "core_name": "iob_axistream_in_sim",
+                "dest_dir": "hardware/simulation/src",
+            },
         ],
     }
 

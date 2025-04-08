@@ -15,6 +15,7 @@ def setup(py_params_dict):
             params[param] = py_params_dict[param]
 
     attributes_dict = {
+        "name": "iob_uut",
         "generate_hw": True,
         "confs": [
             {

@@ -4,9 +4,11 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_axistream_in_csrs_def.vh"
+`include "iob_axistream_in_csrs.vh"
+`include "iob_axistream_in_csrs_conf.vh"
 `include "iob_axistream_in_conf.vh"
-`include "iob_axistream_out_csrs_def.vh"
+`include "iob_axistream_out_csrs.vh"
+`include "iob_axistream_out_csrs_conf.vh"
 `include "iob_axistream_out_conf.vh"
 
 `define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))
@@ -135,15 +137,18 @@ module iob_axis2ahb_tb;
       $display("Starting testbench");
 
       $display("Configure AXIStream IN");
-      axis_in_iob_write(`IOB_AXISTREAM_IN_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_IN_SOFT_RESET_W);
-      axis_in_iob_write(`IOB_AXISTREAM_IN_MODE_ADDR, 0, `IOB_AXISTREAM_IN_MODE_W);
-      axis_in_iob_write(`IOB_AXISTREAM_IN_ENABLE_ADDR, 1, `IOB_AXISTREAM_IN_ENABLE_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_CSRS_SOFT_RESET_ADDR, 0,
+                        `IOB_AXISTREAM_IN_CSRS_SOFT_RESET_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_CSRS_MODE_ADDR, 0, `IOB_AXISTREAM_IN_CSRS_MODE_W);
+      axis_in_iob_write(`IOB_AXISTREAM_IN_CSRS_ENABLE_ADDR, 1, `IOB_AXISTREAM_IN_CSRS_ENABLE_W);
 
       $display("Configure AXIStream OUT");
-      axis_out_iob_write(`IOB_AXISTREAM_OUT_SOFT_RESET_ADDR, 0, `IOB_AXISTREAM_OUT_SOFT_RESET_W);
-      axis_out_iob_write(`IOB_AXISTREAM_OUT_MODE_ADDR, 0, `IOB_AXISTREAM_OUT_MODE_W);
-      axis_out_iob_write(`IOB_AXISTREAM_OUT_NWORDS_ADDR, NWORDS, `IOB_AXISTREAM_IN_NWORDS_W);
-      axis_out_iob_write(`IOB_AXISTREAM_OUT_ENABLE_ADDR, 1, `IOB_AXISTREAM_OUT_ENABLE_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_SOFT_RESET_ADDR, 0,
+                         `IOB_AXISTREAM_OUT_CSRS_SOFT_RESET_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_MODE_ADDR, 0, `IOB_AXISTREAM_OUT_CSRS_MODE_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_NWORDS_ADDR, NWORDS,
+                         `IOB_AXISTREAM_OUT_CSRS_NWORDS_W);
+      axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_ENABLE_ADDR, 1, `IOB_AXISTREAM_OUT_CSRS_ENABLE_W);
 
       $display("Configure AXIS2AHB to write data to memory");
 
@@ -155,7 +160,7 @@ module iob_axis2ahb_tb;
 
       // write data loop
       for (i = 0; i < NWORDS; i = i + 1) begin
-         axis_out_iob_write(`IOB_AXISTREAM_OUT_DATA_ADDR, i, `IOB_AXISTREAM_OUT_DATA_W);
+         axis_out_iob_write(`IOB_AXISTREAM_OUT_CSRS_DATA_ADDR, i, `IOB_AXISTREAM_OUT_CSRS_DATA_W);
       end
 
       $display("Configure AXIS2AHB to read data from memory");
@@ -169,7 +174,7 @@ module iob_axis2ahb_tb;
 
       // read data loop
       for (i = 0; i < NWORDS; i = i + 1) begin
-         axis_in_iob_read(`IOB_AXISTREAM_IN_DATA_ADDR, word, `IOB_AXISTREAM_IN_DATA_W);
+         axis_in_iob_read(`IOB_AXISTREAM_IN_CSRS_DATA_ADDR, word, `IOB_AXISTREAM_IN_DATA_W);
 
          //check data
          if (word != i) begin

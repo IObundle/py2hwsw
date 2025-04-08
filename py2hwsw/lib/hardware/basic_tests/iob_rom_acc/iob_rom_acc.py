@@ -130,7 +130,7 @@ def setup(py_params_dict):
                 acc_reset = 1'b0;
             """,
             "state_descriptions": """
-            IDLE:  
+            IDLE:
                 if (start_i)
                 begin
                     state_nxt = READ;

@@ -29,7 +29,9 @@ def generate_wires(core):
             if isinstance(signal, iob_signal):
                 signals_code += "    " + signal.get_verilog_wire()
         if signals_code:
-            code += f"    // {wire.name}\n"
+            # Add description for the wire if it is not the default one
+            if wire.descr != "" and wire.descr != "Default description":
+                code += f"// {wire.descr}\n"
             code += signals_code
 
         # Close ifdef if conditional interface

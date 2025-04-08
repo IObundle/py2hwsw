@@ -37,7 +37,7 @@ def generate_ports(core):
         if port.if_not_defined:
             lines.append(f"`ifndef {port.if_not_defined}\n")
 
-        lines.append(f"    // {port.name}\n")
+        lines.append(f"    // {port.name}: {port.descr}\n")
 
         for signal_idx, signal in enumerate(port.signals):
             if isinstance(signal, iob_signal):

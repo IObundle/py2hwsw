@@ -25,11 +25,11 @@ a_o = 2;
 
 if(a_o == 0)
 begin
-    pc_nxt = A;
+    pcnt_nxt = A;
 end
 else
 begin
-    pc_nxt = B;
+    pcnt_nxt = B;
 end
 """
         },

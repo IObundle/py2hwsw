@@ -115,7 +115,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "data_i",
-                "descr": "Input port",
+                "descr": "Data input",
                 "signals": [
                     {
                         "name": "data_i",
@@ -125,7 +125,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "data_o",
-                "descr": "Output port",
+                "descr": "Data output",
                 "signals": [
                     {
                         "name": "data_o",

@@ -4,26 +4,12 @@
 
 `timescale 1ns / 1ps
 
+`include "iob_fifo2axis_conf.vh"
+
 module iob_fifo2axis #(
-   parameter DATA_W     = 0,
-   parameter AXIS_LEN_W = 0
+   `include "iob_fifo2axis_params.vs"
 ) (
-   `include "iob_fifo2axis_iob_clk_s_port.vs"
-   input                       rst_i,
-   input                       en_i,
-   input      [AXIS_LEN_W-1:0] len_i,
-   output reg [         2-1:0] level_o,
-
-   // FIFO I/F
-   input               fifo_empty_i,
-   output              fifo_read_o,
-   input  [DATA_W-1:0] fifo_rdata_i,
-
-   // AXIS I/F
-   output              axis_tvalid_o,
-   output [DATA_W-1:0] axis_tdata_o,
-   input               axis_tready_i,
-   output              axis_tlast_o
+   `include "iob_fifo2axis_io.vs"
 );
 
    wire [AXIS_LEN_W-1:0] axis_word_count;

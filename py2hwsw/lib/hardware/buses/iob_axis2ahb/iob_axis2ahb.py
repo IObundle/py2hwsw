@@ -54,6 +54,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axis",
                     "prefix": "in_",
+                    "params": "tlast",
                     "ADDR_W": "ADDR_WIDTH",
                     "DATA_W": "DATA_WIDTH",
                 },
@@ -63,6 +64,7 @@ def setup(py_params_dict):
                 "descr": "AXIS OUT interface",
                 "signals": {
                     "type": "axis",
+                    "params": "tlast",
                     "prefix": "out_",
                     "ADDR_W": "ADDR_WIDTH",
                     "DATA_W": "DATA_WIDTH",

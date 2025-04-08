@@ -2,14 +2,33 @@
 %
 % SPDX-License-Identifier: MIT
 
-Py2HWSW supports \textit{Universal Test Bench}.
+Py2HWSW supports a \textit{Universal Test Bench}.
 
-Create iob\_vlt\_tb.h verilator file and define the dut\_t type as the top module for simulation of the core.
-For example, for the iob\_uart core, we use the iob\_uart\_sim.v as the top module for simulation, so we define the Viob\_uart\_sim as the dut\_t type.
-\lstinputlisting[language=Python]{iob_vlt_tb.h}
-\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/peripherals/iob_uart/hardware/simulation/src/iob_vlt_tb.h}{View Source}
+To use the \textit{Universal Test Bench}, the core needs to provide the following files:
+\begin{itemize}
+  \item iob\_v\_tb.vh
+  \item iob\_uut.v
+  \item iob\_core\_tb.c
+  \item sw\_build.mk
+\end{itemize}
 
-Create the iob\_core\_tb.c source to drive the verification instruments (usually instantiated in the simulation wrapper).
-For example, the iob\_uart core is also used as a verification instrument to test itself. It is instantiated in the iob\_uart\_sim.v file, and its RS232 ports are connected in loopback. The tesbench then drives this core, writing data to it, and reading back the data received from the loopback.
-\lstinputlisting[language=Python]{iob_core_tb.c}
-\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/peripherals/iob_uart/hardware/simulation/src/iob_core_tb.c}{View Source}
+
+Create the \textbf{iob\_v\_tb.vh} testbench header source and define the \textbf{IOB\_CSRS\_ADDR\_W} macro to specify the address width of the simulation wrapper's CSRs bus (the width must be large enough address all CSRs from all verification instruments).
+For example, the iob\_uart core's simulation wrapper only uses one verification instrument (the iob\_uart core itself). Therefore, the testbench should define the \textbf{IOB\_CSRS\_ADDR\_W} macro to have the same width as the iob\_uart core's CSRs bus.
+The iob\_uart core's CSRs header files are also included because we can obtain the CSRs bus width from the auto-generated macro \textit{IOB\_UART\_CSRS\_ADDR\_W}
+% py2_macro: file iob_uart/hardware/simulation/src/iob_v_tb.vh
+
+
+Create \textbf{iob\_uut.v} simulation wrapper and instantiate the verification instruments.
+For example, the iob\_uart core is also used as a verification instrument to test itself. It is instantiated in the uart's iob\_uut.v file, and its RS232 ports are connected in loopback. The iob\_uut.v file is generated from the iob\_uart\_sim.py core's attributes (using the Py2HWSW attribute: "name": "uut").
+% py2_macro: file iob_uart_sim.py
+
+
+Create the \textbf{iob\_core\_tb.c} source to drive the verification instruments (instantiated in the simulation wrapper).
+For example, the iob\_uart core's testbench drives this core, writing data to it, and reading back the data received from the loopback.
+% py2_macro: file iob_uart/software/src/iob_core_tb.c
+
+Create the \textbf{sw\_build.mk} makefile segment and add the `tb` target to the `UTARGETS` list. Adding this target will cause the testbench software to be built. This testbench software will run on the host machine in parallel to the simulation.
+Also add the verification instrument's CSRs sources to the `CSRS` list.
+Also update the `TB\_INCLUDES` list as needed.
+% py2_macro: file iob_uart/software/sw_build.mk

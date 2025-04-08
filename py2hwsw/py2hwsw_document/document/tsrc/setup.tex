@@ -7,9 +7,9 @@ To set up a core with Py2HWSW, you'll need to have Nix installed on your system.
 Next, navigate to the Py2HWSW directory and run the command \texttt{nix-shell} to enter the Nix-shell environment. This will ensure that all dependencies required by Py2HWSW are installed and available.
 
 To set up a core, you can use the command:
-\begin{verbatim}
-nix-shell --run "py2hwsw $(CORE) setup --build_dir ’$(BUILD_DIR)’ --py_params ’param1=param1_val:param2=param2_val’"
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params 'param1=param1_val:param2=param2_val'"
+\end{lstlisting}
 
 This command will generate the necessary files and directories for your core in the specified build directory.
 
@@ -30,9 +30,9 @@ In some cases, the Verilog source file (\texttt{mycore.v}) may not be necessary,
 The Python description is particularly useful because it enables the creation of higher-level abstractions, making it easier to design and work with complex hardware components. Additionally, the use of Python parameters allows for dynamic modification of cores, enabling users to easily customize and adapt their designs to different use cases and applications.
 
 To set up this core, you would run the command:
-\begin{verbatim}
-nix-shell --run "py2hwsw mycore setup --build_dir ’./build’ --py_params ’param1=param1_val:param2=param2_val’"
-\end{verbatim}
+\begin{lstlisting}[language=bash]
+nix-shell --run "py2hwsw mycore setup --build_dir './build' --py_params 'param1=param1_val:param2=param2_val'"
+\end{lstlisting}
 
 This would generate the necessary files and directories for the core in the \texttt{./build} directory.
 

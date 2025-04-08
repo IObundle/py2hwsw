@@ -13,6 +13,7 @@ SIMULATOR ?=icarus
 
 
 REMOTE_BUILD_DIR=$(USER)/$(BUILD_DIR_NAME)
+REMOTE_SW_DIR=$(REMOTE_BUILD_DIR)/software
 REMOTE_SIM_DIR=$(REMOTE_BUILD_DIR)/hardware/simulation
 PYTHON_DIR = ../../scripts
 
@@ -39,10 +40,29 @@ ifneq ($(wildcard sim_build.mk),)
 include sim_build.mk
 endif
 
+#select testbench type
+ifneq ($(TBTYPE),UVM)
+ifneq ($(wildcard ./src/$(NAME)_tb.v),)
+TBTYPE?=V
+TB?=$(NAME)_tb
+else
+ifneq ($(wildcard ../../software/src/iob_core_tb.c),)
+TBTYPE?=C
+TB?=iob_v_tb
+else
+TBTYPE?=none
+endif
+endif
+else
+TB?=iob_v_uvm_tb
+endif
+$(info Testbench is $(TB).v)
+
 #
 # Include the simulator stub
 #
 include $(SIMULATOR).mk
+
 
 
 UFLAGS+=VCD=$(VCD)
@@ -50,12 +70,29 @@ UFLAGS+=COV=$(COV)
 UFLAGS+=SYN=$(SYN)
 UFLAGS+=NODE=$(NODE)
 UFLAGS+=COV_TEST=$(COV_TEST)
+UFLAGS+=TBTYPE=$(TBTYPE)
 
 remote_build_dir:
 ifneq ($(SIM_SERVER),)
 	ssh $(SIM_SSH_FLAGS) $(SIM_USER)@$(SIM_SERVER) "if [ ! -d $(REMOTE_BUILD_DIR) ]; then mkdir -p $(REMOTE_BUILD_DIR); fi"
-	rsync $(SIM_SYNC_FLAGS) -avz --force --delete ../.. $(SIM_USER)@$(SIM_SERVER):$(REMOTE_BUILD_DIR)
+	rsync $(SIM_SYNC_FLAGS) -avz --force --delete --exclude 'software/tb' ../.. $(SIM_USER)@$(SIM_SERVER):$(REMOTE_BUILD_DIR)
 endif
+
+#choose tetsbench type: C, verilog, uvm or none
+ifeq ($(TBTYPE),V)
+VSRC:=$(filter-out ./src/iob_v_tb.v, $(VSRC))
+endif
+
+ifeq ($(TBTYPE),UVM)
+VSRC:=$(filter-out ./src/iob_v_tb.v, $(VSRC))
+VSRC:=$(filter-out ./src/$(NAME)_tb.v, $(VSRC))
+SIMULATOR:=xcelium
+endif
+
+ifeq ($(TBTYPE),C)
+VSRC:=$(filter-out ./src/$(NAME)_tb.v, $(VSRC))
+endif
+
 
 build: $(VHDR) $(VSRC) $(HEX) remote_build_dir
 ifeq ($(SIM_SERVER),)
@@ -72,13 +109,33 @@ run: test.log
 	@if ! grep -q "Test passed!" test.log; then echo "Test failed!"; exit 1; fi
 
 test.log: remote_build_dir
-ifeq ($(SIM_SERVER),)
+ifneq ($(TB),none)
+
+ifeq ($(SIM_SERVER),) #is simulator in local machine?
+
+ifneq ($(TBTYPE),none)
+ifneq ($(TBTYPE),V)
+ifneq ($(SIMULATOR), verilator) #if the simulator is not verilator, run the the C testbench separately
+	../../software/tb & #run the C testbench in background
+endif
+endif
+endif
+
 ifneq ($(CONSOLE_CMD),)
 	$(BOARD_GRAB_CMD) -s 'make exec' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else
 	make exec && echo "Checking test log..." && sleep 2
 endif
-else
+
+else #simulator is in remote machine
+
+#build the software testbench
+ifneq ($(TBTYPE),non)
+ifneq ($(TBTYPE),V)
+	ssh -t $(SIM_SSH_FLAGS) $(SIM_USER)@$(SIM_SERVER) 'make -C $(REMOTE_SW_DIR) tb'
+endif
+endif
+
 ifeq ($(VCD),1)
 	trap 'trap - INT TERM; scp $(SIM_SCP_FLAGS) $(SIM_USER)@$(SIM_SERVER):$(REMOTE_SIM_DIR)/*.vcd .' INT TERM EXIT;\
 	ssh -t $(SIM_SSH_FLAGS) $(SIM_USER)@$(SIM_SERVER) 'make -j1 -C $(REMOTE_SIM_DIR) $@ SIMULATOR=$(SIMULATOR) $(UFLAGS)' || true
@@ -95,7 +152,9 @@ endif
 ifeq ($(VCD),1)
 	make waves
 endif
-
+else
+	echo "Test passed!" > test.log
+endif
 
 
 waves:
@@ -107,7 +166,7 @@ fix-vcd:
 	@echo "" >> $(VCD_FILE)
 
 gen-clean:
-	@rm -f *.hex
+	@rm -f *.hex ../../software/tb
 	@find . -maxdepth 1 -name "*.vh" -not \( -name "uut_build.mk" \) -delete
 ifneq ($(SIM_SERVER),)
 	ssh -t $(SIM_SSH_FLAGS) $(SIM_USER)@$(SIM_SERVER) 'if [ -f $(REMOTE_SIM_DIR)/Makefile ]; then make -C $(REMOTE_SIM_DIR) $@; fi'

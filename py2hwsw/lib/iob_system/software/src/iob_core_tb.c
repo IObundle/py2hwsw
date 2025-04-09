@@ -104,5 +104,6 @@ int iob_core_tb() {
 #endif
   }
 
+  // TODO: Return code based on test result (pass/fail)
   return 0;
 }

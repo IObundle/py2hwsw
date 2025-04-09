@@ -113,7 +113,7 @@ ifneq ($(TBTYPE),none)
 ifneq ($(TBTYPE),V)
 ifneq ($(SIMULATOR), verilator) #if the simulator is not verilator, run the the C testbench separately
 #run the C testbench in background and kill it when simulator exits
-SIM_CMD=../../software/tb & make exec; kill $$!
+SIM_CMD=../../software/tb & make exec && (kill $$! >/dev/null 2>&1; true) || (kill $$! >/dev/null 2>&1; false)
 endif
 endif
 endif

@@ -63,7 +63,7 @@ $(IOBNATIVEBRIDGEIF_DIR)/mkregs.conf: $(IOBNATIVEBRIDGEIF_DIR)/../../sut_csrs.vh
 	$(IOBNATIVEBRIDGEIF_DIR)/software/python/createIObNativeIfcsrs.py $(IOBNATIVEBRIDGEIF_DIR)/../..
 
 #cpu accessible registers
-iob_nativebridgeif_csrs_def.vh iob_nativebridgeif_csrs_gen.vh: $(IOBNATIVEBRIDGEIF_DIR)/mkregs.conf
+iob_nativebridgeif_csrs.vh iob_nativebridgeif_csrs_gen.vh: $(IOBNATIVEBRIDGEIF_DIR)/mkregs.conf
 	$(IOBNATIVEBRIDGEIF_DIR)/software/python/mkregsregfileif.py $< HW $(shell dirname $(MKREGS)) iob_nativebridgeif
 
     """
@@ -93,7 +93,7 @@ IOBNATIVEBRIDGEIF_SRC_DIR:=$(IOBNATIVEBRIDGEIF_HW_DIR)/src
 
 #include files
 VHDR+=$(wildcard $(IOBNATIVEBRIDGEIF_INC_DIR)/*.vh)
-VHDR+=iob_nativebridgeif_csrs_gen.vh iob_nativebridgeif_csrs_def.vh
+VHDR+=iob_nativebridgeif_csrs_gen.vh iob_nativebridgeif_csrs.vh
 VHDR+=$(LIB_DIR)/hardware/include/iob_lib.vh $(LIB_DIR)/hardware/include/iob_s_if.vh $(LIB_DIR)/hardware/include/iob_gen_if.vh
 
 
@@ -200,7 +200,7 @@ fout.close()
     verilog_source_str = """
 `timescale 1ns/1ps
 `include "iob_lib.vh"
-`include "iob_nativebridgeif_csrs_def.vh"
+`include "iob_nativebridgeif_csrs.vh"
 
 module iob_nativebridgeif
   # (

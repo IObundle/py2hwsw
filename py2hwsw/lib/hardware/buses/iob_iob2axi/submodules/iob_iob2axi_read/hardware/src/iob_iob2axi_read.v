@@ -4,6 +4,7 @@
 
 `timescale 1ns / 1ps
 
+`include "iob_iob2axi_read_conf.vh"
 
 module iob_iob2axi_read #(
    `include "iob_iob2axi_read_params.vs"

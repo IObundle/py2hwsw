@@ -12,7 +12,7 @@ import io_gen
 import block_gen
 
 from latex import write_table
-from iob_base import fail_with_msg, find_file
+from iob_base import fail_with_msg, find_path
 
 
 def generate_docs(core):
@@ -298,22 +298,18 @@ def process_tex_macro(line):
     def _find_file(file):
         """Local function to find file, and print error otherwise"""
         filename, extension = file.split(".")
+        if "/" in filename:
+            filename = filename.split("/")[-1]
         extension = "." + extension
-        file = find_file(
-            os.path.join(os.path.dirname(__file__), ".."),
-            filename,
-            filter_extensions=[extension],
-        )
-        if not file:
-            fail_with_msg(
-                f"File '{filename}{extension}' not found! From macro line '{line}'."
-            )
+        found_file = find_path(os.path.join(os.path.dirname(__file__), ".."), file)
+        if not found_file:
+            fail_with_msg(f"File '{file}' not found! From macro line '{line}'.")
         # Update file path and extension for use in TeX
         nonlocal file_path
         nonlocal file_extension
-        file_path = file[len(os.path.join(os.path.dirname(__file__), ".."))+1:]
+        file_path = found_file[len(os.path.join(os.path.dirname(__file__), "..")) + 1 :]
         file_extension = extension
-        return file
+        return found_file
 
     if macro_command == "listing":
         # Search for given attribute/class/method, and print its body

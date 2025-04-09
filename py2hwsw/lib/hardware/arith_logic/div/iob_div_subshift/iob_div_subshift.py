@@ -132,7 +132,7 @@ def setup(py_params_dict):
                 "name": "tmp",
                 "descr": "tmp wire",
                 "signals": [
-                    {"name": "tmp", "width": "DIVISOR_W+2"},
+                    {"name": "tmp", "width": "DIVISOR_W+2", "isvar": True},
                 ],
             },
             # { # NOTE: This wire is implicitly create by py2
@@ -146,14 +146,17 @@ def setup(py_params_dict):
                 "name": "pcnt",
                 "descr": "pcnt wire",
                 "signals": [
-                    {"name": "pcnt", "width": "$clog2(DIVIDEND_W+1)"},
+                    {
+                        "name": "pcnt",
+                        "descr": "pcnt wire",
+                        "width": "$clog2(DIVIDEND_W+1)",
+                    },
                 ],
             },
             {
                 "name": "done_reg",
-                "descr": "done_reg wire",
                 "signals": [
-                    {"name": "done_reg", "width": 1},
+                    {"name": "done_reg", "width": 1, "isvar": True},
                 ],
             },
         ],

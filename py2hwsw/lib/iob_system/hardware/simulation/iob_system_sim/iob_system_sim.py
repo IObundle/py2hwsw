@@ -7,7 +7,7 @@ def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
 
     attributes_dict = {
-        "name": params["name"] + "_sim",
+        "name": "iob_uut",
         "generate_hw": True,
         "confs": [
             {

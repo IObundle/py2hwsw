@@ -22,7 +22,7 @@ $(TOP_MODULE)_version.txt:
 	echo $(VERSION) > version.txt
 
 #cpu accessible registers
-iob_regfileif_csrs_def.vh iob_regfileif_csrs_gen.vh: $(REGFILEIF_DIR)/mkregs.conf
+iob_regfileif_csrs.vh iob_regfileif_csrs_gen.vh: $(REGFILEIF_DIR)/mkregs.conf
 	$(REGFILEIF_DIR)/software/python/mkregsregfileif.py $< HW $(shell dirname $(MKREGS)) iob_regfileif 
 
 regfileif-gen-clean:

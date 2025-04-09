@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
-`include "iob_uart_csrs_def.vh"
+`include "iob_uart_csrs.vh"
 `include "iob_uart_conf.vh"
 
 module iob_uart_core (

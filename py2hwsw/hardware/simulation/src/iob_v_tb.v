@@ -67,54 +67,59 @@ module iob_v_tb;
       arst = 0;
       #10;
 
+      // Open IPC files
+      c2v_read_fp = $fopen("c2v.txt", "rb");
+      if (c2v_read_fp == 0) begin
+         $display("Error: Could not open c2v.txt");
+         $finish;
+      end
+      $fclose(c2v_read_fp);
+      v2c_write_fp = $fopen("v2c.txt", "wb");
+      if (v2c_write_fp == 0) begin
+         $display("Error: Could not open v2c.txt");
+         $finish;
+      end
+
       // Server loop
       while (1) begin
          //read request
          c2v_read_fp = $fopen("c2v.txt", "rb");
-         if (c2v_read_fp == 0) begin
-            $display("Error: Could not open c2v.txt");
-            $finish;
-         end
-         if (c2v_read_fp != 0) begin
-            if ($fscanf(
-                    c2v_read_fp, "%08x %08x %08x %08x %08x\n", req, mode, address, data_w, data
-                )) begin
-               //$display("V: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode, address, data_w, data);
-               //check if request number matches with ack number
-               if (req == ack) begin
-                  v2c_write_fp = $fopen("v2c.txt", "wb");
-                  if (v2c_write_fp == 0) begin
-                     $display("Error: Could not open v2c.txt");
-                     $finish;
-                  end
-                  if (v2c_write_fp != 0) begin
-                     //process request
-                     if (mode == `F) begin  //finish request
-                        $display("V: finish request");
-                        $finish;
-                     end
-                     if (mode == `R) begin  //read request
-                        iob_read(address, data, data_w);
-                        //send ack  and data
-                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address,
-                                  data_w, data);
-                        //$display("V: read request: ack=%d adress=%08x data=%08x", ack, address, data);
-                     end else if (mode == `W) begin  //write request
-                        iob_write(address, data, data_w);
-                        //send ack
-                        $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address,
-                                  data_w, data);
-                        //$display("V: write request: ack=%d adress=%08x data=%08x", ack, address, data);
-                     end
-                     $fclose(v2c_write_fp);
-                  end  // if (v2c_write_fp != 0)
-                  ack = ack + 1;
-               end  // if (req == ack)
-            end  // if (fscanf_ret == 4)
+         if ($fscanf(
+                 c2v_read_fp, "%08x %08x %08x %08x %08x\n", req, mode, address, data_w, data
+             )) begin
             $fclose(c2v_read_fp);
-         end  // if (c2v_read_fp != 0)
+            /*$display("V: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode,
+                     address, data_w, data);*/  // DEBUG
+            //check if request number matches with ack number
+            if (req == ack) begin
+               //process request
+               if (mode == `F) begin  //finish request
+                  $display("V: finish request");
+                  $finish;
+               end
+               if (mode == `R) begin  //read request
+                  iob_read(address, data, data_w);
+                  //send ack  and data
+                  $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w,
+                            data);
+                  $fflush(v2c_write_fp);
+                  //$display("V: read request: ack=%d adress=%08x data=%08x", ack, address, data); // DEBUG
+               end else if (mode == `W) begin  //write request
+                  iob_write(address, data, data_w);
+                  //send ack
+                  $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w,
+                            data);
+                  $fflush(v2c_write_fp);
+                  // $display("V: write request: ack=%d adress=%08x data=%08x", ack, address, data); // DEBUG
+               end
+               ack = ack + 1;
+            end  // if (req == ack)
+         end else begin  // if (fscanf_ret == 5)
+            $fclose(c2v_read_fp);
+         end  // if (fscanf_ret != 5)
          @(posedge clk);  //advance clock
       end  // while (1)
+      $fclose(v2c_write_fp);
    end  // initial begin
 
 

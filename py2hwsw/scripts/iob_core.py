@@ -40,6 +40,7 @@ from iob_base import (
     nix_permission_hack,
     add_traceback_msg,
     debug,
+    validate_verilog_const,
 )
 from iob_license import iob_license, update_license
 import sw_tools
@@ -607,21 +608,30 @@ class iob_core(iob_module, iob_instance):
             elif type(connection_value) is tuple:
                 wire_name = connection_value[0]
                 bit_slices = connection_value[1]
+                if type(bit_slices) is not list:
+                    fail_with_msg(
+                        f"Second element of tuple must be a list of bit slices/connections: {connection_value}"
+                    )
             else:
                 fail_with_msg(f"Invalid connection value: {connection_value}")
 
-            if type(bit_slices) is not list:
-                fail_with_msg(
-                    f"Second element of tuple must be a list of bit slices/connections: {connection_value}"
-                )
-
-            wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(
-                instantiator.ports, wire_name
-            )
-            if not wire:
-                fail_with_msg(
-                    f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
-                )
+            if "'" in wire_name:
+                validate_verilog_const(wire_name, port.direction)
+                if not isintsance(port.signals,list):
+                    fail_with_msg(
+                        f"Port '{port.name}' signals must be a list of lenght 1 to connect to constant value '{wire_name}'"
+                    )
+                elif len(port.signals) != 1:
+                    fail_with_msg(
+                        f"Port '{port.name}' signals must be a list of lenght 1 to connect to constant value '{wire_name}'"
+                    )
+                wire = wire_name
+            else:
+                wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(instantiator.ports, wire_name)
+                if not wire:
+                    fail_with_msg(
+                        f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
+                    )
             port.connect_external(wire, bit_slices=bit_slices)
         for port in self.ports:
             if not port.e_connect and port.interface:

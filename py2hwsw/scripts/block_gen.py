@@ -153,6 +153,14 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
         if not any(isinstance(signal, iob_signal) for signal in port.signals):
             continue
         instance_portmap += f"        // {port.name} port: {port.descr}\n"
+        if isinstance(port.e_connect, str):
+            if len(port.signals) == 1:
+                instance_portmap += f"        .{port.signal[0].name}({port.e_connect}),\n"
+                continue
+            else:
+                fail_with_msg(
+                    f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has more than one signal but is connected to one constant value '{port.e_connect}'!{iob_colors.ENDC}"
+                )
         # Connect individual signals
         for idx, signal in enumerate(port.signals):
             if not isinstance(signal, iob_signal):

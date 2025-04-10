@@ -254,7 +254,7 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "clk_en_rst_s",
                     "rst_i": "rst_i",
                     "en_i": "en_fifo2axis",
-                    "len_i": "length_i",
+                    "len_i": "m_axi_awlen_o",
                     "fifo_r_io": "fifo_r_if",
                     "axis_m": "internal_axis_signals",
                     "level_o": "fifo2axis_level",

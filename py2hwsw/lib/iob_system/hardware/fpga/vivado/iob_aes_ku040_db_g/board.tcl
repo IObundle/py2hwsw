@@ -30,7 +30,7 @@ if { $USE_EXTMEM > 0 } {
 
         create_ip -name axi_interconnect -vendor xilinx.com -library ip -version 1.7 -module_name axi_interconnect_0 -dir ./ip -force
 
-        set_property CONFIG.NUM_SUBORDINATE_PORTS 1 [get_ips axi_interconnect_0]
+        set_property CONFIG.NUM_SLAVE_PORTS 1 [get_ips axi_interconnect_0]
         set_property CONFIG.AXI_ADDR_WIDTH 28 [get_ips axi_interconnect_0]
         set_property CONFIG.ACLK_PERIOD 5000 [get_ips axi_interconnect_0]
         set_property CONFIG.INTERCONNECT_DATA_WIDTH 32 [get_ips axi_interconnect_0]

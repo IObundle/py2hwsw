@@ -127,7 +127,7 @@ ifeq ($(SIM_SERVER),) #is simulator in local machine?
 ifneq ($(CONSOLE_CMD),)
 	$(BOARD_GRAB_CMD) -s '$(SIM_CMD)' -c '$(CONSOLE_CMD)' && echo "Checking test log..." && sleep 2
 else
-	make exec && echo "Checking test log..." && sleep 2
+	$(BOARD_GRAB_CMD) -s '$(SIM_CMD)' && echo "Checking test log..." && sleep 2
 endif
 
 else #simulator is in remote machine

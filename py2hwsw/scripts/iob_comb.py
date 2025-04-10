@@ -162,7 +162,7 @@ class iob_comb(iob_snippet):
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},
                             connect=connect,
-                            port_params={"clk_en_rst_s": self.clk_if},
+                            port_params={"clk_en_rst_s": port_params},
                             instance_description=f"{signal.name} register",
                         )
 

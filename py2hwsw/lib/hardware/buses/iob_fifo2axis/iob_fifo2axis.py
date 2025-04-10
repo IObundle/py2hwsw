@@ -15,19 +15,9 @@ def setup(py_params_dict):
             "name": "clk_en_rst_s",
             "signals": {
                 "type": "iob_clk",
+                "params": "cke_arst_rst",
             },
-            "descr": "Clock, clock enable, and reset",
-        },
-        {
-            "name": "rst_i",
-            "descr": "Reset signal",
-            "signals": [
-                {
-                    "name": "rst_i",
-                    "width": 1,
-                    "descr": "Reset signal",
-                },
-            ],
+            "descr": "Clock, clock enable, async and sync reset",
         },
     ]
     # Use enable signal if requested
@@ -86,6 +76,7 @@ def setup(py_params_dict):
                     "name": "fifo_read_o",
                     "width": 1,
                     "descr": "FIFO read signal",
+                    "isvar": True,
                 },
                 {
                     "name": "fifo_rdata_i",
@@ -127,11 +118,62 @@ def setup(py_params_dict):
 
     wires = [
         {
+            "name": "data_valid",
+            "descr": "Data valid register",
+            "signals": [
+                {
+                    "name": "data_valid",
+                    "width": 1,
+                },
+            ],
+        },
+        # Skid buffer
+        {
             "name": "saved",
             "descr": "Saved register",
             "signals": [
                 {
                     "name": "saved",
+                    "width": 1,
+                },
+            ],
+        },
+        {
+            "name": "saved_tdata",
+            "descr": "Saved tdata register",
+            "signals": [
+                {
+                    "name": "saved_tdata",
+                    "width": "DATA_W",
+                },
+            ],
+        },
+        {
+            "name": "saved_tlast",
+            "descr": "Saved tlast register",
+            "signals": [
+                {
+                    "name": "saved_tlast",
+                    "width": 1,
+                },
+            ],
+        },
+        {
+            "name": "outputs_enable",
+            "descr": "Outputs enable signal",
+            "signals": [
+                {
+                    "name": "outputs_enable",
+                    "width": 1,
+                },
+            ],
+        },
+        {
+            "name": "read_condition",
+            "descr": "Read condition signal",
+            "signals": [
+                {
+                    "name": "read_condition",
                     "width": 1,
                 },
             ],
@@ -142,39 +184,10 @@ def setup(py_params_dict):
     snippets = [
         {
             "verilog_code": """
-    wire                  read_condition;
-    wire                  fifo_read_r;
-    wire                  output_en;
-    wire [DATA_W-1:0] saved_tdata;
-    wire [(DATA_W+2)-1:0] output_nxt;
-    wire [(DATA_W+2)-1:0] output_r;
-
     wire [AXIS_LEN_W-1:0] axis_word_count;
     wire                  axis_tlast_nxt;
     wire [AXIS_LEN_W-1:0] len_int;
-    wire saved_tlast;
-
-    iob_reg_cear_r #(
-        .DATA_W (1),
-        .RST_VAL(1'd0)
-    ) fifo_read_reg (
-        `include "iob_fifo2axis_iob_clk_s_s_portmap.vs"
-        .rst_i (rst_i),
-        .data_i(fifo_read_o),
-        .data_o(fifo_read_r)
-    );
-
-    //FIFO tlast
-    iob_reg_cear_re #(
-        .DATA_W (1),
-        .RST_VAL(1'd0)
-    ) axis_tlast_reg (
-        `include "iob_fifo2axis_iob_clk_s_s_portmap.vs"
-        .rst_i (rst_i),
-        .en_i  (fifo_read_r),
-        .data_i(axis_tlast_nxt),
-        .data_o(saved_tlast)
-    );
+    assign len_int = len_i - 1;
 
     //tdata word count
     iob_modcnt #(
@@ -182,59 +195,10 @@ def setup(py_params_dict):
         .RST_VAL({AXIS_LEN_W{1'b1}})  // go to 0 after first enable
     ) word_count_inst (
         `include "iob_fifo2axis_iob_clk_s_s_portmap.vs"
-        .rst_i (rst_i),
         .en_i  (fifo_read_o),
         .mod_i (len_int),
         .data_o(axis_word_count)
     );
-
-    //tdata register
-    iob_reg_cear_re #(
-        .DATA_W (DATA_W),
-        .RST_VAL({DATA_W{1'd0}})
-    ) axis_tdata_reg (
-        `include "iob_fifo2axis_iob_clk_s_s_portmap.vs"
-        .rst_i (rst_i),
-        .en_i  (fifo_read_r),
-        .data_i(fifo_rdata_i),
-        .data_o(saved_tdata)
-    );
-
-    // register valid + data + last
-    iob_reg_cear_re #(
-        .DATA_W (DATA_W + 2),
-        .RST_VAL({(DATA_W + 2) {1'd0}})
-    ) output_reg (
-        `include "iob_fifo2axis_iob_clk_s_s_portmap.vs"
-        .rst_i (rst_i),
-        .en_i  (output_en),
-        .data_i(output_nxt),
-        .data_o(output_r)
-    );
-
-    // axis outputs
-    assign axis_tvalid_o = output_r[DATA_W+1];
-    assign axis_tdata_o  = output_r[1+:DATA_W];
-    assign axis_tlast_o  = output_r[0];
-
-    // tlast logic
-    assign len_int        = len_i - 1;
-    assign axis_tlast_nxt = (axis_word_count == len_int);
-
-    //FIFO read
-    // read new data:
-    // 1. if tready is high
-    // 2. if no data is saved
-    // 3. if no data is being read from fifo
-    assign read_condition = axis_tready_i | (~(saved | fifo_read_r));
-    assign fifo_read_o    = (en_i & (~fifo_empty_i)) & read_condition;
-
-    // Skid buffer
-    assign output_nxt[DATA_W+1]  = (saved) ? 1'b1 : fifo_read_r;
-    assign output_nxt[1+:DATA_W] = (saved) ? saved_tdata : fifo_rdata_i;
-    assign output_nxt[0]         = (saved) ? saved_tlast : axis_tlast_nxt;
-    assign output_en             = (~axis_tvalid_o) | axis_tready_i;
-
     """
         },
     ]
@@ -242,8 +206,35 @@ def setup(py_params_dict):
     comb_code = """
     // Skid buffer
     // Signals if there is valid data in skid buffer
-    saved_nxt = (fifo_read_r & (~output_en)) | saved;
-    saved_rst = (rst_i | output_en);
+    outputs_enable = (~axis_tvalid_o) | axis_tready_i;
+    saved_rst = rst_i | outputs_enable;
+    saved_nxt = (data_valid & (~outputs_enable)) | saved;
+    saved_tdata_en = data_valid;
+    saved_tdata_nxt = fifo_rdata_i;
+    saved_tlast_en = data_valid;
+    saved_tlast_nxt = axis_word_count == len_int;
+
+    // AXIS regs
+    // tvalid
+    axis_tvalid_o_en  = outputs_enable;
+    axis_tvalid_o_nxt = saved | data_valid;
+    // tdata
+    axis_tdata_o_en  = outputs_enable;
+    axis_tdata_o_nxt = (saved) ? saved_tdata : fifo_rdata_i;
+    // tlast
+    axis_tlast_o_en  = outputs_enable;
+    axis_tlast_o_nxt = (saved) ? saved_tlast : saved_tlast_nxt;
+
+    //FIFO read
+    // read new data:
+    // 1. if tready is high
+    // 2. if no data is saved
+    // 3. if no data is being read from fifo
+    read_condition = axis_tready_i | (~axis_tvalid_o_nxt);
+    fifo_read_o    = (en_i & (~fifo_empty_i)) & read_condition;
+
+    // Data valid register
+    data_valid_nxt = fifo_read_o;
     """
 
     if use_level:
@@ -282,9 +273,9 @@ def setup(py_params_dict):
         "snippets": snippets,
         "comb": {
             "code": comb_code,
+            # All infered registers use rst_i
+            "clk_if": "cke_arst_rst",
         },
     }
-
-    # If using level, add the level output
 
     return attributes_dict

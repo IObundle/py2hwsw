@@ -187,13 +187,15 @@ def create_comb(core, *args, **kwargs):
             "Comb circuits and FSMs are mutually exclusive. Use separate submodules."
         )
     core.set_default_attribute("comb", None)
-    code = kwargs.get("code", None)
     assert_attributes(
         iob_comb,
         kwargs,
         error_msg=f"Invalid {kwargs.get('name', '')} comb attribute '[arg]'!",
     )
-    comb = iob_comb(code=code)
+    # Get attributes from kwargs or use default from iob_comb
+    code = kwargs.get("code", "")
+    clk_if = kwargs.get("clk_if", "cke_arst")
+    comb = iob_comb(code=code, clk_if=clk_if)
     comb.set_needed_reg(core)
     comb.infer_registers(core)
     core.comb = comb

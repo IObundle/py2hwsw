@@ -20,12 +20,12 @@ static clock_t start, end, time_counter, counter_reg;
 static int nco_enable;
 
 static int base;
-void iob_nco_init_baseaddr(uint32_t addr) {
+void iob_nco_csrs_init_baseaddr(uint32_t addr) {
   base = addr;
   return;
 }
 
-void iob_nco_set_soft_reset(uint8_t value) {
+void iob_nco_csrs_set_soft_reset(uint8_t value) {
   // use only reg width
   int rst_int = (value & 0x01);
   if (rst_int) {
@@ -36,7 +36,7 @@ void iob_nco_set_soft_reset(uint8_t value) {
   return;
 }
 
-void iob_nco_set_enable(uint8_t value) {
+void iob_nco_csrs_set_enable(uint8_t value) {
   // use only reg width
   int en_int = (value & 0x01);
   // manage transitions

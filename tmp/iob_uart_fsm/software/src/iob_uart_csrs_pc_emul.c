@@ -23,7 +23,7 @@ void pc_emul_error(char *s) {
 }
 
 static int base;
-void iob_uart_init_baseaddr(uint32_t addr) {
+void iob_uart_csrs_init_baseaddr(uint32_t addr) {
 
   // wait for console to create communication files
   while ((cnsl2soc_fd = fopen("./cnsl2soc", "rb")) == NULL)
@@ -35,17 +35,17 @@ void iob_uart_init_baseaddr(uint32_t addr) {
   return;
 }
 
-void iob_uart_set_softreset(uint8_t value) {
+void iob_uart_csrs_set_softreset(uint8_t value) {
   div_value = 0;
   return;
 }
 
-void iob_uart_set_div(uint16_t value) {
+void iob_uart_csrs_set_div(uint16_t value) {
   div_value = value;
   return;
 }
 
-void iob_uart_set_txdata(uint8_t value) {
+void iob_uart_csrs_set_txdata(uint8_t value) {
   // send byte to console
   char aux_char;
   int nbytes;
@@ -54,13 +54,13 @@ void iob_uart_set_txdata(uint8_t value) {
   fflush(soc2cnsl_fd);
 }
 
-void iob_uart_set_txen(uint8_t value) { return; }
+void iob_uart_csrs_set_txen(uint8_t value) { return; }
 
-void iob_uart_set_rxen(uint8_t value) { return; }
+void iob_uart_csrs_set_rxen(uint8_t value) { return; }
 
-uint8_t iob_uart_get_txready() { return 1; }
+uint8_t iob_uart_csrs_get_txready() { return 1; }
 
-uint8_t iob_uart_get_rxdata() {
+uint8_t iob_uart_csrs_get_rxdata() {
   // get byte from console
   uint8_t c;
   int nbytes;
@@ -85,4 +85,4 @@ uint8_t iob_uart_get_rxdata() {
   return c;
 }
 
-uint8_t iob_uart_get_rxready() { return 1; }
+uint8_t iob_uart_csrs_get_rxready() { return 1; }

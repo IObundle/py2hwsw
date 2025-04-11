@@ -178,6 +178,16 @@ def setup(py_params_dict):
                 },
             ],
         },
+        {
+            "name": "len_int",
+            "descr": "Length internal signal",
+            "signals": [
+                {
+                    "name": "len_int",
+                    "width": "AXIS_LEN_W",
+                },
+            ],
+        },
     ]
 
     # Setup snippets based on the parameters
@@ -185,9 +195,6 @@ def setup(py_params_dict):
         {
             "verilog_code": """
     wire [AXIS_LEN_W-1:0] axis_word_count;
-    wire                  axis_tlast_nxt;
-    wire [AXIS_LEN_W-1:0] len_int;
-    assign len_int = len_i - 1;
 
     //tdata word count
     iob_modcnt #(
@@ -211,6 +218,7 @@ def setup(py_params_dict):
     saved_nxt = (data_valid & (~outputs_enable)) | saved;
     saved_tdata_en = data_valid;
     saved_tdata_nxt = fifo_rdata_i;
+    len_int = len_i - 1;
     saved_tlast_en = data_valid;
     saved_tlast_nxt = axis_word_count == len_int;
 

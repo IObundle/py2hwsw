@@ -49,21 +49,16 @@ def setup(py_params_dict):
     elif "arstn" in clk_s_params:
         sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
 
-    if any([x in clk_s_params for x in ["arst", "arstn", "rst", "rstn"]]):
-        rst_con = (
-            " | ".join(
-                [
-                    f"{x}_i"
-                    for x in ["arst", "arstn", "rst", "rstn"]
-                    if x in clk_s_params
-                ]
-            )
-            .replace("arstn", "~arst_n")
-            .replace("rstn", "~rst_n")
-        )
-        rst_str = (
-            f"        if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
-        )
+    if any([x in clk_s_params for x in ["arst", "arstn"]]):
+        arst_con = " | ".join(
+            [f"{x}_i" for x in ["arst", "arstn"] if x in clk_s_params]
+        ).replace("arstn", "~arst_n")
+        rst_str += f"        if ({arst_con}) begin\n            data_o <= RST_VAL;\n        end"
+    if any([x in clk_s_params for x in ["rst", "rstn"]]):
+        rst_con = " | ".join(
+            [f"{x}_i" for x in ["rst", "rstn"] if x in clk_s_params]
+        ).replace("rstn", "~rst_n")
+        rst_str += f"{' else ' if rst_str != '' else '        '}if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
 
     if any([x in clk_s_params for x in ["cke", "cken", "en", "enn"]]):
         en_con = (

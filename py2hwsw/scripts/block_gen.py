@@ -179,8 +179,7 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
                 e_signal_name = real_e_signal.name
 
             for bit_slice in port.e_connect_bit_slices:
-                # ignore bit slices that describe signal connections
-                if e_signal_name in bit_slice:
+                if signal.name in bit_slice:
                     # Connection is not a bit_slice
                     if f"{signal.name}:" not in bit_slice:
                         e_signal_name = bit_slice
@@ -188,7 +187,6 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
                     else:
                         e_signal_name = bit_slice.split(":")[1]
                         port_name = signal.name
-
                     break
             instance_portmap += f"        .{port_name}({e_signal_name}),\n"
 

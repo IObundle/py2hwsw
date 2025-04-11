@@ -141,6 +141,9 @@ def kill_processes(sig=None, frame=None):
                 # Wait for process to terminate gracefully
                 proc.wait(2)
             except subprocess.TimeoutExpired:
+                print(
+                    "Timeout waiting for process to terminate gracefully! Forcing process kill..."
+                )
                 # Process did not terminate gracefully, kill it
                 os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
     # Dont throw an error if the function is called from signal handler

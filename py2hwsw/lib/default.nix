@@ -96,6 +96,7 @@ let
     llvmPackages_14.clangUseLLVM
     librsvg
     libreofficeWithEnv
+    jre # Dependency of libreoffice
     minicom     # Terminal emulator
     lrzsz       # For Zmodem file transfers via serial connection of the terminal emulator
     # Add Volare custom Python installation

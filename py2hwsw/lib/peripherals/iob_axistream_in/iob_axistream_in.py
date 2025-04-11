@@ -332,6 +332,9 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_fifo2axis",
                 "instantiate": False,
+                "use_tlast": True,
+                "use_level": True,
+                "use_en": True,
             },
             {
                 "core_name": "iob_fifo_async",

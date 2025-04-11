@@ -1067,16 +1067,15 @@ def get_axis_ports(params: str = None):
             width=DATA_W,
             descr="axis stream data.",
         ),
-        
     ]
     if "tlast" in params:
         signals += [
             iob_signal(
-            name="axis_tlast_o",
-            width=1,
-            descr="axis stream last.",
-        ),
-    ]
+                name="axis_tlast_o",
+                width=1,
+                descr="axis stream last.",
+            ),
+        ]
     return signals
 
 

@@ -91,7 +91,7 @@ class iob_comb(iob_snippet):
                     for port in core.ports:
                         if port.interface:
                             if port.interface.type == "iob_clk":
-                                clk_if_name = port.name 
+                                clk_if_name = port.name
                     connect = {
                         "clk_en_rst_s": clk_if_name,
                         "data_i": f"{signal.name}_nxt",
@@ -121,13 +121,23 @@ class iob_comb(iob_snippet):
                     port_params = self.clk_if
                     if any(reg_signal == "_en" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                            {"name": f"{signal.name}_en", "descr": f"{signal.name} enable", "width": 1, "isvar": True}
+                            {
+                                "name": f"{signal.name}_en",
+                                "descr": f"{signal.name} enable",
+                                "width": 1,
+                                "isvar": True,
+                            }
                         )
                         bit_slices.append(f"en_i:{signal.name}_en")
                         port_params = port_params + "_en"
                     if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                            {"name": f"{signal.name}_rst", "descr": f"{signal.name} reset", "width": 1, "isvar": True}
+                            {
+                                "name": f"{signal.name}_rst",
+                                "descr": f"{signal.name} reset",
+                                "width": 1,
+                                "isvar": True,
+                            }
                         )
                         bit_slices.append(f"rst_i:{signal.name}_rst")
                         port_params = port_params + "_rst"
@@ -187,13 +197,15 @@ def create_comb(core, *args, **kwargs):
             "Comb circuits and FSMs are mutually exclusive. Use separate submodules."
         )
     core.set_default_attribute("comb", None)
-    code = kwargs.get("code", None)
     assert_attributes(
         iob_comb,
         kwargs,
         error_msg=f"Invalid {kwargs.get('name', '')} comb attribute '[arg]'!",
     )
-    comb = iob_comb(code=code)
+    # Get attributes from kwargs or use default from iob_comb
+    code = kwargs.get("code", "")
+    clk_if = kwargs.get("clk_if", "cke_arst")
+    comb = iob_comb(code=code, clk_if=clk_if)
     comb.set_needed_reg(core)
     comb.infer_registers(core)
     core.comb = comb

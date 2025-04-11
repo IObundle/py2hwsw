@@ -9,7 +9,6 @@
 #include <verilated_vcd_c.h>
 #endif
 
-
 #include "Viob_uut.h" //user file that defins the dut
 
 #ifndef CLK_PERIOD
@@ -71,8 +70,7 @@ void iob_hard_reset() {
 }
 
 // Write data to IOb Native subordinate
-void iob_write(unsigned int address, unsigned data_w,
-               unsigned int data) {
+void iob_write(unsigned int address, unsigned data_w, unsigned int data) {
 
   unsigned int nbytes = data_w / 8 + (data_w % 8 ? 1 : 0);
 

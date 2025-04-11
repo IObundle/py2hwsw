@@ -256,7 +256,9 @@ def str_to_kwargs(attrs: list):
                 if arg in dicts and kwargs[arg] is not None:
                     if isinstance(dicts[arg], str):
                         if dicts[arg] == "pairs":
-                            kwargs[arg.split("&")[0]] = dict(pair.split(":") for pair in kwargs[arg])
+                            kwargs[arg.split("&")[0]] = dict(
+                                pair.split(":") for pair in kwargs[arg]
+                            )
                     elif isinstance(dicts[arg], list):
                         _keys = [key for item in dicts[arg] for key in item.split(":")]
                         _values = [
@@ -268,7 +270,7 @@ def str_to_kwargs(attrs: list):
                         ]
                     elif isinstance(dicts[arg], tuple):
                         kwargs[arg.split("&")[0]] = dict(zip(dicts[arg], kwargs[arg]))
-                    if '&' in arg:
+                    if "&" in arg:
                         kwargs.pop(arg)
             for key, value in list(kwargs.items()):
                 if ":" in key:
@@ -282,7 +284,7 @@ def str_to_kwargs(attrs: list):
                         values = value.split(":")
                         for i in range(len(keys)):
                             kwargs[keys[i]] = values[i]
-                
+
         except Exception as e:
             print(
                 iob_colors.FAIL
@@ -357,7 +359,7 @@ def str_to_kwargs(attrs: list):
                     for i in range(len(output[key])):
                         if "core_name" in output[key][i]:
                             output[key][i]["instance_description"] = output[key][i].pop(
-                                    "descr"
+                                "descr"
                             )
             return {k: v for k, v in output.items() if v != []}
 

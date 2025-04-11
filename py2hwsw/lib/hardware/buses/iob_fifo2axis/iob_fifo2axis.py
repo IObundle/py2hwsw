@@ -272,6 +272,7 @@ def setup(py_params_dict):
                         {
                             "name": "len_int",
                             "width": "AXIS_LEN_W",
+                            "isvar": True,
                         },
                     ],
                 },

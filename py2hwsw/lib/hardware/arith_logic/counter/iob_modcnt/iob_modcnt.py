@@ -37,14 +37,14 @@ def setup(py_params_dict):
                 "descr": "Enable and Synchronous reset interface",
                 "signals": [
                     {
-                        "name": "en_i",
-                        "width": 1,
-                        "descr": "Enable input",
-                    },
-                    {
                         "name": "rst_i",
                         "width": 1,
                         "descr": "Synchronous reset input",
+                    },
+                    {
+                        "name": "en_i",
+                        "width": 1,
+                        "descr": "Enable input",
                     },
                 ],
             },

@@ -250,6 +250,9 @@ def setup(py_params_dict):
                     "DATA_W": "AXI_DATA_W",
                     "AXIS_LEN_W": "AXI_LEN_W+1",
                 },
+                "use_tlast": True,
+                "use_level": True,
+                "use_en": True,
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "rst_i": "rst_i",

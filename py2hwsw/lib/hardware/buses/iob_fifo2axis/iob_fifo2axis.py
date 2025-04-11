@@ -76,54 +76,47 @@ def setup(py_params_dict):
             },
         )
     # FIFO read interface
-    ports.append(
-        {
-            "name": "fifo_r_io",
-            "descr": "FIFO read interface",
-            "signals": [
-                {
-                    "name": "fifo_read_o",
-                    "width": 1,
-                    "descr": "FIFO read signal",
-                    "isvar": True,
+    ports.extend(
+        [
+            {
+                "name": "fifo_r_io",
+                "descr": "FIFO read interface",
+                "signals": [
+                    {
+                        "name": "fifo_read_o",
+                        "width": 1,
+                        "descr": "FIFO read signal",
+                        "isvar": True,
+                    },
+                    {
+                        "name": "fifo_rdata_i",
+                        "width": "DATA_W",
+                        "descr": "FIFO read data signal",
+                    },
+                    {
+                        "name": "fifo_empty_i",
+                        "width": 1,
+                        "descr": "FIFO empty signal",
+                    },
+                ],
+            },
+            {
+                "name": "axis_m",
+                "descr": "AXIS master interface",
+                "signals": {
+                    "type": "axis",
+                    "DATA_W": "DATA_W",
                 },
-                {
-                    "name": "fifo_rdata_i",
-                    "width": "DATA_W",
-                    "descr": "FIFO read data signal",
-                },
-                {
-                    "name": "fifo_empty_i",
-                    "width": 1,
-                    "descr": "FIFO empty signal",
-                },
-            ],
-        },
+            },
+        ]
     )
-    # AXIS master interface
+
     if use_tlast:
-        ports.append(
-            {
-                "name": "axis_m",
-                "descr": "AXIS master interface",
-                "signals": {
-                    "type": "axis",
-                    "params": "tlast",
-                    "DATA_W": "DATA_W",
-                },
-            },
-        )
-    else:
-        ports.append(
-            {
-                "name": "axis_m",
-                "descr": "AXIS master interface",
-                "signals": {
-                    "type": "axis",
-                    "DATA_W": "DATA_W",
-                },
-            },
-        )
+        # append tlast to "params" in axis_m signals
+        for port in ports:
+            if port["name"] == "axis_m":
+                port["signals"]["params"] = "tlast"
+                break
 
     wires = [
         {
@@ -158,16 +151,6 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "saved_tlast",
-            "descr": "Saved tlast register",
-            "signals": [
-                {
-                    "name": "saved_tlast",
-                    "width": 1,
-                },
-            ],
-        },
-        {
             "name": "outputs_enable",
             "descr": "Outputs enable signal",
             "signals": [
@@ -187,39 +170,12 @@ def setup(py_params_dict):
                 },
             ],
         },
-        {
-            "name": "len_int",
-            "descr": "Length internal signal",
-            "signals": [
-                {
-                    "name": "len_int",
-                    "width": "AXIS_LEN_W",
-                },
-            ],
-        },
-    ]
-
-    # Setup snippets based on the parameters
-    snippets = [
-        {
-            "verilog_code": """
-    wire [AXIS_LEN_W-1:0] axis_word_count;
-
-    //tdata word count
-    iob_modcnt #(
-        .DATA_W (AXIS_LEN_W),
-        .RST_VAL({AXIS_LEN_W{1'b1}})  // go to 0 after first enable
-    ) word_count_inst (
-        `include "iob_fifo2axis_iob_clk_s_s_portmap.vs"
-        .en_i  (fifo_read_o),
-        .mod_i (len_int),
-        .data_o(axis_word_count)
-    );
-    """
-        },
     ]
 
     comb_code = """
+    // Data valid register
+    data_valid_nxt = fifo_read_o;
+
     // Skid buffer
     // Signals if there is valid data in skid buffer
     outputs_enable = (~axis_tvalid_o) | axis_tready_i;
@@ -227,9 +183,6 @@ def setup(py_params_dict):
     saved_nxt = (data_valid & (~outputs_enable)) | saved;
     saved_tdata_en = data_valid;
     saved_tdata_nxt = fifo_rdata_i;
-    len_int = len_i - 1;
-    saved_tlast_en = data_valid;
-    saved_tlast_nxt = axis_word_count == len_int;
 
     // AXIS regs
     // tvalid
@@ -238,9 +191,6 @@ def setup(py_params_dict):
     // tdata
     axis_tdata_o_en  = outputs_enable;
     axis_tdata_o_nxt = (saved) ? saved_tdata : fifo_rdata_i;
-    // tlast
-    axis_tlast_o_en  = outputs_enable;
-    axis_tlast_o_nxt = (saved) ? saved_tlast : saved_tlast_nxt;
 
     //FIFO read
     // read new data:
@@ -248,21 +198,23 @@ def setup(py_params_dict):
     // 2. if no data is saved
     // 3. if no data is being read from fifo
     read_condition = axis_tready_i | (~axis_tvalid_o_nxt);
-    fifo_read_o    = (en_i & (~fifo_empty_i)) & read_condition;
-
-    // Data valid register
-    data_valid_nxt = fifo_read_o;
     """
 
     if use_level:
         comb_code += """
-            if (saved && axis_tvalid_o) begin
-                level_o = 2'd2;
-            end else if (saved || axis_tvalid_o) begin
-                level_o = 2'd1;
-            end else begin
-                level_o = 2'd0;
-            end"""
+        if (saved && axis_tvalid_o) begin
+            level_o = 2'd2;
+        end else if (saved || axis_tvalid_o) begin
+            level_o = 2'd1;
+        end else begin
+            level_o = 2'd0;
+        end
+        """
+
+    if use_en:
+        comb_code += "fifo_read_o    = (en_i & (~fifo_empty_i)) & read_condition;"
+    else:
+        comb_code += "fifo_read_o    = (~fifo_empty_i) & read_condition;"
 
     # Setup the module
     attributes_dict = {
@@ -276,23 +228,103 @@ def setup(py_params_dict):
                 "min": "1",
                 "max": "NA",
             },
-            {
-                "name": "AXIS_LEN_W",
-                "descr": "AXIS length bus width",
-                "type": "P",
-                "val": "1",
-                "min": "1",
-                "max": "NA",
-            },
         ],
         "ports": ports,
         "wires": wires,
-        "snippets": snippets,
         "comb": {
             "code": comb_code,
             # All infered registers use rst_i
             "clk_if": "cke_arst_rst",
         },
     }
+
+    # When using tlast, add the modcnt module and necessary logic/signals
+    if use_tlast:
+        attributes_dict["confs"].append(
+            {
+                "name": "AXIS_LEN_W",
+                "descr": "AXIS length signal width",
+                "type": "P",
+                "val": "0",
+                "min": "1",
+                "max": "NA",
+            },
+        )
+
+        attributes_dict["wires"].extend(
+            [
+                {
+                    "name": "axis_word_count",
+                    "descr": "AXIS word count signal",
+                    "signals": [
+                        {
+                            "name": "axis_word_count",
+                            "width": "AXIS_LEN_W",
+                        },
+                    ],
+                },
+                {
+                    "name": "len_int",
+                    "descr": "Length internal signal",
+                    "signals": [
+                        {
+                            "name": "len_int",
+                            "width": "AXIS_LEN_W",
+                        },
+                    ],
+                },
+                {
+                    "name": "saved_tlast",
+                    "descr": "Saved tlast register",
+                    "signals": [
+                        {
+                            "name": "saved_tlast",
+                            "width": 1,
+                        },
+                    ],
+                },
+                {
+                    "name": "en_rst_i_ref",
+                    "descr": "Modcnt Synchronous and Enable reset reference",
+                    "signals": [
+                        {
+                            "name": "rst_i",
+                        },
+                        {
+                            "name": "fifo_read_o",
+                        },
+                    ],
+                },
+            ],
+        )
+
+        attributes_dict["comb"][
+            "code"
+        ] += """
+        // tlast
+        len_int = len_i - 1;
+        saved_tlast_en = data_valid;
+        saved_tlast_nxt = axis_word_count == len_int;
+        axis_tlast_o_en  = outputs_enable;
+        axis_tlast_o_nxt = (saved) ? saved_tlast : saved_tlast_nxt;
+        """
+
+        attributes_dict["subblocks"] = [
+            {
+                "core_name": "iob_modcnt",
+                "instance_name": "word_count_inst",
+                "instance_description": "tdata word count",
+                "parameters": {
+                    "DATA_W": "AXIS_LEN_W",
+                    "RST_VAL": """{AXIS_LEN_W{1'b1}}""",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "en_rst_i": "en_rst_i_ref",
+                    "mod_i": "len_int",
+                    "data_o": "axis_word_count",
+                },
+            },
+        ]
 
     return attributes_dict

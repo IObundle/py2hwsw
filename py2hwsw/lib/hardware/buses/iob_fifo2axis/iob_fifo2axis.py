@@ -157,6 +157,7 @@ def setup(py_params_dict):
                 {
                     "name": "outputs_enable",
                     "width": 1,
+                    "isvar": True,
                 },
             ],
         },
@@ -167,6 +168,7 @@ def setup(py_params_dict):
                 {
                     "name": "read_condition",
                     "width": 1,
+                    "isvar": True,
                 },
             ],
         },

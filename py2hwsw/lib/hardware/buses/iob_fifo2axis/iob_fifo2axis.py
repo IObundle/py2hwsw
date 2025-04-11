@@ -5,9 +5,18 @@
 
 def setup(py_params_dict):
 
+    # Get parameters from the dictionary
     use_tlast = py_params_dict.get("use_tlast", False)
     use_level = py_params_dict.get("use_level", False)
     use_en = py_params_dict.get("use_en", False)
+
+    # change parameters to boolean
+    if isinstance(use_tlast, str):
+        use_tlast = use_tlast.lower() == "true"
+    if isinstance(use_level, str):
+        use_level = use_level.lower() == "true"
+    if isinstance(use_en, str):
+        use_en = use_en.lower() == "true"
 
     # Set ports based on the parameters
     ports = [

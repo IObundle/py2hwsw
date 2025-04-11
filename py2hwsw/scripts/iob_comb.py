@@ -91,7 +91,7 @@ class iob_comb(iob_snippet):
                     for port in core.ports:
                         if port.interface:
                             if port.interface.type == "iob_clk":
-                                clk_if_name = port.name 
+                                clk_if_name = port.name
                     connect = {
                         "clk_en_rst_s": clk_if_name,
                         "data_i": f"{signal.name}_nxt",
@@ -121,13 +121,23 @@ class iob_comb(iob_snippet):
                     port_params = self.clk_if
                     if any(reg_signal == "_en" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                            {"name": f"{signal.name}_en", "descr": f"{signal.name} enable", "width": 1, "isvar": True}
+                            {
+                                "name": f"{signal.name}_en",
+                                "descr": f"{signal.name} enable",
+                                "width": 1,
+                                "isvar": True,
+                            }
                         )
                         bit_slices.append(f"en_i:{signal.name}_en")
                         port_params = port_params + "_en"
                     if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                            {"name": f"{signal.name}_rst", "descr": f"{signal.name} reset", "width": 1, "isvar": True}
+                            {
+                                "name": f"{signal.name}_rst",
+                                "descr": f"{signal.name} reset",
+                                "width": 1,
+                                "isvar": True,
+                            }
                         )
                         bit_slices.append(f"rst_i:{signal.name}_rst")
                         port_params = port_params + "_rst"

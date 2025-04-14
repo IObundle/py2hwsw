@@ -2,8 +2,14 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 
 def setup(py_params_dict):
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        py_params_dict["name"] = os.path.basename(__file__)
+
     # Each generated interconnect must have a unique name (can't have two verilog modules with same name).
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated axi interconnect module."

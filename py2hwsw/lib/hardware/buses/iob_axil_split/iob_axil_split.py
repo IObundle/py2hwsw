@@ -2,8 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 
 def setup(py_params_dict):
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        py_params_dict["name"] = os.path.basename(__file__)
+        py_params_dict["num_outputs"] = 2
+
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated split module."
     )
@@ -39,7 +46,7 @@ def setup(py_params_dict):
         ("axil_awvalid", "input", 1, "write"),
         ("axil_awready", "output", 1, "write"),
         ("axil_wdata", "input", DATA_W, "write"),
-        ("axil_wstrb", "input", int(DATA_W / DATA_SECTION_W, "write")),
+        ("axil_wstrb", "input", int(DATA_W / DATA_SECTION_W), "write"),
         ("axil_wvalid", "input", 1, "write"),
         ("axil_wready", "output", 1, "write"),
         ("axil_bresp", "output", RESP_W, "write"),

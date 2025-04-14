@@ -244,8 +244,10 @@ class Port:
             direction = "in"
         elif self.direction == "output":
             direction = "out"
+        elif self.direction == "inout":
+            direction = "input-output"
         else:
-            print("ERROR: Port direction not recognized")
+            print(f"ERROR: Port direction not recognized. {self.direction}")
             exit(1)
 
         # Search for parameters in the n_bits and replace them with their ID

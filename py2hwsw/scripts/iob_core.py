@@ -640,7 +640,7 @@ class iob_core(iob_module, iob_instance):
                     self.__connect_clk_interface(port, instantiator)
 
         # iob_csrs specific code
-        if self.original_name == "iob_csrs":
+        if self.original_name == "iob_csrs" and instantiator:
             self.__connect_cbus_port(instantiator)
 
     def __connect_cbus_port(self, instantiator):
@@ -983,6 +983,33 @@ class iob_core(iob_module, iob_instance):
             f"{core.build_dir}/document/tsrc"
         )
         doc_gen.process_tex_macros(f"{core.build_dir}/document/tsrc")
+
+    @staticmethod
+    def browse_lib():
+        """Generate IP-XACT library with all lib cores"""
+        lib_path = os.path.join(os.path.dirname(__file__), "../lib")
+        # Set as special target to avoid setting up the cores
+        __class__.global_special_target = "ipxact_gen"
+        # Find all .py files under lib_path
+        for root, dirs, files in os.walk(lib_path):
+            # Skip specific directories
+            if os.path.basename(root) in ["scripts", "test", "document"]:
+                dirs[:] = []
+                continue
+            for file in files:
+                if file.endswith(".py"):
+                    print(f"Generating ipxact for '{file}'.")
+                    # Create the core object as a top module to obtain its attributes.
+                    # Also, always set python parameter `demo=True`, since some lib cores use this parameter to generate a demo core.
+                    __class__.global_top_module = None
+                    module = __class__.get_core_obj(os.path.splitext(file)[0], demo=True)
+                    # Generate IP-XACT for the core
+                    ipxact_gen.generate_ipxact_xml(module, "ipxact_lib")
+                    # Skip subdirectories of this core to avoid including subblocks specific of this core
+                    dirs[:] = []
+                    continue
+
+
 
     @staticmethod
     def version_str_to_digits(version_str):

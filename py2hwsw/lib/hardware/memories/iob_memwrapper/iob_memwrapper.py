@@ -14,6 +14,15 @@ def setup(py_params_dict):
     """Memory wrapper core. Inteended to be used as a superblock of other cores.
     Required memories are automatically generated based on the ports of the instantiator (subblock).
     """
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        py_params_dict["mem_if_names"] = []
+        py_params_dict["instantiator"] = {
+            "original_name": "iob_core",
+            "name": "iob",
+            "confs": [],
+            "ports": [],
+        }
 
     # List of supported memory interfaces (usually taken from if_gen.py)
     mem_if_names = py_params_dict["mem_if_names"]

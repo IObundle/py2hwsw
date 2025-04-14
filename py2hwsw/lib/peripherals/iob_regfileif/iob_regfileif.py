@@ -18,6 +18,8 @@ def setup(py_params_dict):
         "test": False,  # Enable this to use random registers
         "addr_w": 32,
         "data_w": 32,
+        # Version of the CSRs module (by default use same version as py2hwsw)
+        "version": py_params_dict["py2hwsw_version"],
     }
 
     # Update params with values from py_params_dict
@@ -58,6 +60,26 @@ def setup(py_params_dict):
                         "log2n_items": 0,
                         "autoreg": True,
                         "descr": "Test register 3",
+                    },
+                ],
+            }
+        ]
+
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        params["csrs"] = [
+            {
+                "name": "reg_group",
+                "descr": "Dummy reg group",
+                "regs": [
+                    {
+                        "name": "dummy_reg",
+                        "type": "W",
+                        "n_bits": 1,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "Dummy register for demo",
                     },
                 ],
             }
@@ -171,6 +193,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": "iob_regfileif",
         "generate_hw": True,
+        "version": params["version"],
     }
     attributes_dict |= {
         "confs": [

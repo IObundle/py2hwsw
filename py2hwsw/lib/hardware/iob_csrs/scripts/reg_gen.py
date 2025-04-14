@@ -118,10 +118,11 @@ def generate_csr_sw(core, csr_gen_obj, reg_table):
     csr_gen_obj.write_swcode(reg_table, core["build_dir"] + "/" + sw_dest_dir, name)
 
 
-def generate_csr(core):
+def generate_csr(core, create_files=True):
     """Generate hw, sw and doc files"""
     csr_gen_obj, reg_table = build_regs_table(core)
-    generate_csr_hw(core, csr_gen_obj, reg_table)
-    generate_csr_sw(core, csr_gen_obj, reg_table)
+    if create_files:
+        generate_csr_hw(core, csr_gen_obj, reg_table)
+        generate_csr_sw(core, csr_gen_obj, reg_table)
     auto_setup_iob_ctls(core)
     return csr_gen_obj, reg_table

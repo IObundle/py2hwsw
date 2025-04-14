@@ -28,7 +28,7 @@ def setup(py_params_dict):
                 "type": "P",
                 "val": "10",
                 "min": "0",
-                "max": "1",
+                "max": "10",
                 "descr": "Time in ms reset is active",
             },
         ],

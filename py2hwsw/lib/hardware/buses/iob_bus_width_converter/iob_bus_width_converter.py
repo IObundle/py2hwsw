@@ -118,7 +118,7 @@ def setup(py_params_dict):
             {
                 "name": f"SUBORDINATE_{width}",
                 "type": "P",
-                "val": "0",
+                "val": "1",
                 "min": "1",
                 "max": "32",
                 "descr": f"Subordinate {width[:-2]} bus width",
@@ -126,7 +126,7 @@ def setup(py_params_dict):
             {
                 "name": f"MANAGER_{width}",
                 "type": "P",
-                "val": "0",
+                "val": "1",
                 "min": "1",
                 "max": "32",
                 "descr": f"Manager {width[:-2]} bus width",

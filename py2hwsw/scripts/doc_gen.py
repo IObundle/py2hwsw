@@ -107,6 +107,9 @@ def generate_tex_core_lib(out_dir):
                         os.path.relpath(root, lib_path),
                     ]
                 )
+                # Skip subdirectories of this core to avoid including subblocks specific of this core
+                dirs[:] = []
+                continue
 
     write_table(f"{out_dir}/py2hwsw_core_lib", tex_table)
 

@@ -20,6 +20,32 @@ static_reg_tables = {}
 
 def setup(py_params_dict):
     """Standard Py2HWSW setup function"""
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        py_params_dict["csrs"] = [
+            {
+                "name": "reg_group",
+                "descr": "Dummy reg group",
+                "regs": [
+                    {
+                        "name": "dummy_reg",
+                        "type": "W",
+                        "n_bits": 1,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "Dummy register for demo",
+                    },
+                ],
+            }
+        ]
+        py_params_dict["build_dir"] = "dummy_folder"
+        py_params_dict["instantiator"] = {
+            "name": "iob",
+            "confs": [],
+        }
+        py_params_dict["dest_dir"] = "dummy_dest"
+
     params = {
         # Use the same name as instantiator + the suffix "_csrs"
         "name": py_params_dict["instantiator"]["name"] + "_csrs",
@@ -152,18 +178,22 @@ def setup(py_params_dict):
     }
 
     # Generate snippets
-    csr_gen_obj, reg_table = generate_csr(attributes_with_csrs)
+    csr_gen_obj, reg_table = generate_csr(
+        attributes_with_csrs,
+        create_files=py_params_dict.get("py2hwsw_target", "") == "setup",
+    )
 
     # Store reg_table in static dict
     global static_reg_tables
     static_reg_tables[params["name"]] = reg_table
 
     # Generate docs
-    csr_gen_obj.generate_regs_tex(
-        attributes_with_csrs["csrs"],
-        reg_table,
-        attributes_with_csrs["build_dir"] + "/document/tsrc",
-    )
+    if py_params_dict.get("py2hwsw_target", "") == "setup":
+        csr_gen_obj.generate_regs_tex(
+            attributes_with_csrs["csrs"],
+            reg_table,
+            attributes_with_csrs["build_dir"] + "/document/tsrc",
+        )
 
     # Add ports and internal wires for registers
     auto_ports, auto_wires, auto_snippet = csr_gen_obj.gen_ports_wires(reg_table)

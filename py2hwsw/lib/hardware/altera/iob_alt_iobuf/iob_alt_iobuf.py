@@ -50,7 +50,7 @@ def setup(py_params_dict):
         ],
         "snippets": [
             {
-                "verilog_code": f"""
+                "verilog_code": """
             assign in_out_io = en_i ? in_i : 1'bz;
             assign out_o     = in_out_io;
          """,

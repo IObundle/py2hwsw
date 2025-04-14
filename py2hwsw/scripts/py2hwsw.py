@@ -106,6 +106,12 @@ if __name__ == "__main__":
         action="store_true",
         help="Print supported Py2HWSW core dictionary attributes",
     )
+    parser.add_argument(
+        "--browse",
+        dest="browse_lib",
+        action="store_true",
+        help="Generate IP-XACT library including every lib core",
+    )
     args = parser.parse_args()
 
     # print(f"Args: {args}", file=sys.stderr)  # DEBUG
@@ -120,9 +126,11 @@ if __name__ == "__main__":
     if args.py2hwsw_docs:
         iob_core.setup_py2_docs(PY2HWSW_VERSION)
         exit(0)
-
-    if args.print_py2hwsw_attributes:
+    elif args.print_py2hwsw_attributes:
         iob_core.print_py2hwsw_attributes()
+        exit(0)
+    elif args.browse_lib:
+        iob_core.browse_lib()
         exit(0)
 
     if not args.core_name:

@@ -14,28 +14,24 @@ def setup(py_params_dict):
 
     clk_s_params = [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
 
-    clk_suff_dict = {
-        "cke": "ce",
-        "cken": "cen",
-        "arst": "ar",
-        "arstn": "arn",
-    }
-
-    sync_suff_dict = {
+    suffix_dict = {
+        "cke": "c",
+        "cken": "cn",
+        "arst": "a",
+        "arstn": "an",
         "rst": "r",
         "rstn": "rn",
         "en": "e",
         "enn": "en",
     }
 
-    clk_suffix = "".join([clk_suff_dict[x] for x in clk_s_params if x in clk_suff_dict])
-    sync_suffix = "".join(
-        [sync_suff_dict[x] for x in clk_s_params if x in sync_suff_dict]
+    suffix = "".join(
+        [suffix_dict[x] for x in suffix_dict if x in clk_s_params]
     )
 
     reg_type = "iob_regn" if "n" in clk_s_params else "iob_reg"
 
-    reg_name = "_".join(filter(lambda x: x != "", [reg_type, clk_suffix, sync_suffix]))
+    reg_name = "_".join(filter(lambda x: x != "", [reg_type, suffix]))
 
     rst_str = ""
     en_str = ""

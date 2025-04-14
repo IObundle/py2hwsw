@@ -65,7 +65,7 @@ module iob_regfile_2p #(
          ) begin : g_columns
             if ((row_sel + col_sel) < N) begin : g_if
                assign wen[row_sel+col_sel] = wen_i & (waddr_int == (row_sel + col_sel)) & wstrb[col_sel];
-               iob_reg_cear_e #(
+               iob_reg_cae #(
                   .DATA_W (W),
                   .RST_VAL({W{1'b0}})
                ) iob_reg_inst (

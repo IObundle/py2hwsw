@@ -275,7 +275,7 @@ class csr_gen:
                     },
                 )
                 lines += f"    assign {name_idx}_wen = internal_iob_valid & (write_en & {name_idx}_addressed_w);\n"
-                lines += "    iob_reg_cear_e #(\n"
+                lines += "    iob_reg_cae #(\n"
                 lines += f"      .DATA_W({n_bits}),\n"
                 lines += f"      .RST_VAL({rst_val_str})\n"
                 lines += f"    ) {name_idx}_datareg (\n"

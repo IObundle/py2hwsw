@@ -175,8 +175,6 @@ def setup(py_params_dict):
     ]
 
     comb_code = """
-    // Data valid register
-    data_valid_nxt = fifo_read_o;
 
     // Skid buffer
     // Signals if there is valid data in skid buffer
@@ -214,9 +212,18 @@ def setup(py_params_dict):
         """
 
     if use_en:
-        comb_code += "fifo_read_o    = (en_i & (~fifo_empty_i)) & read_condition;"
+        comb_code += """
+        fifo_read_o    = (en_i & (~fifo_empty_i)) & read_condition;
+        """
     else:
-        comb_code += "fifo_read_o    = (~fifo_empty_i) & read_condition;"
+        comb_code += """
+        fifo_read_o    = (~fifo_empty_i) & read_condition;
+        """
+
+    comb_code += """
+    // Data valid register
+    data_valid_nxt = fifo_read_o;
+    """
 
     # Setup the module
     attributes_dict = {

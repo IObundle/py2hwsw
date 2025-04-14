@@ -68,7 +68,7 @@ delivery:
 
 
 lib-ipxact:
-	nix-shell --run "py2hwsw --browse "
+	nix-shell --run "py2hwsw --browse"
 
 
 .PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery lib-ipxact

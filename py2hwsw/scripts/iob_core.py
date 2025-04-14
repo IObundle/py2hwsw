@@ -998,7 +998,7 @@ class iob_core(iob_module, iob_instance):
                 continue
             for file in files:
                 if file.endswith(".py"):
-                    print(f"Generating ipxact for '{file}'.")
+                    print(f"Generating IP-XACT for '{file}'.")
                     # Create the core object as a top module to obtain its attributes.
                     # Also, always set python parameter `demo=True`, since some lib cores use this parameter to generate a demo core.
                     __class__.global_top_module = None
@@ -1008,6 +1008,10 @@ class iob_core(iob_module, iob_instance):
                     # Skip subdirectories of this core to avoid including subblocks specific of this core
                     dirs[:] = []
                     continue
+
+        print(
+            f"{iob_colors.INFO}Generated IP-XACT library in './ipxact_lib/' folder.{iob_colors.ENDC}"
+        )
 
 
 

@@ -488,15 +488,15 @@ def validate_verilog_const(value: str, direction: str):
         _bases = {"b":"01","d":"0123456789", "h":"0123456789abcdef"}
         _, _v = value.split("'")
         if _v[0] not in _bases:
-            fail_with_msg(f"Invalid base for wire '{wire_name}'! Expected b, d or h, got {_v[0]}.")
+            fail_with_msg(f"Invalid base for wire '{value}'! Expected b, d or h, got {_v[0]}.")
         elif not all(c in _bases[_v[0]] for c in _v[1:]):
-            fail_with_msg(f"Invalid value for wire '{wire_name}'! Expected [{_bases[_v[0]]}], got {_v[1:]}.")
+            fail_with_msg(f"Invalid value for wire '{value}'! Expected [{_bases[_v[0]]}], got {_v[1:]}.")
     elif direction == "output":
         assert (
             "z" in value.lower(),
-            f"If not connected, output wire '{wire_name}' must be a high impedance value (z)!"
+            f"If not connected, output wire '{value}' must be a high impedance value (z)!"
         )
     else:
         fail_with_msg(
-            f"Invalid direction '{direction}' for wire '{wire_name}'! Expected input or output."
+            f"Invalid direction '{direction}' for wire '{value}'! Expected input or output."
         )

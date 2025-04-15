@@ -5,6 +5,7 @@
 from dataclasses import dataclass, field
 
 import if_gen
+import iob_colors
 from iob_wire import iob_wire, replace_duplicate_signals_by_references
 from iob_base import (
     convert_dict2obj_list,
@@ -134,11 +135,11 @@ class iob_port(iob_wire):
                     fail_with_msg(
                         """{iob_colors.FAIL}Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
 Port '{self.name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(port).name for port in self.signals)}
+{newlinechar.join("- " + signal.name for signal in self.signals)}
 
-External connection '{get_real_signal(wire).name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(port).name for port in wire.signals)}
-{iob_colors.ENDC}"""
+External connection '{wire.name}' has the following signals:
+{newlinechar.join("- " + signal.name for signal in wire.signals)}
+{iob_colors.ENDC}""",
                         ValueError,
                     )
             elif len(self.signals) != len(wire.signals):
@@ -146,11 +147,11 @@ External connection '{get_real_signal(wire).name}' has the following signals:
                 fail_with_msg(
                     f"""{iob_colors.FAIL}Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
 Port '{self.name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(port).name for port in self.signals)}
+{newlinechar.join("- " + signal.name for signal in self.signals)}
 
-External connection '{get_real_signal(wire).name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(port).name for port in wire.signals)}
-{iob_colors.ENDC}"""
+External connection '{wire.name}' has the following signals:
+{newlinechar.join("- " + signal.name for signal in wire.signals)}
+{iob_colors.ENDC}""",
                     ValueError,
                 )
         else:

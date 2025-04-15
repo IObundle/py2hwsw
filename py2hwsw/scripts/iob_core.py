@@ -615,7 +615,7 @@ class iob_core(iob_module, iob_instance):
             else:
                 fail_with_msg(f"Invalid connection value: {connection_value}")
 
-            if "'" in wire_name:
+            if "'" in wire_name or wire_name.lower() == "z":
                 wire = wire_name
             else:
                 wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(instantiator.ports, wire_name)

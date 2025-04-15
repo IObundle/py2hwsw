@@ -68,6 +68,15 @@ def replace_params_with_ids(string, parameters_list, double_usage_count=False):
     return xml_output
 
 
+def escape_xml_special_chars(string):
+    """
+    Replace special XML characters with their XML escaped version
+    """
+    if type(string) is not str:
+        return string
+    return string.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+
+
 class Parameter:
     """
     Parameter class
@@ -94,6 +103,7 @@ class Parameter:
 
         # if the parameter is a string, it has params, change them to their ID
         def_value = replace_params_with_ids(self.def_value, parameters_list)
+        def_value = escape_xml_special_chars(def_value)
 
         # Generate the xml code
         xml_code = f"""<ipxact:parameter kactus2:usageCount="{self.usage_count}" """
@@ -171,6 +181,7 @@ class SwRegister:
 
         # Search for parameters in the hw_size and replace them with their ID
         xml_hw_size = replace_params_with_ids(self.hw_size, parameters_list)
+        xml_hw_size = escape_xml_special_chars(xml_hw_size)
 
         rsvd_xml = ""
         # If the register is not a multiple of 8 bits, add the reserved bits
@@ -179,6 +190,7 @@ class SwRegister:
                 rsvd_size = replace_params_with_ids(
                     f"{self.sw_size}-{self.hw_size}", parameters_list, True
                 )
+                rsvd_size = escape_xml_special_chars(rsvd_size)
             else:
                 rsvd_size = self.sw_size - self.hw_size
 
@@ -253,6 +265,7 @@ class Port:
         # Search for parameters in the n_bits and replace them with their ID
         if isinstance(self.n_bits, str):
             left_bit = replace_params_with_ids(f"{self.n_bits}-1", parameters_list)
+            left_bit = escape_xml_special_chars(left_bit)
         else:
             left_bit = self.n_bits - 1
 

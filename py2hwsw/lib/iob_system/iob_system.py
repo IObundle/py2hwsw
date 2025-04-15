@@ -41,6 +41,8 @@ def setup(py_params_dict):
         "fw_addr_w": 18,
         # If should include a tester system
         "include_tester": True,
+        # If should include default snippet
+        "include_snippet": True,
         # CPU selection.
         # If set to "none", the iob_system will export an `iob_s` port for an external
         # CPU. This port will give direct access to the system's peripherals. The internal
@@ -736,14 +738,16 @@ def setup(py_params_dict):
             "instance_name": "iob_printf_inst",
         },
     ]
-    attributes_dict["snippets"] = [
-        {
+
+    if params["include_snippet"]:
+        attributes_dict["snippets"] = [
+            {
             "verilog_code": """
    //assign interrupts = {{30{1'b0}}, uart_interrupt_o, 1'b0};
    assign interrupts = {{30{1'b0}}, 1'b0, 1'b0};
 """
-        }
-    ]
+                }
+            ]
 
     iob_system_scripts(attributes_dict, params, py_params_dict)
 

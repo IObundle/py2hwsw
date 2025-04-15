@@ -9,8 +9,8 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": NAME,
         "generate_hw": True,
-        "version": "0.1",
-        "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g"],
+        "board_list": ["iob_cyclonev_gt_dk", "iob_aes_ku040_db_g"],
+        "description": "The IObundle UART is a RISC-V-based Peripheral written in Verilog, which users can download for free, modify, simulate and implement in FPGA or ASIC. It is written in Verilog and includes a C software driver. The IObundle UART is a very compact IP that works at high clock rates if needed. It supports full-duplex operation and a configurable baud rate. The IObundle UART has a fixed configuration for the Start and Stop bits. More flexible licensable commercial versions are available upon request.",
         "confs": [
             {
                 "name": "DATA_W",
@@ -66,7 +66,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "txdata_wdata_wr", "width": 8},
                     {"name": "txdata_wen_wr", "width": 1},
-                    {"name": "txdata_wready_wr", "width": 1},
+                    {"name": "txdata_ready_wr", "width": 1},
                 ],
             },
             {
@@ -103,11 +103,20 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "rxdata_rdata_rd", "width": 8},
                     {"name": "rxdata_rvalid_rd", "width": 1},
-                    {"name": "rxdata_ren_rd", "width": 1},
                     {"name": "rxdata_rready_rd", "width": 1},
+                    {"name": "rxdata_ren_rd", "width": 1},
+                    {"name": "rxdata_ready_rd", "width": 1},
                 ],
             },
             # RXDATA reg
+            {
+                "name": "iob_reg_rvalid_en_rst",
+                "descr": "",
+                "signals": [
+                    {"name": "rxdata_rvalid_en", "width": 1},
+                    {"name": "rxdata_rvalid_rst", "width": 1},
+                ],
+            },
             {
                 "name": "iob_reg_rvalid_data_i",
                 "descr": "",
@@ -184,8 +193,15 @@ def setup(py_params_dict):
                     "DATA_W": 1,
                     "RST_VAL": "1'b0",
                 },
+                "port_params": {"clk_en_rst_s": "cke_arst_rst_en"},
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:rxdata_rvalid_en",
+                            "rst_i:rxdata_rvalid_rst",
+                        ],
+                    ),
                     "data_i": "iob_reg_rvalid_data_i",
                     "data_o": "iob_reg_rvalid_data_o",
                 },
@@ -200,34 +216,38 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
-            {
-                "core_name": "iob_clock",
-                "instance_name": "iob_clk_inst",
-                "dest_dir": "hardware/simulation/src",
-                "instantiate": False,
-            },
             # uncomment the following block to reveal a bug in py2hwsw
             #            {
             #                "core_name": "iob_sync",
             #                "instance_name": "iob_sync_inst",
             #                "instantiate": False,
             #            },
+        ],
+        "superblocks": [
+            # Tester
             {
-                "core_name": "iob_reg_re",
-                "instance_name": "iob_reg_re_inst",
-                "instantiate": False,
+                "core_name": "iob_uart_tester",
+                "dest_dir": "tester",
+            },
+            # Simulation wrapper
+            {
+                "core_name": "iob_uart_sim",
+                "dest_dir": "hardware/simulation/src",
+                "csr_if": CSR_IF,
             },
         ],
         "snippets": [
             {
                 "verilog_code": """
     // txdata Manual logic
-    assign txdata_wready_wr = 1'b1;
+    assign txdata_ready_wr = 1'b1;
 
     // rxdata Manual logic
-    assign rxdata_rready_rd = 1'b1;
+    assign rxdata_ready_rd = 1'b1;
 
-    // rxdata rvalid is iob_valid registered
+    // set rxdata on read enable, reset on (rready and rvalid)
+    assign rxdata_rvalid_en = rxdata_ren_rd;
+    assign rxdata_rvalid_rst = rxdata_rvalid_rd & rxdata_rready_rd;
     assign rxdata_rvalid_nxt = rxdata_ren_rd;
 """,
             },

@@ -14,6 +14,8 @@ class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
 
     type: str = "prog"
+    default_assignments: str = ""
+    state_descriptions: str = ""
 
     def __post_init__(self):
         if self.type not in ["prog", "fsm"]:
@@ -22,16 +24,12 @@ class iob_fsm(iob_comb):
             self.state_reg_name = "state"
             update_statement = "state_nxt = state;"
         else:
-            self.state_reg_name = "pc"
-            update_statement = "pc_nxt = pc + 1;"
-        _states = self.verilog_code.split("\n\n")
+            self.state_reg_name = "pcnt"
+            update_statement = "pcnt_nxt = pcnt + 1;"
+        update_statement += f"{self.default_assignments}\n"
+        _states = self.state_descriptions.split("\n\n")
         self.state_names = {}
         _for_loops = {}
-        tag = re.search(r"^\s*(\w+):", _states[0])
-        tag = tag.group(1) if tag else None
-        if tag == "default_assignments":
-            update_statement += f"{_states[0].replace(f'{tag}:', '')}"
-            _states = _states[1:]
         self.state_reg_width = (len(_states) - 1).bit_length()
         for i, state in enumerate(_states):
             tag = re.search(r"^\s*(\w+):", state)
@@ -69,7 +67,7 @@ class iob_fsm(iob_comb):
         for state_name, i in self.state_names.items():
             _states[i] = _states[i].replace(f"{i}:", f"{state_name}:", 1)
             if not state_name.endswith("_endfor"):
-                localparams += f"localparam {state_name} = {i};\n"
+                localparams += f"localparam {state_name} = {self.state_reg_width}'d{i};\n"
         joined_states = "\n".join(_states)
         self.verilog_code = f"""
 {localparams}
@@ -91,20 +89,31 @@ def create_fsm(core, *args, **kwargs):
 
     core.set_default_attribute("fsm", None)
 
-    verilog_code = kwargs.get("verilog_code", "")
+    default_assignments = kwargs.get("default_assignments", "")
     type = kwargs.get("type", "prog")
+    state_descriptions = kwargs.get("state_descriptions", "")
 
     assert_attributes(
         iob_fsm,
         kwargs,
         error_msg=f"Invalid {kwargs.get('name', '')} fsm attribute '[arg]'!",
     )
-    fsm = iob_fsm(type=type, verilog_code=verilog_code)
-
-    core.create_wire(
-        name=fsm.state_reg_name,
-        signals=[{"name": fsm.state_reg_name, "width": fsm.state_reg_width}],
+    fsm = iob_fsm(
+        type=type,
+        default_assignments=default_assignments,
+        state_descriptions=state_descriptions,
     )
+
+    # Check if the FSM wire is already created, if not create it
+    if not any(
+        wire.name == fsm.state_reg_name
+        for wire in core.wires
+    ):
+        core.create_wire(
+            name=fsm.state_reg_name,
+            descr = "FSM state",
+            signals=[{"name": fsm.state_reg_name, "width": fsm.state_reg_width}],
+        )
 
     fsm.set_needed_reg(core)
 

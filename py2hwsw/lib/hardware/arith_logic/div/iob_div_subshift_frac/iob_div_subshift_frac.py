@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -68,6 +67,7 @@ def setup(py_params_dict):
                     {
                         "name": "quotient_o",
                         "width": "DATA_W",
+                        "isvar": True,
                     },
                 ],
             },
@@ -101,7 +101,7 @@ def setup(py_params_dict):
                 "name": "incr",
                 "descr": "incr wire",
                 "signals": [
-                    {"name": "incr", "width": 1},
+                    {"name": "incr", "width": 1, "isvar": True},
                 ],
             },
             {
@@ -112,10 +112,10 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "pc",
-                "descr": "pc wire",
+                "name": "pcnt",
+                "descr": "pcnt wire",
                 "signals": [
-                    {"name": "pc", "width": 2},
+                    {"name": "pcnt", "width": 2, "isvar": True},
                 ],
             },
             {
@@ -155,7 +155,7 @@ def setup(py_params_dict):
                 "core_name": "iob_div_subshift",
                 "instance_name": "div_subshift0",
                 "parameters": {
-                    "DATA_W": "DATA_W",
+                    "DIVIDEND_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
@@ -165,19 +165,19 @@ def setup(py_params_dict):
             },
         ],
         "fsm": {
-            "verilog_code": """
-default_assignments:
+            "default_assignments": """
     incr        = 1'b0;
     quotient_o  = quotient_int + incr;
     res_acc_nxt = res_acc + remainder_o;
     res_acc_en  = 1'b0;
-
+""",
+            "state_descriptions": """
     if (!start_i) begin //wait for div start
-        pc_nxt = pc;
+        pcnt_nxt = pcnt;
     end
 
     if (!done_o) begin //wait for div done
-        pc_nxt = pc;
+        pcnt_nxt = pcnt;
     end
 
     res_acc_en = 1'b1;
@@ -186,10 +186,10 @@ default_assignments:
         res_acc_nxt = res_acc + remainder_o - divisor_i;
     end
     if (!start_i) begin
-        pc_nxt = pc;
+        pcnt_nxt = pcnt;
     end
     else begin
-        pc_nxt = 1'b1;
+        pcnt_nxt = 1'b1;
     end
 """,
         },

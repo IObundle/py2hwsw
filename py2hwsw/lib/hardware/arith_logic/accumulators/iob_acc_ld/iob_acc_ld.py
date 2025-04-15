@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -15,6 +14,14 @@ def setup(py_params_dict):
                 "min": "NA",
                 "max": "NA",
                 "descr": "Data bus width",
+            },
+            {
+                "name": "INCR_W",
+                "type": "P",
+                "val": "DATA_W",
+                "min": "NA",
+                "max": "NA",
+                "descr": "Increment value width",
             },
             {
                 "name": "RST_VAL",
@@ -75,7 +82,7 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "incr_i",
-                        "width": "DATA_W",
+                        "width": "INCR_W",
                     },
                 ],
             },
@@ -111,15 +118,23 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
                 "instance_name": "reg0",
                 "parameters": {
                     "DATA_W": "DATA_W+1",
                     "RST_VAL": "RST_VAL",
                 },
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "en_rst_i",
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:en_i",
+                            "rst_i:rst_i",
+                        ],
+                    ),
                     "data_i": "data_nxt",
                     "data_o": "data_int",
                 },

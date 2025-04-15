@@ -15,12 +15,15 @@ from iob_signal import get_real_signal
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
 
+    code: str = ""
+    clk_if: str = "cke_arst"
+
     def __post_init__(self):
         """Wrap verilog code with the always block"""
         self.verilog_code = (
             f"""\talways @ (*)\n\t\tbegin\n"""
             + """\t\t\t"""
-            + self.verilog_code
+            + self.code
             + """\n\t\tend"""
         )
 
@@ -76,9 +79,7 @@ class iob_comb(iob_snippet):
             else:
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name)
 
-            if signal is not None:
-                signal.isvar = True
-            else:
+            if signal is None:
                 fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
 
     def infer_registers(self, core):
@@ -86,9 +87,13 @@ class iob_comb(iob_snippet):
             for signal_ref in wire.signals:
                 signal = get_real_signal(signal_ref)
                 if signal.isreg:
-                    reg_type = "iob_reg"
+                    clk_if_name = "clk_en_rst_s"
+                    for port in core.ports:
+                        if port.interface:
+                            if port.interface.type == "iob_clk":
+                                clk_if_name = port.name 
                     connect = {
-                        "clk_en_rst_s": "clk_en_rst_s",
+                        "clk_en_rst_s": clk_if_name,
                         "data_i": f"{signal.name}_nxt",
                         "data_o": f"{signal.name}",
                     }
@@ -101,31 +106,33 @@ class iob_comb(iob_snippet):
                                 signals=[
                                     {
                                         "name": f"{signal.name}_nxt",
+                                        "descr": f"{signal.name} next value",
                                         "width": signal.width,
                                         "isvar": True,
                                     }
                                 ],
                             )
+                        core.create_wire(
+                            name=signal.name,
+                            signals=[{"name": signal.name}],
+                        )
                     _reg_signals = []
-                    connect_key = None
+                    bit_slices = []
+                    port_params = self.clk_if
                     if any(reg_signal == "_en" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                            {"name": f"{signal.name}_en", "width": 1, "isvar": True}
+                            {"name": f"{signal.name}_en", "descr": f"{signal.name} enable", "width": 1, "isvar": True}
                         )
-                        reg_type = "iob_reg_e"
-                        connect_key = "en_i"
+                        bit_slices.append(f"en_i:{signal.name}_en")
+                        port_params = port_params + "_en"
                     if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
-                            {"name": f"{signal.name}_rst", "width": 1, "isvar": True}
+                            {"name": f"{signal.name}_rst", "descr": f"{signal.name} reset", "width": 1, "isvar": True}
                         )
-                        if reg_type.endswith("_e"):
-                            reg_type = "iob_reg_re"
-                            connect_key = "en_rst"
-                        else:
-                            reg_type = "iob_reg_r"
-                            connect_key = "rst"
+                        bit_slices.append(f"rst_i:{signal.name}_rst")
+                        port_params = port_params + "_rst"
 
-                    if reg_type != "iob_reg":
+                    if any(x in port_params for x in ["_rst", "_en"]):
                         if not any(
                             wire.name == f"{signal.name}_reg_signals"
                             for wire in core.wires
@@ -133,14 +140,17 @@ class iob_comb(iob_snippet):
                             core.create_wire(
                                 name=f"{signal.name}_reg_signals", signals=_reg_signals
                             )
-                            connect[connect_key] = f"{signal.name}_reg_signals"
 
                     if not any(port.name == "clk_en_rst_s" for port in core.ports):
                         core.create_port(
                             name="clk_en_rst_s",
-                            signals={"type": "iob_clk"},
-                            descr="Clock enable and reset signal",
+                            signals={"type": "iob_clk", "params": self.clk_if},
+                            descr="Clock interface signals",
                         )
+
+                    # if bit_slices is not empty, add it to the connect dictionary
+                    if bit_slices:
+                        connect["clk_en_rst_s"] = (clk_if_name, bit_slices)
 
                     if not any(
                         block.instance_name == f"{signal.name}_reg"
@@ -148,11 +158,12 @@ class iob_comb(iob_snippet):
                         for block in group.blocks
                     ):
                         core.create_subblock_group(
-                            core_name=reg_type,
+                            core_name="iob_reg",
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},
                             connect=connect,
-                            instance_description=f"Infered register for {signal.name}",
+                            port_params={"clk_en_rst_s": port_params},
+                            instance_description=f"{signal.name} register",
                         )
 
 
@@ -176,13 +187,13 @@ def create_comb(core, *args, **kwargs):
             "Comb circuits and FSMs are mutually exclusive. Use separate submodules."
         )
     core.set_default_attribute("comb", None)
-    verilog_code = kwargs.get("verilog_code", None)
+    code = kwargs.get("code", None)
     assert_attributes(
         iob_comb,
         kwargs,
         error_msg=f"Invalid {kwargs.get('name', '')} comb attribute '[arg]'!",
     )
-    comb = iob_comb(verilog_code=verilog_code)
+    comb = iob_comb(code=code)
     comb.set_needed_reg(core)
     comb.infer_registers(core)
     core.comb = comb

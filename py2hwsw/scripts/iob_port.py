@@ -36,8 +36,8 @@ class iob_port(iob_wire):
             "_i": "input",
             "_o": "output",
             "_io": "inout",
-            "_s": "slave",
-            "_m": "master",
+            "_s": "subordinate",
+            "_m": "manager",
         }
         _direction = None
         for sufix, d in _sufix_dict.items():
@@ -53,14 +53,14 @@ class iob_port(iob_wire):
 
         if self.interface:
             self.signals += if_gen.get_signals(
-                name = self.interface.type,
-                if_type = _direction,
-                mult = self.interface.mult,
-                widths = self.interface.widths,
-                params = self.interface.params,
-                signal_prefix = self.interface.prefix,
+                name=self.interface.type,
+                if_type=_direction,
+                mult=self.interface.mult,
+                widths=self.interface.widths,
+                params=self.interface.params,
+                signal_prefix=self.interface.prefix,
             )
-        elif _direction in ["slave", "master"]:
+        elif _direction in ["subordinate", "manager"]:
             fail_with_msg(
                 f"Port '{self.name}' is a '{_direction}' port but no interface is defined",
                 ValueError,
@@ -112,8 +112,8 @@ class iob_port(iob_wire):
 
 attrs = [
     "name",
-    ["-i", "signals", {"nargs": 1}, ("type",)],
-    ["-s", "signals", {"nargs": "+"}, ["name:width"]],
+    ["-i", "signals&i", {"nargs": 1}, ("type",)],
+    ["-s", "signals&s", {"nargs": "+"}, ["name:width"]],
 ]
 
 

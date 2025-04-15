@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -40,7 +39,7 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "descr": "IOb native master interface",
+                "descr": "IOb native manager interface",
             },
             {
                 "name": "wb_s",
@@ -49,15 +48,15 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "descr": "Wishbone slave interface",
+                "descr": "Wishbone subordinate interface",
             },
         ],
         "wires": [
             {
-                "name": "valid",
-                "descr": "valid wire",
+                "name": "valid_int",
+                "descr": "valid_int wire",
                 "signals": [
-                    {"name": "valid", "width": 1},
+                    {"name": "valid_int", "width": 1},
                 ],
             },
             {
@@ -82,13 +81,6 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "rdata_r",
-                "descr": "rdata_r wire",
-                "signals": [
-                    {"name": "rdata_r", "width": "DATA_W"},
-                ],
-            },
-            {
                 "name": "wack",
                 "descr": "wack wire",
                 "signals": [
@@ -103,60 +95,24 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "wb_addr_r",
-                "descr": "wb_addr_r wire",
-                "signals": [
-                    {"name": "wb_addr_r", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "wb_data_r",
-                "descr": "wb_data_r wire",
-                "signals": [
-                    {"name": "wb_data_r", "width": "DATA_W"},
-                ],
-            },
-            {
                 "name": "wb_data_mask",
                 "descr": "wb_data_mask wire",
                 "signals": [
                     {"name": "wb_data_mask", "width": "DATA_W"},
                 ],
             },
+            # Busy reg
             {
-                "name": "reg_wack_int",
-                "descr": "reg_wack_int wire",
+                "name": "busy",
+                "descr": "busy wire",
                 "signals": [
-                    {"name": "reg_wack_int", "width": 1},
-                ],
-            },
-            {
-                "name": "reg_wack_int_1",
-                "descr": "reg_wack_int_1 wire",
-                "signals": [
-                    {"name": "reg_wack_int_1", "width": 1},
-                ],
-            },
-            {
-                "name": "int",
-                "descr": "int wire",
-                "signals": [
-                    {"name": "reg_wack_int_1"},
-                    {"name": "reg_wack_int"},
-                ],
-            },
-            {
-                "name": "int_2",
-                "descr": "int wire",
-                "signals": [
-                    {"name": "valid"},
-                    {"name": "rst_valid"},
+                    {"name": "busy", "width": 1},
                 ],
             },
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_wack",
                 "parameters": {
                     "DATA_W": 1,
@@ -164,43 +120,73 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "int",
                     "data_i": "wack",
                     "data_o": "wack_r",
                 },
             },
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_valid",
                 "parameters": {
                     "DATA_W": 1,
                     "RST_VAL": 0,
                 },
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "int_2",
-                    "data_i": "valid",
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:valid_int",
+                            "rst_i:rst_valid",
+                        ],
+                    ),
+                    "data_i": "valid_int",
                     "data_o": "valid_r",
+                },
+            },
+            {
+                "core_name": "iob_reg",
+                "instance_name": "iob_reg_busy",
+                "parameters": {
+                    "DATA_W": 1,
+                    "RST_VAL": 0,
+                },
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
+                "connect": {
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:valid_int",
+                            "rst_i:wb_ack_o",
+                        ],
+                    ),
+                    "data_i": "valid_int",
+                    "data_o": "busy",
                 },
             },
         ],
         "snippets": [
             {
                 "verilog_code": """
-             assign iob_valid_o = valid;
-        assign iob_address_o = wb_adr_i;
-        assign iob_wdata_o = wb_dat_i;
-        assign iob_wstrb_o = wstrb;
-        assign valid = (wb_stb_i & wb_cyc_i) & (~valid_r);
-        assign rst_valid = (~wb_stb_i) & valid_r;
-        assign wstrb = wb_we_i ? wb_sel_i : 4'h0;
-        assign wb_dat_o = (iob_rdata_i) & (wb_data_mask);
-        assign wb_ack_o = iob_rvalid_i | wack_r;
-        assign wack = iob_ready_i & iob_valid_o & (|iob_wstrb_o);
-        assign wb_data_mask = {{8{wb_sel_i[3]}}, {8{wb_sel_i[2]}}, {8{wb_sel_i[1]}}, {8{wb_sel_i[0]}}};
-        assign reg_wack_int= 1'b0; 
-        assign reg_wack_int_1= 1'b1;   
-                """,
+   assign iob_valid_o = ~busy ? valid_int : valid_r;
+   assign valid_int = wb_stb_i & wb_cyc_i & ~busy;
+   assign rst_valid = iob_ready_i;
+
+   assign iob_addr_o = wb_adr_i;
+   assign iob_wdata_o = wb_datout_i;
+   assign iob_wstrb_o = wstrb;
+   assign wstrb = wb_we_i ? wb_sel_i : 4'h0;
+   assign iob_rready_o = 1'b1;
+
+   assign wb_dat_o = (iob_rdata_i) & (wb_data_mask);
+   assign wb_data_mask = {{8{wb_sel_i[3]}}, {8{wb_sel_i[2]}}, {8{wb_sel_i[1]}}, {8{wb_sel_i[0]}}};
+
+   assign wb_ack_o = wb_we_i ? iob_ready_i : iob_rvalid_i;
+""",
             },
         ],
     }

@@ -20,17 +20,24 @@ EMB_DIR = ../../software
 PYTHON_DIR = ../../scripts
 
 #default board
-BOARD ?= cyclonev_gt_dk
+ifeq ($(BOARD),)
+$(warning BOARD not set, skipping build)
+$(exit 0)
+endif
 
 #fpga toolchain
 FPGA_TOOL:=$(shell find . -name $(BOARD) | cut -d"/" -f2)
 
+ifeq ($(FPGA_TOOL),)
+$(warning Unsupported FPGA board $(BOARD) or FPGA toolchain. Check the board name and FPGA toochain installation.)
+$(exit 0)
+endif
+
+
+
 FPGA_TOP ?=$(NAME)_$(BOARD)
 SDC_PREFIX ?=$(NAME)
 
-ifeq ($(FPGA_TOOL),)
-$(error Cannot find FPGA toolchain for board $(BOARD). Please make sure that the board name is correct and that the board is supported by the FPGA toolchain)
-endif
 
 include $(FPGA_TOOL)/$(BOARD)/board.mk
 include $(FPGA_TOOL)/build.mk
@@ -55,7 +62,7 @@ ifeq ($(FPGA_SERVER),)
 	make $(FPGA_OBJ)
 else 
 	ssh $(FPGA_SSH_FLAGS) $(FPGA_USER)@$(FPGA_SERVER) "if [ ! -d $(REMOTE_BUILD_DIR) ]; then mkdir -p $(REMOTE_BUILD_DIR); fi"
-	rsync $(FPGA_SYNC_FLAGS) -avz --delete --force ../.. $(FPGA_USER)@$(FPGA_SERVER):$(REMOTE_BUILD_DIR)
+	rsync $(FPGA_SYNC_FLAGS) -avz --delete --force --exclude 'software/tb' ../.. $(FPGA_USER)@$(FPGA_SERVER):$(REMOTE_BUILD_DIR)
 	ssh -t $(FPGA_SSH_FLAGS) $(FPGA_USER)@$(FPGA_SERVER) 'if [ -f quartus_env ]; then source quartus_env $(USE_QUARTUS_PRO); fi; make -C $(REMOTE_FPGA_DIR) $@ BOARD=$(BOARD) $(UFLAGS)'
 	scp $(FPGA_SCP_FLAGS) $(FPGA_USER)@$(FPGA_SERVER):$(REMOTE_FPGA_DIR)/$(FPGA_OBJ) .
 	scp -r $(FPGA_SCP_FLAGS) $(FPGA_USER)@$(FPGA_SERVER):$(REMOTE_FPGA_DIR)/reports .
@@ -80,7 +87,7 @@ ifeq ($(BOARD_SERVER),)
 	$(BOARD_GRAB_CMD) -p '$(FPGA_PROG)' -c '$(CONSOLE_CMD)'  && echo "Checking test log..." && test "$$(cat test.log)" = "Test passed!"
 else
 	ssh $(BOARD_USER)@$(BOARD_SERVER) "if [ ! -d $(REMOTE_BUILD_DIR) ]; then mkdir -p $(REMOTE_BUILD_DIR); fi"
-	rsync $(BOARD_SYNC_FLAGS) -avz --delete --force ../.. $(BOARD_USER)@$(BOARD_SERVER):$(REMOTE_BUILD_DIR)
+	rsync $(BOARD_SYNC_FLAGS) -avz --delete --force --exclude 'software/tb' ../.. $(BOARD_USER)@$(BOARD_SERVER):$(REMOTE_BUILD_DIR)
 	ssh -t $(BOARD_USER)@$(BOARD_SERVER) 'if [ -f quartus_env ]; then source quartus_env $(USE_QUARTUS_PRO); fi; make -C $(REMOTE_FPGA_DIR) $@ BOARD=$(BOARD) GRAB_TIMEOUT=$(GRAB_TIMEOUT) $(UFLAGS)'
 	scp $(BOARD_USER)@$(BOARD_SERVER):$(REMOTE_FPGA_DIR)/*.log . 2> /dev/null | true
 endif

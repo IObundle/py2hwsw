@@ -10,7 +10,7 @@ def generate_fsm(core):
     returns: Generated verilog code
     """
     if core.fsm != None:
-        return core.fsm.verilog_code + "\n"
+        return core.fsm.verilog_code
 
     return ""
 

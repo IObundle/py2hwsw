@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             #
@@ -118,7 +117,7 @@ def setup(py_params_dict):
         //USER LOGIC CLOCK
         .addn_ui_clkout1        (clkout_o),
 
-        //AXI INTERFACE         (slave)
+        //AXI INTERFACE         (subordinate)
         .c0_ddr4_ui_clk         (axi_clk_o),
         .c0_ddr4_ui_clk_sync_rst(axi_clk_rst_o),
         .c0_ddr4_aresetn        (axi_arstn_i),
@@ -170,7 +169,7 @@ def setup(py_params_dict):
         .c0_ddr4_s_axi_rlast (axi_rlast_o),
         .c0_ddr4_s_axi_rvalid(axi_rvalid_o),
 
-        //DDR4 INTERFACE (master of external DDR4 module)
+        //DDR4 INTERFACE (manager of external DDR4 module)
         .c0_ddr4_act_n         (ddr4_act_n_o),
         .c0_ddr4_adr           (ddr4_adr_o),
         .c0_ddr4_ba            (ddr4_ba_o),

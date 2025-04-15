@@ -7,13 +7,13 @@ def setup(py_params_dict):
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated merge module."
     )
-    assert "num_slaves" in py_params_dict, print(
-        "Error: Missing number of slaves for generated merge module."
+    assert "num_subordinates" in py_params_dict, print(
+        "Error: Missing number of subordinates for generated merge module."
     )
 
-    NUM_SLAVES = int(py_params_dict["num_slaves"])
-    # Number of bits required for slave selection
-    NBITS = (NUM_SLAVES - 1).bit_length()
+    NUM_SUBORDINATES = int(py_params_dict["num_subordinates"])
+    # Number of bits required for subordinate selection
+    NBITS = (NUM_SUBORDINATES - 1).bit_length()
 
     TRANSFER_COUNTER_DATA_W = py_params_dict.get(
         "transfer_counter_data_w", 5
@@ -26,7 +26,7 @@ def setup(py_params_dict):
     BURST_W = int(py_params_dict["burst_w"]) if "burst_w" in py_params_dict else 2
     LOCK_W = int(py_params_dict["lock_w"]) if "lock_w" in py_params_dict else 2
     CACHE_W = int(py_params_dict["cache_w"]) if "cache_w" in py_params_dict else 4
-    PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
+    # PROT_W = int(py_params_dict["prot_w"]) if "prot_w" in py_params_dict else 3
     QOS_W = int(py_params_dict["qos_w"]) if "qos_w" in py_params_dict else 4
     RESP_W = int(py_params_dict["resp_w"]) if "resp_w" in py_params_dict else 2
     # LEN_W = int(py_params_dict["len_w"]) if "len_w" in py_params_dict else 8
@@ -46,7 +46,7 @@ def setup(py_params_dict):
         #
         # AW Channel
         ("axi_awaddr",  "input",  ADDR_W,                       "write", False),
-        ("axi_awprot",  "input",  PROT_W,                       "write", False),
+        # ("axi_awprot",  "input",  PROT_W,                       "write", False),
         ("axi_awvalid", "input",  1,                            "write", False),
         ("axi_awready", "output", 1,                            "write", False),
         # W Channel
@@ -79,7 +79,7 @@ def setup(py_params_dict):
         #
         # AR Channel
         ("axi_araddr",  "input",  ADDR_W,                        "read", False),
-        ("axi_arprot",  "input",  PROT_W,                        "read", False),
+        # ("axi_arprot",  "input",  PROT_W,                        "read", False),
         ("axi_arvalid", "input",  1,                             "read", False),
         ("axi_arready", "output", 1,                             "read", False),
         # R Channel
@@ -107,7 +107,6 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": py_params_dict["name"],
         "generate_hw": True,
-        "version": "0.1",
         #
         # AXI Parameters
         #
@@ -164,15 +163,15 @@ def setup(py_params_dict):
                 "BURST_W": BURST_W,
                 "LOCK_W": LOCK_W,
                 "CACHE_W": CACHE_W,
-                "PROT_W": PROT_W,
+                # "PROT_W": PROT_W,
                 "QOS_W": QOS_W,
                 "RESP_W": RESP_W,
                 "LEN_W": "LEN_W",
             },
-            "descr": "Merge master",
+            "descr": "Merge manager",
         },
     ]
-    for port_idx in range(NUM_SLAVES):
+    for port_idx in range(NUM_SUBORDINATES):
         attributes_dict["ports"].append(
             {
                 "name": f"s_{port_idx}_s",
@@ -187,12 +186,12 @@ def setup(py_params_dict):
                     "BURST_W": BURST_W,
                     "LOCK_W": LOCK_W,
                     "CACHE_W": CACHE_W,
-                    "PROT_W": PROT_W,
+                    # "PROT_W": PROT_W,
                     "QOS_W": QOS_W,
                     "RESP_W": RESP_W,
                     "LEN_W": "LEN_W",
                 },
-                "descr": "Merge slave interfaces",
+                "descr": "Merge subordinate interfaces",
             },
         )
     #
@@ -269,14 +268,14 @@ def setup(py_params_dict):
         },
         {
             "name": "s_read_sel",
-            "descr": "Select slave interface",
+            "descr": "Select subordinate interface",
             "signals": [
                 {"name": "read_sel"},
             ],
         },
         {
             "name": "s_read_sel_reg",
-            "descr": "Registered select slave interface",
+            "descr": "Registered select subordinate interface",
             "signals": [
                 {"name": "read_sel_reg"},
             ],
@@ -447,14 +446,14 @@ def setup(py_params_dict):
         },
         {
             "name": "s_write_sel",
-            "descr": "Select slave interface",
+            "descr": "Select subordinate interface",
             "signals": [
                 {"name": "write_sel"},
             ],
         },
         {
             "name": "s_write_sel_reg",
-            "descr": "Registered select slave interface",
+            "descr": "Registered select subordinate interface",
             "signals": [
                 {"name": "write_sel_reg"},
             ],
@@ -464,14 +463,17 @@ def setup(py_params_dict):
             "name": "read_sel_prio_enc_i",
             "descr": "Input of read priority encoder",
             "signals": [
-                {"name": "mux_axi_arvalid", "width": f"{NUM_SLAVES} * 1"},
+                {"name": "mux_axi_arvalid", "width": f"{NUM_SUBORDINATES} * 1"},
             ],
         },
         {
             "name": "read_sel_prio_enc_o",
             "descr": "Output of read priority encoder",
             "signals": [
-                {"name": "read_sel_prio_enc_o", "width": NBITS},
+                {
+                    "name": "read_sel_prio_enc_o",
+                    "width": f"$clog2({NUM_SUBORDINATES}+1)",
+                },
             ],
         },
         # Write priority encoder signals
@@ -479,14 +481,17 @@ def setup(py_params_dict):
             "name": "write_sel_prio_enc_i",
             "descr": "Input of write priority encoder",
             "signals": [
-                {"name": "mux_axi_awvalid", "width": f"{NUM_SLAVES} * 1"},
+                {"name": "mux_axi_awvalid", "width": f"{NUM_SUBORDINATES} * 1"},
             ],
         },
         {
             "name": "write_sel_prio_enc_o",
             "descr": "Output of write priority encoder",
             "signals": [
-                {"name": "write_sel_prio_enc_o", "width": NBITS},
+                {
+                    "name": "write_sel_prio_enc_o",
+                    "width": f"$clog2({NUM_SUBORDINATES}+1)",
+                },
             ],
         },
     ]
@@ -513,7 +518,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "demux_" + signal,
-                            "width": f"{NUM_SLAVES} * {width}",
+                            "width": f"{NUM_SUBORDINATES} * {width}",
                         },
                     ],
                 },
@@ -530,7 +535,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "mux_" + signal,
-                            "width": f"{NUM_SLAVES} * {width}",
+                            "width": f"{NUM_SUBORDINATES} * {width}",
                         },
                     ],
                 },
@@ -551,43 +556,66 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         # Read blocks
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "busy_read_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "busy_read_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:busy_read_reg_en",
+                        "rst_i:busy_read_reg_rst",
+                    ],
+                ),
                 "data_i": "busy_read_reg_data_i",
                 "data_o": "busy_read_reg_data_o",
             },
         },
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "active_transaction_read_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "active_transaction_read_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:active_transaction_read_reg_en",
+                        "rst_i:active_transaction_read_reg_rst",
+                    ],
+                ),
                 "data_i": "active_transaction_read_reg_data_i",
                 "data_o": "active_transaction_read_reg_data_o",
             },
         },
         {
-            "core_name": "iob_reg_r",
+            "core_name": "iob_reg",
             "instance_name": "read_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": "read_sel_reg_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "read_sel_reg_data_i",
                 "data_o": "read_sel_reg_data_o",
             },
@@ -596,7 +624,7 @@ def setup(py_params_dict):
             "core_name": "iob_prio_enc",
             "instance_name": "read_sel_enc",
             "parameters": {
-                "W": NUM_SLAVES,
+                "W": NUM_SUBORDINATES,
                 "MODE": '"HIGH"',
             },
             "connect": {
@@ -606,15 +634,23 @@ def setup(py_params_dict):
         },
          # Write blocks
         {
-            "core_name": "iob_reg_re",
+            "core_name": "iob_reg",
             "instance_name": "busy_write_reg_re",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": "1'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "en_rst_i": "busy_write_reg_en_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:busy_write_reg_en",
+                        "rst_i:busy_write_reg_rst",
+                    ],
+                ),
                 "data_i": "busy_write_reg_data_i",
                 "data_o": "busy_write_reg_data_o",
             },
@@ -625,6 +661,9 @@ def setup(py_params_dict):
             "instance_name": "active_write_transaction_acc",
             "parameters": {
                 "DATA_W": TRANSFER_COUNTER_DATA_W,
+            },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
@@ -639,6 +678,9 @@ def setup(py_params_dict):
             "parameters": {
                 "DATA_W": TRANSFER_COUNTER_DATA_W,
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst_en",
+            },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "en_rst_i": "pending_write_response_acc_en_rst",
@@ -647,15 +689,22 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg_r",
+            "core_name": "iob_reg",
             "instance_name": "write_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
                 "RST_VAL": f"{NBITS}'b0",
             },
+            "port_params": {
+                "clk_en_rst_s": "cke_arst_rst",
+            },
             "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": "write_sel_reg_rst",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "rst_i:rst_i",
+                    ],
+                ),
                 "data_i": "write_sel_reg_data_i",
                 "data_o": "write_sel_reg_data_o",
             },
@@ -664,7 +713,7 @@ def setup(py_params_dict):
             "core_name": "iob_prio_enc",
             "instance_name": "write_sel_enc",
             "parameters": {
-                "W": NUM_SLAVES,
+                "W": NUM_SUBORDINATES,
                 "MODE": '"HIGH"',
             },
             "connect": {
@@ -684,7 +733,7 @@ def setup(py_params_dict):
                     "instance_name": "iob_demux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_SLAVES,
+                        "N": NUM_SUBORDINATES,
                     },
                     "connect": {
                         "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
@@ -701,7 +750,7 @@ def setup(py_params_dict):
                     "instance_name": "iob_mux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_SLAVES,
+                        "N": NUM_SUBORDINATES,
                     },
                     "connect": {
                         "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
@@ -720,14 +769,14 @@ def setup(py_params_dict):
    // Read
    //
 
-   // Only switch masters when there is no current active transaction
-   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o;
+   // Only switch managers when there is no current active transaction
+   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o[{NUM_SUBORDINATES}-1:0];
 
    assign busy_read_reg_en = m_axi_arvalid_o & !busy_read_reg_o;
    assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
    assign busy_read_reg_i = 1'b1;
 
-   // Block address valid/ready signals of current master if there is still an active transaction
+   // Block address valid/ready signals of current manager if there is still an active transaction
    assign m_axi_arvalid_o = ~active_transaction_read_reg_o & mux_axi_arvalid_o;
    assign demux_axi_arready_i = ~active_transaction_read_reg_o & m_axi_arready_i;
 
@@ -740,16 +789,16 @@ def setup(py_params_dict):
    //
 
    // NOTE: Current logic does not allow wvalid to be asserted before awvalid!
-   //       If the wvalid comes before, the data will go to the currently selected master_interface, and that may not be the intended destination (real destination will be given later by awvalid)
+   //       If the wvalid comes before, the data will go to the currently selected manager_interface, and that may not be the intended destination (real destination will be given later by awvalid)
 
-   // Only switch masters when there is no current active transaction
-   assign write_sel = (busy_write_reg_o | active_write_transaction) ? write_sel_reg : write_sel_prio_enc_o;
+   // Only switch managers when there is no current active transaction
+   assign write_sel = (busy_write_reg_o | active_write_transaction) ? write_sel_reg : write_sel_prio_enc_o[{NUM_SUBORDINATES}-1:0];
 
    assign busy_write_reg_en = m_axi_awvalid_o & !busy_write_reg_o;
    assign busy_write_reg_rst = end_pending_write_response;
    assign busy_write_reg_i = 1'b1;
 
-   // Block address valid/ready signals of current master if accumulator full or if another master wants to write
+   // Block address valid/ready signals of current manager if accumulator full or if another manager wants to write
    assign wants_change_write_sel = write_sel != write_sel_prio_enc_o;
    assign allow_write_address = ~(full_active_write_transaction | (active_write_transaction & wants_change_write_sel));
    assign m_axi_awvalid_o = allow_write_address & mux_axi_awvalid_o;
@@ -764,7 +813,7 @@ def setup(py_params_dict):
    assign active_write_transaction_acc_en = start_active_write_transaction ^ end_active_write_transaction;
    assign active_write_transaction_acc_input = start_active_write_transaction ? {TRANSFER_COUNTER_DATA_W}'d1 : -{TRANSFER_COUNTER_DATA_W}'d1;
 
-   // Block data valid/ready signals of current master if accumulator full or if another master wants to write
+   // Block data valid/ready signals of current manager if accumulator full or if another manager wants to write
    assign allow_write_data = ~(full_pending_write_response | (pending_write_response & wants_change_write_sel));
    assign m_axi_wvalid_o = allow_write_data & mux_axi_wvalid_o;
    assign demux_axi_wready_i = allow_write_data & m_axi_wready_i;
@@ -786,20 +835,20 @@ def setup(py_params_dict):
     for signal, direction, width, _, _ in axi_signals:
         if direction == "output":
             # Connect demuxers outputs
-            for port_idx in range(NUM_SLAVES):
+            for port_idx in range(NUM_SUBORDINATES):
                 verilog_code += f"""
    assign s{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
 """
         elif signal in ["axi_araddr", "axi_awaddr"]:
             # Connect address muxer inputs
             verilog_code += f"   assign mux_{signal} = {{"
-            for port_idx in range(NUM_SLAVES - 1, -1, -1):
+            for port_idx in range(NUM_SUBORDINATES - 1, -1, -1):
                 verilog_code += f"{{{NBITS}'d{port_idx}}}, s{port_idx}_{signal}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
         else:  # Input direction
             # Connect muxer inputs
             verilog_code += f"   assign mux_{signal} = {{"
-            for port_idx in range(NUM_SLAVES - 1, -1, -1):
+            for port_idx in range(NUM_SUBORDINATES - 1, -1, -1):
                 verilog_code += f"s{port_idx}_{signal}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
     # Create snippet with muxer and demuxer connections

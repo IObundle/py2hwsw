@@ -12,15 +12,15 @@ from iob_axi_crossbar_wrap import generate
 
 
 def setup(py_params_dict):
-    """AXI nonblocking crossbar interconnect with parametrizable data and address interface widths and master and slave interface counts. Supports all burst types. Fully nonblocking with completely separate read and write paths; ID-based transaction ordering protection logic; and per-port address decode, admission control, and decode error handling. Wrapper for axi_crossbar_rd and axi_crossbar_wr."""
+    """AXI nonblocking crossbar interconnect with parametrizable data and address interface widths and manager and subordinate interface counts. Supports all burst types. Fully nonblocking with completely separate read and write paths; ID-based transaction ordering protection logic; and per-port address decode, admission control, and decode error handling. Wrapper for axi_crossbar_rd and axi_crossbar_wr."""
 
     params = {
         # Name of generated module
         "name": None,
-        # Number of master to connect (= number of slave interfaces)
-        "num_masters": 1,
-        # Number of slaves to connect (= number of master interfaces)
-        "num_slaves": 1,
+        # Number of manager to connect (= number of subordinate interfaces)
+        "num_managers": 1,
+        # Number of subordinates to connect (= number of manager interfaces)
+        "num_subordinates": 1,
         # Build directory (usually auto-filled py py2hwsw).
         "build_dir": "",
         # Destination directory inside build directory.
@@ -37,8 +37,8 @@ def setup(py_params_dict):
         "Error: Missing name for generated axi crossbar module."
     )
 
-    m = params["num_masters"]
-    n = params["num_slaves"]
+    m = params["num_managers"]
+    n = params["num_subordinates"]
 
     # Don't generate files for other py2 targets (like clean)
     if py_params_dict.get("py2hwsw_target", "") == "setup":
@@ -60,11 +60,11 @@ def setup(py_params_dict):
             "(DATA_WIDTH/8)",
             "Width of wstrb (width of data bus in words)",
         ),
-        ("S_ID_WIDTH", 8, "Input ID field width (from AXI masters)"),
+        ("S_ID_WIDTH", 8, "Input ID field width (from AXI managers)"),
         (
             "M_ID_WIDTH",
             "S_ID_WIDTH+$clog2(S_COUNT)",
-            "Output ID field width (towards AXI slaves)",
+            "Output ID field width (towards AXI subordinates)",
         ),
         ("AWUSER_ENABLE", 0, "Propagate awuser signal"),
         ("AWUSER_WIDTH", 1, "Width of awuser signal"),
@@ -76,7 +76,7 @@ def setup(py_params_dict):
         ("ARUSER_WIDTH", 1, "Width of aruser signal"),
         ("RUSER_ENABLE", 0, "Propagate ruser signal"),
         ("RUSER_WIDTH", 1, "Width of ruser signal"),
-        ("M_REGIONS", 1, "Number of regions per master interface"),
+        ("M_REGIONS", 1, "Number of regions per manager interface"),
     ]
     for p in range(m):
         axi_verilog_params += [
@@ -88,12 +88,12 @@ def setup(py_params_dict):
             (
                 f"M{p:02d}_BASE_ADDR",
                 0,
-                "Master interface base addresses. M_REGIONS concatenated fields of ADDR_WIDTH bits",
+                "Manager interface base addresses. M_REGIONS concatenated fields of ADDR_WIDTH bits",
             ),
             (
                 f"M{p:02d}_ADDR_WIDTH",
                 "{M_REGIONS{32'd24}}",
-                "Master interface address widths. M_REGIONS concatenated fields of 32 bits",
+                "Manager interface address widths. M_REGIONS concatenated fields of 32 bits",
             ),
             (
                 f"M{p:02d}_CONNECT_READ",
@@ -108,12 +108,12 @@ def setup(py_params_dict):
             (
                 f"M{p:02d}_ISSUE",
                 4,
-                "Number of concurrent operations for each master interface",
+                "Number of concurrent operations for each manager interface",
             ),
             (
                 f"M{p:02d}_SECURE",
                 0,
-                "Secure master (fail operations based on awprot/arprot)",
+                "Secure manager (fail operations based on awprot/arprot)",
             ),
         ]
     for p in range(m):
@@ -121,27 +121,27 @@ def setup(py_params_dict):
             (
                 f"S{p:02d}_AW_REG_TYPE",
                 0,
-                "Slave interface AW channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Subordinate interface AW channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
             (
                 f"S{p:02d}_W_REG_TYPE",
                 0,
-                "Slave interface W channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Subordinate interface W channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
             (
                 f"S{p:02d}_B_REG_TYPE",
                 1,
-                "Slave interface B channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Subordinate interface B channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
             (
                 f"S{p:02d}_AR_REG_TYPE",
                 0,
-                "Slave interface AR channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Subordinate interface AR channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
             (
                 f"S{p:02d}_R_REG_TYPE",
                 2,
-                "Slave interface R channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Subordinate interface R channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
         ]
     for p in range(n):
@@ -149,34 +149,33 @@ def setup(py_params_dict):
             (
                 f"M{p:02d}_AW_REG_TYPE",
                 1,
-                "Master interface AW channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Manager interface AW channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
             (
                 f"M{p:02d}_W_REG_TYPE",
                 2,
-                "Master interface W channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Manager interface W channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
             (
                 f"M{p:02d}_B_REG_TYPE",
                 0,
-                "Master interface B channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Manager interface B channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
             (
                 f"M{p:02d}_AR_REG_TYPE",
                 1,
-                "Master interface AR channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Manager interface AR channel register type (output). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
             (
                 f"M{p:02d}_R_REG_TYPE",
                 0,
-                "Master interface R channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
+                "Manager interface R channel register type (input). 0 to bypass, 1 for simple buffer, 2 for skid buffer",
             ),
         ]
 
     attributes_dict = {
         "name": params["name"],
         "generate_hw": False,
-        "version": "0.1",
     }
     #
     # Confs
@@ -222,7 +221,7 @@ def setup(py_params_dict):
         attributes_dict["ports"].append(
             {
                 "name": f"m{p}_axi_m",
-                "descr": f"Master interface {p}",
+                "descr": f"Manager interface {p}",
                 "signals": {
                     "type": "axi",
                     "prefix": f"m{p:02d}_",
@@ -238,7 +237,7 @@ def setup(py_params_dict):
         attributes_dict["ports"].append(
             {
                 "name": f"s{p}_axi_s",
-                "descr": f"Slave interface {p}",
+                "descr": f"Subordinate interface {p}",
                 "signals": {
                     "type": "axi",
                     "prefix": f"s{p:02d}_",

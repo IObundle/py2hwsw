@@ -35,17 +35,17 @@
 #define IOB_UART_VERSION_W 16
 
 // Core Setters and Getters
-void IOB_UART_SET_BASEADDR(uint32_t addr);
-void IOB_UART_SET_SOFTRESET(uint8_t value);
-void IOB_UART_SET_DIV(uint16_t value);
-void IOB_UART_SET_TXDATA(uint8_t value);
-void IOB_UART_SET_TXEN(uint8_t value);
-void IOB_UART_SET_RXEN(uint8_t value);
-uint32_t IOB_UART_GET_BASEADDR();
-uint8_t IOB_UART_GET_TXREADY();
-uint8_t IOB_UART_GET_RXREADY();
-uint8_t IOB_UART_GET_RXDATA();
-uint16_t IOB_UART_GET_VERSION();
+void iob_uart_set_baseaddr(uint32_t addr);
+void iob_uart_set_softreset(uint8_t value);
+void iob_uart_set_div(uint16_t value);
+void iob_uart_set_txdata(uint8_t value);
+void iob_uart_set_txen(uint8_t value);
+void iob_uart_set_rxen(uint8_t value);
+uint32_t iob_uart_get_baseaddr();
+uint8_t iob_uart_get_txready();
+uint8_t iob_uart_get_rxready();
+uint8_t iob_uart_get_rxdata();
+uint16_t iob_uart_get_version();
 
 void iob_write(unsigned int cpu_address, unsigned cpu_data_w,
                unsigned int cpu_data);

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
-`include "iob_csrs_demo_csrs_def.vh"
+`include "iob_csrs_demo_csrs_conf.vh"
 
 module iob_csrs_demo_tb;
 
@@ -25,6 +25,7 @@ module iob_csrs_demo_tb;
    wire [                        32-1:0] iob_rdata_o;
    wire                                  iob_ready_o;
    wire                                  iob_rvalid_o;
+   reg                                   iob_rready_i;
 
    initial begin
 `ifdef VCD
@@ -63,7 +64,8 @@ module iob_csrs_demo_tb;
       .iob_csrs_iob_wstrb_i (iob_wstrb_i),
       .iob_csrs_iob_rvalid_o(iob_rvalid_o),
       .iob_csrs_iob_rdata_o (iob_rdata_o),
-      .iob_csrs_iob_ready_o (iob_ready_o)
+      .iob_csrs_iob_ready_o (iob_ready_o),
+      .iob_csrs_iob_rready_i(iob_rready_i)
    );
 
 endmodule

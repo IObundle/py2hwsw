@@ -1,0 +1,12 @@
+% SPDX-FileCopyrightText: 2025 IObundle
+%
+% SPDX-License-Identifier: MIT
+
+
+From the user's perspective, interacting with Py2HWSW is straightforward and intuitive. Users describe cores using dictionaries, lists, and strings, which are then converted internally into object representations of the correct class. The main attributes of Py2HWSW, such as ports, wires, and configuration, each have their own class, organizing the properties of each attribute. These attributes are described by a dictionary, where each key is a property, and are converted to the corresponding property of the class for the internal object representation when calling the Py2HWSW process.
+
+As described in the "Standard Interfaces" section, users only need to interact with Py2HWSW using standard interfaces based on dictionaries, lists, and strings. Internally, Py2HWSW converts these inputs into object representations, but these are usually only modified by developers. A typical user does not need to understand the inner workings of Py2HWSW, making it easy to use and focus on designing and developing hardware components.
+
+The iob\_core.py class is the central component of Py2HWSW, aggregating all the properties of an IP core. Its constructor is responsible for the setup process of the core, which involves converting and initializing the attributes of the core, setting up submodules (each one a new iob\_core instance), setting up superblocks (only if the current core is the top module or another superblock), and generating the sources for the current core in the build directory. If the current core is the top module, the setup process terminates by formatting and linting the code, as well as cleaning up temporary files from the build directory.
+
+In terms of dependencies, Py2HWSW itself has a minimal set of requirements, including Python and certain Python libraries, as well as optional dependencies such as formatters and linters like Black, Verible, and Verilator. These formatters can be skipped if the user chooses not to use formatting and linting during setup. The generated build directory, on the other hand, may have additional dependencies specific to the build process, such as Makefiles, Verilog compilers and simulators. However, these dependencies are independent of Py2HWSW and are only required for the build process. Makefiles are not a required dependency of Py2HWSW itself, but can be useful for automating the setup process and integrating Py2HWSW into a larger project workflow. 

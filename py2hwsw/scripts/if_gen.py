@@ -12,46 +12,253 @@ from dataclasses import dataclass, field
 from typing import Dict
 from iob_signal import iob_signal, iob_signal_reference
 
-mem_if_names = [
-    "rom_2p",
-    "rom_atdp",
-    "rom_sp",
-    "rom_tdp",
-    "ram_2p",
-    "ram_at2p",
-    "ram_atdp",
-    "ram_atdp_be",
-    "ram_sp",
-    "ram_sp_be",
-    "ram_sp_se",
-    "ram_t2p",
-    "ram_t2p_be",
-    "ram_t2p_tiled",
-    "ram_tdp",
-    "ram_tdp_be",
-    "ram_tdp_be_xil",
-    "regfile_2p",
-    "regfile_at2p",
-    "regfile_sp",
+mem_if_details = [
+    {
+        "name": "rom_2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "ROM 2 Port",
+    },
+    {
+        "name": "rom_atdp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "ROM Asynchronous True Dual Port",
+    },
+    {
+        "name": "rom_sp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "ROM Single Port",
+    },
+    {
+        "name": "rom_tdp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "ROM True Dual Port",
+    },
+    {
+        "name": "ram_2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM 2 Port",
+    },
+    {
+        "name": "ram_at2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Asynchronous True 2 Port",
+    },
+    {
+        "name": "ram_atdp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Asynchronous True Dual Port",
+    },
+    {
+        "name": "ram_atdp_be",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Asynchronous True Dual Port with Byte Enable",
+    },
+    {
+        "name": "ram_sp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Single Port",
+    },
+    {
+        "name": "ram_sp_be",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Single Port with Byte Enable",
+    },
+    {
+        "name": "ram_sp_se",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM Single Port with Single Enable",
+    },
+    {
+        "name": "ram_t2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True 2 Port",
+    },
+    {
+        "name": "ram_t2p_be",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True 2 Port with Byte Enable",
+    },
+    {
+        "name": "ram_t2p_tiled",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True 2 Port Tiled",
+    },
+    {
+        "name": "ram_tdp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True Dual Port",
+    },
+    {
+        "name": "ram_tdp_be",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True Dual Port with Byte Enable",
+    },
+    {
+        "name": "ram_tdp_be_xil",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "RAM True Dual Port with Byte Enable Xilinx",
+    },
+    {
+        "name": "regfile_2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "Register File 2 Port",
+    },
+    {
+        "name": "regfile_at2p",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "Register File Asynchronous True 2 Port",
+    },
+    {
+        "name": "regfile_sp",
+        "vendor": "IObundle",
+        "lib": "MEM",
+        "version": "1.0",
+        "full_name": "Register File Single Port",
+    },
 ]
 
-if_names = [
-    "clk_en_rst",
-    "clk_rst",
-    "iob_clk",
-    "iob",
-    "axil_read",
-    "axil_write",
-    "axil",
-    "axi_read",
-    "axi_write",
-    "axi",
-    "apb",
-    "axis",
-    "rs232",
-    "wb",
-    "wb_full",
-] + mem_if_names
+mem_if_names = [item["name"] for item in mem_if_details]
+
+if_details = [
+    {
+        "name": "iob_clk",
+        "vendor": "IObundle",
+        "lib": "CLK",
+        "version": "1.0",
+        "full_name": "Clock (configurable)",
+    },
+    {
+        "name": "iob",
+        "vendor": "IObundle",
+        "lib": "IOb",
+        "version": "1.0",
+        "full_name": "IOb",
+    },
+    {
+        "name": "axil_read",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI-Lite Read",
+    },
+    {
+        "name": "axil_write",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI-Lite Write",
+    },
+    {
+        "name": "axil",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI-Lite",
+    },
+    {
+        "name": "axi_read",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI Read",
+    },
+    {
+        "name": "axi_write",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI Write",
+    },
+    {
+        "name": "axi",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI",
+    },
+    {
+        "name": "apb",
+        "vendor": "ARM",
+        "lib": "APB",
+        "version": "4.0",
+        "full_name": "APB",
+    },
+    {
+        "name": "ahb",
+        "vendor": "ARM",
+        "lib": "AHB",
+        "version": "4.0",
+        "full_name": "AHB",
+    },
+    {
+        "name": "axis",
+        "vendor": "ARM",
+        "lib": "AXI",
+        "version": "4.0",
+        "full_name": "AXI Stream",
+    },
+    {
+        "name": "rs232",
+        "vendor": "Generic",
+        "lib": "RS232",
+        "version": "1.0",
+        "full_name": "RS232",
+    },
+    {
+        "name": "wb",
+        "vendor": "OPENCORES",
+        "lib": "Wishbone",
+        "version": "B4",
+        "full_name": "Wishbone",
+    },
+    {
+        "name": "wb_full",
+        "vendor": "OPENCORES",
+        "lib": "Wishbone",
+        "version": "B4",
+        "full_name": "Wishbone Full",
+    },
+] + mem_if_details
+
+if_names = [item["name"] for item in if_details]
 
 if_types = [
     "m_port",
@@ -70,14 +277,19 @@ if_types = [
 class interface:
     """Class to represent an interface for generation"""
 
+    # Type/Name of interface to generate
     type: str = ""
-    file_prefix: str = ""
+    # Prefix for signals of the interface
     prefix: str = ""
+    # Width multiplier. Used when concatenating multiple instances of the interface.
     mult: str | int = 1
-    params: str = "None"
+    # Generic string parameter that is passed to "get_<interface>_ports" function
+    params: str = None
+    # Dictionary of width properties of interface
     widths: Dict[str, str] = field(default_factory=dict)
-    # For ports only:
-    # For portmaps .vs only:
+    # Prefix for generated "Verilog Snippets" of this interface
+    file_prefix: str = ""
+    # Prefix for "Verilog snippets" of portmaps of this interface:
     portmap_port_prefix: str = ""
 
     def __post_init__(self):
@@ -89,15 +301,16 @@ def dict2interface(interface_dict):
     """Convert dictionary to 'interface' class instance.
     Example interface dict:
     {
-        "name": "cpu_i",
+        "name": "cpu_m",
+        "descr": "cpu instruction bus",
         "signals": {
             "type": "iob",
+            # Generic string parameter
             "params": "",
             # Widths/Other parameters
             "DATA_W": "DATA_W",
             "ADDR_W": "ADDR_W",
         },
-        "descr": "cpu instruction bus",
     },
     """
     if not interface_dict:
@@ -118,7 +331,7 @@ def dict2interface(interface_dict):
 def parse_widths(func):
     """Decorator to temporarily change values of global variables based on `widths` dictionary."""
 
-    def inner(widths={},params="None"):
+    def inner(widths={}, params=None):
         vars_backup = {}
         interface_name = func.__name__[4:-6]
         # Backup global variables
@@ -129,7 +342,7 @@ def parse_widths(func):
             vars_backup[k] = globals()[k]
             globals()[k] = v
         # Call the function
-        if params != "None":
+        if params is not None:
             return_obj = func(params)
         else:
             return_obj = func()
@@ -155,7 +368,7 @@ ADDR_W = 32
 
 #
 # below are functions that return interface ports for each interface type
-# the port direction is relative to the master module (driver)
+# the port direction is relative to the manager module (driver)
 #
 
 
@@ -197,13 +410,28 @@ def get_iob_ports():
             width=1,
             descr="Interface ready.",
         ),
+        iob_signal(
+            name="iob_rready_o",
+            width=1,
+            descr="Read data ready.",
+        ),
     ]
 
+
 @parse_widths
-def get_iob_clk_ports(params: str = "None"):
-    if params == "None":
+def get_iob_clk_ports(params: str = None):
+    if params is None:
         params = "cke_arst"
     params = params.split("_")
+    if (
+        all(x in params for x in ["arst", "arstn"])
+        or all(x in params for x in ["rst", "rstn"])
+        or all(x in params for x in ["en", "enn"])
+        or all(x in params for x in ["cke", "cken"])
+    ):
+        raise ValueError(
+            "All signals are mutually exclusive with their negated version"
+        )
     ports = [
         iob_signal(
             name="clk_o",
@@ -211,14 +439,20 @@ def get_iob_clk_ports(params: str = "None"):
             descr="Clock",
         )
     ]
+
     for port, descr in [
-        ("cke","Clock enable"),
-        ("arst","Asynchronous active-high reset"),
-        ("anrst","Asynchronous active-low reset"),
-        ("rst","Synchronous active-high reset"),
-        ("nrst","Synchronous active-low reset"),
-        ("en", "Enable")]:
+        ("cke", "Clock enable"),
+        ("cken", "Active-low clock enable"),
+        ("arst", "Asynchronous active-high reset"),
+        ("arstn", "Asynchronous active-low reset"),
+        ("rst", "Synchronous active-high reset"),
+        ("rstn", "Synchronous active-low reset"),
+        ("en", "Enable"),
+        ("enn", "Active-low enable"),
+    ]:
         if port in params:
+            if "low" in descr:
+                port = port[:-1] + "_n"
             ports.append(
                 iob_signal(
                     name=port + "_o",
@@ -228,39 +462,6 @@ def get_iob_clk_ports(params: str = "None"):
             )
     return ports
 
-
-
-@parse_widths
-def get_clk_rst_ports():
-    # deprecated
-    raise NotImplementedError("CLK_RST interface deprecateed in favor of IOB_CLK")
-    #return [
-        #iob_signal(
-            #name="clk_o",
-            #width=1,
-            #descr="Clock",
-        #),
-        #iob_signal(
-            #name="arst_o",
-            #width=1,
-            #descr="Asynchronous active-high reset",
-        #),
-    #]
-
-
-@parse_widths
-def get_clk_en_rst_ports():
-    raise NotImplementedError("CLK_EN_RST interface deprecateed in favor of IOB_CLK")
-#clk_rst_ports = get_clk_rst_ports()
-    #return [
-        #clk_rst_ports[0],
-        #iob_signal(
-            #name="cke_o",
-            #width=1,
-            #descr="Enable",
-        #),
-        #clk_rst_ports[1],
-    #]
 
 def get_mem_ports(
     suffix: str, async_clk: bool = False, addr: bool = True, enable: bool = True
@@ -273,7 +474,7 @@ def get_mem_ports(
             iob_signal(
                 name="addr" + suffix + "_o",
                 width=ADDR_W,
-                descr="Address port {suffix}",
+                descr=f"Address port {suffix}",
             )
         )
     if enable:
@@ -281,7 +482,7 @@ def get_mem_ports(
             iob_signal(
                 name="en" + suffix + "_o",
                 width=1,
-                descr="Enable port {suffix}",
+                descr=f"Enable port {suffix}",
             )
         )
     return [
@@ -291,6 +492,7 @@ def get_mem_ports(
             descr=f"Clock port {clk_suffix}",
         ),
     ] + extra_signals
+
 
 def get_mem_read_ports(
     suffix: str,
@@ -330,15 +532,18 @@ def get_mem_read_ports(
         iob_signal(
             name="r_data" + rd_suffix + "_i",
             width=DATA_W,
-            descr="Data port {suffix}",
-            isvar=True,
+            descr=f"Data port {suffix}",
         ),
     ] + extra_signals
     return mem_read_ports
 
 
 def get_mem_write_ports(
-    suffix: str, ready: bool = False, addr: bool = False, true: bool = False
+    suffix: str,
+    ready: bool = False,
+    addr: bool = False,
+    true: bool = False,
+    byte_enable: bool = False,
 ):
     suffix = f"_{suffix}" if suffix else ""
     wr_suffix = suffix if true else ""
@@ -359,16 +564,28 @@ def get_mem_write_ports(
                 descr=f"Write address port {suffix}",
             )
         )
+    if byte_enable:
+        extra_signals.append(
+            iob_signal(
+                name="w_strb" + suffix + "_o",
+                width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
+                descr=f"Write strobe port {suffix}",
+            )
+        )
+    else:  # No byte enable
+        extra_signals.append(
+            iob_signal(
+                name="w_en" + suffix + "_o",
+                width=1,
+                descr=f"Write enable port {suffix}",
+            )
+        )
+
     mem_write_ports = [
         iob_signal(
             name="w_data" + wr_suffix + "_o",
             width=DATA_W,
-            descr="Data port {suffix}",
-        ),
-        iob_signal(
-            name="w_strb" + suffix + "_o",
-            width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
-            descr="Write strobe port {suffix}",
+            descr=f"Data port {suffix}",
         ),
     ] + extra_signals
     return mem_write_ports
@@ -383,6 +600,7 @@ def remove_duplicates(ports):
             result.append(d)
     return result
 
+
 @parse_widths
 def get_rom_2p_ports():
     ports = (
@@ -392,10 +610,12 @@ def get_rom_2p_ports():
     )
     return remove_duplicates(ports)
 
+
 @parse_widths
 def get_rom_sp_ports():
     ports = get_mem_ports("") + get_mem_read_ports("")
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_rom_tdp_ports():
@@ -405,6 +625,7 @@ def get_rom_tdp_ports():
         + get_mem_read_ports("b", enable=True, addr=True, true=True)
     )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_rom_atdp_ports():
@@ -416,6 +637,7 @@ def get_rom_atdp_ports():
     )
     return remove_duplicates(ports)
 
+
 @parse_widths
 def get_ram_2p_ports():
     ports = (
@@ -424,6 +646,7 @@ def get_ram_2p_ports():
         + get_mem_write_ports("", ready=True, addr=True)
     )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_at2p_ports():
@@ -434,6 +657,7 @@ def get_ram_at2p_ports():
         + get_mem_write_ports("", addr=True)
     )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_atdp_ports():
@@ -447,22 +671,40 @@ def get_ram_atdp_ports():
     )
     return remove_duplicates(ports)
 
+
 @parse_widths
 def get_ram_atdp_be_ports():
-    return get_ram_atdp_ports()
+    ports = (
+        get_mem_ports("a", async_clk=True)
+        + get_mem_ports("b", async_clk=True)
+        + get_mem_read_ports("a", true=True)
+        + get_mem_read_ports("b", true=True)
+        + get_mem_write_ports("a", true=True, byte_enable=True)
+        + get_mem_write_ports("b", true=True, byte_enable=True)
+    )
+    return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_sp_ports():
     ports = get_mem_ports("") + get_mem_read_ports("") + get_mem_write_ports("")
     return remove_duplicates(ports)
 
+
 @parse_widths
 def get_ram_sp_be_ports():
-    return get_ram_sp_ports()
+    ports = (
+        get_mem_ports("")
+        + get_mem_read_ports("")
+        + get_mem_write_ports("", byte_enable=True)
+    )
+    return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_sp_se_ports():
     return get_ram_sp_ports()
+
 
 @parse_widths
 def get_ram_t2p_ports():
@@ -473,9 +715,16 @@ def get_ram_t2p_ports():
     )
     return remove_duplicates(ports)
 
+
 @parse_widths
 def get_ram_t2p_be_ports():
-    return get_ram_t2p_ports()
+    ports = (
+        get_mem_ports("", addr=False, enable=False)
+        + get_mem_read_ports("", enable=True, addr=True)
+        + get_mem_write_ports("", addr=True, byte_enable=True)
+    )
+    return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_t2p_tiled_ports():
@@ -485,6 +734,7 @@ def get_ram_t2p_tiled_ports():
         + get_mem_write_ports("")
     )
     return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_tdp_ports():
@@ -498,25 +748,39 @@ def get_ram_tdp_ports():
     )
     return remove_duplicates(ports)
 
+
 @parse_widths
 def get_ram_tdp_be_ports():
-    return get_ram_tdp_ports()
+    ports = (
+        get_mem_ports("a")
+        + get_mem_ports("b")
+        + get_mem_read_ports("a")
+        + get_mem_read_ports("b")
+        + get_mem_write_ports("a", byte_enable=True)
+        + get_mem_write_ports("b", byte_enable=True)
+    )
+    return remove_duplicates(ports)
+
 
 @parse_widths
 def get_ram_tdp_be_xil_ports():
-    return get_ram_tdp_ports()
+    return get_ram_tdp_be_ports()
+
 
 @parse_widths
 def get_regfile_2p_ports():
     raise NotImplementedError("REGFILE 2P not interface implemented")
 
+
 @parse_widths
 def get_regfile_at2p_ports():
     raise NotImplementedError("REGFILE AT2P not interface implemented")
 
+
 @parse_widths
 def get_regfile_sp_ports():
     raise NotImplementedError("REGFILE SP not interface implemented")
+
 
 #
 # AXI4
@@ -533,18 +797,27 @@ LEN_W = 8
 
 
 @parse_widths
-def get_axil_write_ports():
-    return [
+def get_axil_write_ports(params: str = None):
+    if params is None:
+        params = ""
+    params = params.split("_")
+
+    signals = [
         iob_signal(
             name="axil_awaddr_o",
             width=ADDR_W,
             descr="Address write channel address.",
         ),
-        iob_signal(
-            name="axil_awprot_o",
-            width=PROT_W,
-            descr="Address write channel protection type. Set to 000 if master output; ignored if slave input.",
-        ),
+    ]
+    if "prot" in params:
+        signals += [
+            iob_signal(
+                name="axil_awprot_o",
+                width=PROT_W,
+                descr="Address write channel protection type. Set to 000 if manager output; ignored if subordinate input.",
+            ),
+        ]
+    signals += [
         iob_signal(
             name="axil_awvalid_o",
             width=1,
@@ -591,21 +864,31 @@ def get_axil_write_ports():
             descr="Write response channel ready.",
         ),
     ]
+    return signals
 
 
 @parse_widths
-def get_axil_read_ports():
-    return [
+def get_axil_read_ports(params: str = None):
+    if params is None:
+        params = ""
+    params = params.split("_")
+
+    signals = [
         iob_signal(
             name="axil_araddr_o",
             width=ADDR_W,
             descr="Address read channel address.",
         ),
-        iob_signal(
-            name="axil_arprot_o",
-            width=PROT_W,
-            descr="Address read channel protection type. Set to 000 if master output; ignored if slave input.",
-        ),
+    ]
+    if "prot" in params:
+        signals += [
+            iob_signal(
+                name="axil_arprot_o",
+                width=PROT_W,
+                descr="Address read channel protection type. Set to 000 if manager output; ignored if subordinate input.",
+            ),
+        ]
+    signals += [
         iob_signal(
             name="axil_arvalid_o",
             width=1,
@@ -637,16 +920,17 @@ def get_axil_read_ports():
             descr="Read channel ready.",
         ),
     ]
+    return signals
 
 
 @parse_widths
-def get_axil_ports():
-    return get_axil_read_ports() + get_axil_write_ports()
+def get_axil_ports(params: str = None):
+    return get_axil_read_ports(params=params) + get_axil_write_ports(params=params)
 
 
 @parse_widths
-def get_axi_write_ports():
-    axil_write = get_axil_write_ports()
+def get_axi_write_ports(params: str = None):
+    axil_write = get_axil_write_ports(params=params)
 
     for port in axil_write:
         port.name = port.name.replace("axil", "axi")
@@ -680,7 +964,7 @@ def get_axi_write_ports():
         iob_signal(
             name="axi_awcache_o",
             width=CACHE_W,
-            descr="Address write channel memory type. Set to 0000 if master output; ignored if slave input.",
+            descr="Address write channel memory type. Set to 0000 if manager output; ignored if subordinate input.",
         ),
         iob_signal(
             name="axi_awqos_o",
@@ -701,8 +985,8 @@ def get_axi_write_ports():
 
 
 @parse_widths
-def get_axi_read_ports():
-    axil_read = get_axil_read_ports()
+def get_axi_read_ports(params: str = None):
+    axil_read = get_axil_read_ports(params=params)
 
     for port in axil_read:
         port.name = port.name.replace("axil", "axi")
@@ -736,7 +1020,7 @@ def get_axi_read_ports():
         iob_signal(
             name="axi_arcache_o",
             width=CACHE_W,
-            descr="Address read channel memory type. Set to 0000 if master output; ignored if slave input.",
+            descr="Address read channel memory type. Set to 0000 if manager output; ignored if subordinate input.",
         ),
         iob_signal(
             name="axi_arqos_o",
@@ -757,13 +1041,17 @@ def get_axi_read_ports():
 
 
 @parse_widths
-def get_axi_ports():
-    return get_axi_read_ports() + get_axi_write_ports()
+def get_axi_ports(params: str = None):
+    return get_axi_read_ports(params=params) + get_axi_write_ports(params=params)
 
 
 @parse_widths
-def get_axis_ports():
-    return [
+def get_axis_ports(params: str = None):
+    if params is None:
+        params = ""
+    params = params.split("_")
+
+    signals = [
         iob_signal(
             name="axis_tvalid_o",
             width=1,
@@ -779,12 +1067,17 @@ def get_axis_ports():
             width=DATA_W,
             descr="axis stream data.",
         ),
-        iob_signal(
+        
+    ]
+    if "tlast" in params:
+        signals += [
+            iob_signal(
             name="axis_tlast_o",
             width=1,
             descr="axis stream last.",
         ),
     ]
+    return signals
 
 
 #
@@ -803,7 +1096,7 @@ def get_apb_ports():
         iob_signal(
             name="apb_sel_o",
             width=1,
-            descr="Slave select.",
+            descr="Subordinate select.",
         ),
         iob_signal(
             name="apb_enable_o",
@@ -834,6 +1127,85 @@ def get_apb_ports():
             name="apb_ready_i",
             width=1,
             descr="Ready. Indicates the end of a transfer.",
+        ),
+    ]
+
+
+#
+# AHB
+#
+AHB_PROT_W = 4
+AHB_BURST_W = 3
+AHB_TRANS_W = 2
+
+
+@parse_widths
+def get_ahb_ports():
+    return [
+        iob_signal(
+            name="ahb_addr_o",
+            width=ADDR_W,
+            descr="Byte address of the transfer.",
+        ),
+        iob_signal(
+            name="ahb_burst_o",
+            width=AHB_BURST_W,
+            descr="Burst size.",
+        ),
+        iob_signal(
+            name="ahb_mastlock_o",
+            width=1,
+            descr="Current transfer is locked sequence.",
+        ),
+        iob_signal(
+            name="ahb_prot_o",
+            width=AHB_PROT_W,
+            descr="Byte address of the transfer.",
+        ),
+        iob_signal(
+            name="ahb_size_o",
+            width=SIZE_W,
+            descr="Size of transfer.",
+        ),
+        iob_signal(
+            name="ahb_trans_o",
+            width=AHB_TRANS_W,
+            descr="Transfer type.",
+        ),
+        iob_signal(
+            name="ahb_wdata_o",
+            width=DATA_W,
+            descr="Write data.",
+        ),
+        iob_signal(
+            name="ahb_wstrb_o",
+            width=try_math_eval(f"{DATA_W}/{8}"),
+            descr="Write strobe.",
+        ),
+        iob_signal(
+            name="ahb_write_o",
+            width=1,
+            descr="Transfer direction: (1) Write; (0) Read.",
+        ),
+        iob_signal(
+            name="ahb_rdata_i",
+            width=DATA_W,
+            descr="Read data.",
+        ),
+        iob_signal(
+            name="ahb_readyout_i",
+            width=1,
+            descr="Transfer finished on the bus.",
+        ),
+        iob_signal(
+            name="ahb_resp_i",
+            width=1,
+            descr="Transfer response: (0) Okay; (1) Error.",
+        ),
+        iob_signal(
+            name="ahb_sel_o",
+            width=1,
+            descr="Subordinate select.",
         ),
     ]
 
@@ -926,7 +1298,7 @@ def get_wb_ports():
             descr="Data input.",
         ),
         iob_signal(
-            name="wb_dat_o",
+            name="wb_datout_o",
             width=DATA_W,
             descr="Data output.",
         ),
@@ -1164,7 +1536,7 @@ def write_single_wire(fout, prefix, wire, for_tb):
     if for_tb:
         wire_name = wire_name + get_suffix(reverse_direction(wire.direction))
         wtype = get_tbsignal_type(wire.direction)
-    if wire.isvar or wire.isreg:
+    if wire.isvar:
         wtype = "reg"
     width_str = f" [{wire.width}-1:0] "
     fout.write(wtype + width_str + wire_name + ";\n")
@@ -1193,10 +1565,10 @@ def write_s_tb_wire(fout, prefix, wires):
 #
 
 
-def get_signals(name, if_type="", mult=1, widths={}, params="None", signal_prefix=""):
+def get_signals(name, if_type="", mult=1, widths={}, params=None, signal_prefix=""):
     """Get list of signals for given interface
     param if_type: Type of interface.
-                   Examples: '' (unspecified), 'master', 'slave', ...
+                   Examples: '' (unspecified), 'manager', 'subordinate', ...
     param mult: Multiplication factor for all signal widths.
     param widths: Dictionary for configuration of specific signal widths.
     """
@@ -1205,7 +1577,7 @@ def get_signals(name, if_type="", mult=1, widths={}, params="None", signal_prefi
     signals = eval(eval_str)
 
     # Set direction according to if_type
-    if if_type == "slave":
+    if if_type == "subordinate":
         signals = reverse_signals_dir(signals)
     # TODO: Code to support other if_types
     # For example, the rs232 has not type.
@@ -1245,9 +1617,17 @@ def gen_if(interface):
 
         # get ports
         if if_type.startswith("s"):
-            ports = get_signals(name=name, if_type="slave", mult=mult, widths=widths, params=params)
+            ports = get_signals(
+                name=name,
+                if_type="subordinate",
+                mult=mult,
+                widths=widths,
+                params=params,
+            )
         else:
-            ports = get_signals(name=name, if_type="master", mult=mult, widths=widths, params=params)
+            ports = get_signals(
+                name=name, if_type="manager", mult=mult, widths=widths, params=params
+            )
 
         eval_str = f"write_{if_type}(fout, prefix1,{prefix2_str} ports)"
         # print(eval_str, prefix1)
@@ -1264,7 +1644,9 @@ def gen_wires(interface):
     params = interface.params
     widths = interface.widths
 
-    signals = get_signals(name=name, if_type="", mult=mult, widths=widths, params=params)
+    signals = get_signals(
+        name=name, if_type="", mult=mult, widths=widths, params=params
+    )
 
     fout = open(file_prefix + name + "_wire.vs", "w")
     write_wire(fout, prefix, signals)

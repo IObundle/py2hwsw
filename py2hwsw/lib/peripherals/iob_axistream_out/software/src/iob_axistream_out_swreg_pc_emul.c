@@ -12,23 +12,23 @@
 
 // Base Address
 static int base;
-void IOB_AXISTREAM_OUT_INIT_BASEADDR(uint32_t addr) { base = addr; }
+void iob_axistream_out_csrs_init_baseaddr(uint32_t addr) { base = addr; }
 
 // Core Setters and Getters
-void IOB_AXISTREAM_OUT_SET_DATA(uint32_t value) {}
+void iob_axistream_out_csrs_set_data(uint32_t value) {}
 
-uint8_t IOB_AXISTREAM_OUT_GET_FULL() { return 0x00; }
+uint8_t iob_axistream_out_csrs_get_full() { return 0x00; }
 
-void IOB_AXISTREAM_OUT_SET_SOFT_RESET(uint8_t value) {}
+void iob_axistream_out_csrs_set_soft_reset(uint8_t value) {}
 
-void IOB_AXISTREAM_OUT_SET_ENABLE(uint8_t value) {}
+void iob_axistream_out_csrs_set_enable(uint8_t value) {}
 
-void IOB_AXISTREAM_OUT_SET_WSTRB(uint8_t value) {}
+void iob_axistream_out_csrs_set_wstrb(uint8_t value) {}
 
-void IOB_AXISTREAM_OUT_SET_LAST(uint8_t value) {}
+void iob_axistream_out_csrs_set_last(uint8_t value) {}
 
-void IOB_AXISTREAM_OUT_SET_FIFO_THRESHOLD(uint32_t value) {}
+void iob_axistream_out_csrs_set_fifo_threshold(uint32_t value) {}
 
-uint32_t IOB_AXISTREAM_OUT_GET_FIFO_LEVEL() { return 0x00; }
+uint32_t iob_axistream_out_csrs_get_fifo_level() { return 0x00; }
 
-uint16_t IOB_AXISTREAM_OUT_GET_VERSION() { return 0xaaaa; }
+uint16_t iob_axistream_out_csrs_get_version() { return 0xaaaa; }

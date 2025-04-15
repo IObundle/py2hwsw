@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -55,9 +54,10 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-   localparam INIT_RAM = (MEM_INIT_FILE_INT != "none") ? 1 : 0;
+   localparam INIT_RAM = (MEM_INIT_FILE_INT != "none.hex") ? 1 : 0;
             // Declare the ROM
    reg [DATA_W-1:0] rom[(2**ADDR_W)-1:0];
+   reg [DATA_W-1:0] r_data_int;
 
    // Initialize the ROM
    generate
@@ -68,7 +68,9 @@ def setup(py_params_dict):
 
    // Operate the ROM
    always @(posedge clk_i) if (en_i) 
-   r_data_o <= rom[addr_i];
+   r_data_int <= rom[addr_i];
+
+   assign r_data_o = r_data_int;
             """,
             },
         ],

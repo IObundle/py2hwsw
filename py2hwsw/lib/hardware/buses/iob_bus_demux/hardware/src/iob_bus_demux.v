@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ps
 
-// Split the IOb native interface, from a single master to multiple followers
+// Split the IOb native interface, from a single manager to multiple followers
 module iob_bus_demux #(
    parameter ADDR_W = 32,
    parameter DATA_W = 32,
@@ -13,7 +13,7 @@ module iob_bus_demux #(
 ) (
    `include "iob_bus_demux_clk_rst_s_port.vs"
 
-   // Master's interface
+   // Manager's interface
    input                 m_valid_i,
    input  [ADDR_W-1:0]   m_addr_i,
    input  [DATA_W-1:0]   m_wdata_i,
@@ -40,7 +40,7 @@ module iob_bus_demux #(
    //
 
    wire [NB-1:0] f_sel_r;
-   iob_reg_e #(
+   iob_reg_cear_e #(
       .DATA_W (NB),
       .RST_VAL(0)
    ) reg_f_sel (
@@ -52,7 +52,7 @@ module iob_bus_demux #(
    );
 
    //
-   // Route master request to selected follower
+   // Route manager request to selected follower
    //
 
    iob_demux #(
@@ -92,7 +92,7 @@ module iob_bus_demux #(
    );
 
    //
-   // Route selected follower response to master
+   // Route selected follower response to manager
    //
 
    iob_mux #(

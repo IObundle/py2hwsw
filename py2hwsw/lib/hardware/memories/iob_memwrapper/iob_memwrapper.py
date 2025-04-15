@@ -4,9 +4,10 @@
 
 import copy
 import os
-import math
+import sys
 from latex import write_table
-from iob_base import find_obj_in_list
+from iob_base import find_obj_in_list, import_python_module
+from iob_core import find_module_setup_dir
 
 
 def setup(py_params_dict):
@@ -21,18 +22,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": f"{attrs['name']}_mwrap",
         "generate_hw": True,
-        "version": "0.1",
-        "confs": attrs["confs"]
-        + [
-            {
-                "name": "MEM_NO_READ_ON_WRITE",
-                "type": "P",
-                "val": "0",
-                "min": "0",
-                "max": "1",
-                "descr": "No simultaneous read/write",
-            },
-        ],
+        "confs": attrs["confs"],
     }
 
     mwrap_wires = []
@@ -70,32 +60,52 @@ def setup(py_params_dict):
         else:
             prefix_str = wire["name"] + "_"
 
-        # Word address bus width
-        word_addr_w = wire["signals"].get("ADDR_W", 32)
+        signals_type = wire["signals"]["type"]
+
+        # Instance name
+        name = f"{prefix_str}mem"
+        # Memory type
+        type = f"iob_{signals_type}"
         # Data bus width
         data_w = wire["signals"].get("DATA_W", 32)
-
+        # Address bus width
+        word_addr_w = wire["signals"].get("ADDR_W", 32)
+        # Memory init hexfile name
         hexfile_param = f"{prefix_str.upper()}HEXFILE"
+        hexfile_obj = find_obj_in_list(attrs["confs"], hexfile_param)
+        if hexfile_obj is None:
+            hexfile = "none"
+            hexfile_param = '"none"'
+        else:
+            hexfile = hexfile_obj["val"]
+
+        # Add memory instance to list
         list_of_mems.append(
             {
-                "name": f"{prefix_str}mem",
-                "type": f"iob_{wire['signals']['type']}",
-                # Get default values of parameters
+                "name": name,
+                "type": type,
                 "addr_w": word_addr_w,
                 "data_w": data_w,
-                "hexfile": find_obj_in_list(attrs["confs"], hexfile_param)["val"],
+                "hexfile": hexfile,
             }
         )
 
         # Extra Verilog parameters for this memory subblock
         extra_params = {}
-        if "ram" in list_of_mems[-1]["type"]:
-            extra_params["MEM_NO_READ_ON_WRITE"] = "MEM_NO_READ_ON_WRITE"
+        if "ram" in type:
+            # check if memory module has MEM_NO_READ_ON_WRITE conf
+            mem_dir, file_ext = find_module_setup_dir(type)
+            import_python_module(os.path.join(mem_dir, f"{type}.py"))
+            mem_module = sys.modules[type]
+            mem_dict = mem_module.setup({})
+            if "MEM_NO_READ_ON_WRITE" in mem_dict["confs"]:
+                extra_params["MEM_NO_READ_ON_WRITE"] = mem_dict["MEM_NO_READ_ON_WRITE"]
 
+        # Add memory instace to subblocks list
         attributes_dict["subblocks"].append(
             {
-                "core_name": list_of_mems[-1]["type"],
-                "instance_name": list_of_mems[-1]["name"],
+                "core_name": type,
+                "instance_name": name,
                 "parameters": {
                     "DATA_W": data_w,
                     "ADDR_W": word_addr_w,
@@ -103,13 +113,32 @@ def setup(py_params_dict):
                 }
                 | extra_params,
                 "connect": {
-                    f"{wire['signals']['type']}_s": wire["name"],
+                    f"{signals_type}_s": wire["name"],
                 },
             }
         )
 
     if "superblocks" in attrs:
         attributes_dict["superblocks"] = attrs["superblocks"]
+
+    # Add MEM_NO_READ_ON_WRITE to the attributes dictionary
+    # if the user has not set it
+    has_mem_no_read_on_write_in_attrs = False
+    for conf in attrs["confs"]:
+        if conf["name"] == "MEM_NO_READ_ON_WRITE":
+            has_mem_no_read_on_write_in_attrs = True
+            break
+    if not has_mem_no_read_on_write_in_attrs:
+        attributes_dict["confs"] += [
+            {
+                "name": "MEM_NO_READ_ON_WRITE",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "1",
+                "descr": "No simultaneous read/write",
+            },
+        ]
 
     # Generate LaTeX table of memories
     # But don't create files for other targets (like clean)

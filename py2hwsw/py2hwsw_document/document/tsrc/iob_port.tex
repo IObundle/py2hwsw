@@ -11,8 +11,8 @@ An interface is a group of hardware ports (signals) that may be generic or follo
 Due to the similarities between a port and a wire, this class inherits the attributes from the `iob\_wire` class (Section~\ref{sec:iob_wire}).
 Besides the inherited attributes, the class contains a set of new port specific attributes, each preceded by a comment describing the purpose of the attribute.
 
-\lstinputlisting[firstline=19,lastline=29,language=Python]{iob_port.py}
-\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_port.py}{View Source}
+% Show attributes of iob_port
+% py2_macro: class_attributes iob_port from iob_port.py
 
 Similar to the `iob\_wire` class, the `signals` attribute stores a list of signal objects, represented by the `iob\_signal` class  (Section~\ref{sec:iob_signal}).
 
@@ -22,5 +22,5 @@ Similar to the `iob\_wire` class, the `signals` attribute stores a list of signa
 
 The py2hwsw tool uses the `generate\_ports` method from the `io\_gen.py` script to generate the Verilog code for the port based on the attributes from the corresponding instance of the `iob\_port` class.
 
-\lstinputlisting[firstline=28,lastline=53,language=Python]{io_gen.py}
-\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/io_gen.py}{View Source}
+% Show verilog generator function for ports
+% py2_macro: listing generate_ports from io_gen.py

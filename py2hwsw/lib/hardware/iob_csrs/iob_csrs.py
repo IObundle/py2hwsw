@@ -8,8 +8,8 @@ import os
 # Add csrs scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
 
-import reg_gen
-from iob_csr import create_csr_group
+from reg_gen import generate_csr
+from csr_classes import create_csr_group
 from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
 
@@ -23,8 +23,10 @@ def setup(py_params_dict):
     params = {
         # Use the same name as instantiator + the suffix "_csrs"
         "name": py_params_dict["instantiator"]["name"] + "_csrs",
-        # Version of the CSRs module
-        "version": "1.0",
+        # Destination directory
+        "dest_dir": py_params_dict["dest_dir"],
+        # Version of the CSRs module (by default use same version as py2hwsw)
+        "version": py_params_dict["py2hwsw_version"],
         # Type of interface for CSR bus
         "csr_if": "iob",
         # List of Control Status Registers (CSRs)
@@ -87,6 +89,7 @@ def setup(py_params_dict):
     attributes_dict = {
         "name": params["name"],
         "generate_hw": True,
+        "dest_dir": params["dest_dir"],
         "version": params["version"],
         "confs": confs,
         "ports": [
@@ -120,8 +123,11 @@ def setup(py_params_dict):
                 "instantiate": False,
             },
             {
-                "core_name": "iob_reg_e",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_e_inst",
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_en",
+                },
                 "instantiate": False,
             },
         ],
@@ -146,7 +152,7 @@ def setup(py_params_dict):
     }
 
     # Generate snippets
-    csr_gen_obj, reg_table = reg_gen.generate_csr(attributes_with_csrs)
+    csr_gen_obj, reg_table = generate_csr(attributes_with_csrs)
 
     # Store reg_table in static dict
     global static_reg_tables
@@ -158,25 +164,6 @@ def setup(py_params_dict):
         reg_table,
         attributes_with_csrs["build_dir"] + "/document/tsrc",
     )
-
-    # Auto-add VERSION macro
-    found_version_macro = False
-    if attributes_with_csrs["confs"]:
-        for macro in attributes_with_csrs["confs"]:
-            if macro["name"] == "VERSION":
-                found_version_macro = True
-    if not found_version_macro:
-        attributes_with_csrs["confs"].append(
-            {
-                "name": "VERSION",
-                "type": "M",
-                "val": "16'h"
-                + reg_gen.version_str_to_digits(attributes_with_csrs["version"]),
-                "min": "NA",
-                "max": "NA",
-                "descr": "Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
-            }
-        )
 
     # Add ports and internal wires for registers
     auto_ports, auto_wires, auto_snippet = csr_gen_obj.gen_ports_wires(reg_table)

@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": False,
         "confs": [
             {
@@ -28,7 +27,7 @@ def setup(py_params_dict):
                 "name": "ADDR_W",
                 "descr": "",
                 "type": "P",
-                "val": "21",
+                "val": "AXIL_ADDR_W",
                 "min": "1",
                 "max": "32",
             },
@@ -36,7 +35,7 @@ def setup(py_params_dict):
                 "name": "DATA_W",
                 "descr": "",
                 "type": "P",
-                "val": "21",
+                "val": "AXIL_DATA_W",
                 "min": "1",
                 "max": "32",
             },
@@ -49,7 +48,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "iob_s",
-                "descr": "Slave IOb interface",
+                "descr": "Subordinate IOb interface",
                 "signals": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",
@@ -58,7 +57,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axil_m",
-                "descr": "Master AXI Lite interface",
+                "descr": "Manager AXI Lite interface",
                 "signals": {
                     "type": "axil",
                     "ADDR_W": "AXIL_ADDR_W",

@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import copy
 from types import SimpleNamespace
+import pathlib
 
 import iob_colors
 
@@ -26,8 +27,10 @@ import doc_gen
 import verilog_gen
 import ipxact_gen
 
+from py2hwsw_version import PY2HWSW_VERSION
+from iob_python_parameter import create_python_parameter_group
 from if_gen import mem_if_names
-from iob_module import iob_module
+from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
     find_obj_in_list,
@@ -38,6 +41,7 @@ from iob_base import (
     add_traceback_msg,
     debug,
 )
+from iob_license import iob_license, update_license
 import sw_tools
 import verilog_format
 import verilog_lint
@@ -58,6 +62,8 @@ class iob_core(iob_module, iob_instance):
     global_special_target: str = ""
     # Clang format rules
     global_clang_format_rules_filepath: str = None
+    # List of callbacks to run at post setup stage
+    global_post_setup_callbacks: list = []
 
     def __init__(self, *args, **kwargs):
         """Build a core (includes module and instance attributes)
@@ -89,7 +95,7 @@ class iob_core(iob_module, iob_instance):
         is_parent = kwargs.get("is_parent", False)
 
         # Store kwargs to allow access to python parameters after object has been created
-        self.python_parameters = kwargs
+        self.received_python_parameters = kwargs
 
         # Create core based on 'parent' core (if applicable)
         if self.handle_parent(*args, **kwargs):
@@ -102,9 +108,9 @@ class iob_core(iob_module, iob_instance):
         self.update_global_top_module(attributes)
         self.set_default_attribute(
             "version",
-            "",
+            PY2HWSW_VERSION,
             str,
-            descr="Core version.",
+            descr="Core version. By default is the same as Py2HWSW version.",
         )
         self.set_default_attribute(
             "previous_version",
@@ -114,7 +120,7 @@ class iob_core(iob_module, iob_instance):
         )
         self.set_default_attribute(
             "setup_dir",
-            "",
+            kwargs.get("setup_dir", ""),
             str,
             descr="Path to root setup folder of the core.",
         )
@@ -123,6 +129,12 @@ class iob_core(iob_module, iob_instance):
             "",
             str,
             descr="Path to folder of build directory to be generated for this project.",
+        )
+        self.set_default_attribute(
+            "instance_name",
+            "",
+            str,
+            descr="Name of an instance of this class.",
         )
         self.set_default_attribute(
             "use_netlist",
@@ -184,6 +196,21 @@ class iob_core(iob_module, iob_instance):
             bool,
             descr="Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).",
         )
+        # List of core Python Parameters (for documentation)
+        self.set_default_attribute(
+            "python_parameters",
+            [],
+            list,
+            get_list_attr_handler(self.create_python_parameter_group),
+            descr="List of core Python Parameters. Used for documentation.",
+        )
+        self.set_default_attribute(
+            "license",
+            iob_license(),  # Create a default license
+            iob_license,
+            lambda y: update_license(self, **y),
+            descr="License for the core.",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 
@@ -223,6 +250,14 @@ class iob_core(iob_module, iob_instance):
             ):
                 superblocks = self.__create_memwrapper(superblocks=superblocks)
 
+        # Add 'VERSION' macro
+        self.create_conf_group(
+            name="VERSION",
+            type="M",
+            val="16'h" + self.version_str_to_digits(self.version),
+            descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
+        )
+
         # Ensure superblocks are set up last
         # and only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
@@ -233,7 +268,6 @@ class iob_core(iob_module, iob_instance):
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
-        self.setup_dir = find_module_setup_dir(self.original_name)[0]
         # print(
         #     f"DEBUG: {self.name} {self.original_name} {self.build_dir} {self.is_top_module}",
         #     file=sys.stderr,
@@ -314,22 +348,38 @@ class iob_core(iob_module, iob_instance):
         # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
         self._remove_duplicate_sources()
         if self.is_tester:
-            # Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
-            self._remove_duplicate_sources(
-                main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
-                subfolders=[
-                    "hardware/src",
-                    "hardware/simulation/src",
-                    "hardware/fpga/src",
-                    "hardware/common_src",
-                ],
+            # Add callback to: Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
+            __class__.global_post_setup_callbacks.append(
+                lambda: self._remove_duplicate_sources(
+                    main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
+                    subfolders=[
+                        "hardware/src",
+                        "hardware/simulation/src",
+                        "hardware/fpga/src",
+                        "hardware/common_src",
+                    ],
+                )
             )
+        else:  # Not tester
+            # Run post setup callbacks
+            for callback in __class__.global_post_setup_callbacks:
+                callback()
         # Generate docs
         doc_gen.generate_docs(self)
         # Generate ipxact file
         ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
+        # Remove 'iob_v_tb.v' from build dir if 'iob_v_tb.vh' does not exist
+        sim_src_dir = "hardware/simulation/src"
+        if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
+            os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
         # Lint and format sources
         self.lint_and_format()
+        print(
+            f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
+        )
+
+    def create_python_parameter_group(self, *args, **kwargs):
+        create_python_parameter_group(self, *args, **kwargs)
 
     def handle_parent(self, *args, **kwargs):
         """Create a new core based on parent core.
@@ -357,7 +407,7 @@ class iob_core(iob_module, iob_instance):
         name = attributes.get("name", attributes["original_name"])
         # Update global build dir to match this module's name and version
         if is_first_module_called and not __class__.global_build_dir:
-            version = attributes.get("version", "1.0")
+            version = attributes.get("version", PY2HWSW_VERSION)
             __class__.global_build_dir = f"../{name}_V{version}"
 
         filtered_parent_py_params = dict(parent)
@@ -365,6 +415,7 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
         filtered_parent_py_params.pop("instantiator", None)
+        filtered_parent_py_params.pop("py2hwsw_version", None)
         filtered_parent_py_params.pop("connect", None)
         filtered_parent_py_params.pop("parameters", None)
         if "name" not in filtered_parent_py_params:
@@ -384,9 +435,10 @@ class iob_core(iob_module, iob_instance):
             parameters=kwargs.get("parameters", {}),
         )
 
-        # Copy parent attributes to child
+        # Copy (some) parent attributes to child
         self.__dict__.update(parent_module.__dict__)
-        self.setup_dir = find_module_setup_dir(attributes["original_name"])[0]
+        self.original_name = attributes["original_name"]
+        self.setup_dir = attributes["setup_dir"]
 
         if self.abort_reason:
             return True
@@ -450,7 +502,7 @@ class iob_core(iob_module, iob_instance):
         if __class__.global_top_module == self:
             original_name = attributes.get("original_name", self.__class__.__name__)
             name = attributes.get("name", self.original_name)
-            version = attributes.get("version", "1.0")
+            version = attributes.get("version", PY2HWSW_VERSION)
             # Set attributes
             if not hasattr(self, "original_name") or not self.original_name:
                 self.original_name = original_name
@@ -512,8 +564,19 @@ class iob_core(iob_module, iob_instance):
         _signals.update(port.interface.widths)
         for p in instantiator.ports:
             if p.interface:
-                if p.interface.type == port.interface.type and p.interface.prefix == port.interface.prefix:
-                    p.interface.params = "_".join(filter(None, [p.interface.params, port.interface.params]))
+                if (
+                    p.interface.type == port.interface.type
+                    and p.interface.prefix == port.interface.prefix
+                ):
+                    if p.interface.params != port.interface.params:
+                        p.interface.params = "_".join(
+                            filter(
+                                lambda x: x != "None",
+                                [p.interface.params, port.interface.params],
+                            )
+                        )
+                        p.signals = []
+                        p.__post_init__()
                     port.connect_external(p, bit_slices=[])
                     return
         instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
@@ -678,7 +741,7 @@ class iob_core(iob_module, iob_instance):
         verilog_sources = []
         for path in Path(os.path.join(self.build_dir, "hardware")).rglob("*.vh"):
             # Skip specific Verilog headers
-            if path.name.endswith("version.vh") or "test_" in path.name:
+            if "test_" in path.name:
                 continue
             # Skip synthesis directory # TODO: Support this?
             if "/syn/" in str(path):
@@ -742,7 +805,11 @@ class iob_core(iob_module, iob_instance):
             core_dict = json.load(f)
 
         default_core_name = os.path.splitext(os.path.basename(filepath))[0]
-        py2_core_dict = {"original_name": default_core_name, "name": default_core_name}
+        py2_core_dict = {
+            "original_name": default_core_name,
+            "name": default_core_name,
+            "setup_dir": os.path.dirname(filepath),
+        }
         py2_core_dict.update(core_dict)
 
         return cls.py2hw(py2_core_dict, **kwargs)
@@ -758,12 +825,12 @@ class iob_core(iob_module, iob_instance):
         if not os.path.exists(module.build_dir):
             return
         print(
-            f"{iob_colors.INFO}Cleaning build directory: {module.build_dir}{iob_colors.ENDC}"
+            f"{iob_colors.INFO}Cleaning build directory: '{module.build_dir}'.{iob_colors.ENDC}"
         )
         os.system(f"make -C {module.build_dir} clean")
         shutil.rmtree(module.build_dir)
         print(
-            f"{iob_colors.INFO}Cleaning complete. Removed: {module.build_dir}{iob_colors.ENDC}"
+            f"{iob_colors.INFO}Cleaning complete. Removed: '{module.build_dir}'.{iob_colors.ENDC}"
         )
 
     @staticmethod
@@ -775,14 +842,12 @@ class iob_core(iob_module, iob_instance):
         module = __class__.get_core_obj(core_name)
         # Don't try to deliver if build dir doesn't exist
         if not os.path.exists(module.build_dir):
-            #print error and exit 
+            # print error and exit
             print(
                 f"{iob_colors.FAIL}Build directory not found: {module.build_dir}{iob_colors.ENDC}"
-                )
-            exit(1)
-        print(
-            f"{iob_colors.INFO}Delivering core: {core_name} {iob_colors.ENDC}"
             )
+            exit(1)
+        print(f"{iob_colors.INFO}Delivering core: {core_name} {iob_colors.ENDC}")
         os.system(f"CORE={core_name} BUILD_DIR={module.build_dir} delivery.sh")
 
     @staticmethod
@@ -820,18 +885,15 @@ class iob_core(iob_module, iob_instance):
         print(json.dumps(module.attributes_dict, indent=4))
 
     @staticmethod
-    def print_py2hwsw_attributes(core_name, **kwargs):
-        """Print the supported py2hw attributes of this core.
-        The attributes listed can be used in the 'attributes' dictionary of the
-        constructor. This defines the information supported by the py2hw interface.
+    def print_py2hwsw_attributes():
+        """Print the supported attributes of the py2hwsw interface.
+        The attributes listed can be used in the 'attributes' dictionary of cores.
         """
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_attributes"
-        # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name, **kwargs)
-        print(
-            f"Attributes supported by the '{module.name}' core's 'py2hwsw' interface:"
-        )
+        # Build a new dummy module instance, to obtain its attributes
+        module = __class__()
+        print("Attributes supported by the 'py2hwsw' core dictionary interface:")
         for name in module.ATTRIBUTE_PROPERTIES.keys():
             datatype = module.ATTRIBUTE_PROPERTIES[name].datatype
             descr = module.ATTRIBUTE_PROPERTIES[name].descr
@@ -868,10 +930,15 @@ class iob_core(iob_module, iob_instance):
                     "instantiator": (
                         instantiator.attributes_dict if instantiator else ""
                     ),
+                    "py2hwsw_version": PY2HWSW_VERSION,
                     **kwargs,
                 }
             )
-            py2_core_dict = {"original_name": core_name, "name": core_name}
+            py2_core_dict = {
+                "original_name": core_name,
+                "name": core_name,
+                "setup_dir": core_dir,
+            }
             py2_core_dict.update(core_dict)
             instance = __class__.py2hw(
                 py2_core_dict,
@@ -897,7 +964,7 @@ class iob_core(iob_module, iob_instance):
             original_name="py2hwsw",
             name="py2hwsw",
             setup_dir=os.path.join(os.path.dirname(__file__), "../py2hwsw_document"),
-            build_dir="py2hwsw_docs",
+            build_dir="py2hwsw_generated_docs",
         )
         copy_srcs.doc_setup(core)
         copy_srcs.copy_rename_setup_subdir(core, "document")
@@ -905,6 +972,25 @@ class iob_core(iob_module, iob_instance):
             f.write("NAME=Py2HWSW\n")
         with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
             f.write(py2_version)
+        # Build a new dummy module instance, to obtain its attributes
+        __class__.global_special_target = "print_attributes"
+        dummy_module = __class__()
+        doc_gen.generate_tex_py2hwsw_attributes(
+            dummy_module, f"{core.build_dir}/document/tsrc"
+        )
+        doc_gen.generate_tex_core_lib(f"{core.build_dir}/document/tsrc")
+        doc_gen.generate_tex_py2hwsw_standard_py_params(
+            f"{core.build_dir}/document/tsrc"
+        )
+        doc_gen.process_tex_macros(f"{core.build_dir}/document/tsrc")
+
+    @staticmethod
+    def version_str_to_digits(version_str):
+        """Given a version string (like "V0.12"), return a 4 digit string representing
+        the version (like "0012")"""
+        version_str = version_str.replace("V", "")
+        major_ver, minor_ver = version_str.split(".")
+        return f"{int(major_ver):02d}{int(minor_ver):02d}"
 
 
 def find_common_deep(path1, path2):
@@ -945,6 +1031,20 @@ def find_module_setup_dir(core_name):
         )
 
     file_ext = os.path.splitext(file_path)[1]
+
+    filepath = pathlib.Path(file_path)
+    # Force core file to be contained in a folder with the same name.
+    # Skip this check if we are the top module (no top defined) or trying to setup the top module again (same name as previous defined top)
+    if filepath.parent.name != core_name and (
+        iob_core.global_top_module
+        and core_name != iob_core.global_top_module.original_name
+    ):
+        fail_with_msg(
+            f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
+            f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
+            f"But found incorrect path:    '{filepath.resolve()}'."
+        )
+
     # print("Found setup dir based on location of: " + file_path, file=sys.stderr)
     if file_ext == ".py" or file_ext == ".json":
         return os.path.dirname(file_path), file_ext

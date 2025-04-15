@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             """
@@ -128,22 +127,16 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "snippets": [
-            {
-                "verilog_code": """
-""",
-            },
-        ],
         "fsm": {
-            "verilog_code": """
-default_assignments:
+            "default_assignments": """
         right = {q, r[SIZE_W+1], 1'b1};
         left = {r[SIZE_W-1:0], a[DATA_W-1 -: 2]};
         a_in = {a[DATA_W-3:0], 2'b00};
         tmp =  r[SIZE_W+1] ? left + right : left - right;
         res_o = q;
-        done_o = ~pc;
-
+        done_o = ~pcnt;
+""",
+            "state_descriptions": """
         idle:
             if (start_i) begin
                 a_nxt = op_i;
@@ -151,7 +144,7 @@ default_assignments:
                 r_nxt = 0;
                 counter_nxt = 0;
             end else begin
-                pc_nxt = pc;
+                pcnt_nxt = pcnt;
             end
 
             r_nxt = tmp;
@@ -159,9 +152,9 @@ default_assignments:
             a_nxt = a_in;
             if (counter != END_COUNT[COUNT_W-1:0] - 1) begin
                 counter_nxt = counter + 1'b1;
-                pc_nxt = pc;
+                pcnt_nxt = pcnt;
             end else begin
-                pc_nxt = idle; end
+                pcnt_nxt = idle; end
 """,
         },
     }

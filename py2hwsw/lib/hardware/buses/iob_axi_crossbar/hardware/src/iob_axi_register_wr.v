@@ -49,7 +49,7 @@ module iob_axi_register_wr #(
    input wire rst,
 
    /*
-     * AXI slave interface
+     * AXI subordinate interface
      */
    input  wire [    ID_WIDTH-1:0] s_axi_awid,
    input  wire [  ADDR_WIDTH-1:0] s_axi_awaddr,
@@ -77,7 +77,7 @@ module iob_axi_register_wr #(
    input  wire                    s_axi_bready,
 
    /*
-     * AXI master interface
+     * AXI manager interface
      */
    output wire [    ID_WIDTH-1:0] m_axi_awid,
    output wire [  ADDR_WIDTH-1:0] m_axi_awaddr,
@@ -162,7 +162,8 @@ module iob_axi_register_wr #(
          assign m_axi_awvalid  = m_axi_awvalid_reg;
 
          // enable ready input next cycle if output is ready or the temp reg will not be filled on the next cycle (output reg empty or no input)
-         wire s_axi_awready_early = m_axi_awready | (~temp_m_axi_awvalid_reg & (~m_axi_awvalid_reg | ~s_axi_awvalid));
+         wire s_axi_awready_early;
+         assign s_axi_awready_early = m_axi_awready | (~temp_m_axi_awvalid_reg & (~m_axi_awvalid_reg | ~s_axi_awvalid));
 
          always @* begin
             // transfer sink ready state to source
@@ -283,7 +284,8 @@ module iob_axi_register_wr #(
          assign m_axi_awvalid  = m_axi_awvalid_reg;
 
          // enable ready input next cycle if output buffer will be empty
-         wire s_axi_awready_eawly = !m_axi_awvalid_next;
+         wire s_axi_awready_eawly;
+         assign s_axi_awready_eawly = !m_axi_awvalid_next;
 
          always @* begin
             // transfer sink ready state to source
@@ -377,7 +379,8 @@ module iob_axi_register_wr #(
          assign m_axi_wvalid = m_axi_wvalid_reg;
 
          // enable ready input next cycle if output is ready or the temp reg will not be filled on the next cycle (output reg empty or no input)
-         wire s_axi_wready_early = m_axi_wready | (~temp_m_axi_wvalid_reg & (~m_axi_wvalid_reg | ~s_axi_wvalid));
+         wire s_axi_wready_early;
+         assign s_axi_wready_early = m_axi_wready | (~temp_m_axi_wvalid_reg & (~m_axi_wvalid_reg | ~s_axi_wvalid));
 
          always @* begin
             // transfer sink ready state to source
@@ -463,7 +466,8 @@ module iob_axi_register_wr #(
          assign m_axi_wvalid = m_axi_wvalid_reg;
 
          // enable ready input next cycle if output buffer will be empty
-         wire s_axi_wready_ewly = !m_axi_wvalid_next;
+         wire s_axi_wready_ewly;
+         assign s_axi_wready_ewly = !m_axi_wvalid_next;
 
          always @* begin
             // transfer sink ready state to source
@@ -540,7 +544,8 @@ module iob_axi_register_wr #(
          assign s_axi_bvalid = s_axi_bvalid_reg;
 
          // enable ready input next cycle if output is ready or the temp reg will not be filled on the next cycle (output reg empty or no input)
-         wire m_axi_bready_early = s_axi_bready | (~temp_s_axi_bvalid_reg & (~s_axi_bvalid_reg | ~m_axi_bvalid));
+         wire m_axi_bready_early;
+         assign m_axi_bready_early = s_axi_bready | (~temp_s_axi_bvalid_reg & (~s_axi_bvalid_reg | ~m_axi_bvalid));
 
          always @* begin
             // transfer sink ready state to source
@@ -621,7 +626,8 @@ module iob_axi_register_wr #(
          assign s_axi_bvalid = s_axi_bvalid_reg;
 
          // enable ready input next cycle if output buffer will be empty
-         wire m_axi_bready_early = !s_axi_bvalid_next;
+         wire m_axi_bready_early;
+         assign m_axi_bready_early = !s_axi_bvalid_next;
 
          always @* begin
             // transfer sink ready state to source

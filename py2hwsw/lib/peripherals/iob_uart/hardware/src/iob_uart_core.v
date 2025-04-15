@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
-`include "iob_uart_csrs_def.vh"
+`include "iob_uart_csrs.vh"
 `include "iob_uart_conf.vh"
 
 module iob_uart_core (
@@ -22,7 +22,7 @@ module iob_uart_core (
    output reg                       rs232_rts_o,
    input                            data_write_en_i,
    input                            data_read_en_i,
-   input      [`IOB_UART_DIV_W-1:0] bit_duration_i
+   input      [`IOB_UART_CSRS_DIV_W-1:0] bit_duration_i
 );
 
    ////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ module iob_uart_core (
    always @(posedge clk_i) cts_int <= {cts_int[0], rs232_cts_i};
 
    wire [7:0] tx_data_int;
-   iob_reg_e #(
+   iob_reg_cear_e #(
       .DATA_W (8),
       .RST_VAL(8'b0)
    ) txdata_reg (

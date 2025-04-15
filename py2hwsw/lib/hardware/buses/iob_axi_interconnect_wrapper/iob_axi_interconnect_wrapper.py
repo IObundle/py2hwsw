@@ -49,28 +49,29 @@ AXI_OUT_SIGNAL_NAMES = [
 def setup(py_params_dict):
     """Wrapper for `axi_interconnect` core.
     Python parameters:
-    - num_slaves: number of slave interfaces
-    - masters: dictionary with name and address width of each master
+    - num_subordinates: number of subordinate interfaces
+    - managers: dictionary with name and address width of each manager
     """
     # Each generated wrapper must have a unique name (can't have two verilog modules with same name).
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated interconnect wrapper module."
     )
-    # Number of slave interfaces (number of masters to connect to)
-    N_SLAVES = (
-        int(py_params_dict["num_slaves"]) if "num_slaves" in py_params_dict else 1
+    # Number of subordinate interfaces (number of managers to connect to)
+    N_SUBORDINATES = (
+        int(py_params_dict["num_subordinates"])
+        if "num_subordinates" in py_params_dict
+        else 1
     )
-    # Dictionary with name and address width of each master
-    MASTERS = (
-        py_params_dict["masters"]
-        if "masters" in py_params_dict
+    # Dictionary with name and address width of each manager
+    MANAGERS = (
+        py_params_dict["managers"]
+        if "managers" in py_params_dict
         else {"m0": "AXI_ADDR_W"}
     )
 
     attributes_dict = {
         "name": py_params_dict["name"],
         "generate_hw": True,
-        "version": "0.1",
         #
         # AXI Parameters
         #
@@ -126,12 +127,12 @@ def setup(py_params_dict):
             },
         ],
     }
-    slave_axi_ports = []
-    for i in range(N_SLAVES):
-        slave_axi_ports += [
+    subordinate_axi_ports = []
+    for i in range(N_SUBORDINATES):
+        subordinate_axi_ports += [
             {
                 "name": f"s{i}_axi_s",
-                "descr": f"Slave {i} interface",
+                "descr": f"Subordinate {i} interface",
                 "signals": {
                     "type": "axi",
                     "prefix": f"s{i}_",
@@ -142,9 +143,9 @@ def setup(py_params_dict):
                 },
             },
         ]
-    master_axi_ports = []
-    master_addr_w_parameter = ""
-    for name, width in MASTERS.items():
+    manager_axi_ports = []
+    manager_addr_w_parameter = ""
+    for name, width in MANAGERS.items():
         attributes_dict["confs"].append(
             {
                 "name": f"{name.upper()}_ADDR_W",
@@ -152,13 +153,13 @@ def setup(py_params_dict):
                 "val": width,
                 "min": "1",
                 "max": "32",
-                "descr": f"{name.upper()} address bus width. Can be smaller than address range of master, but not larger.",
+                "descr": f"{name.upper()} address bus width. Can be smaller than address range of manager, but not larger.",
             }
         )
-        master_axi_ports += [
+        manager_axi_ports += [
             {
                 "name": f"{name}_axi_m",
-                "descr": f"Master '{name}' axi interface",
+                "descr": f"Manager '{name}' axi interface",
                 "signals": {
                     "type": "axi",
                     "prefix": f"{name}_",
@@ -173,22 +174,22 @@ def setup(py_params_dict):
             width_str = "32'd" + str(int(width))
         except ValueError:
             width_str = width
-        master_addr_w_parameter = f"{width_str}," + master_addr_w_parameter
-    master_addr_w_parameter = master_addr_w_parameter[:-1]
-    if len(MASTERS) > 1:
-        master_addr_w_parameter = "{" + master_addr_w_parameter + "}"
-    attributes_dict["ports"] += slave_axi_ports + master_axi_ports
+        manager_addr_w_parameter = f"{width_str}," + manager_addr_w_parameter
+    manager_addr_w_parameter = manager_addr_w_parameter[:-1]
+    if len(MANAGERS) > 1:
+        manager_addr_w_parameter = "{" + manager_addr_w_parameter + "}"
+    attributes_dict["ports"] += subordinate_axi_ports + manager_axi_ports
     #
     # Wires
     #
     attributes_dict["wires"] = [
         {
             "name": "interconnect_s_axi",
-            "descr": "AXI slave bus for interconnect",
+            "descr": "AXI subordinate bus for interconnect",
             "signals": {
                 "type": "axi",
                 "prefix": "intercon_s_",
-                "mult": N_SLAVES,
+                "mult": N_SUBORDINATES,
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W",
                 "DATA_W": "AXI_DATA_W",
@@ -197,11 +198,11 @@ def setup(py_params_dict):
         },
         {
             "name": "interconnect_m_axi",
-            "descr": "AXI master bus for interconnect",
+            "descr": "AXI manager bus for interconnect",
             "signals": {
                 "type": "axi",
                 "prefix": "intercon_m_",
-                "mult": len(MASTERS),
+                "mult": len(MANAGERS),
                 "ID_W": "AXI_ID_W",
                 "ADDR_W": "AXI_ADDR_W",
                 "DATA_W": "AXI_DATA_W",
@@ -221,9 +222,9 @@ def setup(py_params_dict):
                 "ID_WIDTH": "AXI_ID_W",
                 "DATA_WIDTH": "AXI_DATA_W",
                 "ADDR_WIDTH": "AXI_ADDR_W",
-                "S_COUNT": N_SLAVES,
-                "M_COUNT": len(MASTERS),
-                "M_ADDR_WIDTH": master_addr_w_parameter,
+                "S_COUNT": N_SUBORDINATES,
+                "M_COUNT": len(MANAGERS),
+                "M_ADDR_WIDTH": manager_addr_w_parameter,
             },
             "connect": {
                 "clk_i": "clk_i",
@@ -234,11 +235,11 @@ def setup(py_params_dict):
         },
     ]
 
-    # Connect all Slave AXI interfaces to interconnect
-    verilog_code = "    // Connect all slave AXI interfaces to interconnect\n"
+    # Connect all Subordinate AXI interfaces to interconnect
+    verilog_code = "    // Connect all subordinate AXI interfaces to interconnect\n"
     for sig_name, _ in AXI_IN_SIGNAL_NAMES:
         assign_str = ""
-        for port in slave_axi_ports:
+        for port in subordinate_axi_ports:
             prefix = ""
             if "prefix" in port["signals"]:
                 prefix = port["signals"]["prefix"]
@@ -249,23 +250,23 @@ def setup(py_params_dict):
         )
 
     for sig_name, sig_size in AXI_OUT_SIGNAL_NAMES:
-        for idx, port in enumerate(slave_axi_ports):
+        for idx, port in enumerate(subordinate_axi_ports):
             prefix = ""
             if "prefix" in port["signals"]:
                 prefix = port["signals"]["prefix"]
             bit_select = ""
             if type(sig_size) is not int or sig_size > 1:
                 bit_select = f"[{idx}*{sig_size}+:{sig_size}]"
-            elif len(slave_axi_ports) > 1:
+            elif len(subordinate_axi_ports) > 1:
                 bit_select = f"[{idx}]"
             verilog_code += f"    assign {prefix}axi_{sig_name}_o = intercon_s_axi_{sig_name}{bit_select}; \n"
 
-    # Connect all Master AXI interfaces to interconnect
-    verilog_code += "    // Connect all master AXI interfaces to interconnect\n"
+    # Connect all Manager AXI interfaces to interconnect
+    verilog_code += "    // Connect all manager AXI interfaces to interconnect\n"
     for sig_name, _ in AXI_OUT_SIGNAL_NAMES:
         assign_str = ""
-        for master_name in MASTERS:
-            prefix = f"{master_name}_"
+        for manager_name in MANAGERS:
+            prefix = f"{manager_name}_"
             assign_str = f"{prefix}axi_{sig_name}_i, " + assign_str
         assign_str = assign_str[:-2]
         verilog_code += (
@@ -273,15 +274,15 @@ def setup(py_params_dict):
         )
 
     for sig_name, sig_size in AXI_IN_SIGNAL_NAMES:
-        for idx, master_name in enumerate(MASTERS):
-            prefix = f"{master_name}_"
+        for idx, manager_name in enumerate(MANAGERS):
+            prefix = f"{manager_name}_"
             output_size = sig_size
             if sig_name.endswith("addr"):
                 output_size = f"{name.upper()}_ADDR_W"
             bit_select = ""
             if type(sig_size) is not int or sig_size > 1:
                 bit_select = f"[{idx}*{sig_size}+:{output_size}]"
-            elif len(master_axi_ports) > 1:
+            elif len(manager_axi_ports) > 1:
                 bit_select = f"[{idx}]"
             verilog_code += f"    assign {prefix}axi_{sig_name}_o = intercon_m_axi_{sig_name}{bit_select}; \n"
 

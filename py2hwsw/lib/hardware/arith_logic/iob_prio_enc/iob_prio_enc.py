@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -42,31 +41,43 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "encoded_o",
-                        "width": "$clog2(W)",
+                        "width": "$clog2(W+1)",
                         "isvar": True,
                     },
+                ],
+            },
+        ],
+        "wires": [
+            {
+                "name": "unencoded_int",
+                "descr": "",
+                "signals": [
+                    {"name": "unencoded_int", "width": "W+1"},
                 ],
             },
         ],
         "snippets": [
             {
                 "verilog_code": """
-         integer pos;
+   // MSB = 1 if unencoded_i = 0
+   assign unencoded_int = {(~(|unencoded_i)), unencoded_i};
+
+   integer pos;
    generate
       if (MODE == "LOW") begin : gen_low_prio
          always @* begin
-            encoded_o = {$clog2(W) {1'd0}};  //In case input is 0
-            for (pos = W - 1; pos != -1; pos = pos - 1) begin
-               if (unencoded_i[pos]) begin
+            encoded_o = 1'b0;  //placeholder default value
+            for (pos = W; pos != -1; pos = pos - 1) begin
+               if (unencoded_int[pos]) begin
                   encoded_o = pos[$clog2(W)-1:0];
                end
             end
          end
       end else begin : gen_highest_prio  //MODE == "HIGH"
          always @* begin
-            encoded_o = {$clog2(W){1'd0}};  //In case input is 0
-            for (pos = 0; pos < W; pos = pos + 1) begin
-               if (unencoded_i[pos]) begin
+            encoded_o = 1'b0;  //placeholder default value
+            for (pos = {W{1'd0}}; pos < (W+1); pos = pos + 1) begin
+               if (unencoded_int[pos]) begin
                   encoded_o = pos[$clog2(W)-1:0];
                end
             end

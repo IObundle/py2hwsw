@@ -20,10 +20,10 @@
       .ready_ext   (/*<InstanceName>*/_ready),
 
       // CPU interface
-      .valid       (slaves_req[`valid(`/*<InstanceName>*/)]),
-      .address     (slaves_req[`address(`/*<InstanceName>*/,`iob_regfileif_csrs_ADDR_W+2)-2]),
-      .wdata       (slaves_req[`wdata(`/*<InstanceName>*/)]),
-      .wstrb       (slaves_req[`wstrb(`/*<InstanceName>*/)]),
-      .rdata       (slaves_resp[`rdata(`/*<InstanceName>*/)]),
-      .ready       (slaves_resp[`ready(`/*<InstanceName>*/)])
+      .valid       (subordinates_req[`valid(`/*<InstanceName>*/)]),
+      .address     (subordinates_req[`address(`/*<InstanceName>*/,`iob_regfileif_csrs_ADDR_W+2)-2]),
+      .wdata       (subordinates_req[`wdata(`/*<InstanceName>*/)]),
+      .wstrb       (subordinates_req[`wstrb(`/*<InstanceName>*/)]),
+      .rdata       (subordinates_resp[`rdata(`/*<InstanceName>*/)]),
+      .ready       (subordinates_resp[`ready(`/*<InstanceName>*/)])
       );

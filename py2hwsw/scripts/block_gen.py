@@ -140,8 +140,8 @@ def get_instance_port_connections(instance):
         newlinechar = "\n"
         if not port.interface or not port.e_connect.interface:
             assert len(port.signals) == len(
-                    port.e_connect.signals
-                ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
+                port.e_connect.signals
+            ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
 Port '{port.name}' has the following signals:
 {newlinechar.join("- " + get_real_signal(port).name for port in port.signals)}
 
@@ -152,14 +152,12 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
         # If port has only non-iob signals, skip it
         if not any(isinstance(signal, iob_signal) for signal in port.signals):
             continue
-        instance_portmap += f"        // {port.name} port\n"
+        instance_portmap += f"        // {port.name} port: {port.descr}\n"
         # Connect individual signals
         for idx, signal in enumerate(port.signals):
             if not isinstance(signal, iob_signal):
                 continue
             port_name = signal.name
-            real_e_signal = get_real_signal(port.e_connect.signals[idx])
-            e_signal_name = real_e_signal.name
             # Connect interface signals by name and not by order
             if port.interface and port.e_connect.interface:
                 port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
@@ -168,14 +166,26 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
                     e_signal_name = real_e_signal.name
                     if e_signal_name[-2:] in ["_o", "_i"]:
                         e_signal_name = e_signal_name[:-2]
-                    e_signal_name = e_signal_name.replace(port.e_connect.interface.prefix, "", 1)
+                    e_signal_name = e_signal_name.replace(
+                        port.e_connect.interface.prefix, "", 1
+                    )
                     if e_signal_name == port_name:
                         e_signal_name = real_e_signal.name
                         port_name = signal.name
                         break
+                    elif e_signal is port.e_connect.signals[-1]:
+                        # if signal is not found in e_connect.signals, find a bit slice that describes the signal connection
+                        for bit_slice in port.e_connect_bit_slices:
+                            if f"{signal.name}:" in bit_slice:
+                                e_signal_name = bit_slice.split(":")[1]
+                port_name = signal.name
+            else:
+                real_e_signal = get_real_signal(port.e_connect.signals[idx])
+                e_signal_name = real_e_signal.name
 
             for bit_slice in port.e_connect_bit_slices:
-                if e_signal_name in bit_slice:
+                # ignore bit slices that describe signal connections
+                if e_signal_name in bit_slice and f"{signal.name}:" not in bit_slice:
                     e_signal_name = bit_slice
                     break
 

@@ -14,7 +14,7 @@ The IObundle GPIO is a RISC-V-based Peripheral written in Verilog, which users c
 This peripheral provides a General Purpose Input/Output interface with up to 32 inputs and 32 outputs.
 The tri-state output logic is supported via external tri-state buffers using the output enable interface of this peripheral.
 
-This peripheral can be used as a verification tool of the [OpenCryptoTester](https://nlnet.nl/project/OpenCryptoTester#ack) project.
+This peripheral can be used as a verification instrument of the [OpenCryptoTester](https://nlnet.nl/project/OpenCryptoTester#ack) project.
 
 ## Integrate in SoC ##
 

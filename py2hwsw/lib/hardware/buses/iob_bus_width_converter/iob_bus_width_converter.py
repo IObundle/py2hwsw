@@ -14,7 +14,7 @@ interfaces = {
     ],
     "axil": [
         ("awaddr", "output", "ADDR_W"),
-        ("awprot", "output", "PROT_W"),
+        # ("awprot", "output", "PROT_W"),
         ("awvalid", "output", 1),
         ("awready", "input", 1),
         ("wdata", "output", "DATA_W"),
@@ -25,7 +25,7 @@ interfaces = {
         ("bvalid", "input", 1),
         ("bready", "output", 1),
         ("araddr", "output", "ADDR_W"),
-        ("arprot", "output", "PROT_W"),
+        # ("arprot", "output", "PROT_W"),
         ("arvalid", "output", 1),
         ("arready", "input", 1),
         ("rdata", "input", "DATA_W"),
@@ -35,7 +35,7 @@ interfaces = {
     ],
     "axi": [
         ("awaddr", "output", "ADDR_W"),
-        ("awprot", "output", "PROT_W"),
+        # ("awprot", "output", "PROT_W"),
         ("awvalid", "output", 1),
         ("awready", "input", 1),
         ("wdata", "output", "DATA_W"),
@@ -46,7 +46,7 @@ interfaces = {
         ("bvalid", "input", 1),
         ("bready", "output", 1),
         ("araddr", "output", "ADDR_W"),
-        ("arprot", "output", "PROT_W"),
+        # ("arprot", "output", "PROT_W"),
         ("arvalid", "output", 1),
         ("arready", "input", 1),
         ("rdata", "input", "DATA_W"),
@@ -85,8 +85,8 @@ def setup(py_params_dict):
     wire_assigns = ""
     parameter_names = []
     verilog_parameters = []
-    master_interface_parameters = {}
-    slave_interface_parameters = {}
+    manager_interface_parameters = {}
+    subordinate_interface_parameters = {}
     for signal in interfaces[INTERFACE]:
         name = signal[0]
         direction = signal[1]
@@ -95,9 +95,9 @@ def setup(py_params_dict):
         if type(width) is int:
             bit_select = ""
         elif direction == "output":
-            bit_select = f"[MASTER_{width}-1:0]"
+            bit_select = f"[MANAGER_{width}-1:0]"
         else:
-            bit_select = f"[SLAVE_{width}-1:0]"
+            bit_select = f"[SUBORDINATE_{width}-1:0]"
 
         # Connect both interfaces
         wire_assigns += f"""
@@ -116,46 +116,45 @@ def setup(py_params_dict):
         # Set verilog parameters for each interface
         verilog_parameters += [
             {
-                "name": f"SLAVE_{width}",
+                "name": f"SUBORDINATE_{width}",
                 "type": "P",
                 "val": "0",
                 "min": "1",
                 "max": "32",
-                "descr": f"Slave {width[:-2]} bus width",
+                "descr": f"Subordinate {width[:-2]} bus width",
             },
             {
-                "name": f"MASTER_{width}",
+                "name": f"MANAGER_{width}",
                 "type": "P",
                 "val": "0",
                 "min": "1",
                 "max": "32",
-                "descr": f"Master {width[:-2]} bus width",
+                "descr": f"Manager {width[:-2]} bus width",
             },
         ]
         # Set parameters for if_gen generation of each interface
-        slave_interface_parameters[width] = f"SLAVE_{width}"
-        master_interface_parameters[width] = f"MASTER_{width}"
+        subordinate_interface_parameters[width] = f"SUBORDINATE_{width}"
+        manager_interface_parameters[width] = f"MANAGER_{width}"
 
     attributes_dict = {
         "name": f"iob_{INTERFACE}_bus_width_converter",
         "generate_hw": True,
-        "version": "0.1",
         "confs": verilog_parameters,
         "ports": [
             {
-                "name": "slave_s",
-                "descr": "Slave interface (connects to master)",
+                "name": "subordinate_s",
+                "descr": "Subordinate interface (connects to manager)",
                 "signals": {
                     "type": INTERFACE,
-                    **slave_interface_parameters,
+                    **subordinate_interface_parameters,
                 },
             },
             {
-                "name": "master_m",
-                "descr": "Master interface (connects to slave)",
+                "name": "manager_m",
+                "descr": "Manager interface (connects to subordinate)",
                 "signals": {
                     "type": INTERFACE,
-                    **master_interface_parameters,
+                    **manager_interface_parameters,
                 },
             },
         ],

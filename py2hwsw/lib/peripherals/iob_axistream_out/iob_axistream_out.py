@@ -5,10 +5,9 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.3",
         # Note: This core currently has a manual verilog source! The generate_hw is true only because of the generated csrs subblock.
         "generate_hw": True,
-        "board_list": ["cyclonev_gt_dk", "aes_ku040_db_g"],
+        "board_list": ["iob_cyclonev_gt_dk", "iob_aes_ku040_db_g"],
         "confs": [
             {
                 "name": "DATA_W",
@@ -51,15 +50,6 @@ def setup(py_params_dict):
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
-            },
-            {
-                "name": "iob_s",
-                "signals": {
-                    "type": "iob",
-                    "ADDR_W": "ADDR_W - 2",
-                    "DATA_W": "DATA_W",
-                },
-                "descr": "CPU native interface",
             },
             {
                 "name": "interrupt_o",
@@ -156,7 +146,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "data_wdata_wr", "width": 32},
                     {"name": "data_wen_wr", "width": 1},
-                    {"name": "data_wready_wr", "width": 1},
+                    {"name": "data_ready_wr", "width": 1},
                 ],
             },
             {
@@ -207,6 +197,9 @@ def setup(py_params_dict):
                 "core_name": "iob_csrs",
                 "instance_name": "iob_csrs",
                 "instance_description": "Control/Status Registers",
+                "parameters": {
+                    "FIFO_ADDR_W": "FIFO_ADDR_W",
+                },
                 "csrs": [
                     {
                         "name": "axistream",
@@ -304,7 +297,6 @@ def setup(py_params_dict):
                 ],
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "control_if_s": "iob_s",
                     # Register interfaces
                     "soft_reset_o": "soft_reset",
                     "enable_o": "enable",
@@ -327,8 +319,11 @@ def setup(py_params_dict):
                 "instantiate": False,
             },
             {
-                "core_name": "iob_reg_re",
+                "core_name": "iob_reg",
                 "instantiate": False,
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst_en",
+                },
             },
             {
                 "core_name": "iob_ram_at2p",

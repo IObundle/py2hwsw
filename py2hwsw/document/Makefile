@@ -24,14 +24,25 @@ TSRC = $(patsubst tsrc/%, ./%, $(wildcard tsrc/*))
 	cp $< $@
 %.py: tsrc/%.py
 	cp $< $@
+%.h: tsrc/%.h
+	cp $< $@
+%.c: tsrc/%.c
+	cp $< $@
 
 TSRC+=name.tex
 name.tex:
-	 @echo $(NAME) | sed 's/_/\\_/g' > $@
+	@echo $(NAME) | sed 's/_/\\_/g' > $@
 
 TSRC+=signature.tex
-signature.tex:
-	 @echo `cat name.tex`-USG-`cat version.tex`-`cat shortHash.tex` > signature.tex
+signature.tex: $(DOC)_signature.tex
+	mv $< $@
+
+ug_signature.tex pb_signature.tex:
+	@echo `cat name.tex`-USG-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+
+rn_signature.tex:
+	@echo `cat name.tex`-REL-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+
 
 #make figures
 figs:
@@ -67,10 +78,11 @@ ug.pdf: debug results figs ugtop.tex
 
 #ug top file containing the definition of sections to include
 ugtop.tex:
-	if [ -f confs_tab.tex ]; then echo "\def\CONFS{Y}" >> $@; fi
+	if ls *_py_params_tab.tex > /dev/null 2>&1; then echo "\def\PYPARAMS{Y}" >> $@; fi
+	if ls *_confs_tab.tex > /dev/null 2>&1; then echo "\def\CONFS{Y}" >> $@; fi
 	if [ -f td.tex ]; then echo "\def\TD{Y}" >> $@; fi
 	if ls *_csrs_tab.tex > /dev/null 2>&1; then echo "\def\CSRS{Y}" >> $@; fi
-	if ls mems_tab.tex > /dev/null 2>&1; then echo "\def\MEMS{Y}" >> $@; fi
+	if [ -f mems_tab.tex ]; then echo "\def\MEMS{Y}" >> $@; fi
 	if [ $(ASICSYNTH) == 1 ]; then echo "\def\ASICSYNTH{Y}" >> $@; fi
 	if [ $(FPGACOMP) == 1 ]; then echo "\def\FPGACOMP{Y}" >> $@; fi
 	make doctop DOC=ug

@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": False,
         "confs": [
             {
@@ -150,22 +149,12 @@ def setup(py_params_dict):
                         "name": "ext_mem_clk_o",
                         "width": 1,
                     },
-                    {
-                        "name": "ext_mem_w_en_o",
-                        "width": "R",
-                        "descr": "Memory write enable",
-                    },
-                    {
-                        "name": "ext_mem_w_addr_o",
-                        "width": "MINADDR_W",
-                        "descr": "Memory write address",
-                    },
-                    {
-                        "name": "ext_mem_w_data_o",
-                        "width": "MAXDATA_W",
-                        "descr": "Memory write data",
-                    },
                     #  Read port
+                    {
+                        "name": "ext_mem_r_data_i",
+                        "width": "MAXDATA_W",
+                        "descr": "Memory read data",
+                    },
                     {
                         "name": "ext_mem_r_en_o",
                         "width": "R",
@@ -176,10 +165,21 @@ def setup(py_params_dict):
                         "width": "MINADDR_W",
                         "descr": "Memory read address",
                     },
+                    #  Write port
                     {
-                        "name": "ext_mem_r_data_i",
+                        "name": "ext_mem_w_data_o",
                         "width": "MAXDATA_W",
-                        "descr": "Memory read data",
+                        "descr": "Memory write data",
+                    },
+                    {
+                        "name": "ext_mem_w_addr_o",
+                        "width": "MINADDR_W",
+                        "descr": "Memory write address",
+                    },
+                    {
+                        "name": "ext_mem_w_en_o",
+                        "width": "R",
+                        "descr": "Memory write enable",
                     },
                 ],
             },
@@ -197,8 +197,11 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg_r",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_r_inst",
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_rst",
+                },
             },
             {
                 "core_name": "iob_reg",

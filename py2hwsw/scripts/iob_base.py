@@ -9,7 +9,6 @@ import argparse
 from dataclasses import dataclass
 import importlib
 import traceback
-import re
 from functools import wraps
 import inspect
 
@@ -253,22 +252,24 @@ def str_to_kwargs(attrs: list):
         args = parser.parse_args(args)
         kwargs = vars(args)
         try:
-            for arg in kwargs:
+            for arg in list(kwargs.keys()):
                 if arg in dicts and kwargs[arg] is not None:
                     if isinstance(dicts[arg], str):
                         if dicts[arg] == "pairs":
-                            kwargs[arg] = dict(pair.split(":") for pair in kwargs[arg])
+                            kwargs[arg.split("&")[0]] = dict(pair.split(":") for pair in kwargs[arg])
                     elif isinstance(dicts[arg], list):
                         _keys = [key for item in dicts[arg] for key in item.split(":")]
                         _values = [
                             value for item in kwargs[arg] for value in item.split(":")
                         ]
-                        kwargs[arg] = [
+                        kwargs[arg.split("&")[0]] = [
                             dict(zip(_keys, _values[i:]))
                             for i in range(0, len(_values), len(_keys))
                         ]
                     elif isinstance(dicts[arg], tuple):
-                        kwargs[arg] = dict(zip(dicts[arg], kwargs[arg]))
+                        kwargs[arg.split("&")[0]] = dict(zip(dicts[arg], kwargs[arg]))
+                    if '&' in arg:
+                        kwargs.pop(arg)
             for key, value in list(kwargs.items()):
                 if ":" in key:
                     kwargs.pop(key)
@@ -281,6 +282,7 @@ def str_to_kwargs(attrs: list):
                         values = value.split(":")
                         for i in range(len(keys)):
                             kwargs[keys[i]] = values[i]
+                
         except Exception as e:
             print(
                 iob_colors.FAIL
@@ -351,11 +353,12 @@ def str_to_kwargs(attrs: list):
                     sub_lists = sub_lists[0]
                 output = parse_args(parser_dict, sub_lists)
             for key in output.keys():
-                for i in range(len(output[key])):
-                    if "core_name" in output[key][i]:
-                        output[key][i]["instance_description"] = output[key][i].pop(
-                            "descr"
-                        )
+                if isinstance(output[key], list):
+                    for i in range(len(output[key])):
+                        if "core_name" in output[key][i]:
+                            output[key][i]["instance_description"] = output[key][i].pop(
+                                    "descr"
+                            )
             return {k: v for k, v in output.items() if v != []}
 
         kwargs = make_hierarchy(lists, "main")
@@ -390,7 +393,7 @@ def find_file(search_directory, name_without_ext, filter_extensions=[]):
     """Find a file, without extension, in a given directory or subdirectories
     param name_without_ext: name_without_ext of the file without extension
     param search_directory: directory to search
-    param filter_extensions: list of extensions to filter
+    param filter_extensions: list of extensions to filter (example: [".py", ".tex"])
     """
     for root, _, files in os.walk(search_directory):
         for file in files:
@@ -421,6 +424,23 @@ def hardcoded_find_file(name_without_ext, filter_extensions=[]):
                 filter_extensions == [] or file_ext in filter_extensions
             ):
                 return os.path.join(dir, file)
+    return None
+
+
+def find_path(search_directory, path):
+    """Find a path inside the search_directory
+    param search_directory: directory to search
+    param path: path to find. Examples: "submodules/ethernet", "iob_uart.py", "iob_uart/hardware/simulation/src/iob_vlt_tb.vh"
+    """
+    for root, dirs, files in os.walk(search_directory):
+        for dir in dirs:
+            dir_path = os.path.join(root, dir)
+            if dir_path.endswith(path):
+                return dir_path
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file_path.endswith(path):
+                return file_path
     return None
 
 

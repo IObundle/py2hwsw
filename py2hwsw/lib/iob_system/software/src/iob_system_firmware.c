@@ -59,8 +59,6 @@ int main() {
 
   free(sendfile);
   free(recvfile);
-
-  uart_sendfile("test.log", strlen(pass_string), pass_string);
 #endif // TESTER
 
   // read current timer count, compute elapsed time

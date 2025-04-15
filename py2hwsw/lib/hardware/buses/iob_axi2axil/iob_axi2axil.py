@@ -9,7 +9,6 @@ def setup(py_params_dict):
     - No Burst Support: burst-related signals (like AWLEN, AWSIZE, ARBURST, etc.) are ignored.
     """
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": True,
         "confs": [
             {
@@ -48,7 +47,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "axi_s",
-                "descr": "AXI slave interface to connect to external master",
+                "descr": "AXI subordinate interface to connect to external manager",
                 "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
@@ -59,7 +58,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axil_m",
-                "descr": "AXI Lite master interface to connect to external slave",
+                "descr": "AXI Lite manager interface to connect to external subordinate",
                 "signals": {
                     "type": "axil",
                     "ID_W": "AXI_ID_W",

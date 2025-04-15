@@ -8,48 +8,44 @@ import os
 # Add iob-system scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
 
-from iob_system_utils import update_params, iob_system_scripts
+from iob_system_utils import convert_params_dict, update_params, iob_system_scripts
 
 
 def setup(py_params_dict):
     params = {
-        # Name of the generated System
-        "name": "iob_system",
-        # If should initialize memories from data in .hex files
-        "init_mem": True,
-        # If should include an internal memory
-        "use_intmem": True,
-        # If should use external memory (usually DDR)
-        "use_extmem": False,
-        # If should include a bootrom
-        "use_bootrom": True,
-        # If should include peripherals
-        "use_peripherals": True,
-        # If should setup ethernet ports and testbenches
-        "use_ethernet": False,
-        # CPU address width
-        "addr_w": 32,
-        # CPU data width
-        "data_w": 32,
-        # Memory address width
-        "mem_addr_w": 18,
-        # Bootrom address width
-        "bootrom_addr_w": 12,
-        # Firmware base address
-        "fw_baseaddr": 0,
-        # Firmware address width
-        "fw_addr_w": 18,
-        # If should include a tester system
-        "include_tester": True,
-        # If should include default snippet
-        "include_snippet": True,
-        # CPU selection.
-        # If set to "none", the iob_system will export an `iob_s` port for an external
-        # CPU. This port will give direct access to the system's peripherals. The internal
-        # memories and crossbar will be removed.
-        "cpu": "iob_vexriscv",
+        "name": ("iob_system", "Name of the generated System"),
+        "init_mem": (True, "If should initialize memories from data in .hex files"),
+        "use_intmem": (True, "If should include an internal memory"),
+        "use_extmem": (False, "If should use external memory (usually DDR)"),
+        "use_bootrom": (True, "If should include a bootrom"),
+        "use_peripherals": (True, "If should include peripherals"),
+        "use_ethernet": (False, "If should setup ethernet ports and testbenches"),
+        "addr_w": (32, "CPU address width"),
+        "data_w": (32, "CPU data width"),
+        "mem_addr_w": (18, "Memory address width"),
+        "bootrom_addr_w": (12, "Bootrom address width"),
+        "fw_baseaddr": (0, "Firmware base address"),
+        "fw_addr_w": (18, "Firmware address width"),
+        "include_tester": (True, "If should include a tester system"),
+        "include_snippet": (True, "If should include default system snippet"),
+        "cpu": (
+            "iob_vexriscv",
+            """CPU selection.
+        If set to "none", the iob_system will export an `iob_s` port for an external
+        CPU. This port will give direct access to the system's peripherals. The internal
+        memories and crossbar will be removed.""",
+        ),
+        "system_attributes": (
+            {},
+            "Core dictionary with attributes to override/append to the ones of iob_system. Usually passed by child cores to add their own components.",
+        ),
     }
 
+    # Converts dictionary tuple values into single values without description
+    # And creates "python_parameters" list attribute for py2hwsw documentation
+    python_parameters_attribute = convert_params_dict(params)
+
+    # Update parameters values with ones given in python parameters
     update_params(params, py_params_dict)
 
     if params["cpu"] == "none":
@@ -57,18 +53,18 @@ def setup(py_params_dict):
         params["use_extmem"] = False
         params["use_bootrom"] = False
 
-    num_xbar_masters = 0
+    num_xbar_managers = 0
     for param_name in ["use_intmem", "use_extmem", "use_bootrom", "use_peripherals"]:
         if params[param_name]:
-            num_xbar_masters += 1
-    xbar_sel_w = (num_xbar_masters - 1).bit_length()
+            num_xbar_managers += 1
+    xbar_sel_w = (num_xbar_managers - 1).bit_length()
 
     attributes_dict = {
         "name": params["name"],
         "generate_hw": True,
-        "version": "0.8",
         "is_system": True,
-        "board_list": ["aes_ku040_db_g"],
+        "board_list": ["iob_aes_ku040_db_g"],
+        "python_parameters": python_parameters_attribute,
         "confs": [
             # macros
             {  # Needed for testbench
@@ -254,7 +250,7 @@ def setup(py_params_dict):
         attributes_dict["ports"] += [
             {
                 "name": "axi_m",
-                "descr": "AXI master interface for DDR memory",
+                "descr": "AXI manager interface for DDR memory",
                 "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
@@ -281,7 +277,7 @@ def setup(py_params_dict):
         attributes_dict["ports"] += [
             {
                 "name": "iob_s",
-                "descr": "IOb slave interface for external CPU. Gives direct access to system peripherals",
+                "descr": "IOb subordinate interface for external CPU. Gives direct access to system peripherals",
                 "signals": {
                     "type": "iob",
                     "ADDR_W": "AXI_ADDR_W-2",
@@ -379,7 +375,7 @@ def setup(py_params_dict):
         attributes_dict["wires"] += [
             {
                 "name": "int_mem_axi",
-                "descr": "AXI master interface for internal memory",
+                "descr": "AXI manager interface for internal memory",
                 "signals": {
                     "type": "axi",
                     "prefix": "int_mem_",
@@ -511,15 +507,15 @@ def setup(py_params_dict):
                     "rst_i": "rst",
                     "s0_axi_s": "cpu_ibus",
                     "s1_axi_s": "cpu_dbus",
-                    # Master interfaces connected below
+                    # Manager interfaces connected below
                 },
                 "addr_w": params["addr_w"] - 2,
                 "data_w": params["data_w"],
                 "lock_w": 1,
-                "num_slaves": 2,
+                "num_subordinates": 2,
             },
         ]
-        full_xbar_master_interfaces = {
+        full_xbar_manager_interfaces = {
             "use_intmem": (
                 "int_mem_axi",
                 [
@@ -551,15 +547,15 @@ def setup(py_params_dict):
                 ],
             ),
         }
-        # Connect xbar master interfaces
-        num_masters = 0
-        for param_name, interface_connection in full_xbar_master_interfaces.items():
+        # Connect xbar manager interfaces
+        num_managers = 0
+        for param_name, interface_connection in full_xbar_manager_interfaces.items():
             if params[param_name]:
                 attributes_dict["subblocks"][-1]["connect"] |= {
-                    f"m{num_masters}_axi_m": interface_connection
+                    f"m{num_managers}_axi_m": interface_connection
                 }
-                num_masters += 1
-        attributes_dict["subblocks"][-1]["num_masters"] = num_masters
+                num_managers += 1
+        attributes_dict["subblocks"][-1]["num_managers"] = num_managers
 
     if params["use_intmem"]:
         attributes_dict["subblocks"] += [
@@ -684,17 +680,6 @@ def setup(py_params_dict):
             },
             # NOTE: Instantiate other peripherals here, using the 'is_peripheral' flag
         ]
-    attributes_dict["subblocks"] += [
-        # Modules that need to be setup, but are not instantiated directly inside
-        # 'iob_system' Verilog module
-        # Testbench
-        {
-            "core_name": "iob_tasks",
-            "instance_name": "iob_tasks_inst",
-            "instantiate": False,
-            "dest_dir": "hardware/simulation/src",
-        },
-    ]
     attributes_dict["superblocks"] = [
         # Synthesis module (needed for macros)
         {

@@ -5,7 +5,6 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "version": "0.1",
         "generate_hw": False,
         "ports": [
             {
@@ -36,8 +35,11 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg_e",
+                "core_name": "iob_reg",
                 "instance_name": "iob_reg_e_inst",
+                "port_params": {
+                    "clk_en_rst_s": "cke_arst_en",
+                },
             },
         ],
     }

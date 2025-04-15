@@ -42,7 +42,7 @@ def flows_setup(python_module):
 
 
 def hw_setup(python_module):
-    # Create module's version TeX file, also create *_version.vh Verilog Header.
+    # Create module's version TeX file
     if python_module.is_top_module:
         version_file(python_module)
 
@@ -306,10 +306,10 @@ def sw_setup(python_module):
     build_dir = python_module.build_dir
     setup_dir = python_module.setup_dir
 
-    os.makedirs(build_dir + "/software/src", exist_ok=True)
+    #os.makedirs(build_dir + "/software/src", 
     # Copy LIB software Makefile
-    shutil.copy(f"{get_lib_dir()}/software/Makefile", f"{build_dir}/software/Makefile")
-    nix_permission_hack(f"{build_dir}/software/Makefile")
+    shutil.copytree(f"{get_lib_dir()}/software", f"{build_dir}/software", dirs_exist_ok=True)
+    nix_permission_hack(f"{build_dir}/software")
 
     # Create 'scripts/' directory
     python_setup(build_dir)
@@ -481,7 +481,7 @@ def copy_files(src_dir, dest_dir, sources=[], pattern="*", copy_all=False):
     return files_copied
 
 
-# Create TeX and optionally Verilog header files with the version of the system
+# Create TeX files with the version of the core
 def version_file(
     python_module,
     create_version_header=True,
@@ -501,14 +501,6 @@ def version_file(
     tex_file = f"{tex_dir}/{core_name}_previous_version.tex"
     with open(tex_file, "w") as tex_f:
         tex_f.write(core_previous_version)
-
-    vh_file = f"{verilog_dir}/{core_name}_version.vh"
-    vh_version_string = "0"
-    for c in core_version:
-        if c.isdigit():
-            vh_version_string += c
-    with open(vh_file, "w") as vh_f:
-        vh_f.write(f"`define VERSION {vh_version_string}")
 
 
 def copy_with_rename(old_core_name, new_core_name):

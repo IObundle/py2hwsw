@@ -616,15 +616,6 @@ class iob_core(iob_module, iob_instance):
                 fail_with_msg(f"Invalid connection value: {connection_value}")
 
             if "'" in wire_name:
-                validate_verilog_const(wire_name, port.direction)
-                if not isintsance(port.signals,list):
-                    fail_with_msg(
-                        f"Port '{port.name}' signals must be a list of lenght 1 to connect to constant value '{wire_name}'"
-                    )
-                elif len(port.signals) != 1:
-                    fail_with_msg(
-                        f"Port '{port.name}' signals must be a list of lenght 1 to connect to constant value '{wire_name}'"
-                    )
                 wire = wire_name
             else:
                 wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(instantiator.ports, wire_name)

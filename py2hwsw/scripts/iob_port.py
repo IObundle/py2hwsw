@@ -11,8 +11,10 @@ from iob_base import (
     fail_with_msg,
     str_to_kwargs,
     assert_attributes,
+    find_obj_in_list,
+    validate_verilog_const,
 )
-from iob_signal import iob_signal
+from iob_signal import iob_signal, get_real_signal
 
 
 @dataclass
@@ -103,12 +105,62 @@ class iob_port(iob_wire):
 
     def connect_external(self, wire, bit_slices={}):
         """Connects the port to an external wire
+        Verifies that the wire is compatible with the port
         :param iob_wire wire: external wire
         :param list bit_slices: bit slices of signals in wire
         """
+        #wire must be iob_wire or str
+        if isinstance(wire, str):
+            if len(self.signals) != 1:
+                fail_with_msg(
+                    f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has more than one signal but is connected to one constant value '{port.e_connect}'!{iob_colors.ENDC}",
+                    ValueError,
+                )
+            else:
+                validate_verilog_const(value=wire, direction=self.signals[0].direction)
+        elif isinstance(wire, iob_wire):
+            if self.interface and wire.interface:
+                if self.interface.type == wire.interface.type:
+                    for signal in self.signals:
+                        e_signal = find_obj_in_list(wire.signals, signal.name, get_real_signal)
+                        if not e_signal:
+                            if not any([f"{signal.name}:" in bit_slice for bit_slice in bit_slices]):
+                                fail_with_msg(
+                                    f"Port '{self.name}' signal '{signal.name}' not connected to external wire '{wire.name}'",
+                                    ValueError,
+                                )
+                elif len(self.signals) != len(wire.signals):
+                    newlinechar = "\n"
+                    fail_with_msg(
+                        """{iob_colors.FAIL}Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
+Port '{self.name}' has the following signals:
+{newlinechar.join("- " + get_real_signal(port).name for port in self.signals)}
+
+External connection '{get_real_signal(wire).name}' has the following signals:
+{newlinechar.join("- " + get_real_signal(port).name for port in wire.signals)}
+{iob_colors.ENDC}"""
+                        ValueError,
+                    )
+            elif len(self.signals) != len(wire.signals):
+                newlinechar = "\n"
+                fail_with_msg(
+                    f"""{iob_colors.FAIL}Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
+Port '{self.name}' has the following signals:
+{newlinechar.join("- " + get_real_signal(port).name for port in self.signals)}
+
+External connection '{get_real_signal(wire).name}' has the following signals:
+{newlinechar.join("- " + get_real_signal(port).name for port in wire.signals)}
+{iob_colors.ENDC}"""
+                    ValueError,
+                )
+        else:
+            fail_with_msg(
+                f"Invalid wire type! {wire}. Must be iob_wire or str",
+                TypeError,
+            )
+
         self.e_connect = wire
         self.e_connect_bit_slices = bit_slices
-
 
 attrs = [
     "name",

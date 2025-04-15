@@ -107,6 +107,12 @@ if __name__ == "__main__":
         help="Print supported Py2HWSW core dictionary attributes",
     )
     parser.add_argument(
+        "--print_lib_cores",
+        dest="print_lib_cores",
+        action="store_true",
+        help="Print cores provided by Py2HWSW's library",
+    )
+    parser.add_argument(
         "--browse",
         dest="browse_lib",
         action="store_true",
@@ -128,6 +134,9 @@ if __name__ == "__main__":
         exit(0)
     elif args.print_py2hwsw_attributes:
         iob_core.print_py2hwsw_attributes()
+        exit(0)
+    elif args.print_lib_cores:
+        iob_core.print_lib_cores()
         exit(0)
     elif args.browse_lib:
         iob_core.browse_lib()

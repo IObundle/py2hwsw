@@ -40,6 +40,7 @@ from iob_base import (
     nix_permission_hack,
     add_traceback_msg,
     debug,
+    get_lib_cores,
 )
 from iob_license import iob_license, update_license
 import sw_tools
@@ -985,29 +986,31 @@ class iob_core(iob_module, iob_instance):
         doc_gen.process_tex_macros(f"{core.build_dir}/document/tsrc")
 
     @staticmethod
+    def print_lib_cores():
+        lib_path = os.path.join(os.path.dirname(__file__), "../lib")
+        cores = get_lib_cores()
+        print("Cores available in the Py2HWSW library:")
+        for path in cores:
+            file = os.path.basename(path)
+            dir = os.path.dirname(path)
+            print(f"- {os.path.splitext(file)[0]}: {os.path.relpath(dir, lib_path)}")
+
+    @staticmethod
     def browse_lib():
         """Generate IP-XACT library with all lib cores"""
-        lib_path = os.path.join(os.path.dirname(__file__), "../lib")
         # Set as special target to avoid setting up the cores
         __class__.global_special_target = "ipxact_gen"
-        # Find all .py files under lib_path
-        for root, dirs, files in os.walk(lib_path):
-            # Skip specific directories
-            if os.path.basename(root) in ["scripts", "test", "document"]:
-                dirs[:] = []
-                continue
-            for file in files:
-                if file.endswith(".py"):
-                    print(f"Generating IP-XACT for '{file}'.")
-                    # Create the core object as a top module to obtain its attributes.
-                    # Also, always set python parameter `demo=True`, since some lib cores use this parameter to generate a demo core.
-                    __class__.global_top_module = None
-                    module = __class__.get_core_obj(os.path.splitext(file)[0], demo=True)
-                    # Generate IP-XACT for the core
-                    ipxact_gen.generate_ipxact_xml(module, "ipxact_lib")
-                    # Skip subdirectories of this core to avoid including subblocks specific of this core
-                    dirs[:] = []
-                    continue
+
+        cores = get_lib_cores()
+        for path in cores:
+            file = os.path.basename(path)
+            print(f"Generating IP-XACT for '{file}'.")
+            # Create the core object as a top module to obtain its attributes.
+            # Also, always set python parameter `demo=True`, since some lib cores use this parameter to generate a demo core.
+            __class__.global_top_module = None
+            module = __class__.get_core_obj(os.path.splitext(file)[0], demo=True)
+            # Generate IP-XACT for the core
+            ipxact_gen.generate_ipxact_xml(module, "ipxact_lib")
 
         print(
             f"{iob_colors.INFO}Generated IP-XACT library in './ipxact_lib/' folder.{iob_colors.ENDC}"

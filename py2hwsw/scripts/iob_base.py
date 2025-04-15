@@ -479,3 +479,22 @@ def assert_attributes(
     for arg in kwargs:
         if arg not in inspect.signature(func).parameters:
             fail_with_msg(error_msg.replace("[func]", str(func)).replace("[arg]", arg))
+
+
+def get_lib_cores():
+    """Search for py2hwsw library cores and return a list with their file paths"""
+    lib_path = os.path.join(os.path.dirname(__file__), "../lib")
+    cores = []
+    # Find all .py files under lib_path
+    for root, dirs, files in os.walk(lib_path):
+        # Skip specific directories
+        if os.path.basename(root) in ["scripts", "test", "document"]:
+            dirs[:] = []
+            continue
+        for file in files:
+            if file.endswith(".py") or file.endswith(".json"):
+                cores.append(os.path.join(root, file))
+                # Skip subdirectories of this core to avoid including subblocks specific of this core
+                dirs[:] = []
+                continue
+    return cores

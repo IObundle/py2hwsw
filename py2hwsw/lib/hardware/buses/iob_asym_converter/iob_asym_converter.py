@@ -6,6 +6,46 @@
 def setup(py_params_dict):
     attributes_dict = {
         "generate_hw": False,
+        "confs": [
+            {"name": "W_DATA_W", "type": "P", "val": 21, "min": 1, "max": "NA"},
+            {"name": "R_DATA_W", "type": "P", "val": 21, "min": 1, "max": "NA"},
+            {
+                "name": "ADDR_W",
+                "type": "P",
+                "val": 3,
+                "min": 1,
+                "max": "NA",
+                "descr": "higher ADDR_W lower DATA_W",
+            },
+            {
+                "name": "BIG_ENDIAN",
+                "type": "P",
+                "val": 0,
+                "min": 0,
+                "max": 1,
+                "descr": "0: little endian, 1: big endian",
+            },
+            # determine W_ADDR_W and R_ADDR_W
+            {"name": "MAXDATA_W", "type": "F", "val": "iob_max(W_DATA_W, R_DATA_W)"},
+            {"name": "MINDATA_W", "type": "F", "val": "iob_min(W_DATA_W, R_DATA_W)"},
+            {"name": "R", "type": "F", "val": "MAXDATA_W / MINDATA_W"},
+            {
+                "name": "MINADDR_W",
+                "type": "F",
+                "val": "ADDR_W - $clog2(R)",
+                "descr": "lower ADDR_W (higher DATA_W)",
+            },
+            {
+                "name": "W_ADDR_W",
+                "type": "F",
+                "val": "(W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W",
+            },
+            {
+                "name": "R_ADDR_W",
+                "type": "F",
+                "val": "(R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W",
+            },
+        ],
         "ports": [
             {
                 "name": "clk_en_rst_s",

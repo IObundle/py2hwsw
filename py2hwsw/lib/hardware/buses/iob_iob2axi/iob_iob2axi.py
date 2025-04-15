@@ -11,8 +11,8 @@ def setup(py_params_dict):
             "name": "ADDR_W",
             "descr": "",
             "type": "P",
-            "val": "0",
-            "min": "0",
+            "val": "1",
+            "min": "1",
             "max": "32",
         },
         {
@@ -52,8 +52,8 @@ def setup(py_params_dict):
             "name": "AXI_ID_W",
             "descr": "AXI ID bus width",
             "type": "P",
-            "val": "0",
-            "min": "0",
+            "val": "1",
+            "min": "1",
             "max": "32",
         },
     ]

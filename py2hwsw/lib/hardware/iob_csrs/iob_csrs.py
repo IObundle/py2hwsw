@@ -95,6 +95,21 @@ def setup(py_params_dict):
             continue
         confs.append(conf)
 
+    # Append DATA_W parameter if not already present
+    if "DATA_W" not in [
+        conf["name"] for conf in py_params_dict["instantiator"]["confs"]
+    ]:
+        confs.append(
+            {
+                "name": "DATA_W",
+                "type": "P",
+                "val": "1",
+                "min": "1",
+                "max": "32",
+                "descr": "Data bus width",
+            }
+        )
+
     # Append parameters for csr interface
     if_gen_params = {}
     for param_name, param_value in csr_if_params.items():

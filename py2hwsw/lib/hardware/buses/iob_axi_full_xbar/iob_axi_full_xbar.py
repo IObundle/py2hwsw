@@ -52,8 +52,8 @@ def setup(py_params_dict):
     AXI_PYTHON_PARAMS = {i.upper(): v for i, v in axi_python_params.items()}
 
     axi_verilog_params = {
-        "ID_W": 0,
-        "LEN_W": 0,
+        "ID_W": 1,
+        "LEN_W": 1,
     }
     # Dictionary maps verilog paramters to ones with same name of interconnect
     AXI_VERILOG_PARAMS_MAP = {i: i for i in axi_verilog_params}

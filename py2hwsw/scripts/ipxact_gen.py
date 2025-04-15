@@ -105,13 +105,21 @@ class Parameter:
         def_value = replace_params_with_ids(self.def_value, parameters_list)
         def_value = escape_xml_special_chars(def_value)
 
+        # Try to convert def_value to int
+        if type(def_value) is str and def_value.isnumeric():
+            def_value = int(def_value)
+
+        param_val_type = "int"
+        if type(def_value) is not int:
+            param_val_type = "string"
+
         # Generate the xml code
         xml_code = f"""<ipxact:parameter kactus2:usageCount="{self.usage_count}" """
         if self.max_value != "NA":
             xml_code += f"""maximum="{self.max_value}" """
         if self.min_value != "NA":
             xml_code += f"""minimum="{self.min_value}" """
-        xml_code += f"""parameterId="{self.name}_ID" type="int">
+        xml_code += f"""parameterId="{self.name}_ID" type="{param_val_type}">
 			<ipxact:name>{self.name}</ipxact:name>
 			<ipxact:description>{self.description}</ipxact:description>
 			<ipxact:value>{def_value}</ipxact:value>

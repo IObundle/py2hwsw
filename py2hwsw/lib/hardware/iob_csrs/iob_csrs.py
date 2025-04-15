@@ -207,7 +207,9 @@ def setup(py_params_dict):
     # Set correct address width in ADDR_W (false-)parameter
     attributes_dict["confs"][0]["val"] = csr_gen_obj.core_addr_w
     # Set correct address width in control_if port (ADDR_W - 2 lsbs)
-    attributes_dict["ports"][1]["signals"]["ADDR_W"] = csr_gen_obj.core_addr_w - 2
+    attributes_dict["ports"][1]["signals"]["ADDR_W"] = max(
+        1, csr_gen_obj.core_addr_w - 2
+    )
 
     return attributes_dict
 

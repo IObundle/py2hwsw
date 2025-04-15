@@ -138,7 +138,7 @@ def get_instance_port_connections(instance):
             port.e_connect
         ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
         newlinechar = "\n"
-        if not port.interface or not port.e_connect.interface:
+        if (not port.interface or not port.e_connect.interface) and not isinstance(port.e_connect, str):
             assert len(port.signals) == len(
                 port.e_connect.signals
             ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
@@ -155,7 +155,10 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
         instance_portmap += f"        // {port.name} port: {port.descr}\n"
         if isinstance(port.e_connect, str):
             if len(port.signals) == 1:
-                instance_portmap += f"        .{port.signal[0].name}({port.e_connect}),\n"
+                if "z" in port.e_connect.lower():
+                    instance_portmap += f"        .{port.signals[0].name}(),\n"
+                else:
+                    instance_portmap += f"        .{port.signals[0].name}({port.e_connect}),\n"
                 continue
             else:
                 fail_with_msg(

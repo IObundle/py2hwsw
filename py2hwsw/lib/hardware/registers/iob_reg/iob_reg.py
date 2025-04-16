@@ -14,18 +14,18 @@ def setup(py_params_dict):
 
     clk_s_params = [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
 
-    suffix_dict = {
-        "cke": "c",
-        "cken": "cn",
-        "arst": "a",
-        "arstn": "an",
-        "rst": "r",
-        "rstn": "rn",
-        "en": "e",
-        "enn": "en",
-    }
+    suffix_list = [
+        "c",
+        "cn",
+        "a",
+        "an",
+        "r",
+        "rn",
+        "e",
+        "en",
+    ]
 
-    suffix = "".join([suffix_dict[x] for x in suffix_dict if x in clk_s_params])
+    suffix = "".join([suffix_list for x in suffix_list if x in clk_s_params])
 
     reg_type = "iob_regn" if "n" in clk_s_params else "iob_reg"
 
@@ -35,29 +35,27 @@ def setup(py_params_dict):
     en_str = ""
 
     sensitivity_list = "negedge clk_i" if "n" in clk_s_params else "posedge clk_i"
-    if "arst" in clk_s_params:
+    if "a" in clk_s_params:
         sensitivity_list = f"{sensitivity_list}, posedge arst_i"
-    elif "arstn" in clk_s_params:
+    elif "an" in clk_s_params:
         sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
 
-    if any([x in clk_s_params for x in ["arst", "arstn"]]):
-        arst_con = " | ".join(
-            [f"{x}_i" for x in ["arst", "arstn"] if x in clk_s_params]
-        ).replace("arstn", "~arst_n")
+    if any([x in clk_s_params for x in ["a", "an"]]):
+        arst_con = f"{'arst' if 'a' in clk_s_params else '~arst_n'}_i"
         rst_str += f"        if ({arst_con}) begin\n            data_o <= RST_VAL;\n        end"
-    if any([x in clk_s_params for x in ["rst", "rstn"]]):
-        rst_con = " | ".join(
-            [f"{x}_i" for x in ["rst", "rstn"] if x in clk_s_params]
-        ).replace("rstn", "~rst_n")
+    if any([x in clk_s_params for x in ["r", "rn"]]):
+        rst_con = f"{'rst' if 'r' in clk_s_params else '~rst_n'}_i"
         rst_str += f"{' else ' if rst_str != '' else '        '}if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
 
-    if any([x in clk_s_params for x in ["cke", "cken", "en", "enn"]]):
+    if any([x in clk_s_params for x in ["c", "cn", "e", "en"]]):
         en_con = (
             " & ".join(
-                [f"{x}_i" for x in ["cke", "cken", "en", "enn"] if x in clk_s_params]
+                [f"{x}_i" for x in ["c", "cn", "e", "en"] if x in clk_s_params]
             )
-            .replace("cken", "~cke_n")
-            .replace("enn", "~en_n")
+            .replace("cn_i", "~cke_n_i")
+            .replace("en_i", "~en_n_i")
+            .replace("c_i", "cke_i")
+            .replace("e_i", "en_i")
         )
         en_str = f"{'else ' if rst_str != '' else '        '}if ({en_con}) begin\n            data_o <= data_i;\n        end"
     else:

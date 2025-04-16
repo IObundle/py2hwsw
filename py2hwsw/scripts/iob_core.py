@@ -40,7 +40,6 @@ from iob_base import (
     nix_permission_hack,
     add_traceback_msg,
     debug,
-    validate_verilog_const,
 )
 from iob_license import iob_license, update_license
 import sw_tools

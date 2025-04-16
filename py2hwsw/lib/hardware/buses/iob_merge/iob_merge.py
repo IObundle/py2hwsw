@@ -242,7 +242,7 @@ def setup(py_params_dict):
                 "RST_VAL": f"{NBITS}'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst",
+                "clk_en_rst_s": "c_a_r",
             },
             "connect": {
                 "clk_en_rst_s": (

@@ -88,6 +88,17 @@ INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
             "-avz --force --delete --exclude 'software/tb' ../..",
             f"-avz --force --delete --exclude 'software/tb' ../../{python_module.relative_path_to_UUT}",
         )
+        # Append UUT's verilog paths in verilator.mk includes
+        replace_str_in_file(
+            f"{build_dir}/{sim_dir}/verilator.mk",
+            "# verilator  flags",
+            f"""\
+#include the UUT's headers
+VLTINCLUDES+=-I../../{python_module.relative_path_to_UUT}/hardware/src
+
+# verilator  flags
+""",
+        )
 
 
 # Setup fpga files, but only the ones in the board_list

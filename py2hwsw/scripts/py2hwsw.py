@@ -5,10 +5,11 @@
 # SPDX-License-Identifier: MIT
 
 import sys
+import os
 import argparse
 
 import iob_base
-from iob_base import fail_with_msg
+from iob_base import list_dir, copy_dir, cat_file
 from iob_core import iob_core
 
 from py2hwsw_version import PY2HWSW_VERSION
@@ -118,6 +119,36 @@ if __name__ == "__main__":
         action="store_true",
         help="Generate IP-XACT library including every lib core",
     )
+    # Browse/Copy/Manage py2hwsw files
+    # https://github.com/IObundle/iob-soc/pull/975#discussion_r1843025005
+    dirs = {
+        "root": ".",
+        "lib": "lib",
+        "sim": "hardware/simulation",
+        "fpga": "hardware/fpga",
+        "syn": "hardware/syn",
+    }
+    for dir in dirs:
+        parser.add_argument(
+            f"--{dir}-ls",
+            type=str,
+            metavar=(f"<relative/path/to/py2hwsw/{dir}>"),
+            help=f"List contents of a given {dir} directory.",
+        )
+        parser.add_argument(
+            f"--{dir}-cp",
+            type=str,
+            nargs=2,
+            metavar=(f"<relative/path/to/py2hwsw/{dir}>", "<destination/dir>"),
+            help=f"Copy contents of a given {dir} directory.",
+        )
+        parser.add_argument(
+            f"--{dir}-cat",
+            type=str,
+            metavar=(f"<relative/path/to/py2hwsw/{dir}>"),
+            help=f"List contents of a given {dir} file.",
+        )
+
     args = parser.parse_args()
 
     # print(f"Args: {args}", file=sys.stderr)  # DEBUG
@@ -141,6 +172,25 @@ if __name__ == "__main__":
     elif args.browse_lib:
         iob_core.browse_lib()
         exit(0)
+
+    # Browse/Copy/Manage py2hwsw files
+    # https://github.com/IObundle/iob-soc/pull/975#discussion_r1843025005
+    for dir in dirs:
+        py2hwsw_dir = os.path.join(
+            os.path.dirname(os.path.realpath(__file__)), "..", dirs[dir]
+        )
+        if args.__dict__[f"{dir}_ls"]:
+            list_dir(os.path.join(py2hwsw_dir, args.__dict__[f"{dir}_ls"]))
+            exit(0)
+        if args.__dict__[f"{dir}_cp"]:
+            copy_dir(
+                os.path.join(py2hwsw_dir, args.__dict__[f"{dir}_cp"][0]),
+                args.__dict__[f"{dir}_cp"][1],
+            )
+            exit(0)
+        if args.__dict__[f"{dir}_cat"]:
+            cat_file(os.path.join(py2hwsw_dir, args.__dict__[f"{dir}_cat"]))
+            exit(0)
 
     if not args.core_name:
         parser.print_usage(sys.stderr)

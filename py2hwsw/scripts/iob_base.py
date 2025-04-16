@@ -11,6 +11,7 @@ import importlib
 import traceback
 from functools import wraps
 import inspect
+import shutil
 
 import iob_colors
 
@@ -498,3 +499,59 @@ def get_lib_cores():
                 dirs[:] = []
                 continue
     return cores
+
+
+# Browse/Copy/Manage py2hwsw files
+# https://github.com/IObundle/iob-soc/pull/975#discussion_r1843025005
+def list_dir(path):
+    """
+    Lists the contents of a directory.
+    Args:
+        path (str): The path to the directory.
+    Returns:
+        list: A list of files and directories in the given path.
+    """
+    try:
+        print("\n".join(os.listdir(path)))
+    except FileNotFoundError:
+        print(f"Directory '{path}' not found.")
+        exit(1)
+
+
+def copy_dir(src, dest):
+    """
+    Copies the contents of a directory to another directory.
+    Args:
+        src (str): The source directory path.
+        dest (str): The destination directory path.
+    Returns:
+        None
+    """
+    try:
+        if os.path.isfile(src):
+            shutil.copy(src, dest)
+        else:
+            shutil.copytree(src, dest)
+        nix_permission_hack(dest)
+    except FileNotFoundError:
+        print(f"Directory '{src}' not found.")
+        exit(1)
+    except FileExistsError:
+        print(f"Directory '{dest}' already exists.")
+        exit(1)
+
+
+def cat_file(path):
+    """
+    Prints the contents of a file.
+    Args:
+        path (str): The path to the file.
+    Returns:
+        None
+    """
+    try:
+        with open(path, 'r') as file:
+            print(file.read())
+    except FileNotFoundError:
+        print(f"File '{path}' not found.")
+        exit(1)

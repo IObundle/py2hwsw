@@ -1016,8 +1016,6 @@ class iob_core(iob_module, iob_instance):
             f"{iob_colors.INFO}Generated IP-XACT library in './ipxact_lib/' folder.{iob_colors.ENDC}"
         )
 
-
-
     @staticmethod
     def version_str_to_digits(version_str):
         """Given a version string (like "V0.12"), return a 4 digit string representing

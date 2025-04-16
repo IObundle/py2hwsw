@@ -485,6 +485,8 @@ def validate_verilog_const(value: str, direction: str):
     :param value: constant to validate
     :param direction: direction of the constant (input or output)"""
     if direction == "input":
+        assert "'" in value, f"{iob_colors.FAIL}Invalid format for wire '{value}'! Expected <width>'<base><value>', got {value}.{iob_colors.ENDC}"
+        
         _bases = {"b":"01","d":"0123456789", "h":"0123456789abcdef"}
         _, _v = value.split("'")
         if _v[0] not in _bases:
@@ -492,10 +494,8 @@ def validate_verilog_const(value: str, direction: str):
         elif not all(c in _bases[_v[0]] for c in _v[1:]):
             fail_with_msg(f"Invalid value for wire '{value}'! Expected [{_bases[_v[0]]}], got {_v[1:]}.")
     elif direction == "output":
-        assert (
-            "z" in value.lower(),
-            f"If not connected, output wire '{value}' must be a high impedance value (z)!"
-        )
+        assert "z" in value.lower(), f"{iob_colors.FAIL}If not connected, output wire '{value}' must be a high impedance value (z)!{iob_colors.ENDC}"
+        
     else:
         fail_with_msg(
             f"Invalid direction '{direction}' for wire '{value}'! Expected input or output."

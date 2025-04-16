@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
+`include "iob_asym_converter_conf.vh"
 
 module iob_asym_converter #(
    `include "iob_asym_converter_params.vs"

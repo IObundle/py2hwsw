@@ -724,15 +724,16 @@ def setup(py_params_dict):
         },
     ]
 
+    attributes_dict["snippets"] = []
     if params["include_snippet"]:
-        attributes_dict["snippets"] = [
+        attributes_dict["snippets"] += [
             {
-            "verilog_code": """
+                "verilog_code": """
    //assign interrupts = {{30{1'b0}}, uart_interrupt_o, 1'b0};
    assign interrupts = {{30{1'b0}}, 1'b0, 1'b0};
 """
-                }
-            ]
+            }
+        ]
 
     iob_system_scripts(attributes_dict, params, py_params_dict)
 

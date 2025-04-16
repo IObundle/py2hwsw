@@ -25,9 +25,7 @@ def setup(py_params_dict):
         "enn": "en",
     }
 
-    suffix = "".join(
-        [suffix_dict[x] for x in suffix_dict if x in clk_s_params]
-    )
+    suffix = "".join([suffix_dict[x] for x in suffix_dict if x in clk_s_params])
 
     reg_type = "iob_regn" if "n" in clk_s_params else "iob_reg"
 

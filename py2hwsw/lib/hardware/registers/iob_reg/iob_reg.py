@@ -2,13 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+import sys
+
 
 def setup(py_params_dict):
 
     port_params = (
         py_params_dict["port_params"]
         if "port_params" in py_params_dict
-        else {"clk_en_rst_s": "cke_arst"}
+        else {"clk_en_rst_s": "c_a"}
     )
     assert "clk_en_rst_s" in port_params, "clk_en_rst_s port is missing"
 
@@ -25,7 +27,7 @@ def setup(py_params_dict):
         "en",
     ]
 
-    suffix = "".join([suffix_list for x in suffix_list if x in clk_s_params])
+    suffix = "".join([x for x in suffix_list if x in clk_s_params])
 
     reg_type = "iob_regn" if "n" in clk_s_params else "iob_reg"
 
@@ -49,13 +51,11 @@ def setup(py_params_dict):
 
     if any([x in clk_s_params for x in ["c", "cn", "e", "en"]]):
         en_con = (
-            " & ".join(
-                [f"{x}_i" for x in ["c", "cn", "e", "en"] if x in clk_s_params]
-            )
+            " & ".join([f"{x}_i" for x in ["c", "cn", "e", "en"] if x in clk_s_params])
             .replace("cn_i", "~cke_n_i")
             .replace("en_i", "~en_n_i")
-            .replace("c_i", "cke_i")
             .replace("e_i", "en_i")
+            .replace("c_i", "cke_i")
         )
         en_str = f"{'else ' if rst_str != '' else '        '}if ({en_con}) begin\n            data_o <= data_i;\n        end"
     else:

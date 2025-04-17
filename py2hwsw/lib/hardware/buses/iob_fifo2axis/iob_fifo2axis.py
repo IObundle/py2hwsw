@@ -24,7 +24,7 @@ def setup(py_params_dict):
             "name": "clk_en_rst_s",
             "signals": {
                 "type": "iob_clk",
-                "params": "cke_arst_rst",
+                "params": "c_a_r",
             },
             "descr": "Clock, clock enable, async and sync reset",
         },

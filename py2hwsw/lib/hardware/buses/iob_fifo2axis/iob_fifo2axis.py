@@ -243,7 +243,7 @@ def setup(py_params_dict):
         "comb": {
             "code": comb_code,
             # All infered registers use rst_i
-            "clk_if": "cke_arst_rst",
+            "clk_if": "c_a_r",
         },
     }
 

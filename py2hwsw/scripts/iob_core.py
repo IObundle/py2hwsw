@@ -617,7 +617,9 @@ class iob_core(iob_module, iob_instance):
             if "'" in wire_name or wire_name.lower() == "z":
                 wire = wire_name
             else:
-                wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(instantiator.ports, wire_name)
+                wire = find_obj_in_list(
+                    instantiator.wires, wire_name
+                ) or find_obj_in_list(instantiator.ports, wire_name)
                 if not wire:
                     fail_with_msg(
                         f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"

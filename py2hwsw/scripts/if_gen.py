@@ -441,14 +441,14 @@ def get_iob_clk_ports(params: str = None):
     ]
 
     for param, port, descr in [
-        ("c",  "cke",    "Clock enable"),
-        ("cn", "cke_n",  "Active-low clock enable"),
-        ("a",  "arst",   "Asynchronous active-high reset"),
+        ("c", "cke", "Clock enable"),
+        ("cn", "cke_n", "Active-low clock enable"),
+        ("a", "arst", "Asynchronous active-high reset"),
         ("an", "arst_n", "Asynchronous active-low reset"),
-        ("r",  "rst",    "Synchronous active-high reset"),
-        ("rn", "rst_n",  "Synchronous active-low reset"),
-        ("e",  "en",     "Enable"),
-        ("en", "en_n",   "Active-low enable"),
+        ("r", "rst", "Synchronous active-high reset"),
+        ("rn", "rst_n", "Synchronous active-low reset"),
+        ("e", "en", "Enable"),
+        ("en", "en_n", "Active-low enable"),
     ]:
         if param in params:
             ports.append(

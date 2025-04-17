@@ -137,12 +137,16 @@ def get_instance_port_connections(instance):
             continue
 
         # Check if there are connections for this instance
-        assert (port.e_connect), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
+        assert (
+            port.e_connect
+        ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
 
         # If one of the ports is not a standard inferface, check if the number of signals is the same
         if not port.interface or not port.e_connect.interface:
             newlinechar = "\n"
-            assert len(port.signals) == len(port.e_connect.signals), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
+            assert len(port.signals) == len(
+                port.e_connect.signals
+            ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
 Port '{port.name}' has the following signals:
 {newlinechar.join("- " + get_real_signal(port).name for port in port.signals)}
 
@@ -163,7 +167,9 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
             if "z" in port.e_connect.lower():
                 instance_portmap += f"        .{port.signals[0].name}(),\n"
             else:
-                instance_portmap += f"        .{port.signals[0].name}({port.e_connect}),\n"
+                instance_portmap += (
+                    f"        .{port.signals[0].name}({port.e_connect}),\n"
+                )
             continue
         # Connect individual signals
         for idx, port_signal in enumerate(port.signals):
@@ -204,7 +210,7 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
                         e_signal_name = bit_slice.split(":")[1]
                         port_name = port_signal.name
                     else:
-                    # Connection is a bit slice
+                        # Connection is a bit slice
                         e_signal_name = bit_slice
                     break
                 elif port_signal.name in bit_slice:
@@ -213,7 +219,7 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
                         e_signal_name = bit_slice.split(":")[1]
                         port_name = port_signal.name
                     else:
-                    # Connection is a bit slice
+                        # Connection is a bit slice
                         e_signal_name = bit_slice
                     break
 

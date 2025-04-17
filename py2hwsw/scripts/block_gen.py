@@ -159,6 +159,12 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
         if port.descr and not port.doc_only:
             instance_portmap += f"        // {port.name} port: {port.descr}\n"
 
+        if isinstance(port.e_connect, str):
+            if "z" in port.e_connect.lower():
+                instance_portmap += f"        .{port.signals[0].name}(),\n"
+            else:
+                instance_portmap += f"        .{port.signals[0].name}({port.e_connect}),\n"
+            continue
         # Connect individual signals
         for idx, port_signal in enumerate(port.signals):
             # Skip signals that are not iob_signals

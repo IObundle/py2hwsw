@@ -403,7 +403,7 @@ def setup(py_params_dict):
                 "RST_VAL": "1'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst_en",
+                "clk_en_rst_s": "c_a_r_e",
             },
             "connect": {
                 "clk_en_rst_s": (
@@ -425,7 +425,7 @@ def setup(py_params_dict):
                 "RST_VAL": f"{NBITS}'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst",
+                "clk_en_rst_s": "c_a_r",
             },
             "connect": {
                 "clk_en_rst_s": (
@@ -447,7 +447,7 @@ def setup(py_params_dict):
                 "RST_VAL": "1'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst_en",
+                "clk_en_rst_s": "c_a_r_e",
             },
             "connect": {
                 "clk_en_rst_s": (
@@ -469,7 +469,7 @@ def setup(py_params_dict):
                 "RST_VAL": "1'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst_en",
+                "clk_en_rst_s": "c_a_r_e",
             },
             "connect": {
                 "clk_en_rst_s": (
@@ -491,7 +491,7 @@ def setup(py_params_dict):
                 "RST_VAL": f"{NBITS}'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst",
+                "clk_en_rst_s": "c_a_r",
             },
             "connect": {
                 "clk_en_rst_s": (

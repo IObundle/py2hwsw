@@ -32,7 +32,7 @@ module iob_regfile_at2p #(
    generate
       for (addr = 0; addr < (2 ** ADDR_W); addr = addr + 1) begin : gen_register_file
          assign regfile_en[addr] = (w_addr_i == addr);
-         iob_reg_cear_e #(
+         iob_reg_cae #(
             .DATA_W (DATA_W),
             .RST_VAL({DATA_W{1'd0}})
          ) rdata (
@@ -50,7 +50,7 @@ module iob_regfile_at2p #(
    assign r_data = regfile_in[r_addr_i*DATA_W+:DATA_W];
 
    //read
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'd0}})
    ) rdata (

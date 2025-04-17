@@ -117,11 +117,8 @@ def setup(py_params_dict):
                 "use_level": True,
                 "use_en": True,
             },
-            {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "cke_arst_rst"}},
-            {
-                "core_name": "iob_reg",
-                "port_params": {"clk_en_rst_s": "cke_arst_rst_en"},
-            },
+            {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "c_a_r"}},
+            {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "c_a_r_e"}},
             {"core_name": "iob_counter"},
         ],
     }

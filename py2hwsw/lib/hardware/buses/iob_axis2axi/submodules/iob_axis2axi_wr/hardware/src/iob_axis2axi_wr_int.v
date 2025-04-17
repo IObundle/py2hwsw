@@ -184,7 +184,7 @@ module iob_axis2axi_wr_int #(
    end
 
    // Registers for address_done and data_done
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) address_done_reg (
@@ -196,7 +196,7 @@ module iob_axis2axi_wr_int #(
       .data_o(address_done)
    );
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) data_done_reg (
@@ -220,7 +220,7 @@ module iob_axis2axi_wr_int #(
       .data_o(transf_data_count)
    );
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W ((AXI_LEN_W + 1)),
       .RST_VAL(0)
    ) length_reg (
@@ -232,7 +232,7 @@ module iob_axis2axi_wr_int #(
       .data_o(length)
    );
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (2),
       .RST_VAL(0)
    ) state_reg (
@@ -245,7 +245,7 @@ module iob_axis2axi_wr_int #(
    );
 
    // AXI Interface registers
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (AXI_LEN_W),
       .RST_VAL(0)
    ) axi_awlen_reg (
@@ -257,7 +257,7 @@ module iob_axis2axi_wr_int #(
       .data_o(axi_awlen_o)
    );
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (AXI_ADDR_W),
       .RST_VAL(0)
    ) axi_awaddr_reg (
@@ -269,7 +269,7 @@ module iob_axis2axi_wr_int #(
       .data_o(axi_awaddr_o)
    );
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_awvalid_reg (
@@ -281,7 +281,7 @@ module iob_axis2axi_wr_int #(
       .data_o(axi_awvalid_o)
    );
 
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (AXI_DATA_W),
       .RST_VAL(0)
    ) axi_wdata_reg (
@@ -294,7 +294,7 @@ module iob_axis2axi_wr_int #(
       .data_o(axi_wdata_o)
    );
 
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_wvalid_reg (
@@ -307,7 +307,7 @@ module iob_axis2axi_wr_int #(
       .data_o(axi_wvalid_o)
    );
 
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_wlast_reg (

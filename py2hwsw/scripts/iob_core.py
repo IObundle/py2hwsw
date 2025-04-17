@@ -433,6 +433,7 @@ class iob_core(iob_module, iob_instance):
             instantiator=kwargs.get("instantiator", None),
             connect=kwargs.get("connect", {}),
             parameters=kwargs.get("parameters", {}),
+            is_superblock=kwargs.get("is_superblock", False)
         )
 
         # Copy (some) parent attributes to child

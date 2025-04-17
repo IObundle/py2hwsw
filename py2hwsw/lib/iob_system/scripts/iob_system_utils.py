@@ -76,7 +76,7 @@ def assert_block_attributes(attributes_dict, py_params):
         for block in attributes_dict.get(attribute, []) + child_attributes.get(
             attribute, []
         ):
-            assert block.get("core_name", None), "All subblocks must have a core name!"
+            assert block.get("core_name", None), f"All {attribute} must have a core name!"
             assert block.get(
                 "instance_name", None
             ), f"Block '{block['core_name']}' must have an instance name!"
@@ -153,6 +153,7 @@ def handle_system_overrides(attributes_dict, py_params):
             else:
                 # Didn't override, so append it to list
                 attributes_dict[child_attribute_name].append(child_obj)
+                # print(f"DEBUG: Appending {child_obj[identifier]}", file=sys.stderr)
 
 
 def set_build_dir(attributes_dict, py_params):

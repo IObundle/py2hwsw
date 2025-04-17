@@ -16,6 +16,9 @@ def setup(py_params_dict):
 
     clk_s_params = [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
 
+    # Remove duplicated entries
+    clk_s_params = list(dict.fromkeys(clk_s_params))
+
     suffix_list = [
         "c",
         "cn",

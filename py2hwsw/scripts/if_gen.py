@@ -441,14 +441,14 @@ def get_iob_clk_ports(params: str = None):
     ]
 
     for param, port, descr in [
-        ("c",  "cke",    "Clock enable"),
-        ("cn", "cke_n",  "Active-low clock enable"),
-        ("a",  "arst",   "Asynchronous active-high reset"),
+        ("c", "cke", "Clock enable"),
+        ("cn", "cke_n", "Active-low clock enable"),
+        ("a", "arst", "Asynchronous active-high reset"),
         ("an", "arst_n", "Asynchronous active-low reset"),
-        ("r",  "rst",    "Synchronous active-high reset"),
-        ("rn", "rst_n",  "Synchronous active-low reset"),
-        ("e",  "en",     "Enable"),
-        ("en", "en_n",   "Active-low enable"),
+        ("r", "rst", "Synchronous active-high reset"),
+        ("rn", "rst_n", "Synchronous active-low reset"),
+        ("e", "en", "Enable"),
+        ("en", "en_n", "Active-low enable"),
     ]:
         if param in params:
             ports.append(
@@ -1065,16 +1065,15 @@ def get_axis_ports(params: str = None):
             width=DATA_W,
             descr="axis stream data.",
         ),
-        
     ]
     if "tlast" in params:
         signals += [
             iob_signal(
-            name="axis_tlast_o",
-            width=1,
-            descr="axis stream last.",
-        ),
-    ]
+                name="axis_tlast_o",
+                width=1,
+                descr="axis stream last.",
+            ),
+        ]
     return signals
 
 

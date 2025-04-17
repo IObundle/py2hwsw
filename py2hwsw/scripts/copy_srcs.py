@@ -306,9 +306,11 @@ def sw_setup(python_module):
     build_dir = python_module.build_dir
     setup_dir = python_module.setup_dir
 
-    #os.makedirs(build_dir + "/software/src", 
+    # os.makedirs(build_dir + "/software/src",
     # Copy LIB software Makefile
-    shutil.copytree(f"{get_lib_dir()}/software", f"{build_dir}/software", dirs_exist_ok=True)
+    shutil.copytree(
+        f"{get_lib_dir()}/software", f"{build_dir}/software", dirs_exist_ok=True
+    )
     nix_permission_hack(f"{build_dir}/software")
 
     # Create 'scripts/' directory

@@ -36,11 +36,14 @@ def setup(py_params_dict):
 
     mwrap_wires = []
     mwrap_ports = []
+    memory_ports = []
     for port in attrs["ports"]:
         if isinstance(port["signals"], dict):
             if port["signals"]["type"] in mem_if_names:
                 wire = copy.deepcopy(port)
+                wire["name"] = wire["name"][:-2]
                 mwrap_wires.append(wire)
+                memory_ports.append(port)
             else:
                 mwrap_ports.append(port)
         else:
@@ -50,6 +53,11 @@ def setup(py_params_dict):
 
     attributes_dict["wires"] = mwrap_wires
 
+    connect_dict = {
+        p["name"]: w["name"]
+        for p, w in zip(memory_ports + mwrap_ports, mwrap_wires + mwrap_ports)
+    }
+
     attributes_dict["subblocks"] = [
         {
             "core_name": attrs["original_name"],
@@ -58,7 +66,7 @@ def setup(py_params_dict):
             "parameters": {
                 i["name"]: i["name"] for i in attrs["confs"] if i["type"] in ["P", "F"]
             },
-            "connect": {i["name"]: i["name"] for i in attrs["ports"]},
+            "connect": connect_dict,
         }
     ]
 

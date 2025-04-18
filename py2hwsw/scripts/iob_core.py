@@ -608,21 +608,21 @@ class iob_core(iob_module, iob_instance):
             elif type(connection_value) is tuple:
                 wire_name = connection_value[0]
                 bit_slices = connection_value[1]
+                if type(bit_slices) is not list:
+                    fail_with_msg(
+                        f"Second element of tuple must be a list of bit slices/connections: {connection_value}"
+                    )
             else:
                 fail_with_msg(f"Invalid connection value: {connection_value}")
 
-            if type(bit_slices) is not list:
-                fail_with_msg(
-                    f"Second element of tuple must be a list of bit slices/connections: {connection_value}"
-                )
-
-            wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(
-                instantiator.ports, wire_name
-            )
-            if not wire:
-                fail_with_msg(
-                    f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
-                )
+            if "'" in wire_name or wire_name.lower() == "z":
+                wire = wire_name
+            else:
+                wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(instantiator.ports, wire_name)
+                if not wire:
+                    fail_with_msg(
+                        f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
+                    )
             port.connect_external(wire, bit_slices=bit_slices)
         for port in self.ports:
             if not port.e_connect and port.interface:

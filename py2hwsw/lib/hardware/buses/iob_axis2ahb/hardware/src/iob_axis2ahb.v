@@ -44,7 +44,7 @@ module iob_axis2ahb #(
    assign addr_add_step = m_ahb_addr_o + ADDR_STEP;
 
    reg [ADDR_WIDTH-1:0] haddr_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (ADDR_WIDTH),
       .RST_VAL(0)
    ) iob_reg_haddr (
@@ -57,7 +57,7 @@ module iob_axis2ahb #(
 
    // htrans
    reg [2-1:0] htrans_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (2),
       .RST_VAL(0)
    ) iob_reg_htrans (
@@ -70,7 +70,7 @@ module iob_axis2ahb #(
 
    // hwdata
    reg [DATA_WIDTH-1:0] hwdata_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (DATA_WIDTH),
       .RST_VAL(0)
    ) hwdata_reg (
@@ -85,7 +85,7 @@ module iob_axis2ahb #(
    // hwstrb
    reg  [STRB_WIDTH-1:0] hwstrb_nxt;
    wire [STRB_WIDTH-1:0] hwstrb_pipe;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (STRB_WIDTH),
       .RST_VAL(0)
    ) hwstrb_pipe_reg (
@@ -95,7 +95,7 @@ module iob_axis2ahb #(
       .data_i(hwstrb_nxt),
       .data_o(hwstrb_pipe)
    );
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (STRB_WIDTH),
       .RST_VAL(0)
    ) hwstrb_reg (
@@ -108,7 +108,7 @@ module iob_axis2ahb #(
 
    // hwrite
    reg hwrite_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (1),
       .RST_VAL(0)
    ) hwrite_reg (
@@ -122,7 +122,7 @@ module iob_axis2ahb #(
    // config registers
    reg  [ADDR_WIDTH-1:0] config_out_length_nxt;
    wire [ADDR_WIDTH-1:0] config_out_length_int;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (ADDR_WIDTH),
       .RST_VAL(0)
    ) config_out_length_reg (
@@ -137,7 +137,7 @@ module iob_axis2ahb #(
    // state register
    wire [STATE_W-1:0] state;
    reg  [STATE_W-1:0] state_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (STATE_W),
       .RST_VAL(0)
    ) state_reg (
@@ -160,7 +160,7 @@ module iob_axis2ahb #(
 
    // axis out tready register
    reg in_axis_tready_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (1),
       .RST_VAL(0)
    ) in_axis_tready_reg (
@@ -173,7 +173,7 @@ module iob_axis2ahb #(
 
    // axis in tvalid register
    reg out_axis_tvalid_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (1),
       .RST_VAL(0)
    ) out_axis_tvalid_reg (

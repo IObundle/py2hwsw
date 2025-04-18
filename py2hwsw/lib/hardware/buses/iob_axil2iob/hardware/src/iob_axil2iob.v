@@ -54,7 +54,7 @@ module iob_axil2iob #(
 
    assign iob_addr_en = axil_arvalid_i | axil_awvalid_i;
 
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (1),
       .RST_VAL(0)
    ) iob_reg_bvalid (
@@ -65,7 +65,7 @@ module iob_axil2iob #(
       .data_o(axil_bvalid_o)
    );
 
-   iob_reg_cear_e #(
+   iob_reg_cae #(
       .DATA_W (ADDR_W),
       .RST_VAL(0)
    ) iob_reg_addr (
@@ -85,7 +85,7 @@ module iob_axil2iob #(
    // axil_awready == 1: waiting for awvalid
    assign awready_en = axil_awready_o ? axil_awvalid_i : (axil_bvalid_o & axil_bready_i);
    assign axil_awready_nxt = ~axil_awready_o; // toggle state
-   iob_reg_cear_e #(
+   iob_reg_cae #(
       .DATA_W (1),
       .RST_VAL(1)
    ) iob_reg_awready (

@@ -74,7 +74,7 @@ def setup(py_params_dict):
                     "RST_VAL": "RST_VAL",
                 },
                 "port_params": {
-                    "clk_en_rst_s": "cke_arst_rst_en",
+                    "clk_en_rst_s": "c_a_r_e",
                 },
                 "connect": {
                     "clk_en_rst_s": (

@@ -27,7 +27,7 @@ module iob_fifo2axis #(
    assign read_condition = axis_tready_i | (~(saved | fifo_read_r));
    assign fifo_read_o    = (en_i & (~fifo_empty_i)) & read_condition;
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) fifo_read_reg (
@@ -44,7 +44,7 @@ module iob_fifo2axis #(
    wire saved_nxt;
    assign saved_rst = (rst_i | output_en);
    assign saved_nxt = (fifo_read_r & (~output_en)) | saved;
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) saved_reg (
@@ -61,7 +61,7 @@ module iob_fifo2axis #(
    assign axis_tlast_nxt = (axis_word_count == len_int);
    wire saved_tlast;
 
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) axis_tlast_reg (
@@ -86,7 +86,7 @@ module iob_fifo2axis #(
 
    //tdata register
    wire [DATA_W-1:0] saved_tdata;
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'd0}})
    ) axis_tdata_reg (
@@ -104,7 +104,7 @@ module iob_fifo2axis #(
    assign output_nxt[1+:DATA_W] = (saved) ? saved_tdata : fifo_rdata_i;
    assign output_nxt[0]         = (saved) ? saved_tlast : axis_tlast_nxt;
    assign output_en             = (~axis_tvalid_o) | axis_tready_i;
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (DATA_W + 2),
       .RST_VAL({(DATA_W + 2) {1'd0}})
    ) output_reg (

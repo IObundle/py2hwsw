@@ -36,7 +36,7 @@ module iob_apb2iob #(
    //program counter
    wire [1:0] pc_cnt;
    reg  [1:0] pc_cnt_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (2),
       .RST_VAL(2'd0)
    ) pc_reg (
@@ -86,7 +86,7 @@ module iob_apb2iob #(
 
 
    //APB outputs
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) apb_ready_reg (
@@ -95,7 +95,7 @@ module iob_apb2iob #(
       .data_o(apb_ready_o)
    );
 
-   iob_reg_cear_e #(
+   iob_reg_cae #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'd0}})
    ) apb_rdata_reg (

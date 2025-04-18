@@ -111,7 +111,7 @@ module iob_pack #(
   );
 
   //wrap control accumulator
-  iob_reg_cear_r #(
+  iob_reg_car #(
       .DATA_W ($clog2(DATA_W) + 1),
       .RST_VAL({$clog2(DATA_W) + 1{1'b0}})
   ) wrap_acc_reg (
@@ -122,7 +122,7 @@ module iob_pack #(
   );
 
   //pcnt register (state counter)
-  iob_reg_cear_r #(
+  iob_reg_car #(
       .DATA_W (2),
       .RST_VAL(2'b0)
   ) pcnt_reg (

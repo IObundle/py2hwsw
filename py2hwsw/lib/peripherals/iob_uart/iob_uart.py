@@ -193,7 +193,7 @@ def setup(py_params_dict):
                     "DATA_W": 1,
                     "RST_VAL": "1'b0",
                 },
-                "port_params": {"clk_en_rst_s": "cke_arst_rst_en"},
+                "port_params": {"clk_en_rst_s": "c_a_r_e"},
                 "connect": {
                     "clk_en_rst_s": (
                         "clk_en_rst_s",

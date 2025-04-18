@@ -60,7 +60,7 @@ module iob_iob2axil #(
    //program counter
    wire [2:0] pc_cnt;
    reg  [2:0] pc_cnt_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (3),
       .RST_VAL(3'd0)
    ) pc_reg (

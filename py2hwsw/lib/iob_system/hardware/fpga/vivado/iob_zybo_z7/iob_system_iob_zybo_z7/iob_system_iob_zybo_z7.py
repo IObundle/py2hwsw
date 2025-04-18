@@ -106,7 +106,7 @@ def setup(py_params_dict):
             "descr": "Clock and reset",
             "signals": {
                 "type": "iob_clk",
-                "params": "arst",
+                "params": "a",
             },
         },
         {
@@ -129,7 +129,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": "iob_clk",
                 "prefix": "intercon_m_",
-                "params": "arst",
+                "params": "a",
             },
         },
         {

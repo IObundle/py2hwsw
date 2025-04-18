@@ -16,7 +16,7 @@ class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
 
     code: str = ""
-    clk_if: str = "cke_arst"
+    clk_if: str = "c_a"
 
     def __post_init__(self):
         """Wrap verilog code with the always block"""
@@ -124,15 +124,15 @@ class iob_comb(iob_snippet):
                             {"name": f"{signal.name}_en", "descr": f"{signal.name} enable", "width": 1, "isvar": True}
                         )
                         bit_slices.append(f"en_i:{signal.name}_en")
-                        port_params = port_params + "_en"
+                        port_params = port_params + "_e"
                     if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
                             {"name": f"{signal.name}_rst", "descr": f"{signal.name} reset", "width": 1, "isvar": True}
                         )
                         bit_slices.append(f"rst_i:{signal.name}_rst")
-                        port_params = port_params + "_rst"
+                        port_params = port_params + "_r"
 
-                    if any(x in port_params for x in ["_rst", "_en"]):
+                    if any(x in port_params for x in ["_r", "_e"]):
                         if not any(
                             wire.name == f"{signal.name}_reg_signals"
                             for wire in core.wires

@@ -41,7 +41,7 @@ def setup(py_params_dict):
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_r_inst",
                 "port_params": {
-                    "clk_en_rst_s": "cke_arst_rst",
+                    "clk_en_rst_s": "c_a_r",
                 },
             },
         ],

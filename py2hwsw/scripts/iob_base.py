@@ -11,6 +11,7 @@ import importlib
 import traceback
 from functools import wraps
 import inspect
+import shutil
 
 import iob_colors
 
@@ -480,14 +481,90 @@ def assert_attributes(
         if arg not in inspect.signature(func).parameters:
             fail_with_msg(error_msg.replace("[func]", str(func)).replace("[arg]", arg))
 
+
+def get_lib_cores():
+    """Search for py2hwsw library cores and return a list with their file paths"""
+    lib_path = os.path.join(os.path.dirname(__file__), "../lib")
+    cores = []
+    # Find all .py files under lib_path
+    for root, dirs, files in os.walk(lib_path):
+        # Skip specific directories
+        if os.path.basename(root) in ["scripts", "test", "document"]:
+            dirs[:] = []
+            continue
+        for file in files:
+            if file.endswith(".py") or file.endswith(".json"):
+                cores.append(os.path.join(root, file))
+                # Skip subdirectories of this core to avoid including subblocks specific of this core
+                dirs[:] = []
+                continue
+    return cores
+
+
+# Browse/Copy/Manage py2hwsw files
+# https://github.com/IObundle/iob-soc/pull/975#discussion_r1843025005
+def list_dir(path):
+    """
+    Lists the contents of a directory.
+    Args:
+        path (str): The path to the directory.
+    Returns:
+        list: A list of files and directories in the given path.
+    """
+    try:
+        print("\n".join(os.listdir(path)))
+    except FileNotFoundError:
+        print(f"Directory '{path}' not found.")
+        exit(1)
+
+
+def copy_dir(src, dest):
+    """
+    Copies the contents of a directory to another directory.
+    Args:
+        src (str): The source directory path.
+        dest (str): The destination directory path.
+    Returns:
+        None
+    """
+    try:
+        if os.path.isfile(src):
+            shutil.copy(src, dest)
+        else:
+            shutil.copytree(src, dest)
+        nix_permission_hack(dest)
+    except FileNotFoundError:
+        print(f"Directory '{src}' not found.")
+        exit(1)
+    except FileExistsError:
+        print(f"Directory '{dest}' already exists.")
+        exit(1)
+
+
+def cat_file(path):
+    """
+    Prints the contents of a file.
+    Args:
+        path (str): The path to the file.
+    Returns:
+        None
+    """
+    try:
+        with open(path, 'r') as file:
+            print(file.read())
+    except FileNotFoundError:
+        print(f"File '{path}' not found.")
+        exit(1)
+
+
 def validate_verilog_const(value: str, direction: str):
     """Validate if constant is a valid Verilog constant and if it is compatible with the direction
     :param value: constant to validate
     :param direction: direction of the constant (input or output)"""
     if direction == "input":
         assert "'" in value, f"{iob_colors.FAIL}Invalid format for wire '{value}'! Expected <width>'<base><value>', got {value}.{iob_colors.ENDC}"
-        
-        _bases = {"b":"01","d":"0123456789", "h":"0123456789abcdef"}
+
+        _bases = {"b": "01", "d": "0123456789", "h": "0123456789abcdef"}
         _, _v = value.split("'")
         if _v[0] not in _bases:
             fail_with_msg(f"Invalid base for wire '{value}'! Expected b, d or h, got {_v[0]}.")
@@ -495,7 +572,7 @@ def validate_verilog_const(value: str, direction: str):
             fail_with_msg(f"Invalid value for wire '{value}'! Expected [{_bases[_v[0]]}], got {_v[1:]}.")
     elif direction == "output":
         assert "z" in value.lower(), f"{iob_colors.FAIL}If not connected, output wire '{value}' must be a high impedance value (z)!{iob_colors.ENDC}"
-        
+
     else:
         fail_with_msg(
             f"Invalid direction '{direction}' for wire '{value}'! Expected input or output."

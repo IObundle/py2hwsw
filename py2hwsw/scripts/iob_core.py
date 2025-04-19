@@ -40,6 +40,7 @@ from iob_base import (
     nix_permission_hack,
     add_traceback_msg,
     debug,
+    get_lib_cores,
 )
 from iob_license import iob_license, update_license
 import sw_tools
@@ -641,7 +642,7 @@ class iob_core(iob_module, iob_instance):
                     self.__connect_clk_interface(port, instantiator)
 
         # iob_csrs specific code
-        if self.original_name == "iob_csrs":
+        if self.original_name == "iob_csrs" and instantiator:
             self.__connect_cbus_port(instantiator)
 
     def __connect_cbus_port(self, instantiator):
@@ -984,6 +985,37 @@ class iob_core(iob_module, iob_instance):
             f"{core.build_dir}/document/tsrc"
         )
         doc_gen.process_tex_macros(f"{core.build_dir}/document/tsrc")
+
+    @staticmethod
+    def print_lib_cores():
+        lib_path = os.path.join(os.path.dirname(__file__), "../lib")
+        cores = get_lib_cores()
+        print("Cores available in the Py2HWSW library:")
+        for path in cores:
+            file = os.path.basename(path)
+            dir = os.path.dirname(path)
+            print(f"- {os.path.splitext(file)[0]}: {os.path.relpath(dir, lib_path)}")
+
+    @staticmethod
+    def browse_lib():
+        """Generate IP-XACT library with all lib cores"""
+        # Set as special target to avoid setting up the cores
+        __class__.global_special_target = "ipxact_gen"
+
+        cores = get_lib_cores()
+        for path in cores:
+            file = os.path.basename(path)
+            print(f"Generating IP-XACT for '{file}'.")
+            # Create the core object as a top module to obtain its attributes.
+            # Also, always set python parameter `demo=True`, since some lib cores use this parameter to generate a demo core.
+            __class__.global_top_module = None
+            module = __class__.get_core_obj(os.path.splitext(file)[0], demo=True)
+            # Generate IP-XACT for the core
+            ipxact_gen.generate_ipxact_xml(module, "ipxact_lib")
+
+        print(
+            f"{iob_colors.INFO}Generated IP-XACT library in './ipxact_lib/' folder.{iob_colors.ENDC}"
+        )
 
     @staticmethod
     def version_str_to_digits(version_str):

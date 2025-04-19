@@ -85,8 +85,19 @@ INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
         # Replace ROOT_DIR for rsync to remote machine
         replace_str_in_file(
             f"{build_dir}/{sim_dir}/Makefile",
-            "-avz --force --delete ../..",
-            f"-avz --force --delete ../../{python_module.relative_path_to_UUT}",
+            "-avz --force --delete --exclude 'software/tb' ../..",
+            f"-avz --force --delete --exclude 'software/tb' ../../{python_module.relative_path_to_UUT}",
+        )
+        # Append UUT's verilog paths in verilator.mk includes
+        replace_str_in_file(
+            f"{build_dir}/{sim_dir}/verilator.mk",
+            "# verilator  flags",
+            f"""\
+#include the UUT's headers
+VLTINCLUDES+=-I../../{python_module.relative_path_to_UUT}/hardware/src
+
+# verilator  flags
+""",
         )
 
 
@@ -133,8 +144,8 @@ INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
         # Replace ROOT_DIR for rsync to remote machine
         replace_str_in_file(
             f"{build_dir}/{fpga_dir}/Makefile",
-            "-avz --delete --force ../..",
-            f"-avz --delete --force ../../{python_module.relative_path_to_UUT}",
+            "-avz --force --delete --exclude 'software/tb' ../..",
+            f"-avz --force --delete --exclude 'software/tb' ../../{python_module.relative_path_to_UUT}",
         )
 
     # Copy LIB fpga directories only if their name is present in the board_list

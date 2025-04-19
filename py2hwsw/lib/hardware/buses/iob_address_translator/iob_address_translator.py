@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 interfaces = {
     "iob": [
         ("valid", "output", 1),
@@ -90,7 +92,14 @@ def setup(py_params_dict):
             # (Initial zone address, Last zone address (inclusive), Offset to add (for translation))
         ],
     )
-    assert MEMORY_ZONES, """
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        MEMORY_ZONES = [
+            # (Initial zone address, Last zone address (inclusive), Offset to add (for translation))
+            (0x0, 0xFFFF, 0xFF),  # Example zone
+        ]
+    assert MEMORY_ZONES, f"""
+{os.path.basename(__file__)} error:
 No memory zones defined for address translation!
 Memory zones must be configured via the 'memory_zones' python parameter.
 Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), Offset to add (for translation))

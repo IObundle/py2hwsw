@@ -11,7 +11,7 @@ def setup(py_params_dict):
                 "name": "DATA_W",
                 "descr": "Data bus width",
                 "type": "P",
-                "val": "0",
+                "val": "1",
                 "min": "1",
                 "max": "NA",
             },

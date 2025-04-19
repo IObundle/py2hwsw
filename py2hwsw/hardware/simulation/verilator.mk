@@ -20,7 +20,7 @@ VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) $(SW_DIR)/iob_core_tb.c $(
 
 # include files
 VLTINCLUDES=$(addprefix -I, ./src ../src ../../software/src)
-CPPINCLUDES=$(addprefix -I, ../src ../../src ../../software/src)
+CPPINCLUDES=$(addprefix -I, ../src ../../src ../../../software/src)
 
 VFLAGS+=$(VLTINCLUDES) -CFLAGS "$(CPPINCLUDES) -g"
 

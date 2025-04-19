@@ -3,19 +3,10 @@
 // SPDX-License-Identifier: MIT
 
 `timescale 1ns / 1ps
+`include "iob_asym_converter_conf.vh"
 
 module iob_asym_converter #(
-   parameter W_DATA_W = 21,
-   parameter R_DATA_W = 21,
-   parameter ADDR_W = 3,  //higher ADDR_W lower DATA_W
-   parameter BIG_ENDIAN = 0,  //0: little endian, 1: big endian
-   //determine W_ADDR_W and R_ADDR_W
-   parameter MAXDATA_W = iob_max(W_DATA_W, R_DATA_W),
-   parameter MINDATA_W = iob_min(W_DATA_W, R_DATA_W),
-   parameter R = MAXDATA_W / MINDATA_W,
-   parameter MINADDR_W = ADDR_W - $clog2(R),  //lower ADDR_W (higher DATA_W)
-   parameter W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
-   parameter R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
+   `include "iob_asym_converter_params.vs"
 ) (
    `include "iob_asym_converter_io.vs"
 );

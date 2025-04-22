@@ -72,7 +72,7 @@ module iob_axistream_in #(
    assign sys_tvalid_o   = int_tvalid & mode_wr;
    assign sys_tdata_o    = int_tdata;
 
-   assign int_tready     = (mode_wr) ? sys_tready_i : data_ren_rd;
+   assign int_tready     = (mode_wr) ? sys_tready_i : data_rready_rd;
 
    // empty = fifo empty + no data in fifo2axis
    assign fifo_empty_rd  = fifo_empty & (~int_tvalid);

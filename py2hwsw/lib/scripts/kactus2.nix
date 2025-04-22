@@ -4,24 +4,31 @@
 
 { pkgs ? import <nixpkgs> {} }:
 
+let
+  # Required qt6 components for kactus2
+  qt6Components = with pkgs.qt6; [ qtbase qttools qtsvg ];
+  # Combine all qt6 components into one virtual package
+  unifiedQt6Bin = pkgs.symlinkJoin {
+    name = "unified-qt6-bin";
+    paths = qt6Components;
+  };
+in
 pkgs.stdenv.mkDerivation {
   name = "kactus2";
   src = pkgs.fetchFromGitHub {
     owner = "kactus2";
     repo = "kactus2dev";
-    rev = "16813a2";
-    sha256 = "1pj6rwl4h6lcpmqw4cm9im7k8pfrya6ca0hjpgijix0lndfpz1n6";
+    rev = "19c5702";
+    sha256 = "jAMu/BqBjXP35skXXPu2zU5PZVJvangyyoLRjqkmLuI=";
   };
 
-  nativeBuildInputs = [ pkgs.git pkgs.swig pkgs.qt6.wrapQtAppsHook ];
-  buildInputs = [ pkgs.qt6.qtbase pkgs.qt6.qttools pkgs.qt6.qtsvg pkgs.libGL pkgs.python3 ];
-
-  # Ignore errors generating help files
-  # patchPhase = ''
-  #   sed -i 's/^cp -f Help\/Kactus2Help\.qhc executable\/Help\/Kactus2Help\.qhc$/& || true/; s/^cp -f Help\/Kactus2Help\.qch executable\/Help\/Kactus2Help\.qch$/& || true/' createhelp
-  # '';
+  # Replace pkgs.swig4 with pkgs.swig on newer nixpkgs (> 24.05)
+  nativeBuildInputs = [ pkgs.git pkgs.swig4 pkgs.qt6.wrapQtAppsHook ];
+  buildInputs = [ pkgs.qt6.qtbase pkgs.qt6.qttools pkgs.qt6.qtsvg unifiedQt6Bin pkgs.libGL pkgs.python3 ];
 
   configurePhase = ''
+    # Set QTBIN_PATH to unifiedQt6Bin
+    sed -i 's|^QTBIN_PATH=""|QTBIN_PATH="${unifiedQt6Bin}/bin/"\nQTLIBEXEC_PATH="${unifiedQt6Bin}/libexec/"|' ./configure
     ./configure --prefix=$out
   '';
 
@@ -30,10 +37,22 @@ pkgs.stdenv.mkDerivation {
   '';
 
   installPhase = ''
-    make INSTALL_ROOT=$out install
-    mv $out/lib64 $out/lib
-    install -D -m644 LICENSE $out/share/licenses/kactus2-git/LICENSE
+    # Set temporary writable home directory (kactus2 tries to create files in home).
+    # Nix does not recommend creating files in home during build of packages.
+    export HOME=$TMPDIR/nix-build-kactus2
+    # Set correct install directories
+    sed -i 's|^LOCAL_INSTALL_DIR=""|LOCAL_INSTALL_DIR="'$out'"|' ./.qmake.conf
+    sed -i 's|^    bin_path = $$LOCAL_INSTALL_DIR|    bin_path = $$LOCAL_INSTALL_DIR/bin|' ./.qmake.conf
+    sed -i 's|^    lib_path = $$LOCAL_INSTALL_DIR|    lib_path = $$LOCAL_INSTALL_DIR/lib|' ./.qmake.conf
+    # Install
+    make install
+    # Add kactus2 PythonAPI directory to the PYTHONPATH environment variable
+    mkdir -p $out/nix-support
+    cat > $out/nix-support/setup-hook <<EOF
+      export PYTHONPATH=$out/lib:''${PYTHONPATH:-}
+    EOF
   '';
+
 
   meta = {
     description = "Open source IP-XACT-based tool for ASIC, FPGA and embedded systems design";

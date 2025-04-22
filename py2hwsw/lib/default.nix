@@ -36,9 +36,9 @@
 # yosys (commit 543faed9c8cd7c33bbb407577d56e4b7444ba61c)
 # gcc-wrapper-13.2.0
 # libcap-2.69
-# fusesoc-2.2.1
-# kactus2 (commit 16813a2)
 # reuse-3.0.2
+# fusesoc-2.2.1
+# kactus2 (commit 19c5702)
 
 
 let

@@ -148,8 +148,6 @@ int main() {
 
   int failed = iob_core_tb();
 
-  iob_finish();
-
   // create test log file
   FILE *log = fopen("test.log", "w");
   if (failed != 0) {
@@ -158,4 +156,6 @@ int main() {
     fprintf(log, "Test passed!");
   }
   fclose(log);
+
+  iob_finish();
 }

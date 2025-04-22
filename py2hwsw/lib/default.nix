@@ -37,6 +37,7 @@
 # gcc-wrapper-13.2.0
 # libcap-2.69
 # fusesoc-2.2.1
+# kactus2 (commit 16813a2)
 # reuse-3.0.2
 
 
@@ -115,6 +116,7 @@ let
     libcap # Allows setting POSIX capabilities
     reuse
     fusesoc
+    (callPackage ./scripts/kactus2.nix { })
     py2hwsw
   ] ++ extra_pkgs;
 

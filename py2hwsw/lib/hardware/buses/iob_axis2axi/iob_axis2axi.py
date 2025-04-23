@@ -169,16 +169,6 @@ def setup(py_params_dict):
         "subblocks": [
             {"core_name": "iob_axis2axi_rd"},
             {"core_name": "iob_axis2axi_wr"},
-            {
-                "core_name": "iob_axistream_in",
-                "instantiante": False,
-                "dest_dir": "hardware/simulation/src",
-            },
-            {
-                "core_name": "iob_axistream_in",
-                "instantiante": False,
-                "dest_dir": "hardware/simulation/src",
-            },
         ],
         "superblocks": [
             {"core_name": "iob_axistream_in"},

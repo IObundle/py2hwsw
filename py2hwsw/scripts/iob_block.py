@@ -61,7 +61,7 @@ def create_block_group(core, *args, blocks_attribute_name="subblocks", **kwargs)
     """Creates a new block group object and adds it to the core's block list
     param core: core object
     """
-    if core.abort_reason:
+    if core.abort_reason and core.abort_reason != "ipxact_lib":
         return
     try:
         # Ensure list given by 'blocks_attribute_name' exists
@@ -86,6 +86,16 @@ def create_block_group(core, *args, blocks_attribute_name="subblocks", **kwargs)
         if type(blocks) is list:
             # Convert user blocks dictionaries into 'iob_block' objects
             for block in blocks:
+                # Create "iob_csrs" even when abort_reason is "ipxact_lib" in order to create CSRs memory map
+                # Skip all other blocks
+                if (
+                    core.abort_reason == "ipxact_lib"
+                    and block["core_name"] != "iob_csrs"
+                ):
+                    continue
+                    print("Skipping block:", block)
+                print("Creating block:", block)
+
                 # Copy some attributes from group to all of its blocks
                 if "instantiate" in group_kwargs:
                     block["instantiate"] = group_kwargs["instantiate"]

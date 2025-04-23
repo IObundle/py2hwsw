@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 AXI_IN_SIGNAL_NAMES = [
     ("araddr", "AXI_ADDR_W"),
     ("arprot", 3),
@@ -52,6 +54,10 @@ def setup(py_params_dict):
     - num_subordinates: number of subordinate interfaces
     - managers: dictionary with name and address width of each manager
     """
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        py_params_dict["name"] = os.path.basename(__file__)
+
     # Each generated wrapper must have a unique name (can't have two verilog modules with same name).
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated interconnect wrapper module."
@@ -79,24 +85,24 @@ def setup(py_params_dict):
             {
                 "name": "AXI_ID_W",
                 "type": "P",
-                "val": "0",
-                "min": "0",
+                "val": "1",
+                "min": "1",
                 "max": "32",
                 "descr": "AXI ID bus width",
             },
             {
                 "name": "AXI_ADDR_W",
                 "type": "P",
-                "val": "0",
-                "min": "0",
+                "val": "1",
+                "min": "1",
                 "max": "32",
                 "descr": "AXI address bus width",
             },
             {
                 "name": "AXI_DATA_W",
                 "type": "P",
-                "val": "0",
-                "min": "0",
+                "val": "1",
+                "min": "1",
                 "max": "32",
                 "descr": "AXI data bus width",
             },

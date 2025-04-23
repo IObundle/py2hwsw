@@ -9,10 +9,7 @@
 // APB subordinate port to IOb manager interface
 
 module iob_apb2iob #(
-   parameter APB_ADDR_W = 21,          // APB address bus width in bits
-   parameter APB_DATA_W = 21,          // APB data bus width in bits
-   parameter ADDR_W     = APB_ADDR_W,  // IOb address bus width in bits
-   parameter DATA_W     = APB_DATA_W   // IOb data bus width in bits
+   `include "iob_apb2iob_params.vs"
 ) (
    `include "iob_apb2iob_io.vs"
 );

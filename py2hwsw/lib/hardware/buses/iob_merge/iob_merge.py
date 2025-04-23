@@ -2,8 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 
 def setup(py_params_dict):
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        py_params_dict["name"] = os.path.basename(__file__)
+        py_params_dict["num_inputs"] = 2
+
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated merge module."
     )

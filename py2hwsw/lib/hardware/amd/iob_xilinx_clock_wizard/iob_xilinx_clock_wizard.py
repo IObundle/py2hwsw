@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "OUTPUT_PER",
                 "type": "P",
-                "val": "0",
+                "val": "1",
                 "min": "1",
                 "max": "NA",
                 "descr": "",
@@ -18,7 +18,7 @@ def setup(py_params_dict):
             {
                 "name": "INPUT_PER",
                 "type": "P",
-                "val": "0",
+                "val": "1",
                 "min": "1",
                 "max": "NA",
                 "descr": "",

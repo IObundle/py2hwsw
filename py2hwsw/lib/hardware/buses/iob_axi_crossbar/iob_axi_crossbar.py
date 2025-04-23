@@ -32,6 +32,10 @@ def setup(py_params_dict):
         if param in params:
             params[param] = py_params_dict[param]
 
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        params["name"] = os.path.basename(__file__)
+
     # Each generated interconnect must have a unique name (can't have two verilog modules with same name).
     assert params["name"], print(
         "Error: Missing name for generated axi crossbar module."

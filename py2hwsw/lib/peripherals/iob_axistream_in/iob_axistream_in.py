@@ -146,8 +146,8 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "data_rdata_rd", "width": 32},
                     {"name": "data_rvalid_rd", "width": 1},
-                    {"name": "data_ren_rd", "width": 1},
                     {"name": "data_rready_rd", "width": 1},
+                    {"name": "data_ren_rd", "width": 1},
                     {"name": "data_ready_rd", "width": 1},
                 ],
             },

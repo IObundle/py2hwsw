@@ -63,8 +63,6 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "rst_i",
-                        "width": 1,
-                        "descr": "Reset signal",
                     },
                 ],
             },
@@ -75,18 +73,16 @@ def setup(py_params_dict):
                     {
                         "name": "start_addr_i",
                         "width": "AXI_ADDR_W",
-                        "descr": "Burst start address",
                     },
                 ],
             },
             {
                 "name": "length_i",
-                "descr": "Burst length minus 1",
+                "descr": "Burst length",
                 "signals": [
                     {
                         "name": "length_i",
-                        "width": "AXI_LEN_W",
-                        "descr": "Burst length minus 1",
+                        "width": "(AXI_LEN_W+1)",
                     },
                 ],
             },
@@ -97,7 +93,6 @@ def setup(py_params_dict):
                     {
                         "name": "write_data_i",
                         "width": "AXI_DATA_W",
-                        "descr": "Write data",
                     },
                 ],
             },
@@ -108,18 +103,15 @@ def setup(py_params_dict):
                     {
                         "name": "write_strobe_i",
                         "width": "WSTRB_W",
-                        "descr": "Write strobe",
                     },
                 ],
             },
             {
-                "name": "write_ready_o",
-                "descr": "Write ready",
+                "name": "busy_o",
+                "descr": "Signal indicating if the module is busy transferring data",
                 "signals": [
                     {
-                        "name": "write_ready_o",
-                        "width": 1,
-                        "descr": "Write ready",
+                        "name": "busy_o",
                     },
                 ],
             },
@@ -129,7 +121,7 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "level_o",
-                        "width": "AXI_LEN_W+1",
+                        "width": "(AXI_LEN_W+1)",
                         "descr": "FIFO level",
                     },
                 ],
@@ -161,34 +153,18 @@ def setup(py_params_dict):
                 "name": "fifo_w_if",
                 "descr": "FIFO write interface",
                 "signals": [
-                    {"name": "fifo_wen", "width": 1, "isvar": True},
+                    {"name": "fifo_wen", "isvar": True},
                     {"name": "fifo_w_data", "width": "AXI_DATA_W"},
-                    {"name": "fifo_w_full", "width": 1},
+                    {"name": "fifo_w_full"},
                 ],
             },
             {
                 "name": "fifo_r_if",
                 "descr": "FIFO read interface",
                 "signals": [
-                    {"name": "fifo_ren", "width": 1},
+                    {"name": "fifo_ren"},
                     {"name": "fifo_r_data", "width": "AXI_DATA_W"},
-                    {"name": "fifo_r_empty", "width": 1},
-                ],
-            },
-            {
-                "name": "fsm_aux_signals",
-                "descr": "Auxiliary signals for the FSM",
-                "signals": [
-                    {
-                        "name": "write",
-                        "width": 1,
-                        "isvar": True,
-                    },
-                    {
-                        "name": "last_addr",
-                        "width": "AXI_ADDR_W+1",
-                        "isvar": True,
-                    },
+                    {"name": "fifo_r_empty"},
                 ],
             },
             {
@@ -197,7 +173,6 @@ def setup(py_params_dict):
                 "signals": [
                     {
                         "name": "en_fifo2axis",
-                        "width": 1,
                         "isvar": True,
                     },
                 ],
@@ -208,18 +183,27 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axis",
                     "prefix": "int_",
-                    "params": "tlast",
                     "DATA_W": "DATA_W",
                 },
             },
             {
-                "name": "fifo2axis_level",
-                "descr": "FIFO level signal for FIFO to AXI-Stream converter",
+                "name": "en_write",
+                "descr": "Enable signal for write operation",
                 "signals": [
                     {
-                        "name": "fifo2axis_level",
-                        "width": "AXI_LEN_W+1",
+                        "name": "en_write",
+                        "isvar": True,
                     },
+                ],
+            },
+            {
+                "name": "fifo2axis_clk_if",
+                "descr": "FIFO to AXI-Stream clock interface",
+                "signals": [
+                    {"name": "clk_i"},
+                    {"name": "cke_i"},
+                    {"name": "arst_i"},
+                    {"name": "rst_i"},
                 ],
             },
         ],
@@ -250,26 +234,19 @@ def setup(py_params_dict):
                     "DATA_W": "AXI_DATA_W",
                     "AXIS_LEN_W": "AXI_LEN_W+1",
                 },
-                "use_tlast": True,
-                "use_level": True,
                 "use_en": True,
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "rst_i": "rst_i",
+                    "clk_en_rst_s": "fifo2axis_clk_if",
                     "en_i": "en_fifo2axis",
-                    "len_i": "m_axi_awlen_o",
                     "fifo_r_io": "fifo_r_if",
                     "axis_m": "internal_axis_signals",
-                    "level_o": "fifo2axis_level",
                 },
             },
         ],
         "fsm": {
             "type": "fsm",
             "default_assignments": """
-        write = |write_strobe_i;
-        // Calculate the last address of the burst using the normal burst length
-        last_addr           = start_addr_i + ((length_i << 2) - 1);
+        en_write = |write_strobe_i;
         // Default assignments
         m_axi_awaddr_o_nxt = m_axi_awaddr_o;
         m_axi_awvalid_o_nxt = 1'b0;
@@ -279,17 +256,15 @@ def setup(py_params_dict):
         m_axi_wvalid_o_nxt = 1'b0;
         m_axi_bready_o_nxt = 1'b0;
         m_axi_wlast_o_nxt = 1'b0;
-        write_ready_o_nxt = write_ready_o;
         fifo_wen = 1'b0;
         en_fifo2axis = 1'b0;
         """,
             "state_descriptions": """
         WAIT_DATA: // Start transfer in the next state
-            if (write) begin
+            if (en_write) begin
                 fifo_wen = 1'b1;
                 // If it has enough data, it will start the burst
                 if((length_i == {AXI_LEN_W{1'b0}}) || {1'b0,length_i} == level_o) begin
-                    write_ready_o_nxt = 1'b0;
                     m_axi_awaddr_o_nxt = start_addr_i;
                     m_axi_awvalid_o_nxt = 1'b1;
                     // If the burst's last address is in the next 4k boundary,
@@ -300,11 +275,7 @@ def setup(py_params_dict):
                         m_axi_awlen_o_nxt = length_i;
                     end
                     state_nxt = START_BURST;
-                end else begin
-                    write_ready_o_nxt = 1'b1;
                 end
-            end else begin
-                write_ready_o_nxt = 1'b1;
             end
 
         START_BURST: // Send burst address and length and wait for ready signal
@@ -322,17 +293,7 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-    // Write address channel
-    assign m_axi_awid_o = {AXI_ID_W{1'd0}};
-    assign m_axi_awsize_o = 3'd2; // 4 bytes
-    assign m_axi_awburst_o = 2'd1; // INCR
-    assign m_axi_awlock_o = 2'd0; // Normal access
-    assign m_axi_awcache_o = 4'd0; // Normal access
-    assign m_axi_awprot_o = 3'd2; // Unsecured access
-    assign m_axi_awqos_o = 4'd0; // No QoS
-    // FIFO data
-    assign fifo_w_data = write_data_i;
-    assign m_axi_wdata_o = fifo_r_data;
+
     """
             },
         ],

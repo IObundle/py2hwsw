@@ -17,7 +17,7 @@ module iob_diff #(
 );
 
   wire [DATA_W-1:0] data_i_reg;
-  iob_reg_cear_r #(DATA_W, RST_VAL) reg0 (
+  iob_reg_car #(DATA_W, RST_VAL) reg0 (
       `include "iob_diff_iob_clk_s_s_portmap.vs"
 
       .rst_i(rst_i),

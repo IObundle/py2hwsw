@@ -100,7 +100,7 @@ def create_regs(filename, program):
 
             file_contents.append("`IOB_WIRE({}, {})\n".format(reg_name, reg_size_bits))
             file_contents.append(
-                "iob_reg_cear #(.DATA_W({}),.RST_VAL({}))\n".format(
+                "iob_reg_ca #(.DATA_W({}),.RST_VAL({}))\n".format(
                     reg_size_bits, reg_rst_val
                 )
             )

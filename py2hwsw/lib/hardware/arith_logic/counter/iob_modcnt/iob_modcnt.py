@@ -37,14 +37,14 @@ def setup(py_params_dict):
                 "descr": "Enable and Synchronous reset interface",
                 "signals": [
                     {
-                        "name": "en_i",
-                        "width": 1,
-                        "descr": "Enable input",
-                    },
-                    {
                         "name": "rst_i",
                         "width": 1,
                         "descr": "Synchronous reset input",
+                    },
+                    {
+                        "name": "en_i",
+                        "width": 1,
+                        "descr": "Enable input",
                     },
                 ],
             },
@@ -88,7 +88,7 @@ def setup(py_params_dict):
                     "RST_VAL": "RST_VAL",
                 },
                 "port_params": {
-                    "clk_en_rst_s": "cke_arst_rst_en",
+                    "clk_en_rst_s": "c_a_r_e",
                 },
                 "connect": {
                     "clk_en_rst_s": (

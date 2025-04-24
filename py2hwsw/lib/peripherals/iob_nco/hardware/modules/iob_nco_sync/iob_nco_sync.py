@@ -10,8 +10,8 @@ def setup(py_params_dict):
             {
                 "name": "PERIOD_W",
                 "type": "P",
-                "val": "0",
-                "min": "0",
+                "val": "1",
+                "min": "1",
                 "max": "32",
                 "descr": "Period width",
             },

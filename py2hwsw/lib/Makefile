@@ -47,7 +47,7 @@ sim-clean:
 	nix-shell --run "scripts/test.sh clean"
 
 fpga-build:
-	nix-shell --run "make clean setup CORE=$(CORE) INIT_MEM=$(INIT_MEM) USE_EXTMEM=$(USE_EXTMEM) && make -C $(BUILD_DIR) fpga-fw-build BOARD=$(BOARD)" && make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
+	nix-shell --run "make clean setup CORE=$(CORE) INIT_MEM=$(INIT_MEM) USE_EXTMEM=$(USE_EXTMEM) && make -C $(BUILD_DIR) fpga-sw-build BOARD=$(BOARD)" && make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
 
 fpga-run: fpga-build
 	make -C $(BUILD_DIR)/ fpga-run BOARD=$(BOARD)
@@ -67,9 +67,13 @@ delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
 
+lib-ipxact:
+	nix-shell --run "py2hwsw --browse"
+	./scripts/kactus2/import_library.py `realpath $(CURDIR)`/ipxact_lib
+	nix-shell --run "kactus2"
 
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build doc-update
+.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery lib-ipxact
 
 
 # Install board server and client

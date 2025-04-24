@@ -16,7 +16,7 @@ def setup(py_params_dict):
                 "name": "clk_rst_s",
                 "signals": {
                     "type": "iob_clk",
-                    "params": "arst",
+                    "params": "a",
                 },
                 "descr": "clock and reset",
             },
@@ -56,7 +56,7 @@ def setup(py_params_dict):
                     "RST_VAL": "2'd3" if edge else "2'd0",
                 },
                 "port_params": {
-                    "clk_en_rst_s": "arst",
+                    "clk_en_rst_s": "a",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_rst_s",

@@ -421,13 +421,13 @@ def get_iob_ports():
 @parse_widths
 def get_iob_clk_ports(params: str = None):
     if params is None:
-        params = "cke_arst"
+        params = "c_a"
     params = params.split("_")
     if (
-        all(x in params for x in ["arst", "arstn"])
-        or all(x in params for x in ["rst", "rstn"])
-        or all(x in params for x in ["en", "enn"])
-        or all(x in params for x in ["cke", "cken"])
+        all(x in params for x in ["a", "an"])
+        or all(x in params for x in ["r", "rn"])
+        or all(x in params for x in ["e", "en"])
+        or all(x in params for x in ["c", "cn"])
     ):
         raise ValueError(
             "All signals are mutually exclusive with their negated version"
@@ -440,19 +440,17 @@ def get_iob_clk_ports(params: str = None):
         )
     ]
 
-    for port, descr in [
-        ("cke", "Clock enable"),
-        ("cken", "Active-low clock enable"),
-        ("arst", "Asynchronous active-high reset"),
-        ("arstn", "Asynchronous active-low reset"),
-        ("rst", "Synchronous active-high reset"),
-        ("rstn", "Synchronous active-low reset"),
-        ("en", "Enable"),
-        ("enn", "Active-low enable"),
+    for param, port, descr in [
+        ("c", "cke", "Clock enable"),
+        ("cn", "cke_n", "Active-low clock enable"),
+        ("a", "arst", "Asynchronous active-high reset"),
+        ("an", "arst_n", "Asynchronous active-low reset"),
+        ("r", "rst", "Synchronous active-high reset"),
+        ("rn", "rst_n", "Synchronous active-low reset"),
+        ("e", "en", "Enable"),
+        ("en", "en_n", "Active-low enable"),
     ]:
-        if port in params:
-            if "low" in descr:
-                port = port[:-1] + "_n"
+        if param in params:
             ports.append(
                 iob_signal(
                     name=port + "_o",
@@ -1067,16 +1065,15 @@ def get_axis_ports(params: str = None):
             width=DATA_W,
             descr="axis stream data.",
         ),
-        
     ]
     if "tlast" in params:
         signals += [
             iob_signal(
-            name="axis_tlast_o",
-            width=1,
-            descr="axis stream last.",
-        ),
-    ]
+                name="axis_tlast_o",
+                width=1,
+                descr="axis stream last.",
+            ),
+        ]
     return signals
 
 

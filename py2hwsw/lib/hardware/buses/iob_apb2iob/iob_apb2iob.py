@@ -6,6 +6,40 @@
 def setup(py_params_dict):
     attributes_dict = {
         "generate_hw": False,
+        "confs": [
+            {
+                "name": "APB_ADDR_W",
+                "type": "P",
+                "val": 21,
+                "min": 1,
+                "max": 32,
+                "descr": "APB address bus width in bits",
+            },
+            {
+                "name": "APB_DATA_W",
+                "type": "P",
+                "val": 21,
+                "min": 1,
+                "max": 32,
+                "descr": "APB data bus width in bits",
+            },
+            {
+                "name": "ADDR_W",
+                "type": "P",
+                "val": "APB_ADDR_W",
+                "min": 1,
+                "max": 32,
+                "descr": "IOb address bus width in bits",
+            },
+            {
+                "name": "DATA_W",
+                "type": "P",
+                "val": "APB_DATA_W",
+                "min": 1,
+                "max": 32,
+                "descr": "IOb data bus width in bits",
+            },
+        ],
         "ports": [
             {
                 "name": "clk_en_rst_s",
@@ -38,7 +72,7 @@ def setup(py_params_dict):
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_e_inst",
                 "port_params": {
-                    "clk_en_rst_s": "cke_arst_en",
+                    "clk_en_rst_s": "c_a_e",
                 },
             },
         ],

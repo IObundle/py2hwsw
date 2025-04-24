@@ -36,8 +36,9 @@
 # yosys (commit 543faed9c8cd7c33bbb407577d56e4b7444ba61c)
 # gcc-wrapper-13.2.0
 # libcap-2.69
-# fusesoc-2.2.1
 # reuse-3.0.2
+# fusesoc-2.2.1
+# kactus2 (commit 19c5702)
 
 
 let
@@ -96,6 +97,7 @@ let
     llvmPackages_14.clangUseLLVM
     librsvg
     libreofficeWithEnv
+    jre # Dependency of libreoffice
     minicom     # Terminal emulator
     lrzsz       # For Zmodem file transfers via serial connection of the terminal emulator
     # Add Volare custom Python installation
@@ -114,6 +116,7 @@ let
     libcap # Allows setting POSIX capabilities
     reuse
     fusesoc
+    (callPackage ./scripts/kactus2.nix { })
     py2hwsw
   ] ++ extra_pkgs;
 

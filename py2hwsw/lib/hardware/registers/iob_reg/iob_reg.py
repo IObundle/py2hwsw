@@ -2,73 +2,63 @@
 #
 # SPDX-License-Identifier: MIT
 
+import sys
+
 
 def setup(py_params_dict):
 
     port_params = (
         py_params_dict["port_params"]
         if "port_params" in py_params_dict
-        else {"clk_en_rst_s": "cke_arst"}
+        else {"clk_en_rst_s": "c_a"}
     )
     assert "clk_en_rst_s" in port_params, "clk_en_rst_s port is missing"
 
     clk_s_params = [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
 
-    clk_suff_dict = {
-        "cke": "ce",
-        "cken": "cen",
-        "arst": "ar",
-        "arstn": "arn",
-    }
+    # Remove duplicated entries
+    clk_s_params = list(dict.fromkeys(clk_s_params))
 
-    sync_suff_dict = {
-        "rst": "r",
-        "rstn": "rn",
-        "en": "e",
-        "enn": "en",
-    }
+    suffix_list = [
+        "c",
+        "cn",
+        "a",
+        "an",
+        "r",
+        "rn",
+        "e",
+        "en",
+    ]
 
-    clk_suffix = "".join([clk_suff_dict[x] for x in clk_s_params if x in clk_suff_dict])
-    sync_suffix = "".join(
-        [sync_suff_dict[x] for x in clk_s_params if x in sync_suff_dict]
-    )
+    suffix = "".join([x for x in suffix_list if x in clk_s_params])
 
     reg_type = "iob_regn" if "n" in clk_s_params else "iob_reg"
 
-    reg_name = "_".join(filter(lambda x: x != "", [reg_type, clk_suffix, sync_suffix]))
+    reg_name = "_".join(filter(lambda x: x != "", [reg_type, suffix]))
 
     rst_str = ""
     en_str = ""
 
     sensitivity_list = "negedge clk_i" if "n" in clk_s_params else "posedge clk_i"
-    if "arst" in clk_s_params:
+    if "a" in clk_s_params:
         sensitivity_list = f"{sensitivity_list}, posedge arst_i"
-    elif "arstn" in clk_s_params:
+    elif "an" in clk_s_params:
         sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
 
-    if any([x in clk_s_params for x in ["arst", "arstn", "rst", "rstn"]]):
-        rst_con = (
-            " | ".join(
-                [
-                    f"{x}_i"
-                    for x in ["arst", "arstn", "rst", "rstn"]
-                    if x in clk_s_params
-                ]
-            )
-            .replace("arstn", "~arst_n")
-            .replace("rstn", "~rst_n")
-        )
-        rst_str = (
-            f"        if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
-        )
+    if any([x in clk_s_params for x in ["a", "an"]]):
+        arst_con = f"{'arst' if 'a' in clk_s_params else '~arst_n'}_i"
+        rst_str += f"        if ({arst_con}) begin\n            data_o <= RST_VAL;\n        end"
+    if any([x in clk_s_params for x in ["r", "rn"]]):
+        rst_con = f"{'rst' if 'r' in clk_s_params else '~rst_n'}_i"
+        rst_str += f"{' else ' if rst_str != '' else '        '}if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
 
-    if any([x in clk_s_params for x in ["cke", "cken", "en", "enn"]]):
+    if any([x in clk_s_params for x in ["c", "cn", "e", "en"]]):
         en_con = (
-            " & ".join(
-                [f"{x}_i" for x in ["cke", "cken", "en", "enn"] if x in clk_s_params]
-            )
-            .replace("cken", "~cke_n")
-            .replace("enn", "~en_n")
+            " & ".join([f"{x}_i" for x in ["c", "cn", "e", "en"] if x in clk_s_params])
+            .replace("cn_i", "~cke_n_i")
+            .replace("en_i", "~en_n_i")
+            .replace("e_i", "en_i")
+            .replace("c_i", "cke_i")
         )
         en_str = f"{'else ' if rst_str != '' else '        '}if ({en_con}) begin\n            data_o <= data_i;\n        end"
     else:

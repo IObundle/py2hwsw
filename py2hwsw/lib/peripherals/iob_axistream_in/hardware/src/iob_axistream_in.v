@@ -72,7 +72,7 @@ module iob_axistream_in #(
    assign sys_tvalid_o   = int_tvalid & mode_wr;
    assign sys_tdata_o    = int_tdata;
 
-   assign int_tready     = (mode_wr) ? sys_tready_i : data_ren_rd;
+   assign int_tready     = (mode_wr) ? sys_tready_i : data_rready_rd;
 
    // empty = fifo empty + no data in fifo2axis
    assign fifo_empty_rd  = fifo_empty & (~int_tvalid);
@@ -114,7 +114,7 @@ module iob_axistream_in #(
             endcase
          end
 
-         iob_reg_cear_re #(
+         iob_reg_care #(
             .DATA_W (1),
             .RST_VAL(1'd0)
          ) fifo_write_state_reg (
@@ -231,7 +231,7 @@ module iob_axistream_in #(
       .detected_o(axis_tlast_detected)
    );
 
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) tlast_detect_reg (

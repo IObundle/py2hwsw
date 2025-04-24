@@ -20,6 +20,32 @@ static_reg_tables = {}
 
 def setup(py_params_dict):
     """Standard Py2HWSW setup function"""
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        py_params_dict["csrs"] = [
+            {
+                "name": "reg_group",
+                "descr": "Dummy reg group",
+                "regs": [
+                    {
+                        "name": "dummy_reg",
+                        "type": "W",
+                        "n_bits": 1,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "autoreg": True,
+                        "descr": "Dummy register for demo",
+                    },
+                ],
+            }
+        ]
+        py_params_dict["build_dir"] = "dummy_folder"
+        py_params_dict["instantiator"] = {
+            "name": "iob",
+            "confs": [],
+        }
+        py_params_dict["dest_dir"] = "dummy_dest"
+
     params = {
         # Use the same name as instantiator + the suffix "_csrs"
         "name": py_params_dict["instantiator"]["name"] + "_csrs",
@@ -68,6 +94,21 @@ def setup(py_params_dict):
         if conf["name"] == "ADDR_W" or conf["name"] in csr_if_params:
             continue
         confs.append(conf)
+
+    # Append DATA_W parameter if not already present
+    if "DATA_W" not in [
+        conf["name"] for conf in py_params_dict["instantiator"]["confs"]
+    ]:
+        confs.append(
+            {
+                "name": "DATA_W",
+                "type": "P",
+                "val": "1",
+                "min": "1",
+                "max": "32",
+                "descr": "Data bus width",
+            }
+        )
 
     # Append parameters for csr interface
     if_gen_params = {}
@@ -126,7 +167,7 @@ def setup(py_params_dict):
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_e_inst",
                 "port_params": {
-                    "clk_en_rst_s": "cke_arst_en",
+                    "clk_en_rst_s": "c_a_e",
                 },
                 "instantiate": False,
             },
@@ -152,18 +193,22 @@ def setup(py_params_dict):
     }
 
     # Generate snippets
-    csr_gen_obj, reg_table = generate_csr(attributes_with_csrs)
+    csr_gen_obj, reg_table = generate_csr(
+        attributes_with_csrs,
+        create_files=py_params_dict.get("py2hwsw_target", "") == "setup",
+    )
 
     # Store reg_table in static dict
     global static_reg_tables
     static_reg_tables[params["name"]] = reg_table
 
     # Generate docs
-    csr_gen_obj.generate_regs_tex(
-        attributes_with_csrs["csrs"],
-        reg_table,
-        attributes_with_csrs["build_dir"] + "/document/tsrc",
-    )
+    if py_params_dict.get("py2hwsw_target", "") == "setup":
+        csr_gen_obj.generate_regs_tex(
+            attributes_with_csrs["csrs"],
+            reg_table,
+            attributes_with_csrs["build_dir"] + "/document/tsrc",
+        )
 
     # Add ports and internal wires for registers
     auto_ports, auto_wires, auto_snippet = csr_gen_obj.gen_ports_wires(reg_table)
@@ -177,7 +222,9 @@ def setup(py_params_dict):
     # Set correct address width in ADDR_W (false-)parameter
     attributes_dict["confs"][0]["val"] = csr_gen_obj.core_addr_w
     # Set correct address width in control_if port (ADDR_W - 2 lsbs)
-    attributes_dict["ports"][1]["signals"]["ADDR_W"] = csr_gen_obj.core_addr_w - 2
+    attributes_dict["ports"][1]["signals"]["ADDR_W"] = max(
+        1, csr_gen_obj.core_addr_w - 2
+    )
 
     return attributes_dict
 

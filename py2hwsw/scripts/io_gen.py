@@ -41,7 +41,8 @@ def generate_ports(core):
 
         for signal_idx, signal in enumerate(port.signals):
             if isinstance(signal, iob_signal):
-                lines.append("    " + signal.get_verilog_port())
+                if signal.get_verilog_port():
+                    lines.append("    " + signal.get_verilog_port())
 
         # Close ifdef if conditional interface
         if port.if_defined or port.if_not_defined:

@@ -31,7 +31,7 @@ module iob_axis2fifo #(
    //tready
    wire axis_tready_nxt;
    assign axis_tready_nxt = (~fifo_full_i) & en_i;
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) tready_reg (
@@ -45,7 +45,7 @@ module iob_axis2fifo #(
    wire axis_tvalid_reg;
    wire in_regs_en;
    assign in_regs_en = axis_tready_o & en_i;
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) tvalid_reg (
@@ -60,7 +60,7 @@ module iob_axis2fifo #(
    wire axis_tlast_reg;
    wire axis_tlast_nxt;
    assign axis_tlast_nxt = axis_tlast_i & axis_tvalid_i;
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (1),
       .RST_VAL(1'b0)
    ) tlast_reg (
@@ -73,7 +73,7 @@ module iob_axis2fifo #(
 
    // tdata register
    wire [DATA_W-1:0] axis_tdata_reg;
-   iob_reg_cear_re #(
+   iob_reg_care #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'b0}})
    ) tdata_reg (

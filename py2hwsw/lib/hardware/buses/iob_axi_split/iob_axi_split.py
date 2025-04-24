@@ -2,8 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 
 def setup(py_params_dict):
+    # Check if should create a demonstation of this core
+    if py_params_dict.get("demo", False):
+        py_params_dict["name"] = os.path.basename(__file__)
+        py_params_dict["num_managers"] = 2
+
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated split module."
     )
@@ -110,16 +117,16 @@ def setup(py_params_dict):
             {
                 "name": "ID_W",
                 "type": "P",
-                "val": "0",
-                "min": "0",
+                "val": "1",
+                "min": "1",
                 "max": "32",
                 "descr": "AXI ID bus width",
             },
             {
                 "name": "LEN_W",
                 "type": "P",
-                "val": "0",
-                "min": "0",
+                "val": "1",
+                "min": "1",
                 "max": "32",
                 "descr": "AXI LEN bus width",
             },
@@ -403,7 +410,7 @@ def setup(py_params_dict):
                 "RST_VAL": "1'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst_en",
+                "clk_en_rst_s": "c_a_r_e",
             },
             "connect": {
                 "clk_en_rst_s": (
@@ -425,7 +432,7 @@ def setup(py_params_dict):
                 "RST_VAL": f"{NBITS}'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst",
+                "clk_en_rst_s": "c_a_r",
             },
             "connect": {
                 "clk_en_rst_s": (
@@ -447,7 +454,7 @@ def setup(py_params_dict):
                 "RST_VAL": "1'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst_en",
+                "clk_en_rst_s": "c_a_r_e",
             },
             "connect": {
                 "clk_en_rst_s": (
@@ -469,7 +476,7 @@ def setup(py_params_dict):
                 "RST_VAL": "1'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst_en",
+                "clk_en_rst_s": "c_a_r_e",
             },
             "connect": {
                 "clk_en_rst_s": (
@@ -491,7 +498,7 @@ def setup(py_params_dict):
                 "RST_VAL": f"{NBITS}'b0",
             },
             "port_params": {
-                "clk_en_rst_s": "cke_arst_rst",
+                "clk_en_rst_s": "c_a_r",
             },
             "connect": {
                 "clk_en_rst_s": (

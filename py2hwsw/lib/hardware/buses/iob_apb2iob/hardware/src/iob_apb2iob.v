@@ -9,10 +9,7 @@
 // APB subordinate port to IOb manager interface
 
 module iob_apb2iob #(
-   parameter APB_ADDR_W = 21,          // APB address bus width in bits
-   parameter APB_DATA_W = 21,          // APB data bus width in bits
-   parameter ADDR_W     = APB_ADDR_W,  // IOb address bus width in bits
-   parameter DATA_W     = APB_DATA_W   // IOb data bus width in bits
+   `include "iob_apb2iob_params.vs"
 ) (
    `include "iob_apb2iob_io.vs"
 );
@@ -36,7 +33,7 @@ module iob_apb2iob #(
    //program counter
    wire [1:0] pc_cnt;
    reg  [1:0] pc_cnt_nxt;
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (2),
       .RST_VAL(2'd0)
    ) pc_reg (
@@ -86,7 +83,7 @@ module iob_apb2iob #(
 
 
    //APB outputs
-   iob_reg_cear #(
+   iob_reg_ca #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) apb_ready_reg (
@@ -95,7 +92,7 @@ module iob_apb2iob #(
       .data_o(apb_ready_o)
    );
 
-   iob_reg_cear_e #(
+   iob_reg_cae #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'd0}})
    ) apb_rdata_reg (

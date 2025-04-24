@@ -141,7 +141,7 @@ module iob_axis2axi_wr #(
    end
 
    // State register
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) w_state_reg (
@@ -154,7 +154,7 @@ module iob_axis2axi_wr #(
    );
 
    // Length registers
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (WLEN_W),
       .RST_VAL({WLEN_W{1'b0}})
    ) w_length_reg (
@@ -167,7 +167,7 @@ module iob_axis2axi_wr #(
    );
 
    // Address registers
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (AXI_ADDR_W),
       .RST_VAL({AXI_ADDR_W{1'b0}})
    ) w_addr_reg (

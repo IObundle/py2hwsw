@@ -140,7 +140,7 @@ module iob_axis2axi_rd #(
       endcase
    end
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) r_state_reg (
@@ -152,7 +152,7 @@ module iob_axis2axi_rd #(
       .data_o(r_state)
    );
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (RLEN_W),
       .RST_VAL({RLEN_W{1'b0}})
    ) r_length_reg (
@@ -164,7 +164,7 @@ module iob_axis2axi_rd #(
       .data_o(r_remaining_data_o)
    );
 
-   iob_reg_cear_r #(
+   iob_reg_car #(
       .DATA_W (AXI_ADDR_W),
       .RST_VAL({AXI_ADDR_W{1'b0}})
    ) r_addr_reg (

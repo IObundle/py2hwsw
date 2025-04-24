@@ -37,18 +37,18 @@ def conf_vh(macros, top_module, out_dir):
         # Sort macros macros by type, P first, M second, F last
         sorted_macros = []
         for macro in group.confs:
-            if macro["type"] == "P":
+            if macro.type == "P":
                 sorted_macros.append(macro)
         for macro in group.confs:
-            if macro["type"] == "M":
+            if macro.type == "M":
                 sorted_macros.append(macro)
         for macro in group.confs:
-            if macro["type"] == "F":
+            if macro.type == "F":
                 sorted_macros.append(macro)
 
         prev_type = ""
         for macro in sorted_macros:
-            macro_type = macro["type"]
+            macro_type = macro.type
             # If the type of the macro is different from the previous one, add a comment
             if macro_type != prev_type:
                 if macro_type == "P":

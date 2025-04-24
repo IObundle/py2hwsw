@@ -22,6 +22,8 @@ class iob_csr:
     descr: str = "Default description"
     # Select if should generate internal wires or ports for this CSR
     internal_use: bool = False
+    # List of configurations that use this CSR (used for documentation)
+    doc_conf_list: list or None = None
 
     def __post_init__(self):
         if not self.name:

@@ -121,19 +121,15 @@ class csr_gen:
         # Create doc table
         doc_table = []
         for csr_group in csrs:
-            filtered_csr_group = csr_group.copy()
-            filtered_csr_group.csrs = []
-            for reg in csr_group.csrs:
+            filtered_csr_group = copy.copy(csr_group)
+            filtered_csr_group.regs = []
+            for reg in csr_group.regs:
                 # exclude registers without matching doc_conf
                 # registers without 'doc_conf_list' are always included
-                # FIXME: keys?
-                if (
-                    "doc_conf_list" in reg.keys()
-                    and doc_conf not in reg.doc_conf_list
-                ):
+                if reg.doc_conf_list and doc_conf not in reg.doc_conf_list:
                     continue
-                filtered_csr_group.csrs.append(reg)
-            if filtered_csr_group.csrs:
+                filtered_csr_group.regs.append(reg)
+            if filtered_csr_group.regs:
                 doc_table.append(filtered_csr_group)
 
         # List all registers from doc_table
@@ -141,7 +137,9 @@ class csr_gen:
         for csr_group in doc_table:
             reg_table += csr_group.regs
 
-        return self.compute_addr(reg_table, rw_overlap, autoaddr), copy.deepcopy(doc_table)
+        return self.compute_addr(reg_table, rw_overlap, autoaddr), copy.deepcopy(
+            doc_table
+        )
 
     def bceil(self, n, log2base):
         base = int(2**log2base)
@@ -1459,7 +1457,7 @@ class csr_gen:
 
             \\input """
                     + doc_conf
-                    + f'_{csr_group.name}'
+                    + f"_{csr_group.name}"
                     + """_csrs_tab
 
           \\end{tabularx}
@@ -1468,7 +1466,7 @@ class csr_gen:
                     + """}
           \\label{"""
                     + doc_conf
-                    + f'_{csr_group.name}'
+                    + f"_{csr_group.name}"
                     + """_csrs_tab:is}
         \\end{csr_group}
         """

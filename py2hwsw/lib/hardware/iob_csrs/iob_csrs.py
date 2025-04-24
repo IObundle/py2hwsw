@@ -64,6 +64,8 @@ def setup(py_params_dict):
         "rw_overlap": False,
         # Build directory for csrs (usually auto-passed py py2hwsw).
         "build_dir": "",
+        # CSR Configuration to use
+        "doc_conf": False,
     }
 
     # Update params with values from py_params_dict
@@ -191,6 +193,7 @@ def setup(py_params_dict):
         "rw_overlap": params["rw_overlap"],
         "autoaddr": params["autoaddr"],
         "build_dir": params["build_dir"],
+        "doc_conf": params["doc_conf"],
     }
 
     # Generate snippets
@@ -214,7 +217,7 @@ def setup(py_params_dict):
         for doc_conf in doc_configs:
             _reset_autoaddrs(attributes_with_csrs["autoaddr"], regs_copy)
             _, doc_table = csr_gen_obj.get_reg_table(
-                attributes_with_csrs["csrs"],
+                regs_copy,
                 attributes_with_csrs["rw_overlap"],
                 attributes_with_csrs["autoaddr"],
                 attributes_with_csrs["doc_conf"],
@@ -273,10 +276,9 @@ def _list_all_doc_configs(csrs):
     """Return list of all doc configurations"""
     doc_configs = []
     for csr_group in csrs:
-        # FIXME: keys?
-        for reg in csr_group["regs"]:
-            if "doc_conf_list" in reg.keys():
-                doc_configs += reg["doc_conf_list"]
+        for reg in csr_group.regs:
+            if reg.doc_conf_list:
+                doc_configs += reg.doc_conf_list
     if not doc_configs:
         # empty case: no regs with specific doc_conf
         doc_configs = [""]
@@ -286,9 +288,9 @@ def _list_all_doc_configs(csrs):
     return list(set(doc_configs))
 
 
-def _reset_autoaddrs(autoaddr, regs):
+def _reset_autoaddrs(autoaddr, csrs):
     """Reset autoaddr for regs"""
-    if autoaddr and regs:
-        for table in regs:
-            for r in table["regs"]:
-                r.pop("addr", None)
+    if autoaddr and csrs:
+        for csr_group in csrs:
+            for r in csr_group.regs:
+                r.addr = -1

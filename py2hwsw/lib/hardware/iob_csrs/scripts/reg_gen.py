@@ -87,8 +87,8 @@ def build_regs_table(core):
     csr_gen_obj = csr_gen.csr_gen()
     csr_gen_obj.config = core["confs"]
     # Get register table
-    reg_table = csr_gen_obj.get_reg_table(
-        core["csrs"], core["rw_overlap"], core["autoaddr"]
+    reg_table, _ = csr_gen_obj.get_reg_table(
+        core["csrs"], core["rw_overlap"], core["autoaddr"], core["doc_conf"]
     )
 
     return csr_gen_obj, reg_table

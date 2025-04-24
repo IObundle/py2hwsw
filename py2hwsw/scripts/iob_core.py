@@ -212,6 +212,12 @@ class iob_core(iob_module, iob_instance):
             lambda y: update_license(self, **y),
             descr="License for the core.",
         )
+        self.set_default_attribute(
+            "doc_conf",
+            "",
+            str,
+            descr="CSR Configuration to use",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 

@@ -4,6 +4,7 @@
 
 import sys
 import os
+import copy
 
 # Add csrs scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
@@ -202,11 +203,27 @@ def setup(py_params_dict):
     global static_reg_tables
     static_reg_tables[params["name"]] = reg_table
 
-    # Generate docs
+    # Generate tex section for each doc_configuration and reg table
     if py_params_dict.get("py2hwsw_target", "") == "setup":
+        # use regs copy to not modify original regs
+        regs_copy = copy.deepcopy(attributes_with_csrs["csrs"])
+        # Get doc_configuration_list
+        doc_configs = _list_all_doc_configs(attributes_with_csrs["csrs"])
+        doc_tables = {}
+        # Generate doc_table for each doc_configuration
+        for doc_conf in doc_configs:
+            _reset_autoaddrs(attributes_with_csrs["autoaddr"], regs_copy)
+            _, doc_table = csr_gen_obj.get_reg_table(
+                attributes_with_csrs["csrs"],
+                attributes_with_csrs["rw_overlap"],
+                attributes_with_csrs["autoaddr"],
+                attributes_with_csrs["doc_conf"],
+            )
+
+            doc_tables[doc_conf] = doc_table
+
         csr_gen_obj.generate_regs_tex(
-            attributes_with_csrs["csrs"],
-            reg_table,
+            doc_tables,
             attributes_with_csrs["build_dir"] + "/document/tsrc",
         )
 
@@ -250,3 +267,28 @@ def create_group_for_ungrouped_csrs(csrs):
         grouped_csrs.append(general_group)
 
     return grouped_csrs
+
+
+def _list_all_doc_configs(csrs):
+    """Return list of all doc configurations"""
+    doc_configs = []
+    for csr_group in csrs:
+        # FIXME: keys?
+        for reg in csr_group["regs"]:
+            if "doc_conf_list" in reg.keys():
+                doc_configs += reg["doc_conf_list"]
+    if not doc_configs:
+        # empty case: no regs with specific doc_conf
+        doc_configs = [""]
+    else:
+        # Remove duplicates
+        doc_configs = list(set(doc_configs))
+    return list(set(doc_configs))
+
+
+def _reset_autoaddrs(autoaddr, regs):
+    """Reset autoaddr for regs"""
+    if autoaddr and regs:
+        for table in regs:
+            for r in table["regs"]:
+                r.pop("addr", None)

@@ -88,7 +88,8 @@ def generate_if_tex(ports, out_dir):
     if_file = open(f"{out_dir}/if.tex", "w")
 
     if_file.write(
-        "The interface signals of the core are described in the following tables.\n"
+        """The interface signals of the core are described in the following tables.
+Note that the ouput signals are registered in the core, while the input signals are not."""
     )
 
     for port in ports:

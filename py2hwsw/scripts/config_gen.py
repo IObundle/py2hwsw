@@ -31,7 +31,36 @@ def conf_vh(macros, top_module, out_dir):
         # If group has 'doc_only' attribute set to True, skip it
         if group.doc_only:
             continue
+
+        file2create.write(f"// {group.name}: {group.descr}\n")
+
+        # Sort macros macros by type, P first, M second, F last
+        sorted_macros = []
         for macro in group.confs:
+            if macro["type"] == "P":
+                sorted_macros.append(macro)
+        for macro in group.confs:
+            if macro["type"] == "M":
+                sorted_macros.append(macro)
+        for macro in group.confs:
+            if macro["type"] == "F":
+                sorted_macros.append(macro)
+
+        prev_type = ""
+        for macro in sorted_macros:
+            macro_type = macro["type"]
+            # If the type of the macro is different from the previous one, add a comment
+            if macro_type != prev_type:
+                if macro_type == "P":
+                    file2create.write(
+                        "// Core Configuration Parameters Default Values\n"
+                    )
+                elif macro_type == "M":
+                    file2create.write("// Core Constants. DO NOT CHANGE\n")
+                elif macro_type == "F":
+                    file2create.write("// Core Derived Parameters. DO NOT CHANGE\n")
+                prev_type = macro_type
+
             # If macro has 'doc_only' attribute set to True, skip it
             if macro.doc_only:
                 continue
@@ -39,6 +68,7 @@ def conf_vh(macros, top_module, out_dir):
                 file2create.write(f"`ifdef {macro.if_defined}\n")
             if macro.if_not_defined:
                 file2create.write(f"`ifndef {macro.if_not_defined}\n")
+
             # Only insert macro if its is not a bool define, and if so only insert it if it is true
             if type(macro.val) is not bool:
                 m_name = macro.name.upper()
@@ -164,6 +194,24 @@ The following tables describe the IP core configuration. The core may be configu
         if group.doc_clearpage:
             confs_file.write("\\clearpage")
 
+    confs_file.write(
+        """
+The parameters in the top-level Verilog module that are not listed above are
+called Derived Parameters. They are given as function of the primary parameters
+and should never be changed. They are used to simplify the definition of the
+interface and internal signals. The list of derived parameters is given below:
+\\input derived_params
+"""
+    )
+
+    confs_file.write(
+        """
+There are also constants that are used in the core in order to improve the readability
+of the code and should not be changed. They are defined as presented in the list below:
+\\input constants
+"""
+    )
+
     confs_file.write("\\clearpage")
     confs_file.close()
 
@@ -176,11 +224,12 @@ def generate_confs_tex(confs, out_dir):
     # Create table for each group
     for group in confs:
         tex_table = []
-        derv_params = []  # Unused?
+        derv_params = []
+        constants = []
         for conf in group.confs:
             conf_val = conf.val if type(conf.val) is not bool else "1"
-            # False parameters are not included in the table
-            if conf.type != "F":
+            # Only parameters are added to the table
+            if conf.type == "P":
                 tex_table.append(
                     [
                         conf.name,
@@ -191,7 +240,17 @@ def generate_confs_tex(confs, out_dir):
                         conf.descr,
                     ]
                 )
+            elif conf.type == "M":
+                # Add to list of constants
+                constants.append(
+                    [
+                        conf.name,
+                        conf_val,
+                        conf.descr,
+                    ]
+                )
             else:
+                # Add to list of derived parameters
                 derv_params.append(
                     [
                         conf.name,
@@ -200,8 +259,36 @@ def generate_confs_tex(confs, out_dir):
                     ]
                 )
 
-        # Write table with true parameters and macros
+        # Write table with true parameters
         write_table(f"{out_dir}/{group.name}_confs", tex_table)
+
+        # Write list of derived parameters
+        file2create = open(f"{out_dir}/derived_params.tex", "w")
+        file2create.write("\\begin{description}\n")
+        for derv_param in derv_params:
+            # replace underscores and $clog2 with \_ and $\log_2
+            for i in range(len(derv_param)):
+                derv_param[i] = str(derv_param[i]).replace("_", "\\_")
+                derv_param[i] = str(derv_param[i]).replace("$clog2", "log2")
+            # write the line
+            file2create.write(
+                f"  \\item[{derv_param[0]}] {derv_param[2]} Value: {derv_param[1]}.\n"
+            )
+        file2create.write("\\end{description}\n")
+
+        # Write list of constants
+        file2create = open(f"{out_dir}/constants.tex", "w")
+        file2create.write("\\begin{description}\n")
+        for constant in constants:
+            # replace underscores and $clog2 with \_ and $\log_2
+            for i in range(len(constant)):
+                constant[i] = str(constant[i]).replace("_", "\\_")
+                constant[i] = str(constant[i]).replace("$clog2", "log2")
+            # write the line
+            file2create.write(
+                f"  \\item[{constant[0]}] {constant[2]} Value: {constant[1]}.\n"
+            )
+        file2create.write("\\end{description}\n")
 
 
 def generate_confs(core):

@@ -28,7 +28,7 @@
    @(posedge CLK) #1;
 
 
-module iob_axis2axi_tb;
+module iob_axis_s_axi_m_tb;
 
    localparam PER = 10;
    localparam DATA_W = 32;
@@ -112,14 +112,14 @@ module iob_axis2axi_tb;
    wire axis_tlast;
 
    // AXIS2AXI -> AXIS OUT connection
-   wire [DATA_W-1:0] axis2axi_axis_out_tdata;
-   wire axis2axi_axis_out_tvalid;
-   wire axis2axi_axis_out_tready;
+   wire [DATA_W-1:0] axis_s_axi_m_axis_out_tdata;
+   wire axis_s_axi_m_axis_out_tvalid;
+   wire axis_s_axi_m_axis_out_tready;
 
    // AXIS IN -> AXIS2AXI connection
-   wire [DATA_W-1:0] axis2axi_axis_in_tdata;
-   wire axis2axi_axis_in_tvalid;
-   wire axis2axi_axis_in_tready;
+   wire [DATA_W-1:0] axis_s_axi_m_axis_in_tdata;
+   wire axis_s_axi_m_axis_in_tvalid;
+   wire axis_s_axi_m_axis_in_tready;
 
    // Config Write 
    reg [ADDR_W-1:0] w_addr;
@@ -159,7 +159,7 @@ module iob_axis2axi_tb;
 
    initial begin
 `ifdef VCD
-      $dumpfile("axis2axi.vcd");
+      $dumpfile("axis_s_axi_m.vcd");
       $dumpvars();
 `endif
 
@@ -278,15 +278,15 @@ module iob_axis2axi_tb;
       $finish();
    end
 
-   //instantiate axis2axi core
-   iob_axis2axi_mwrap #(
+   //instantiate axis_s_axi_m core
+   iob_axis_s_axi_m_mwrap #(
       .AXI_ADDR_W(ADDR_W),
       .AXI_LEN_W (AXI_LEN_W),
       .AXI_DATA_W(DATA_W),
       .AXI_ID_W  (1),
       .WLEN_W    (WLEN_W),
       .RLEN_W    (RLEN_W)
-   ) axis2axi_mwrap0 (
+   ) axis_s_axi_m_mwrap0 (
       // clk_en_rst_s
       .clk_i             (clk),
       .cke_i             (cke),
@@ -308,13 +308,13 @@ module iob_axis2axi_tb;
       .r_remaining_data_o(r_remaining_data),
       .r_busy_o          (r_busy),
       // axis_in_io
-      .axis_in_tdata_i   (axis2axi_axis_in_tdata),
-      .axis_in_tvalid_i  (axis2axi_axis_in_tvalid),
-      .axis_in_tready_o  (axis2axi_axis_in_tready),
+      .axis_in_tdata_i   (axis_s_axi_m_axis_in_tdata),
+      .axis_in_tvalid_i  (axis_s_axi_m_axis_in_tvalid),
+      .axis_in_tready_o  (axis_s_axi_m_axis_in_tready),
       // axis_out_io
-      .axis_out_tdata_o  (axis2axi_axis_out_tdata),
-      .axis_out_tvalid_o (axis2axi_axis_out_tvalid),
-      .axis_out_tready_i (axis2axi_axis_out_tready),
+      .axis_out_tdata_o  (axis_s_axi_m_axis_out_tdata),
+      .axis_out_tvalid_o (axis_s_axi_m_axis_out_tvalid),
+      .axis_out_tready_i (axis_s_axi_m_axis_out_tready),
       // axi_m
       .axi_araddr_o      (ram_axi_araddr),
       .axi_arvalid_o     (ram_axi_arvalid),
@@ -374,9 +374,9 @@ module iob_axis2axi_tb;
       .axis_tready_o        (axis_tready),
       .axis_tlast_i         (axis_tlast),
       // sys_axis_io
-      .sys_tdata_o          (axis2axi_axis_in_tdata),
-      .sys_tvalid_o         (axis2axi_axis_in_tvalid),
-      .sys_tready_i         (axis2axi_axis_in_tready),
+      .sys_tdata_o          (axis_s_axi_m_axis_in_tdata),
+      .sys_tvalid_o         (axis_s_axi_m_axis_in_tvalid),
+      .sys_tready_i         (axis_s_axi_m_axis_in_tready),
       // iob_csrs_cbus_s
       .iob_csrs_iob_valid_i (axis_in_iob_valid),
       .iob_csrs_iob_addr_i  (axis_in_iob_addr[`IOB_AXISTREAM_IN_CSRS_ADDR_W-1:2]),
@@ -409,9 +409,9 @@ module iob_axis2axi_tb;
       .axis_tready_i        (axis_tready),
       .axis_tlast_o         (axis_tlast),
       // sys_axis_io
-      .sys_tdata_i          (axis2axi_axis_out_tdata),
-      .sys_tvalid_i         (axis2axi_axis_out_tvalid),
-      .sys_tready_o         (axis2axi_axis_out_tready),
+      .sys_tdata_i          (axis_s_axi_m_axis_out_tdata),
+      .sys_tvalid_i         (axis_s_axi_m_axis_out_tvalid),
+      .sys_tready_o         (axis_s_axi_m_axis_out_tready),
       // iob_csrs_cbus_s
       .iob_csrs_iob_valid_i (axis_out_iob_valid),
       .iob_csrs_iob_addr_i  (axis_out_iob_addr[`IOB_AXISTREAM_OUT_CSRS_ADDR_W-1:2]),

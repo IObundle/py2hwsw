@@ -4,12 +4,12 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_axis2axi_rd_conf.vh"
+`include "iob_axis_s_axi_m_read_conf.vh"
 
-module iob_axis2axi_rd #(
-   `include "iob_axis2axi_rd_params.vs"
+module iob_axis_s_axi_m_read #(
+   `include "iob_axis_s_axi_m_read_params.vs"
 ) (
-   `include "iob_axis2axi_rd_io.vs"
+   `include "iob_axis_s_axi_m_read_io.vs"
 );
 
    localparam WAIT_START = 1'd0, WAIT_SPACE_IN_FIFO = 1'd1;
@@ -176,7 +176,7 @@ module iob_axis2axi_rd #(
       .data_o(burst_addr)
    );
 
-   iob_axis2axi_rd_int #(
+   iob_axis_s_axi_m_read_int #(
       .AXI_ADDR_W(AXI_ADDR_W),
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_LEN_W (AXI_LEN_W),
@@ -187,7 +187,7 @@ module iob_axis2axi_rd #(
       .arst_i(arst_i),
       .rst_i(rst_i),
 
-      `include "iob_axis2axi_rd_m_axi_read_m_m_portmap.vs"
+      `include "iob_axis_s_axi_m_read_m_axi_read_m_m_portmap.vs"
 
       .r_addr_i          (burst_addr),
       .r_length_i        (burst_length),

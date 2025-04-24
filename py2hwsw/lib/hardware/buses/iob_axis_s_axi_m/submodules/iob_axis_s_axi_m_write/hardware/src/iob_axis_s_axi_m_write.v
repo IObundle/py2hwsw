@@ -4,12 +4,12 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_axis2axi_wr_conf.vh"
+`include "iob_axis_s_axi_m_write_conf.vh"
 
-module iob_axis2axi_wr #(
-   `include "iob_axis2axi_wr_params.vs"
+module iob_axis_s_axi_m_write #(
+   `include "iob_axis_s_axi_m_write_params.vs"
 ) (
-   `include "iob_axis2axi_wr_io.vs"
+   `include "iob_axis_s_axi_m_write_io.vs"
 );
 
    localparam WAIT_START = 1'd0, WAIT_DATA_IN_FIFO = 1'd1;
@@ -179,7 +179,7 @@ module iob_axis2axi_wr #(
       .data_o(burst_addr)
    );
 
-   iob_axis2axi_wr_int #(
+   iob_axis_s_axi_m_write_int #(
       .AXI_ADDR_W(AXI_ADDR_W),
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_LEN_W (AXI_LEN_W),
@@ -190,7 +190,7 @@ module iob_axis2axi_wr #(
       .arst_i(arst_i),
       .rst_i(rst_i),
 
-      `include "iob_axis2axi_wr_m_axi_write_m_m_portmap.vs"
+      `include "iob_axis_s_axi_m_write_m_axi_write_m_m_portmap.vs"
 
       .w_addr_i          (burst_addr),
       .w_length_i        (burst_length),

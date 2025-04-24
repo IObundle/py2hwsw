@@ -31,21 +31,21 @@ Note: if the transfer goes over the maximum size, given by AXI_ADDR_W,
    the transfer will wrap around and will start reading/writing to the lower addresses.
 */
 
-`include "iob_axis2axi_conf.vh"
+`include "iob_axis_s_axi_m_conf.vh"
 
-module iob_axis2axi #(
-   `include "iob_axis2axi_params.vs"
+module iob_axis_s_axi_m #(
+   `include "iob_axis_s_axi_m_params.vs"
 ) (
-   `include "iob_axis2axi_io.vs"
+   `include "iob_axis_s_axi_m_io.vs"
 );
 
-   iob_axis2axi_rd #(
+   iob_axis_s_axi_m_read #(
       .AXI_ADDR_W(AXI_ADDR_W),
       .AXI_LEN_W (AXI_LEN_W),
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_ID_W  (AXI_ID_W),
       .RLEN_W(RLEN_W)
-   ) axis2axi_read0 (
+   ) axis_s_axi_m_read0 (
       .clk_i(clk_i),
       .cke_i(cke_i),
       .arst_i(arst_i),
@@ -62,7 +62,7 @@ module iob_axis2axi #(
       .axis_out_tvalid_o(axis_out_tvalid_o),
       .axis_out_tready_i(axis_out_tready_i),
 
-      `include "iob_axis2axi_rd_m_axi_read_m_m_portmap.vs"
+      `include "iob_axis_s_axi_m_read_m_axi_read_m_m_portmap.vs"
 
       .ext_mem_read_clk_o(ext_mem_read_clk_o),
       .ext_mem_read_r_data_i(ext_mem_read_r_data_i),
@@ -73,13 +73,13 @@ module iob_axis2axi #(
       .ext_mem_read_w_en_o(ext_mem_read_w_en_o)
    );
 
-   iob_axis2axi_wr #(
+   iob_axis_s_axi_m_write #(
       .AXI_ADDR_W(AXI_ADDR_W),
       .AXI_LEN_W (AXI_LEN_W),
       .AXI_DATA_W(AXI_DATA_W),
       .AXI_ID_W  (AXI_ID_W),
       .WLEN_W(WLEN_W)
-   ) axis2axi_write0 (
+   ) axis_s_axi_m_write0 (
       .clk_i(clk_i),
       .cke_i(cke_i),
       .arst_i(arst_i),
@@ -96,7 +96,7 @@ module iob_axis2axi #(
       .axis_in_tvalid_i(axis_in_tvalid_i),
       .axis_in_tready_o(axis_in_tready_o),
 
-      `include "iob_axis2axi_wr_m_axi_write_m_m_portmap.vs"
+      `include "iob_axis_s_axi_m_write_m_axi_write_m_m_portmap.vs"
 
       .ext_mem_write_clk_o(ext_mem_write_clk_o),
       .ext_mem_write_r_data_i(ext_mem_write_r_data_i),

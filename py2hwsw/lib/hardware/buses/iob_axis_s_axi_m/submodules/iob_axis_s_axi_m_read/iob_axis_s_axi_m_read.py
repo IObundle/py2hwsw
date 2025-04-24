@@ -40,12 +40,12 @@ def setup(py_params_dict):
                 "descr": "AXI ID width",
             },
             {
-                "name": "WLEN_W",
+                "name": "RLEN_W",
                 "type": "P",
                 "val": "1",
                 "min": "NA",
                 "max": "NA",
-                "descr": "Write length width",
+                "descr": "Read length width",
             },
         ],
         "ports": [
@@ -65,32 +65,32 @@ def setup(py_params_dict):
             },
             # Configuration IO's
             {
-                "name": "config_write_io",
+                "name": "config_read_io",
                 "descr": "",
                 "signals": [
-                    {"name": "w_addr_i", "width": "AXI_ADDR_W"},
-                    {"name": "w_length_i", "width": "WLEN_W"},
-                    {"name": "w_start_transfer_i", "width": "1"},
-                    {"name": "w_max_len_i", "width": "(AXI_LEN_W+1)"},
-                    {"name": "w_remaining_data_o", "width": "WLEN_W"},
-                    {"name": "w_busy_o", "width": "1"},
+                    {"name": "r_addr_i", "width": "AXI_ADDR_W"},
+                    {"name": "r_length_i", "width": "RLEN_W"},
+                    {"name": "r_start_transfer_i", "width": "1"},
+                    {"name": "r_max_len_i", "width": "(AXI_LEN_W+1)"},
+                    {"name": "r_remaining_data_o", "width": "RLEN_W"},
+                    {"name": "r_busy_o", "width": "1"},
                 ],
             },
             # AXIS Interface - without last
             {
-                "name": "axis_in_io",
+                "name": "axis_out_io",
                 "descr": "",
                 "signals": [
-                    {"name": "axis_in_tdata_i", "width": "AXI_DATA_W"},
-                    {"name": "axis_in_tvalid_i", "width": "1"},
-                    {"name": "axis_in_tready_o", "width": "1"},
+                    {"name": "axis_out_tdata_o", "width": "AXI_DATA_W"},
+                    {"name": "axis_out_tvalid_o", "width": "1"},
+                    {"name": "axis_out_tready_i", "width": "1"},
                 ],
             },
             {
-                "name": "axi_write_m",
+                "name": "axi_read_m",
                 "signals": {
-                    "type": "axi_write",
-                    "file_prefix": "iob_axis2axi_wr_m_",
+                    "type": "axi_read",
+                    "file_prefix": "iob_axis_s_axi_m_read_m_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -103,23 +103,22 @@ def setup(py_params_dict):
                 "descr": "External memory interface",
                 "signals": {
                     "type": "ram_t2p",
-                    "prefix": "ext_mem_write_",
+                    "prefix": "ext_mem_read_",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                 },
             },
         ],
         "subblocks": [
-            {"core_name": "iob_fifo_sync"},
             {
                 "core_name": "iob_fifo2axis",
                 "use_tlast": True,
                 "use_level": True,
                 "use_en": True,
             },
+            {"core_name": "iob_fifo_sync"},
             {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "c_a_r"}},
             {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "c_a_r_e"}},
-            {"core_name": "iob_counter"},
         ],
     }
     return attributes_dict

@@ -41,10 +41,10 @@ module iob_axis2axi_tb;
    localparam START_ADDR = 4000;  // cross 4kB boundary
 
    // Change this parameters to add a delay, either to the AXI stream or to the AXI connection (0 is valid and will not add any delay)
-   parameter DELAY_AXIS_IN = 0;
-   parameter DELAY_AXIS_OUT = 0;
-   parameter DELAY_AXI_READ = 0;
-   parameter DELAY_AXI_WRITE = 0;
+   parameter DELAY_AXIS_IN = 3;
+   parameter DELAY_AXIS_OUT = 3;
+   parameter DELAY_AXI_READ = 3;
+   parameter DELAY_AXI_WRITE = 3;
 
    integer fd;
 

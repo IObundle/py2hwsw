@@ -273,6 +273,12 @@ module iob_axi_ram #(
                   axi_arready_next = 1'b1;
                   read_state_next  = READ_STATE_IDLE;
                end
+            end else if ((!axi_rready_i) && axi_rvalid_reg) begin
+                // if the read response is not accepted, revert to previous read
+                axi_rvalid_next = 1'b0;
+                read_count_next = read_count_reg + 1'b1;
+                read_addr_next = read_addr_reg - (1 << read_size_reg);
+                read_state_next = READ_STATE_BURST;
             end else begin
                read_state_next = READ_STATE_BURST;
             end

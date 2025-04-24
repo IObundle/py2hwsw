@@ -72,7 +72,9 @@ def setup(py_params_dict):
 
     assert params["csrs"], print("Error: Register list empty.")
 
-    assert params["build_dir"], print("Error: Register build dir empty.")
+    # Ensure build directory is given when py2hwsw is setting up this core
+    if py_params_dict.get("py2hwsw_target", "") == "setup":
+        assert params["build_dir"], print("Error: Register build dir empty.")
 
     # Generate verilog parameters for CSR interface
     csr_if_params = {}

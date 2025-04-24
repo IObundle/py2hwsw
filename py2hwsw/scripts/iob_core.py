@@ -218,9 +218,9 @@ class iob_core(iob_module, iob_instance):
         self.abort_reason = None
         # Don't setup this core if using a project wide special target.
         if __class__.global_special_target:
-            if __class__.global_special_target == "ipxact_lib":
+            if __class__.global_special_target == "ipxact_gen":
                 # Will cause setup to abort except for iob_csrs (to generate memory map)
-                self.abort_reason = "ipxact_lib"
+                self.abort_reason = "ipxact_gen"
             else:
                 self.abort_reason = "special_target"
 

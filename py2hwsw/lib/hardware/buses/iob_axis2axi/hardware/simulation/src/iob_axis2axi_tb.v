@@ -40,6 +40,12 @@ module iob_axis2axi_tb;
    localparam NWORDS = 256;
    localparam START_ADDR = 4000;  // cross 4kB boundary
 
+   // Change this parameters to add a delay, either to the AXI stream or to the AXI connection (0 is valid and will not add any delay)
+   parameter DELAY_AXIS_IN = 3;
+   parameter DELAY_AXIS_OUT = 3;
+   parameter DELAY_AXI_READ = 3;
+   parameter DELAY_AXI_WRITE = 3;
+
    integer fd;
 
    reg     clk;
@@ -159,7 +165,7 @@ module iob_axis2axi_tb;
 
    initial begin
 `ifdef VCD
-      $dumpfile("axis2axi.vcd");
+      $dumpfile("uut.vcd");
       $dumpvars();
 `endif
 
@@ -278,6 +284,73 @@ module iob_axis2axi_tb;
       $finish();
    end
 
+   // Insert delays between AXI like handshake interfaces
+   wire m_rvalid, m_rready, s_rvalid, s_rready;
+   axidelayRead #(
+      .MAX_DELAY(DELAY_AXI_READ)
+   ) delayRead (
+      // Connect directly to the same named axi read wires in the manager interface
+      .m_rvalid_o(m_rvalid),
+      .m_rready_i(m_rready),
+
+      // Connect directly to the same named axi read wires in the subordinate interface
+      .s_rvalid_i(s_rvalid),
+      .s_rready_o(s_rready),
+
+      .clk_i(clk),
+      .rst_i(rst)
+   );
+
+   wire m_wvalid, m_wready, s_wvalid, s_wready;
+   axidelayWrite #(
+      .MAX_DELAY(DELAY_AXI_WRITE)
+   ) delayWrite (
+      // Connect directly to the same named axi write wires in the manager interface
+      .m_wvalid_i(m_wvalid),
+      .m_wready_o(m_wready),
+
+      // Connect directly to the same named axi write wires in the subordinate interface
+      .s_wvalid_o(s_wvalid),
+      .s_wready_i(s_wready),
+
+      .clk_i(clk),
+      .rst_i(rst)
+   );
+
+   wire delayed_axis_in_valid, delayed_axis_in_ready;
+   wire axis_in_valid, axis_in_ready;
+   axidelay #(
+      .MAX_DELAY(DELAY_AXIS_IN)
+   ) delayIn (
+      // Manager interface. Connect to a subordinate interface
+      .m_valid_o(delayed_axis_in_valid),
+      .m_ready_i(delayed_axis_in_ready),
+
+      // Subordinate interface. Connect to a manager interface
+      .s_valid_i(axis_in_valid),
+      .s_ready_o(axis_in_ready),
+
+      .clk_i(clk),
+      .rst_i(rst)
+   );
+
+   wire delayed_axis_out_valid, delayed_axis_out_ready;
+   wire non_delayed_axis_out_valid, non_delayed_axis_out_ready;
+   axidelay #(
+      .MAX_DELAY(DELAY_AXIS_OUT)
+   ) delayOut (
+      // Manager interface. Connect to a subordinate interface
+      .m_valid_o(delayed_axis_out_valid),
+      .m_ready_i(delayed_axis_out_ready),
+
+      // Subordinate interface. Connect to a manager interface
+      .s_valid_i(non_delayed_axis_out_valid),
+      .s_ready_o(non_delayed_axis_out_ready),
+
+      .clk_i(clk),
+      .rst_i(rst)
+   );
+
    //instantiate axis2axi core
    iob_axis2axi_mwrap #(
       .AXI_ADDR_W(ADDR_W),
@@ -309,20 +382,20 @@ module iob_axis2axi_tb;
       .r_busy_o          (r_busy),
       // axis_in_io
       .axis_in_tdata_i   (axis2axi_axis_in_tdata),
-      .axis_in_tvalid_i  (axis2axi_axis_in_tvalid),
-      .axis_in_tready_o  (axis2axi_axis_in_tready),
+      .axis_in_tvalid_i  (delayed_axis_in_valid),
+      .axis_in_tready_o  (delayed_axis_in_ready),
       // axis_out_io
       .axis_out_tdata_o  (axis2axi_axis_out_tdata),
-      .axis_out_tvalid_o (axis2axi_axis_out_tvalid),
-      .axis_out_tready_i (axis2axi_axis_out_tready),
+      .axis_out_tvalid_o (non_delayed_axis_out_valid),
+      .axis_out_tready_i (non_delayed_axis_out_ready),
       // axi_m
       .axi_araddr_o      (ram_axi_araddr),
       .axi_arvalid_o     (ram_axi_arvalid),
       .axi_arready_i     (ram_axi_arready),
       .axi_rdata_i       (ram_axi_rdata),
       .axi_rresp_i       (ram_axi_rresp),
-      .axi_rvalid_i      (ram_axi_rvalid),
-      .axi_rready_o      (ram_axi_rready),
+      .axi_rvalid_i      (m_rvalid),
+      .axi_rready_o      (m_rready),
       .axi_arid_o        (ram_axi_arid),
       .axi_arlen_o       (ram_axi_arlen),
       .axi_arsize_o      (ram_axi_arsize),
@@ -337,8 +410,8 @@ module iob_axis2axi_tb;
       .axi_awready_i     (ram_axi_awready),
       .axi_wdata_o       (ram_axi_wdata),
       .axi_wstrb_o       (ram_axi_wstrb),
-      .axi_wvalid_o      (ram_axi_wvalid),
-      .axi_wready_i      (ram_axi_wready),
+      .axi_wvalid_o      (m_wvalid),
+      .axi_wready_i      (m_wready),
       .axi_bresp_i       (ram_axi_bresp),
       .axi_bvalid_i      (ram_axi_bvalid),
       .axi_bready_o      (ram_axi_bready),
@@ -375,8 +448,8 @@ module iob_axis2axi_tb;
       .axis_tlast_i         (axis_tlast),
       // sys_axis_io
       .sys_tdata_o          (axis2axi_axis_in_tdata),
-      .sys_tvalid_o         (axis2axi_axis_in_tvalid),
-      .sys_tready_i         (axis2axi_axis_in_tready),
+      .sys_tvalid_o         (axis_in_valid),
+      .sys_tready_i         (axis_in_ready),
       // iob_csrs_cbus_s
       .iob_csrs_iob_valid_i (axis_in_iob_valid),
       .iob_csrs_iob_addr_i  (axis_in_iob_addr[`IOB_AXISTREAM_IN_CSRS_ADDR_W-1:2]),
@@ -410,8 +483,8 @@ module iob_axis2axi_tb;
       .axis_tlast_o         (axis_tlast),
       // sys_axis_io
       .sys_tdata_i          (axis2axi_axis_out_tdata),
-      .sys_tvalid_i         (axis2axi_axis_out_tvalid),
-      .sys_tready_o         (axis2axi_axis_out_tready),
+      .sys_tvalid_i         (delayed_axis_out_valid),
+      .sys_tready_o         (delayed_axis_out_ready),
       // iob_csrs_cbus_s
       .iob_csrs_iob_valid_i (axis_out_iob_valid),
       .iob_csrs_iob_addr_i  (axis_out_iob_addr[`IOB_AXISTREAM_OUT_CSRS_ADDR_W-1:2]),
@@ -438,8 +511,8 @@ module iob_axis2axi_tb;
       .axi_arready_o   (ram_axi_arready),
       .axi_rdata_o     (ram_axi_rdata),
       .axi_rresp_o     (ram_axi_rresp),
-      .axi_rvalid_o    (ram_axi_rvalid),
-      .axi_rready_i    (ram_axi_rready),
+      .axi_rvalid_o    (s_rvalid),
+      .axi_rready_i    (s_rready),
       .axi_arid_i      (ram_axi_arid),
       .axi_arlen_i     (ram_axi_arlen),
       .axi_arsize_i    (ram_axi_arsize),
@@ -454,8 +527,8 @@ module iob_axis2axi_tb;
       .axi_awready_o   (ram_axi_awready),
       .axi_wdata_i     (ram_axi_wdata),
       .axi_wstrb_i     (ram_axi_wstrb),
-      .axi_wvalid_i    (ram_axi_wvalid),
-      .axi_wready_o    (ram_axi_wready),
+      .axi_wvalid_i    (s_wvalid),
+      .axi_wready_o    (s_wready),
       .axi_bresp_o     (ram_axi_bresp),
       .axi_bvalid_o    (ram_axi_bvalid),
       .axi_bready_i    (ram_axi_bready),

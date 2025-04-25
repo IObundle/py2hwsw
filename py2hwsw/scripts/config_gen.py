@@ -160,8 +160,17 @@ def append_str_config_build_mk(str_2_append, build_dir):
 def generate_config_tex(confs, out_dir):
     confs_file = open(f"{out_dir}/config.tex", "w")
 
-    confs_file.write(
-        """
+    # Find all conf types present
+    conf_types = []
+    for group in confs:
+        for conf in group.confs:
+            if conf.type not in conf_types:
+                conf_types.append(conf.type)
+
+    # Write info about "M" and "P" confs
+    if "M" in conf_types or "P" in conf_types:
+        confs_file.write(
+            """
 The following tables describe the IP core configuration. The core may be configured using macros or parameters:
 
 \\begin{description}
@@ -169,11 +178,11 @@ The following tables describe the IP core configuration. The core may be configu
     \\item \\textbf{'P'} Parameter: a Verilog parameter is passed to each instance of the core and defines the configuration of that particular instance.
 \\end{description}
 """
-    )
+        )
 
-    for group in confs:
-        confs_file.write(
-            """
+        for group in confs:
+            confs_file.write(
+                """
 \\begin{table}[H]
   \\centering
   \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
@@ -183,39 +192,43 @@ The following tables describe the IP core configuration. The core may be configu
     {\\bf Configuration} & {\\bf Type} & {\\bf Min} & {\\bf Typical} & {\\bf Max} & {\\bf Description} \\\\ \\hline \\hline
 
     \\input """
-            + group.name
-            + """_confs_tab
+                + group.name
+                + """_confs_tab
 
   \\end{tabularx}
   \\caption{"""
-            + group.descr.replace("_", "\\_")
-            + """}
+                + group.descr.replace("_", "\\_")
+                + """}
   \\label{"""
-            + group.name
-            + """_confs_tab:is}
+                + group.name
+                + """_confs_tab:is}
 \\end{table}
 """
-        )
-        if group.doc_clearpage:
-            confs_file.write("\\clearpage")
+            )
+            if group.doc_clearpage:
+                confs_file.write("\\clearpage")
 
-    confs_file.write(
-        """
+    # Write info about "D" conf type
+    if "D" in conf_types:
+        confs_file.write(
+            """
 The parameters in the top-level Verilog module that are not listed above are
 called Derived Parameters. They are given as function of the primary parameters
 and should never be changed. They are used to simplify the definition of the
 interface and internal signals. The list of derived parameters is given below:
 \\input derived_params
 """
-    )
+        )
 
-    confs_file.write(
-        """
+    # Write info about "C" conf type
+    if "C" in conf_types:
+        confs_file.write(
+            """
 There are also constants that are used in the core in order to improve the readability
 of the code and should not be changed. They are defined as presented in the list below:
 \\input constants
 """
-    )
+        )
 
     confs_file.write("\\clearpage")
     confs_file.close()

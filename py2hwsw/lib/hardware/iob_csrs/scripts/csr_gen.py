@@ -1436,8 +1436,8 @@ class csr_gen:
 
         csrs_file.write(
             """
-    The software accessible registers of the core are described in the following
-    tables. The tables give information on the name, read/write capability, address, width in bits, and a textual description.
+The software accessible registers of the core are described in the following
+tables. The tables give information on the name, read/write capability, address, width in bits, and a textual description.
 """
         )
 
@@ -1447,29 +1447,29 @@ class csr_gen:
             for csr_group in doc_table:
                 csrs_file.write(
                     """
-        \\begin{table}[H]
-          \\centering
-          \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
+\\begin{table}[H]
+  \\centering
+  \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
 
-            \\hline
-            \\rowcolor{iob-green}
-            {\\bf Name} & {\\bf R/W} & {\\bf Addr} & {\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ \\hline
+    \\hline
+    \\rowcolor{iob-green}
+    {\\bf Name} & {\\bf R/W} & {\\bf Addr} & {\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ \\hline
 
-            \\input """
+    \\input """
                     + doc_conf
                     + f"_{csr_group.name}"
                     + """_csrs_tab
 
-          \\end{tabularx}
-          \\caption{"""
+  \\end{tabularx}
+  \\caption{"""
                     + csr_group.descr.replace("_", "\\_")
                     + """}
-          \\label{"""
+  \\label{"""
                     + doc_conf
                     + f"_{csr_group.name}"
                     + """_csrs_tab:is}
-        \\end{csr_group}
-        """
+\\end{table}
+"""
                 )
 
                 if csr_group.doc_clearpage:

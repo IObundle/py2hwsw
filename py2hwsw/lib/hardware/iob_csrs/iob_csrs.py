@@ -86,7 +86,7 @@ def setup(py_params_dict):
     confs = [
         {
             "name": "ADDR_W",
-            "type": "F",
+            "type": "D",
             "val": "ND",  # ret automatically
             "min": "0",
             "max": "32",

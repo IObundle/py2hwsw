@@ -43,7 +43,7 @@ def setup(py_params_dict):
             {
                 "name": "WSTRB_W",
                 "descr": "AXI write strobe width",
-                "type": "F",
+                "type": "D",
                 "val": "AXI_DATA_W/8",
                 "min": "1",
                 "max": "32",

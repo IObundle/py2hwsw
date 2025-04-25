@@ -11,13 +11,13 @@ def setup(py_params_dict):
             {
                 "name": "FREQ",
                 "descr": "Typical clock frequency for this FPGA board",
-                "type": "F",
+                "type": "D",
                 "val": "50000000",
             },
             {
                 "name": "INTEL",
                 "descr": "Intel flag to signal that this board uses Intel tools",
-                "type": "F",
+                "type": "D",
                 "val": "1",
             },
         ],

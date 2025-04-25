@@ -34,7 +34,7 @@ def conf_vh(macros, top_module, out_dir):
 
         file2create.write(f"// {group.name}: {group.descr}\n")
 
-        # Sort macros macros by type, P first, M second, F last
+        # Sort macros macros by type, P first, M second, C third, D last
         sorted_macros = []
         for macro in group.confs:
             if macro.type == "P":
@@ -43,7 +43,10 @@ def conf_vh(macros, top_module, out_dir):
             if macro.type == "M":
                 sorted_macros.append(macro)
         for macro in group.confs:
-            if macro.type == "F":
+            if macro.type == "C":
+                sorted_macros.append(macro)
+        for macro in group.confs:
+            if macro.type == "D":
                 sorted_macros.append(macro)
 
         prev_type = ""
@@ -56,8 +59,10 @@ def conf_vh(macros, top_module, out_dir):
                         "// Core Configuration Parameters Default Values\n"
                     )
                 elif macro_type == "M":
+                    file2create.write("// Core Configuration Macros.\n")
+                elif macro_type == "C":
                     file2create.write("// Core Constants. DO NOT CHANGE\n")
-                elif macro_type == "F":
+                elif macro_type == "D":
                     file2create.write("// Core Derived Parameters. DO NOT CHANGE\n")
                 prev_type = macro_type
 
@@ -228,8 +233,8 @@ def generate_confs_tex(confs, out_dir):
         constants = []
         for conf in group.confs:
             conf_val = conf.val if type(conf.val) is not bool else "1"
-            # Only parameters are added to the table
-            if conf.type == "P":
+            # Macros and parameters are added to the table
+            if conf.type in ["P", "M"]:
                 tex_table.append(
                     [
                         conf.name,
@@ -240,7 +245,7 @@ def generate_confs_tex(confs, out_dir):
                         conf.descr,
                     ]
                 )
-            elif conf.type == "M":
+            elif conf.type == "C":
                 # Add to list of constants
                 constants.append(
                     [
@@ -249,7 +254,7 @@ def generate_confs_tex(confs, out_dir):
                         conf.descr,
                     ]
                 )
-            else:
+            else:  # conf.type == "D"
                 # Add to list of derived parameters
                 derv_params.append(
                     [

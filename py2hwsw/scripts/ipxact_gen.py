@@ -576,7 +576,7 @@ def gen_parameters_list(core):
             # Skip doc_only confs
             if conf.doc_only:
                 continue
-            if conf.type != "M":
+            if conf.type != ["M", "C"]:
                 parameters_list.append(
                     Parameter(
                         conf.name,

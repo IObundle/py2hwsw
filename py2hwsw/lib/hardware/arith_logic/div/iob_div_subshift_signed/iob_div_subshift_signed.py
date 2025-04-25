@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "PC_W",
-                "type": "F",
+                "type": "D",
                 "val": "$clog2(DATA_W + 5) + 1",
                 "min": "NA",
                 "max": "NA",

@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "EXP_W",
-                "type": "F",
+                "type": "D",
                 "val": "8",
                 "min": "NA",
                 "max": "NA",

@@ -34,7 +34,7 @@ def setup(py_params_dict):
             # Localparam
             {
                 "name": "DQR_W",
-                "type": "F",
+                "type": "D",
                 "val": "(DIVISOR_W+DIVIDEND_W)+1",
                 "min": "NA",
                 "max": "NA",

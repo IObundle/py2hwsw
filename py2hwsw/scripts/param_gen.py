@@ -10,13 +10,13 @@ from iob_base import find_obj_in_list, fail_with_msg
 
 
 def get_core_params(confs):
-    """Filter given 'confs' list for 'P' and 'F' parameters.
-    Returns a new filtered list containing only 'P' and 'F' parameters.
+    """Filter given 'confs' list for 'P' and 'D' parameters.
+    Returns a new filtered list containing only 'P' and 'D' parameters.
     """
     core_parameters = []
     for group in confs:
         for conf in group.confs:
-            if conf.type in ["P", "F"]:
+            if conf.type in ["P", "D"]:
                 core_parameters.append(conf)
     return core_parameters
 
@@ -39,7 +39,7 @@ def generate_params(core):
 
         p_name = parameter.name.upper()
         p_comment = ""
-        if parameter.type == "F":
+        if parameter.type == "D":
             p_comment = "  // Don't change this parameter value!"
         lines.append(f"    parameter {p_name} = `{core_prefix}{p_name},{p_comment}\n")
 

@@ -19,7 +19,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_ID_W",
                 "descr": "AXI ID bus width",
-                "type": "F",
+                "type": "D",
                 "val": "4",
                 "min": "1",
                 "max": "32",
@@ -27,7 +27,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_LEN_W",
                 "descr": "AXI burst length width",
-                "type": "F",
+                "type": "D",
                 "val": "8",
                 "min": "1",
                 "max": "8",
@@ -35,7 +35,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
-                "type": "F",
+                "type": "D",
                 "val": "30",
                 "min": "1",
                 "max": "32",
@@ -43,7 +43,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_DATA_W",
                 "descr": "AXI data bus width",
-                "type": "F",
+                "type": "D",
                 "val": "32",
                 "min": "1",
                 "max": "32",
@@ -51,19 +51,19 @@ def setup(py_params_dict):
             {
                 "name": "BAUD",
                 "descr": "UART baud rate",
-                "type": "F",
+                "type": "D",
                 "val": "115200",
             },
             {
                 "name": "FREQ",
                 "descr": "Clock frequency",
-                "type": "F",
+                "type": "D",
                 "val": "100000000",
             },
             {
                 "name": "XILINX",
                 "descr": "xilinx flag",
-                "type": "F",
+                "type": "D",
                 "val": "1",
             },
         ],

@@ -6,7 +6,11 @@
 
 #include <verilated.h>
 #if (VM_TRACE == 1) // If verilator was invoked with --trace
+#if (VM_TRACE_FST == 1)
+#include <verilated_fst_c.h>
+#else
 #include <verilated_vcd_c.h>
+#endif
 #endif
 
 

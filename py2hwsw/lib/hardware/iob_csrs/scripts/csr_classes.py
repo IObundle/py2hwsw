@@ -78,8 +78,11 @@ class iob_csr:
         if type(self.n_bits) is not int:
             return
 
+        # CSRs should have width multiple of 8 bits
+        quantized_n_bits = (self.n_bits + 7) // 8 * 8
+
         # List of csr bits. Value corresponds to index of associated field. -1 means free.
-        used_bits = [-1 for i in range(self.n_bits)]
+        used_bits = [-1 for i in range(quantized_n_bits)]
         # Check if any fields overlap
         for idx, _field in enumerate(self.fields):
             for bit in range(_field.base_bit, _field.base_bit + _field.width):
@@ -97,9 +100,20 @@ class iob_csr:
                 width += 1
             elif width > 0:
                 self.fields.append(
-                    csr_field(name="RSVD", type="R", base_bit=idx - width, width=width)
+                    csr_field(
+                        name="RSVD", type=self.type, base_bit=idx - width, width=width
+                    )
                 )
                 width = 0
+        if width > 0:
+            self.fields.append(
+                csr_field(
+                    name="RSVD",
+                    type=self.type,
+                    base_bit=len(used_bits) - width,
+                    width=width,
+                )
+            )
 
 
 @dataclass

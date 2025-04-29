@@ -173,11 +173,10 @@ class SwRegister:
         self.description = description
         self.fields = fields
 
-    def gen_xml(self, parameters_list):
+    def gen_xml(self):
         """
         Generate the xml code for the software register
         @param self: software register object
-        @param parameters_list: list of parameters objects
         return: xml code
         """
 
@@ -189,12 +188,7 @@ class SwRegister:
         else:
             access_type = "read-write"
 
-        # Search for parameters in the hw_size and replace them with their ID
-        xml_hw_size = replace_params_with_ids(self.hw_size, parameters_list)
-        xml_hw_size = escape_xml_special_chars(xml_hw_size)
-
         fields_xml = ""
-
         for csr_field in self.fields:
             # set the access type
             if csr_field.type == "R":
@@ -203,7 +197,7 @@ class SwRegister:
                 field_access_type = "write-only"
             else:
                 field_access_type = "read-write"
-                fields_xml += f"""\
+            fields_xml += f"""\
 					<ipxact:field>
 						<ipxact:name>{csr_field.name}</ipxact:name>
 						<ipxact:bitOffset>{csr_field.base_bit}</ipxact:bitOffset>
@@ -213,19 +207,18 @@ class SwRegister:
 							</ipxact:reset>
 						</ipxact:resets>
 						<ipxact:bitWidth>{csr_field.width}</ipxact:bitWidth>
-						<ipxact:volatile>{csr_field.volatile}</ipxact:volatile>
+						<ipxact:volatile>{str(csr_field.volatile).lower()}</ipxact:volatile>
 						<ipxact:access>{field_access_type}</ipxact:access>
 					</ipxact:field>
 """
 
         # Generate the xml code
-        xml_code = f"""\
-				<ipxact:register>
+        xml_code = f"""<ipxact:register>
 					<ipxact:name>{self.name}</ipxact:name>
 					<ipxact:description>{self.description}</ipxact:description>
 					<ipxact:addressOffset>{self.address}</ipxact:addressOffset>
 					<ipxact:size>{self.sw_size}</ipxact:size>
-					<ipxact:volatile>{self.volatile}</ipxact:volatile>
+					<ipxact:volatile>{str(self.volatile).lower()}</ipxact:volatile>
 					<ipxact:access>{access_type}</ipxact:access>
 {fields_xml}
 				</ipxact:register>"""
@@ -508,7 +501,7 @@ def gen_memory_map_xml(sw_regs, parameters_list):
             sw_reg.volatile,
             sw_reg.descr,
             parameters_list,
-	    sw_reg.fields,
+            sw_reg.fields,
         )
 
         # add it to the sw_regs list
@@ -524,7 +517,7 @@ def gen_memory_map_xml(sw_regs, parameters_list):
             sw_regs_xml += "\n"
             # indent the xml code
             sw_regs_xml += "\t" * 4
-        sw_regs_xml += sw_reg.gen_xml(parameters_list)
+        sw_regs_xml += sw_reg.gen_xml()
 
     # Compute the memory map range by adding the address and sw_size (in bytes) of the last register
     memory_map_range = sw_regs_list[-1].address + sw_regs_list[-1].sw_size / 8

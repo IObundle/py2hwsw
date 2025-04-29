@@ -43,24 +43,49 @@ class iob_csr:
 
         if not self.fields:
             self.fields = [
-                csr_field(name=self.name, type=self.type, base_bit=0, width=self.n_bits)
+                csr_field(
+                    name=self.name,
+                    type=self.type,
+                    base_bit=0,
+                    width=self.n_bits,
+                    volatile=self.volatile,
+                    rst_val=self.rst_val,
+                )
             ]
             # fail_with_msg(f"CSR '{self.name}' has no bit fields", ValueError)
 
-        # Don't try to manage fields, if n_bits is not integer (likely contains parameters)
+        # Check if fields properties match CSR properties
+        for _field in self.fields:
+            if self.type == "R" and _field.type != "R":
+                fail_with_msg(
+                    f"CSR '{self.name}' defined with type '{self.type}' has invalid field type '{_field.type}'.",
+                    ValueError,
+                )
+            elif self.type == "W" and _field.type != "W":
+                fail_with_msg(
+                    f"CSR '{self.name}' defined with type '{self.type}' has invalid field type '{_field.type}'.",
+                    ValueError,
+                )
+
+            # CSR may have non-volatile fields and be volatile itself, but not vice versa
+            if not self.volatile and _field.volatile:
+                fail_with_msg(
+                    f"CSR '{self.name}' defined as non-volatile but has volatile field '{_field.name}'.",
+                    ValueError,
+                )
+
+        # Don't try to manage field bits, if n_bits is not integer (likely contains parameters)
         if type(self.n_bits) is not int:
             return
 
         # List of csr bits. Value corresponds to index of associated field. -1 means free.
         used_bits = [-1 for i in range(self.n_bits)]
         # Check if any fields overlap
-        for idx, _csr_field in enumerate(self.fields):
-            for bit in range(
-                _csr_field.base_bit, _csr_field.base_bit + _csr_field.width
-            ):
+        for idx, _field in enumerate(self.fields):
+            for bit in range(_field.base_bit, _field.base_bit + _field.width):
                 if used_bits[bit] > -1:
                     fail_with_msg(
-                        f"CSR '{self.name}' has overlapping fields: '{_csr_field.name}' and '{self.fields[used_bits[bit]].name}'.",
+                        f"CSR '{self.name}' has overlapping fields: '{_field.name}' and '{self.fields[used_bits[bit]].name}'.",
                         ValueError,
                     )
                 used_bits[bit] = idx
@@ -84,6 +109,7 @@ class csr_field:
     base_bit: int = 0
     width: int = 1
     volatile: bool = True
+    rst_val: int = 0
 
     def __post_init__(self):
         if not self.name:

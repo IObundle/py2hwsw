@@ -194,6 +194,7 @@ module iob_axis_s_axi_m_write #(
 
       .w_addr_i          (burst_addr),
       .w_length_i        (burst_length),
+      .w_strb_i          (4'b1111),
       .w_start_transfer_i(start_burst),
       .w_busy_o          (busy),
 

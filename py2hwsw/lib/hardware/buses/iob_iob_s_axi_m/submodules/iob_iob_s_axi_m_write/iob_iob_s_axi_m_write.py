@@ -242,6 +242,20 @@ def setup(py_params_dict):
                     "axis_m": "internal_axis_signals",
                 },
             },
+            {
+                "core_name": "iob_axis_s_axi_m_write_int",
+                "instance_name": "axis_s_axi_m_write_inst",
+                "instance_description": "AXI-Stream to AXI write burst converter",
+                "parameters": {
+                    "AXI_ADDR_W": "AXI_ADDR_W",
+                    "AXI_DATA_W": "AXI_DATA_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
+                    "AXI_ID_W": "AXI_ID_W",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                },
+            },
         ],
         "fsm": {
             "type": "fsm",

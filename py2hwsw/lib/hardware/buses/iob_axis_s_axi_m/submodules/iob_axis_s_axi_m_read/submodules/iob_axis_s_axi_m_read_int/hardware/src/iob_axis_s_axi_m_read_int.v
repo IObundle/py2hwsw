@@ -4,31 +4,12 @@
 
 `timescale 1ns / 1ps
 
+`include "iob_axis_s_axi_m_read_int_conf.vh"
+
 module iob_axis_s_axi_m_read_int #(
-   parameter AXI_ADDR_W = 0,
-   parameter AXI_DATA_W = 32,  // We currently only support 4 byte transfers
-   parameter AXI_LEN_W  = 8,
-   parameter AXI_ID_W   = 1
+   `include "iob_axis_s_axi_m_read_int_params.vs"
 ) (
-   // Global signals
-   input clk_i,
-   input cke_i,
-   input arst_i,
-   input rst_i,
-
-   // Axi master interface
-   `include "iob_axis_s_axi_m_read_m_axi_read_m_port.vs"
-
-   // Configuration
-   input  [   AXI_ADDR_W-1:0] r_addr_i,
-   input  [(AXI_LEN_W+1)-1:0] r_length_i,
-   input                      r_start_transfer_i,
-   output                     r_busy_o,
-
-   // Axi stream input
-   output [AXI_DATA_W-1:0] axis_out_data_o,
-   output                  axis_out_valid_o,
-   input                   axis_out_ready_i
+   `include "iob_axis_s_axi_m_read_int_io.vs"
 );
 
    localparam WAIT_START = 2'd0, START_BURST = 2'd1, TRANSF_DATA = 2'd2;

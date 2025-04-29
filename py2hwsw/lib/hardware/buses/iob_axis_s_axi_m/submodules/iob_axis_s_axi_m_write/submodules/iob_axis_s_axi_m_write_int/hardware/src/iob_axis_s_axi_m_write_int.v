@@ -4,31 +4,12 @@
 
 `timescale 1ns / 1ps
 
+`include "iob_axis_s_axi_m_write_int_conf.vh"
+
 module iob_axis_s_axi_m_write_int #(
-   parameter AXI_ADDR_W = 0,
-   parameter AXI_DATA_W = 32,  // We currently only support 4 byte transfers
-   parameter AXI_LEN_W  = 8,
-   parameter AXI_ID_W   = 1
+   `include "iob_axis_s_axi_m_write_int_params.vs"
 ) (
-   // Global signals
-   input clk_i,
-   input cke_i,
-   input arst_i,
-   input rst_i,
-
-   // Axi master interface
-   `include "iob_axis_s_axi_m_write_m_axi_write_m_port.vs"
-
-   // Configuration
-   input  [   AXI_ADDR_W-1:0] w_addr_i,
-   input  [(AXI_LEN_W+1)-1:0] w_length_i,
-   input                      w_start_transfer_i,
-   output                     w_busy_o,
-
-   // Axi stream input
-   input  [AXI_DATA_W-1:0] axis_in_data_i,
-   input                   axis_in_valid_i,
-   output                  axis_in_ready_o
+   `include "iob_axis_s_axi_m_write_int_io.vs"
 );
 
    localparam WAIT_START = 2'd0, TRANSF_BURST = 2'd1, WAIT_BRESP = 2'd2;
@@ -47,6 +28,7 @@ module iob_axis_s_axi_m_write_int #(
    assign axis_in_ready_o = axis_in_ready_int;
    // AXI
    assign axi_wdata_nxt = axis_in_data_i;
+   assign axi_wstrb_o   = w_strb_i;
    // Constants
    assign axi_awid_o    = {AXI_ID_W{1'd0}};
    assign axi_awsize_o  = 3'd2;
@@ -54,7 +36,6 @@ module iob_axis_s_axi_m_write_int #(
    assign axi_awlock_o  = 2'd0;
    assign axi_awcache_o = 4'd2;
    assign axi_awqos_o   = 4'd0;
-   assign axi_wstrb_o   = 4'b1111;
    assign axi_bready_o  = 1'b1;
 
    // Busy signal

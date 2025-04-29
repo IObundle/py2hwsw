@@ -16,20 +16,20 @@ def setup(py_params_dict):
                 "descr": "AXI address width",
             },
             {
-                "name": "AXI_LEN_W",
-                "type": "P",
-                "val": "8",
-                "min": "NA",
-                "max": "NA",
-                "descr": "AXI len width",
-            },
-            {
                 "name": "AXI_DATA_W",
                 "type": "P",
                 "val": "32",
                 "min": "NA",
                 "max": "NA",
                 "descr": "AXI data width",
+            },
+            {
+                "name": "AXI_LEN_W",
+                "type": "P",
+                "val": "8",
+                "min": "NA",
+                "max": "NA",
+                "descr": "AXI len width",
             },
             {
                 "name": "AXI_ID_W",
@@ -39,29 +39,15 @@ def setup(py_params_dict):
                 "max": "NA",
                 "descr": "AXI ID width",
             },
-            {
-                "name": "RLEN_W",
-                "type": "P",
-                "val": "1",
-                "min": "NA",
-                "max": "NA",
-                "descr": "Read length width",
-            },
         ],
         "ports": [
             {
                 "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
+                    "params": "c_a_r",
                 },
-                "descr": "Clock, clock enable and reset",
-            },
-            {
-                "name": "rst_i",
-                "descr": "Synchronous reset interface",
-                "signals": [
-                    {"name": "rst_i", "width": 1},
-                ],
+                "descr": "Clock, clock enable, async and sync reset",
             },
             # Configuration IO's
             {
@@ -69,11 +55,9 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "r_addr_i", "width": "AXI_ADDR_W"},
-                    {"name": "r_length_i", "width": "RLEN_W"},
-                    {"name": "r_start_transfer_i", "width": "1"},
-                    {"name": "r_max_len_i", "width": "(AXI_LEN_W+1)"},
-                    {"name": "r_remaining_data_o", "width": "RLEN_W"},
-                    {"name": "r_busy_o", "width": "1"},
+                    {"name": "r_length_i", "width": "(AXI_LEN_W+1)"},
+                    {"name": "r_start_transfer_i"},
+                    {"name": "r_busy_o"},
                 ],
             },
             # AXIS Interface - without last
@@ -81,16 +65,16 @@ def setup(py_params_dict):
                 "name": "axis_out_io",
                 "descr": "",
                 "signals": [
-                    {"name": "axis_out_tdata_o", "width": "AXI_DATA_W"},
-                    {"name": "axis_out_tvalid_o", "width": "1"},
-                    {"name": "axis_out_tready_i", "width": "1"},
+                    {"name": "axis_out_data_o", "width": "AXI_DATA_W"},
+                    {"name": "axis_out_valid_o"},
+                    {"name": "axis_out_ready_i"},
                 ],
             },
             {
                 "name": "axi_read_m",
                 "signals": {
                     "type": "axi_read",
-                    "file_prefix": "iob_axis_s_axi_m_read_m_",
+                    "file_prefix": "iob_axis_s_axi_m_read_int_m_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -98,27 +82,10 @@ def setup(py_params_dict):
                 },
                 "descr": "AXI interface",
             },
-            {
-                "name": "ext_mem_m",
-                "descr": "External memory interface",
-                "signals": {
-                    "type": "ram_t2p",
-                    "prefix": "ext_mem_read_",
-                    "ADDR_W": "AXI_ADDR_W",
-                    "DATA_W": "AXI_DATA_W",
-                },
-            },
         ],
         "subblocks": [
-            {
-                "core_name": "iob_fifo2axis",
-                "use_tlast": True,
-                "use_level": True,
-                "use_en": True,
-            },
-            {"core_name": "iob_fifo_sync"},
             {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "c_a_r"}},
-            {"core_name": "iob_axis_s_axi_m_read_int"},
+            {"core_name": "iob_reg", "port_params": {"clk_en_rst_s": "c_a_r_e"}},
         ],
     }
     return attributes_dict

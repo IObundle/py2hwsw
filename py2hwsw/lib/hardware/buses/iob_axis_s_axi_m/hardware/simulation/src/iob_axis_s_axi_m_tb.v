@@ -177,7 +177,7 @@ module iob_axis_s_axi_m_tb;
       // deassert soft reset
       @(posedge clk) #1 rst = 0;
 
-      $display("AXIS2AXI TEST!");
+      $display("AXIS_S_AXI_M TEST!");
 
       $display("Configure AXIStream IN");
       axis_in_iob_write(`IOB_AXISTREAM_IN_CSRS_SOFT_RESET_ADDR, 1,
@@ -351,73 +351,6 @@ module iob_axis_s_axi_m_tb;
       .rst_i(rst)
    );
 
-   // Insert delays between AXI like handshake interfaces
-   wire m_rvalid, m_rready, s_rvalid, s_rready;
-   axidelayRead #(
-      .MAX_DELAY(DELAY_AXI_READ)
-   ) delayRead (
-      // Connect directly to the same named axi read wires in the manager interface
-      .m_rvalid_o(m_rvalid),
-      .m_rready_i(m_rready),
-
-      // Connect directly to the same named axi read wires in the subordinate interface
-      .s_rvalid_i(s_rvalid),
-      .s_rready_o(s_rready),
-
-      .clk_i(clk),
-      .rst_i(rst)
-   );
-
-   wire m_wvalid, m_wready, s_wvalid, s_wready;
-   axidelayWrite #(
-      .MAX_DELAY(DELAY_AXI_WRITE)
-   ) delayWrite (
-      // Connect directly to the same named axi write wires in the manager interface
-      .m_wvalid_i(m_wvalid),
-      .m_wready_o(m_wready),
-
-      // Connect directly to the same named axi write wires in the subordinate interface
-      .s_wvalid_o(s_wvalid),
-      .s_wready_i(s_wready),
-
-      .clk_i(clk),
-      .rst_i(rst)
-   );
-
-   wire delayed_axis_in_valid, delayed_axis_in_ready;
-   wire axis_in_valid, axis_in_ready;
-   axidelay #(
-      .MAX_DELAY(DELAY_AXIS_IN)
-   ) delayIn (
-      // Manager interface. Connect to a subordinate interface
-      .m_valid_o(delayed_axis_in_valid),
-      .m_ready_i(delayed_axis_in_ready),
-
-      // Subordinate interface. Connect to a manager interface
-      .s_valid_i(axis_in_valid),
-      .s_ready_o(axis_in_ready),
-
-      .clk_i(clk),
-      .rst_i(rst)
-   );
-
-   wire delayed_axis_out_valid, delayed_axis_out_ready;
-   wire non_delayed_axis_out_valid, non_delayed_axis_out_ready;
-   axidelay #(
-      .MAX_DELAY(DELAY_AXIS_OUT)
-   ) delayOut (
-      // Manager interface. Connect to a subordinate interface
-      .m_valid_o(delayed_axis_out_valid),
-      .m_ready_i(delayed_axis_out_ready),
-
-      // Subordinate interface. Connect to a manager interface
-      .s_valid_i(non_delayed_axis_out_valid),
-      .s_ready_o(non_delayed_axis_out_ready),
-
-      .clk_i(clk),
-      .rst_i(rst)
-   );
-
    //instantiate axis_s_axi_m core
    iob_axis_s_axi_m_mwrap #(
       .AXI_ADDR_W(ADDR_W),
@@ -449,8 +382,8 @@ module iob_axis_s_axi_m_tb;
       .r_busy_o          (r_busy),
       // axis_in_io
       .axis_in_tdata_i   (axis_s_axi_m_axis_in_tdata),
-      .axis_in_tvalid_i  (delayed_axis_in_tvalid),
-      .axis_in_tready_o  (delayed_axis_in_tready),
+      .axis_in_tvalid_i  (delayed_axis_in_valid),
+      .axis_in_tready_o  (delayed_axis_in_ready),
       // axis_out_io
       .axis_out_tdata_o  (axis_s_axi_m_axis_out_tdata),
       .axis_out_tvalid_o (non_delayed_axis_out_valid),

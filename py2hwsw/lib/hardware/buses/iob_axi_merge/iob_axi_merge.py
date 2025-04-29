@@ -777,7 +777,7 @@ def setup(py_params_dict):
    //
 
    // Only switch managers when there is no current active transaction
-   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o[{NUM_SUBORDINATES}-1:0];
+   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o[{NBITS}-1:0];
 
    assign busy_read_reg_en = m_axi_arvalid_o & !busy_read_reg_o;
    assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
@@ -799,7 +799,7 @@ def setup(py_params_dict):
    //       If the wvalid comes before, the data will go to the currently selected manager_interface, and that may not be the intended destination (real destination will be given later by awvalid)
 
    // Only switch managers when there is no current active transaction
-   assign write_sel = (busy_write_reg_o | active_write_transaction) ? write_sel_reg : write_sel_prio_enc_o[{NUM_SUBORDINATES}-1:0];
+   assign write_sel = (busy_write_reg_o | active_write_transaction) ? write_sel_reg : write_sel_prio_enc_o[{NBITS}-1:0];
 
    assign busy_write_reg_en = m_axi_awvalid_o & !busy_write_reg_o;
    assign busy_write_reg_rst = end_pending_write_response;

@@ -67,9 +67,13 @@ delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
 
+lib-ipxact:
+	nix-shell --run "py2hwsw --browse"
+	./scripts/kactus2/import_library.py `realpath $(CURDIR)`/ipxact_lib
+	nix-shell --run "kactus2"
 
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build doc-update
+.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery lib-ipxact
 
 
 # Install board server and client

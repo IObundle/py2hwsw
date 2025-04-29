@@ -12,7 +12,7 @@ import io_gen
 import block_gen
 
 from latex import write_table
-from iob_base import fail_with_msg, find_path
+from iob_base import fail_with_msg, find_path, get_lib_cores
 
 
 def generate_docs(core):
@@ -93,20 +93,11 @@ def generate_tex_core_lib(out_dir):
     lib_path = os.path.join(os.path.dirname(__file__), "../lib")
 
     tex_table = []
-    # Find all .py files under lib_path
-    for root, dirs, files in os.walk(lib_path):
-        # Skip specific directories
-        if os.path.basename(root) in ["scripts", "test", "document"]:
-            dirs[:] = []
-            continue
-        for file in files:
-            if file.endswith(".py"):
-                tex_table.append(
-                    [
-                        os.path.splitext(file)[0],
-                        os.path.relpath(root, lib_path),
-                    ]
-                )
+    cores = get_lib_cores()
+    for path in cores:
+        file = os.path.basename(path)
+        dir = os.path.dirname(path)
+        tex_table.append([os.path.splitext(file)[0], os.path.relpath(dir, lib_path)])
 
     write_table(f"{out_dir}/py2hwsw_core_lib", tex_table)
 

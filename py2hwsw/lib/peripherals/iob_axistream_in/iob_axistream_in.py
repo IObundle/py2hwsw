@@ -146,8 +146,8 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "data_rdata_rd", "width": 32},
                     {"name": "data_rvalid_rd", "width": 1},
-                    {"name": "data_ren_rd", "width": 1},
                     {"name": "data_rready_rd", "width": 1},
+                    {"name": "data_ren_rd", "width": 1},
                     {"name": "data_ready_rd", "width": 1},
                 ],
             },
@@ -332,6 +332,9 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_fifo2axis",
                 "instantiate": False,
+                "use_tlast": True,
+                "use_level": True,
+                "use_en": True,
             },
             {
                 "core_name": "iob_fifo_async",

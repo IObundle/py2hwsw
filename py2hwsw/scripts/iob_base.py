@@ -257,7 +257,9 @@ def str_to_kwargs(attrs: list):
                 if arg in dicts and kwargs[arg] is not None:
                     if isinstance(dicts[arg], str):
                         if dicts[arg] == "pairs":
-                            kwargs[arg.split("&")[0]] = dict(pair.split(":") for pair in kwargs[arg])
+                            kwargs[arg.split("&")[0]] = dict(
+                                pair.split(":") for pair in kwargs[arg]
+                            )
                     elif isinstance(dicts[arg], list):
                         _keys = [key for item in dicts[arg] for key in item.split(":")]
                         _values = [
@@ -269,7 +271,7 @@ def str_to_kwargs(attrs: list):
                         ]
                     elif isinstance(dicts[arg], tuple):
                         kwargs[arg.split("&")[0]] = dict(zip(dicts[arg], kwargs[arg]))
-                    if '&' in arg:
+                    if "&" in arg:
                         kwargs.pop(arg)
             for key, value in list(kwargs.items()):
                 if ":" in key:
@@ -358,7 +360,7 @@ def str_to_kwargs(attrs: list):
                     for i in range(len(output[key])):
                         if "core_name" in output[key][i]:
                             output[key][i]["instance_description"] = output[key][i].pop(
-                                    "descr"
+                                "descr"
                             )
             return {k: v for k, v in output.items() if v != []}
 
@@ -562,16 +564,24 @@ def validate_verilog_const(value: str, direction: str):
     :param value: constant to validate
     :param direction: direction of the constant (input or output)"""
     if direction == "input":
-        assert "'" in value, f"{iob_colors.FAIL}Invalid format for wire '{value}'! Expected <width>'<base><value>', got {value}.{iob_colors.ENDC}"
+        assert (
+            "'" in value
+        ), f"{iob_colors.FAIL}Invalid format for wire '{value}'! Expected <width>'<base><value>', got {value}.{iob_colors.ENDC}"
 
         _bases = {"b": "01", "d": "0123456789", "h": "0123456789abcdef"}
         _, _v = value.split("'")
         if _v[0] not in _bases:
-            fail_with_msg(f"Invalid base for wire '{value}'! Expected b, d or h, got {_v[0]}.")
+            fail_with_msg(
+                f"Invalid base for wire '{value}'! Expected b, d or h, got {_v[0]}."
+            )
         elif not all(c in _bases[_v[0]] for c in _v[1:]):
-            fail_with_msg(f"Invalid value for wire '{value}'! Expected [{_bases[_v[0]]}], got {_v[1:]}.")
+            fail_with_msg(
+                f"Invalid value for wire '{value}'! Expected [{_bases[_v[0]]}], got {_v[1:]}."
+            )
     elif direction == "output":
-        assert "z" in value.lower(), f"{iob_colors.FAIL}If not connected, output wire '{value}' must be a high impedance value (z)!{iob_colors.ENDC}"
+        assert (
+            "z" in value.lower()
+        ), f"{iob_colors.FAIL}If not connected, output wire '{value}' must be a high impedance value (z)!{iob_colors.ENDC}"
 
     else:
         fail_with_msg(

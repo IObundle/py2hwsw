@@ -146,7 +146,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         {
             "name": f"{FIFO_NAME}_MAXDATA_W",
             "descr": "",
-            "type": "F",
+            "type": "D",
             "val": f"iob_max({FIFO_NAME}_W_DATA_W, {FIFO_NAME}_R_DATA_W)",
             "min": "NA",
             "max": "NA",
@@ -154,7 +154,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         {
             "name": f"{FIFO_NAME}_MINDATA_W",
             "descr": "",
-            "type": "F",
+            "type": "D",
             "val": f"iob_min({FIFO_NAME}_W_DATA_W, {FIFO_NAME}_R_DATA_W)",
             "min": "NA",
             "max": "NA",
@@ -162,7 +162,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         {
             "name": f"{FIFO_NAME}_R",
             "descr": "",
-            "type": "F",
+            "type": "D",
             "val": f"{FIFO_NAME}_MAXDATA_W / {FIFO_NAME}_MINDATA_W",
             "min": "NA",
             "max": "NA",
@@ -170,7 +170,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         {
             "name": f"{FIFO_NAME}_MINADDR_W",
             "descr": "Lower ADDR_W (higher DATA_W)",
-            "type": "F",
+            "type": "D",
             "val": f"{FIFO_NAME}_ADDR_W - $clog2({FIFO_NAME}_R)",
             "min": "NA",
             "max": "NA",
@@ -178,7 +178,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         {
             "name": f"{FIFO_NAME}_W_ADDR_W",
             "descr": "",
-            "type": "F",
+            "type": "D",
             "val": f"({FIFO_NAME}_W_DATA_W == {FIFO_NAME}_MAXDATA_W) ? {FIFO_NAME}_MINADDR_W : {FIFO_NAME}_ADDR_W",
             "min": "NA",
             "max": "NA",
@@ -186,7 +186,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         {
             "name": f"{FIFO_NAME}_R_ADDR_W",
             "descr": "",
-            "type": "F",
+            "type": "D",
             "val": f"({FIFO_NAME}_R_DATA_W == {FIFO_NAME}_MAXDATA_W) ? {FIFO_NAME}_MINADDR_W : {FIFO_NAME}_ADDR_W",
             "min": "NA",
             "max": "NA",

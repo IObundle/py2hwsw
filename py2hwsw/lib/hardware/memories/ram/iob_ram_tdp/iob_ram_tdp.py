@@ -41,7 +41,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "MEM_INIT_FILE_INT",
-                "type": "F",
+                "type": "D",
                 "val": "HEXFILE",
                 "min": "0",
                 "max": "NA",

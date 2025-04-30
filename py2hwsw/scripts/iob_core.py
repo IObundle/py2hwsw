@@ -212,13 +212,23 @@ class iob_core(iob_module, iob_instance):
             lambda y: update_license(self, **y),
             descr="License for the core.",
         )
+        self.set_default_attribute(
+            "doc_conf",
+            "",
+            str,
+            descr="CSR Configuration to use",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 
         self.abort_reason = None
         # Don't setup this core if using a project wide special target.
         if __class__.global_special_target:
-            self.abort_reason = "special_target"
+            if __class__.global_special_target == "ipxact_gen":
+                # Will cause setup to abort except for iob_csrs (to generate memory map)
+                self.abort_reason = "ipxact_gen"
+            else:
+                self.abort_reason = "special_target"
 
         # Temporarily change global_build_dir to match tester's directory (for tester blocks)
         build_dir_backup = __class__.global_build_dir
@@ -254,7 +264,7 @@ class iob_core(iob_module, iob_instance):
         # Add 'VERSION' macro
         self.create_conf_group(
             name="VERSION",
-            type="M",
+            type="C",
             val="16'h" + self.version_str_to_digits(self.version),
             descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
         )
@@ -619,7 +629,9 @@ class iob_core(iob_module, iob_instance):
             if "'" in wire_name or wire_name.lower() == "z":
                 wire = wire_name
             else:
-                wire = find_obj_in_list(instantiator.wires, wire_name) or find_obj_in_list(instantiator.ports, wire_name)
+                wire = find_obj_in_list(
+                    instantiator.wires, wire_name
+                ) or find_obj_in_list(instantiator.ports, wire_name)
                 if not wire:
                     fail_with_msg(
                         f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"

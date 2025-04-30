@@ -33,7 +33,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "COL_W",
-                "type": "F",
+                "type": "D",
                 "val": "8",
                 "min": "NA",
                 "max": "NA",
@@ -41,7 +41,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "NUM_COL",
-                "type": "F",
+                "type": "D",
                 "val": "DATA_W / COL_W",
                 "min": "NA",
                 "max": "NA",

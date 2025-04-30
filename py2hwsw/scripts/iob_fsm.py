@@ -67,7 +67,9 @@ class iob_fsm(iob_comb):
         for state_name, i in self.state_names.items():
             _states[i] = _states[i].replace(f"{i}:", f"{state_name}:", 1)
             if not state_name.endswith("_endfor"):
-                localparams += f"localparam {state_name} = {self.state_reg_width}'d{i};\n"
+                localparams += (
+                    f"localparam {state_name} = {self.state_reg_width}'d{i};\n"
+                )
         joined_states = "\n".join(_states)
         self.verilog_code = f"""
 {localparams}
@@ -105,13 +107,10 @@ def create_fsm(core, *args, **kwargs):
     )
 
     # Check if the FSM wire is already created, if not create it
-    if not any(
-        wire.name == fsm.state_reg_name
-        for wire in core.wires
-    ):
+    if not any(wire.name == fsm.state_reg_name for wire in core.wires):
         core.create_wire(
             name=fsm.state_reg_name,
-            descr = "FSM state",
+            descr="FSM state",
             signals=[{"name": fsm.state_reg_name, "width": fsm.state_reg_width}],
         )
 

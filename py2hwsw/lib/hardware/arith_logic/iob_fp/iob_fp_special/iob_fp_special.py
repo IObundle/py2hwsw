@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "MAN_W",
-                "type": "F",
+                "type": "D",
                 "val": "DATA_W-EXP_W",
                 "min": "NA",
                 "max": "NA",

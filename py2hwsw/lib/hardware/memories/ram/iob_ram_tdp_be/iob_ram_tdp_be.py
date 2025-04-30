@@ -41,7 +41,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "COL_W",
-                "type": "F",
+                "type": "D",
                 "val": "DATA_W / 4",
                 "min": "NA",
                 "max": "NA",
@@ -49,7 +49,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "NUM_COL",
-                "type": "F",
+                "type": "D",
                 "val": "DATA_W / COL_W",
                 "min": "NA",
                 "max": "NA",
@@ -57,7 +57,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "FILE_SUFFIX",
-                "type": "F",
+                "type": "D",
                 "val": '{"7", "6", "5", "4", "3", "2", "1", "0"}',
                 "min": "NA",
                 "max": "NA",

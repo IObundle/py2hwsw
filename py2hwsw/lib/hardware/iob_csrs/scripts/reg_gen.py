@@ -79,6 +79,7 @@ def build_regs_table(core):
                 log2n_items=0,
                 autoreg=True,
                 descr="Product version. This 16-bit register uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
+                volatile=False,
             )
         )
 
@@ -87,8 +88,8 @@ def build_regs_table(core):
     csr_gen_obj = csr_gen.csr_gen()
     csr_gen_obj.config = core["confs"]
     # Get register table
-    reg_table = csr_gen_obj.get_reg_table(
-        core["csrs"], core["rw_overlap"], core["autoaddr"]
+    reg_table, _ = csr_gen_obj.get_reg_table(
+        core["csrs"], core["rw_overlap"], core["autoaddr"], core["doc_conf"]
     )
 
     return csr_gen_obj, reg_table

@@ -136,7 +136,7 @@ class SwRegister:
     """
 
     def __init__(
-        self, name, address, hw_size, access, rst, rst_val, description, parameters_list
+        self, name, address, hw_size, access, rst, rst_val, volatile, description, parameters_list, fields
     ):
         self.name = name
         self.address = address
@@ -169,13 +169,14 @@ class SwRegister:
         self.access = access
         self.rst = rst
         self.rst_val = rst_val
+        self.volatile = volatile
         self.description = description
+        self.fields = fields
 
-    def gen_xml(self, parameters_list):
+    def gen_xml(self):
         """
         Generate the xml code for the software register
         @param self: software register object
-        @param parameters_list: list of parameters objects
         return: xml code
         """
 
@@ -187,32 +188,29 @@ class SwRegister:
         else:
             access_type = "read-write"
 
-        # Search for parameters in the hw_size and replace them with their ID
-        xml_hw_size = replace_params_with_ids(self.hw_size, parameters_list)
-        xml_hw_size = escape_xml_special_chars(xml_hw_size)
-
-        rsvd_xml = ""
-        # If the register is not a multiple of 8 bits, add the reserved bits
-        if self.sw_size != self.hw_size:
-            if isinstance(self.hw_size, str):
-                rsvd_size = replace_params_with_ids(
-                    f"{self.sw_size}-{self.hw_size}", parameters_list, True
-                )
-                rsvd_size = escape_xml_special_chars(rsvd_size)
+        fields_xml = ""
+        for csr_field in self.fields:
+            # set the access type
+            if csr_field.type == "R":
+                field_access_type = "read-only"
+            elif csr_field.type == "W":
+                field_access_type = "write-only"
             else:
-                rsvd_size = self.sw_size - self.hw_size
-
-            # Generate the reserved bits xml code
-            rsvd_xml = f"""<ipxact:field>
-						<ipxact:name>RSVD</ipxact:name>
-						<ipxact:bitOffset>{xml_hw_size}</ipxact:bitOffset>
+                field_access_type = "read-write"
+            fields_xml += f"""\
+					<ipxact:field>
+						<ipxact:name>{csr_field.name}</ipxact:name>
+						<ipxact:bitOffset>{csr_field.base_bit}</ipxact:bitOffset>
 						<ipxact:resets>
 							<ipxact:reset resetTypeRef="{self.rst}">
-								<ipxact:value>0</ipxact:value>
+								<ipxact:value>{csr_field.rst_val}</ipxact:value>
 							</ipxact:reset>
 						</ipxact:resets>
-						<ipxact:bitWidth>{rsvd_size}</ipxact:bitWidth>
-					</ipxact:field>"""
+						<ipxact:bitWidth>{csr_field.width}</ipxact:bitWidth>
+						<ipxact:volatile>{str(csr_field.volatile).lower()}</ipxact:volatile>
+						<ipxact:access>{field_access_type}</ipxact:access>
+					</ipxact:field>
+"""
 
         # Generate the xml code
         xml_code = f"""<ipxact:register>
@@ -220,21 +218,10 @@ class SwRegister:
 					<ipxact:description>{self.description}</ipxact:description>
 					<ipxact:addressOffset>{self.address}</ipxact:addressOffset>
 					<ipxact:size>{self.sw_size}</ipxact:size>
-					<ipxact:volatile>false</ipxact:volatile>
+					<ipxact:volatile>{str(self.volatile).lower()}</ipxact:volatile>
 					<ipxact:access>{access_type}</ipxact:access>
-					<ipxact:field>
-						<ipxact:name>{self.name}</ipxact:name>
-						<ipxact:bitOffset>0</ipxact:bitOffset>
-						<ipxact:resets>
-							<ipxact:reset resetTypeRef="{self.rst}">
-								<ipxact:value>{self.rst_val}</ipxact:value>
-							</ipxact:reset>
-						</ipxact:resets>
-						<ipxact:bitWidth>{xml_hw_size}</ipxact:bitWidth>
-					</ipxact:field>"""
-        if rsvd_xml != "":
-            xml_code += f"""\n					{rsvd_xml}"""
-        xml_code += """\n				</ipxact:register>"""
+{fields_xml}
+				</ipxact:register>"""
 
         return xml_code
 
@@ -511,8 +498,10 @@ def gen_memory_map_xml(sw_regs, parameters_list):
             sw_reg.type,
             "arst_i",
             sw_reg.rst_val,
+            sw_reg.volatile,
             sw_reg.descr,
             parameters_list,
+            sw_reg.fields,
         )
 
         # add it to the sw_regs list
@@ -528,7 +517,7 @@ def gen_memory_map_xml(sw_regs, parameters_list):
             sw_regs_xml += "\n"
             # indent the xml code
             sw_regs_xml += "\t" * 4
-        sw_regs_xml += sw_reg.gen_xml(parameters_list)
+        sw_regs_xml += sw_reg.gen_xml()
 
     # Compute the memory map range by adding the address and sw_size (in bytes) of the last register
     memory_map_range = sw_regs_list[-1].address + sw_regs_list[-1].sw_size / 8
@@ -576,7 +565,7 @@ def gen_parameters_list(core):
             # Skip doc_only confs
             if conf.doc_only:
                 continue
-            if conf.type != "M":
+            if conf.type != ["M", "C"]:
                 parameters_list.append(
                     Parameter(
                         conf.name,

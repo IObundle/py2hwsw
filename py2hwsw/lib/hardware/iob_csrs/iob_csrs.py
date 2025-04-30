@@ -30,7 +30,7 @@ def setup(py_params_dict):
                 "regs": [
                     {
                         "name": "dummy_reg",
-                        "type": "W",
+                        "mode": "W",
                         "n_bits": 1,
                         "rst_val": 0,
                         "log2n_items": 0,

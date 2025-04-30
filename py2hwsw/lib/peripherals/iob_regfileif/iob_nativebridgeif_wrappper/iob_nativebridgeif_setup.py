@@ -36,7 +36,7 @@ regs = [
         "regs": [
             {
                 "name": "DUMMY",
-                "type": "R",
+                "mode": "R",
                 "n_bits": 1,
                 "rst_val": 0,
                 "addr": -1,

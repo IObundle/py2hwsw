@@ -216,7 +216,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "soft_reset",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -225,7 +225,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "enable",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -234,7 +234,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "data",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": 32,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -243,7 +243,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "mode",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": "1",
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -252,7 +252,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "nwords",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": "DATA_W",
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -261,7 +261,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "tlast_detected",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -276,7 +276,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "fifo_full",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -285,7 +285,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "fifo_empty",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -294,7 +294,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "fifo_threshold",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": "FIFO_ADDR_W+1",
                                 "rst_val": 8,
                                 "log2n_items": 0,
@@ -303,7 +303,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "fifo_level",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": "FIFO_ADDR_W+1",
                                 "rst_val": 0,
                                 "log2n_items": 0,

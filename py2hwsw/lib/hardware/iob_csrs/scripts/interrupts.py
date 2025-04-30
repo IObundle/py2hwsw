@@ -5,7 +5,7 @@
 interrupt_csrs = [
     {
         "name": "status",
-        "type": "R",
+        "mode": "R",
         "n_bits": 32,
         "rst_val": 0,
         "log2n_items": 0,
@@ -14,7 +14,7 @@ interrupt_csrs = [
     },
     {
         "name": "mask",
-        "type": "W",
+        "mode": "W",
         "n_bits": 32,
         "rst_val": 0,
         "log2n_items": 0,
@@ -23,7 +23,7 @@ interrupt_csrs = [
     },
     {
         "name": "clear",
-        "type": "W",
+        "mode": "W",
         "n_bits": 32,
         "rst_val": 0,
         "log2n_items": 0,
@@ -36,13 +36,13 @@ interrupt_csrs = [
 def find_and_update_interrupt_csrs(csrs_dict):
     """Given a dictionary of CSRs, find the interrupt CSRs group and update the dictionary
     accordingly.
-    User should provide a CSR of type "INTERRUPT". This CSR will be replaced by interrupt_csrs.
+    User should provide a CSR of mode "INTERRUPT". This CSR will be replaced by interrupt_csrs.
     """
     csr_group_ref = None
     csr_ref = None
     for csr_group in csrs_dict:
         for csr in csr_group["regs"]:
-            if csr["type"] == "INTERRUPT":
+            if csr["mode"] == "INTERRUPT":
                 csr_group_ref = csr_group
                 csr_ref = csr
                 break

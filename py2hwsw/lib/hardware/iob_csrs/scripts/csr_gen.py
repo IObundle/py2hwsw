@@ -216,7 +216,7 @@ class csr_gen:
         suffix = "" if row.internal_use else "_o"
 
         lines = ""
-        lines += f"\n\n//NAME: {name};\n//TYPE: {row.type}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); AUTO: {auto}\n\n"
+        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); AUTO: {auto}\n\n"
 
         # compute wdata with only the needed bits
         wires.append(
@@ -322,7 +322,7 @@ class csr_gen:
         suffix = "" if row.internal_use else "_o"
 
         lines = ""
-        lines += f"\n\n//NAME: {name};\n//TYPE: {row.type}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); AUTO: {auto}\n\n"
+        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); AUTO: {auto}\n\n"
 
         if not auto:  # output read enable
             lines += f"    wire {name}_addressed_r;\n"
@@ -337,7 +337,7 @@ class csr_gen:
     # auxiliar read register case name
     def aux_read_reg_case_name(self, row):
         aux_read_reg_case_name = ""
-        if "R" in row.type:
+        if "R" in row.mode:
             addr = row.addr
             n_bits = row.n_bits
             log2n_items = row.log2n_items
@@ -358,7 +358,7 @@ class csr_gen:
 
             # version is not a register, it is an internal constant
             if name != "version":
-                if "W" in row.type:
+                if "W" in row.mode:
                     if auto:
                         f.write(
                             f"    wire [{self.verilog_max(n_bits,1)}-1:0] {name}_wr;\n"
@@ -369,7 +369,7 @@ class csr_gen:
                         )
                         f.write(f"    wire {name}_wen_wr;\n")
                         f.write(f"    wire {name}_ready_wr;\n")
-                if "R" in row.type:
+                if "R" in row.mode:
                     if auto:
                         f.write(
                             f"    wire [{self.verilog_max(n_bits,1)}-1:0] {name}_rd;\n"
@@ -394,14 +394,14 @@ class csr_gen:
 
             # version is not a register, it is an internal constant
             if name != "version":
-                if "W" in row.type:
+                if "W" in row.mode:
                     if auto:
                         f.write(f"    .{name}_o({name}_wr),\n")
                     else:
                         f.write(f"    .{name}_wdata_o({name}_wdata_wr),\n")
                         f.write(f"    .{name}_wen_o({name}_wen_wr),\n")
                         f.write(f"    .{name}_ready_i({name}_ready_wr),\n")
-                if "R" in row.type:
+                if "R" in row.mode:
                     if auto:
                         f.write(f"    .{name}_i({name}_rd),\n")
                     else:
@@ -437,7 +437,7 @@ class csr_gen:
             if name == "version":
                 continue
 
-            if "W" in row.type:
+            if "W" in row.mode:
                 if auto:
                     for idx in range(n_items):
                         name_idx = f"{name}_{idx}" if n_items > 1 else name
@@ -491,7 +491,7 @@ class csr_gen:
                     ]
                     port_has_inputs = True
                     port_has_outputs = True
-            if "R" in row.type:
+            if "R" in row.mode:
                 if n_items > 1:
                     register_signals += [
                         {
@@ -674,7 +674,7 @@ class csr_gen:
         for row in table:
             if not row.autoreg:
                 all_auto = False
-                if "R" in row.type:
+                if "R" in row.mode:
                     all_reads_auto = False
                     break
 
@@ -849,7 +849,7 @@ class csr_gen:
         snippet += "    iob_ctls #(.W(WSTRB_W), .MODE(0), .SYMBOL(0)) bo_inst (.data_i(internal_iob_wstrb), .count_o(byte_offset));\n"
 
         for row in table:
-            if "W" in row.type:
+            if "W" in row.mode:
                 # compute write address
                 snippet += "    wire [ADDR_W-1:0] waddr;\n"
                 snippet += "    assign waddr = `IOB_WORD_ADDR(internal_iob_addr_stable) + byte_offset;\n"
@@ -857,14 +857,14 @@ class csr_gen:
 
         # insert write register logic
         for row in table:
-            if "W" in row.type:
+            if "W" in row.mode:
                 _snippet, _wires = self.gen_wr_reg(row)
                 snippet += _snippet
                 wires += _wires
 
         # insert read register logic
         for row in table:
-            if "R" in row.type:
+            if "R" in row.mode:
                 snippet += self.gen_rd_reg(row)
 
         #
@@ -998,7 +998,7 @@ class csr_gen:
 
         # auxiliar read register cases
         for row in table:
-            if "R" in row.type:
+            if "R" in row.mode:
                 aux_read_reg = self.aux_read_reg_case_name(row)
                 if aux_read_reg:
                     wires.append(
@@ -1020,7 +1020,7 @@ class csr_gen:
             n_bytes = int(self.bceil(n_bits, 3) / 8)
             if n_bytes == 3:
                 n_bytes = 4
-            if "R" in row.type:
+            if "R" in row.mode:
                 if name == "version":
                     pass
                 elif auto:
@@ -1068,7 +1068,7 @@ class csr_gen:
             auto = row.autoreg
             suffix = "" if row.internal_use else "_i"
 
-            if "R" in row.type:
+            if "R" in row.mode:
                 aux_read_reg = self.aux_read_reg_case_name(row)
 
                 if self.bfloor(addr, addr_w_base) == self.bfloor(
@@ -1107,7 +1107,7 @@ class csr_gen:
             auto = row.autoreg
             suffix = "" if row.internal_use else "_i"
 
-            if "W" in row.type:
+            if "W" in row.mode:
                 if not auto:
                     # get ready
                     snippet += f"        if((waddr >= {addr}) && (waddr < {addr + 2**addr_w})) begin\n"
@@ -1239,7 +1239,7 @@ class csr_gen:
         fswhdr.write("//Addresses\n")
         for row in table:
             name = row.name.upper()
-            if "W" in row.type or "R" in row.type:
+            if "W" in row.mode or "R" in row.mode:
                 fswhdr.write(f"#define {core_prefix_upper}{name}_ADDR {row.addr}\n")
 
         fswhdr.write("\n//Data widths (bit)\n")
@@ -1249,7 +1249,7 @@ class csr_gen:
             n_bytes = int(self.bceil(n_bits, 3) / 8)
             if n_bytes == 3:
                 n_bytes = 4
-            if "W" in row.type or "R" in row.type:
+            if "W" in row.mode or "R" in row.mode:
                 fswhdr.write(f"#define {core_prefix_upper}{name}_W {n_bytes*8}\n")
 
         fswhdr.write("\n// Base Address\n")
@@ -1271,7 +1271,7 @@ class csr_gen:
             if n_bytes == 3:
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            if "W" in row.type:
+            if "W" in row.mode:
                 sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 if addr_w / n_bytes > 1:
@@ -1279,7 +1279,7 @@ class csr_gen:
                 fswhdr.write(
                     f"void {core_prefix}set_{name}({sw_type} value{addr_arg});\n"
                 )
-            if "R" in row.type:
+            if "R" in row.mode:
                 sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
                 if addr_w / n_bytes > 1:
@@ -1315,13 +1315,13 @@ class csr_gen:
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             addr = f"base + {core_prefix_upper}{name_upper}_ADDR"
             sw_type = self.csr_type(name, n_bytes)
-            if "W" in row.type:
+            if "W" in row.mode:
                 fsw.write(f"void {core_prefix}set_{name}({sw_type} value) {{\n")
                 fsw.write(
                     f"  iob_write({addr}, {core_prefix_upper}{name_upper}_W, value);\n"
                 )
                 fsw.write("}\n\n")
-            if "R" in row.type:
+            if "R" in row.mode:
                 fsw.write(f"{sw_type} {core_prefix}get_{name}() {{\n")
                 fsw.write(
                     f"  return iob_read({addr}, {core_prefix_upper}{name_upper}_W);\n"
@@ -1339,12 +1339,12 @@ class csr_gen:
 
     # check if address overlaps with previous
     @staticmethod
-    def check_overlap(addr, addr_type, read_addr, write_addr):
-        if addr_type == "R" and addr < read_addr:
+    def check_overlap(addr, addr_mode, read_addr, write_addr):
+        if addr_mode == "R" and addr < read_addr:
             sys.exit(
                 f"{iob_colors.FAIL}read address {addr} overlaps with previous addresses{iob_colors.ENDC}"
             )
-        elif addr_type == "W" and addr < write_addr:
+        elif addr_mode == "W" and addr < write_addr:
             sys.exit(
                 f"{iob_colors.FAIL}write address {addr} overlaps with previous addresses{iob_colors.ENDC}"
             )
@@ -1381,7 +1381,7 @@ class csr_gen:
 
         for row in table:
             addr = self.check_autoaddr(autoaddr, row)
-            addr_type = row.type
+            addr_mode = row.mode
             n_bits = row.n_bits
             log2n_items = row.log2n_items
             n_bytes = self.bceil(n_bits, 3) / 8
@@ -1390,17 +1390,17 @@ class csr_gen:
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             if addr >= 0:  # manual address
                 self.check_alignment(addr, addr_w)
-                self.check_overlap(addr, addr_type, read_addr, write_addr)
+                self.check_overlap(addr, addr_mode, read_addr, write_addr)
                 addr_tmp = addr
-            elif "R" in addr_type:  # auto address
+            elif "R" in addr_mode:  # auto address
                 read_addr = self.bceil(read_addr, addr_w)
                 addr_tmp = read_addr
-            elif "W" in addr_type:
+            elif "W" in addr_mode:
                 write_addr = self.bceil(write_addr, addr_w)
                 addr_tmp = write_addr
             else:
                 sys.exit(
-                    f"{iob_colors.FAIL}invalid address type {addr_type} for register named {row.name}{iob_colors.ENDC}"
+                    f"{iob_colors.FAIL}invalid address mode {addr_mode} for register named {row.name}{iob_colors.ENDC}"
                 )
 
             if autoaddr and not rw_overlap:
@@ -1411,9 +1411,9 @@ class csr_gen:
 
             # update addresses
             addr_tmp += 2**addr_w
-            if "R" in addr_type:
+            if "R" in addr_mode:
                 read_addr = addr_tmp
-            elif "W" in addr_type:
+            elif "W" in addr_mode:
                 write_addr = addr_tmp
             if not rw_overlap:
                 read_addr = addr_tmp
@@ -1495,7 +1495,7 @@ tables. The tables give information on the name, read/write capability, address,
                     tex_table.append(
                         [
                             reg.name.upper(),
-                            reg.type,
+                            reg.mode,
                             str(reg.addr),
                             str(reg.n_bits),
                             str(reg.rst_val),

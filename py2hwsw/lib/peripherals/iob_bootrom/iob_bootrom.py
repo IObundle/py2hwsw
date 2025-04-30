@@ -114,7 +114,7 @@ def setup(py_params_dict):
                             {
                                 "name": "rom",
                                 "descr": "Bootloader ROM (read).",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": "DATA_W",
                                 "rst_val": 0,
                                 "addr": -1,

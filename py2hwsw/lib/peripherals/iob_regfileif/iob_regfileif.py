@@ -36,7 +36,7 @@ def setup(py_params_dict):
                 "regs": [
                     {
                         "name": "reg1",
-                        "type": "R",
+                        "mode": "R",
                         "n_bits": 32,
                         "rst_val": 0,
                         "log2n_items": 0,
@@ -45,7 +45,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "reg2",
-                        "type": "W",
+                        "mode": "W",
                         "n_bits": 32,
                         "rst_val": 0,
                         "log2n_items": 0,
@@ -54,7 +54,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "reg3",
-                        "type": "RW",
+                        "mode": "RW",
                         "n_bits": 32,
                         "rst_val": 0,
                         "log2n_items": 0,
@@ -74,7 +74,7 @@ def setup(py_params_dict):
                 "regs": [
                     {
                         "name": "dummy_reg",
-                        "type": "W",
+                        "mode": "W",
                         "n_bits": 1,
                         "rst_val": 0,
                         "log2n_items": 0,
@@ -106,7 +106,7 @@ def setup(py_params_dict):
                         ],
                     },
                 )
-                if csr["type"] == "RW":
+                if csr["mode"] == "RW":
                     reg_wires[-1]["signals"].append(
                         {"name": csr["name"] + "_2", "width": csr["n_bits"]},
                     )
@@ -122,13 +122,13 @@ def setup(py_params_dict):
                     )
 
                 # Connect register interfaces
-                if csr["type"] == "W":
+                if csr["mode"] == "W":
                     external_reg_connections[csr["name"] + "_o"] = csr["name"]
                     internal_reg_connections[csr["name"] + "_i"] = csr["name"]
-                if csr["type"] == "R":
+                if csr["mode"] == "R":
                     external_reg_connections[csr["name"] + "_i"] = csr["name"]
                     internal_reg_connections[csr["name"] + "_o"] = csr["name"]
-                elif csr["type"] == "RW":
+                elif csr["mode"] == "RW":
                     external_reg_connections[csr["name"] + "_io"] = csr["name"]
                     internal_reg_connections[csr["name"] + "_io"] = csr["name"] + "_inv"
             else:  # Autoreg false
@@ -155,7 +155,7 @@ def setup(py_params_dict):
                         },
                     )
 
-                    if csr["type"] == "RW":
+                    if csr["mode"] == "RW":
                         ports[-1]["signals"].append(
                             {"name": csr["name"] + "_2_o", "width": csr["n_bits"]},
                         )
@@ -163,16 +163,16 @@ def setup(py_params_dict):
                     # Assign wires to ports
                     if csr["autoreg"]:
                         snippets += f"assign {csr['name'] + '_o'} = {csr['name']};"
-                        if csr["type"] == "RW":
+                        if csr["mode"] == "RW":
                             snippets += (
                                 f"assign {csr['name'] + '_2_o'} = {csr['name'] + '_2'};"
                             )
                     else:
-                        if csr["type"] == "W":
+                        if csr["mode"] == "W":
                             snippets += f"assign {csr['name'] + '_o'} = {'internal_' + csr['name']+ '_wdata_o'};"
-                        elif csr["type"] == "R":
+                        elif csr["mode"] == "R":
                             snippets += f"assign {csr['name'] + '_o'} = {'external_' + csr['name'] + '_wdata_o'};"
-                        elif csr["type"] == "RW":
+                        elif csr["mode"] == "RW":
                             snippets += f"""assign {csr['name'] + '_o'} = {'internal_' + csr['name']+ '_wdata_o'};
                             assign {csr['name'] + '_2_o'} = {'external_' + csr['name'] + '_wdata_o'};"""
                 csr.pop("output")
@@ -181,11 +181,11 @@ def setup(py_params_dict):
     csrs_inverted = copy.deepcopy(params["csrs"])
     for csr_group in csrs_inverted:
         for csr in csr_group["regs"]:
-            if csr["type"] == "W":
-                csr["type"] = "R"
-            elif csr["type"] == "R":
-                csr["type"] = "W"
-            # Do nothing for type "RW"
+            if csr["mode"] == "W":
+                csr["mode"] = "R"
+            elif csr["mode"] == "R":
+                csr["mode"] = "W"
+            # Do nothing for mode "RW"
 
     if "verilog-snippets" in py_params_dict:
         snippets = snippets + py_params_dict["verilog-snippets"]
@@ -285,7 +285,7 @@ def create_manual_reg_wires(csr):
     internal_signals = []
     external_signals = []
 
-    if csr["type"] == "W":
+    if csr["mode"] == "W":
         internal_signals = get_manual_signals(
             "internal_" + csr["name"], "W", csr["n_bits"]
         )
@@ -293,7 +293,7 @@ def create_manual_reg_wires(csr):
             "external_" + csr["name"], "R", csr["n_bits"]
         )
 
-    elif csr["type"] == "R":
+    elif csr["mode"] == "R":
         internal_signals = get_manual_signals(
             "internal_" + csr["name"], "W", csr["n_bits"]
         )
@@ -301,7 +301,7 @@ def create_manual_reg_wires(csr):
             "external_" + csr["name"], "R", csr["n_bits"]
         )
 
-    elif csr["type"] == "RW":
+    elif csr["mode"] == "RW":
         internal_signals = get_manual_signals(
             "internal_" + csr["name"], "RW", csr["n_bits"]
         )
@@ -322,17 +322,17 @@ def create_manual_reg_wires(csr):
     return reg_wires
 
 
-def get_manual_signals(name, type, data_width):
+def get_manual_signals(name, mode, data_width):
     signals = []
 
-    if "R" in type:
+    if "R" in mode:
         signals += [
             {"name": name + "_rdata_i", "width": data_width},
             {"name": name + "_rvalid_i", "width": 1},
             {"name": name + "_ren_o", "width": 1},
             {"name": name + "_rready_i", "width": 1},
         ]
-    elif "W" in type:
+    elif "W" in mode:
         signals += [
             {"name": name + "_wdata_o", "width": data_width},
             {"name": name + "_wen_o", "width": 1},

@@ -13,7 +13,7 @@ class iob_csr:
     """Class to represent a Control/Status Register."""
 
     name: str = ""
-    type: str = ""
+    mode: str = ""
     n_bits: str or int = 1
     rst_val: int = 0
     addr: int = -1
@@ -32,8 +32,8 @@ class iob_csr:
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
 
-        if self.type not in ["R", "W", "RW"]:
-            fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
+        if self.mode not in ["R", "W", "RW"]:
+            fail_with_msg(f"Invalid CSR mode: '{self.mode}'", ValueError)
 
         # try to convert n_bits to int
         try:
@@ -45,7 +45,7 @@ class iob_csr:
             self.fields = [
                 csr_field(
                     name=self.name,
-                    type=self.type,
+                    mode=self.mode,
                     base_bit=0,
                     width=self.n_bits,
                     volatile=self.volatile,
@@ -56,14 +56,14 @@ class iob_csr:
 
         # Check if fields properties match CSR properties
         for _field in self.fields:
-            if self.type == "R" and _field.type != "R":
+            if self.mode == "R" and _field.mode != "R":
                 fail_with_msg(
-                    f"CSR '{self.name}' defined with type '{self.type}' has invalid field type '{_field.type}'.",
+                    f"CSR '{self.name}' defined with mode '{self.mode}' has invalid field mode '{_field.mode}'.",
                     ValueError,
                 )
-            elif self.type == "W" and _field.type != "W":
+            elif self.mode == "W" and _field.mode != "W":
                 fail_with_msg(
-                    f"CSR '{self.name}' defined with type '{self.type}' has invalid field type '{_field.type}'.",
+                    f"CSR '{self.name}' defined with mode '{self.mode}' has invalid field mode '{_field.mode}'.",
                     ValueError,
                 )
 
@@ -101,7 +101,7 @@ class iob_csr:
             elif width > 0:
                 self.fields.append(
                     csr_field(
-                        name="RSVD", type=self.type, base_bit=idx - width, width=width
+                        name="RSVD", mode=self.mode, base_bit=idx - width, width=width
                     )
                 )
                 width = 0
@@ -109,7 +109,7 @@ class iob_csr:
             self.fields.append(
                 csr_field(
                     name="RSVD",
-                    type=self.type,
+                    mode=self.mode,
                     base_bit=len(used_bits) - width,
                     width=width,
                 )
@@ -119,7 +119,7 @@ class iob_csr:
 @dataclass
 class csr_field:
     name: str = ""
-    type: str = ""
+    mode: str = ""
     base_bit: int = 0
     width: int = 1
     volatile: bool = True
@@ -129,8 +129,8 @@ class csr_field:
         if not self.name:
             fail_with_msg("CSR field name is not set", ValueError)
 
-        if self.type not in ["R", "W", "RW"]:
-            fail_with_msg(f"Invalid CSR field type: '{self.type}'", ValueError)
+        if self.mode not in ["R", "W", "RW"]:
+            fail_with_msg(f"Invalid CSR field mode: '{self.mode}'", ValueError)
 
 
 def fail_with_msg(msg, exception_type=Exception):

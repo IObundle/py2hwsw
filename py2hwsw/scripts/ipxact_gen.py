@@ -191,9 +191,9 @@ class SwRegister:
         fields_xml = ""
         for csr_field in self.fields:
             # set the access type
-            if csr_field.type == "R":
+            if csr_field.mode == "R":
                 field_access_type = "read-only"
-            elif csr_field.type == "W":
+            elif csr_field.mode == "W":
                 field_access_type = "write-only"
             else:
                 field_access_type = "read-write"
@@ -495,7 +495,7 @@ def gen_memory_map_xml(sw_regs, parameters_list):
             sw_reg.name,
             sw_reg.addr,
             sw_reg.n_bits,
-            sw_reg.type,
+            sw_reg.mode,
             "arst_i",
             sw_reg.rst_val,
             sw_reg.volatile,

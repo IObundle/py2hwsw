@@ -406,7 +406,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "single_write",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -415,7 +415,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "single_read",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -433,7 +433,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "regfile_write",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": 8,
                                 "rst_val": 0,
                                 "log2n_items": 2,
@@ -442,7 +442,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "regfile_read",
-                                "type": "R",
+                                "mode": "R",
                                 "n_bits": 8,
                                 "rst_val": 0,
                                 "log2n_items": 2,
@@ -460,7 +460,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "fifo_write",
-                                "type": "FIFO_W",
+                                "mode": "FIFO_W",
                                 "n_bits": 8,
                                 "rst_val": 0,
                                 "log2n_items": 4,
@@ -475,7 +475,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "fifo_read",
-                                "type": "FIFO_R",
+                                "mode": "FIFO_R",
                                 "n_bits": 8,
                                 "rst_val": 0,
                                 "log2n_items": 4,
@@ -490,7 +490,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "async_fifo_write",
-                                "type": "AFIFO_W",
+                                "mode": "AFIFO_W",
                                 "n_bits": 8,
                                 "rst_val": 0,
                                 "log2n_items": 4,
@@ -505,7 +505,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "async_fifo_read",
-                                "type": "AFIFO_R",
+                                "mode": "AFIFO_R",
                                 "n_bits": 8,
                                 "rst_val": 0,
                                 "log2n_items": 4,

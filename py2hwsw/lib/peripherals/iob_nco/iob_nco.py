@@ -115,7 +115,7 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "soft_reset",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -124,7 +124,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "enable",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
@@ -133,7 +133,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "period_int",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": 32,
                                 "rst_val": 5,
                                 "log2n_items": 0,
@@ -142,7 +142,7 @@ def setup(py_params_dict):
                             },
                             {
                                 "name": "period_frac",
-                                "type": "W",
+                                "mode": "W",
                                 "n_bits": 32,
                                 "rst_val": 0,
                                 "log2n_items": 0,

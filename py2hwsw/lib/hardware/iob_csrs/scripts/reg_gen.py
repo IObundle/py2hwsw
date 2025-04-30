@@ -72,7 +72,7 @@ def build_regs_table(core):
         general_regs_table.regs.append(
             iob_csr(
                 name="version",
-                type="R",
+                mode="R",
                 n_bits=16,
                 rst_val=version_str_to_digits(core["version"]),
                 addr=-1,

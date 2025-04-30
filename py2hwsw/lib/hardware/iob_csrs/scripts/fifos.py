@@ -5,11 +5,11 @@
 
 def get_fifo_csrs(csr_ref):
     fifo_csrs = []
-    if csr_ref["type"].endswith("FIFO_R"):
+    if csr_ref["mode"].endswith("FIFO_R"):
         fifo_csrs += [
             {
                 "name": f"{csr_ref['name']}_data",
-                "type": "R",
+                "mode": "R",
                 "n_bits": 32,
                 "rst_val": 0,
                 "log2n_items": 0,
@@ -19,7 +19,7 @@ def get_fifo_csrs(csr_ref):
             },
             {
                 "name": f"{csr_ref['name']}_empty",
-                "type": "R",
+                "mode": "R",
                 "n_bits": 1,
                 "rst_val": 1,
                 "log2n_items": 0,
@@ -29,7 +29,7 @@ def get_fifo_csrs(csr_ref):
             },
             {
                 "name": f"{csr_ref['name']}_thresh",
-                "type": "W",
+                "mode": "W",
                 "n_bits": 32,
                 "rst_val": 0,
                 "log2n_items": 0,
@@ -42,7 +42,7 @@ def get_fifo_csrs(csr_ref):
         fifo_csrs += [
             {
                 "name": f"{csr_ref['name']}_data",
-                "type": "W",
+                "mode": "W",
                 "n_bits": 32,
                 "rst_val": 0,
                 "log2n_items": 0,
@@ -52,7 +52,7 @@ def get_fifo_csrs(csr_ref):
             },
             {
                 "name": f"{csr_ref['name']}_full",
-                "type": "R",
+                "mode": "R",
                 "n_bits": 1,
                 "rst_val": 0,
                 "log2n_items": 0,
@@ -64,7 +64,7 @@ def get_fifo_csrs(csr_ref):
     fifo_csrs += [
         {
             "name": f"{csr_ref['name']}_level",
-            "type": "R",
+            "mode": "R",
             "n_bits": 32,
             "rst_val": 0,
             "log2n_items": 0,
@@ -79,7 +79,7 @@ def get_fifo_csrs(csr_ref):
 def find_and_update_fifo_csrs(csrs_dict, attributes_dict):
     """Given a dictionary of CSRs, find the fifo CSRs group and update the dictionary
     accordingly.
-    User should provide a CSR of type "*FIFO". This CSR will be replaced by fifo_csrs.
+    User should provide a CSR of mode "*FIFO". This CSR will be replaced by fifo_csrs.
     :param dict csrs_dict: Dictionary of CSRs to update.
     :param dict attributes_dict: Dictionary of core attributes to add fifo instance, wires and ports.
     """
@@ -87,7 +87,7 @@ def find_and_update_fifo_csrs(csrs_dict, attributes_dict):
     for csr_group in csrs_dict:
         csr_ref = None
         for csr in csr_group["regs"]:
-            if csr["type"] in ["FIFO_R", "FIFO_W", "AFIFO_R", "AFIFO_W"]:
+            if csr["mode"] in ["FIFO_R", "FIFO_W", "AFIFO_R", "AFIFO_W"]:
                 csr_group_ref = csr_group
                 csr_ref = csr
                 break
@@ -111,8 +111,8 @@ def create_fifo_instance(attributes_dict, csr_ref):
     """
     fifo_name = csr_ref["name"]
     FIFO_NAME = fifo_name.upper()
-    fifo_type = "R" if csr_ref["type"].endswith("FIFO_R") else "W"
-    is_async = csr_ref["type"].startswith("AFIFO")
+    fifo_type = "R" if csr_ref["mode"].endswith("FIFO_R") else "W"
+    is_async = csr_ref["mode"].startswith("AFIFO")
 
     #
     # Confs: Based on confs from iob_fifo_sync.py

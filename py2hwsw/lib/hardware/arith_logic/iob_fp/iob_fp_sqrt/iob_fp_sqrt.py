@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "MAN_W",
-                "type": "F",
+                "type": "D",
                 "val": "DATA_W-EXP_W",
                 "min": "NA",
                 "max": "NA",
@@ -33,7 +33,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "BIAS",
-                "type": "F",
+                "type": "D",
                 "val": "2**(EXP_W-1)-1",
                 "min": "NA",
                 "max": "NA",
@@ -41,7 +41,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "EXTRA",
-                "type": "F",
+                "type": "D",
                 "val": 3,
                 "min": "NA",
                 "max": "NA",
@@ -49,7 +49,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "END_COUNT",
-                "type": "F",
+                "type": "D",
                 "val": "MAN_W+EXTRA-1+4",
                 "min": "NA",
                 "max": "NA",
@@ -57,7 +57,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "COUNT_W",
-                "type": "F",
+                "type": "D",
                 "val": "$clog2(END_COUNT+1)",
                 "min": "NA",
                 "max": "NA",

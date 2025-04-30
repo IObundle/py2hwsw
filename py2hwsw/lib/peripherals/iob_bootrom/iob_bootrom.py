@@ -16,7 +16,7 @@ def setup(py_params_dict):
             {
                 "name": "DATA_W",
                 "descr": "Data bus width",
-                "type": "F",
+                "type": "D",
                 "val": "32",
                 "min": "0",
                 "max": "32",
@@ -24,7 +24,7 @@ def setup(py_params_dict):
             {
                 "name": "ADDR_W",
                 "descr": "Address bus width",
-                "type": "F",
+                "type": "D",
                 "val": BOOTROM_ADDR_W - 2,
                 "min": "0",
                 "max": "32",

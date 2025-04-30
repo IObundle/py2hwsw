@@ -61,7 +61,7 @@ def setup(py_params_dict):
             {
                 "name": "WRITE_HEXFILE",
                 "descr": "Write hexfile",
-                "type": "F",
+                "type": "D",
                 "val": '"none"',
                 "min": "NA",
                 "max": "NA",
@@ -69,7 +69,7 @@ def setup(py_params_dict):
             {
                 "name": "READ_HEXFILE",
                 "descr": "Read hexfile",
-                "type": "F",
+                "type": "D",
                 "val": '"none"',
                 "min": "NA",
                 "max": "NA",

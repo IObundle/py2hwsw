@@ -4,6 +4,7 @@
 
 
 def setup(py_params_dict):
+    CSR_IF = py_params_dict["csr_if"] if "csr_if" in py_params_dict else "iob"
     attributes_dict = {
         "generate_hw": True,
         "confs": [
@@ -550,6 +551,14 @@ def setup(py_params_dict):
                 "connect": {
                     "ram_t2p_s": "read_ext_mem",
                 },
+            },
+        ],
+        "superblocks": [
+            # Simulation wrapper
+            {
+                "core_name": "iob_dma_sim",
+                "dest_dir": "hardware/simulation/src",
+                "csr_if": CSR_IF,
             },
         ],
         "snippets": [

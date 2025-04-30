@@ -185,7 +185,7 @@ def setup(py_params_dict):
                     {"name": "axis_in_cnt", "width": "WLEN_W"},
                 ],
             },
-            # AXIS2AXI configuration wires
+            # AXIS_S_AXI_M configuration wires
             {
                 "name": "config_write",
                 "descr": "Configure write (AXIS in)",
@@ -505,8 +505,8 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_axis2axi",
-                "instance_name": "axis2axi_inst",
+                "core_name": "iob_axis_s_axi_m",
+                "instance_name": "axis_s_axi_m_inst",
                 "instance_description": "AXIS to AXI",
                 "parameters": {
                     "AXI_ADDR_W": "AXI_ADDR_W",

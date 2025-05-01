@@ -13,6 +13,7 @@ from reg_gen import generate_csr
 from csr_classes import create_csr_group
 from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
+from roms import find_and_update_rom_csrs
 
 # Static (shared) dictionary to store reg tables of generated csrs
 # May be read by other python modules
@@ -34,7 +35,6 @@ def setup(py_params_dict):
                         "n_bits": 1,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": True,
                         "descr": "Dummy register for demo",
                     },
                 ],
@@ -183,6 +183,7 @@ def setup(py_params_dict):
     params["csrs"] = create_group_for_ungrouped_csrs(params["csrs"])
     find_and_update_interrupt_csrs(params["csrs"])
     find_and_update_fifo_csrs(params["csrs"], attributes_dict)
+    # find_and_update_rom_csrs(params["csrs"], attributes_dict) # TODO:
 
     # Convert csrs dictionaries to objects
     csrs_obj_list = []

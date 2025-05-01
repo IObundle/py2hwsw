@@ -212,7 +212,7 @@ class csr_gen:
             n_bytes = 4
         addr = row.addr
         addr_w = self.calc_verilog_addr_w(log2n_items, n_bytes)
-        auto = row.autoreg
+        auto = row.type != "NOAUTO"
         suffix = "" if row.internal_use else "_o"
 
         lines = ""
@@ -318,7 +318,7 @@ class csr_gen:
             n_bytes = 4
         addr = row.addr
         addr_w = self.calc_verilog_addr_w(log2n_items, n_bytes)
-        auto = row.autoreg
+        auto = row.type != "NOAUTO"
         suffix = "" if row.internal_use else "_o"
 
         lines = ""
@@ -354,7 +354,7 @@ class csr_gen:
         for row in table:
             name = row.name
             n_bits = row.n_bits
-            auto = row.autoreg
+            auto = row.type != "NOAUTO"
 
             # version is not a register, it is an internal constant
             if name != "version":
@@ -390,7 +390,7 @@ class csr_gen:
     def gen_portmap(self, table, f):
         for row in table:
             name = row.name
-            auto = row.autoreg
+            auto = row.type != "NOAUTO"
 
             # version is not a register, it is an internal constant
             if name != "version":
@@ -422,7 +422,7 @@ class csr_gen:
         snippet = ""
         for row in table:
             name = row.name
-            auto = row.autoreg
+            auto = row.type != "NOAUTO"
             addr = row.addr
             n_bits = row.n_bits
             log2n_items = row.log2n_items
@@ -672,7 +672,7 @@ class csr_gen:
         all_auto = True
         all_reads_auto = True
         for row in table:
-            if not row.autoreg:
+            if row.type == "NOAUTO":
                 all_auto = False
                 if "R" in row.mode:
                     all_reads_auto = False
@@ -1014,7 +1014,7 @@ class csr_gen:
         # Create byte aligned wires
         for row in table:
             name = row.name
-            auto = row.autoreg
+            auto = row.type != "NOAUTO"
             suffix = "" if row.internal_use else "_i"
             n_bits = row.n_bits
             n_bytes = int(self.bceil(n_bits, 3) / 8)
@@ -1065,7 +1065,7 @@ class csr_gen:
             )
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             addr_w_base = max(log(self.cpu_n_bytes, 2), addr_w)
-            auto = row.autoreg
+            auto = row.type != "NOAUTO"
             suffix = "" if row.internal_use else "_i"
 
             if "R" in row.mode:
@@ -1104,7 +1104,7 @@ class csr_gen:
             if n_bytes == 3:
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            auto = row.autoreg
+            auto = row.type != "NOAUTO"
             suffix = "" if row.internal_use else "_i"
 
             if "W" in row.mode:

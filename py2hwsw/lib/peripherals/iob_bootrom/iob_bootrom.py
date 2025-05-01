@@ -114,12 +114,13 @@ def setup(py_params_dict):
                             {
                                 "name": "rom",
                                 "descr": "Bootloader ROM (read).",
+                                "type": "NOAUTO",
+                                # "type": "ROM", #TODO:
                                 "mode": "R",
                                 "n_bits": "DATA_W",
                                 "rst_val": 0,
                                 "addr": -1,
                                 "log2n_items": BOOTROM_ADDR_W - 2,
-                                "autoreg": False,
                             },
                         ],
                     }

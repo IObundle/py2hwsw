@@ -170,12 +170,12 @@ def setup(py_params_dict):
                     -d 'UART software accessible registers' 
                         -r softreset:1 -m W -d 'Soft reset'  --rst_val 0 --addr 0 --log2n_items 0
                         -r div:16 -m W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
-                        -r txdata:8 -m W -d 'TX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
+                        -r txdata:8 -t NOAUTO -m W -d 'TX data.' --rst_val 0 --addr 4 --log2n_items 0
                         -r txen:1 -m W -d 'TX enable.' --rst_val 0 --addr 5 --log2n_items 0
 				        -r rxen:1 -m W -d 'RX enable.' --rst_val 0 --addr 6 --log2n_items 0
                         -r txready:1 -m R -d 'TX ready to receive data.' --rst_val 0 --addr 0 --log2n_items 0
                         -r rxready:1 -m R -d 'RX ready to be read.' --rst_val 0 --addr 1 --log2n_items 0
-                        -r rxdata:8 -m R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
+                        -r rxdata:8 -t NOAUTO -m R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0
             """,
             {
                 "core_name": "iob_reg",

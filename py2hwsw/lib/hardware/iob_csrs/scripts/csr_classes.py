@@ -13,12 +13,12 @@ class iob_csr:
     """Class to represent a Control/Status Register."""
 
     name: str = ""
+    type: str = "REG"
     mode: str = ""
     n_bits: str or int = 1
     rst_val: int = 0
     addr: int = -1
     log2n_items: int = 0
-    autoreg: bool = True
     descr: str = "Default description"
     # Select if should generate internal wires or ports for this CSR
     internal_use: bool = False
@@ -27,10 +27,15 @@ class iob_csr:
     volatile: bool = True
     # Bit fields
     fields: list or None = None
+    # Asymetric ration between internal and external interfaces address
+    asym: int = 0
 
     def __post_init__(self):
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
+
+        if self.type not in ["REG", "FIFO", "ROM", "NOAUTO", "INTERRUPT"]:
+            fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
 
         if self.mode not in ["R", "W", "RW"]:
             fail_with_msg(f"Invalid CSR mode: '{self.mode}'", ValueError)

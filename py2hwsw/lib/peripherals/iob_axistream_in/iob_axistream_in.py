@@ -220,7 +220,6 @@ def setup(py_params_dict):
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "Soft reset.",
                             },
                             {
@@ -229,16 +228,15 @@ def setup(py_params_dict):
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "Enable peripheral.",
                             },
                             {
                                 "name": "data",
+                                "type": "NOAUTO",
                                 "mode": "R",
                                 "n_bits": 32,
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": False,
                                 "descr": "Data output.",
                             },
                             {
@@ -247,7 +245,6 @@ def setup(py_params_dict):
                                 "n_bits": "1",
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "Sets the operation mode: (0) data is read using CSR; (1) data is read using system axistream interface.",
                             },
                             {
@@ -256,7 +253,6 @@ def setup(py_params_dict):
                                 "n_bits": "DATA_W",
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "Read the number of words (with TDATA_W bits) written to the FIFO.",
                             },
                             {
@@ -265,7 +261,6 @@ def setup(py_params_dict):
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "Read the TLAST detected status.",
                             },
                         ],
@@ -280,7 +275,6 @@ def setup(py_params_dict):
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "Full (1), or non-full (0).",
                             },
                             {
@@ -289,7 +283,6 @@ def setup(py_params_dict):
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "Full (1), or non-full (0).",
                             },
                             {
@@ -298,7 +291,6 @@ def setup(py_params_dict):
                                 "n_bits": "FIFO_ADDR_W+1",
                                 "rst_val": 8,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "FIFO threshold level for interrupt signal",
                             },
                             {
@@ -307,7 +299,6 @@ def setup(py_params_dict):
                                 "n_bits": "FIFO_ADDR_W+1",
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "autoreg": True,
                                 "descr": "Current FIFO level",
                             },
                         ],

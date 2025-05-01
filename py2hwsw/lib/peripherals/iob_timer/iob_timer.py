@@ -102,7 +102,6 @@ def setup(py_params_dict):
                         "n_bits": 1,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": True,
                         "descr": "Timer soft reset",
                     },
                     {
@@ -111,7 +110,6 @@ def setup(py_params_dict):
                         "n_bits": 1,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": True,
                         "descr": "Timer enable",
                     },
                     {
@@ -120,7 +118,6 @@ def setup(py_params_dict):
                         "n_bits": 1,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": True,
                         "descr": "Sample time counter value into a readable register",
                     },
                     {
@@ -129,7 +126,6 @@ def setup(py_params_dict):
                         "n_bits": 32,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": True,
                         "descr": "High part of the timer value, which has twice the width of the data word width",
                     },
                     {
@@ -138,7 +134,6 @@ def setup(py_params_dict):
                         "n_bits": 32,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": True,
                         "descr": "Low part of the timer value, which has twice the width of the data word width",
                     },
                 ],

@@ -5,64 +5,40 @@
 from csr_classes import fail_with_msg
 
 
-def get_fifo_csrs(csr_ref):
-    fifo_csrs = []
-    if csr_ref["mode"] == "R":  # FIFO_R
-        fifo_csrs += [
-            {
-                "name": f"{csr_ref['name']}_data",
-                "type": "NOAUTO",
-                "mode": "R",
-                "n_bits": 32,
-                "rst_val": 0,
-                "log2n_items": 0,
-                "descr": "Read data from FIFO.",
-                "internal_use": True,
-            },
-            {
-                "name": f"{csr_ref['name']}_empty",
-                "mode": "R",
-                "n_bits": 1,
-                "rst_val": 1,
-                "log2n_items": 0,
-                "descr": "Empty (1) or non-empty (0).",
-                "internal_use": True,
-            },
-            {
-                "name": f"{csr_ref['name']}_thresh",
-                "mode": "W",
-                "n_bits": 32,
-                "rst_val": 0,
-                "log2n_items": 0,
-                "descr": "Interrupt upper level threshold: an interrupt is triggered when the number of words in the FIFO reaches this upper level threshold.",
-                "internal_use": True,
-            },
-        ]
-    elif csr_ref["mode"] == "W":  # FIFO_W
-        fifo_csrs += [
-            {
-                "name": f"{csr_ref['name']}_data",
-                "type": "NOAUTO",
-                "mode": "W",
-                "n_bits": 32,
-                "rst_val": 0,
-                "log2n_items": 0,
-                "descr": "Write data to FIFO.",
-                "internal_use": True,
-            },
-            {
-                "name": f"{csr_ref['name']}_full",
-                "mode": "R",
-                "n_bits": 1,
-                "rst_val": 0,
-                "log2n_items": 0,
-                "descr": "Full (1), or non-full (0).",
-                "internal_use": True,
-            },
-        ]
-    else:  # FIFO_RW
-        fail_with_msg("FIFOs of mode 'RW' are not supported.", ValueError)
-    fifo_csrs += [
+def get_rom_csrs(csr_ref):
+    rom_csrs = []
+    if "W" in csr_ref["mode"]:
+        fail_with_msg(f"Unsupported mode '{csr_ref['mode']}' for ROM.", ValueError)
+
+    rom_csrs += [
+        {
+            "name": f"{csr_ref['name']}_data",
+            "type": "NOAUTO",
+            "mode": "R",
+            "n_bits": 32,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "descr": "Read data from FIFO.",
+            "internal_use": True,
+        },
+        {
+            "name": f"{csr_ref['name']}_empty",
+            "mode": "R",
+            "n_bits": 1,
+            "rst_val": 1,
+            "log2n_items": 0,
+            "descr": "Empty (1) or non-empty (0).",
+            "internal_use": True,
+        },
+        {
+            "name": f"{csr_ref['name']}_thresh",
+            "mode": "W",
+            "n_bits": 32,
+            "rst_val": 0,
+            "log2n_items": 0,
+            "descr": "Interrupt upper level threshold: an interrupt is triggered when the number of words in the FIFO reaches this upper level threshold.",
+            "internal_use": True,
+        },
         {
             "name": f"{csr_ref['name']}_level",
             "mode": "R",
@@ -73,21 +49,21 @@ def get_fifo_csrs(csr_ref):
             "internal_use": True,
         },
     ]
-    return fifo_csrs
+    return rom_csrs
 
 
-def find_and_update_fifo_csrs(csrs_dict, attributes_dict):
-    """Given a dictionary of CSRs, find the fifo CSRs group and update the dictionary
+def find_and_update_rom_csrs(csrs_dict, attributes_dict):
+    """Given a dictionary of CSRs, find the ROM CSRs group and update the dictionary
     accordingly.
-    User should provide a CSR of type "*FIFO". This CSR will be replaced by fifo_csrs.
+    User should provide a CSR of type "ROM". This CSR will be replaced by rom_csrs.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add fifo instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add rom instance, wires and ports.
     """
     csr_group_ref = None
     for csr_group in csrs_dict:
         csr_ref = None
         for csr in csr_group["regs"]:
-            if csr.get("type", "") in ["FIFO", "AFIFO"]:
+            if csr.get("type", "") == "ROM":
                 csr_group_ref = csr_group
                 csr_ref = csr
                 break
@@ -96,15 +72,15 @@ def find_and_update_fifo_csrs(csrs_dict, attributes_dict):
             continue
 
         # Add fifo_csrs to group
-        csr_group_ref["regs"] += get_fifo_csrs(csr_ref)
+        csr_group_ref["regs"] += get_rom_csrs(csr_ref)
 
         # Remove original csr from csr_group
         csr_group_ref["regs"].remove(csr_ref)
 
-        create_fifo_instance(attributes_dict, csr_ref)
+        create_rom_instance(attributes_dict, csr_ref)
 
 
-def create_fifo_instance(attributes_dict, csr_ref):
+def create_rom_instance(attributes_dict, csr_ref):
     """Add fifo instance, wires and ports to given attributes_dict, based on fifo description provided by CSR.
     :param dict attributes_dict: Dictionary of core attributes to add fifo instance, wires and ports.
     :param dict csr_ref: CSR description dictionary, with FIFO information.

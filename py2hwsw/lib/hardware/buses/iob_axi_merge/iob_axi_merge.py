@@ -22,9 +22,7 @@ def setup(py_params_dict):
     # Number of bits required for subordinate selection
     NBITS = (NUM_SUBORDINATES - 1).bit_length()
 
-    TRANSFER_COUNTER_DATA_W = py_params_dict.get(
-        "transfer_counter_data_w", 5
-    )
+    TRANSFER_COUNTER_DATA_W = py_params_dict.get("transfer_counter_data_w", 5)
 
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
@@ -639,7 +637,7 @@ def setup(py_params_dict):
                 "encoded_o": "read_sel_prio_enc_o",
             },
         },
-         # Write blocks
+        # Write blocks
         {
             "core_name": "iob_reg",
             "instance_name": "busy_write_reg_re",

@@ -76,7 +76,9 @@ def assert_block_attributes(attributes_dict, py_params):
         for block in attributes_dict.get(attribute, []) + child_attributes.get(
             attribute, []
         ):
-            assert block.get("core_name", None), f"All {attribute} must have a core name!"
+            assert block.get(
+                "core_name", None
+            ), f"All {attribute} must have a core name!"
             assert block.get(
                 "instance_name", None
             ), f"Block '{block['core_name']}' must have an instance name!"

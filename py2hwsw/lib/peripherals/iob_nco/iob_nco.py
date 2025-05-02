@@ -188,7 +188,7 @@ def setup(py_params_dict):
                 "instantiate": False,
             },
             {
-                "core_name": "iob_regfile_at2p",
+                "core_name": "iob_regarray_at2p",
                 "instantiate": False,
             },
             # For simulation

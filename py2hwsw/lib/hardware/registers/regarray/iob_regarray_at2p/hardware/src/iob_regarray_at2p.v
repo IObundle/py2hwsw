@@ -5,7 +5,7 @@
 `timescale 1 ns / 1 ps
 
 
-module iob_regfile_at2p #(
+module iob_regarray_at2p #(
    parameter ADDR_W = 3,
    parameter DATA_W = 21
 ) (
@@ -25,13 +25,13 @@ module iob_regfile_at2p #(
 );
 
    //write
-   wire [((2**ADDR_W)*DATA_W)-1:0] regfile_in;
-   wire [         (2**ADDR_W)-1:0] regfile_en;
+   wire [((2**ADDR_W)*DATA_W)-1:0] regarray_in;
+   wire [         (2**ADDR_W)-1:0] regarray_en;
 
    genvar addr;
    generate
       for (addr = 0; addr < (2 ** ADDR_W); addr = addr + 1) begin : gen_register_file
-         assign regfile_en[addr] = (w_addr_i == addr);
+         assign regarray_en[addr] = (w_addr_i == addr);
          iob_reg_cae #(
             .DATA_W (DATA_W),
             .RST_VAL({DATA_W{1'd0}})
@@ -39,15 +39,15 @@ module iob_regfile_at2p #(
             .clk_i (w_clk_i),
             .cke_i (w_cke_i),
             .arst_i(w_arst_i),
-            .en_i  (regfile_en[addr]),
+            .en_i  (regarray_en[addr]),
             .data_i(w_data_i),
-            .data_o(regfile_in[addr*DATA_W+:DATA_W])
+            .data_o(regarray_in[addr*DATA_W+:DATA_W])
          );
       end
    endgenerate
 
    wire [DATA_W-1:0] r_data;
-   assign r_data = regfile_in[r_addr_i*DATA_W+:DATA_W];
+   assign r_data = regarray_in[r_addr_i*DATA_W+:DATA_W];
 
    //read
    iob_reg_ca #(

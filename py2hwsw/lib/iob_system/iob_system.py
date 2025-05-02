@@ -27,6 +27,7 @@ def setup(py_params_dict):
         "fw_baseaddr": (0, "Firmware base address"),
         "fw_addr_w": (18, "Firmware address width"),
         "include_tester": (True, "If should include a tester system"),
+        "include_snippet": (True, "If should include default system snippet"),
         "cpu": (
             "iob_vexriscv",
             """CPU selection.
@@ -722,14 +723,17 @@ def setup(py_params_dict):
             "instance_name": "iob_printf_inst",
         },
     ]
-    attributes_dict["snippets"] = [
-        {
-            "verilog_code": """
+
+    attributes_dict["snippets"] = []
+    if params["include_snippet"]:
+        attributes_dict["snippets"] += [
+            {
+                "verilog_code": """
    //assign interrupts = {{30{1'b0}}, uart_interrupt_o, 1'b0};
    assign interrupts = {{30{1'b0}}, 1'b0, 1'b0};
 """
-        }
-    ]
+            }
+        ]
 
     iob_system_scripts(attributes_dict, params, py_params_dict)
 

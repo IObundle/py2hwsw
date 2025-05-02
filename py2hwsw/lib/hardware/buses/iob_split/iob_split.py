@@ -310,7 +310,7 @@ def setup(py_params_dict):
                 "N": NUM_OUTPUTS,
             },
             "connect": {
-                "sel_i": "output_sel",
+                "sel_i": "output_sel_reg",
                 "data_i": "demux_rready_data_i",
                 "data_o": "demux_rready_data_o",
             },

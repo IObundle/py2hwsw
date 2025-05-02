@@ -15,6 +15,7 @@ def setup(py_params_dict):
         "external_csr_if_widths": {"ADDR_W": 32, "DATA_W": 32},
         "csrs": [],
         "autoaddr": True,
+        "version": py_params_dict["py2hwsw_version"],
         "test": False,  # Enable this to use random registers
         "addr_w": 32,
         "data_w": 32,
@@ -262,7 +263,7 @@ def setup(py_params_dict):
                 },
                 "csr_if": params["internal_csr_if"],
                 # TODO: Support internal_csr_if_widths
-                "version": attributes_dict["version"],
+                "version": py_params_dict["py2hwsw_version"],
                 "autoaddr": params["autoaddr"],
             },
         ],
@@ -325,8 +326,9 @@ def get_manual_signals(name, mode, data_width):
         signals += [
             {"name": name + "_rdata_i", "width": data_width},
             {"name": name + "_rvalid_i", "width": 1},
+            {"name": name + "_rready_o", "width": 1},
             {"name": name + "_ren_o", "width": 1},
-            {"name": name + "_rready_i", "width": 1},
+            {"name": name + "_ready_i", "width": 1},
         ]
     elif "W" in mode:
         signals += [

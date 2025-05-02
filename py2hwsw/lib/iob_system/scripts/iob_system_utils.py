@@ -55,8 +55,8 @@ def iob_system_scripts(attributes_dict, params, py_params):
     :param dict py_params: iob_system argument python parameters
     """
     assert_block_attributes(attributes_dict, py_params)
-    handle_system_overrides(attributes_dict, py_params)
     append_board_wrappers(attributes_dict, params)
+    handle_system_overrides(attributes_dict, py_params)
     set_build_dir(attributes_dict, py_params)
     peripherals = get_iob_system_peripherals_list(attributes_dict)
     connect_peripherals_cbus(attributes_dict, peripherals, params)
@@ -76,7 +76,9 @@ def assert_block_attributes(attributes_dict, py_params):
         for block in attributes_dict.get(attribute, []) + child_attributes.get(
             attribute, []
         ):
-            assert block.get("core_name", None), "All subblocks must have a core name!"
+            assert block.get(
+                "core_name", None
+            ), f"All {attribute} must have a core name!"
             assert block.get(
                 "instance_name", None
             ), f"Block '{block['core_name']}' must have an instance name!"
@@ -153,6 +155,7 @@ def handle_system_overrides(attributes_dict, py_params):
             else:
                 # Didn't override, so append it to list
                 attributes_dict[child_attribute_name].append(child_obj)
+                # print(f"DEBUG: Appending {child_obj[identifier]}", file=sys.stderr)
 
 
 def set_build_dir(attributes_dict, py_params):

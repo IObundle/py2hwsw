@@ -473,7 +473,7 @@ class csr_gen:
                         port_has_outputs = True
                         # FIXME:Find out how to suppress linter warnings
                         snippet += f"""
-   assign {name}_waddr_o = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
+   assign {name}_waddr{"" if row.internal_use else "_o"} = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
 """
                     register_signals += [
                         {
@@ -502,7 +502,7 @@ class csr_gen:
                     port_has_outputs = True
                     # FIXME:Find out how to suppress linter warnings
                     snippet += f"""
-   assign {name}_raddr_o = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
+   assign {name}_raddr{"" if row.internal_use else "_o"} = internal_iob_addr_stable[ADDR_W-1:2]-{addr>>2};
 """
                 if auto:
                     register_signals.append(

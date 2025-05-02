@@ -604,7 +604,7 @@ def setup(py_params_dict):
                             "{1'b0, bootrom_axi_awlock}",
                         ],
                     ),
-                    "ext_rom_bus_m": "rom_bus_m",
+                    "rom_bus_m": "rom_bus_m",
                 },
                 "bootrom_addr_w": params["bootrom_addr_w"],
                 "soc_name": params["name"],

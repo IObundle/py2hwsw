@@ -183,7 +183,7 @@ def setup(py_params_dict):
     params["csrs"] = create_group_for_ungrouped_csrs(params["csrs"])
     find_and_update_interrupt_csrs(params["csrs"])
     find_and_update_fifo_csrs(params["csrs"], attributes_dict)
-    # find_and_update_rom_csrs(params["csrs"], attributes_dict) # TODO:
+    find_and_update_rom_csrs(params["csrs"], attributes_dict)
 
     # Convert csrs dictionaries to objects
     csrs_obj_list = []

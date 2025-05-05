@@ -27,6 +27,7 @@ def setup(py_params_dict):
         "fw_baseaddr": (0, "Firmware base address"),
         "fw_addr_w": (18, "Firmware address width"),
         "include_tester": (True, "If should include a tester system"),
+        "include_snippet": (True, "If should include default system snippet"),
         "cpu": (
             "iob_vexriscv",
             """CPU selection.
@@ -158,7 +159,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_ID_W",
                 "descr": "AXI ID bus width",
-                "type": "F",
+                "type": "D",
                 "val": "1",
                 "min": "1",
                 "max": "32",
@@ -166,7 +167,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_ADDR_W",
                 "descr": "AXI address bus width",
-                "type": "F",
+                "type": "D",
                 "val": params["mem_addr_w"],
                 "min": "1",
                 "max": "32",
@@ -174,7 +175,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_DATA_W",
                 "descr": "AXI data bus width",
-                "type": "F",
+                "type": "D",
                 "val": params["data_w"],
                 "min": "1",
                 "max": "32",
@@ -182,7 +183,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_LEN_W",
                 "descr": "AXI burst length width",
-                "type": "F",
+                "type": "D",
                 "val": "4",
                 "min": "1",
                 "max": "4",
@@ -194,7 +195,7 @@ def setup(py_params_dict):
             {
                 "name": "BOOTROM_MEM_HEXFILE",
                 "descr": "Bootloader file name",
-                "type": "F",
+                "type": "D",
                 "val": f'"{params["name"]}_bootrom"',
                 "min": "NA",
                 "max": "NA",
@@ -203,7 +204,7 @@ def setup(py_params_dict):
             {
                 "name": "EXT_MEM_HEXFILE",
                 "descr": "Firmware file name",
-                "type": "F",
+                "type": "D",
                 "val": f'"{params["name"]}_firmware"',
                 "min": "NA",
                 "max": "NA",
@@ -722,14 +723,17 @@ def setup(py_params_dict):
             "instance_name": "iob_printf_inst",
         },
     ]
-    attributes_dict["snippets"] = [
-        {
-            "verilog_code": """
+
+    attributes_dict["snippets"] = []
+    if params["include_snippet"]:
+        attributes_dict["snippets"] += [
+            {
+                "verilog_code": """
    //assign interrupts = {{30{1'b0}}, uart_interrupt_o, 1'b0};
    assign interrupts = {{30{1'b0}}, 1'b0, 1'b0};
 """
-        }
-    ]
+            }
+        ]
 
     iob_system_scripts(attributes_dict, params, py_params_dict)
 

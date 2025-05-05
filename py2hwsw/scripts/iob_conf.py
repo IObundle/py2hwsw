@@ -41,8 +41,10 @@ class iob_conf:
             fail_with_msg("Every conf must have a name!")
         if not self.type:
             fail_with_msg(f"Conf '{self.name}' must have a type!")
-        elif self.type not in ["M", "P", "F"]:
-            fail_with_msg(f"Conf '{self.name}' type must be either M, P or F!")
+        elif self.type not in ["P", "M", "C", "D"]:
+            fail_with_msg(
+                f"Conf '{self.name}' type must be either P (Parameter), M (Macro), C (Constant) or D (Derived Parameter)!"
+            )
 
         try:
             val = int(self.val)

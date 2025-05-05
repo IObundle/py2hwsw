@@ -212,13 +212,23 @@ class iob_core(iob_module, iob_instance):
             lambda y: update_license(self, **y),
             descr="License for the core.",
         )
+        self.set_default_attribute(
+            "doc_conf",
+            "",
+            str,
+            descr="CSR Configuration to use",
+        )
 
         self.attributes_dict = copy.deepcopy(attributes)
 
         self.abort_reason = None
         # Don't setup this core if using a project wide special target.
         if __class__.global_special_target:
-            self.abort_reason = "special_target"
+            if __class__.global_special_target == "ipxact_gen":
+                # Will cause setup to abort except for iob_csrs (to generate memory map)
+                self.abort_reason = "ipxact_gen"
+            else:
+                self.abort_reason = "special_target"
 
         # Temporarily change global_build_dir to match tester's directory (for tester blocks)
         build_dir_backup = __class__.global_build_dir
@@ -254,7 +264,7 @@ class iob_core(iob_module, iob_instance):
         # Add 'VERSION' macro
         self.create_conf_group(
             name="VERSION",
-            type="M",
+            type="C",
             val="16'h" + self.version_str_to_digits(self.version),
             descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
         )
@@ -419,6 +429,7 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("py2hwsw_version", None)
         filtered_parent_py_params.pop("connect", None)
         filtered_parent_py_params.pop("parameters", None)
+        filtered_parent_py_params.pop("is_superblock", None)
         if "name" not in filtered_parent_py_params:
             filtered_parent_py_params["name"] = name
 
@@ -434,6 +445,7 @@ class iob_core(iob_module, iob_instance):
             instantiator=kwargs.get("instantiator", None),
             connect=kwargs.get("connect", {}),
             parameters=kwargs.get("parameters", {}),
+            is_superblock=kwargs.get("is_superblock", False)
         )
 
         # Copy (some) parent attributes to child

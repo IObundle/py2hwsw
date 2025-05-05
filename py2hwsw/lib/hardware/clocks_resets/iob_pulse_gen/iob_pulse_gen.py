@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "WIDTH",
-                "type": "F",
+                "type": "D",
                 "val": "$clog2(START + DURATION + 2)",
                 "min": "NA",
                 "max": "NA",
@@ -33,7 +33,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "START_INT",
-                "type": "F",
+                "type": "D",
                 "val": "(START <= 0) ? 0 : START - 1",
                 "min": "NA",
                 "max": "NA",
@@ -41,7 +41,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "FINISH",
-                "type": "F",
+                "type": "D",
                 "val": "START_INT + DURATION",
                 "min": "NA",
                 "max": "NA",

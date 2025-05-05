@@ -34,7 +34,7 @@ def setup(py_params_dict):
             {
                 "name": "MAXDATA_W",
                 "descr": "",
-                "type": "F",
+                "type": "D",
                 "val": "iob_max(W_DATA_W, R_DATA_W)",
                 "min": "NA",
                 "max": "NA",
@@ -42,7 +42,7 @@ def setup(py_params_dict):
             {
                 "name": "MINDATA_W",
                 "descr": "",
-                "type": "F",
+                "type": "D",
                 "val": "iob_min(W_DATA_W, R_DATA_W)",
                 "min": "NA",
                 "max": "NA",
@@ -50,7 +50,7 @@ def setup(py_params_dict):
             {
                 "name": "R",
                 "descr": "",
-                "type": "F",
+                "type": "D",
                 "val": "MAXDATA_W / MINDATA_W",
                 "min": "NA",
                 "max": "NA",
@@ -58,7 +58,7 @@ def setup(py_params_dict):
             {
                 "name": "MINADDR_W",
                 "descr": "Lower ADDR_W (higher DATA_W)",
-                "type": "F",
+                "type": "D",
                 "val": "ADDR_W - $clog2(R)",
                 "min": "NA",
                 "max": "NA",
@@ -66,7 +66,7 @@ def setup(py_params_dict):
             {
                 "name": "W_ADDR_W",
                 "descr": "",
-                "type": "F",
+                "type": "D",
                 "val": "(W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W",
                 "min": "NA",
                 "max": "NA",
@@ -74,7 +74,7 @@ def setup(py_params_dict):
             {
                 "name": "R_ADDR_W",
                 "descr": "",
-                "type": "F",
+                "type": "D",
                 "val": "(R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W",
                 "min": "NA",
                 "max": "NA",

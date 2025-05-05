@@ -33,7 +33,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "K",
-                "type": "F",
+                "type": "D",
                 "val": "$ceil(2 ** (ADDR_W - TILE_ADDR_W))",
                 "min": "0",
                 "max": "NA",

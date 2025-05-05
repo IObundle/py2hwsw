@@ -37,3 +37,19 @@ function [31:0] iob_cshift_right;
       iob_cshift_right = (DATA >> SHIFT) | (DATA << (DATA_W - SHIFT));
    end
 endfunction
+
+function [31:0] iob_abs;
+   input [31:0] a;
+   begin
+      if (a < 0) iob_abs = -a;
+      else iob_abs = a;
+   end
+endfunction
+
+function [31:0] iob_sign;
+   input [31:0] a;
+   begin
+      if (a < 0) iob_sign = -1;
+      else iob_sign = 1;
+   end
+endfunction

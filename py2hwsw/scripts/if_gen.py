@@ -273,6 +273,7 @@ if_types = [
 ]
 
 
+# NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
 @dataclass
 class interface:
     """Class to represent an interface for generation"""

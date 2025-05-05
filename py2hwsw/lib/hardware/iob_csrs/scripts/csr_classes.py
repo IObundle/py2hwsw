@@ -28,7 +28,12 @@ class iob_csr:
     # Bit fields
     fields: list or None = None
     # Asymetric ration between internal and external interfaces address
-    asym: int = 0
+    # asym >= 1: W_INT = W_EXT * asym
+    # asym <= -1: W_INT = W_EXT / (-asym)
+    asym: int = 1
+
+    # TODO: Autoclear register for NOAUTO. If cpu writes 1 to it, it will be autocleared when core returns ready (reads value from it). IPxact should have an attribute for this.
+    # FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
 
     def __post_init__(self):
         if not self.name:
@@ -39,6 +44,12 @@ class iob_csr:
 
         if self.mode not in ["R", "W", "RW"]:
             fail_with_msg(f"Invalid CSR mode: '{self.mode}'", ValueError)
+
+        if self.asym == 0:
+            fail_with_msg(
+                "CSR asym attribute cannot be 0. Must be either >= 1 or <= -1.",
+                ValueError,
+            )
 
         # try to convert n_bits to int
         try:

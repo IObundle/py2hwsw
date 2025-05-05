@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import math
+
 from csr_classes import fail_with_msg
 
 
@@ -111,35 +113,48 @@ def create_fifo_instance(attributes_dict, csr_ref):
     """
     fifo_name = csr_ref["name"]
     FIFO_NAME = fifo_name.upper()
-    fifo_mode = csr_ref["mode"]
+    mode = csr_ref["mode"]
     is_async = csr_ref["type"] == "AFIFO"
+
+    log2n_items = csr_ref["log2n_items"]
+    # n_items = 2**log2n_items
+    n_bits = csr_ref["n_bits"]
+    asym = csr_ref.get("asym", 1)
+    asym_sign = f"iob_sign({asym})"
+    internal_n_bits = f"({n_bits} * ({asym}**{asym_sign}))"
+    # external_n_bits = "DATA_W"
+
+    wdata_w = n_bits if mode == "W" else internal_n_bits
+    rdata_w = n_bits if mode == "R" else internal_n_bits
+    # Higher address width (the one with lower data width)
+    higher_addr_w = f"iob_max({log2n_items}, {asym_sign} * $clog2(iob_abs({asym})))"
 
     #
     # Confs: Based on confs from iob_fifo_sync.py
     #
-    # Needed to define widths of FIFO ports based on verilog parameters
+    # Create confs to simplify long expressions.
     attributes_dict["confs"] += [
         {
             "name": f"{FIFO_NAME}_W_DATA_W",
             "descr": "",
-            "type": "P",
-            "val": 32 if fifo_mode == "W" else csr_ref["n_bits"],
+            "type": "D",
+            "val": wdata_w,
             "min": "NA",
             "max": "NA",
         },
         {
             "name": f"{FIFO_NAME}_R_DATA_W",
             "descr": "",
-            "type": "P",
-            "val": 32 if fifo_mode == "R" else csr_ref["n_bits"],
+            "type": "D",
+            "val": rdata_w,
             "min": "NA",
             "max": "NA",
         },
         {
             "name": f"{FIFO_NAME}_ADDR_W",
             "descr": "Higher ADDR_W lower DATA_W",
-            "type": "P",
-            "val": csr_ref["log2n_items"],
+            "type": "D",
+            "val": higher_addr_w,
             "min": "NA",
             "max": "NA",
         },
@@ -152,18 +167,10 @@ def create_fifo_instance(attributes_dict, csr_ref):
             "max": "NA",
         },
         {
-            "name": f"{FIFO_NAME}_MINDATA_W",
-            "descr": "",
-            "type": "D",
-            "val": f"iob_min({FIFO_NAME}_W_DATA_W, {FIFO_NAME}_R_DATA_W)",
-            "min": "NA",
-            "max": "NA",
-        },
-        {
             "name": f"{FIFO_NAME}_R",
             "descr": "",
             "type": "D",
-            "val": f"{FIFO_NAME}_MAXDATA_W / {FIFO_NAME}_MINDATA_W",
+            "val": f"iob_abs({asym})",
             "min": "NA",
             "max": "NA",
         },
@@ -175,28 +182,12 @@ def create_fifo_instance(attributes_dict, csr_ref):
             "min": "NA",
             "max": "NA",
         },
-        {
-            "name": f"{FIFO_NAME}_W_ADDR_W",
-            "descr": "",
-            "type": "D",
-            "val": f"({FIFO_NAME}_W_DATA_W == {FIFO_NAME}_MAXDATA_W) ? {FIFO_NAME}_MINADDR_W : {FIFO_NAME}_ADDR_W",
-            "min": "NA",
-            "max": "NA",
-        },
-        {
-            "name": f"{FIFO_NAME}_R_ADDR_W",
-            "descr": "",
-            "type": "D",
-            "val": f"({FIFO_NAME}_R_DATA_W == {FIFO_NAME}_MAXDATA_W) ? {FIFO_NAME}_MINADDR_W : {FIFO_NAME}_ADDR_W",
-            "min": "NA",
-            "max": "NA",
-        },
     ]
     if is_async:
         #
         # Async FIFO Ports
         #
-        if fifo_mode == "R":
+        if mode == "R":
             attributes_dict["ports"].append(
                 {
                     "name": f"{fifo_name}_write_io",
@@ -229,7 +220,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         },
                         {
                             "name": f"{fifo_name}_w_data_i",
-                            "width": f"{FIFO_NAME}_W_DATA_W",
+                            "width": wdata_w,
                             "descr": "Write data",
                         },
                         {
@@ -250,7 +241,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     ],
                 }
             )
-        else:  # fifo_mode == "W":
+        else:  # mode == "W":
             attributes_dict["ports"].append(
                 {
                     "name": f"{fifo_name}_read_io",
@@ -372,7 +363,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 ],
             }
         )
-        if fifo_mode == "R":
+        if mode == "R":
             attributes_dict["ports"] += [
                 {
                     "name": f"{fifo_name}_write_io",
@@ -385,7 +376,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         },
                         {
                             "name": f"{fifo_name}_w_data_i",
-                            "width": f"{FIFO_NAME}_W_DATA_W",
+                            "width": wdata_w,
                             "descr": "Write data",
                         },
                         {
@@ -407,7 +398,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     ],
                 },
             ]
-        else:  # fifo_mode == "W"
+        else:  # mode == "W"
             attributes_dict["ports"].append(
                 {
                     "name": f"{fifo_name}_read_io",
@@ -490,7 +481,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         #
         # Async FIFO Wires
         #
-        if fifo_mode == "W":
+        if mode == "W":
             attributes_dict["wires"] += [
                 f"""
                 {fifo_name}_empty -s {fifo_name}_empty:1
@@ -512,7 +503,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     ],
                 },
             ]
-        else:  # fifo_mode == "R"
+        else:  # mode == "R"
             attributes_dict["wires"] += [
                 f"""
                 {fifo_name}_full -s {fifo_name}_full:1
@@ -538,7 +529,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         #
         # Sync FIFO Wires
         #
-        if fifo_mode == "W":
+        if mode == "W":
             attributes_dict["wires"].append(
                 {
                     "name": f"{fifo_name}_write_io",
@@ -550,7 +541,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     ],
                 }
             )
-        else:  # fifo_mode == "R"
+        else:  # mode == "R"
             attributes_dict["wires"].append(
                 {
                     "name": f"{fifo_name}_read_io",
@@ -628,7 +619,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
 """,
             }
         )
-    if not is_async and fifo_mode == "R":
+    if not is_async and mode == "R":
         attributes_dict["snippets"].append(
             {
                 "verilog_code": f"""

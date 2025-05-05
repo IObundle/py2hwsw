@@ -406,44 +406,46 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "single_write",
+                                "descr": "Single write register",
                                 "mode": "W",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "descr": "Single write register",
                             },
                             {
                                 "name": "single_read",
+                                "descr": "Single read register",
                                 "mode": "R",
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
-                                "descr": "Single read register",
                             },
                         ],
                     },
                     #
-                    # See commit 0fc91ac for info about regfiles
+                    # See commit 0fc91ac for info about regarrays
                     #
                     {
-                        "name": "demo_regfiles",
+                        "name": "demo_regarrays",
                         "descr": "demo software accessible registers.",
                         "regs": [
                             {
-                                "name": "regfile_write",
+                                "name": "regarray_write",
+                                "descr": "Write regarray with 4 registers",
                                 "mode": "W",
-                                "n_bits": 8,
+                                "n_bits": 8, # register width
                                 "rst_val": 0,
-                                "log2n_items": 2,
-                                "descr": "Write regfile with 4 registers",
+                                "log2n_items": 2, # log number of items in the array
+                                "asym": 2,  # Internal core interface twice the size as register width
                             },
                             {
-                                "name": "regfile_read",
+                                "name": "regarray_read",
+                                "descr": "Read regarray with wires for 4 registers (no generated registers)",
                                 "mode": "R",
                                 "n_bits": 8,
                                 "rst_val": 0,
-                                "log2n_items": 2,
-                                "descr": "Read regfile with wires for 4 registers (no generated registers)",
+                                "log2n_items": 2, # log number of items in the array
+                                "asym": -2,  # Internal core interface half the size as register width
                             },
                         ],
                     },
@@ -456,11 +458,13 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "fifo_write",
-                                "mode": "FIFO_W",
-                                "n_bits": 8,
-                                "rst_val": 0,
-                                "log2n_items": 4,
                                 "descr": "Write FIFO",
+                                "type": "FIFO",
+                                "mode": "W",
+                                "n_bits": 8, # fifo item width
+                                "rst_val": 0,
+                                "log2n_items": 4, # log number of items in the fifo
+                                "asym": -2,  # Internal core interface half the size as fifo item width
                             },
                         ],
                     },
@@ -470,11 +474,13 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "fifo_read",
-                                "mode": "FIFO_R",
-                                "n_bits": 8,
-                                "rst_val": 0,
-                                "log2n_items": 4,
                                 "descr": "Read FIFO",
+                                "type": "FIFO",
+                                "mode": "R",
+                                "n_bits": 8, # fifo item width
+                                "rst_val": 0,
+                                "log2n_items": 4, # log number of items in the fifo
+                                "asym": 2,  # Internal core interface twice the size as fifo item width
                             },
                         ],
                     },
@@ -484,11 +490,12 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "async_fifo_write",
-                                "mode": "AFIFO_W",
+                                "descr": "Asynchronous write FIFO",
+                                "type": "AFIFO",
+                                "mode": "W",
                                 "n_bits": 8,
                                 "rst_val": 0,
                                 "log2n_items": 4,
-                                "descr": "Asynchronous write FIFO",
                             },
                         ],
                     },
@@ -498,11 +505,12 @@ def setup(py_params_dict):
                         "regs": [
                             {
                                 "name": "async_fifo_read",
-                                "mode": "AFIFO_R",
+                                "descr": "Asynchronous read FIFO",
+                                "type": "AFIFO",
+                                "mode": "R",
                                 "n_bits": 8,
                                 "rst_val": 0,
                                 "log2n_items": 4,
-                                "descr": "Asynchronous read FIFO",
                             },
                         ],
                     },
@@ -517,9 +525,9 @@ def setup(py_params_dict):
                     # Single registers
                     "single_write_o": "single_write",
                     "single_read_i": "single_read",
-                    # Regfile
-                    "regfile_write_io": "regfile_write",
-                    "regfile_read_io": "regfile_read",
+                    # regarray
+                    "regarray_write_io": "regarray_write",
+                    "regarray_read_io": "regarray_read",
                     # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
                     "fifo_write_read_io": "fifo_write_read",

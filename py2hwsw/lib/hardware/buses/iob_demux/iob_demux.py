@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "SEL_W",
-                "type": "F",
+                "type": "D",
                 "val": "($clog2(N) == 0 ? 1 : $clog2(N))",
                 "min": "NA",
                 "max": "NA",

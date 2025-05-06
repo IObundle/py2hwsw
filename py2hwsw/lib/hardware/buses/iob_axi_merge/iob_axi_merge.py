@@ -22,6 +22,8 @@ def setup(py_params_dict):
     # Number of bits required for subordinate selection
     NBITS = (NUM_SUBORDINATES - 1).bit_length()
 
+    TRANSFER_COUNTER_DATA_W = py_params_dict.get("transfer_counter_data_w", 5)
+
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
     # ID_W = int(py_params_dict["id_w"]) if "id_w" in py_params_dict else 1
@@ -306,50 +308,123 @@ def setup(py_params_dict):
                 {"name": "busy_write_reg_o", "width": 1},
             ],
         },
-        # Active write transfer reg
+        # Allow write address signals
         {
-            "name": "active_transaction_write_reg_en_rst",
-            "descr": "Enable and reset signal for active_transaction_write_reg",
+            "name": "allow_write_address",
+            "descr": "Signals to allow address valid/ready",
             "signals": [
-                {"name": "active_transaction_write_reg_en", "width": 1},
-                {"name": "active_transaction_write_reg_rst", "width": 1},
+                {"name": "wants_change_write_sel", "width": 1},
+                {"name": "allow_write_address", "width": 1},
+            ],
+        },
+        # Active write transaction acc
+        {
+            "name": "active_write_transaction_acc_en_rst",
+            "descr": "Enable and reset signal for active_write_transaction_acc",
+            "signals": [
+                {"name": "active_write_transaction_acc_en", "width": 1},
+                {"name": "rst_i"},
             ],
         },
         {
-            "name": "active_transaction_write_reg_data_i",
-            "descr": "Input of active_transaction_write_reg",
+            "name": "active_write_transaction_acc_input",
+            "descr": "Input of active_write_transaction_acc",
             "signals": [
-                {"name": "active_transaction_write_reg_i", "width": 1},
+                {
+                    "name": "active_write_transaction_acc_input",
+                    "width": TRANSFER_COUNTER_DATA_W,
+                },
             ],
         },
         {
-            "name": "active_transaction_write_reg_data_o",
-            "descr": "Output of active_transaction_write_reg",
+            "name": "active_write_transaction_count",
+            "descr": "Output of active_write_transaction_acc",
             "signals": [
-                {"name": "active_transaction_write_reg_o", "width": 1},
-            ],
-        },
-        # Data burst complete reg
-        {
-            "name": "data_burst_complete_write_reg_en_rst",
-            "descr": "Enable and reset signal for data_burst_complete_write_reg",
-            "signals": [
-                {"name": "data_burst_complete_write_reg_en", "width": 1},
-                {"name": "data_burst_complete_write_reg_rst", "width": 1},
+                {
+                    "name": "active_write_transaction_count",
+                    "width": TRANSFER_COUNTER_DATA_W,
+                },
             ],
         },
         {
-            "name": "data_burst_complete_write_reg_data_i",
-            "descr": "Input of data_burst_complete_write_reg",
+            "name": "active_write_transaction",
+            "descr": "Check for any active write transactions",
             "signals": [
-                {"name": "data_burst_complete_write_reg_i", "width": 1},
+                {"name": "active_write_transaction", "width": 1},
             ],
         },
         {
-            "name": "data_burst_complete_write_reg_data_o",
-            "descr": "Output of data_burst_complete_write_reg",
+            "name": "active_write_transaction_start_end",
+            "descr": "Start and end signals of active write transaction",
             "signals": [
-                {"name": "data_burst_complete_write_reg_o", "width": 1},
+                {"name": "start_active_write_transaction", "width": 1},
+                {"name": "end_active_write_transaction", "width": 1},
+            ],
+        },
+        {
+            "name": "full_active_write_transaction",
+            "descr": "Check if active write accumulator is full",
+            "signals": [
+                {"name": "full_active_write_transaction", "width": 1},
+            ],
+        },
+        # Allow write data
+        {
+            "name": "allow_write_data",
+            "descr": "Signal to allow data valid/ready",
+            "signals": [
+                {"name": "allow_write_data", "width": 1},
+            ],
+        },
+        # Pending write response acc
+        {
+            "name": "pending_write_response_acc_en_rst",
+            "descr": "Enable and reset signal for pending_write_response_acc",
+            "signals": [
+                {"name": "pending_write_response_acc_en", "width": 1},
+                {"name": "rst_i"},
+            ],
+        },
+        {
+            "name": "pending_write_response_acc_input",
+            "descr": "Input of pending_write_response_acc",
+            "signals": [
+                {
+                    "name": "pending_write_response_acc_input",
+                    "width": TRANSFER_COUNTER_DATA_W,
+                },
+            ],
+        },
+        {
+            "name": "pending_write_response_count",
+            "descr": "Output of pending_write_response_acc",
+            "signals": [
+                {
+                    "name": "pending_write_response_count",
+                    "width": TRANSFER_COUNTER_DATA_W,
+                },
+            ],
+        },
+        {
+            "name": "pending_write_response",
+            "descr": "Check for any active write transactions",
+            "signals": [
+                {"name": "pending_write_response", "width": 1},
+            ],
+        },
+        {
+            "name": "pending_write_response_start_end",
+            "descr": "Start and end signals of active write transaction",
+            "signals": [
+                {"name": "start_pending_write_response", "width": 1},
+                {"name": "end_pending_write_response", "width": 1},
+            ],
+        },
+        {
+            "name": "full_pending_write_response",
+            "descr": "Check if pending write accumulator is full",
+            "signals": [
+                {"name": "full_pending_write_response", "width": 1},
             ],
         },
         # Write selection register signals
@@ -585,48 +660,37 @@ def setup(py_params_dict):
                 "data_o": "busy_write_reg_data_o",
             },
         },
+        # Write blocks
         {
-            "core_name": "iob_reg",
-            "instance_name": "active_transaction_write_reg_re",
+            "core_name": "iob_acc",
+            "instance_name": "active_write_transaction_acc",
             "parameters": {
-                "DATA_W": 1,
-                "RST_VAL": "1'b0",
+                "DATA_W": TRANSFER_COUNTER_DATA_W,
             },
             "port_params": {
                 "clk_en_rst_s": "c_a_r_e",
             },
             "connect": {
-                "clk_en_rst_s": (
-                    "clk_en_rst_s",
-                    [
-                        "en_i:active_transaction_write_reg_en",
-                        "rst_i:active_transaction_write_reg_rst",
-                    ],
-                ),
-                "data_i": "active_transaction_write_reg_data_i",
-                "data_o": "active_transaction_write_reg_data_o",
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "active_write_transaction_acc_en_rst",
+                "incr_i": "active_write_transaction_acc_input",
+                "data_o": "active_write_transaction_count",
             },
         },
         {
-            "core_name": "iob_reg",
-            "instance_name": "data_burst_complete_write_reg_re",
+            "core_name": "iob_acc",
+            "instance_name": "pending_write_response_acc",
             "parameters": {
-                "DATA_W": 1,
-                "RST_VAL": "1'b0",
+                "DATA_W": TRANSFER_COUNTER_DATA_W,
             },
             "port_params": {
                 "clk_en_rst_s": "c_a_r_e",
             },
             "connect": {
-                "clk_en_rst_s": (
-                    "clk_en_rst_s",
-                    [
-                        "en_i:data_burst_complete_write_reg_en",
-                        "rst_i:data_burst_complete_write_reg_rst",
-                    ],
-                ),
-                "data_i": "data_burst_complete_write_reg_data_i",
-                "data_o": "data_burst_complete_write_reg_data_o",
+                "clk_en_rst_s": "clk_en_rst_s",
+                "en_rst_i": "pending_write_response_acc_en_rst",
+                "incr_i": "pending_write_response_acc_input",
+                "data_o": "pending_write_response_count",
             },
         },
         {
@@ -711,7 +775,7 @@ def setup(py_params_dict):
    //
 
    // Only switch managers when there is no current active transaction
-   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o[{NUM_SUBORDINATES}-1:0];
+   assign read_sel = busy_read_reg_o ? read_sel_reg : read_sel_prio_enc_o[{NBITS}-1:0];
 
    assign busy_read_reg_en = m_axi_arvalid_o & !busy_read_reg_o;
    assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
@@ -733,27 +797,40 @@ def setup(py_params_dict):
    //       If the wvalid comes before, the data will go to the currently selected manager_interface, and that may not be the intended destination (real destination will be given later by awvalid)
 
    // Only switch managers when there is no current active transaction
-   assign write_sel = busy_write_reg_o ? write_sel_reg : write_sel_prio_enc_o[{NUM_SUBORDINATES}-1:0];
+   assign write_sel = (busy_write_reg_o | active_write_transaction) ? write_sel_reg : write_sel_prio_enc_o[{NBITS}-1:0];
 
    assign busy_write_reg_en = m_axi_awvalid_o & !busy_write_reg_o;
-   assign busy_write_reg_rst = (m_axi_bvalid_i & m_axi_bready_o) | rst_i;
+   assign busy_write_reg_rst = end_pending_write_response;
    assign busy_write_reg_i = 1'b1;
 
-   // Block address valid/ready signals of current manager if there is still an active transaction
-   assign m_axi_awvalid_o = ~active_transaction_write_reg_o & mux_axi_awvalid_o;
-   assign demux_axi_awready_i = ~active_transaction_write_reg_o & m_axi_awready_i;
+   // Block address valid/ready signals of current manager if accumulator full or if another manager wants to write
+   assign wants_change_write_sel = write_sel != write_sel_prio_enc_o;
+   assign allow_write_address = ~(full_active_write_transaction | (active_write_transaction & wants_change_write_sel));
+   assign m_axi_awvalid_o = allow_write_address & mux_axi_awvalid_o;
+   assign demux_axi_awready_i = allow_write_address & m_axi_awready_i;
 
-   assign active_transaction_write_reg_en = m_axi_awvalid_o & m_axi_awready_i;
-   assign active_transaction_write_reg_rst = busy_write_reg_rst;
-   assign active_transaction_write_reg_i = 1'b1;
+   assign start_active_write_transaction = m_axi_awvalid_o & m_axi_awready_i;
+   assign end_active_write_transaction = end_pending_write_response;
+   assign active_write_transaction = |active_write_transaction_count;
+   assign full_active_write_transaction = &active_write_transaction_count;
 
-   // Block data valid/ready signals of current manager if there is still an active transaction
-   assign m_axi_wvalid_o = ~data_burst_complete_write_reg_o & mux_axi_wvalid_o;
-   assign demux_axi_wready_i = ~data_burst_complete_write_reg_o & m_axi_wready_i;
+   // iob_acc inputs
+   assign active_write_transaction_acc_en = start_active_write_transaction ^ end_active_write_transaction;
+   assign active_write_transaction_acc_input = start_active_write_transaction ? {TRANSFER_COUNTER_DATA_W}'d1 : -{TRANSFER_COUNTER_DATA_W}'d1;
 
-   assign data_burst_complete_write_reg_en = m_axi_wlast_o & m_axi_wvalid_o & m_axi_wready_i;
-   assign data_burst_complete_write_reg_rst = busy_write_reg_rst;
-   assign data_burst_complete_write_reg_i = 1'b1;
+   // Block data valid/ready signals of current manager if accumulator full or if another manager wants to write
+   assign allow_write_data = ~(full_pending_write_response | (pending_write_response & wants_change_write_sel));
+   assign m_axi_wvalid_o = allow_write_data & mux_axi_wvalid_o;
+   assign demux_axi_wready_i = allow_write_data & m_axi_wready_i;
+
+   assign start_pending_write_response = m_axi_wlast_o & m_axi_wvalid_o & m_axi_wready_i;
+   assign end_pending_write_response = m_axi_bvalid_i & m_axi_bready_o;
+   assign pending_write_response = |pending_write_response_count;
+   assign full_pending_write_response = &pending_write_response_count;
+
+   // iob_acc inputs
+   assign pending_write_response_acc_en = start_pending_write_response ^ end_pending_write_response;
+   assign pending_write_response_acc_input = start_pending_write_response ? {TRANSFER_COUNTER_DATA_W}'d1 : -{TRANSFER_COUNTER_DATA_W}'d1;
 """,
         },
     ]

@@ -22,6 +22,11 @@ class iob_csr:
     descr: str = "Default description"
     # Select if should generate internal wires or ports for this CSR
     internal_use: bool = False
+    # List of configurations that use this CSR (used for documentation)
+    doc_conf_list: list or None = None
+    volatile: bool = True
+    # Bit fields
+    fields: list or None = None
 
     def __post_init__(self):
         if not self.name:
@@ -29,6 +34,103 @@ class iob_csr:
 
         if self.type not in ["R", "W", "RW"]:
             fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
+
+        # try to convert n_bits to int
+        try:
+            self.n_bits = int(self.n_bits)
+        except ValueError:
+            pass
+
+        if not self.fields:
+            self.fields = [
+                csr_field(
+                    name=self.name,
+                    type=self.type,
+                    base_bit=0,
+                    width=self.n_bits,
+                    volatile=self.volatile,
+                    rst_val=self.rst_val,
+                )
+            ]
+            # fail_with_msg(f"CSR '{self.name}' has no bit fields", ValueError)
+
+        # Check if fields properties match CSR properties
+        for _field in self.fields:
+            if self.type == "R" and _field.type != "R":
+                fail_with_msg(
+                    f"CSR '{self.name}' defined with type '{self.type}' has invalid field type '{_field.type}'.",
+                    ValueError,
+                )
+            elif self.type == "W" and _field.type != "W":
+                fail_with_msg(
+                    f"CSR '{self.name}' defined with type '{self.type}' has invalid field type '{_field.type}'.",
+                    ValueError,
+                )
+
+            # CSR may have non-volatile fields and be volatile itself, but not vice versa
+            if not self.volatile and _field.volatile:
+                fail_with_msg(
+                    f"CSR '{self.name}' defined as non-volatile but has volatile field '{_field.name}'.",
+                    ValueError,
+                )
+
+        # Don't try to manage field bits, if n_bits is not integer (likely contains parameters)
+        if type(self.n_bits) is not int:
+            return
+
+        # CSRs should have width multiple of 8 bits
+        quantized_n_bits = (self.n_bits + 7) // 8 * 8
+
+        # List of csr bits. Value corresponds to index of associated field. -1 means free.
+        used_bits = [-1 for i in range(quantized_n_bits)]
+        # Check if any fields overlap
+        for idx, _field in enumerate(self.fields):
+            for bit in range(_field.base_bit, _field.base_bit + _field.width):
+                if used_bits[bit] > -1:
+                    fail_with_msg(
+                        f"CSR '{self.name}' has overlapping fields: '{_field.name}' and '{self.fields[used_bits[bit]].name}'.",
+                        ValueError,
+                    )
+                used_bits[bit] = idx
+
+        # Automatically create RSVD fields for unused bits
+        width = 0
+        for idx, bit in enumerate(used_bits):
+            if bit < 0:
+                width += 1
+            elif width > 0:
+                self.fields.append(
+                    csr_field(
+                        name="RSVD", type=self.type, base_bit=idx - width, width=width
+                    )
+                )
+                width = 0
+        if width > 0:
+            self.fields.append(
+                csr_field(
+                    name="RSVD",
+                    type=self.type,
+                    base_bit=len(used_bits) - width,
+                    width=width,
+                )
+            )
+
+
+@dataclass
+class csr_field:
+    name: str = ""
+    type: str = ""
+    base_bit: int = 0
+    width: int = 1
+    volatile: bool = True
+    rst_val: int = 0
+
+    def __post_init__(self):
+        if not self.name:
+            fail_with_msg("CSR field name is not set", ValueError)
+
+        if self.type not in ["R", "W", "RW"]:
+            fail_with_msg(f"Invalid CSR field type: '{self.type}'", ValueError)
 
 
 def fail_with_msg(msg, exception_type=Exception):

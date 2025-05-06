@@ -27,7 +27,7 @@ def setup(py_params_dict):
         {
             "name": "AXI_ADDR_W",
             "descr": "AXI address bus width",
-            "type": "F",
+            "type": "D",
             "val": "ADDR_W",
             "min": "1",
             "max": "32",
@@ -43,7 +43,7 @@ def setup(py_params_dict):
         {
             "name": "AXI_DATA_W",
             "descr": "AXI data bus width",
-            "type": "F",
+            "type": "D",
             "val": "DATA_W",
             "min": "1",
             "max": "32",

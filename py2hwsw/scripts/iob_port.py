@@ -175,10 +175,10 @@ External connection '{wire.name}' has the following signals:
                 fail_with_msg(
                     f"""Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
 Port '{self.name}' has the following signals:
-{newlinechar.join("- " + signal.name for signal in self.signals)}
+{newlinechar.join("- " + get_real_signal(signal).name for signal in self.signals)}
 
 External connection '{wire.name}' has the following signals:
-{newlinechar.join("- " + signal.name for signal in wire.signals)}
+{newlinechar.join("- " + get_real_signal(signal).name for signal in wire.signals)}
 """,
                     ValueError,
                 )

@@ -18,7 +18,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "PERIOD_W",
-                "type": "F",
+                "type": "D",
                 "val": "2*DATA_W",
                 "min": "0",
                 "max": "32",
@@ -26,7 +26,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "FRAC_W",
-                "type": "F",
+                "type": "D",
                 "val": "DATA_W",
                 "min": "0",
                 "max": "32",

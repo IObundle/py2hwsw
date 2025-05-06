@@ -11,13 +11,13 @@ def setup(py_params_dict):
             {
                 "name": "FREQ",
                 "descr": "Clock frequency",
-                "type": "F",
+                "type": "D",
                 "val": "100000000",
             },
             {
                 "name": "XILINX",
                 "descr": "Xilinx flag to signal that this board uses Xilinx tools",
-                "type": "F",
+                "type": "D",
                 "val": "1",
             },
         ],

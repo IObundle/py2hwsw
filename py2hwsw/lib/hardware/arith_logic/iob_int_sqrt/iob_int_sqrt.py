@@ -20,10 +20,10 @@ def setup(py_params_dict):
             SIZE_W -t P -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
             -d 'Size width'
 
-            END_COUNT -t F -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA
+            END_COUNT -t D -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA
             -d 'End count'
 
-            COUNT_W -t F -v $clog2(END_COUNT) -m NA -M NA
+            COUNT_W -t D -v $clog2(END_COUNT) -m NA -M NA
             -d 'Count width'
             """,
         ],

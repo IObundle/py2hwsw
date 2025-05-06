@@ -64,7 +64,7 @@ def setup(py_params_dict):
             "instance_name": f"{attrs['name']}_inst",
             "instance_description": "Wrapped module",
             "parameters": {
-                i["name"]: i["name"] for i in attrs["confs"] if i["type"] in ["P", "F"]
+                i["name"]: i["name"] for i in attrs["confs"] if i["type"] in ["P", "D"]
             },
             "connect": connect_dict,
         }

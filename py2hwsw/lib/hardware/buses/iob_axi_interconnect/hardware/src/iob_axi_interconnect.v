@@ -84,7 +84,6 @@ module iob_axi_interconnect #(
    input  wire [          S_COUNT*2-1:0] s_axi_awburst_i,
    input  wire [            S_COUNT-1:0] s_axi_awlock_i,
    input  wire [          S_COUNT*4-1:0] s_axi_awcache_i,
-   input  wire [          S_COUNT*3-1:0] s_axi_awprot_i,
    input  wire [          S_COUNT*4-1:0] s_axi_awqos_i,
    input  wire [            S_COUNT-1:0] s_axi_awvalid_i,
    output wire [            S_COUNT-1:0] s_axi_awready_o,
@@ -105,7 +104,6 @@ module iob_axi_interconnect #(
    input  wire [          S_COUNT*2-1:0] s_axi_arburst_i,
    input  wire [            S_COUNT-1:0] s_axi_arlock_i,
    input  wire [          S_COUNT*4-1:0] s_axi_arcache_i,
-   input  wire [          S_COUNT*3-1:0] s_axi_arprot_i,
    input  wire [          S_COUNT*4-1:0] s_axi_arqos_i,
    input  wire [            S_COUNT-1:0] s_axi_arvalid_i,
    output wire [            S_COUNT-1:0] s_axi_arready_o,
@@ -127,7 +125,6 @@ module iob_axi_interconnect #(
    output wire [           M_COUNT*2-1:0] m_axi_awburst_o,
    output wire [             M_COUNT-1:0] m_axi_awlock_o,
    output wire [           M_COUNT*4-1:0] m_axi_awcache_o,
-   output wire [           M_COUNT*3-1:0] m_axi_awprot_o,
    output wire [           M_COUNT*4-1:0] m_axi_awqos_o,
    output wire [           M_COUNT*4-1:0] m_axi_awregion_o,
    output wire [M_COUNT*AWUSER_WIDTH-1:0] m_axi_awuser_o,
@@ -150,7 +147,6 @@ module iob_axi_interconnect #(
    output wire [           M_COUNT*2-1:0] m_axi_arburst_o,
    output wire [             M_COUNT-1:0] m_axi_arlock_o,
    output wire [           M_COUNT*4-1:0] m_axi_arcache_o,
-   output wire [           M_COUNT*3-1:0] m_axi_arprot_o,
    output wire [           M_COUNT*4-1:0] m_axi_arqos_o,
    output wire [           M_COUNT*4-1:0] m_axi_arregion_o,
    output wire [M_COUNT*ARUSER_WIDTH-1:0] m_axi_aruser_o,
@@ -174,6 +170,14 @@ module iob_axi_interconnect #(
    assign s_axi_aruser_i = 'b0;
    assign m_axi_buser_i  = 'b0;
    assign m_axi_ruser_i  = 'b0;
+
+   // Unused prot ports
+   wire [          S_COUNT*3-1:0] s_axi_awprot_i;
+   wire [          S_COUNT*3-1:0] s_axi_arprot_i;
+   wire [           M_COUNT*3-1:0] m_axi_awprot_o;
+   wire [           M_COUNT*3-1:0] m_axi_arprot_o;
+   assign s_axi_awprot_i = 'b0;
+   assign s_axi_arprot_i  = 'b0;
 
    localparam CL_S_COUNT = $clog2(S_COUNT);
    localparam CL_M_COUNT = $clog2(M_COUNT);

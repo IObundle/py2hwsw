@@ -4,6 +4,7 @@
 
 import sys
 import os
+import copy
 
 # Add csrs scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
@@ -63,6 +64,8 @@ def setup(py_params_dict):
         "rw_overlap": False,
         # Build directory for csrs (usually auto-passed py py2hwsw).
         "build_dir": "",
+        # CSR Configuration to use
+        "doc_conf": False,
     }
 
     # Update params with values from py_params_dict
@@ -72,7 +75,9 @@ def setup(py_params_dict):
 
     assert params["csrs"], print("Error: Register list empty.")
 
-    assert params["build_dir"], print("Error: Register build dir empty.")
+    # Ensure build directory is given when py2hwsw is setting up this core
+    if py_params_dict.get("py2hwsw_target", "") == "setup":
+        assert params["build_dir"], print("Error: Register build dir empty.")
 
     # Generate verilog parameters for CSR interface
     csr_if_params = {}
@@ -83,7 +88,7 @@ def setup(py_params_dict):
     confs = [
         {
             "name": "ADDR_W",
-            "type": "F",
+            "type": "D",
             "val": "ND",  # ret automatically
             "min": "0",
             "max": "32",
@@ -190,6 +195,7 @@ def setup(py_params_dict):
         "rw_overlap": params["rw_overlap"],
         "autoaddr": params["autoaddr"],
         "build_dir": params["build_dir"],
+        "doc_conf": params["doc_conf"],
     }
 
     # Generate snippets
@@ -202,11 +208,27 @@ def setup(py_params_dict):
     global static_reg_tables
     static_reg_tables[params["name"]] = reg_table
 
-    # Generate docs
+    # Generate tex section for each doc_configuration and reg table
     if py_params_dict.get("py2hwsw_target", "") == "setup":
+        # use regs copy to not modify original regs
+        regs_copy = copy.deepcopy(attributes_with_csrs["csrs"])
+        # Get doc_configuration_list
+        doc_configs = _list_all_doc_configs(attributes_with_csrs["csrs"])
+        doc_tables = {}
+        # Generate doc_table for each doc_configuration
+        for doc_conf in doc_configs:
+            _reset_autoaddrs(attributes_with_csrs["autoaddr"], regs_copy)
+            _, doc_table = csr_gen_obj.get_reg_table(
+                regs_copy,
+                attributes_with_csrs["rw_overlap"],
+                attributes_with_csrs["autoaddr"],
+                attributes_with_csrs["doc_conf"],
+            )
+
+            doc_tables[doc_conf] = doc_table
+
         csr_gen_obj.generate_regs_tex(
-            attributes_with_csrs["csrs"],
-            reg_table,
+            doc_tables,
             attributes_with_csrs["build_dir"] + "/document/tsrc",
         )
 
@@ -250,3 +272,27 @@ def create_group_for_ungrouped_csrs(csrs):
         grouped_csrs.append(general_group)
 
     return grouped_csrs
+
+
+def _list_all_doc_configs(csrs):
+    """Return list of all doc configurations"""
+    doc_configs = []
+    for csr_group in csrs:
+        for reg in csr_group.regs:
+            if reg.doc_conf_list:
+                doc_configs += reg.doc_conf_list
+    if not doc_configs:
+        # empty case: no regs with specific doc_conf
+        doc_configs = [""]
+    else:
+        # Remove duplicates
+        doc_configs = list(set(doc_configs))
+    return list(set(doc_configs))
+
+
+def _reset_autoaddrs(autoaddr, csrs):
+    """Reset autoaddr for regs"""
+    if autoaddr and csrs:
+        for csr_group in csrs:
+            for r in csr_group.regs:
+                r.addr = -1

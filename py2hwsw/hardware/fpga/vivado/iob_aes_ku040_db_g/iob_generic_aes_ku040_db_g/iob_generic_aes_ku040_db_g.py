@@ -11,19 +11,19 @@ def setup(py_params_dict):
             {
                 "name": "DDR_ADDR_W",
                 "descr": "Width of DDR memory address bus (byte addressed).",
-                "type": "F",
+                "type": "D",
                 "val": "30",
             },
             {
                 "name": "FREQ",
                 "descr": "Typical clock frequency for this FPGA board",
-                "type": "F",
+                "type": "D",
                 "val": "100000000",
             },
             {
                 "name": "XILINX",
                 "descr": "Xilinx flag to signal that this board uses Xilinx tools",
-                "type": "F",
+                "type": "D",
                 "val": "1",
             },
         ],

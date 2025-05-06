@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "BIT_W",
-                "type": "F",
+                "type": "D",
                 "val": "$clog2(DATA_W+1)",
                 "min": "NA",
                 "max": "NA",

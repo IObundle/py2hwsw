@@ -7,6 +7,7 @@
 #
 # csr_gen.py: build Verilog control and status registers and software bare-metal driver
 #
+import copy
 import sys
 import os
 from math import ceil, log, log2
@@ -116,17 +117,29 @@ class csr_gen:
             # a or b is a string
             return f"(({a} > {b}) ? {a} : {b})"
 
-    def get_reg_table(self, csrs, rw_overlap, autoaddr):
-        # Create reg table
-        reg_table = []
+    def get_reg_table(self, csrs, rw_overlap, autoaddr, doc_conf):
+        # Create doc table
+        doc_table = []
         for csr_group in csrs:
-            # If csr_group has 'doc_only' attribute set to True, skip it
-            if csr_group.doc_only:
-                continue
+            filtered_csr_group = copy.copy(csr_group)
+            filtered_csr_group.regs = []
+            for reg in csr_group.regs:
+                # exclude registers without matching doc_conf
+                # registers without 'doc_conf_list' are always included
+                if reg.doc_conf_list and doc_conf not in reg.doc_conf_list:
+                    continue
+                filtered_csr_group.regs.append(reg)
+            if filtered_csr_group.regs:
+                doc_table.append(filtered_csr_group)
 
+        # List all registers from doc_table
+        reg_table = []
+        for csr_group in doc_table:
             reg_table += csr_group.regs
 
-        return self.compute_addr(reg_table, rw_overlap, autoaddr)
+        return self.compute_addr(reg_table, rw_overlap, autoaddr), copy.deepcopy(
+            doc_table
+        )
 
     def bceil(self, n, log2base):
         base = int(2**log2base)
@@ -1417,77 +1430,76 @@ class csr_gen:
 
     # Generate csrs.tex file with list TeX tables of regs
     @staticmethod
-    def generate_csrs_tex(regs, out_dir):
+    def generate_csrs_tex(doc_tables, out_dir):
         os.makedirs(out_dir, exist_ok=True)
         csrs_file = open(f"{out_dir}/csrs.tex", "w")
 
         csrs_file.write(
             """
-    The software accessible registers of the core are described in the following
-    tables. The tables give information on the name, read/write capability, address, width in bits, and a textual description.
+The software accessible registers of the core are described in the following
+tables. The tables give information on the name, read/write capability, address, width in bits, and a textual description.
 """
         )
 
-        for table in regs:
-            csrs_file.write(
-                """
-    \\begin{table}[H]
-      \\centering
-      \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
-        
-        \\hline
-        \\rowcolor{iob-green}
-        {\\bf Name} & {\\bf R/W} & {\\bf Addr} & {\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ \\hline
+        for doc_conf, doc_table in doc_tables.items():
+            csrs_file.write(f"\\subsubsection{{{doc_conf} Configuration}}")
 
-        \\input """
-                + table.name
-                + """_csrs_tab
-     
-      \\end{tabularx}
-      \\caption{"""
-                + table.descr.replace("_", "\\_")
-                + """}
-      \\label{"""
-                + table.name
-                + """_csrs_tab:is}
-    \\end{table}
+            for csr_group in doc_table:
+                csrs_file.write(
+                    """
+\\begin{table}[H]
+  \\centering
+  \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
+
+    \\hline
+    \\rowcolor{iob-green}
+    {\\bf Name} & {\\bf R/W} & {\\bf Addr} & {\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ \\hline
+
+    \\input """
+                    + doc_conf
+                    + f"_{csr_group.name}"
+                    + """_csrs_tab
+
+  \\end{tabularx}
+  \\caption{"""
+                    + csr_group.descr.replace("_", "\\_")
+                    + """}
+  \\label{"""
+                    + doc_conf
+                    + f"_{csr_group.name}"
+                    + """_csrs_tab:is}
+\\end{table}
 """
-            )
-            if table.doc_clearpage:
-                csrs_file.write("\\clearpage")
+                )
+
+                if csr_group.doc_clearpage:
+                    csrs_file.write("\\clearpage")
 
         csrs_file.write("\\clearpage")
         csrs_file.close()
 
     # Generate TeX tables of registers
-    # csrs: list of tables containing registers, as defined in <corename>_setup.py
-    # regs_with_addr: list of all registers, where 'addr' field has already been computed
+    # doc_tables: dictionary of doc_conf tables,
+    #    each ['doc_conf'] key as respective doc_table only with valid registers
     # out_dir: output directory
     @classmethod
-    def generate_regs_tex(self, csrs, regs_with_addr, out_dir):
+    def generate_regs_tex(self, doc_tables, out_dir):
         os.makedirs(out_dir, exist_ok=True)
         # Create csrs.tex file
-        self.generate_csrs_tex(csrs, out_dir)
+        self.generate_csrs_tex(doc_tables, out_dir)
 
-        for csr_group in csrs:
-            tex_table = []
-            for reg in csr_group.regs:
-                addr = "None"
-                # Find address of matching register in regs_with_addr list
-                for reg_with_addr in regs_with_addr:
-                    if reg_with_addr.name == reg.name:
-                        addr = reg_with_addr.addr
-                        break
-
-                tex_table.append(
-                    [
-                        reg.name.upper(),
-                        reg.type,
-                        str(addr),
-                        str(reg.n_bits),
-                        str(reg.rst_val),
-                        reg.descr,
-                    ]
-                )
-
-            write_table(f"{out_dir}/{csr_group.name}_csrs", tex_table)
+        for doc_conf, doc_table in doc_tables.items():
+            for csr_group in doc_table:
+                tex_table = []
+                for reg in csr_group.regs:
+                    tex_table.append(
+                        [
+                            reg.name.upper(),
+                            reg.type,
+                            str(reg.addr),
+                            str(reg.n_bits),
+                            str(reg.rst_val),
+                            reg.descr,
+                        ]
+                    )
+                write_table(f"{out_dir}/{doc_conf}_{csr_group.name}_csrs", tex_table)

@@ -8,7 +8,6 @@ def setup(py_params_dict):
     # Get parameters from the dictionary
     use_tlast = py_params_dict.get("use_tlast", False)
     use_en = py_params_dict.get("use_en", False)
-    use_done = py_params_dict.get("use_done", False)
 
     # change parameters to boolean
     if isinstance(use_tlast, str):

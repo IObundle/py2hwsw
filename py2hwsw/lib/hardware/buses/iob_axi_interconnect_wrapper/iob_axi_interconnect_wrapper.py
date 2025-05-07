@@ -6,7 +6,6 @@ import os
 
 AXI_IN_SIGNAL_NAMES = [
     ("araddr", "AXI_ADDR_W"),
-    ("arprot", 3),
     ("arvalid", 1),
     ("rready", 1),
     ("arid", "AXI_ID_W"),
@@ -17,7 +16,6 @@ AXI_IN_SIGNAL_NAMES = [
     ("arcache", 4),
     ("arqos", 4),
     ("awaddr", "AXI_ADDR_W"),
-    ("awprot", 3),
     ("awvalid", 1),
     ("wdata", "AXI_DATA_W"),
     ("wstrb", "AXI_DATA_W / 8"),

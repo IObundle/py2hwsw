@@ -15,8 +15,7 @@ module iob_iob2axil #(
    localparam WAIT_AWREADY = 3'd1;
    localparam WAIT_WREADY  = 3'd2;
    localparam WAIT_BVALID  = 3'd3;
-   localparam WAIT_ARREADY = 3'd4;
-   localparam WAIT_RVALID  = 3'd5;
+   localparam WAIT_RVALID  = 3'd4;
 
    reg axil_awvalid_int;
    reg axil_arvalid_int;
@@ -89,9 +88,12 @@ module iob_iob2axil #(
                      axil_bready_int = 1'b1;
                      pc_cnt_nxt = WAIT_AWREADY;
                 end else begin
-                     axil_arvalid_int = 1'b1;
-                     pc_cnt_nxt = WAIT_ARREADY;
-                end
+                    axil_arvalid_int = 1'b1;
+                    if (axil_arready_i) begin
+                        iob_ready_int = 1'b1;
+                        pc_cnt_nxt = WAIT_RVALID;
+                    end
+                end 
              end
          end
          WAIT_AWREADY: begin
@@ -118,16 +120,9 @@ module iob_iob2axil #(
                  iob_ready_int = 1'b1;
              end
          end
-         WAIT_ARREADY: begin
-             axil_arvalid_int = 1'b1;
-             if (axil_arready_i) begin
-                 pc_cnt_nxt = WAIT_RVALID;
-             end
-         end
          WAIT_RVALID: begin
-             if (axil_rvalid_i) begin
+             if (axil_rvalid_i & iob_rready_i) begin
                  pc_cnt_nxt = WAIT_AVALID;
-                 iob_ready_int = 1'b1;
              end
          end
          default: begin

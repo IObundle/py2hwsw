@@ -38,28 +38,26 @@ def setup(py_params_dict):
                 "name": "single_read",
                 "descr": "",
                 "signals": [
-                    {"name": "single_read_wr", "width": 1},
+                    {"name": "single_read_rd", "width": 1},
                 ],
             },
             # Regifiles wires
             {
-                "name": "regfile_write",
+                "name": "regarray_write",
                 "descr": "",
                 "signals": [
-                    {"name": "regfile_write_0_wr", "width": 8},
-                    {"name": "regfile_write_1_wr", "width": 8},
-                    {"name": "regfile_write_2_wr", "width": 8},
-                    {"name": "regfile_write_3_wr", "width": 8},
-                    {"name": "regfile_write_raddr_wr", "width": 2},
-                    {"name": "regfile_write_rdata_wr", "width": 8},
+                    {"name": "regarray_write_en_wr", "width": 1},
+                    {"name": "regarray_write_strb_wr", "width": 16/8},
+                    {"name": "regarray_write_addr_wr", "width": 1},
+                    {"name": "regarray_write_data_wr", "width": 16},
                 ],
             },
             {
-                "name": "regfile_read",
+                "name": "regarray_read",
                 "descr": "",
                 "signals": [
-                    {"name": "regfile_read_raddr", "width": 2},
-                    {"name": "regfile_read", "width": 8},
+                    {"name": "regarray_read_addr_rd", "width": 3},
+                    {"name": "regarray_read_data_rd", "width": 4},
                 ],
             },
             # FIFO write wires
@@ -75,7 +73,7 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "fifo_write_w_en", "width": 1},
-                    {"name": "fifo_write_w_data", "width": 8},
+                    {"name": "fifo_write_w_data", "width": 4},
                     {"name": "fifo_write_w_empty", "width": 1},
                 ],
             },
@@ -89,7 +87,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "fifo_write_ext_mem_w_en_o",
-                        "width": 4,
+                        "width": 1,
                         "descr": "Memory write enable",
                     },
                     {
@@ -99,13 +97,13 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "fifo_write_ext_mem_w_data_o",
-                        "width": 32,
+                        "width": 8,
                         "descr": "Memory write data",
                     },
                     #  Read port
                     {
                         "name": "fifo_write_ext_mem_r_en_o",
-                        "width": 4,
+                        "width": 1,
                         "descr": "Memory read enable",
                     },
                     {
@@ -115,7 +113,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "fifo_write_ext_mem_r_data_i",
-                        "width": 32,
+                        "width": 8,
                         "descr": "Memory read data",
                     },
                 ],
@@ -140,7 +138,7 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "fifo_read_r_en", "width": 1},
-                    {"name": "fifo_read_r_data", "width": 8},
+                    {"name": "fifo_read_r_data", "width": 16},
                     {"name": "fifo_read_r_full", "width": 1},
                 ],
             },
@@ -161,33 +159,33 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "fifo_read_ext_mem_w_en_o",
-                        "width": 4,
+                        "width": 2,
                         "descr": "Memory read enable",
                     },
                     {
                         "name": "fifo_read_ext_mem_w_addr_o",
-                        "width": 2,
+                        "width": 1,
                         "descr": "Memory read address",
                     },
                     {
                         "name": "fifo_read_ext_mem_w_data_o",
-                        "width": 32,
+                        "width": 16,
                         "descr": "Memory read data",
                     },
                     #  Read port
                     {
                         "name": "fifo_read_ext_mem_r_en_o",
-                        "width": 4,
+                        "width": 2,
                         "descr": "Memory read enable",
                     },
                     {
                         "name": "fifo_read_ext_mem_r_addr_o",
-                        "width": 2,
+                        "width": 1,
                         "descr": "Memory read address",
                     },
                     {
                         "name": "fifo_read_ext_mem_r_data_i",
-                        "width": 32,
+                        "width": 16,
                         "descr": "Memory read data",
                     },
                 ],
@@ -261,7 +259,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "async_fifo_write_ext_mem_w_en_o",
-                        "width": 4,
+                        "width": 1,
                         "descr": "Memory write enable",
                     },
                     {
@@ -271,7 +269,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "async_fifo_write_ext_mem_w_data_o",
-                        "width": 32,
+                        "width": 8,
                         "descr": "Memory write data",
                     },
                     #  Read port
@@ -281,7 +279,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "async_fifo_write_ext_mem_r_en_o",
-                        "width": 4,
+                        "width": 1,
                         "descr": "Memory read enable",
                     },
                     {
@@ -291,7 +289,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "async_fifo_write_ext_mem_r_data_i",
-                        "width": 32,
+                        "width": 8,
                         "descr": "Memory read data",
                     },
                 ],
@@ -358,7 +356,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "async_fifo_read_ext_mem_w_en_o",
-                        "width": 4,
+                        "width": 1,
                         "descr": "Memory read enable",
                     },
                     {
@@ -368,7 +366,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "async_fifo_read_ext_mem_w_data_o",
-                        "width": 32,
+                        "width": 8,
                         "descr": "Memory read data",
                     },
                     #  Read port
@@ -378,7 +376,7 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "async_fifo_read_ext_mem_r_en_o",
-                        "width": 4,
+                        "width": 1,
                         "descr": "Memory read enable",
                     },
                     {
@@ -388,9 +386,49 @@ def setup(py_params_dict):
                     },
                     {
                         "name": "async_fifo_read_ext_mem_r_data_i",
-                        "width": 32,
+                        "width": 8,
                         "descr": "Memory read data",
                     },
+                ],
+            },
+            # NOAUTO wires
+            {
+                "name": "noauto_write",
+                "descr": "",
+                "signals": [
+                    {"name": "noauto_write_valid_wr", "width": 1},
+                    {"name": "noauto_write_wstrb_wr", "width": 1},
+                    {"name": "noauto_write_wdata_wr", "width": 1},
+                    {"name": "noauto_write_ready_wr", "width": 1},
+                ],
+            },
+            {
+                "name": "noauto_read",
+                "descr": "",
+                "signals": [
+                    {"name": "noauto_read_rdata_rd", "width": 1},
+                    {"name": "noauto_read_rvalid_rd", "width": 1},
+                    {"name": "noauto_read_rvalid_rd", "width": 1},
+                ],
+            },
+            # Autoclear wires
+            {
+                "name": "autoclear_write",
+                "descr": "",
+                "signals": [
+                    {"name": "autoclear_write_valid_wr", "width": 1},
+                    {"name": "autoclear_write_wstrb_wr", "width": 1},
+                    {"name": "autoclear_write_wdata_wr", "width": 1},
+                    {"name": "autoclear_write_ready_wr", "width": 1},
+                ],
+            },
+            {
+                "name": "autoclear_read",
+                "descr": "",
+                "signals": [
+                    {"name": "autoclear_read_rdata_rd", "width": 1},
+                    {"name": "autoclear_read_rvalid_rd", "width": 1},
+                    {"name": "autoclear_read_rvalid_rd", "width": 1},
                 ],
             },
         ],
@@ -514,6 +552,59 @@ def setup(py_params_dict):
                             },
                         ],
                     },
+                    # No auto
+                    {
+                        "name": "demo_noauto_csrs",
+                        "descr": "demo software accessible registers.",
+                        "regs": [
+                            {
+                                "name": "noauto_write",
+                                "descr": "noauto write register",
+                                "type": "NOAUTO",
+                                "mode": "W",
+                                "n_bits": 1,
+                                "rst_val": 0,
+                                "log2n_items": 0,
+                            },
+                            {
+                                "name": "noauto_read",
+                                "descr": "noauto read register",
+                                "type": "NOAUTO",
+                                "mode": "R",
+                                "n_bits": 1,
+                                "rst_val": 0,
+                                "log2n_items": 0,
+                            },
+                        ],
+                    },
+                    # Auto clear (also noauto)
+                    {
+                        "name": "demo_autoclear_csrs",
+                        "descr": "demo software accessible registers.",
+                        "regs": [
+                            {
+                                "name": "autoclear_write",
+                                "descr": "autoclear write register",
+                                "type": "NOAUTO",
+                                "mode": "W",
+                                "n_bits": 1,
+                                "rst_val": 0,
+                                "log2n_items": 0,
+                                "autoclear": True,
+                            },
+                            {
+                                "name": "autoclear_read",
+                                "descr": "autoclear read register",
+                                "type": "NOAUTO",
+                                "mode": "R",
+                                "n_bits": 1,
+                                "rst_val": 0,
+                                "log2n_items": 0,
+                                "autoclear": True,
+                            },
+                        ],
+                    },
+                    # Other supported types: "ROM", "INTERRUPT"
                 ],
                 "csr_if": "iob",
                 "connect": {
@@ -545,6 +636,12 @@ def setup(py_params_dict):
                     # Async FIFO read
                     "async_fifo_read_write_io": "async_fifo_read_write",
                     "async_fifo_read_extmem_io": "async_fifo_read_extmem",
+                    # No auto
+                    "noauto_write_o": "noauto_write",
+                    "noauto_read_i": "noauto_read",
+                    # Auto clear
+                    "autoclear_write_o": "autoclear_write",
+                    "autoclear_read_i": "autoclear_read",
                 },
             },
         ],

@@ -32,14 +32,11 @@ class iob_csr:
     # asym <= -1: W_INT = W_EXT / (-asym)
     asym: int = 1
 
-    # TODO: Autoclear register for NOAUTO. If cpu writes 1 to it, it will be autocleared when core returns ready (reads value from it). IPxact should have an attribute for this.
-    # FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
-
     def __post_init__(self):
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
 
-        if self.type not in ["REG", "FIFO", "ROM", "NOAUTO", "INTERRUPT"]:
+        if self.type not in ["REG", "FIFO", "ROM", "NOAUTO", "INTERRUPT", "AUTOCLEAR"]:
             fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
 
         if self.mode not in ["R", "W", "RW"]:
@@ -132,6 +129,8 @@ class iob_csr:
             )
 
 
+# TODO: Autoclear register for NOAUTO. If cpu writes 1 to it, it will be autocleared when core returns ready (reads value from it). IPxact should have an attribute for this.
+# FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
 @dataclass
 class csr_field:
     name: str = ""
@@ -140,6 +139,10 @@ class csr_field:
     width: int = 1
     volatile: bool = True
     rst_val: int = 0
+    # Similar to 'modifiedWriteValue' in IPxact.
+    write_action: str = ""
+    # SImilar to 'readAction' in IPxact
+    read_action: str = ""
 
     def __post_init__(self):
         if not self.name:
@@ -147,6 +150,28 @@ class csr_field:
 
         if self.mode not in ["R", "W", "RW"]:
             fail_with_msg(f"Invalid CSR field mode: '{self.mode}'", ValueError)
+
+        if self.write_action not in [
+            "",  # Indicates that the value written to a field is the value stored in the field. This is the default.
+            "oneToClear",  # Each written '1' bit will assign the corresponding bit to '0'.
+            "oneToSet",  # Each written '1' bit will assign the corresponding bit to '1'.
+            "oneToToggle",  # Each written '1' bit will toggle the corresponding bit.
+            "zeroToClear, zeroToSet, zeroToToggle",  # Similar to previous ones, except that written '0' bit triggers the action.
+            "clear",  # Each write operation will clear all bits in the field to '0'.
+            "set",  # Each write operation will set all bits in the field to '1'.
+            "modify",  # Indicates that after a write operation all bits in the field can be modified.
+        ]:
+            fail_with_msg(
+                f"Invalid CSR write_action: '{self.write_action}'", ValueError
+            )
+
+        if self.read_action not in [
+            "",  # Indicates that field is not modified after a read operation. This is the default.
+            "clear",  # All bits in the field are cleared to '0' after a read operation.
+            "set",  # All bits in the field are set to '1' after a read operation.
+            "modify",  # Indicates that the bits in the field are modified in some way after a read operation.
+        ]:
+            fail_with_msg(f"Invalid CSR read_action: '{self.read_action}'", ValueError)
 
 
 def fail_with_msg(msg, exception_type=Exception):

@@ -15,6 +15,7 @@ from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
 from roms import find_and_update_rom_csrs
 from regfiles import find_and_update_regfile_csrs
+from special_csrs import find_and_update_autoclear_csrs
 
 # Static (shared) dictionary to store reg tables of generated csrs
 # May be read by other python modules
@@ -186,6 +187,7 @@ def setup(py_params_dict):
     find_and_update_fifo_csrs(params["csrs"], attributes_dict)
     find_and_update_rom_csrs(params["csrs"], attributes_dict)
     find_and_update_regfile_csrs(params["csrs"], attributes_dict)
+    find_and_update_autoclear_csrs(params["csrs"], attributes_dict)
 
     # Convert csrs dictionaries to objects
     csrs_obj_list = []

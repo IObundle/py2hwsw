@@ -209,6 +209,8 @@ class SwRegister:
 						<ipxact:bitWidth>{csr_field.width}</ipxact:bitWidth>
 						<ipxact:volatile>{str(csr_field.volatile).lower()}</ipxact:volatile>
 						<ipxact:access>{field_access_type}</ipxact:access>
+						<ipxact:modifiedWriteValue>{csr_field.write_action}</ipxact:modifiedWriteValue>
+						<ipxact:readAction>{csr_field.read_action}</ipxact:readAction>
 					</ipxact:field>
 """
 

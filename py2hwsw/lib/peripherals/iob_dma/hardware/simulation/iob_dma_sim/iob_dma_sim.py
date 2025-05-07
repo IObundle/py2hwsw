@@ -29,7 +29,7 @@ def setup(py_params_dict):
                 "name": "ADDR_W",
                 "descr": "Address bus width",
                 "type": "P",
-                "val": "5",
+                "val": "8",
             },
             # DMA External memory interface
             {
@@ -94,11 +94,11 @@ def setup(py_params_dict):
             },
         },
         {
-            "name": "dma_s",
+            "name": "pbus_s",
             "descr": "Testbench dma csrs interface",
             "signals": {
                 "type": "iob",
-                "ADDR_W": 5,
+                "ADDR_W": 7,
             },
         },
     ]
@@ -106,6 +106,145 @@ def setup(py_params_dict):
     # Wires
     #
     attributes_dict["wires"] = [
+        {
+            "name": "split_reset",
+            "descr": "Reset signal for iob_split components",
+            "signals": [
+                {"name": "arst_i"},
+            ],
+        },
+        # AXISTREAM IN
+        {
+            "name": "axistream_in_interrupt",
+            "descr": "Interrupt signal",
+            "signals": [
+                {
+                    "name": "axistream_in_interrupt",
+                    "width": "1",
+                },
+            ],
+        },
+        {
+            "name": "axistream_in_axis",
+            "descr": "AXI Stream interface signals",
+            "signals": [
+                {
+                    "name": "axis_clk",
+                    "width": "1",
+                    "descr": "Clock.",
+                },
+                {
+                    "name": "axis_cke",
+                    "width": "1",
+                    "descr": "Clock enable",
+                },
+                {
+                    "name": "axis_arst",
+                    "width": "1",
+                    "descr": "Asynchronous and active high reset.",
+                },
+                {
+                    "name": "axis_tdata",
+                    "width": "DATA_W",
+                    "descr": "Data.",
+                },
+                {
+                    "name": "axis_tvalid",
+                    "width": "1",
+                    "descr": "Valid.",
+                },
+                {
+                    "name": "axis_tready",
+                    "width": "1",
+                    "descr": "Ready.",
+                },
+                {
+                    "name": "axis_tlast",
+                    "width": "1",
+                    "descr": "Last word.",
+                },
+            ],
+        },
+        {
+            "name": "axistream_in_csrs",
+            "descr": "axistream_in CSRs interface",
+            "signals": {
+                "type": "iob",
+                "prefix": "axistream_in_csrs_",
+                "ADDR_W": 5 - 2,
+            },
+        },
+        # AXISTREAM OUT
+        {
+            "name": "axistream_out_interrupt",
+            "descr": "Interrupt signal",
+            "signals": [
+                {
+                    "name": "axistream_out_interrupt",
+                    "width": "1",
+                },
+            ],
+        },
+        {
+            "name": "axistream_out_axis",
+            "descr": "AXI Stream interface signals",
+            "signals": [
+                {
+                    "name": "axis_clk",
+                    "width": "1",
+                    "descr": "Clock.",
+                },
+                {
+                    "name": "axis_cke",
+                    "width": "1",
+                    "descr": "Clock enable",
+                },
+                {
+                    "name": "axis_arst",
+                    "width": "1",
+                    "descr": "Asynchronous and active high reset.",
+                },
+                {
+                    "name": "axis_tdata",
+                    "width": "DATA_W",
+                    "descr": "Data.",
+                },
+                {
+                    "name": "axis_tvalid",
+                    "width": "1",
+                    "descr": "Valid.",
+                },
+                {
+                    "name": "axis_tready",
+                    "width": "1",
+                    "descr": "Ready.",
+                },
+                {
+                    "name": "axis_tlast",
+                    "width": "1",
+                    "descr": "Last word.",
+                },
+            ],
+        },
+        {
+            "name": "axistream_out_csrs",
+            "descr": "axistream_out CSRs interface",
+            "signals": {
+                "type": "iob",
+                "prefix": "axistream_out_csrs_",
+                "ADDR_W": 5 - 2,
+            },
+        },
+        # Other
+        {
+            "name": "dma_csrs",
+            "descr": "dma CSRs interface",
+            "signals": {
+                "type": "iob",
+                "prefix": "dma_csrs_",
+                "ADDR_W": 5 - 2,
+            },
+        },
         {
             "name": "axi_dma_ram",
             "descr": "DMA <-> AXI RAM connection wires",
@@ -147,15 +286,6 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "dma_cbus",
-            "descr": "Testbench uart csrs bus",
-            "signals": {
-                "type": params["csr_if"],
-                "prefix": "internal_",
-                "ADDR_W": 5 - 2,  # Does not include 2 LSBs
-            },
-        },
-        {
             "name": "axi_ram_mem",
             "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
             "signals": {
@@ -170,20 +300,72 @@ def setup(py_params_dict):
     #
     attributes_dict["subblocks"] = [
         {
+            "core_name": "iob_axistream_in",
+            "instance_name": "axistream_in0",
+            "instance_description": "AXIS IN test instrument",
+            "parameters": {
+                "ADDR_W": "ADDR_W",
+                "DATA_W": "DATA_W",
+                "TDATA_W": "DATA_W",
+                "FIFO_ADDR_W": "AXI_ADDR_W",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "interrupt_o": "axistream_in_interrupt",
+                "axistream_io": "axistream_in_axis",
+                "sys_axis_io": "dma_axis_in",
+                "iob_csrs_cbus_s": "axistream_in_csrs",
+            },
+        },
+        {
+            "core_name": "iob_axistream_out",
+            "instance_name": "axistream_out0",
+            "instance_description": "AXIS OUT test instrument",
+            "parameters": {
+                "ADDR_W": "ADDR_W",
+                "DATA_W": "DATA_W",
+                "TDATA_W": "DATA_W",
+                "FIFO_ADDR_W": "AXI_ADDR_W",
+            },
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "interrupt_o": "axistream_out_interrupt",
+                "axistream_io": "axistream_out_axis",
+                "sys_axis_io": "dma_axis_out",
+                "iob_csrs_cbus_s": "axistream_out_csrs",
+            },
+        },
+        {
+            "core_name": "iob_split",
+            "name": "tb_pbus_split",
+            "instance_name": "iob_pbus_split",
+            "instance_description": "Split between testbench peripherals",
+            "connect": {
+                "clk_en_rst_s": "clk_en_rst_s",
+                "reset_i": "split_reset",
+                "input_s": ("pbus_s", ["iob_addr_i[7:2]"]),  # Ignore 2 LSBs
+                "output_0_m": "axistream_in_csrs",
+                "output_1_m": "axistream_out_csrs",
+                "output_2_m": "dma_csrs",
+            },
+            "num_outputs": 3,
+            "addr_w": 7 - 2,
+        },
+        {
             "core_name": "iob_dma",
             "instance_name": "dma_inst",
-            "instance_description": f"Unit Under Test (UUT) DMA instance with '{params['csr_if']}' interface.",
+            "instance_description": "Unit Under Test (UUT) DMA instance.",
             "parameters": {
                 "DATA_W": "DATA_W",
                 "ADDR_W": "ADDR_W",
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
             },
-            "csr_if": params["csr_if"],
+            "csr_if": "iob",
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "rst_i": "rst",
-                "iob_csrs_cbus_s": "dma_cbus",
+                "iob_csrs_cbus_s": "dma_csrs",
                 "dma_input_io": "dma_axis_out",
                 "dma_output_io": "dma_axis_in",
                 "axi_m": "axi_dma_ram",
@@ -228,124 +410,16 @@ def setup(py_params_dict):
             },
         },
     ]
-    if params["csr_if"] == "wb":
-        # "Wishbone" CSR_IF
-        attributes_dict["subblocks"].append(
-            {
-                "core_name": "iob_iob2wishbone",
-                "instance_name": "iob_iob2wishbone_coverter",
-                "instance_description": "Convert IOb port from testbench into Wishbone interface for DMA CSRs bus",
-                "parameters": {
-                    "ADDR_W": 5 - 2,
-                    "DATA_W": "DATA_W",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "wb_m": "dma_cbus",
-                    "iob_s": (
-                        "dma_s",
-                        [
-                            "iob_addr_i[5-1:2]",
-                        ],
-                    ),
-                },
-            }
-        )
-    elif params["csr_if"] == "apb":
-        # "APB" CSR_IF
-        attributes_dict["subblocks"].append(
-            {
-                "core_name": "iob_iob2apb",
-                "instance_name": "iob_iob2apb_coverter",
-                "instance_description": "Convert IOb port from testbench into APB interface for DMA CSRs bus",
-                "parameters": {
-                    "APB_ADDR_W": 5 - 2,
-                    "APB_DATA_W": "DATA_W",
-                    "ADDR_W": 5 - 2,
-                    "DATA_W": "DATA_W",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "apb_m": "dma_cbus",
-                    "iob_s": (
-                        "dma_s",
-                        [
-                            "iob_addr_i[5-1:2]",
-                        ],
-                    ),
-                },
-            }
-        )
-    elif params["csr_if"] == "axil":
-        # "AXI_Lite" CSR_IF
-        attributes_dict["subblocks"].append(
-            {
-                "core_name": "iob_iob2axil",
-                "instance_name": "iob_iob2axil_coverter",
-                "instance_description": "Convert IOb port from testbench into AXI-Lite interface for DMA CSRs bus",
-                "parameters": {
-                    "AXIL_ADDR_W": 5 - 2,
-                    "AXIL_DATA_W": "DATA_W",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "axil_m": "dma_cbus",
-                    "iob_s": (
-                        "dma_s",
-                        [
-                            "iob_addr_i[5-1:2]",
-                        ],
-                    ),
-                },
-            }
-        )
-    elif params["csr_if"] == "axi":
-        # "AXI" CSR_IF
-        attributes_dict["subblocks"].append(
-            {
-                "core_name": "iob_iob2axi",
-                "instance_name": "iob_iob2axi_coverter",
-                "instance_description": "Convert IOb port from testbench into AXI interface for DMA CSRs bus",
-                "parameters": {
-                    "ADDR_WIDTH": 5 - 2,
-                    "DATA_WIDTH": "DATA_W",
-                    "AXI_ID_WIDTH": "AXI_ID_W",
-                    "AXI_LEN_WIDTH": "AXI_LEN_W",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "axi_m": (
-                        "dma_cbus",
-                        [
-                            "axi_awlock_i[0]",
-                            "axi_arlock_i[0]",
-                        ],
-                    ),
-                    "iob_s": (
-                        "dma_s",
-                        [
-                            "iob_addr_i[5-1:2]",
-                        ],
-                    ),
-                },
-            }
-        )
+
     #
     # Snippets
     #
     attributes_dict["snippets"] = []
     snippet_code = """ """
-    if params["csr_if"] == "iob":
-        snippet_code += """
-   // Directly connect cbus IOb port to internal IOb wires
-   assign internal_iob_valid = iob_valid_i;
-   assign internal_iob_addr = iob_addr_i[5-1:2]; // Ignore 2 LSBs
-   assign internal_iob_wdata = iob_wdata_i;
-   assign internal_iob_wstrb = iob_wstrb_i;
-   assign internal_iob_rready = iob_rready_i;
-   assign iob_rvalid_o = internal_iob_rvalid;
-   assign iob_rdata_o = internal_iob_rdata;
-   assign iob_ready_o = internal_iob_ready;
+    snippet_code += """
+    assign axis_clk = clk_i;
+    assign axis_cke = cke_i;
+    assign axis_arst = arst_i;
 """
     attributes_dict["snippets"] += [
         {"verilog_code": snippet_code},

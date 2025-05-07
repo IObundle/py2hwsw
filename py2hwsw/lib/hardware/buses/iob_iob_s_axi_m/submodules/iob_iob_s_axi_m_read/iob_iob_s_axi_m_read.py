@@ -237,12 +237,11 @@ def setup(py_params_dict):
             "type": "fsm",
             "default_assignments": """
         // Default assignments
-        busy_o = 1'b1;
+        busy_o = 1'b0;
         en_fifo2axis = 1'b0;
         """,
             "state_descriptions": """
         WAIT_START: // Wait to start transfer
-            busy_o = 1'b0;
             if (start_transfer_i) begin
                 state_nxt = WAIT_DATA;
             end
@@ -251,6 +250,8 @@ def setup(py_params_dict):
             if ((!read_busy) && (level_o == length_i)) begin // Wait for the data to be available
                 en_fifo2axis = 1'b1;
                 state_nxt = TRANSF_DATA;
+            end else begin
+                busy_o = 1'b1;
             end
 
         TRANSF_DATA: // Transfer data from FIFO to AXI-Stream

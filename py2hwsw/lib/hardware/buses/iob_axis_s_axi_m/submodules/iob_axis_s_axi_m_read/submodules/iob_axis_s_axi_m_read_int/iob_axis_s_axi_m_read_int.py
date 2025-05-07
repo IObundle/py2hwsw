@@ -65,9 +65,9 @@ def setup(py_params_dict):
                 "name": "axis_out_io",
                 "descr": "",
                 "signals": [
-                    {"name": "axis_out_data_o", "width": "AXI_DATA_W"},
                     {"name": "axis_out_valid_o"},
                     {"name": "axis_out_ready_i"},
+                    {"name": "axis_out_data_o", "width": "AXI_DATA_W"},
                 ],
             },
             {

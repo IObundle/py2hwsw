@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import math
-
 from csr_classes import fail_with_msg
 
 
@@ -496,7 +494,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         {"name": "arst_i"},
                         {"name": "arst_i"},  # Synchronous reset
                         {"name": f"{fifo_name}_data_wen", "width": 1},
-                        {"name": f"{fifo_name}_wdata", "width": 32},
+                        {"name": f"{fifo_name}_data_wdata", "width": 32},
                         {"name": f"{fifo_name}_full", "width": 1},
                         {"name": f"{fifo_name}_empty"},
                         {"name": f"{fifo_name}_level", "width": 32},
@@ -536,7 +534,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     "descr": "FIFO write interface.",
                     "signals": [
                         {"name": f"{fifo_name}_data_wen", "width": 1},
-                        {"name": f"{fifo_name}_wdata", "width": 32},
+                        {"name": f"{fifo_name}_data_wdata", "width": 32},
                         {"name": f"{fifo_name}_full", "width": 1},
                     ],
                 }

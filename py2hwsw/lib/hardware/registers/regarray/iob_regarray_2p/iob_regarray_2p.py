@@ -67,7 +67,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "WSTRB_W",
-                "type": "P",
+                "type": "D",
                 "val": "WDATA_W / 8",
                 "min": "0",
                 "max": "NA",

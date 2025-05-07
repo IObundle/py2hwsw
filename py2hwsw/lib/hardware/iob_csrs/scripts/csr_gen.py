@@ -174,33 +174,6 @@ class csr_gen:
             else:
                 return f"{log2n_items}+{ceil(log(n_bytes, 2))}"
 
-    def gen_regfile_read_addr_logic(self, row):
-        """Generate regfile access logic via read address."""
-        name = row.name
-        n_bits = row.n_bits
-        log2n_items = row.log2n_items
-        n_items = 2 ** eval_param_expression_from_config(
-            log2n_items, self.config, "max"
-        )
-
-        lines = f"""
-   reg {name}_rdata_reg;
-   assign {name}_rdata_o = {name}_rdata_reg;
-   always @(*) begin
-      case ({name}_raddr_i)
-"""
-        for idx in range(n_items):
-            lines += (
-                f"         {log2n_items}'d{idx}: {name}_rdata_reg = {name}_{idx}_o;\n"
-            )
-
-        lines += f"""\
-         default: {name}_rdata_reg = {n_bits}'b0; // Default case to handle invalid address
-      endcase
-   end
-"""
-        return lines
-
     def gen_wr_reg(self, row):
         wires = []
         name = row.name
@@ -243,17 +216,7 @@ class csr_gen:
             n_items = 2 ** eval_param_expression_from_config(
                 log2n_items, self.config, "max"
             )
-            # Create addressed signal for each reg in regfile
-            if n_items > 1 and isinstance(addr, int) and isinstance(addr_w, int):
-                for idx in range(n_items):
-                    name_idx = f"{name}_{idx}"
-                    lines += f"    wire {name_idx}_addressed_w;\n"
-                    lines += f"    assign {name_idx}_addressed_w = (waddr >= {addr+idx*addr_w}) && (waddr < ({addr+(idx+1)*addr_w}));\n"
-            elif n_items > 1:
-                for idx in range(n_items):
-                    name_idx = f"{name}_{idx}"
-                    lines += f"    wire {name_idx}_addressed_w;\n"
-                    lines += f"    assign {name_idx}_addressed_w = (waddr >= {addr}+{idx}*{addr_w}) && (waddr < ({addr}+({idx+1})*{addr_w}));\n"
+            assert n_items == 1, "Regfiles (n_items > 1) cannot be generated with auto. This error is a bug, auto regfiles should be handled by previous scripts."
 
             # fill remaining bits with 0s
             if isinstance(n_bits, str):
@@ -276,31 +239,27 @@ class csr_gen:
                     rst_val_str = "{" + str(n_bits) + "{1'd0}}"
             else:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
-            for idx in range(n_items):
-                name_idx = f"{name}_{idx}" if n_items > 1 else name
-                wires.append(
-                    {
-                        "name": f"{name_idx}_wen",
-                        "descr": "",
-                        "signals": [
-                            {"name": f"{name_idx}_wen", "width": 1},
-                        ],
-                    },
-                )
-                lines += f"    assign {name_idx}_wen = internal_iob_valid & (write_en & {name_idx}_addressed_w);\n"
-                lines += "    iob_reg_cae #(\n"
-                lines += f"      .DATA_W({n_bits}),\n"
-                lines += f"      .RST_VAL({rst_val_str})\n"
-                lines += f"    ) {name_idx}_datareg (\n"
-                lines += "      .clk_i  (clk_i),\n"
-                lines += "      .cke_i  (cke_i),\n"
-                lines += "      .arst_i (arst_i),\n"
-                lines += f"      .en_i   ({name_idx}_wen),\n"
-                lines += f"      .data_i ({name}_wdata),\n"
-                lines += f"      .data_o ({name_idx}{suffix})\n"
-                lines += "    );\n\n"
-            if n_items > 1:
-                lines += self.gen_regfile_read_addr_logic(row)
+            wires.append(
+                {
+                    "name": f"{name}_wen",
+                    "descr": "",
+                    "signals": [
+                        {"name": f"{name}_wen", "width": 1},
+                    ],
+                },
+            )
+            lines += f"    assign {name}_wen = internal_iob_valid & (write_en & {name}_addressed_w);\n"
+            lines += "    iob_reg_cae #(\n"
+            lines += f"      .DATA_W({n_bits}),\n"
+            lines += f"      .RST_VAL({rst_val_str})\n"
+            lines += f"    ) {name}_datareg (\n"
+            lines += "      .clk_i  (clk_i),\n"
+            lines += "      .cke_i  (cke_i),\n"
+            lines += "      .arst_i (arst_i),\n"
+            lines += f"      .en_i   ({name}_wen),\n"
+            lines += f"      .data_i ({name}_wdata),\n"
+            lines += f"      .data_o ({name}{suffix})\n"
+            lines += "    );\n\n"
         else:  # not auto: compute wen
             lines += f"    assign {name}_wen{suffix} = (internal_iob_valid & internal_iob_ready) & (write_en & {name}_addressed_w);\n"
             if suffix:

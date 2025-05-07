@@ -104,7 +104,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "ram_t2p",
                     "prefix": "ext_mem_read_",
-                    "ADDR_W": "AXI_ADDR_W",
+                    "ADDR_W": "AXI_LEN_W",
                     "DATA_W": "AXI_DATA_W",
                 },
             },

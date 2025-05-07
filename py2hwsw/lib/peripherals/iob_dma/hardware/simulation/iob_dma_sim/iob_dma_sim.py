@@ -35,7 +35,7 @@ def setup(py_params_dict):
             {
                 "name": "AXI_ADDR_W",
                 "type": "P",
-                "val": "1",
+                "val": "14",
                 "min": "1",
                 "max": "32",
                 "descr": "AXI address width",
@@ -111,6 +111,7 @@ def setup(py_params_dict):
             "descr": "DMA <-> AXI RAM connection wires",
             "signals": {
                 "type": "axi",
+                "ADDR_W": "AXI_ADDR_W",
             },
         },
         {
@@ -157,7 +158,11 @@ def setup(py_params_dict):
         {
             "name": "axi_ram_mem",
             "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
-            "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
+            "signals": {
+                "type": "ram_t2p_be",
+                "ADDR_W": "AXI_ADDR_W - 2",
+                "prefix": "ext_mem_",
+            },
         },
     ]
     #
@@ -168,6 +173,12 @@ def setup(py_params_dict):
             "core_name": "iob_dma",
             "instance_name": "dma_inst",
             "instance_description": f"Unit Under Test (UUT) DMA instance with '{params['csr_if']}' interface.",
+            "parameters": {
+                "DATA_W": "DATA_W",
+                "ADDR_W": "ADDR_W",
+                "AXI_ADDR_W": "AXI_ADDR_W",
+                "AXI_DATA_W": "AXI_DATA_W",
+            },
             "csr_if": params["csr_if"],
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",

@@ -29,7 +29,7 @@ def setup(py_params_dict):
                 "name": "ADDR_W",
                 "descr": "Address bus width",
                 "type": "P",
-                "val": "8",
+                "val": "7",
             },
             # DMA External memory interface
             {
@@ -95,7 +95,7 @@ def setup(py_params_dict):
         },
         {
             "name": "pbus_s",
-            "descr": "Testbench dma csrs interface",
+            "descr": "Testbench dma sim wrapper csrs interface",
             "signals": {
                 "type": "iob",
                 "ADDR_W": 7,
@@ -304,7 +304,7 @@ def setup(py_params_dict):
             "instance_name": "axistream_in0",
             "instance_description": "AXIS IN test instrument",
             "parameters": {
-                "ADDR_W": "ADDR_W",
+                "ADDR_W": "(ADDR_W-2)",
                 "DATA_W": "DATA_W",
                 "TDATA_W": "DATA_W",
                 "FIFO_ADDR_W": "AXI_ADDR_W",
@@ -322,7 +322,7 @@ def setup(py_params_dict):
             "instance_name": "axistream_out0",
             "instance_description": "AXIS OUT test instrument",
             "parameters": {
-                "ADDR_W": "ADDR_W",
+                "ADDR_W": "(ADDR_W-2)",
                 "DATA_W": "DATA_W",
                 "TDATA_W": "DATA_W",
                 "FIFO_ADDR_W": "AXI_ADDR_W",
@@ -343,7 +343,7 @@ def setup(py_params_dict):
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "reset_i": "split_reset",
-                "input_s": ("pbus_s", ["iob_addr_i[7:2]"]),  # Ignore 2 LSBs
+                "input_s": ("pbus_s", ["iob_addr_i[6:2]"]),  # Ignore 2 LSBs
                 "output_0_m": "axistream_in_csrs",
                 "output_1_m": "axistream_out_csrs",
                 "output_2_m": "dma_csrs",
@@ -357,7 +357,7 @@ def setup(py_params_dict):
             "instance_description": "Unit Under Test (UUT) DMA instance.",
             "parameters": {
                 "DATA_W": "DATA_W",
-                "ADDR_W": "ADDR_W",
+                "ADDR_W": "(ADDR_W-2)",
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
             },
@@ -371,7 +371,6 @@ def setup(py_params_dict):
                 "axi_m": "axi_dma_ram",
             },
         },
-        # TODO: connect AXI RAM
         {
             "core_name": "iob_axi_ram",
             "instance_name": "axi_ram_inst",

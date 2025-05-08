@@ -150,7 +150,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axis",
                     "prefix": "int_",
-                    "DATA_W": "DATA_W",
+                    "DATA_W": "AXI_DATA_W",
                 },
             },
             {
@@ -205,7 +205,6 @@ def setup(py_params_dict):
                 "instance_description": "FIFO to AXI-Stream converter",
                 "parameters": {
                     "DATA_W": "AXI_DATA_W",
-                    "AXIS_LEN_W": "AXI_LEN_W+1",
                 },
                 "use_en": True,
                 "connect": {
@@ -247,6 +246,7 @@ def setup(py_params_dict):
             if (en_write && (level_o == (length_i - 1))) begin
                 start_transfer = 1'b1;
                 en_fifo2axis = 1'b1;
+                busy_o = 1'b1;
                 state_nxt = TRANSF_DATA;
             end
 

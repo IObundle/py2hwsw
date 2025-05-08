@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef _DMA_H_
 #define _DMA_H_
 

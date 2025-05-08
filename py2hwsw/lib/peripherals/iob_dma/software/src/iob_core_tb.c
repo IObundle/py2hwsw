@@ -11,7 +11,8 @@
 
 #include <stdio.h>
 
-#define NWORDS 256
+#define NWORDS 512
+#define RAM_ADDR 4000
 
 int iob_core_tb() {
 
@@ -70,7 +71,8 @@ int iob_core_tb() {
     ;
   // 2. Configure AXIS IN -> DMA -> AXI RAM write operation
   printf("2.1. Configure DMA write transfer\n");
-  dma_write_transfer(0, NWORDS);
+  iob_dma_csrs_set_w_burstlen(100);
+  dma_write_transfer((uint32_t *)RAM_ADDR, NWORDS);
 
   // 3. Wait for DMA transfer complete
   printf("3. Wait for DMA write transfer complete...");
@@ -93,10 +95,11 @@ int iob_core_tb() {
   iob_axistream_out_csrs_set_enable(1);
 
   printf("4.3. Configure DMA read transfer\n");
-  dma_read_transfer(0, NWORDS);
+  iob_dma_csrs_set_r_burstlen(200);
+  dma_read_transfer((uint32_t *)RAM_ADDR, NWORDS);
 
   // 5. Wait for DMA transfer complete
-  printf("3. Wait for DMA read transfer complete...");
+  printf("5. Wait for DMA read transfer complete...");
   while (dma_read_busy())
     ;
   printf("done!\n");

@@ -645,11 +645,11 @@ def setup(py_params_dict):
                     "async_fifo_read_write_io": "async_fifo_read_write",
                     "async_fifo_read_extmem_io": "async_fifo_read_extmem",
                     # No auto
-                    "noauto_write_o": "noauto_write",
-                    "noauto_read_i": "noauto_read",
+                    "noauto_write_io": "noauto_write",
+                    "noauto_read_io": "noauto_read",
                     # Auto clear
-                    "autoclear_write_o": "autoclear_write",
-                    "autoclear_read_i": "autoclear_read",
+                    "autoclear_write_io": "autoclear_write",
+                    "autoclear_read_io": "autoclear_read",
                 },
             },
         ],

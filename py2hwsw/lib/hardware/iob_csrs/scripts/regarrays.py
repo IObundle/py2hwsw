@@ -14,25 +14,21 @@ def find_and_update_regarray_csrs(csrs_dict, attributes_dict):
     for csr_group in csrs_dict:
         csr_ref = None
         for csr in csr_group["regs"]:
-            if csr.get("type", "") == "REG" and csr.get("log2n_items", 0) > 0:
+            if csr.get("type", "REG") == "REG" and csr.get("log2n_items", 0) > 0:
                 csr_group_ref = csr_group
                 csr_ref = csr
-                break
 
-        if not csr_ref:
-            continue
+                # Replace original csr with "NOAUTO" type
+                csr_ref["type"] = "NOAUTO"
+                # Don't generate standard ports for this CSR.
+                # It will be internal to the CSRs module, and have a custom port generated later.
+                csr_ref["internal_use"] = True
 
-        # Replace original csr with "NOAUTO" type
-        csr_ref["type"] = "NOAUTO"
-        # Don't generate standard ports for this CSR.
-        # It will be internal to the CSRs module, and have a custom port generated later.
-        csr_ref["internal_use"] = True
-
-        if "R" in csr_ref["mode"]:
-            create_regarray_instance(attributes_dict, csr_ref, "R")
-        if "W" in csr_ref["mode"]:
-            create_regarray_instance(attributes_dict, csr_ref, "W")
-        # FIXME: If RW, make sure signals do not colide
+                if "R" in csr_ref["mode"]:
+                    create_regarray_instance(attributes_dict, csr_ref, "R")
+                if "W" in csr_ref["mode"]:
+                    create_regarray_instance(attributes_dict, csr_ref, "W")
+                # FIXME: If RW, make sure signals do not colide
 
 
 def create_regarray_instance(attributes_dict, csr_ref, mode):

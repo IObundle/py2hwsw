@@ -52,11 +52,9 @@ def create_autoclear_instance(attributes_dict, csr_ref):
     descr = csr_ref["descr"]
     mode = csr_ref["mode"]
     width = csr_ref["n_bits"]
-    port_suffix = "_"
     port_signals = []
     snippet = ""
     if "R" in mode:
-        port_suffix += "i"
         port_signals += [
             {"name": f"{name}_valid_o", "width": 1},
             {"name": f"{name}_addr_o", "width": 1},
@@ -83,7 +81,6 @@ def create_autoclear_instance(attributes_dict, csr_ref):
    assign {name}_rst = {name}_rready;
 """
     if "W" in mode:
-        port_suffix += "o"
         port_signals += [
             {"name": f"{name}_valid_o", "width": 1},
             {"name": f"{name}_addr_o", "width": 1},
@@ -113,7 +110,7 @@ def create_autoclear_instance(attributes_dict, csr_ref):
     attributes_dict["ports"].append(
         # Create normal port, as if it were of type "NOAUTO"
         {
-            "name": f"{name}{port_suffix}",
+            "name": f"{name}_io",
             "descr": descr,
             "signals": port_signals,
         }

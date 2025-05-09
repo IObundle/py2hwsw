@@ -41,7 +41,7 @@ def setup(py_params_dict):
                     {"name": "single_read_rd", "width": 1},
                 ],
             },
-            # Regifiles wires
+            # Regarray wires
             {
                 "name": "regarray_write",
                 "descr": "",
@@ -397,8 +397,9 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "noauto_write_valid_wr", "width": 1},
-                    {"name": "noauto_write_wstrb_wr", "width": 1},
+                    {"name": "noauto_write_addr_wr", "width": 1},
                     {"name": "noauto_write_wdata_wr", "width": 1},
+                    {"name": "noauto_write_wstrb_wr", "width": 1},
                     {"name": "noauto_write_ready_wr", "width": 1},
                 ],
             },
@@ -406,9 +407,12 @@ def setup(py_params_dict):
                 "name": "noauto_read",
                 "descr": "",
                 "signals": [
+                    {"name": "noauto_read_valid_rd", "width": 1},
+                    {"name": "noauto_read_addr_rd", "width": 1},
+                    {"name": "noauto_read_rvalid_rd", "width": 1},
                     {"name": "noauto_read_rdata_rd", "width": 1},
-                    {"name": "noauto_read_rvalid_rd", "width": 1},
-                    {"name": "noauto_read_rvalid_rd", "width": 1},
+                    {"name": "noauto_read_ready_rd", "width": 1},
+                    {"name": "noauto_read_rready_rd", "width": 1},
                 ],
             },
             # Autoclear wires
@@ -417,8 +421,9 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "autoclear_write_valid_wr", "width": 1},
-                    {"name": "autoclear_write_wstrb_wr", "width": 1},
+                    {"name": "autoclear_write_addr_wr", "width": 1},
                     {"name": "autoclear_write_wdata_wr", "width": 1},
+                    {"name": "autoclear_write_wstrb_wr", "width": 1},
                     {"name": "autoclear_write_ready_wr", "width": 1},
                 ],
             },
@@ -426,9 +431,12 @@ def setup(py_params_dict):
                 "name": "autoclear_read",
                 "descr": "",
                 "signals": [
+                    {"name": "autoclear_read_valid_rd", "width": 1},
+                    {"name": "autoclear_read_addr_rd", "width": 1},
+                    {"name": "autoclear_read_rvalid_rd", "width": 1},
                     {"name": "autoclear_read_rdata_rd", "width": 1},
-                    {"name": "autoclear_read_rvalid_rd", "width": 1},
-                    {"name": "autoclear_read_rvalid_rd", "width": 1},
+                    {"name": "autoclear_read_ready_rd", "width": 1},
+                    {"name": "autoclear_read_rready_rd", "width": 1},
                 ],
             },
         ],

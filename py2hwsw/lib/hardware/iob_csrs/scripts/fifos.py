@@ -474,7 +474,14 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 ],
             },
         ]
-    attributes_dict["wires"] += []
+    if mode == "W":
+        attributes_dict["wires"] += [
+            {"name": f"{fifo_name}_data_wen", "width": 1},
+        ]
+    else:  # mode R
+        attributes_dict["wires"] += [
+            {"name": f"{fifo_name}_data_ren", "width": 1},
+        ]
     if is_async:
         #
         # Async FIFO Wires
@@ -626,3 +633,24 @@ def create_fifo_instance(attributes_dict, csr_ref):
 """,
             }
         )
+
+    if mode == "W":
+        attributes_dict["snippets"] += [
+            {
+                "verilog_code": f"""
+   // Generate wen signal
+   assign {fifo_name}_data_wen = {fifo_name}_data_valid & |{fifo_name}_data_wstrb;
+
+""",
+            }
+        ]
+    else:  # mode R
+        attributes_dict["snippets"] += [
+            {
+                "verilog_code": f"""
+   // Generate ren signal
+   assign {fifo_name}_data_ren = {fifo_name}_data_valid & ~|{fifo_name}_data_wstrb;
+
+""",
+            }
+        ]

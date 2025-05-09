@@ -36,7 +36,8 @@ class iob_csr:
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
 
-        if self.type not in ["REG", "FIFO", "ROM", "NOAUTO", "INTERRUPT", "AUTOCLEAR"]:
+        if self.type not in ["REG", "FIFO", "ROM", "NOAUTO", "INTERRUPT"]:
+            # FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
             fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
 
         if self.mode not in ["R", "W", "RW"]:
@@ -66,6 +67,8 @@ class iob_csr:
                 )
             ]
             # fail_with_msg(f"CSR '{self.name}' has no bit fields", ValueError)
+        else:  # Convert fields to objects
+            self.fields = convert_dict2obj_list(self.fields, csr_field)
 
         # Check if fields properties match CSR properties
         for _field in self.fields:
@@ -129,8 +132,6 @@ class iob_csr:
             )
 
 
-# TODO: Autoclear register for NOAUTO. If cpu writes 1 to it, it will be autocleared when core returns ready (reads value from it). IPxact should have an attribute for this.
-# FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
 @dataclass
 class csr_field:
     name: str = ""
@@ -149,7 +150,10 @@ class csr_field:
             fail_with_msg("CSR field name is not set", ValueError)
 
         if self.mode not in ["R", "W", "RW"]:
-            fail_with_msg(f"Invalid CSR field mode: '{self.mode}'", ValueError)
+            fail_with_msg(
+                f"Invalid CSR field mode '{self.mode}' in field '{self.name}'",
+                ValueError,
+            )
 
         if self.write_action not in [
             "",  # Indicates that the value written to a field is the value stored in the field. This is the default.

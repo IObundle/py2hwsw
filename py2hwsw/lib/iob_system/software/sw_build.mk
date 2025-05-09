@@ -29,7 +29,7 @@ iob_system_firmware.bin: ../../software/iob_system_firmware.bin
 	cp $< $@
 
 ../../software/%.bin:
-	make -C ../../ fw-build
+	make -C ../../ sw-build
 
 UTARGETS+=build_iob_system_software tb
 CSRS=./src/iob_uart_csrs.c

@@ -476,11 +476,23 @@ def create_fifo_instance(attributes_dict, csr_ref):
         ]
     if mode == "W":
         attributes_dict["wires"] += [
-            {"name": f"{fifo_name}_data_wen", "width": 1},
+            {
+                "name": f"{fifo_name}_data_wen",
+                "descr": "FIFO data write enable",
+                "signals": [
+                    {"name": f"{fifo_name}_data_wen", "width": 1},
+                ],
+            },
         ]
     else:  # mode R
         attributes_dict["wires"] += [
-            {"name": f"{fifo_name}_data_ren", "width": 1},
+            {
+                "name": f"{fifo_name}_data_ren",
+                "descr": "FIFO data read enable",
+                "signals": [
+                    {"name": f"{fifo_name}_data_ren", "width": 1},
+                ],
+            },
         ]
     if is_async:
         #

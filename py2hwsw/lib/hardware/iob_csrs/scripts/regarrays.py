@@ -154,7 +154,13 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
     #
     if mode == "W":
         attributes_dict["wires"] += [
-            {"name": f"{regarray_name}_wen", "width": 1},
+            {
+                "name": f"{regarray_name}_wen",
+                "descr": "Regarray data write enable",
+                "signals": [
+                    {"name": f"{regarray_name}_wen", "width": 1},
+                ],
+            },
             {
                 "name": f"{regarray_name}_write_i",
                 "descr": "REGARRAY write interface.",
@@ -162,8 +168,10 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
                     {"name": f"{regarray_name}_wen", "width": 1},
                     # Wstrb unused. Connected to high in verilog snippet.
                     {"name": f"{regarray_name}_w_strb", "width": "WDATA_W/8"},
-                    {"name": f"{regarray_name}_addr", "width": "WADDR_W"},
-                    {"name": f"{regarray_name}_wdata", "width": "WDATA_W"},
+                    # FIXME: Not using verilog parameters WADDR_W and WDATA_W because csr_gen later creates a reference with 'n_bits' width
+                    # but it would be better to use verilog parameters so the core can override it if needed.
+                    {"name": f"{regarray_name}_addr", "width": waddr_w},
+                    {"name": f"{regarray_name}_wdata", "width": wdata_w},
                 ],
             },
         ]
@@ -173,8 +181,10 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
                 "name": f"{regarray_name}_read_io",
                 "descr": "REGARRAY read interface.",
                 "signals": [
-                    {"name": f"{regarray_name}_addr", "width": "RADDR_W"},
-                    {"name": f"{regarray_name}_rdata", "width": "RDATA_W"},
+                    # FIXME: Not using verilog parameters RADDR_W and RDATA_W because csr_gen later creates a reference with 'n_bits' width
+                    # but it would be better to use verilog parameters so the core can override it if needed.
+                    {"name": f"{regarray_name}_addr", "width": raddr_w},
+                    {"name": f"{regarray_name}_rdata", "width": rdata_w},
                 ],
             }
         )

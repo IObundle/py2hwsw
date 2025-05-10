@@ -253,6 +253,7 @@ def setup(py_params_dict):
         1, csr_gen_obj.core_addr_w - 2
     )
 
+    print(attributes_dict)
     return attributes_dict
 
 

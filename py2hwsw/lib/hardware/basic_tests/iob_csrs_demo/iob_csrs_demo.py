@@ -46,18 +46,18 @@ def setup(py_params_dict):
                 "name": "regarray_write",
                 "descr": "",
                 "signals": [
-                    {"name": "regarray_write_en_wr", "width": 1},
-                    {"name": "regarray_write_strb_wr", "width": 16/8},
-                    {"name": "regarray_write_addr_wr", "width": 1},
-                    {"name": "regarray_write_data_wr", "width": 16},
+                    {"name": "regarray_read_addr_rd", "width": 3},
+                    {"name": "regarray_read_data_rd", "width": 4},
                 ],
             },
             {
                 "name": "regarray_read",
                 "descr": "",
                 "signals": [
-                    {"name": "regarray_read_addr_rd", "width": 3},
-                    {"name": "regarray_read_data_rd", "width": 4},
+                    {"name": "regarray_write_en_wr", "width": 1},
+                    {"name": "regarray_write_strb_wr", "width": 16 / 8},
+                    {"name": "regarray_write_addr_wr", "width": 1},
+                    {"name": "regarray_write_data_wr", "width": 16},
                 ],
             },
             # FIFO write wires
@@ -479,9 +479,9 @@ def setup(py_params_dict):
                                 "name": "regarray_write",
                                 "descr": "Write regarray with 4 registers",
                                 "mode": "W",
-                                "n_bits": 8, # register width
+                                "n_bits": 8,  # register width
                                 "rst_val": 0,
-                                "log2n_items": 2, # log number of items in the array
+                                "log2n_items": 2,  # log number of items in the array
                                 "asym": 2,  # Internal core interface twice the size as register width
                             },
                             {
@@ -490,7 +490,7 @@ def setup(py_params_dict):
                                 "mode": "R",
                                 "n_bits": 8,
                                 "rst_val": 0,
-                                "log2n_items": 2, # log number of items in the array
+                                "log2n_items": 2,  # log number of items in the array
                                 "asym": -2,  # Internal core interface half the size as register width
                             },
                         ],
@@ -507,9 +507,9 @@ def setup(py_params_dict):
                                 "descr": "Write FIFO",
                                 "type": "FIFO",
                                 "mode": "W",
-                                "n_bits": 8, # fifo item width
+                                "n_bits": 8,  # fifo item width
                                 "rst_val": 0,
-                                "log2n_items": 4, # log number of items in the fifo
+                                "log2n_items": 4,  # log number of items in the fifo
                                 "asym": -2,  # Internal core interface half the size as fifo item width
                             },
                         ],
@@ -523,9 +523,9 @@ def setup(py_params_dict):
                                 "descr": "Read FIFO",
                                 "type": "FIFO",
                                 "mode": "R",
-                                "n_bits": 8, # fifo item width
+                                "n_bits": 8,  # fifo item width
                                 "rst_val": 0,
-                                "log2n_items": 4, # log number of items in the fifo
+                                "log2n_items": 4,  # log number of items in the fifo
                                 "asym": 2,  # Internal core interface twice the size as fifo item width
                             },
                         ],
@@ -625,8 +625,8 @@ def setup(py_params_dict):
                     "single_write_o": "single_write",
                     "single_read_i": "single_read",
                     # regarray
-                    "regarray_write_io": "regarray_write",
-                    "regarray_read_io": "regarray_read",
+                    "regarray_write_read_io": "regarray_write",
+                    "regarray_read_write_i": "regarray_read",
                     # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
                     "fifo_write_read_io": "fifo_write_read",

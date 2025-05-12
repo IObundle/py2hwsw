@@ -28,7 +28,6 @@ module iob_uart_core (
    ////////////////////////////////////////////////////////
    // TX
    ////////////////////////////////////////////////////////
-   assign rs232_txd_o = tx_pattern[0];
 
    //clear to send (cts) synchronizer
    wire cts_int;
@@ -113,6 +112,7 @@ module iob_uart_core (
       .data_i(tx_pattern_nxt),
       .data_o(tx_pattern)
    );
+   assign rs232_txd_o = tx_pattern[0];
 
    iob_reg_care #(
       .DATA_W(4)

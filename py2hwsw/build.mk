@@ -102,13 +102,13 @@ sim-cov: sim-clean
 #
 FPGA_DIR=hardware/fpga
 fpga-build:
-	make -C $(FPGA_DIR) -j1 build
+	make -C $(FPGA_DIR) -j1 build USE_FPGA=$(USE_FPGA)
 
 fpga-run:
-	make -C $(FPGA_DIR) -j1 run
+	make -C $(FPGA_DIR) -j1 run USE_FPGA=$(USE_FPGA)
 
 fpga-test:
-	make -C $(FPGA_DIR) test
+	make -C $(FPGA_DIR) test USE_FPGA=$(USE_FPGA)
 
 fpga-debug:
 	echo "BOARD=$(BOARD)"

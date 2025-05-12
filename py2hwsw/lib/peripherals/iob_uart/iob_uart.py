@@ -163,6 +163,7 @@ def setup(py_params_dict):
                 -d 'Control/Status Registers' 
                 --no_autoaddr 
                 --rw_overlap 
+                --dest_dir 'hardware/src'
                 -c 
                     "clk_en_rst_s":"clk_en_rst_s"
                     "softreset_o":"softreset"

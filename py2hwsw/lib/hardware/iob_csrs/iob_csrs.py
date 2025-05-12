@@ -183,11 +183,21 @@ def setup(py_params_dict):
     }
 
     params["csrs"] = create_group_for_ungrouped_csrs(params["csrs"])
-    find_and_update_interrupt_csrs(params["csrs"])
-    find_and_update_fifo_csrs(params["csrs"], attributes_dict)
-    find_and_update_rom_csrs(params["csrs"], attributes_dict)
+
+    #
+    # Layer 1 CSRs: Adds support for special CSRs. All of these will be converted into Layer 0 CSRs with extra logic.
+    #
+    find_and_update_interrupt_csrs(params["csrs"])  # "INTERUPT"
+    find_and_update_fifo_csrs(params["csrs"], attributes_dict)  # "FIFO", "AFIFO"
+    find_and_update_rom_csrs(params["csrs"], attributes_dict)  # "ROM"
+    # "REG" with log2n_items > 0
     find_and_update_regarray_csrs(params["csrs"], attributes_dict)
+    # "NOAUTO" with autoclear = True
     find_and_update_autoclear_csrs(params["csrs"], attributes_dict)
+
+    #
+    # Layer 0 CSRs: From this point, params["csrs"] only contains basic Layer 0 CSRs: "REG", "NOAUTO"
+    #
 
     # Convert csrs dictionaries to objects
     csrs_obj_list = []

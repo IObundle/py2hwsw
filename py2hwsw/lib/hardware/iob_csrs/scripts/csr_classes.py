@@ -36,7 +36,7 @@ class iob_csr:
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
 
-        if self.type not in ["REG", "FIFO", "ROM", "NOAUTO", "INTERRUPT"]:
+        if self.type not in ["REG", "NOAUTO"]:
             # FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
             fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
 

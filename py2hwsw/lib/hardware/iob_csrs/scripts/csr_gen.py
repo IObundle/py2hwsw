@@ -294,6 +294,7 @@ class csr_gen:
         addr_w = self.calc_verilog_addr_w(log2n_items, n_bytes)
         auto = row.type != "NOAUTO"
         suffix = "" if row.internal_use else "_o"
+        suffix_i = "" if row.internal_use else "_i"
 
         lines = ""
         lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); AUTO: {auto}\n\n"
@@ -308,7 +309,6 @@ class csr_gen:
                 lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_min(1,{addr+2**addr_w}>>shift_amount));\n"
             else:
                 lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_min(1,({addr}+(2**({addr_w})))>>shift_amount));\n"
-
 
             n_items = 2 ** eval_param_expression_from_config(
                 log2n_items, self.config, "max"
@@ -347,6 +347,15 @@ class csr_gen:
                     ],
                 },
             )
+            wires.append(
+                {
+                    "name": f"{name}_rdata",
+                    "descr": "",
+                    "signals": [
+                        {"name": f"{name}_rdata", "width": self.verilog_max(n_bits, 1)},
+                    ],
+                },
+            )
             lines += f"    assign {name}_r_valid = internal_iob_valid & (!write_en & {name}_addressed_r);\n"
             lines += "    iob_reg_cae #(\n"
             lines += f"      .DATA_W({n_bits}),\n"
@@ -356,7 +365,7 @@ class csr_gen:
             lines += "      .cke_i  (cke_i),\n"
             lines += "      .arst_i (arst_i),\n"
             lines += f"      .en_i   ({name}_r_valid),\n"
-            lines += f"      .data_i ({name}{suffix}),\n"
+            lines += f"      .data_i ({name}{suffix_i}),\n"
             lines += f"      .data_o ({name}_rdata)\n"
             lines += "    );\n\n"
         else:  # not auto: output read enable
@@ -912,6 +921,9 @@ class csr_gen:
 
         # insert read register logic
         for row in table:
+            # version is not a register, it is an internal constant
+            if row.name == "version":
+                continue
             if "R" in row.mode:
                 _snippet, _wires = self.gen_rd_reg(row)
                 snippet += _snippet
@@ -1075,7 +1087,7 @@ class csr_gen:
                     pass
                 elif auto:
                     snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}{suffix};\n"
-                    snippet += f"assign byte_aligned_{name}{suffix} = {name}{suffix};\n"
+                    snippet += f"assign byte_aligned_{name}{suffix} = {name}_rdata;\n"
                 else:
                     snippet += (
                         f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata{suffix};\n"

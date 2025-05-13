@@ -81,6 +81,8 @@ class iob_comb(iob_snippet):
 
             if signal is None:
                 fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
+            else:
+                signal.isvar = True
 
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""

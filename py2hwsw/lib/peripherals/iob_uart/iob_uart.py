@@ -163,7 +163,6 @@ def setup(py_params_dict):
                 -d 'Control/Status Registers' 
                 --no_autoaddr 
                 --rw_overlap 
-                --dest_dir 'hardware/src'
                 -c 
                     "clk_en_rst_s":"clk_en_rst_s"
                     "softreset_o":"softreset"
@@ -217,12 +216,6 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
-            # uncomment the following block to reveal a bug in py2hwsw
-            #            {
-            #                "core_name": "iob_sync",
-            #                "instance_name": "iob_sync_inst",
-            #                "instantiate": False,
-            #            },
         ],
         "superblocks": [
             # Tester

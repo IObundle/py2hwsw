@@ -95,14 +95,14 @@ def setup(py_params_dict):
             "descr": "Address bus width",
         },
     ]
-    for conf in py_params_dict["instantiator"]["confs"]:
+    for conf in py_params_dict["instantiator"].get("confs", []):
         if conf["name"] == "ADDR_W" or conf["name"] in csr_if_params:
             continue
         confs.append(conf)
 
     # Append DATA_W parameter if not already present
     if "DATA_W" not in [
-        conf["name"] for conf in py_params_dict["instantiator"]["confs"]
+        conf["name"] for conf in py_params_dict["instantiator"].get("confs", [])
     ]:
         confs.append(
             {

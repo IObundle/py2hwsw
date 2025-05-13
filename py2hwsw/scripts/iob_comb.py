@@ -48,12 +48,14 @@ class iob_comb(iob_snippet):
                     signal_name,
                     process_func=generate_direction_process_func("output"),
                 )
+                signal.isvar = True
             elif signal_name.endswith("_io"):
                 signal = find_signal_in_wires(
                     core.ports,
                     signal_name,
                     process_func=generate_direction_process_func("inout"),
                 )
+                signal.isvar = True
             elif signal_name.endswith("_nxt"):
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name[:-4])
                 if not signal:
@@ -78,11 +80,10 @@ class iob_comb(iob_snippet):
                 signal.reg_signals.append("_en")
             else:
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name)
+                signal.isvar = True
 
             if signal is None:
                 fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
-            else:
-                signal.isvar = True
 
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""

@@ -59,7 +59,7 @@ module iob_csrs_demo_tb;
       .arst_i               (rst),
       // cbus_s port
       .iob_csrs_iob_valid_i (iob_valid_i),
-      .iob_csrs_iob_addr_i  (iob_addr_i[`IOB_CSRS_DEMO_CSRS_ADDR_W-1:2]),
+      .iob_csrs_iob_addr_i  (iob_addr_i),
       .iob_csrs_iob_wdata_i (iob_wdata_i),
       .iob_csrs_iob_wstrb_i (iob_wstrb_i),
       .iob_csrs_iob_rvalid_o(iob_rvalid_o),

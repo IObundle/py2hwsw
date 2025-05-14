@@ -769,7 +769,7 @@ class csr_gen:
             # "IOb" CSR_IF
             snippet += """
    assign internal_iob_valid = iob_valid_i;
-   assign internal_iob_addr = {iob_addr_i, 2'b0};
+   assign internal_iob_addr = iob_addr_i;
    assign internal_iob_wdata = iob_wdata_i;
    assign internal_iob_wstrb = iob_wstrb_i;
    assign internal_iob_rready = iob_rready_i;
@@ -790,12 +790,7 @@ class csr_gen:
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
-                        "apb_s": (
-                            "control_if_s",
-                            [
-                                "{apb_addr_i,2'b0}",
-                            ],
-                        ),
+                        "apb_s": "control_if_s",
                         "iob_m": "internal_iob",
                     },
                 }
@@ -813,13 +808,7 @@ class csr_gen:
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
-                        "axil_s": (
-                            "control_if_s",
-                            [
-                                "{axil_awaddr_i,2'b0}",
-                                "{axil_araddr_i,2'b0}",
-                            ],
-                        ),
+                        "axil_s": "control_if_s",
                         "iob_m": "internal_iob",
                     },
                 }
@@ -842,8 +831,6 @@ class csr_gen:
                         "axi_s": (
                             "control_if_s",
                             [
-                                "{axi_awaddr_i,2'b0}",
-                                "{axi_araddr_i,2'b0}",
                                 "axi_awlock_i[0]",
                                 "axi_arlock_i[0]",
                             ],
@@ -865,12 +852,7 @@ class csr_gen:
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
-                        "wb_s": (
-                            "control_if_s",
-                            [
-                                "{wb_adr_i,2'b0}",
-                            ],
-                        ),
+                        "wb_s": "control_if_s",
                         "iob_m": "internal_iob",
                     },
                 }

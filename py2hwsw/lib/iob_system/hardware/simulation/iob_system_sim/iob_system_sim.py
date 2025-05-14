@@ -143,7 +143,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": 1,
@@ -273,8 +273,6 @@ def setup(py_params_dict):
                     "axi_s": (
                         "axi",
                         [
-                            "{axi_araddr, 2'b0}",
-                            "{axi_awaddr, 2'b0}",
                             "{1'b0, axi_arlock}",
                             "{1'b0, axi_awlock}",
                         ],

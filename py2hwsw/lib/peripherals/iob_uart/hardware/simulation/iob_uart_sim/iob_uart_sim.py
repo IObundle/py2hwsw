@@ -63,7 +63,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": params["csr_if"],
                 "prefix": "internal_",
-                "ADDR_W": 3 - 2,  # Does not include 2 LSBs
+                "ADDR_W": 3,
             },
         },
     ]
@@ -91,18 +91,13 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2wishbone_coverter",
                 "instance_description": "Convert IOb port from testbench into Wishbone interface for UART CSRs bus",
                 "parameters": {
-                    "ADDR_W": 3 - 2,
+                    "ADDR_W": 3,
                     "DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "wb_m": "uart_cbus",
-                    "iob_s": (
-                        "uart_s",
-                        [
-                            "iob_addr_i[3-1:2]",
-                        ],
-                    ),
+                    "iob_s": "uart_s",
                 },
             }
         )
@@ -114,20 +109,15 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2apb_coverter",
                 "instance_description": "Convert IOb port from testbench into APB interface for UART CSRs bus",
                 "parameters": {
-                    "APB_ADDR_W": 3 - 2,
+                    "APB_ADDR_W": 3,
                     "APB_DATA_W": "DATA_W",
-                    "ADDR_W": 3 - 2,
+                    "ADDR_W": 3,
                     "DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "apb_m": "uart_cbus",
-                    "iob_s": (
-                        "uart_s",
-                        [
-                            "iob_addr_i[3-1:2]",
-                        ],
-                    ),
+                    "iob_s": "uart_s",
                 },
             }
         )
@@ -139,18 +129,13 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2axil_coverter",
                 "instance_description": "Convert IOb port from testbench into AXI-Lite interface for UART CSRs bus",
                 "parameters": {
-                    "AXIL_ADDR_W": 3 - 2,
+                    "AXIL_ADDR_W": 3,
                     "AXIL_DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "axil_m": "uart_cbus",
-                    "iob_s": (
-                        "uart_s",
-                        [
-                            "iob_addr_i[3-1:2]",
-                        ],
-                    ),
+                    "iob_s": "uart_s",
                 },
             }
         )
@@ -162,7 +147,7 @@ def setup(py_params_dict):
                 "instance_name": "iob_iob2axi_coverter",
                 "instance_description": "Convert IOb port from testbench into AXI interface for UART CSRs bus",
                 "parameters": {
-                    "ADDR_WIDTH": 3 - 2,
+                    "ADDR_WIDTH": 3,
                     "DATA_WIDTH": "DATA_W",
                     "AXI_ID_WIDTH": "AXI_ID_W",
                     "AXI_LEN_WIDTH": "AXI_LEN_W",
@@ -176,12 +161,7 @@ def setup(py_params_dict):
                             "axi_arlock_i[0]",
                         ],
                     ),
-                    "iob_s": (
-                        "uart_s",
-                        [
-                            "iob_addr_i[3-1:2]",
-                        ],
-                    ),
+                    "iob_s": "uart_s",
                 },
             }
         )
@@ -197,7 +177,7 @@ def setup(py_params_dict):
         snippet_code += """
    // Directly connect cbus IOb port to internal IOb wires
    assign internal_iob_valid = iob_valid_i;
-   assign internal_iob_addr = iob_addr_i[3-1:2]; // Ignore 2 LSBs
+   assign internal_iob_addr = iob_addr_i;
    assign internal_iob_wdata = iob_wdata_i;
    assign internal_iob_wstrb = iob_wstrb_i;
    assign internal_iob_rready = iob_rready_i;

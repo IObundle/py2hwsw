@@ -38,7 +38,7 @@ def setup(py_params_dict):
             "type": "P",
             "val": "4",
             "min": "1",
-            "max": "4",
+            "max": "8",
         },
         {
             "name": "AXI_DATA_W",
@@ -99,7 +99,7 @@ def setup(py_params_dict):
             "signals": [
                 {
                     "name": "length_i",
-                    "width": "AXI_LEN_W",
+                    "width": "(AXI_LEN_W+1)",
                     "descr": "Burst length minus 1",
                 },
                 {
@@ -232,7 +232,7 @@ def setup(py_params_dict):
         {
             "name": "length",
             "descr": "Length of the burst",
-            "signals": [{"name": "length_i", "width": "AXI_LEN_W"}],
+            "signals": [{"name": "length_i", "width": "(AXI_LEN_W+1)"}],
         },
         {
             "name": "w_level",
@@ -383,6 +383,14 @@ def setup(py_params_dict):
         },
     ]
 
+    # Simulation wrapper
+    superblocks = [
+        {
+            "core_name": "iob_iob_s_axi_m_sim",
+            "dest_dir": "hardware/simulation/src",
+        },
+    ]
+
     attributes_dict = {
         "generate_hw": True,
         "confs": confs,
@@ -390,6 +398,8 @@ def setup(py_params_dict):
         "wires": wires,
         "subblocks": subblocks,
         "fsm": fsm,
+        "snippets": snippets,
+        "superblocks": superblocks,
     }
 
     return attributes_dict

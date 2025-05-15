@@ -19,7 +19,9 @@ export LIB_DIR
 # Default lib module to setup. Can be overriden by the user.
 CORE ?=iob_ctls
 
-PY_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM)"
+CSR_IF?=iob
+
+PY_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM):csr_if=$(CSR_IF)"
 
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi

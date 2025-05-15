@@ -41,15 +41,16 @@ endfunction
 function [31:0] iob_abs;
    input [31:0] a;
    begin
-      if (a < 0) iob_abs = -a;
-      else iob_abs = a;
+      iob_abs = ($signed(a) >= 0) ? $signed(a) : -$signed(a);
    end
 endfunction
 
 function [31:0] iob_sign;
    input [31:0] a;
    begin
-      if (a < 0) iob_sign = -1;
-      else iob_sign = 1;
+      if ($signed(a) < 0)
+        iob_sign = -1;
+      else
+        iob_sign = 1;
    end
 endfunction

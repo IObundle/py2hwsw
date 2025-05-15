@@ -54,21 +54,18 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
     n_items = 2**log2n_items
     n_bits = csr_ref["n_bits"]
     asym = csr_ref.get("asym", 1)
-    asym_sign = f"iob_sign({asym})"
-    internal_n_bits = f"({n_bits} * ({asym}**{asym_sign}))"
+    internal_n_bits = (
+        f"($signed({asym}) > 0 ? ({n_bits} * {asym}) : ({n_bits} / iob_abs({asym})))"
+    )
     # external_n_bits = "DATA_W"
 
     wdata_w = n_bits if mode == "W" else internal_n_bits
     rdata_w = n_bits if mode == "R" else internal_n_bits
     waddr_w = (
-        log2n_items
-        if mode == "W"
-        else (f"{log2n_items} + {asym_sign} * $clog2(iob_abs({asym}))")
+        log2n_items if mode == "W" else (f"{log2n_items} + $clog2(iob_abs({asym}))")
     )
     raddr_w = (
-        log2n_items
-        if mode == "R"
-        else (f"{log2n_items} + {asym_sign} * $clog2(iob_abs({asym}))")
+        log2n_items if mode == "R" else (f"{log2n_items} + $clog2(iob_abs({asym}))")
     )
 
     #

@@ -216,12 +216,6 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
-            # uncomment the following block to reveal a bug in py2hwsw
-            #            {
-            #                "core_name": "iob_sync",
-            #                "instance_name": "iob_sync_inst",
-            #                "instantiate": False,
-            #            },
         ],
         "superblocks": [
             # Tester

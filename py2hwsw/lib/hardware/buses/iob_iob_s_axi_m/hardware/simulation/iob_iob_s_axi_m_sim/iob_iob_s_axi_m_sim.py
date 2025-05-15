@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 def setup(py_params_dict):
     attributes_dict = {
         "name": "iob_sim_wrapper",

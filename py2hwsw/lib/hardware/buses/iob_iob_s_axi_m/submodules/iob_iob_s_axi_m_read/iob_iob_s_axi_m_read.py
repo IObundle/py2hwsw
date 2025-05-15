@@ -22,7 +22,7 @@ def setup(py_params_dict):
                 "type": "P",
                 "val": "4",
                 "min": "1",
-                "max": "4",
+                "max": "8",
             },
             {
                 "name": "AXI_DATA_W",
@@ -106,7 +106,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "external_mem_bus_m",
+                "name": "read_fifo_external_mem_bus_m",
                 "descr": "Port for connection to external iob_ram_t2p memory",
                 "signals": {
                     "type": "ram_t2p",
@@ -198,7 +198,7 @@ def setup(py_params_dict):
                     "rst_i": "rst_i",
                     "write_io": "fifo_w_if",
                     "read_io": "fifo_r_if",
-                    "extmem_io": "external_mem_bus_m",
+                    "extmem_io": "read_fifo_external_mem_bus_m",
                     "fifo_o": "level_o",
                 },
             },

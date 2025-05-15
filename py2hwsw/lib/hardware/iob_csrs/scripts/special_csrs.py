@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from csr_classes import fail_with_msg
+from csr_gen import convert_int
 
 
 def find_and_update_autoclear_csrs(csrs_dict, attributes_dict):
@@ -52,21 +52,28 @@ def create_autoclear_instance(attributes_dict, csr_ref):
     descr = csr_ref["descr"]
     mode = csr_ref["mode"]
     width = csr_ref["n_bits"]
+    log2n_items = convert_int(csr_ref["log2n_items"])
     port_signals = []
     snippet = ""
     if "R" in mode:
         port_signals += [
             {"name": f"{name}_valid_o", "width": 1},
-            {"name": f"{name}_addr_o", "width": 1},
+        ]
+        if type(log2n_items) is not int or log2n_items > 0:
+            port_signals += [
+                {"name": f"{name}_addr_o", "width": log2n_items},
+            ]
+            snippet += f"""
+   assign {name}_addr_o = {name}_addr;
+"""
+        port_signals += [
             {"name": f"{name}_rvalid_i", "width": 1},
             {"name": f"{name}_rdata_i", "width": width},
             {"name": f"{name}_ready_i", "width": 1},
             {"name": f"{name}_rready_o", "width": 1},
         ]
         snippet += f"""
-   // Should these signals be registered?
    assign {name}_valid_o = {name}_valid;
-   assign {name}_addr_o = {name}_addr;
    // assign {name}_rdata = {name}_rdata_i;
    assign {name}_ready = {name}_ready_i;
 
@@ -83,15 +90,21 @@ def create_autoclear_instance(attributes_dict, csr_ref):
     if "W" in mode:
         port_signals += [
             {"name": f"{name}_valid_o", "width": 1},
-            {"name": f"{name}_addr_o", "width": 1},
+        ]
+        if type(log2n_items) is not int or log2n_items > 0:
+            port_signals += [
+                {"name": f"{name}_addr_o", "width": 1},
+            ]
+            snippet += f"""
+   assign {name}_addr_o = {name}_addr;
+"""
+        port_signals += [
             {"name": f"{name}_wdata_o", "width": width},
             {"name": f"{name}_wstrb_o", "width": f"{width}/8"},
             {"name": f"{name}_ready_i", "width": 1},
         ]
         snippet += f"""
-   // Should these signals be registered?
    assign {name}_valid_o = {name}_valid;
-   assign {name}_addr_o = {name}_addr;
    // assign {name}_wdata_o = {name}_wdata;
    assign {name}_wstrb_o = {name}_wstrb;
 

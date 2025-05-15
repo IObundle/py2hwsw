@@ -17,6 +17,17 @@ import re
 from csr_classes import iob_csr, iob_csr_group
 
 
+def convert_int(value):
+    """Try to convert given str (or int) to int. Otherwise return as is."""
+    if type(value) is int:
+        return value
+
+    try:
+        return int(value)
+    except ValueError:
+        return value
+
+
 def clog2(val):
     """Used by eval_param_expression"""
     return ceil(log2(val))
@@ -179,7 +190,7 @@ class csr_gen:
         name = row.name
         rst_val = int(row.rst_val)
         n_bits = row.n_bits
-        log2n_items = row.log2n_items
+        log2n_items = convert_int(row.log2n_items)
         n_bytes = self.bceil(n_bits, 3) / 8
         if n_bytes == 3:
             n_bytes = 4
@@ -274,7 +285,8 @@ class csr_gen:
                 lines += f"    assign {name}_addressed = (internal_iob_addr_stable >= ({addr})) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
 
             lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed;\n"
-            lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable;\n"
+            if type(log2n_items) is not int or log2n_items > 0:
+                lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable;\n"
             lines += f"   assign {name}_wstrb{suffix} = internal_iob_wstrb;\n"
             if suffix:
                 lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
@@ -286,7 +298,7 @@ class csr_gen:
         name = row.name
         rst_val = row.rst_val
         n_bits = row.n_bits
-        log2n_items = row.log2n_items
+        log2n_items = convert_int(row.log2n_items)
         n_bytes = self.bceil(n_bits, 3) / 8
         if n_bytes == 3:
             n_bytes = 4
@@ -383,7 +395,10 @@ class csr_gen:
 
                 # Create new valid and addr signals
                 lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed;\n"
-                lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable;\n"
+                if type(log2n_items) is not int or log2n_items > 0:
+                    lines += (
+                        f"   assign {name}_addr{suffix} = internal_iob_addr_stable;\n"
+                    )
 
             lines += (
                 f"    assign {name}_rready{suffix} = {name}_addressed & rready_int;\n"
@@ -482,7 +497,7 @@ class csr_gen:
             auto = row.type != "NOAUTO"
             addr = row.addr
             n_bits = row.n_bits
-            log2n_items = row.log2n_items
+            log2n_items = convert_int(row.log2n_items)
             n_items = 2 ** eval_param_expression_from_config(
                 log2n_items, self.config, "max"
             )
@@ -512,10 +527,15 @@ class csr_gen:
                             "name": f"{name}_valid_o",
                             "width": 1,
                         },
-                        {
-                            "name": f"{name}_addr_o",
-                            "width": log2n_items,
-                        },
+                    ]
+                    if type(log2n_items) is not int or log2n_items > 0:
+                        register_signals += [
+                            {
+                                "name": f"{name}_addr_o",
+                                "width": log2n_items,
+                            },
+                        ]
+                    register_signals += [
                         {
                             "name": f"{name}_wdata_o",
                             "width": self.verilog_max(n_bits, 1),
@@ -542,15 +562,22 @@ class csr_gen:
                     )
                     port_has_inputs = True
                 else:  # not auto
+                    # Valid, addr, and ready are shared with "W" mode. Don't create them if they already exist.
+                    if "W" not in row.mode:
+                        register_signals += [
+                            {
+                                "name": f"{name}_valid_o",
+                                "width": 1,
+                            },
+                        ]
+                        if type(log2n_items) is not int or log2n_items > 0:
+                            register_signals += [
+                                {
+                                    "name": f"{name}_addr_o",
+                                    "width": log2n_items,
+                                },
+                            ]
                     register_signals += [
-                        {
-                            "name": f"{name}_valid_o",
-                            "width": 1,
-                        },
-                        {
-                            "name": f"{name}_addr_o",
-                            "width": log2n_items,
-                        },
                         {
                             "name": f"{name}_rdata_i",
                             "width": self.verilog_max(n_bits, 1),
@@ -559,10 +586,15 @@ class csr_gen:
                             "name": f"{name}_rready_o",
                             "width": 1,
                         },
-                        {
-                            "name": f"{name}_ready_i",
-                            "width": 1,
-                        },
+                    ]
+                    if "W" not in row.mode:
+                        register_signals += [
+                            {
+                                "name": f"{name}_ready_i",
+                                "width": 1,
+                            },
+                        ]
+                    register_signals += [
                         {
                             "name": f"{name}_rvalid_i",
                             "width": 1,

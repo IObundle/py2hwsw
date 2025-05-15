@@ -64,8 +64,9 @@ def setup(py_params_dict):
                 "name": "txdata",
                 "descr": "",
                 "signals": [
+                    {"name": "txdata_valid_wr", "width": 1},
                     {"name": "txdata_wdata_wr", "width": 8},
-                    {"name": "txdata_wen_wr", "width": 1},
+                    {"name": "txdata_wstrb_wr", "width": 1},
                     {"name": "txdata_ready_wr", "width": 1},
                 ],
             },
@@ -101,11 +102,11 @@ def setup(py_params_dict):
                 "name": "rxdata",
                 "descr": "",
                 "signals": [
+                    {"name": "rxdata_valid_rd", "width": 1},
                     {"name": "rxdata_rdata_rd", "width": 8},
-                    {"name": "rxdata_rvalid_rd", "width": 1},
                     {"name": "rxdata_rready_rd", "width": 1},
-                    {"name": "rxdata_ren_rd", "width": 1},
                     {"name": "rxdata_ready_rd", "width": 1},
+                    {"name": "rxdata_rvalid_rd", "width": 1},
                 ],
             },
             # RXDATA reg
@@ -152,7 +153,7 @@ def setup(py_params_dict):
                     {"name": "txdata_wdata_wr"},
                     {"name": "rxdata_rdata_rd"},
                     {"name": "txdata_wen_wr"},
-                    {"name": "rxdata_ren_rd"},
+                    {"name": "rxdata_valid_rd"},
                     {"name": "div_wr"},
                 ],
             },
@@ -216,12 +217,6 @@ def setup(py_params_dict):
                     "rs232_m": "rs232_m",
                 },
             },
-            # uncomment the following block to reveal a bug in py2hwsw
-            #            {
-            #                "core_name": "iob_sync",
-            #                "instance_name": "iob_sync_inst",
-            #                "instantiate": False,
-            #            },
         ],
         "superblocks": [
             # Tester
@@ -241,14 +236,15 @@ def setup(py_params_dict):
                 "verilog_code": """
     // txdata Manual logic
     assign txdata_ready_wr = 1'b1;
+    assign txdata_wen_wr = txdata_valid_wr & txdata_wstrb_wr;
 
     // rxdata Manual logic
     assign rxdata_ready_rd = 1'b1;
 
     // set rxdata on read enable, reset on (rready and rvalid)
-    assign rxdata_rvalid_en = rxdata_ren_rd;
+    assign rxdata_rvalid_en = rxdata_valid_rd;
     assign rxdata_rvalid_rst = rxdata_rvalid_rd & rxdata_rready_rd;
-    assign rxdata_rvalid_nxt = rxdata_ren_rd;
+    assign rxdata_rvalid_nxt = rxdata_valid_rd;
 """,
             },
         ],

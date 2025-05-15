@@ -14,7 +14,18 @@ def find_and_update_regarray_csrs(csrs_dict, attributes_dict):
     for csr_group in csrs_dict:
         csr_ref = None
         for csr in csr_group["regs"]:
-            if csr.get("type", "REG") == "REG" and csr.get("log2n_items", 0) > 0:
+            # Try to convert log2n_items to int
+            log2n_items = csr.get("log2n_items", 0)
+            try:
+                log2n_items = int(log2n_items)
+            except ValueError:
+                pass
+
+            # Reg arrays contain log2n_items > 0
+            # If log2n_items is not int, assume it is a verilog expression with parameters, so it likely is > 0
+            if csr.get("type", "REG") == "REG" and (
+                type(log2n_items) is not int or log2n_items > 0
+            ):
                 csr_group_ref = csr_group
                 csr_ref = csr
 
@@ -167,7 +178,10 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
                 "signals": [
                     {"name": f"{regarray_name}_wen", "width": 1},
                     # Wstrb unused. Connected to high in verilog snippet.
-                    {"name": f"{regarray_name}_w_strb", "width": "WDATA_W/8"},
+                    {
+                        "name": f"{regarray_name}_w_strb",
+                        "width": f"{REGARRAY_NAME}_W_DATA_W/8",
+                    },
                     # FIXME: Not using verilog parameters WADDR_W and WDATA_W because csr_gen later creates a reference with 'n_bits' width
                     # but it would be better to use verilog parameters so the core can override it if needed.
                     {"name": f"{regarray_name}_addr", "width": waddr_w},
@@ -220,7 +234,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
             {
                 "verilog_code": f"""
    // Write always connected to high
-   assign {regarray_name}_w_strb = {{WDATA_W/8{{1'b1}}}};
+   assign {regarray_name}_w_strb = {{{REGARRAY_NAME}_W_DATA_W/8{{1'b1}}}};
    // Always ready
    assign {regarray_name}_ready = 1'b1;
    // Generate wen signal

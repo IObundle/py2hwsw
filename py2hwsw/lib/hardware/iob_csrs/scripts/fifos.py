@@ -661,7 +661,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "verilog_code": f"""
    // Generate ren signal
-   assign {fifo_name}_data_ren = {fifo_name}_data_valid & ~|{fifo_name}_data_wstrb;
+   assign {fifo_name}_data_ren = {fifo_name}_data_valid;
 
 """,
             }

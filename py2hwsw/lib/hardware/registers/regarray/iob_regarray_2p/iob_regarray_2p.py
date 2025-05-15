@@ -73,6 +73,14 @@ def setup(py_params_dict):
                 "max": "NA",
                 "descr": "width of write strobe",
             },
+            {
+                "name": "WADDR_INT_W",
+                "type": "D",
+                "val": "(WADDR_W > ($clog2(DATA_W / 8) + 1)) ? WADDR_W : ($clog2(DATA_W / 8) + 1)",
+                "min": "0",
+                "max": "NA",
+                "descr": "reconstruct write address from waddr_i and wstrb_i",
+            },
         ],
         "ports": [
             {
@@ -127,12 +135,6 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-   //reconstruct write address from waddr_i and wstrb_i
-   localparam WADDR_INT_W = (WADDR_W > ($clog2(
-       DATA_W / 8
-   ) + 1)) ? WADDR_W : ($clog2(
-       DATA_W / 8
-   ) + 1);
    assign waddr_int = w_addr_i + waddr_incr;
 
    iob_ctls #(

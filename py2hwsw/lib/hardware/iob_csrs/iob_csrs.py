@@ -195,6 +195,10 @@ def setup(py_params_dict):
     # "NOAUTO" with autoclear = True
     find_and_update_autoclear_csrs(params["csrs"], attributes_dict)
 
+    # TODO: Support RAM and REGFILE. They are simmilar to regarray, but implement iob_rams.
+    #       If REGFILE, implements a ram inside csrs (should be used for small memories. Will generate LUTRAM in fpga).
+    #       If RAM, implements a ram outside of csrs (in memory wrapper).
+
     #
     # Layer 0 CSRs: From this point, params["csrs"] only contains basic Layer 0 CSRs: "REG", "NOAUTO"
     #

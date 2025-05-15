@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "STRB_WIDTH",
-                "type": "P",
+                "type": "D",
                 "val": "(DATA_WIDTH / 8)",
                 "min": "NA",
                 "max": "NA",

@@ -565,6 +565,14 @@ class iob_core(iob_module, iob_instance):
         if _signals["prefix"] == "":
             _signals.update({"prefix": f"{_name}_"})
         instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
+        # Add port also to attributes_dict
+        instantiator.attributes_dict["ports"].append(
+            {
+                "name": _name,
+                "signals": _signals,
+                "descr": port.descr,
+            }
+        )
         _port = find_obj_in_list(instantiator.ports + instantiator.wires, _name)
         port.connect_external(_port, bit_slices=[])
 

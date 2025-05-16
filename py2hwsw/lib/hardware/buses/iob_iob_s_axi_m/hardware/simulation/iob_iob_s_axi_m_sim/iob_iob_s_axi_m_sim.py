@@ -174,6 +174,16 @@ def setup(py_params_dict):
                 "descr": "Clock signal",
                 "signals": [{"name": "clk_i"}],
             },
+            {
+                "name": "axi_ram_ext_mem",
+                "descr": "AXI RAM external memory bus",
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "AXI_DATA_W",
+                },
+            },
         ],
         "subblocks": [
             {
@@ -237,6 +247,20 @@ def setup(py_params_dict):
                     "clk_i": "clk",
                     "rst_i": "soft_reset",
                     "axi_s": "axi_access",
+                    "external_mem_bus_m": "axi_ram_ext_mem",
+                },
+            },
+            {
+                "core_name": "iob_ram_t2p_be",
+                "instance_name": "iob_ram_t2p_be_inst",
+                "instance_description": "Memory for AXI RAM",
+                "parameters": {
+                    "HEXFILE": '"none"',
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "DATA_W",
+                },
+                "connect": {
+                    "ram_t2p_be_s": "axi_ram_ext_mem",
                 },
             },
         ],

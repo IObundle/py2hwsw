@@ -15,7 +15,6 @@
 `define IOB_NBYTES (DATA_W/8)
 `define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))
 `define IOB_NBYTES_W $clog2(`IOB_NBYTES)
-`define IOB_WORD_ADDR(ADDR) ((ADDR>>`IOB_NBYTES_W)<<`IOB_NBYTES_W)
 
 `define IOB_BYTE_OFFSET(ADDR) (ADDR%(32/8))
 
@@ -577,7 +576,7 @@ module iob_axis_s_axi_m_tb;
 
       begin
          @(posedge clk) #1 axis_in_iob_valid = 1;  //sync and assign
-         axis_in_iob_addr  = `IOB_WORD_ADDR(addr);
+         axis_in_iob_addr  = addr;
          axis_in_iob_wdata = `IOB_GET_WDATA(addr, data);
          axis_in_iob_wstrb = `IOB_GET_WSTRB(addr, width);
 
@@ -596,7 +595,7 @@ module iob_axis_s_axi_m_tb;
 
       begin
          @(posedge clk) #1 axis_in_iob_valid = 1;
-         axis_in_iob_addr  = `IOB_WORD_ADDR(addr);
+         axis_in_iob_addr  = addr;
          axis_in_iob_wstrb = 0;
 
          #1 while (!axis_in_iob_ready) #1;
@@ -617,7 +616,7 @@ module iob_axis_s_axi_m_tb;
 
       begin
          @(posedge clk) #1 axis_out_iob_valid = 1;  //sync and assign
-         axis_out_iob_addr  = `IOB_WORD_ADDR(addr);
+         axis_out_iob_addr  = addr;
          axis_out_iob_wdata = `IOB_GET_WDATA(addr, data);
          axis_out_iob_wstrb = `IOB_GET_WSTRB(addr, width);
 
@@ -636,7 +635,7 @@ module iob_axis_s_axi_m_tb;
 
       begin
          @(posedge clk) #1 axis_out_iob_valid = 1;
-         axis_out_iob_addr  = `IOB_WORD_ADDR(addr);
+         axis_out_iob_addr  = addr;
          axis_out_iob_wstrb = 0;
 
          #1 while (!axis_out_iob_ready) #1;

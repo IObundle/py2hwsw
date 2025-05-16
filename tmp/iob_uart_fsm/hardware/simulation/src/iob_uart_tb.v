@@ -11,7 +11,6 @@
 `define IOB_NBYTES (32/8)
 `define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))
 `define IOB_NBYTES_W $clog2(`IOB_NBYTES)
-`define IOB_WORD_ADDR(ADDR) ((ADDR>>`IOB_NBYTES_W)<<`IOB_NBYTES_W)
 
 `define IOB_BYTE_OFFSET(ADDR) (ADDR%(32/8))
 
@@ -188,7 +187,7 @@ module iob_uart_tb;
 
       begin
          @(posedge clk) #1 iob_valid_i = 1;  //sync and assign
-         iob_addr_i  = `IOB_WORD_ADDR(addr);
+         iob_addr_i  = addr;
          iob_wdata_i = `IOB_GET_WDATA(addr, data);
          iob_wstrb_i = `IOB_GET_WSTRB(addr, width);
 
@@ -207,7 +206,7 @@ module iob_uart_tb;
 
       begin
          @(posedge clk) #1 iob_valid_i = 1;
-         iob_addr_i  = `IOB_WORD_ADDR(addr);
+         iob_addr_i  = addr;
          iob_wstrb_i = 0;
 
          #1 while (!iob_ready_o) #1;

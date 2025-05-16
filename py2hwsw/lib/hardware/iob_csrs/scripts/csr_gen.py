@@ -329,6 +329,10 @@ class csr_gen:
                 n_items == 1
             ), "Regfiles (n_items > 1) cannot be generated with auto. This error is a bug, auto regfiles should be handled by previous scripts."
 
+            # version is not a register, it is an internal constant
+            if name == "version":
+                return lines, wires
+
             # fill remaining bits of reset value with 0s
             if isinstance(n_bits, str):
                 if rst_val != 0:
@@ -935,9 +939,6 @@ class csr_gen:
 
         # insert read register logic
         for row in table:
-            # version is not a register, it is an internal constant
-            if row.name == "version":
-                continue
             if "R" in row.mode:
                 _snippet, _wires = self.gen_rd_reg(row)
                 snippet += _snippet
@@ -1145,16 +1146,10 @@ class csr_gen:
             suffix = "" if row.internal_use else "_i"
 
             if "R" in row.mode:
-                aux_read_reg = self.aux_read_reg_case_name(row)
-
-                if self.bfloor(addr, addr_w_base) == self.bfloor(
-                    addr_last, addr_w_base
-                ):
-                    snippet += f"        {aux_read_reg} = (`IOB_WORD_ADDR(internal_iob_addr_stable) == {self.bfloor(addr, addr_w_base)});\n"
-                    snippet += f"        if({aux_read_reg}) "
-                else:
-                    snippet += f"            {aux_read_reg} = ((`IOB_WORD_ADDR(internal_iob_addr_stable) >= {self.bfloor(addr, addr_w_base)}) && (`IOB_WORD_ADDR(internal_iob_addr_stable) < {self.bfloor(addr_last, addr_w_base)}));\n"
-                    snippet += f"        if({aux_read_reg}) "
+                if auto:
+                    snippet += f"        if({name}_addressed_r) "
+                else:  # Not auto
+                    snippet += f"        if({name}_addressed) "
                 snippet += "begin\n"
                 if name == "version":
                     rst_val = row.rst_val

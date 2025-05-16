@@ -52,11 +52,11 @@ class iob_fsm(iob_comb):
                 )
             if loop["update"] != "":
                 _states[self.state_names[tag + "_endfor"]] = (
-                    f"{_states[self.state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+                    f"{_states[self.state_names[tag+'_endfor']]}\n{loop['update']};\nif ({loop['cond']}) begin\npcnt_nxt = {tag} + 1;\nend"
                 )
             else:
                 _states[self.state_names[tag + "_endfor"]] = (
-                    f"{_states[self.state_names[tag+'_endfor']]}\nif ({loop['cond']}) begin\npc_nxt = {tag} + 1;\nend"
+                    f"{_states[self.state_names[tag+'_endfor']]}\nif ({loop['cond']}) begin\npcnt_nxt = {tag} + 1;\nend"
                 )
         for i, state in enumerate(_states[:-1]):
             _states[i] = f"{i}: begin\n{state}\nend"

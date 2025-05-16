@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 def setup(py_params_dict):
     attributes_dict = {
         "name": "iob_sim_wrapper",
@@ -191,7 +192,7 @@ def setup(py_params_dict):
                 "addr_w": 20,
             },
             {
-                "core_name": "iob_iob_s_axi_m",
+                "core_name": "iob_memwrapper",
                 "instance_name": "uut_inst",
                 "instance_description": "Unit Under Test (UUT)",
                 "parameters": {

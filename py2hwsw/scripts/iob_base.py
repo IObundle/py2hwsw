@@ -285,7 +285,7 @@ def str_to_kwargs(attrs: list):
                         values = value.split(":")
                         for i in range(len(keys)):
                             kwargs[keys[i]] = values[i]
-                
+
         except Exception as e:
             print(
                 iob_colors.FAIL
@@ -552,7 +552,7 @@ def cat_file(path):
         None
     """
     try:
-        with open(path, 'r') as file:
+        with open(path, "r") as file:
             print(file.read())
     except FileNotFoundError:
         print(f"File '{path}' not found.")

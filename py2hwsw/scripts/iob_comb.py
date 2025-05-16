@@ -84,7 +84,7 @@ class iob_comb(iob_snippet):
 
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""
-        
+
         for wire in core.wires + core.ports:
             for signal_ref in wire.signals:
                 signal = get_real_signal(signal_ref)
@@ -96,7 +96,7 @@ class iob_comb(iob_snippet):
                         if port.interface:
                             if port.interface.type == "iob_clk":
                                 clk_if_name = port.name
-    
+
                     # Connect the register
                     connect = {
                         "clk_en_rst_s": clk_if_name,
@@ -126,7 +126,7 @@ class iob_comb(iob_snippet):
                             name=signal.name,
                             signals=[{"name": signal.name}],
                         )
-                    
+
                     _reg_signals = []
                     bit_slices = []
                     port_params = self.clk_if
@@ -143,7 +143,7 @@ class iob_comb(iob_snippet):
                         )
                         bit_slices.append(f"en_i:{signal.name}_en")
                         port_params = port_params + "_e"
-                    
+
                     if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
                             {

@@ -74,7 +74,12 @@ def escape_xml_special_chars(string):
     """
     if type(string) is not str:
         return string
-    return string.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+    return (
+        string.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 class Parameter:
@@ -136,7 +141,17 @@ class SwRegister:
     """
 
     def __init__(
-        self, name, address, hw_size, access, rst, rst_val, volatile, description, parameters_list, fields
+        self,
+        name,
+        address,
+        hw_size,
+        access,
+        rst,
+        rst_val,
+        volatile,
+        description,
+        parameters_list,
+        fields,
     ):
         self.name = name
         self.address = address

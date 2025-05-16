@@ -46,6 +46,13 @@ def setup(py_params_dict):
                 ],
             },
             {
+                "name": "en_int",
+                "descr": "Enable internal",
+                "signals": [
+                    {"name": "en_int", "width": 1},
+                ],
+            },
+            {
                 "name": "load",
                 "descr": "Load",
                 "signals": [
@@ -142,7 +149,8 @@ def setup(py_params_dict):
             "code": """
             mul1_nxt = a*b;
             mul2_nxt = mul1;
-            enp_nxt = en & ~enp;
+            en_int_nxt = en;
+            enp = en & ~en_int;
             acc_nxt = done[2]? (load? mul2: mul2+acc): acc;
             done_nxt = {done[1], done[0], enp};
             done_int_nxt = enp? 1'b0: (done[2] | done_int);

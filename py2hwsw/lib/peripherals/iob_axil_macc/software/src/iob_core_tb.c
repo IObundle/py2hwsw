@@ -33,18 +33,20 @@ int iob_core_tb() {
     iob_axil_macc_csrs_set_en(0);
   }
 
-  int acc_hw = iob_axil_macc_csrs_get_done(0);
+  int acc_hw;
+  acc_hw = iob_axil_macc_csrs_get_c();
 
   // compute in sw
   int acc = 2;
   for (i = 0; i < 10; i++)
     acc += (i + 3) * (i + 4);
 
-  if (acc = acc_hw) {
+  if (acc == acc_hw) {
     printf("SW and HW computation match\n");
     return 0;
   } else {
     printf("Error: SW and HW computation do not match\n");
+    printf("Expected %d, got %d\n", acc, acc_hw);
     return 1;
   }
 }

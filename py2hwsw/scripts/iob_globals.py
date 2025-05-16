@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 from iob_base import fail_with_msg
 
-class iob_config:
+class iob_globals:
     _instance = None
     _is_set = False
 

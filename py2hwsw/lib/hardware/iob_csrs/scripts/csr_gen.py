@@ -1315,16 +1315,29 @@ class csr_gen:
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             addr = f"base + {core_prefix_upper}{name_upper}_ADDR"
             sw_type = self.csr_type(name, n_bytes)
+
+            # addr argument for regfiles
+            addr_arg = ""
+            addr_offset = ""
+            if addr_w / n_bytes > 1:
+                addr_arg = "int addr"
+                addr_offset = "+addr"
+
             if "W" in row.type:
-                fsw.write(f"void {core_prefix}set_{name}({sw_type} value) {{\n")
+                waddr_arg = ""
+                if addr_arg:
+                    waddr_arg = f", {addr_arg}"
                 fsw.write(
-                    f"  iob_write({addr}, {core_prefix_upper}{name_upper}_W, value);\n"
+                    f"void {core_prefix}set_{name}({sw_type} value{waddr_arg}) {{\n"
+                )
+                fsw.write(
+                    f"  iob_write({addr}{addr_offset}, {core_prefix_upper}{name_upper}_W, value);\n"
                 )
                 fsw.write("}\n\n")
             if "R" in row.type:
-                fsw.write(f"{sw_type} {core_prefix}get_{name}() {{\n")
+                fsw.write(f"{sw_type} {core_prefix}get_{name}({addr_arg}) {{\n")
                 fsw.write(
-                    f"  return iob_read({addr}, {core_prefix_upper}{name_upper}_W);\n"
+                    f"  return iob_read({addr}{addr_offset}, {core_prefix_upper}{name_upper}_W);\n"
                 )
                 fsw.write("}\n\n")
         fsw.close()

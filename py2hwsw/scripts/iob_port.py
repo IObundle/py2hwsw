@@ -161,7 +161,7 @@ External connection '{wire.name}' has the following signals:
                 elif len(self.signals) != len(wire.signals):
                     newlinechar = "\n"
                     fail_with_msg(
-                        """Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
+                        f"""Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
 Port '{self.name}' has the following signals:
 {newlinechar.join("- " + signal.name for signal in self.signals)}
 

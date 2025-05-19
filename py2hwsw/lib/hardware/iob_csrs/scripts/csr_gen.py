@@ -318,9 +318,9 @@ class csr_gen:
             # test if addr and addr_w are int and substitute with their values
             # For (auto) REG, use special read strobe based on 'shift_amount'
             if isinstance(addr, int) and isinstance(addr_w, int):
-                lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_min(1,{addr+2**addr_w}>>shift_amount));\n"
+                lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_max(1,{addr+2**addr_w}>>shift_amount));\n"
             else:
-                lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_min(1,({addr}+(2**({addr_w})))>>shift_amount));\n"
+                lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_max(1,({addr}+(2**({addr_w})))>>shift_amount));\n"
 
             n_items = 2 ** eval_param_expression_from_config(
                 log2n_items, self.config, "max"

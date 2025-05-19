@@ -35,7 +35,7 @@ module iob_axil2iob #(
    reg [ADDR_W-1:0]    iob_addr_nxt;
    reg [WSTRB_W-1:0]   iob_wstrb_nxt;
    reg [DATA_W-1:0]    iob_wdata_nxt;
-   reg                 iob_rready_nxt;
+   assign iob_rready_o = 1'b1;
    
    
    always @* begin
@@ -43,17 +43,16 @@ module iob_axil2iob #(
       pc_nxt = pc+1'b1;
 
       //axil response
-      axil_arready_nxt = axil_arready_o;
+      axil_arready_nxt = 0;
       axil_rvalid_nxt = axil_rvalid_o;
       axil_rdata_nxt = axil_rdata_o;
-      axil_awready_nxt = axil_awready_o;
-      axil_wready_nxt = axil_wready_o;
+      axil_awready_nxt = 0;
+      axil_wready_nxt = 0;
       axil_bvalid_nxt = axil_bvalid_o;
 
       //iob command
       iob_valid_nxt = iob_valid_o;
       iob_addr_nxt = iob_addr_o;
-      iob_rready_nxt = iob_rready_o;
       iob_wstrb_nxt = iob_wstrb_o;
       iob_wdata_nxt = iob_wdata_o;
 
@@ -81,7 +80,6 @@ module iob_axil2iob #(
            end
         end 
         1: begin //write: wait axil_wvalid
-           axil_awready_nxt = 1'b0;
            if(!axil_wvalid_i) begin
               pc_nxt = pc;
            end else begin
@@ -92,8 +90,6 @@ module iob_axil2iob #(
            end
         end
         2: begin //write: wait for iob_ready
-           axil_awready_nxt = 1'b0;
-           axil_wready_nxt = 1'b0;
            if(!iob_ready_i) begin
               pc_nxt = pc;
            end else begin
@@ -110,19 +106,16 @@ module iob_axil2iob #(
            end 
         end
         4: begin //read: wait for iob_ready
-           axil_arready_nxt = 1'b0;
            if(!iob_ready_i) begin
               pc_nxt = pc;
            end else begin
               iob_valid_nxt = 1'b0;
-              iob_rready_nxt = 1'b1;
            end
         end
         5: begin //read: wait for iob_rvalid
            if(!iob_rvalid_i) begin
               pc_nxt = pc;
            end else begin
-              iob_rready_nxt = 1'b0;
               axil_rvalid_nxt = 1'b1;
               axil_rdata_nxt = iob_rdata_i;
               pc_nxt = 3'd0;
@@ -182,17 +175,6 @@ module iob_axil2iob #(
                                  .arst_i(arst_i),
                                  .data_i(iob_valid_nxt),
                                  .data_o(iob_valid_o)
-                                 );
-
-   iob_reg_ca #(
-                .DATA_W (1),
-                .RST_VAL(0)
-                ) iob_reg_rready (
-                                 .clk_i (clk_i),
-                                 .cke_i (cke_i),
-                                 .arst_i(arst_i),
-                                 .data_i(iob_rready_nxt),
-                                 .data_o(iob_rready_o)
                                  );
 
    iob_reg_ca #(
@@ -271,6 +253,4 @@ module iob_axil2iob #(
                               .data_o(pc)
                               );
 
-   
-   
 endmodule

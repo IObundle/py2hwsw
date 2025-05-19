@@ -36,7 +36,7 @@ def setup(py_params_dict):
             "name": "AXI_LEN_W",
             "descr": "AXI burst length width",
             "type": "P",
-            "val": "4",
+            "val": "6",
             "min": "1",
             "max": "8",
         },
@@ -100,7 +100,7 @@ def setup(py_params_dict):
                 {
                     "name": "length_i",
                     "width": "(AXI_LEN_W+1)",
-                    "descr": "Burst length minus 1",
+                    "descr": "Burst length",
                 },
                 {
                     "name": "w_level_o",

@@ -14,7 +14,7 @@ void iob_s_axi_m_controller_init_baseaddr(uint32_t addr) {
   iob_s_axi_m_sim_controller_csrs_init_baseaddr(addr);
 }
 
-void iob_axis_in_reset() {
+void iob_s_axi_m_reset() {
   iob_s_axi_m_sim_controller_csrs_set_soft_reset(1);
   iob_s_axi_m_sim_controller_csrs_set_soft_reset(0);
 }

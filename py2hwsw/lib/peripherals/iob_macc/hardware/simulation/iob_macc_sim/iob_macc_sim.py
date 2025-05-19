@@ -38,8 +38,8 @@ def setup(py_params_dict):
             },
         },
         {
-            "name": "axil_macc_s",
-            "descr": "Testbench axil_macc csrs interface",
+            "name": "macc_s",
+            "descr": "Testbench macc csrs interface",
             "signals": {
                 "type": "iob",
                 "ADDR_W": 4,
@@ -51,8 +51,8 @@ def setup(py_params_dict):
     #
     attributes_dict["wires"] = [
         {
-            "name": "axil_macc_cbus",
-            "descr": "Testbench axil_macc csrs bus",
+            "name": "macc_cbus",
+            "descr": "Testbench macc csrs bus",
             "signals": {
                 "type": params["csr_if"],
                 "prefix": "internal_",
@@ -65,13 +65,13 @@ def setup(py_params_dict):
     #
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_axil_macc",
-            "instance_name": "axil_macc_inst",
-            "instance_description": f"Unit Under Test (UUT) AXIL_MACC instance with '{params['csr_if']}' interface.",
+            "core_name": "iob_macc",
+            "instance_name": "macc_inst",
+            "instance_description": f"Unit Under Test (UUT) MACC instance with '{params['csr_if']}' interface.",
             "csr_if": params["csr_if"],
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "iob_csrs_cbus_s": "axil_macc_cbus",
+                "iob_csrs_cbus_s": "macc_cbus",
             },
         },
     ]
@@ -81,16 +81,16 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_iob2wishbone",
                 "instance_name": "iob_iob2wishbone_coverter",
-                "instance_description": "Convert IOb port from testbench into Wishbone interface for AXIL_MACC CSRs bus",
+                "instance_description": "Convert IOb port from testbench into Wishbone interface for MACC CSRs bus",
                 "parameters": {
                     "ADDR_W": 4,
                     "DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "wb_m": "axil_macc_cbus",
+                    "wb_m": "macc_cbus",
                     "iob_s": (
-                        "axil_macc_s",
+                        "macc_s",
                         [
                             "iob_addr_i[1:0]",
                         ],
@@ -104,7 +104,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_iob2apb",
                 "instance_name": "iob_iob2apb_coverter",
-                "instance_description": "Convert IOb port from testbench into APB interface for AXIL_MACC CSRs bus",
+                "instance_description": "Convert IOb port from testbench into APB interface for MACC CSRs bus",
                 "parameters": {
                     "APB_ADDR_W": 2,
                     "APB_DATA_W": "DATA_W",
@@ -113,9 +113,9 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "apb_m": "axil_macc_cbus",
+                    "apb_m": "macc_cbus",
                     "iob_s": (
-                        "axil_macc_s",
+                        "macc_s",
                         [
                             "iob_addr_i[3:2]",
                         ],
@@ -129,16 +129,16 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_iob2axil",
                 "instance_name": "iob_iob2axil_coverter",
-                "instance_description": "Convert IOb port from testbench into AXI-Lite interface for AXIL_MACC CSRs bus",
+                "instance_description": "Convert IOb port from testbench into AXI-Lite interface for MACC CSRs bus",
                 "parameters": {
                     "AXIL_ADDR_W": 2,
                     "AXIL_DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "axil_m": "axil_macc_cbus",
+                    "axil_m": "macc_cbus",
                     "iob_s": (
-                        "axil_macc_s",
+                        "macc_s",
                         [
                             "iob_addr_i[3:2]",
                         ],
@@ -152,7 +152,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_iob2axi",
                 "instance_name": "iob_iob2axi_coverter",
-                "instance_description": "Convert IOb port from testbench into AXI interface for AXIL_MACC CSRs bus",
+                "instance_description": "Convert IOb port from testbench into AXI interface for MACC CSRs bus",
                 "parameters": {
                     "ADDR_WIDTH": 2,
                     "DATA_WIDTH": "DATA_W",
@@ -162,14 +162,14 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "axi_m": (
-                        "axil_macc_cbus",
+                        "macc_cbus",
                         [
                             "axi_awlock_i[0]",
                             "axi_arlock_i[0]",
                         ],
                     ),
                     "iob_s": (
-                        "axil_macc_s",
+                        "macc_s",
                         [
                             "iob_addr_i[3:2]",
                         ],

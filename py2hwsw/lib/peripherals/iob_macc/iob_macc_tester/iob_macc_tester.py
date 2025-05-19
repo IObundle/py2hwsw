@@ -22,7 +22,7 @@ def setup(py_params_dict):
                     "iob_cyclonev_gt_dk",
                 ],
                 "subblocks": [
-                    # Since Tester already contains one iob_axil_macc peripheral by default
+                    # Since Tester already contains one iob_macc peripheral by default
                     # to communicate with the testbench/console, we will use it as the
                     # UUT and verify it by checking that the Tester messages are
                     # printed correctly. So there is no need for other verification

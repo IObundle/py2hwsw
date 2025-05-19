@@ -5,12 +5,12 @@
 
 def setup(py_params_dict):
     CSR_IF = py_params_dict["csr_if"] if "csr_if" in py_params_dict else "iob"
-    NAME = py_params_dict["name"] if "name" in py_params_dict else "iob_axil_macc"
+    NAME = py_params_dict["name"] if "name" in py_params_dict else "iob_macc"
     attributes_dict = {
         "name": NAME,
         "generate_hw": True,
         "board_list": ["iob_cyclonev_gt_dk", "iob_aes_ku040_db_g"],
-        "description": "The IObundle AXIL_MACC is a RISC-V-based Peripheral written in Verilog, which users can download for free, modify, simulate and implement in FPGA or ASIC. It is written in Verilog and includes a C software driver. The IObundle AXIL_MACC is a very compact IP that works at high clock rates if needed. It supports full-duplex operation and a configurable baud rate. The IObundle AXIL_MACC has a fixed configuration for the Start and Stop bits. More flexible licensable commercial versions are available upon request.",
+        "description": "The IObundle MACC is a RISC-V-based Peripheral written in Verilog, which users can download for free, modify, simulate and implement in FPGA or ASIC. It is written in Verilog and includes a C software driver. The IObundle MACC is a very compact IP that works at high clock rates if needed. It supports full-duplex operation and a configurable baud rate. The IObundle MACC has a fixed configuration for the Start and Stop bits. More flexible licensable commercial versions are available upon request.",
         "confs": [
             {
                 "name": "DATA_W",
@@ -122,8 +122,8 @@ def setup(py_params_dict):
                     "b_o":"b"
                     "c_i":"acc"
                 --csr_if {CSR_IF}
-                --csr-group axil_macc 
-                    -d 'AXIL_MACC software accessible registers' 
+                --csr-group macc 
+                    -d 'MACC software accessible registers' 
                         -r en:1 -t W -d 'Enable.'
                         -r done:1 -t R -d 'Done.'
                         -r load:1 -t W -d 'Load.'
@@ -135,12 +135,12 @@ def setup(py_params_dict):
         "superblocks": [
             # Tester
             {
-                "core_name": "iob_axil_macc_tester",
+                "core_name": "iob_macc_tester",
                 "dest_dir": "tester",
             },
             # Simulation wrapper
             {
-                "core_name": "iob_axil_macc_sim",
+                "core_name": "iob_macc_sim",
                 "dest_dir": "hardware/simulation/src",
                 "csr_if": CSR_IF,
             },

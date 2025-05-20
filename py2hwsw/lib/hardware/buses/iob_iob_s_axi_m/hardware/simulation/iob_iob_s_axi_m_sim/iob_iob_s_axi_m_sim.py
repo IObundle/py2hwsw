@@ -140,7 +140,7 @@ def setup(py_params_dict):
                 "descr": "Control signals",
                 "signals": [
                     {
-                        "name": "iob_s_axi_m_control_r_level",
+                        "name": "iob_s_axi_m_control_length",
                         "width": "(AXI_LEN_W+1)",
                     },
                     {
@@ -148,7 +148,7 @@ def setup(py_params_dict):
                         "width": "(AXI_LEN_W+1)",
                     },
                     {
-                        "name": "iob_s_axi_m_control_length",
+                        "name": "iob_s_axi_m_control_r_level",
                         "width": "(AXI_LEN_W+1)",
                     },
                 ],

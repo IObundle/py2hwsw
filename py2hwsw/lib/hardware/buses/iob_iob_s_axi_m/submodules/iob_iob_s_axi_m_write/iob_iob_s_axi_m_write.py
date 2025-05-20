@@ -154,11 +154,6 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "en_write",
-                "descr": "Enable signal for write operation",
-                "signals": [{"name": "en_write", "isvar": True}],
-            },
-            {
                 "name": "fifo2axis_clk_if",
                 "descr": "FIFO to AXI-Stream clock interface",
                 "signals": [
@@ -235,7 +230,7 @@ def setup(py_params_dict):
         "fsm": {
             "type": "fsm",
             "default_assignments": """
-        en_write = |write_strobe_i;
+        fifo_wen = |write_strobe_i;
         // Default assignments
         start_transfer = 1'b0;
         busy_o = 1'b0;
@@ -243,7 +238,7 @@ def setup(py_params_dict):
         """,
             "state_descriptions": """
         WAIT_DATA: // Start transfer when enough data is available in the FIFO
-            if (en_write && (level_o == (length_i - 1))) begin
+            if (level_o == length_i) begin
                 start_transfer = 1'b1;
                 en_fifo2axis = 1'b1;
                 busy_o = 1'b1;

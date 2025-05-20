@@ -17,11 +17,27 @@ module iob_axis_s_axi_m_write_int #(
    // Internal signals
    wire [   AXI_DATA_W-1:0] axi_wdata_nxt;
 
-
    // Instantiation wires
    wire [            2-1:0] state;
    wire [    AXI_LEN_W-1:0] transf_data_count;
    wire [(AXI_LEN_W+1)-1:0] length;
+
+   // FSM signals
+   reg                       transfer_count_rst;
+   reg                       transfer_count_incr;
+   reg                       axi_awvalid_nxt;
+   reg  [    AXI_ADDR_W-1:0] axi_awaddr_nxt;
+   reg  [     AXI_LEN_W-1:0] axi_awlen_nxt;
+   reg                       axi_wvalid_nxt;
+   reg                       axi_wlast_nxt;
+   reg  [             2-1:0] state_nxt;
+   reg  [ (AXI_LEN_W+1)-1:0] length_nxt;
+   reg  [(AXI_ADDR_W+1)-1:0] last_addr;
+   reg                       address_done_nxt;
+   reg                       data_done_nxt;
+   reg                       axis_in_ready_int;
+   wire                      address_done;
+   wire                      data_done;
 
    // Assignment to outputs
    // AXIS
@@ -40,23 +56,6 @@ module iob_axis_s_axi_m_write_int #(
 
    // Busy signal
    assign w_busy_o      = state != WAIT_START;
-
-   // FSM signals
-   reg                       transfer_count_rst;
-   reg                       transfer_count_incr;
-   reg                       axi_awvalid_nxt;
-   reg  [    AXI_ADDR_W-1:0] axi_awaddr_nxt;
-   reg  [     AXI_LEN_W-1:0] axi_awlen_nxt;
-   reg                       axi_wvalid_nxt;
-   reg                       axi_wlast_nxt;
-   reg  [             2-1:0] state_nxt;
-   reg  [ (AXI_LEN_W+1)-1:0] length_nxt;
-   reg  [(AXI_ADDR_W+1)-1:0] last_addr;
-   reg                       address_done_nxt;
-   reg                       data_done_nxt;
-   reg                       axis_in_ready_int;
-   wire                      address_done;
-   wire                      data_done;
 
    always @* begin
       // Calculate the last address of the burst using the normal burst length

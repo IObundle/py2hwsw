@@ -105,7 +105,7 @@ def create_rom_instance(attributes_dict, csr_ref):
 // Connect ROM to external memory signals
    assign {rom_name}_clk_o = clk_i;
    assign {rom_name}_en_o   = {rom_name}_ren;
-   assign {rom_name}_addr_o = {rom_name}_addr;
+   assign {rom_name}_addr_o = {rom_name}_addr[{rom_addr_w}-1:2];
    assign {rom_name}_rdata   = {rom_name}_r_data_i;
    assign {rom_name}_ready  = 1'b1;  // ROM is always ready
 

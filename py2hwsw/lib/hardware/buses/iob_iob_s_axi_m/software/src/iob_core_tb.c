@@ -59,5 +59,11 @@ int iob_core_tb() {
     }
   }
 
+  if (failed == 0) {
+    printf("Test passed\n");
+  } else {
+    printf("Test failed\n");
+  }
+
   return failed;
 }

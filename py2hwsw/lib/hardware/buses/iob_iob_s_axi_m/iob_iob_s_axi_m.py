@@ -198,7 +198,7 @@ def setup(py_params_dict):
             "descr": "Read data AXI-Stream signals",
             "signals": [
                 {"name": "iob_rvalid_o"},
-                {"name": "iob_ready_o"},
+                {"name": "iob_rready_i"},
                 {"name": "iob_rdata_o", "width": "DATA_W"},
             ],
         },
@@ -368,7 +368,7 @@ def setup(py_params_dict):
             end
 
         WAIT_READ_FINISH: // Wait for the read operation to finish
-            if (r_level_o == 0) begin
+            if ((r_level_o == 0) && (!iob_rvalid_o)) begin
                 state_nxt = WAIT_OPERATION;
             end
         """,

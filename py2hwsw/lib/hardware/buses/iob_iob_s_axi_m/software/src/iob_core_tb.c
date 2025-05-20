@@ -46,6 +46,9 @@ int iob_core_tb() {
     // wait
   }
 
+  printf("Write done\n");
+
+  printf("Read data from Converter\n");
   // read data loop
   for (i = 0; i < NWORDS; i = i + 1) {
     // read data

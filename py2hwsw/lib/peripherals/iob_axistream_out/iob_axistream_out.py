@@ -141,11 +141,19 @@ def setup(py_params_dict):
                 ],
             },
             {
+                "name": "data_wen_wr",
+                "descr": "",
+                "signals": [
+                    {"name": "data_wen_wr", "width": 1},
+                ],
+            },
+            {
                 "name": "data",
                 "descr": "",
                 "signals": [
+                    {"name": "data_valid_wr", "width": 1},
                     {"name": "data_wdata_wr", "width": 32},
-                    {"name": "data_wen_wr", "width": 1},
+                    {"name": "data_wstrb_wr", "width": 4},
                     {"name": "data_ready_wr", "width": 1},
                 ],
             },

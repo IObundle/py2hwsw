@@ -2,4 +2,4 @@
 //
 // SPDX-License-Identifier: MIT
 
-`define IOB_CSRS_ADDR_W 17
+`define IOB_CSRS_ADDR_W 20

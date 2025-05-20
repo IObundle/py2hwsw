@@ -5,7 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "name": "iob_sim_wrapper",
+        "name": "iob_uut",
         "generate_hw": True,
         "board_list": [],
         "confs": [
@@ -161,12 +161,21 @@ def setup(py_params_dict):
                 ],
             },
             {
+                "name": "split_control_csrs",
+                "descr": "Control/Status Registers interface",
+                "signals": {
+                    "type": "iob",
+                    "prefix": "split_control_",
+                    "ADDR_W": 16,
+                },
+            },
+            {
                 "name": "control_csrs",
                 "descr": "Control/Status Registers interface",
                 "signals": {
                     "type": "iob",
                     "prefix": "control_",
-                    "ADDR_W": 4,
+                    "ADDR_W": 2,
                 },
             },
             {
@@ -196,7 +205,7 @@ def setup(py_params_dict):
                     "reset_i": "split_reset",
                     "input_s": ("pbus_s", ["iob_addr_i[16:0]"]),
                     "output_0_m": "uut_access",
-                    "output_1_m": "control_csrs",
+                    "output_1_m": "split_control_csrs",
                 },
                 "num_outputs": 2,
                 "addr_w": 17,
@@ -223,7 +232,10 @@ def setup(py_params_dict):
                 "core_name": "iob_s_axi_m_sim_controller",
                 "instance_name": "iob_s_axi_m_sim_controller_inst",
                 "instance_description": "Length and levels controller",
-                "parameters": {"AXI_LEN_W": "AXI_LEN_W"},
+                "parameters": {
+                    "AXI_LEN_W": "AXI_LEN_W",
+                    "DATA_W": "AXI_DATA_W",
+                },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "iob_csrs_cbus_s": "control_csrs",
@@ -262,6 +274,20 @@ def setup(py_params_dict):
                 "connect": {
                     "ram_t2p_be_s": "axi_ram_ext_mem",
                 },
+            },
+        ],
+        "snippets": [
+            {
+                "verilog_code": """
+            assign control_iob_valid = split_control_iob_valid;
+            assign control_iob_addr = split_control_iob_addr[2+:2];
+            assign control_iob_wdata = split_control_iob_wdata;
+            assign control_iob_wstrb = split_control_iob_wstrb;
+            assign split_control_iob_rvalid = control_iob_rvalid;
+            assign split_control_iob_rdata = control_iob_rdata;
+            assign split_control_iob_ready = control_iob_ready;
+            assign control_iob_rready = split_control_iob_rready;
+            """
             },
         ],
     }

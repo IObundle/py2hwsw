@@ -15,6 +15,8 @@ from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
 from roms import find_and_update_rom_csrs
 from regarrays import find_and_update_regarray_csrs
+from regfiles import find_and_update_regfile_csrs
+from rams import find_and_update_ram_csrs
 from special_csrs import find_and_update_autoclear_csrs
 
 # Static (shared) dictionary to store reg tables of generated csrs
@@ -192,6 +194,8 @@ def setup(py_params_dict):
     find_and_update_rom_csrs(params["csrs"], attributes_dict)  # "ROM"
     # "REG" with log2n_items > 0
     find_and_update_regarray_csrs(params["csrs"], attributes_dict)
+    # find_and_update_regfile_csrs(params["csrs"], attributes_dict)  # "REGFILE"
+    # find_and_update_ram_csrs(params["csrs"], attributes_dict)  # "RAM"
     # "NOAUTO" with autoclear = True
     find_and_update_autoclear_csrs(params["csrs"], attributes_dict)
 

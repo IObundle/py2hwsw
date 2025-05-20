@@ -154,11 +154,6 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "en_write",
-                "descr": "Enable signal for write operation",
-                "signals": [{"name": "en_write", "isvar": True}],
-            },
-            {
                 "name": "fifo2axis_clk_if",
                 "descr": "FIFO to AXI-Stream clock interface",
                 "signals": [
@@ -174,7 +169,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "start_addr_i", "width": "AXI_ADDR_W"},
                     {"name": "length_i", "width": "(AXI_LEN_W+1)"},
-                    {"name": "write_strobe_i", "width": "WSTRB_W"},
+                    {"name": "wstrb_int", "width": "WSTRB_W", "isvar": True},
                     {"name": "start_transfer"},
                     {"name": "write_busy"},
                 ],
@@ -235,15 +230,16 @@ def setup(py_params_dict):
         "fsm": {
             "type": "fsm",
             "default_assignments": """
-        en_write = |write_strobe_i;
+        fifo_wen = |write_strobe_i;
         // Default assignments
         start_transfer = 1'b0;
         busy_o = 1'b0;
         en_fifo2axis = 1'b0;
+        wstrb_int = {WSTRB_W{1'b0}};
         """,
             "state_descriptions": """
         WAIT_DATA: // Start transfer when enough data is available in the FIFO
-            if (en_write && (level_o == (length_i - 1))) begin
+            if (level_o == length_i) begin
                 start_transfer = 1'b1;
                 en_fifo2axis = 1'b1;
                 busy_o = 1'b1;
@@ -253,6 +249,7 @@ def setup(py_params_dict):
         TRANSF_DATA: // Transfer data
             busy_o = 1'b1;
             en_fifo2axis = 1'b1;
+            wstrb_int = {WSTRB_W{1'b1}};
             if (!write_busy) begin // Wait for the AXI write burst converter to finish
                 state_nxt = WAIT_DATA;
             end

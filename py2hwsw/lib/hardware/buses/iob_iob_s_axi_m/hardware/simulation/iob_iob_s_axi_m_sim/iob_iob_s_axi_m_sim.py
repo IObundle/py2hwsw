@@ -2,9 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
+
 def setup(py_params_dict):
     attributes_dict = {
-        "name": "iob_sim_wrapper",
+        "name": "iob_uut",
         "generate_hw": True,
         "board_list": [],
         "confs": [
@@ -37,7 +38,7 @@ def setup(py_params_dict):
                 "name": "AXI_LEN_W",
                 "descr": "AXI burst length width",
                 "type": "P",
-                "val": "4",
+                "val": "6",
                 "min": "1",
                 "max": "8",
             },
@@ -139,7 +140,7 @@ def setup(py_params_dict):
                 "descr": "Control signals",
                 "signals": [
                     {
-                        "name": "iob_s_axi_m_control_r_level",
+                        "name": "iob_s_axi_m_control_length",
                         "width": "(AXI_LEN_W+1)",
                     },
                     {
@@ -147,7 +148,7 @@ def setup(py_params_dict):
                         "width": "(AXI_LEN_W+1)",
                     },
                     {
-                        "name": "iob_s_axi_m_control_length",
+                        "name": "iob_s_axi_m_control_r_level",
                         "width": "(AXI_LEN_W+1)",
                     },
                 ],
@@ -160,18 +161,37 @@ def setup(py_params_dict):
                 ],
             },
             {
+                "name": "split_control_csrs",
+                "descr": "Control/Status Registers interface",
+                "signals": {
+                    "type": "iob",
+                    "prefix": "split_control_",
+                    "ADDR_W": 16,
+                },
+            },
+            {
                 "name": "control_csrs",
                 "descr": "Control/Status Registers interface",
                 "signals": {
                     "type": "iob",
                     "prefix": "control_",
-                    "ADDR_W": 4,
+                    "ADDR_W": 2,
                 },
             },
             {
                 "name": "clk",
                 "descr": "Clock signal",
                 "signals": [{"name": "clk_i"}],
+            },
+            {
+                "name": "axi_ram_ext_mem",
+                "descr": "AXI RAM external memory bus",
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "AXI_DATA_W",
+                },
             },
         ],
         "subblocks": [
@@ -183,15 +203,15 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": "pbus_s",
-                    "output_0_m": "control_csrs",
-                    "output_1_m": "uut_access",
+                    "input_s": ("pbus_s", ["iob_addr_i[16:0]"]),
+                    "output_0_m": "uut_access",
+                    "output_1_m": "split_control_csrs",
                 },
                 "num_outputs": 2,
-                "addr_w": 20,
+                "addr_w": 17,
             },
             {
-                "core_name": "iob_iob_s_axi_m",
+                "core_name": "iob_memwrapper",
                 "instance_name": "uut_inst",
                 "instance_description": "Unit Under Test (UUT)",
                 "parameters": {
@@ -212,7 +232,10 @@ def setup(py_params_dict):
                 "core_name": "iob_s_axi_m_sim_controller",
                 "instance_name": "iob_s_axi_m_sim_controller_inst",
                 "instance_description": "Length and levels controller",
-                "parameters": {"AXI_LEN_W": "AXI_LEN_W"},
+                "parameters": {
+                    "AXI_LEN_W": "AXI_LEN_W",
+                    "DATA_W": "AXI_DATA_W",
+                },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "iob_csrs_cbus_s": "control_csrs",
@@ -236,7 +259,35 @@ def setup(py_params_dict):
                     "clk_i": "clk",
                     "rst_i": "soft_reset",
                     "axi_s": "axi_access",
+                    "external_mem_bus_m": "axi_ram_ext_mem",
                 },
+            },
+            {
+                "core_name": "iob_ram_t2p_be",
+                "instance_name": "iob_ram_t2p_be_inst",
+                "instance_description": "Memory for AXI RAM",
+                "parameters": {
+                    "HEXFILE": '"none"',
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "DATA_W": "DATA_W",
+                },
+                "connect": {
+                    "ram_t2p_be_s": "axi_ram_ext_mem",
+                },
+            },
+        ],
+        "snippets": [
+            {
+                "verilog_code": """
+            assign control_iob_valid = split_control_iob_valid;
+            assign control_iob_addr = split_control_iob_addr[2+:2];
+            assign control_iob_wdata = split_control_iob_wdata;
+            assign control_iob_wstrb = split_control_iob_wstrb;
+            assign split_control_iob_rvalid = control_iob_rvalid;
+            assign split_control_iob_rdata = control_iob_rdata;
+            assign split_control_iob_ready = control_iob_ready;
+            assign control_iob_rready = split_control_iob_rready;
+            """
             },
         ],
     }

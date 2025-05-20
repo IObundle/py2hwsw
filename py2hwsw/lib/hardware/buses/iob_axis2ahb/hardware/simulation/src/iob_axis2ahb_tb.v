@@ -228,7 +228,7 @@ module iob_axis2ahb_tb;
       .sys_tready_i         (1'b0),
       // iob_csrs_cbus_s
       .iob_csrs_iob_valid_i (axis_in_iob_valid),
-      .iob_csrs_iob_addr_i  (axis_in_iob_addr[`IOB_AXISTREAM_IN_CSRS_ADDR_W-1:2]),
+      .iob_csrs_iob_addr_i  (axis_in_iob_addr),
       .iob_csrs_iob_wdata_i (axis_in_iob_wdata),
       .iob_csrs_iob_wstrb_i (axis_in_iob_wstrb),
       .iob_csrs_iob_rvalid_o(axis_in_iob_rvalid),
@@ -263,7 +263,7 @@ module iob_axis2ahb_tb;
       .sys_tready_o         (),
       // iob_csrs_cbus_s
       .iob_csrs_iob_valid_i (axis_out_iob_valid),
-      .iob_csrs_iob_addr_i  (axis_out_iob_addr[`IOB_AXISTREAM_IN_CSRS_ADDR_W-1:2]),
+      .iob_csrs_iob_addr_i  (axis_out_iob_addr),
       .iob_csrs_iob_wdata_i (axis_out_iob_wdata),
       .iob_csrs_iob_wstrb_i (axis_out_iob_wstrb),
       .iob_csrs_iob_rvalid_o(axis_out_iob_rvalid),

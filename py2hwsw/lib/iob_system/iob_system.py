@@ -228,7 +228,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "rom_sp",
                     "prefix": "bootrom_mem_",
-                    "ADDR_W": params["bootrom_addr_w"],
+                    "ADDR_W": params["bootrom_addr_w"] - 2,
                     "DATA_W": params["data_w"],
                 },
             },

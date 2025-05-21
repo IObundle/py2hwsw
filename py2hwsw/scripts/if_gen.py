@@ -600,6 +600,16 @@ def remove_duplicates(ports):
     return result
 
 
+# Memory symbols meaning:
+# SP: Single-Port read-write
+# 2P: 2-Port (one read, one write)
+# DP: Dual-Port (two read-write)
+# TDP/T2P: True (Dual-/2-)Port; Can perform transactions in both ports at the same time
+# ATDP/AT2P: Asynchronous ports
+# BE: byte-enable for each byte of data word
+# SE: Single enable for entire data word
+# Xil: Xilinx IP implementation
+
 @parse_widths
 def get_rom_2p_ports():
     ports = (

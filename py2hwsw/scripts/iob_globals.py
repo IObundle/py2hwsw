@@ -29,3 +29,10 @@ class iob_globals:
                 AttributeError,
             )
         super().__setattr__(key, value)
+
+def create_globals(global_values):
+    """
+    Create a singleton instance of iob_globals with the given attributes.
+    If the instance already exists, it will not be modified.
+    """
+    return iob_globals(**global_values)

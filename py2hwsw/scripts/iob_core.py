@@ -30,6 +30,7 @@ import ipxact_gen
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
 from if_gen import mem_if_names
+from iob_globals import iob_globals, create_globals
 from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
@@ -107,6 +108,13 @@ class iob_core(iob_module, iob_instance):
         iob_instance.__init__(self, *args, **kwargs)
         # Ensure global top module is set
         self.update_global_top_module(attributes)
+        self.set_default_attribute(
+            "globals",
+            None,
+            iob_globals,
+            create_globals,
+            descr="Immutable global values shared by all cores.",
+        )
         self.set_default_attribute(
             "version",
             PY2HWSW_VERSION,
@@ -750,6 +758,9 @@ class iob_core(iob_module, iob_instance):
         # For each attribute of the dictionary, check if there is a handler,
         # and use it to set the attribute
         for attr_name, attr_value in attributes.items():
+            if attr_name == "globals":
+                print(attr_value)
+                print(self.ATTRIBUTE_PROPERTIES["globals"])
             if attr_name in self.ATTRIBUTE_PROPERTIES:
                 self.ATTRIBUTE_PROPERTIES[attr_name].set_handler(attr_value),
             else:

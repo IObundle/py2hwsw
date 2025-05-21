@@ -19,7 +19,7 @@ class iob_conf:
 
     # Identifier name for the configuration option.
     name: str = ""
-    # Type of configuration option, either M (Verilog macro), P (Verilog parameter) or F (Verilog false-parameter).
+    # Type of configuration option, either M (Verilog macro), P (Verilog parameter), C (Constant) or D (Derived Parameter).
     # False-parameters are the same as verilog parameters except that the its value must not be overriden.
     type: str = ""
     # Value of the configuration option.

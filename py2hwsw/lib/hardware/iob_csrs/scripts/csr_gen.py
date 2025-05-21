@@ -484,11 +484,15 @@ class csr_gen:
                             "name": f"{name}_wen_o",
                             "width": 1,
                         },
-                        {
-                            "name": f"{name}_ready_i",
-                            "width": 1,
-                        },
                     ]
+                    # if "RW" type, ready added by "R" logic (keep ready as last signal)
+                    if "R" not in row.type:
+                        register_signals.append(
+                            {
+                                "name": f"{name}_ready_i",
+                                "width": 1,
+                            }
+                        )
                     port_has_inputs = True
                     port_has_outputs = True
             if "R" in row.type:
@@ -533,7 +537,7 @@ class csr_gen:
                         {
                             "name": f"{name}_ready_i",
                             "width": 1,
-                        },
+                        }
                     ]
                     port_has_inputs = True
                     port_has_outputs = True

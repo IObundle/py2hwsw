@@ -21,7 +21,7 @@ class iob_conf:
     name: str = ""
     # Type of configuration option, either M (Verilog macro), P (Verilog parameter), C (Constant) or D (Derived Parameter).
     # False-parameters are the same as verilog parameters except that the its value must not be overriden.
-    type: str = ""
+    type: str = "P"
     # Value of the configuration option.
     val: str | int | bool = ""
     # Minimum value supported by the configuration option (NA if not applicable).

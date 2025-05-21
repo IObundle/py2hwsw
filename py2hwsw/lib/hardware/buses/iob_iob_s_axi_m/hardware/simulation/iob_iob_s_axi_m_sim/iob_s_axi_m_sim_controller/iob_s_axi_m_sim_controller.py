@@ -15,6 +15,14 @@ def setup(py_params_dict):
                 "max": "8",
                 "descr": "AXI burst length width",
             },
+            {
+                "name": "DATA_W",
+                "type": "P",
+                "val": "32",
+                "min": "1",
+                "max": "32",
+                "descr": "AXI data bus width",
+            },
         ],
         "ports": [
             {
@@ -69,6 +77,9 @@ def setup(py_params_dict):
                 "core_name": "iob_csrs",
                 "instance_name": "iob_csrs",
                 "instance_description": "Control/Status Registers",
+                "parameters": {
+                    "AXI_LEN_W": "AXI_LEN_W",
+                },
                 "csrs": [
                     {
                         "name": "Control",

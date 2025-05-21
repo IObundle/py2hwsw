@@ -6,40 +6,30 @@
 def find_and_update_ram_csrs(csrs_dict, attributes_dict):
     """Given a dictionary of CSRs, find the ram CSRs group and update the dictionary
     accordingly.
-    User should provide a CSR of type "*RAM". This CSR will be replaced by ram_csrs.
+    RAMs use iob_dp_ram, with memories outside the csrs core.
     :param dict csrs_dict: Dictionary of CSRs to update.
     :param dict attributes_dict: Dictionary of core attributes to add ram instance, wires and ports.
     """
-    csr_group_ref = None
     for csr_group in csrs_dict:
         csr_ref = None
         for csr in csr_group["regs"]:
-            # Try to convert log2n_items to int
-            log2n_items = csr.get("log2n_items", 0)
-            try:
-                log2n_items = int(log2n_items)
-            except ValueError:
-                pass
-
-            # Reg arrays contain log2n_items > 0
-            # If log2n_items is not int, assume it is a verilog expression with parameters, so it likely is > 0
-            if csr.get("type", "REG") == "REG" and (
-                type(log2n_items) is not int or log2n_items > 0
-            ):
-                csr_group_ref = csr_group
+            if csr.get("type", "") == "RAM":
                 csr_ref = csr
+                break
 
-                # Replace original csr with "NOAUTO" type
-                csr_ref["type"] = "NOAUTO"
-                # Don't generate standard ports for this CSR.
-                # It will be internal to the CSRs module, and have a custom port generated later.
-                csr_ref["internal_use"] = True
+        if not csr_ref:
+            continue
 
-                if "R" in csr_ref["mode"]:
-                    create_ram_instance(attributes_dict, csr_ref, "R")
-                if "W" in csr_ref["mode"]:
-                    create_ram_instance(attributes_dict, csr_ref, "W")
-                # FIXME: If RW, make sure signals do not colide
+        # Replace original csr with "NOAUTO" type
+        csr_ref["type"] = "NOAUTO"
+        # Don't generate standard ports for this CSR.
+        # It will be internal to the CSRs module, and have a custom port generated later.
+        csr_ref["internal_use"] = True
+
+        if "R" in csr_ref["mode"]:
+            create_ram_instance(attributes_dict, csr_ref, "R")
+        if "W" in csr_ref["mode"]:
+            create_ram_instance(attributes_dict, csr_ref, "W")
 
 
 def create_ram_instance(attributes_dict, csr_ref, mode):
@@ -108,6 +98,7 @@ def create_ram_instance(attributes_dict, csr_ref, mode):
     ]
     #
     # Ports
+    #
     if mode == "R":
         attributes_dict["ports"] += [
             {

@@ -10,7 +10,6 @@ def find_and_update_regarray_csrs(csrs_dict, attributes_dict):
     :param dict csrs_dict: Dictionary of CSRs to update.
     :param dict attributes_dict: Dictionary of core attributes to add regarray instance, wires and ports.
     """
-    csr_group_ref = None
     for csr_group in csrs_dict:
         csr_ref = None
         for csr in csr_group["regs"]:
@@ -26,7 +25,6 @@ def find_and_update_regarray_csrs(csrs_dict, attributes_dict):
             if csr.get("type", "REG") == "REG" and (
                 type(log2n_items) is not int or log2n_items > 0
             ):
-                csr_group_ref = csr_group
                 csr_ref = csr
 
                 # Replace original csr with "NOAUTO" type
@@ -108,6 +106,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
     ]
     #
     # Ports
+    #
     if mode == "R":
         attributes_dict["ports"] += [
             {
@@ -158,7 +157,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
         )
     attributes_dict["wires"] += []
     #
-    # Wires
+    # Wires FIXME:
     #
     if mode == "W":
         attributes_dict["wires"] += [
@@ -204,7 +203,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
     #
     attributes_dict["subblocks"].append(
         {
-            "core_name": "iob_regarray_2p",
+            "core_name": "iob_ram_2p",
             "instance_name": regarray_name,
             "instance_description": f"REGARRAY {regarray_name}",
             "parameters": {
@@ -224,7 +223,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
         }
     )
     #
-    # Snippets
+    # Snippets FIXME:
     #
     if mode == "W":
         attributes_dict["snippets"].append(

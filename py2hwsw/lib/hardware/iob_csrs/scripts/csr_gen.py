@@ -537,7 +537,7 @@ class csr_gen:
                         {
                             "name": f"{name}_ready_i",
                             "width": 1,
-                        }
+                        },
                     ]
                     port_has_inputs = True
                     port_has_outputs = True

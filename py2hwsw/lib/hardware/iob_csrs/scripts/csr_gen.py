@@ -536,7 +536,7 @@ class csr_gen:
                         register_signals += [
                             {
                                 "name": f"{name}_addr_o",
-                                "width": log2n_items,
+                                "width": log2n_items + 2,
                             },
                         ]
                     register_signals += [
@@ -578,7 +578,7 @@ class csr_gen:
                             register_signals += [
                                 {
                                     "name": f"{name}_addr_o",
-                                    "width": log2n_items,
+                                    "width": log2n_items + 2,
                                 },
                             ]
                     register_signals += [

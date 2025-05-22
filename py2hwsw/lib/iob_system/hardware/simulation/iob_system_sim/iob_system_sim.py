@@ -152,7 +152,11 @@ def setup(py_params_dict):
             {
                 "name": "axi_ram_mem",
                 "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
-                "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                },
             },
         ]
     if params["use_ethernet"]:

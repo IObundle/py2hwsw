@@ -47,13 +47,19 @@ def setup(py_params_dict):
         }
         py_params_dict["dest_dir"] = "dummy_dest"
 
+    # by default use same version as instantiator
+    # use py2hwsw version as fallback
+    default_version = py_params_dict["py2hwsw_version"]
+    if "instantiator" in py_params_dict:
+        default_version = py_params_dict["instantiator"].get("version", default_version)
+
     params = {
         # Use the same name as instantiator + the suffix "_csrs"
         "name": py_params_dict["instantiator"]["name"] + "_csrs",
         # Destination directory
         "dest_dir": py_params_dict["dest_dir"],
-        # Version of the CSRs module (by default use same version as py2hwsw)
-        "version": py_params_dict["py2hwsw_version"],
+        # Version of the CSRs module (by default use instantiator version, py2hwsw as fallback)
+        "version": default_version,
         # Type of interface for CSR bus
         "csr_if": "iob",
         # List of Control Status Registers (CSRs)

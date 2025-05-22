@@ -286,7 +286,7 @@ class csr_gen:
 
             lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed & ~iob_ready_out;\n"
             if type(log2n_items) is not int or log2n_items > 0:
-                lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable;\n"
+                lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
             lines += f"   assign {name}_wstrb{suffix} = internal_iob_wstrb;\n"
             if suffix:
                 lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
@@ -400,9 +400,7 @@ class csr_gen:
                 # Create new valid and addr signals
                 lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed & ~write_en & ~iob_ready_out;\n"
                 if type(log2n_items) is not int or log2n_items > 0:
-                    lines += (
-                        f"   assign {name}_addr{suffix} = internal_iob_addr_stable;\n"
-                    )
+                    lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
 
             lines += (
                 f"    assign {name}_rready{suffix} = {name}_addressed & rready_int;\n"
@@ -508,6 +506,7 @@ class csr_gen:
             register_signals = []
             port_has_inputs = False
             port_has_outputs = False
+            num_byte_sel_bits = (ceil(n_bits / 8) - 1).bit_length()
 
             # version is not a register, it is an internal constant
             if name == "version":
@@ -536,7 +535,7 @@ class csr_gen:
                         register_signals += [
                             {
                                 "name": f"{name}_addr_o",
-                                "width": log2n_items + 2,
+                                "width": log2n_items + num_byte_sel_bits,
                             },
                         ]
                     register_signals += [
@@ -546,7 +545,7 @@ class csr_gen:
                         },
                         {
                             "name": f"{name}_wstrb_o",
-                            "width": self.verilog_max(n_bits / 8, 1),
+                            "width": self.verilog_max(num_byte_sel_bits, 1),
                         },
                         {
                             "name": f"{name}_ready_i",
@@ -578,7 +577,7 @@ class csr_gen:
                             register_signals += [
                                 {
                                     "name": f"{name}_addr_o",
-                                    "width": log2n_items + 2,
+                                    "width": log2n_items + num_byte_sel_bits,
                                 },
                             ]
                     register_signals += [

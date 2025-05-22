@@ -192,7 +192,10 @@ def setup(py_params_dict):
     find_and_update_interrupt_csrs(params["csrs"])  # "INTERUPT"
     find_and_update_fifo_csrs(params["csrs"], attributes_dict)  # "FIFO", "AFIFO"
     find_and_update_rom_csrs(params["csrs"], attributes_dict)  # "ROM"
-    # TODO: regarrays, regfiles, and rams should use iob_asym_converter to implement 'asym'
+    # FIXME:
+    # - regarrays, regfiles, and rams should use iob_asym_converter to implement 'asym'
+    # - auto csrs of type "RW" should be implemented with a single reg/regarray/ram, and have 2 read-write ports. One for the cpu and one for the core.
+    #
     # "REG" with log2n_items > 0
     find_and_update_regarray_csrs(params["csrs"], attributes_dict)
     # find_and_update_regfile_csrs(params["csrs"], attributes_dict)  # "REGFILE"

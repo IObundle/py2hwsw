@@ -157,7 +157,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
         )
     attributes_dict["wires"] += []
     #
-    # Wires FIXME:
+    # Wires
     #
     if mode == "W":
         attributes_dict["wires"] += [
@@ -178,7 +178,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
                         "name": f"{regarray_name}_w_strb",
                         "width": f"{REGARRAY_NAME}_W_DATA_W/8",
                     },
-                    # FIXME: Not using verilog parameters WADDR_W and WDATA_W because csr_gen later creates a reference with 'n_bits' width
+                    # FIXME: Not using verilog parameters WADDR_W and WDATA_W because csr_gen later creates a signal reference with 'n_bits' width (this throws an errror during setup if signals have different widths)
                     # but it would be better to use verilog parameters so the core can override it if needed.
                     {"name": f"{regarray_name}_addr", "width": waddr_w},
                     {"name": f"{regarray_name}_wdata", "width": wdata_w},
@@ -191,7 +191,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
                 "name": f"{regarray_name}_read_io",
                 "descr": "REGARRAY read interface.",
                 "signals": [
-                    # FIXME: Not using verilog parameters RADDR_W and RDATA_W because csr_gen later creates a reference with 'n_bits' width
+                    # FIXME: Not using verilog parameters RADDR_W and RDATA_W because csr_gen later creates a signal reference with 'n_bits' width (this throws an errror during setup if signals have different widths)
                     # but it would be better to use verilog parameters so the core can override it if needed.
                     {"name": f"{regarray_name}_addr", "width": raddr_w},
                     {"name": f"{regarray_name}_rdata", "width": rdata_w},
@@ -203,7 +203,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
     #
     attributes_dict["subblocks"].append(
         {
-            "core_name": "iob_ram_2p",
+            "core_name": "iob_regarray_2p",
             "instance_name": regarray_name,
             "instance_description": f"REGARRAY {regarray_name}",
             "parameters": {
@@ -223,7 +223,7 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
         }
     )
     #
-    # Snippets FIXME:
+    # Snippets
     #
     if mode == "W":
         attributes_dict["snippets"].append(

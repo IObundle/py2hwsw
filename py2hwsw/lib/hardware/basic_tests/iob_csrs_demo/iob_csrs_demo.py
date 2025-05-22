@@ -608,7 +608,7 @@ def setup(py_params_dict):
                             },
                         ],
                     },
-                    # Other supported types: "ROM", "INTERRUPT"
+                    # Other supported types: "ROM", "REGFILE", "RAM", "INTERRUPT"
                 ],
                 "csr_if": "iob",
                 "connect": {

@@ -62,22 +62,22 @@ module iob_axistream_in #(
    wire tlast_detected_reg;
 
    //CPU INTERFACE
-   assign data_ready_rd = int_tvalid;
-   assign interrupt_o = fifo_level_rd >= fifo_threshold_wr;
+   assign data_ready_rd  = int_tvalid;
+   assign interrupt_o    = fifo_level_rd >= fifo_threshold_wr;
    assign data_rvalid_rd = int_tvalid & (~mode_wr);
-   assign data_rdata_rd = int_tdata;
+   assign data_rdata_rd  = int_tdata;
 
    //System Stream output interface
    // System output valid only if in system stream mode
-   assign sys_tvalid_o = int_tvalid & mode_wr;
-   assign sys_tdata_o = int_tdata;
+   assign sys_tvalid_o   = int_tvalid & mode_wr;
+   assign sys_tdata_o    = int_tdata;
 
-   assign int_tready = (mode_wr) ? sys_tready_i : (data_valid_rd | reading_data) & data_rready_rd;
+   assign int_tready     = (mode_wr) ? sys_tready_i : data_rready_rd;
 
    // empty = fifo empty + no data in fifo2axis
-   assign fifo_empty_rd = fifo_empty & (~int_tvalid);
+   assign fifo_empty_rd  = fifo_empty & (~int_tvalid);
    // level = fifo level + data in fifo2axis
-   assign fifo_level_rd = fifo_level + int_tvalid;
+   assign fifo_level_rd  = fifo_level + int_tvalid;
 
    wire ready_int;
    // Ready if not full and, if in CSR mode, tlast not detected
@@ -240,20 +240,6 @@ module iob_axistream_in #(
       .arst_i(axis_arst_i),
       .data_i(axis_tlast_detected),
       .data_o(tlast_detected_reg)
-   );
-
-   // CPU read request
-   iob_reg_care #(
-      .DATA_W (1),
-      .RST_VAL(1'd0)
-   ) reading_data_reg (
-      .clk_i (clk_i),
-      .cke_i (cke_i),
-      .arst_i(arst_i),
-      .en_i  (data_valid_rd & data_ready_rd),
-      .rst_i (data_rvalid_rd & data_rready_rd),
-      .data_i(1'b1),
-      .data_o(reading_data)
    );
 
    //FIFOs RAM

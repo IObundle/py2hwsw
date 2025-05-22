@@ -141,17 +141,10 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "reading_data",
-                "descr": "",
-                "signals": [
-                    {"name": "enable_wr", "width": 1},
-                ],
-            },
-            {
                 "name": "data",
                 "descr": "",
                 "signals": [
-                    {"name": "data_valid_rd", "width": 1},  # Unused?
+                    {"name": "data_valid_rd", "width": 1},  # Unused
                     {"name": "data_rdata_rd", "width": 32},
                     {"name": "data_rready_rd", "width": 1},
                     {"name": "data_ready_rd", "width": 1},

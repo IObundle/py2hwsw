@@ -42,7 +42,7 @@ def eval_param_expression(param_expression, params_dict):
             for idx, word in enumerate(split_expression):
                 if word == param_name:
                     # Replace parameter/macro by its value
-                    split_expression[idx] = param_value
+                    split_expression[idx] = str(param_value)
                     # Remove '`' char if it was a macro
                     if idx > 0 and split_expression[idx - 1] == "`":
                         split_expression[idx - 1] = ""

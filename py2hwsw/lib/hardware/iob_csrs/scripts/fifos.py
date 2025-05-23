@@ -430,21 +430,6 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         "name": f"{fifo_name}_ext_mem_clk_o",
                         "width": 1,
                     },
-                    {
-                        "name": f"{fifo_name}_ext_mem_w_en_o",
-                        "width": f"{FIFO_NAME}_R",
-                        "descr": "Memory write enable",
-                    },
-                    {
-                        "name": f"{fifo_name}_ext_mem_w_addr_o",
-                        "width": f"{FIFO_NAME}_MINADDR_W",
-                        "descr": "Memory write address",
-                    },
-                    {
-                        "name": f"{fifo_name}_ext_mem_w_data_o",
-                        "width": f"{FIFO_NAME}_MAXDATA_W",
-                        "descr": "Memory write data",
-                    },
                     #  Read port
                     {
                         "name": f"{fifo_name}_ext_mem_r_en_o",
@@ -460,6 +445,22 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         "name": f"{fifo_name}_ext_mem_r_data_i",
                         "width": f"{FIFO_NAME}_MAXDATA_W",
                         "descr": "Memory read data",
+                    },
+                    # Write port
+                    {
+                        "name": f"{fifo_name}_ext_mem_w_en_o",
+                        "width": f"{FIFO_NAME}_R",
+                        "descr": "Memory write enable",
+                    },
+                    {
+                        "name": f"{fifo_name}_ext_mem_w_addr_o",
+                        "width": f"{FIFO_NAME}_MINADDR_W",
+                        "descr": "Memory write address",
+                    },
+                    {
+                        "name": f"{fifo_name}_ext_mem_w_data_o",
+                        "width": f"{FIFO_NAME}_MAXDATA_W",
+                        "descr": "Memory write data",
                     },
                 ],
             },

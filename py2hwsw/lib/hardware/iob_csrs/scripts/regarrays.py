@@ -209,10 +209,15 @@ def create_regarray_instance(attributes_dict, csr_ref, mode):
             "parameters": {
                 "N": n_items,  # number of registers
                 "W": n_bits,  # register width
-                "WDATA_W": f"{REGARRAY_NAME}_W_DATA_W",  # width of write data
-                "WADDR_W": f"{REGARRAY_NAME}_W_ADDR_W",  # width of write address
-                "RDATA_W": f"{REGARRAY_NAME}_R_DATA_W",  # width of read data
-                "RADDR_W": f"{REGARRAY_NAME}_R_ADDR_W",  # width of read address
+                "WDATA_W": n_bits,  # width of write data
+                "WADDR_W": log2n_items,  # width of write address
+                "RDATA_W": n_bits,  # width of read data
+                "RADDR_W": log2n_items,  # width of read address
+                # FIXME:: Below is causing regarray to be to large (icarus is stuck; verilator-lint throws error)
+                # "WDATA_W": f"{REGARRAY_NAME}_W_DATA_W",  # width of write data
+                # "WADDR_W": f"{REGARRAY_NAME}_W_ADDR_W",  # width of write address
+                # "RDATA_W": f"{REGARRAY_NAME}_R_DATA_W",  # width of read data
+                # "RADDR_W": f"{REGARRAY_NAME}_R_ADDR_W",  # width of read address
                 "DATA_W": "DATA_W",  # width of each register
             },
             "connect": {

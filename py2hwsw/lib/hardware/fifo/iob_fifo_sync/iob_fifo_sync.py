@@ -151,11 +151,6 @@ def setup(py_params_dict):
                     },
                     #  Read port
                     {
-                        "name": "ext_mem_r_data_i",
-                        "width": "MAXDATA_W",
-                        "descr": "Memory read data",
-                    },
-                    {
                         "name": "ext_mem_r_en_o",
                         "width": "R",
                         "descr": "Memory read enable",
@@ -165,11 +160,16 @@ def setup(py_params_dict):
                         "width": "MINADDR_W",
                         "descr": "Memory read address",
                     },
+                    {
+                        "name": "ext_mem_r_data_i",
+                        "width": "MAXDATA_W",
+                        "descr": "Memory read data",
+                    },
                     #  Write port
                     {
-                        "name": "ext_mem_w_data_o",
-                        "width": "MAXDATA_W",
-                        "descr": "Memory write data",
+                        "name": "ext_mem_w_en_o",
+                        "width": "R",
+                        "descr": "Memory write enable",
                     },
                     {
                         "name": "ext_mem_w_addr_o",
@@ -177,9 +177,9 @@ def setup(py_params_dict):
                         "descr": "Memory write address",
                     },
                     {
-                        "name": "ext_mem_w_en_o",
-                        "width": "R",
-                        "descr": "Memory write enable",
+                        "name": "ext_mem_w_data_o",
+                        "width": "MAXDATA_W",
+                        "descr": "Memory write data",
                     },
                 ],
             },
@@ -216,12 +216,14 @@ def setup(py_params_dict):
                 "instance_name": "iob_asym_converter_inst",
             },
             {
-                "core_name": "iob_ram_t2p",
-                "instance_name": "iob_ram_t2p_inst",
-            },
-            {
                 "core_name": "iob_functions",
                 "instance_name": "iob_functions_inst",
+            },
+            # For simulation
+            {
+                "core_name": "iob_ram_t2p",
+                "instance_name": "iob_ram_t2p_inst",
+                "dest_dir": "hardware/simulation/src",
             },
         ],
     }

@@ -5,6 +5,10 @@
 `timescale 1ns / 1ps
 `include "iob_csrs_demo_csrs_conf.vh"
 
+`define IOB_RESET(CLK, RESET, PRE, DURATION, POST) RESET=0;\
+   #PRE RESET=1; #DURATION RESET=0; #POST;\
+   @(posedge CLK) #1;
+
 module iob_csrs_demo_tb;
 
    localparam PER = 10;
@@ -29,9 +33,21 @@ module iob_csrs_demo_tb;
 
    initial begin
 `ifdef VCD
-      $dumpfile("iob_csrs_demo.vcd");
+      $dumpfile("uut.vcd");
       $dumpvars();
 `endif
+
+      rst          = 0;
+
+      // Initialize inputs
+      iob_valid_i  = 0;
+      iob_addr_i   = 0;
+      iob_wdata_i  = 0;
+      iob_wstrb_i  = 0;
+      iob_rready_i = 0;
+
+      //apply async reset
+      `IOB_RESET(clk, rst, 100, 1_000, 100);
 
       if (1) begin  // TODO: Check if passed
          $display("%c[1;34m", 27);

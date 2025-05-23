@@ -503,7 +503,8 @@ def setup(py_params_dict):
                                 "n_bits": 8,  # fifo item width
                                 "rst_val": 0,
                                 "log2n_items": 4,  # log number of items in the fifo
-                                "asym": -2,  # Internal core interface half the size as fifo item width
+                                # FIXME: For some reason negative 'asym' is causing issues with iob_asym_converter of FIFO
+                                # "asym": -2,  # Internal core interface half the size as fifo item width
                             },
                         ],
                     },

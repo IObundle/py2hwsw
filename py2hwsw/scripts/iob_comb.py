@@ -48,12 +48,14 @@ class iob_comb(iob_snippet):
                     signal_name,
                     process_func=generate_direction_process_func("output"),
                 )
+                signal.isvar = True
             elif signal_name.endswith("_io"):
                 signal = find_signal_in_wires(
                     core.ports,
                     signal_name,
                     process_func=generate_direction_process_func("inout"),
                 )
+                signal.isvar = True
             elif signal_name.endswith("_nxt"):
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name[:-4])
                 if not signal:
@@ -78,13 +80,14 @@ class iob_comb(iob_snippet):
                 signal.reg_signals.append("_en")
             else:
                 signal = find_signal_in_wires(core.wires + core.ports, signal_name)
+                signal.isvar = True
 
             if signal is None:
                 fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
 
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""
-        
+
         for wire in core.wires + core.ports:
             for signal_ref in wire.signals:
                 signal = get_real_signal(signal_ref)
@@ -96,7 +99,7 @@ class iob_comb(iob_snippet):
                         if port.interface:
                             if port.interface.type == "iob_clk":
                                 clk_if_name = port.name
-    
+
                     # Connect the register
                     connect = {
                         "clk_en_rst_s": clk_if_name,
@@ -126,7 +129,7 @@ class iob_comb(iob_snippet):
                             name=signal.name,
                             signals=[{"name": signal.name}],
                         )
-                    
+
                     _reg_signals = []
                     bit_slices = []
                     port_params = self.clk_if
@@ -143,7 +146,7 @@ class iob_comb(iob_snippet):
                         )
                         bit_slices.append(f"en_i:{signal.name}_en")
                         port_params = port_params + "_e"
-                    
+
                     if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
                         _reg_signals.append(
                             {

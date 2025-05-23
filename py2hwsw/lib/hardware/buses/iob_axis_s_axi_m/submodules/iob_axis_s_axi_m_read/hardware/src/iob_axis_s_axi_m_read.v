@@ -16,7 +16,7 @@ module iob_axis_s_axi_m_read #(
    localparam FIFO_MAX_LEVEL = 1 << AXI_LEN_W;
 
    // Calculate empty space in FIFO
-   wire [(AXI_ADDR_W+1)-1:0] fifo_level;
+   wire [(AXI_LEN_W+1)-1:0] fifo_level;
    wire [(AXI_LEN_W+1)-1:0] space_in_fifo = FIFO_MAX_LEVEL - fifo_level;
 
    wire [   AXI_DATA_W-1:0] fifo_wdata;
@@ -54,7 +54,7 @@ module iob_axis_s_axi_m_read #(
    iob_fifo_sync #(
       .W_DATA_W(AXI_DATA_W),
       .R_DATA_W(AXI_DATA_W),
-      .ADDR_W  (AXI_ADDR_W)
+      .ADDR_W  (AXI_LEN_W)
    ) buffer_inst (
       // Global signals
       .clk_i           (clk_i),

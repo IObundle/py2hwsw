@@ -445,7 +445,7 @@ class iob_core(iob_module, iob_instance):
             instantiator=kwargs.get("instantiator", None),
             connect=kwargs.get("connect", {}),
             parameters=kwargs.get("parameters", {}),
-            is_superblock=kwargs.get("is_superblock", False)
+            is_superblock=kwargs.get("is_superblock", False),
         )
 
         # Copy (some) parent attributes to child
@@ -565,6 +565,14 @@ class iob_core(iob_module, iob_instance):
         if _signals["prefix"] == "":
             _signals.update({"prefix": f"{_name}_"})
         instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
+        # Add port also to attributes_dict
+        instantiator.attributes_dict["ports"].append(
+            {
+                "name": _name,
+                "signals": _signals,
+                "descr": port.descr,
+            }
+        )
         _port = find_obj_in_list(instantiator.ports + instantiator.wires, _name)
         port.connect_external(_port, bit_slices=[])
 

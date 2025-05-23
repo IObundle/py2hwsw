@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
+
 
 def setup(py_params_dict):
     # Py2hwsw dictionary describing current core
@@ -31,5 +33,28 @@ def setup(py_params_dict):
             },
         },
     }
+
+    # Create symlinks to the UUT's (iob_uart) software sources inside the Tester's software folder
+    # Destination folder is Tester's software/src
+    DEST_DIR = os.path.join(
+        py_params_dict.get("build_dir"), py_params_dict.get("dest_dir"), "software/src"
+    )
+    # Source folder is relative path to core's software/src
+    SRC_DIR = os.path.relpath(
+        os.path.join(
+            py_params_dict.get("build_dir"),
+            "software/src",
+        ),
+        DEST_DIR,
+    )
+    os.makedirs(DEST_DIR, exist_ok=True)
+    os.symlink(
+        os.path.join(SRC_DIR, "iob_uart_csrs.c"),
+        os.path.join(DEST_DIR, "iob_uart_csrs.c"),
+    )
+    os.symlink(
+        os.path.join(SRC_DIR, "iob_uart_csrs.h"),
+        os.path.join(DEST_DIR, "iob_uart_csrs.h"),
+    )
 
     return core_dict

@@ -21,7 +21,7 @@ class iob_conf:
     name: str = ""
     # Type of configuration option, either M (Verilog macro), P (Verilog parameter), C (Constant) or D (Derived Parameter).
     # False-parameters are the same as verilog parameters except that the its value must not be overriden.
-    type: str = ""
+    type: str = "P"
     # Value of the configuration option.
     val: str | int | bool = ""
     # Minimum value supported by the configuration option (NA if not applicable).
@@ -39,9 +39,7 @@ class iob_conf:
     def __post_init__(self):
         if not self.name:
             fail_with_msg("Every conf must have a name!")
-        if not self.type:
-            fail_with_msg(f"Conf '{self.name}' must have a type!")
-        elif self.type not in ["P", "M", "C", "D"]:
+        if self.type not in ["P", "M", "C", "D"]:
             fail_with_msg(
                 f"Conf '{self.name}' type must be either P (Parameter), M (Macro), C (Constant) or D (Derived Parameter)!"
             )

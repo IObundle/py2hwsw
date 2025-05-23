@@ -442,6 +442,7 @@ def setup(py_params_dict):
                 "instance_name": "iob_csrs",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
+                    # Single registers
                     {
                         "name": "demo_single_csrs",
                         "descr": "demo software accessible registers.",
@@ -464,9 +465,7 @@ def setup(py_params_dict):
                             },
                         ],
                     },
-                    #
-                    # See commit 0fc91ac for info about regarrays
-                    #
+                    # Reg arrays
                     {
                         "name": "demo_regarrays",
                         "descr": "demo software accessible registers.",
@@ -491,9 +490,7 @@ def setup(py_params_dict):
                             },
                         ],
                     },
-                    #
-                    # See commit 925e7ad for info about FIFOs
-                    #
+                    # FIFO
                     {
                         "name": "demo_fifo_write",
                         "descr": "demo software accessible registers.",
@@ -526,6 +523,7 @@ def setup(py_params_dict):
                             },
                         ],
                     },
+                    # Asynchronous FIFO
                     {
                         "name": "demo_afifo_write",
                         "descr": "demo software accessible registers.",

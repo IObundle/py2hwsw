@@ -41,17 +41,6 @@ def version_str_to_digits(version_str):
     return f"{int(major_ver):02d}{int(minor_ver):02d}"
 
 
-def auto_setup_iob_ctls(core):
-    """Auto-add iob_ctls module to subblocks list"""
-    core["subblocks"].append(
-        {
-            "core_name": "iob_ctls",
-            "instance_name": "iob_ctls_inst",
-            "instantiate": False,
-        },
-    )
-
-
 def build_regs_table(core):
     """Build registers table.
     :returns csr_gen csr_gen_obj: Instance of csr_gen class
@@ -124,5 +113,4 @@ def generate_csr(core, create_files=True):
     if create_files:
         generate_csr_hw(core, csr_gen_obj, reg_table)
         generate_csr_sw(core, csr_gen_obj, reg_table)
-    auto_setup_iob_ctls(core)
     return csr_gen_obj, reg_table

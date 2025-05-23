@@ -654,89 +654,6 @@ class csr_gen:
         wires = []
         subblocks = []
         snippet = ""
-        # macros
-        snippet += """
-    // Include iob_functions for use in parameters
-    `include "iob_functions.vs"
-    `define IOB_NBYTES (DATA_W/8)
-    `define IOB_NBYTES_W $clog2(`IOB_NBYTES)
-    `define IOB_WORD_ADDR(ADDR) ((ADDR>>`IOB_NBYTES_W)<<`IOB_NBYTES_W)\n
-"""
-
-        snippet += """
-    localparam WSTRB_W = DATA_W/8;
-
-    //FSM states
-    localparam WAIT_REQ = 1'd0;
-    localparam WAIT_RVALID = 1'd1;
-"""
-        wires += [
-            {
-                "name": "internal_iob",
-                "descr": "Internal iob interface",
-                "signals": {
-                    "type": "iob",
-                    "prefix": "internal_",
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
-            },
-            {
-                "name": "state",
-                "descr": "",
-                "signals": [
-                    {"name": "state", "width": 1},
-                ],
-            },
-            {
-                "name": "state_nxt",
-                "descr": "",
-                "signals": [
-                    {"name": "state_nxt", "width": 1, "isvar": True, "isreg": True},
-                ],
-            },
-            {
-                "name": "write_en",
-                "descr": "",
-                "signals": [
-                    {"name": "write_en", "width": 1},
-                ],
-            },
-            {
-                "name": "internal_iob_addr",
-                "descr": "",
-                "signals": [
-                    {"name": "internal_iob_addr"},
-                ],
-            },
-            {
-                "name": "internal_iob_addr_stable",
-                "descr": "",
-                "signals": [
-                    {"name": "internal_iob_addr_stable", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "internal_iob_addr_reg",
-                "descr": "",
-                "signals": [
-                    {"name": "internal_iob_addr_reg", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "internal_iob_addr_reg_en",
-                "descr": "",
-                "signals": [
-                    {"name": "internal_iob_addr_reg_en", "width": 1},
-                ],
-            },
-        ]
-        snippet += """
-    assign internal_iob_addr_reg_en = (state == WAIT_REQ);
-    assign internal_iob_addr_stable = (state == WAIT_RVALID) ? internal_iob_addr_reg : internal_iob_addr;
-
-    assign write_en = |internal_iob_wstrb;
-"""
         # check if all registers are auto and add rready_int if not
         all_auto = True
         all_reads_auto = True
@@ -757,47 +674,6 @@ class csr_gen:
                     ],
                 }
             )
-
-        subblocks.append(
-            {
-                "core_name": "iob_reg",
-                "instance_name": "internal_addr_reg",
-                "instance_description": "store iob addr",
-                "parameters": {
-                    "DATA_W": "ADDR_W",
-                    "RST_VAL": "{ADDR_W{1'b0}}",
-                },
-                "port_params": {
-                    "clk_en_rst_s": "c_a_e",
-                },
-                "connect": {
-                    "clk_en_rst_s": (
-                        "clk_en_rst_s",
-                        [
-                            "en_i:internal_iob_addr_reg_en",
-                        ],
-                    ),
-                    "data_i": "internal_iob_addr",
-                    "data_o": "internal_iob_addr_reg",
-                },
-            }
-        )
-        subblocks.append(
-            {
-                "core_name": "iob_reg",
-                "instance_name": "state_reg",
-                "instance_description": "state register",
-                "parameters": {
-                    "DATA_W": 1,
-                    "RST_VAL": "1'b0",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "data_i": "state_nxt",
-                    "data_o": "state",
-                },
-            }
-        )
 
         # TODO: These converters should be handled by a single universal converter as specified in: https://github.com/IObundle/py2hwsw/issues/259
         if core_attributes["csr_if"] == "iob":
@@ -893,13 +769,6 @@ class csr_gen:
                 }
             )
 
-        # write address
-        snippet += "\n    //write address\n"
-
-        # extract address byte offset
-        snippet += "    wire [($clog2(WSTRB_W)+1)-1:0] byte_offset;\n"
-        snippet += "    iob_ctls #(.W(WSTRB_W), .MODE(0), .SYMBOL(0)) bo_inst (.data_i(internal_iob_wstrb), .count_o(byte_offset));\n"
-
         for row in table:
             if "W" in row.mode:
                 # compute write address based on write strobe (ignore LSBs)
@@ -946,15 +815,6 @@ class csr_gen:
         #
         # RESPONSE SWITCH
         #
-        snippet += "\n\n//RESPONSE SWITCH\n\n"
-
-        # use variables to compute response
-        snippet += """
-    assign internal_iob_rvalid = iob_rvalid_out;
-    assign internal_iob_rdata = iob_rdata_out;
-    assign internal_iob_ready = iob_ready_out;
-
-"""
         wires += [
             # iob_regs
             {

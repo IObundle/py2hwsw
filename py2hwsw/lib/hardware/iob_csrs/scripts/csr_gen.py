@@ -506,7 +506,10 @@ class csr_gen:
             register_signals = []
             port_has_inputs = False
             port_has_outputs = False
-            num_byte_sel_bits = (ceil(n_bits / 8) - 1).bit_length()
+            if type(n_bits) is int:
+                num_byte_sel_bits = (ceil(n_bits / 8) - 1).bit_length()
+            else:
+                num_byte_sel_bits = f"$clog2({n_bits}/8)"
 
             # version is not a register, it is an internal constant
             if name == "version":
@@ -545,7 +548,7 @@ class csr_gen:
                         },
                         {
                             "name": f"{name}_wstrb_o",
-                            "width": self.verilog_max(num_byte_sel_bits, 1),
+                            "width": self.verilog_max(n_bits / 8, 1),
                         },
                         {
                             "name": f"{name}_ready_i",

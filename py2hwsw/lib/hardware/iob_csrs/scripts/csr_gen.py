@@ -506,10 +506,15 @@ class csr_gen:
             register_signals = []
             port_has_inputs = False
             port_has_outputs = False
+            n_bits = convert_int(n_bits)
+            # Figure out how many bits needed to select each byte in the CSR word,
+            # and how many bits to address each byte in the entire CSR array
             if type(n_bits) is int:
                 num_byte_sel_bits = (ceil(n_bits / 8) - 1).bit_length()
+                internal_addr_w = log2n_items + num_byte_sel_bits
             else:
                 num_byte_sel_bits = f"$clog2({n_bits}/8)"
+                internal_addr_w = f"{log2n_items}+{num_byte_sel_bits}"
 
             # version is not a register, it is an internal constant
             if name == "version":
@@ -538,7 +543,7 @@ class csr_gen:
                         register_signals += [
                             {
                                 "name": f"{name}_addr_o",
-                                "width": log2n_items + num_byte_sel_bits,
+                                "width": internal_addr_w,
                             },
                         ]
                     register_signals += [
@@ -580,7 +585,7 @@ class csr_gen:
                             register_signals += [
                                 {
                                     "name": f"{name}_addr_o",
-                                    "width": log2n_items + num_byte_sel_bits,
+                                    "width": internal_addr_w,
                                 },
                             ]
                     register_signals += [

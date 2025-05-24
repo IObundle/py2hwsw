@@ -2,8 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
+import sys
+
+# set path for imports
+sys.path.append("../../../../scripts")
+from iob_globals import iob_globals
+
 
 def setup(py_params_dict):
+    reset_polarity = getattr(iob_globals(reset_polarity="negative"), "reset_polarity")
+    rst_signal = "arst_n_i" if reset_polarity == "negative" else "~arst_i"
     attributes_dict = {
         "generate_hw": True,
         "confs": [
@@ -46,7 +54,7 @@ def setup(py_params_dict):
         ],
         "snippets": [
             {
-                "verilog_code": """
+                "verilog_code": f"""
    AHB2MEM #(
       .MEMWIDTH(ADDR_WIDTH)
    ) ahb2bram_inst (
@@ -54,7 +62,7 @@ def setup(py_params_dict):
       .HSEL     (s_ahb_sel_i),
       // Global Signals
       .HCLK     (clk_i),
-      .HRESETn  (arst_n_i),
+      .HRESETn  ({rst_signal}),
       // Address, Control & Write Data
       .HREADY   (1'b1),
       .HADDR    (s_ahb_addr_i),

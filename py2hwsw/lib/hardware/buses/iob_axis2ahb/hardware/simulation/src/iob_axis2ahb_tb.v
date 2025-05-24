@@ -324,7 +324,7 @@ module iob_axis2ahb_tb;
    ) ahb_ram0 (
       // clk_en_rst_s
       .clk_i           (clk),
-      .arst_n_i        (~arst),
+      .arst_i        (arst),
       // ahb_s
       .s_ahb_addr_i    (ahb_addr),
       .s_ahb_burst_i   (ahb_burst),

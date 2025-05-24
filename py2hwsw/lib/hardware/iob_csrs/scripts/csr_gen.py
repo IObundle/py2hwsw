@@ -284,7 +284,7 @@ class csr_gen:
             else:
                 lines += f"    assign {name}_addressed = (internal_iob_addr_stable >= ({addr})) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
 
-            lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed & ~iob_ready_out;\n"
+            lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed;\n"
             if type(log2n_items) is not int or log2n_items > 0:
                 lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
             lines += f"   assign {name}_wstrb{suffix} = internal_iob_wstrb;\n"
@@ -398,7 +398,7 @@ class csr_gen:
                     lines += f"    assign {name}_addressed = (internal_iob_addr_stable >= ({addr})) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
 
                 # Create new valid and addr signals
-                lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed & ~write_en & ~iob_ready_out;\n"
+                lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed & ~write_en;\n"
                 if type(log2n_items) is not int or log2n_items > 0:
                     lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
 
@@ -882,16 +882,23 @@ class csr_gen:
             wires += [
                 {
                     "name": "rvalid_int",
-                    "descr": "",
+                    "descr": "Rvalid signal of currently addressed CSR",
                     "signals": [
                         {"name": "rvalid_int", "width": 1, "isvar": True},
                     ],
                 },
                 {
                     "name": "ready_int",
-                    "descr": "",
+                    "descr": "Ready signal of currently addressed CSR",
                     "signals": [
                         {"name": "ready_int", "width": 1, "isvar": True},
+                    ],
+                },
+                {
+                    "name": "auto_addressed",
+                    "descr": "Flag if an auto-register is currently addressed",
+                    "signals": [
+                        {"name": "auto_addressed", "width": 1, "isvar": True},
                     ],
                 },
             ]
@@ -976,6 +983,25 @@ class csr_gen:
                     )
                     snippet += f"assign byte_aligned_{name}_rdata{suffix} = {name}_rdata{suffix};\n"
 
+        # Response signals switch logic
+        if all_auto:
+            snippet += """
+    //RESPONSE SWITCH
+
+    assign internal_iob_rvalid = iob_rvalid_out;
+    assign internal_iob_rdata = iob_rdata_out;
+    assign internal_iob_ready = iob_ready_out;
+"""
+        else:  # Not all auto
+            snippet += """
+    //RESPONSE SWITCH
+
+    // Don't register response signals if accessing non-auto CSR
+    assign internal_iob_rvalid = auto_addressed ? iob_rvalid_out : rvalid_int;
+    assign internal_iob_rdata = auto_addressed ? iob_rdata_out : iob_rdata_nxt;
+    assign internal_iob_ready = auto_addressed ? iob_ready_out : ready_int;
+"""
+
         snippet += f"""
     always @* begin
         iob_rdata_nxt = {8*self.cpu_n_bytes}'d0;
@@ -984,6 +1010,9 @@ class csr_gen:
             snippet += f"""
         rvalid_int = 1'b1;
         ready_int = 1'b1;
+        if (internal_iob_valid) begin
+            auto_addressed = 1'b1;
+        end
 """
 
         # read register response
@@ -1030,6 +1059,11 @@ class csr_gen:
 """
                 if not auto:
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
+                    snippet += (
+                        "            if (internal_iob_valid & ~|internal_iob_wstrb) begin\n"
+                        "                auto_addressed = 1'b0;\n"
+                        "            end\n"
+                    )
                 snippet += "        end\n\n"
 
         # write register response
@@ -1049,9 +1083,13 @@ class csr_gen:
                 if not auto:
                     # get ready
                     snippet += f"        if((wstrb_addr >= {addr}) && (wstrb_addr < {addr + 2**addr_w})) begin\n"
+                    snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
-                        f"            ready_int = {name}_ready{suffix};\n        end\n"
+                        "            if (internal_iob_valid & |internal_iob_wstrb) begin\n"
+                        "                auto_addressed = 1'b0;\n"
+                        "            end\n"
                     )
+                    snippet += "        end\n\n"
 
         snippet += """
 

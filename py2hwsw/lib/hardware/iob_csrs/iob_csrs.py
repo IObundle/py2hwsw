@@ -311,14 +311,6 @@ def setup(py_params_dict):
     //write address
     wire [($clog2(WSTRB_W)+1)-1:0] byte_offset;
     iob_ctls #(.W(WSTRB_W), .MODE(0), .SYMBOL(0)) bo_inst (.data_i(internal_iob_wstrb), .count_o(byte_offset));
-
-
-    //RESPONSE SWITCH
-
-    assign internal_iob_rvalid = iob_rvalid_out;
-    assign internal_iob_rdata = iob_rdata_out;
-    assign internal_iob_ready = iob_ready_out;
-
 """
             }
         ],

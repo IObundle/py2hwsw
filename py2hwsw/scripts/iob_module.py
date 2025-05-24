@@ -7,6 +7,7 @@ from iob_conf import create_conf_group
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
+from iob_globals import iob_globals, create_globals
 from iob_comb import iob_comb, create_comb
 from iob_fsm import iob_fsm, create_fsm
 from iob_block import create_block_group, iob_block_group
@@ -35,6 +36,13 @@ class iob_module(iob_base):
             "Default description",
             str,
             descr="Description of the module",
+        )
+        self.set_default_attribute(
+            "reset_polarity",
+            None,
+            str,
+            self.set_rst_polarity,
+            "Reset polarity of the module. Can be 'positive' or 'negative'.",
         )
         # List of module macros and Verilog (false-)parameters
         self.set_default_attribute(
@@ -106,6 +114,9 @@ class iob_module(iob_base):
             get_list_attr_handler(self.create_sw_instance_group),
             "List of software modules required by this core.",
         )
+
+    def set_rst_polarity(self, polarity):
+        create_globals(self, "reset_polarity", polarity)
 
     def create_conf_group(self, *args, **kwargs):
         create_conf_group(self, *args, **kwargs)

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import sys
+
 sys.path.append("../../../scripts")
 from iob_globals import iob_globals
 
@@ -21,20 +22,13 @@ def setup(py_params_dict):
     # Remove duplicated entries
     clk_s_params = list(dict.fromkeys(clk_s_params))
 
-    global_params = "_".join([x for x in clk_s_params if x in ["c", "cn", "a", "an"]])
-    global_params = iob_globals(clk_params=global_params).clk_params.split("_")
-
-    # Set default values if not provided
-    if not any([x in global_params for x in ["c", "cn"]]):
-        global_params.append("c")
-    if not any([x in global_params for x in ["a", "an"]]):
-        global_params.append("a")
-
-    for g in global_params:
-        for p in clk_s_params:
-            if p.startswith(g[0]):
-                clk_s_params.remove(p)
-                clk_s_params.append(g)
+    # Impose global reset polarity
+    if any(x in clk_s_params for x in ["a", "an"]):
+        reset_polarity = "negative" if "an" in clk_s_params else "positive"
+        reset_polarity = iob_globals(reset_polarity=reset_polarity).reset_polarity
+        for i, p in enumerate(clk_s_params):
+            if p in ["a", "an"]:
+                clk_s_params[i] = "a" if reset_polarity == "positive" else "an"
 
     suffix_list = [
         "c",

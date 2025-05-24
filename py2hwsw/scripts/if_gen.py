@@ -433,19 +433,14 @@ def get_iob_clk_ports(params: str = None):
         raise ValueError(
             "All signals are mutually exclusive with their negated version"
         )
-    global_params = "_".join([x for x in params if x in ["c", "cn", "a", "an"]])
-    global_params = iob_globals(clk_params=global_params).clk_params.split("_")
-    # Set default values if not provided
-    if not any([x in global_params for x in ["c", "cn"]]):
-        global_params.append("c")
-    if not any([x in global_params for x in ["a", "an"]]):
-        global_params.append("a")
 
-    for g in global_params:
-        for p in params:
-            if p.startswith(g[0]):
-                params.remove(p)
-                params.append(g)
+    # Impose global reset polarity
+    if any(x in params for x in ["a", "an"]):
+        reset_polarity = "negative" if "an" in params else "positive"
+        reset_polarity = iob_globals(reset_polarity=reset_polarity).reset_polarity
+        for i, p in enumerate(params):
+            if p in ["a", "an"]:
+                params[i] = "a" if reset_polarity == "positive" else "an"
 
     ports = [
         iob_signal(

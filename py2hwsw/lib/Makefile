@@ -11,7 +11,8 @@ BUILD_DIR ?=build
 INIT_MEM ?= 1
 USE_EXTMEM ?= 0
 BOARD ?= iob_aes_ku040_db_g
- 
+#BOARD_SERIAL_PORT ?= /dev/ttyUSB1
+
 # Used by test.sh
 LIB_DIR:=.
 export LIB_DIR

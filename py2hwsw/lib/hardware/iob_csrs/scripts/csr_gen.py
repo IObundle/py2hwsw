@@ -198,6 +198,7 @@ class csr_gen:
         addr_w = self.calc_verilog_addr_w(log2n_items, n_bytes)
         auto = row.type != "NOAUTO"
         suffix = "" if row.internal_use else "_o"
+        suffix_i = "" if row.internal_use else "_i"
 
         lines = ""
         lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); AUTO: {auto}\n\n"
@@ -262,17 +263,56 @@ class csr_gen:
                 },
             )
             lines += f"    assign {name}_w_valid = internal_iob_valid & (write_en & {name}_addressed_w);\n"
-            lines += "    iob_reg_cae #(\n"
-            lines += f"      .DATA_W({n_bits}),\n"
-            lines += f"      .RST_VAL({rst_val_str})\n"
-            lines += f"    ) {name}_datareg_wr (\n"
-            lines += "      .clk_i  (clk_i),\n"
-            lines += "      .cke_i  (cke_i),\n"
-            lines += "      .arst_i (arst_i),\n"
-            lines += f"      .en_i   ({name}_w_valid),\n"
-            lines += f"      .data_i ({name}_wdata),\n"
-            lines += f"      .data_o ({name}{suffix})\n"
-            lines += "    );\n\n"
+
+            if "R" in row.mode:
+                # This is a "RW" CSR. Create logic to mux inputs and assign outputs of reg
+                wires += [
+                    {
+                        "name": f"{name}_reg_en",
+                        "descr": "",
+                        "signals": [
+                            {"name": f"{name}_reg_en", "width": 1},
+                        ],
+                    },
+                    {
+                        "name": f"{name}_reg_data",
+                        "descr": "",
+                        "signals": [
+                            {
+                                "name": f"{name}_reg_data",
+                                "width": self.verilog_max(n_bits, 1),
+                            },
+                        ],
+                    },
+                ]
+
+                lines += (
+                    f"    assign {name}_rdata = {name}{suffix};\n"
+                    f"    assign {name}_reg_en = {name}_w_valid | {name}_r_valid;\n"
+                    f"    assign {name}_reg_data = {name}_w_valid ? {name}_wdata : {name}{suffix_i};\n"
+                )
+
+            # Create reg
+            lines += (
+                "    iob_reg_cae #(\n"
+                f"      .DATA_W({n_bits}),\n"
+                f"      .RST_VAL({rst_val_str})\n"
+                f"    ) {name}_datareg_wr (\n"
+                "      .clk_i  (clk_i),\n"
+                "      .cke_i  (cke_i),\n"
+                "      .arst_i (arst_i),\n"
+            )
+            if "R" in row.mode:  # inputs of "RW" CSR
+                lines += (
+                    f"      .en_i   ({name}_reg_en),\n"
+                    f"      .data_i ({name}_reg_data),\n"
+                )
+            else:  # inputs of "W" CSR
+                lines += (
+                    f"      .en_i   ({name}_w_valid),\n"
+                    f"      .data_i ({name}_wdata),\n"
+                )
+            lines += f"      .data_o ({name}{suffix})\n" "    );\n\n"
         else:  # not auto: compute valid
             # signal to indicate if the register is addressed
             lines += f"    wire {name}_addressed;\n"
@@ -354,7 +394,7 @@ class csr_gen:
                     rst_val_str = "{" + str(n_bits) + "{1'd0}}"
             else:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
-            wires.append(
+            wires += [
                 {
                     "name": f"{name}_r_valid",
                     "descr": "",
@@ -362,8 +402,6 @@ class csr_gen:
                         {"name": f"{name}_r_valid", "width": 1},
                     ],
                 },
-            )
-            wires.append(
                 {
                     "name": f"{name}_rdata",
                     "descr": "",
@@ -371,19 +409,23 @@ class csr_gen:
                         {"name": f"{name}_rdata", "width": self.verilog_max(n_bits, 1)},
                     ],
                 },
-            )
+            ]
+
             lines += f"    assign {name}_r_valid = internal_iob_valid & (!write_en & {name}_addressed_r);\n"
-            lines += "    iob_reg_cae #(\n"
-            lines += f"      .DATA_W({n_bits}),\n"
-            lines += f"      .RST_VAL({rst_val_str})\n"
-            lines += f"    ) {name}_datareg_rd (\n"
-            lines += "      .clk_i  (clk_i),\n"
-            lines += "      .cke_i  (cke_i),\n"
-            lines += "      .arst_i (arst_i),\n"
-            lines += f"      .en_i   ({name}_r_valid),\n"
-            lines += f"      .data_i ({name}{suffix_i}),\n"
-            lines += f"      .data_o ({name}_rdata)\n"
-            lines += "    );\n\n"
+
+            # Create reg only if this is not a "RW" CSR. For "RW" we reuse CSR created previously.
+            if "W" not in row.mode:
+                lines += "    iob_reg_cae #(\n"
+                lines += f"      .DATA_W({n_bits}),\n"
+                lines += f"      .RST_VAL({rst_val_str})\n"
+                lines += f"    ) {name}_datareg_rd (\n"
+                lines += "      .clk_i  (clk_i),\n"
+                lines += "      .cke_i  (cke_i),\n"
+                lines += "      .arst_i (arst_i),\n"
+                lines += f"      .en_i   ({name}_r_valid),\n"
+                lines += f"      .data_i ({name}{suffix_i}),\n"
+                lines += f"      .data_o ({name}_rdata)\n"
+                lines += "    );\n\n"
         else:  # not auto: output read enable
             # If CSR is also "W", then use same valid and addr as generated by "W", otherwise create a new one
             if "W" not in row.mode:
@@ -571,6 +613,14 @@ class csr_gen:
                             "width": self.verilog_max(n_bits, 1),
                         }
                     )
+                    # If CSR mode is "RW", then also include a wen signal (to mux input of single RW CSR)
+                    if "W" in row.mode:
+                        register_signals.append(
+                            {
+                                "name": name + "_wen_i",
+                                "width": self.verilog_max(n_bits, 1),
+                            }
+                        )
                     port_has_inputs = True
                 else:  # not auto
                     # Valid, addr, and ready are shared with "W" mode. Don't create them if they already exist.

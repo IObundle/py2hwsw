@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 #  UART 1 / rx / uart_rxd
 set_property iostandard "LVCMOS33" [get_ports "uart_rxd"]
 set_property PACKAGE_PIN "V12" [get_ports "uart_rxd"]

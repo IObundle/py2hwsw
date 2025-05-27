@@ -41,6 +41,15 @@ def setup(py_params_dict):
                     {"name": "single_read_rd", "width": 1},
                 ],
             },
+            {
+                "name": "single_read_write",
+                "descr": "",
+                "signals": [
+                    {"name": "single_read_write_wrrd_o", "width": 1},
+                    {"name": "single_read_write_wrrd_i", "width": 1},
+                    {"name": "single_read_write_wrrd_wen", "width": 1},
+                ],
+            },
             # Regarray wires
             {
                 "name": "regarray_write",
@@ -463,6 +472,14 @@ def setup(py_params_dict):
                                 "rst_val": 0,
                                 "log2n_items": 0,
                             },
+                            {
+                                "name": "single_read_write",
+                                "descr": "Single read write register",
+                                "mode": "RW",
+                                "n_bits": 1,
+                                "rst_val": 0,
+                                "log2n_items": 0,
+                            },
                         ],
                     },
                     # Reg arrays
@@ -618,6 +635,7 @@ def setup(py_params_dict):
                     # Single registers
                     "single_write_o": "single_write",
                     "single_read_i": "single_read",
+                    "single_read_write_io": "single_read_write",
                     # regarray
                     "regarray_write_read_io": "regarray_write",
                     "regarray_read_write_i": "regarray_read",

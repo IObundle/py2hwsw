@@ -26,7 +26,7 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_rst_s",
+                "name": "clk_rst_i",
                 "signals": [
                     {"name": "clk_i", "descr": "Clock signal"},
                     {"name": "arst_n_i", "descr": "Asynchronous reset, active low"},

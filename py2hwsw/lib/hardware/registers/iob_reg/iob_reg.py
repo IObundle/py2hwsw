@@ -23,7 +23,7 @@ def setup(py_params_dict):
     clk_s_params = list(dict.fromkeys(clk_s_params))
 
     if any(x in clk_s_params for x in ["a", "an"]):
-        reset_polarity = getattr(iob_globals().reset_polarity, "NotSet")
+        reset_polarity = getattr(iob_globals(), "reset_polarity", "NotSet")
         for i, p in enumerate(clk_s_params):
             if p in ["a", "an"]:
                 if reset_polarity in ["positive", "negative"]:

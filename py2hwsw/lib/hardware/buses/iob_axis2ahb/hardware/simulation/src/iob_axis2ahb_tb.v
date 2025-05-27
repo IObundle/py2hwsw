@@ -322,7 +322,7 @@ module iob_axis2ahb_tb;
       .ADDR_WIDTH(MEM_ADDR_W),
       .DATA_WIDTH(DATA_W)
    ) ahb_ram0 (
-      // clk_en_rst_s
+      // clk_rst_s
       .clk_i           (clk),
       .arst_n_i        (~arst),
       // ahb_s

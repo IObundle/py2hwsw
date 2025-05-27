@@ -26,12 +26,12 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_en_rst_s",
-                "signals": {
-                    "type": "iob_clk",
-                    "params": "an",
-                },
-                "descr": "Clock, clock enable and reset",
+                "name": "clk_rst_s",
+                "signals": [
+                    {"name": "clk_i", "descr": "Clock signal"},
+                    {"name": "arst_n_i", "descr": "Asynchronous reset, active low"},
+                ],
+                "descr": "Clock and reset",
             },
             {
                 "name": "ahb_s",

@@ -1,13 +1,7 @@
-//Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
-//Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
-//--------------------------------------------------------------------------------
-//Tool Version: Vivado v.2024.2 (lin64) Build 5239630 Fri Nov 08 22:34:34 MST 2024
-//Date        : Mon May 19 22:40:48 2025
-//Host        : pastel-de-nata running 64-bit Ubuntu 22.04.5 LTS
-//Command     : generate_target design_1_wrapper.bd
-//Design      : design_1_wrapper
-//Purpose     : IP block netlist
-//--------------------------------------------------------------------------------
+// SPDX-FileCopyrightText: 2025 IObundle
+//
+// SPDX-License-Identifier: MIT
+
 `timescale 1 ps / 1 ps
 
 module iob_system_iob_zybo_z7 #(
@@ -39,7 +33,10 @@ module iob_system_iob_zybo_z7 #(
     FIXED_IO_mio,
     FIXED_IO_ps_clk,
     FIXED_IO_ps_porb,
-    FIXED_IO_ps_srstb);
+    FIXED_IO_ps_srstb,
+    uart_txd,
+    uart_rxd
+);
   inout [14:0]DDR_addr;
   inout [2:0]DDR_ba;
   inout DDR_cas_n;
@@ -61,6 +58,10 @@ module iob_system_iob_zybo_z7 #(
   inout FIXED_IO_ps_clk;
   inout FIXED_IO_ps_porb;
   inout FIXED_IO_ps_srstb;
+
+   // UART interface
+        output uart_txd;
+        input uart_rxd;
 
   wire [14:0]DDR_addr;
   wire [2:0]DDR_ba;
@@ -84,12 +85,10 @@ module iob_system_iob_zybo_z7 #(
   wire FIXED_IO_ps_porb;
   wire FIXED_IO_ps_srstb;
 
+   wire uart_txd;
+   wire uart_rxd;
    wire clk;
    wire arst_n;
-   wire cke= 1'b1;
-
-   wire rxd;
-   wire txd;
    
    processing_system7_0 processing_system7_0
      (
@@ -100,9 +99,6 @@ module iob_system_iob_zybo_z7 #(
       .FCLK_CLK0(clk),
       .FCLK_RESET0_N(arst_n),
       
-      .UART1_RX(txd),
-      .UART1_TX(rxd),
-
       .DDR_Addr(DDR_addr),
       .DDR_BankAddr(DDR_ba),
       .DDR_CAS_n(DDR_cas_n),
@@ -131,13 +127,13 @@ module iob_system_iob_zybo_z7 #(
     ) iob_memwrapper (
             // clk_en_rst_s port: Clock, clock enable and reset
         .clk_i(clk),
-        .cke_i(cke),
-        .arst_i(arst),
+        .cke_i(1'b1),
+        .arst_i(~arst_n),
         // rs232_m port: iob-system uart interface
-        .rs232_rxd_i(rxd),
-        .rs232_txd_o(txd),
+        .rs232_rxd_i(uart_rxd),
+        .rs232_txd_o(uart_txd),
         .rs232_rts_o(),
-        .rs232_cts_i()
+        .rs232_cts_i(1'b1)
         );
         
 endmodule

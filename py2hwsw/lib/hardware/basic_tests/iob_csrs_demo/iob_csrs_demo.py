@@ -422,6 +422,19 @@ def setup(py_params_dict):
                     {"name": "noauto_read_rvalid_rd", "width": 1},
                 ],
             },
+            {
+                "name": "noauto_read_write",
+                "descr": "",
+                "signals": [
+                    {"name": "noauto_read_write_valid_wrrd", "width": 1},
+                    {"name": "noauto_read_write_wdata_wrrd", "width": 1},
+                    {"name": "noauto_read_write_wstrb_wrrd", "width": 1},
+                    {"name": "noauto_read_write_ready_wrrd", "width": 1},
+                    {"name": "noauto_read_write_rdata_wrrd", "width": 1},
+                    {"name": "noauto_read_write_rready_wrrd", "width": 1},
+                    {"name": "noauto_read_write_rvalid_wrrd", "width": 1},
+                ],
+            },
             # Autoclear wires
             {
                 "name": "autoclear_write",
@@ -594,6 +607,15 @@ def setup(py_params_dict):
                                 "rst_val": 0,
                                 "log2n_items": 0,
                             },
+                            {
+                                "name": "noauto_read_write",
+                                "descr": "noauto read-write register",
+                                "type": "NOAUTO",
+                                "mode": "RW",
+                                "n_bits": 1,
+                                "rst_val": 0,
+                                "log2n_items": 0,
+                            },
                         ],
                     },
                     # Auto clear (also noauto)
@@ -659,6 +681,7 @@ def setup(py_params_dict):
                     # No auto
                     "noauto_write_io": "noauto_write",
                     "noauto_read_io": "noauto_read",
+                    "noauto_read_write_io": "noauto_read_write",
                     # Auto clear
                     "autoclear_write_io": "autoclear_write",
                     "autoclear_read_io": "autoclear_read",

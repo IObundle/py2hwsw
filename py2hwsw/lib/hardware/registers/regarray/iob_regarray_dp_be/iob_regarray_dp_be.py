@@ -45,22 +45,22 @@ def setup(py_params_dict):
                 "name": "port_a_io",
                 "descr": "Port A",
                 "signals": [
-                    {"name": "a_en_i", "width": 1},
-                    {"name": "a_wstrb_i", "width": "WSTRB_W"},
-                    {"name": "a_addr_i", "width": "ADDR_W"},
-                    {"name": "a_data_i", "width": "DATA_W"},
-                    {"name": "a_data_o", "width": "DATA_W"},
+                    {"name": "enA_i", "width": 1},
+                    {"name": "wstrbA_i", "width": "WSTRB_W"},
+                    {"name": "addrA_i", "width": "ADDR_W"},
+                    {"name": "dA_i", "width": "DATA_W"},
+                    {"name": "dA_o", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "port_b_io",
                 "descr": "Port B",
                 "signals": [
-                    {"name": "b_en_i", "width": 1},
-                    {"name": "b_wstrb_i", "width": "WSTRB_W"},
-                    {"name": "b_addr_i", "width": "ADDR_W"},
-                    {"name": "b_data_i", "width": "DATA_W"},
-                    {"name": "b_data_o", "width": "DATA_W"},
+                    {"name": "enB_i", "width": 1},
+                    {"name": "wstrbB_i", "width": "WSTRB_W"},
+                    {"name": "addrB_i", "width": "ADDR_W"},
+                    {"name": "dB_i", "width": "DATA_W"},
+                    {"name": "dB_o", "width": "DATA_W"},
                 ],
             },
         ],
@@ -108,14 +108,14 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-   assign 2p_w_en_i = (a_en_i & |a_wstrb_i) | (b_en_i & |b_wstrb_i);
-   assign 2p_w_strb_i = (a_en_i & |a_wstrb_i) ? a_wstrb_i : b_wstrb_i;
-   assign 2p_w_addr_i = (a_en_i & |a_wstrb_i) ? a_addr_i : b_addr_i;
-   assign 2p_w_data_i = (a_en_i & |a_wstrb_i) ? a_data_i : b_data_i;
+   assign 2p_w_en_i = (enA_i & |wstrbA_i) | (enB_i & |wstrbB_i);
+   assign 2p_w_strb_i = (enA_i & |wstrbA_i) ? wstrbA_i : wstrbB_i;
+   assign 2p_w_addr_i = (enA_i & |wstrbA_i) ? addrA_i : addrB_i;
+   assign 2p_w_data_i = (enA_i & |wstrbA_i) ? dA_i : dB_i;
 
-   assign 2p_r_addr_i = (a_en_i & ~|a_wstrb_i) ? a_addr_i : b_addr_i;
-   assign a_data_o = 2p_r_data_o;
-   assign b_data_o = 2p_r_data_o;
+   assign 2p_r_addr_i = (enA_i & ~|wstrbA_i) ? addrA_i : addrB_i;
+   assign dA_o = 2p_r_data_o;
+   assign dB_o = 2p_r_data_o;
 """,
             },
         ],

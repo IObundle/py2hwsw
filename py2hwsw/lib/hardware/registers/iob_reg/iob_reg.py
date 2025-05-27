@@ -22,13 +22,12 @@ def setup(py_params_dict):
     # Remove duplicated entries
     clk_s_params = list(dict.fromkeys(clk_s_params))
 
-    # Impose global reset polarity
     if any(x in clk_s_params for x in ["a", "an"]):
-        reset_polarity = "negative" if "an" in clk_s_params else "positive"
-        reset_polarity = iob_globals(reset_polarity=reset_polarity).reset_polarity
+        reset_polarity = getattr(iob_globals().reset_polarity, "NotSet")
         for i, p in enumerate(clk_s_params):
             if p in ["a", "an"]:
-                clk_s_params[i] = "a" if reset_polarity == "positive" else "an"
+                if reset_polarity in ["positive", "negative"]:
+                    clk_s_params[i] = "a" if reset_polarity == "positive" else "an"
 
     suffix_list = [
         "c",

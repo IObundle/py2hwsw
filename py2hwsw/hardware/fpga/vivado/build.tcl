@@ -41,7 +41,9 @@ foreach dir $INCLUDE_DIRS {
 #read design constraints and synthesize design
 if { $IS_FPGA == "1" } {
     puts "Synthesizing for FPGA"
-    read_xdc vivado/$BOARD/$SDC_PREFIX\_dev.sdc
+    if {[file exists "vivado/$BOARD/$SDC_PREFIX\_dev.sdc"]} {
+        read_xdc vivado/$BOARD/$SDC_PREFIX\_dev.sdc
+    }
     if {[file exists "../src/$SDC_PREFIX.sdc"]} {
         read_xdc ../src/$SDC_PREFIX.sdc
     }

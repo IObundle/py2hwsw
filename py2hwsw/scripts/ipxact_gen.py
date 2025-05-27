@@ -170,7 +170,7 @@ class SwRegister:
                 for param in parameters_list:
                     # only replace complete words
                     max_size = re.sub(
-                        r"\b" + param.name + r"\b", param.max_value, max_size
+                        r"\b" + param.name + r"\b", str(param.max_value), max_size
                     )
 
                 # if the string only contains numbers or operators, evaluate it and break the loop

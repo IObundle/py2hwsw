@@ -38,17 +38,17 @@ function [31:0] iob_cshift_right;
    end
 endfunction
 
-function [31:0] iob_abs;
-   input [31:0] a;
+function integer iob_abs;
+   input integer a;
    begin
-      iob_abs = ($signed(a) >= 0) ? $signed(a) : -$signed(a);
+      iob_abs = (a >= 0) ? a : -a;
    end
 endfunction
 
-function [31:0] iob_sign;
-   input [31:0] a;
+function integer iob_sign;
+   input integer a;
    begin
-      if ($signed(a) < 0)
+      if (a < 0)
         iob_sign = -1;
       else
         iob_sign = 1;

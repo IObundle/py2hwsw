@@ -119,7 +119,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
     n_bits = csr_ref["n_bits"]
     asym = csr_ref.get("asym", 1)
     internal_n_bits = (
-        f"($signed({asym}) > 0 ? ({n_bits} * {asym}) : ({n_bits} / iob_abs({asym})))"
+        f"({asym} > 0 ? ({n_bits} * {asym}) : ({n_bits} / iob_abs({asym})))"
     )
     # external_n_bits = "DATA_W"
 

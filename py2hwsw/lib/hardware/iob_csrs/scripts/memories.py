@@ -265,12 +265,12 @@ def create_memory_instance(
     #
     attributes_dict["subblocks"] += [
         {
-            "core_name": "iob_asym_converter",
+            "core_name": "iob_asym_converter_m_s",
             "instance_name": f"{memory_name}_asym_converter",
             "instance_description": f"Asymetric converter for MEMORY {memory_name}",
             "parameters": {
-                "MDATA_W": f"{MEMORY_NAME}_INTERNAL_DATA_W",  # width of manager data
-                "SDATA_W": n_bits,  # width of subordinate data
+                "M_DATA_W": f"{MEMORY_NAME}_INTERNAL_DATA_W",  # width of manager data
+                "S_DATA_W": n_bits,  # width of subordinate data
                 "ADDR_W": f"{MEMORY_NAME}_MAX_ADDR_W",  # width of higher address
             },
             "connect": {
@@ -304,7 +304,7 @@ def create_memory_instance(
     // MEMORY: {MEMORY_NAME}
 
 """
-    # Signals for Port A of memory
+    # Signals for Port A of memory (connect to cpu)
     snippet = f"""
     // Connect Port A to internal logic (for cbus)
     assign enA_i = {memory_name}_valid & {memory_name}_ready;
@@ -334,7 +334,7 @@ def create_memory_instance(
     assign {memory_name}_rvalid = 1'b1;
 """
 
-    # Signals for subordinate port of asym converter
+    # Signals for subordinate port of asym converter (connect to core)
     snippet = """
     // Connect asym converter subordinate port to core's logic
 """

@@ -168,6 +168,11 @@ def create_memory_instance(
                         "width": f"{MEMORY_NAME}_R_DATA_W",
                         "descr": "Read data",
                     },
+                    {
+                        "name": f"{memory_name}_r_ready_o",
+                        "descr": "Flag if transactions is complete. Needed because asym converter needs multiple cycles to complete transaction when DATA_W of this interface is larger than the DATA_W of the CSR.",
+                        "width": 1,
+                    },
                 ],
             }
         )
@@ -196,6 +201,11 @@ def create_memory_instance(
                         "name": f"{memory_name}_w_data_i",
                         "width": f"{MEMORY_NAME}_W_DATA_W",
                         "descr": "Write data",
+                    },
+                    {
+                        "name": f"{memory_name}_w_ready_o",
+                        "descr": "Flag if transactions is complete. Needed because asym converter needs multiple cycles to complete transaction when DATA_W of this interface is larger than the DATA_W of the CSR.",
+                        "width": 1,
                     },
                 ],
             },
@@ -240,7 +250,10 @@ def create_memory_instance(
             "name": f"{memory_name}_asym_s_io",
             "descr": "Subordinate interface of asym",
             "signals": [
-                {"name": f"{memory_name}_asym_en_i", "width": 1},
+                {
+                    "name": f"{memory_name}_asym_en_i",
+                    "width": 1,
+                },
                 {
                     "name": f"{memory_name}_asym_wstrb_i",
                     "width": f"{MEMORY_NAME}_INTERNAL_DATA_W/8",
@@ -256,6 +269,10 @@ def create_memory_instance(
                 {
                     "name": f"{memory_name}_asym_d_o",
                     "width": f"{MEMORY_NAME}_INTERNAL_DATA_W",
+                },
+                {
+                    "name": f"{memory_name}_asym_ready_o",
+                    "width": 1,
                 },
             ],
         },
@@ -335,8 +352,10 @@ def create_memory_instance(
 """
 
     # Signals for subordinate port of asym converter (connect to core)
-    snippet = """
+    snippet = f"""
     // Connect asym converter subordinate port to core's logic
+    assign {memory_name}_r_ready_o = {memory_name}_asym_ready_o;
+    assign {memory_name}_w_ready_o = {memory_name}_asym_ready_o;
 """
     if mode == "RW":
         snippet = f"""

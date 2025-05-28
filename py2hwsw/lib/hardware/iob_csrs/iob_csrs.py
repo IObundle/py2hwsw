@@ -14,9 +14,9 @@ from csr_classes import create_csr_group
 from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
 from roms import find_and_update_rom_csrs
-from regarrays import find_and_update_regarray_csrs
-from regfiles import find_and_update_regfile_csrs
-from rams import find_and_update_ram_csrs
+from memories import find_and_update_regarray_csrs
+from memories import find_and_update_regfile_csrs
+from memories import find_and_update_ram_csrs
 from special_csrs import find_and_update_autoclear_csrs
 
 # Static (shared) dictionary to store reg tables of generated csrs

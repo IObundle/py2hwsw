@@ -30,6 +30,10 @@ def setup(py_params_dict):
 
     suffix = "".join([x for x in suffix_list if x in clk_s_params_list])
 
+    if reset_polarity != "NotSet":
+        suffix = suffix.replace('a', 'an' if reset_polarity == "negative" else 'a')
+        suffix = suffix.replace('an', 'a' if reset_polarity == "positive" else 'an')
+
     reg_type = "iob_regn" if "n" in clk_s_params_list else "iob_reg"
 
     reg_name = "_".join(filter(lambda x: x != "", [reg_type, suffix]))

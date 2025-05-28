@@ -38,22 +38,21 @@ def setup(py_params_dict):
     en_str = ""
 
     sensitivity_list = "negedge clk_i" if "n" in clk_s_params_list else "posedge clk_i"
-    if "a" in clk_s_params_list:
-        sensitivity_list = f"{sensitivity_list}, posedge arst_i"
-    elif "an" in clk_s_params_list:
-        sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
 
     if any([x in clk_s_params_list for x in ["a", "an"]]):
         if reset_polarity == "positive":
             arst_con = "arst_i"
+            sensitivity_list = f"{sensitivity_list}, posedge arst_i"
         elif reset_polarity == "negative":
             arst_con = "~arst_n_i"
+            sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
         else:
             arst_con = f"{'arst' if 'a' in clk_s_params_list else '~arst_n'}_i"
+            sensitivity_list = f"{sensitivity_list}, {'posedge arst_i' if 'a' in clk_s_params_list else 'negedge arst_n_i'}"
         rst_str += f"        if ({arst_con}) begin\n            data_o <= RST_VAL;\n        end"
+
     if "r" in clk_s_params_list:
-        rst_con = "rst_i"
-        rst_str += f"{' else ' if rst_str != '' else '        '}if ({rst_con}) begin\n            data_o <= RST_VAL;\n        end"
+        rst_str += f"{' else ' if rst_str != '' else '        '}if (rst_i) begin\n            data_o <= RST_VAL;\n        end"
 
     if any([x in clk_s_params_list for x in ["c", "e"]]):
         en_con = (

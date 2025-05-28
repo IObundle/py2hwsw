@@ -424,14 +424,9 @@ def get_iob_clk_ports(params: str = None):
     if params is None:
         params = "c_a"
     params = params.split("_")
-    if (
-        all(x in params for x in ["a", "an"])
-        or all(x in params for x in ["r", "rn"])
-        or all(x in params for x in ["e", "en"])
-        or all(x in params for x in ["c", "cn"])
-    ):
+    if all(x in params for x in ["a", "an"]):
         raise ValueError(
-            "All signals are mutually exclusive with their negated version"
+            "Asynchronous reset cannot be both active-high and active-low at the same time!"
         )
 
     # Impose global reset polarity
@@ -452,13 +447,10 @@ def get_iob_clk_ports(params: str = None):
 
     for param, port, descr in [
         ("c", "cke", "Clock enable"),
-        ("cn", "cke_n", "Active-low clock enable"),
         ("a", "arst", "Asynchronous active-high reset"),
         ("an", "arst_n", "Asynchronous active-low reset"),
         ("r", "rst", "Synchronous active-high reset"),
-        ("rn", "rst_n", "Synchronous active-low reset"),
         ("e", "en", "Enable"),
-        ("en", "en_n", "Active-low enable"),
     ]:
         if param in params:
             ports.append(

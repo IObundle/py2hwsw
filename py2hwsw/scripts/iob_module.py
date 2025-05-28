@@ -42,7 +42,7 @@ class iob_module(iob_base):
             None,
             str,
             self.set_rst_polarity,
-            "Reset polarity of the module. Can be 'positive' or 'negative'.",
+            "Global reset polarity of the module. Can be 'positive' or 'negative'. (Will override all subblocks' reset polarities).",
         )
         # List of module macros and Verilog (false-)parameters
         self.set_default_attribute(

@@ -69,18 +69,18 @@ def setup(py_params_dict):
                 "name": "regarray_2p_write_i",
                 "descr": "Write port",
                 "signals": [
-                    {"name": "2p_w_en_i", "width": 1},
-                    {"name": "2p_w_strb_i", "width": "WSTRB_W"},
-                    {"name": "2p_w_addr_i", "width": "ADDR_W"},
-                    {"name": "2p_w_data_i", "width": "DATA_W"},
+                    {"name": "regarray_2p_w_en_i", "width": 1},
+                    {"name": "regarray_2p_w_strb_i", "width": "WSTRB_W"},
+                    {"name": "regarray_2p_w_addr_i", "width": "ADDR_W"},
+                    {"name": "regarray_2p_w_data_i", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "regarray_2p_read_io",
                 "descr": "read port",
                 "signals": [
-                    {"name": "2p_r_addr_i", "width": "ADDR_W"},
-                    {"name": "2p_r_data_o", "width": "DATA_W"},
+                    {"name": "regarray_2p_r_addr_i", "width": "ADDR_W"},
+                    {"name": "regarray_2p_r_data_o", "width": "DATA_W"},
                 ],
             },
         ],
@@ -108,14 +108,14 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-   assign 2p_w_en_i = (enA_i & |wstrbA_i) | (enB_i & |wstrbB_i);
-   assign 2p_w_strb_i = (enA_i & |wstrbA_i) ? wstrbA_i : wstrbB_i;
-   assign 2p_w_addr_i = (enA_i & |wstrbA_i) ? addrA_i : addrB_i;
-   assign 2p_w_data_i = (enA_i & |wstrbA_i) ? dA_i : dB_i;
+   assign regarray_2p_w_en_i = (enA_i & |wstrbA_i) | (enB_i & |wstrbB_i);
+   assign regarray_2p_w_strb_i = (enA_i & |wstrbA_i) ? wstrbA_i : wstrbB_i;
+   assign regarray_2p_w_addr_i = (enA_i & |wstrbA_i) ? addrA_i : addrB_i;
+   assign regarray_2p_w_data_i = (enA_i & |wstrbA_i) ? dA_i : dB_i;
 
-   assign 2p_r_addr_i = (enA_i & ~|wstrbA_i) ? addrA_i : addrB_i;
-   assign dA_o = 2p_r_data_o;
-   assign dB_o = 2p_r_data_o;
+   assign regarray_2p_r_addr_i = (enA_i & ~|wstrbA_i) ? addrA_i : addrB_i;
+   assign dA_o = regarray_2p_r_data_o;
+   assign dB_o = regarray_2p_r_data_o;
 """,
             },
         ],

@@ -2,6 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
+# Notes:
+# - regarrays, regfiles, and rams should use an iob_asym_converter_m_s between CSR and CORE to implement 'asym'.
+# - auto csrs of type "RW" should be implemented with a single reg/regarray/ram, and have 2 read-write ports. One for the cpu and one for the core.
+# - Supports RAM and REGFILE. They are simmilar to regarray, but implement iob_rams.
+#   - If REGFILE, implements a ram inside csrs (should be used for small memories. Will generate LUTRAM in fpga).
+#   - If RAM, implements a ram outside of csrs (possibly in memory wrapper).
+
 
 def find_and_update_regarray_csrs(csrs_dict, attributes_dict):
     """Given a dictionary of CSRs, find the regarray CSRs group and update the dictionary
@@ -160,12 +167,12 @@ def create_memory_instance(
                     },
                     {
                         "name": f"{memory_name}_r_addr_i",
-                        "width": f"{MEMORY_NAME}_R_ADDR_W",
+                        "width": f"{MEMORY_NAME}_INTERNAL_ADDR_W",
                         "descr": "Read address",
                     },
                     {
                         "name": f"{memory_name}_r_data_o",
-                        "width": f"{MEMORY_NAME}_R_DATA_W",
+                        "width": f"{MEMORY_NAME}_INTERNAL_DATA_W",
                         "descr": "Read data",
                     },
                     {
@@ -179,7 +186,7 @@ def create_memory_instance(
     if "R" in mode:
         attributes_dict["ports"] += [
             {
-                "name": f"{memory_name}_write_i",
+                "name": f"{memory_name}_write_io",
                 "descr": "MEMORY write interface.",
                 "signals": [
                     {
@@ -189,17 +196,17 @@ def create_memory_instance(
                     },
                     {
                         "name": f"{memory_name}_w_strb_i",
-                        "width": f"{MEMORY_NAME}_W_DATA_W/8",
+                        "width": f"{MEMORY_NAME}_INTERNAL_DATA_W/8",
                         "descr": "Write strobe",
                     },
                     {
                         "name": f"{memory_name}_w_addr_i",
-                        "width": f"{MEMORY_NAME}_W_ADDR_W",
+                        "width": f"{MEMORY_NAME}_INTERNAL_ADDR_W",
                         "descr": "Write address",
                     },
                     {
                         "name": f"{memory_name}_w_data_i",
-                        "width": f"{MEMORY_NAME}_W_DATA_W",
+                        "width": f"{MEMORY_NAME}_INTERNAL_DATA_W",
                         "descr": "Write data",
                     },
                     {

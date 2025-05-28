@@ -5,7 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "generate_hw": False,
+        "generate_hw": True,
         "confs": [
             # Parameters
             {
@@ -34,8 +34,8 @@ def setup(py_params_dict):
             },
             # Derived parameters
             # determine W_ADDR_W and R_ADDR_W
-            {"name": "MAXDATA_W", "type": "D", "val": "iob_max(W_DATA_W, R_DATA_W)"},
-            {"name": "MINDATA_W", "type": "D", "val": "iob_min(W_DATA_W, R_DATA_W)"},
+            {"name": "MAXDATA_W", "type": "D", "val": "iob_max(M_DATA_W, S_DATA_W)"},
+            {"name": "MINDATA_W", "type": "D", "val": "iob_min(M_DATA_W, S_DATA_W)"},
             {"name": "R", "type": "D", "val": "MAXDATA_W / MINDATA_W"},
             {
                 "name": "MINADDR_W",
@@ -110,7 +110,7 @@ def setup(py_params_dict):
          assign m_en_o = s_en_i;
          assign m_wstrb_o = s_wstrb_i<<(align_bits/8);
          assign m_addr_o = s_addr_i/R;
-         assign m_d_o = (s_d_i<<align_bits) | M_DATA_W'd0;
+         assign m_d_o = (s_d_i<<align_bits) | {M_DATA_W{1'b0}};
          assign s_d_o = m_d_i[align_bits+:S_DATA_W];
          assign s_ready_o = 1;
       end else begin : g_subordinate_larger_dat
@@ -178,12 +178,13 @@ def setup(py_params_dict):
                      m_addr_int = current_manager_address;
                      m_d_int = s_d_i[align_bits+:M_DATA_W];
 
-                     if word_count < R-1:
+                     if (word_count < R-1) begin
                         word_count_nxt = word_count + 1;
-                     else:
+                     end else begin
                         // Transaction complete. Sent all data from subordinate word to manager.
                         state_nxt = IDLE;
                         s_ready_int = 1;
+                     end
                 end
                 READ_WORD: begin // Read word from subordinate and fill it in manager
                      current_manager_address = s_addr_i*R + word_count;
@@ -196,12 +197,13 @@ def setup(py_params_dict):
                      m_d_int = 'd0;
                      s_d_int[align_bits+:M_DATA_W] = m_d_i;
 
-                     if word_count < R-1:
+                     if (word_count < R-1) begin
                         word_count_nxt = word_count + 1;
-                     else:
+                     end else begin
                         // Transaction complete. Subordinate word is filled with data from manager.
                         state_nxt = IDLE;
                         s_ready_int = 1;
+                     end
                 end
             endcase
          end
@@ -210,7 +212,7 @@ def setup(py_params_dict):
          iob_reg_ca #(
             .DATA_W (R+1),
             .RST_VAL('d0)
-         ) state_reg (
+         ) word_count_reg (
             // clk_en_rst_s port: Clock, clock enable and reset
             .clk_i (clk_i),
             .cke_i (cke_i),

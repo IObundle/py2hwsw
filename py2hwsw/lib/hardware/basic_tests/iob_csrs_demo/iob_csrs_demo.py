@@ -55,8 +55,10 @@ def setup(py_params_dict):
                 "name": "regarray_write",
                 "descr": "",
                 "signals": [
+                    {"name": "regarray_read_en_rd", "width": 1},
                     {"name": "regarray_read_addr_rd", "width": 3},
                     {"name": "regarray_read_data_rd", "width": 4},
+                    {"name": "regarray_read_ready_rd", "width": 1},
                 ],
             },
             {
@@ -67,6 +69,7 @@ def setup(py_params_dict):
                     {"name": "regarray_write_strb_wr", "width": 16 / 8},
                     {"name": "regarray_write_addr_wr", "width": 1},
                     {"name": "regarray_write_data_wr", "width": 16},
+                    {"name": "regarray_write_ready_wr", "width": 1},
                 ],
             },
             # FIFO write wires
@@ -660,7 +663,7 @@ def setup(py_params_dict):
                     "single_read_write_io": "single_read_write",
                     # regarray
                     "regarray_write_read_io": "regarray_write",
-                    "regarray_read_write_i": "regarray_read",
+                    "regarray_read_write_io": "regarray_read",
                     # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
                     "fifo_write_read_io": "fifo_write_read",

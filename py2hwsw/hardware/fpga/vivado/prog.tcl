@@ -4,6 +4,12 @@
 
 #extract cli args
 set NAME [lindex $argv 0]
+# check if device id is provided as the second argument and set the device id
+if {[llength $argv] > 1} {
+    set DEVICE_ID [lindex $argv 1]
+} else {
+    set DEVICE_ID 0
+}
 
 #place holder for future remote execution
 set HOST localhost
@@ -30,25 +36,25 @@ if { [catch {open_hw_target} result] } {
 # Program and refresh the device
 
 # Identify the AMD FPGA on the open hardware target
-if { [catch {current_hw_device [lindex [get_hw_devices] 0]} result] } {
+if { [catch {current_hw_device [lindex [get_hw_devices] $DEVICE_ID]} result] } {
    puts "ERROR: Can't identify hardware device.\n"
    exit result
 }
-refresh_hw_device -update_hw_probes false [lindex [get_hw_devices] 0]
+refresh_hw_device -update_hw_probes false [lindex [get_hw_devices]  $DEVICE_ID]
 # Associate the bitstream data programming file with the appropriate FPGA device
-if { [catch {set_property PROGRAM.FILE "./$NAME.bit" [lindex [get_hw_devices] 0]} result] } {
+if { [catch {set_property PROGRAM.FILE "./$NAME.bit" [lindex [get_hw_devices] $DEVICE_ID]} result] } {
    puts "ERROR: Can't associate bitstream to FPGA.\n"
    exit result
 }
-#set_property PROBES.FILE {C:/design.ltx} [lindex [get_hw_devices] 0]
+#set_property PROBES.FILE {C:/design.ltx} [lindex [get_hw_devices] $DEVICE_ID]
 
 # Program or download the programming file into the hardware device
-if { [catch {program_hw_devices [lindex [get_hw_devices] 0]} result] } {
+if { [catch {program_hw_devices [lindex [get_hw_devices] $DEVICE_ID]} result] } {
    puts "ERROR: Can't program FPGA.\n"
    exit result
 }
 # Refresh the hardware device to update the hardware probes
-if { [catch {refresh_hw_device [lindex [get_hw_devices] 0]} result] } {
+if { [catch {refresh_hw_device [lindex [get_hw_devices] $DEVICE_ID]} result] } {
    puts "ERROR: Can't refresh hardware device.\n"
    exit result
 }

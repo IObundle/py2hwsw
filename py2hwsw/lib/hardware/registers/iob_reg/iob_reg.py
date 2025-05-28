@@ -45,9 +45,9 @@ def setup(py_params_dict):
 
     if any([x in clk_s_params_list for x in ["a", "an"]]):
         if reset_polarity == "positive":
-            rst_con = "arst_i"
+            arst_con = "arst_i"
         elif reset_polarity == "negative":
-            rst_con = "~arst_n_i"
+            arst_con = "~arst_n_i"
         else:
             arst_con = f"{'arst' if 'a' in clk_s_params_list else '~arst_n'}_i"
         rst_str += f"        if ({arst_con}) begin\n            data_o <= RST_VAL;\n        end"

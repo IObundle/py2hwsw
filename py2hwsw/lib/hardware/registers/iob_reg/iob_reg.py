@@ -7,7 +7,6 @@ import sys
 sys.path.append("../../../scripts")
 from iob_globals import iob_globals
 
-
 def setup(py_params_dict):
 
     port_params = (
@@ -19,12 +18,7 @@ def setup(py_params_dict):
 
     clk_s_params_list = [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
 
-    if any(x in clk_s_params_list for x in ["a", "an"]):
-        reset_polarity = getattr(iob_globals(), "reset_polarity", "NotSet")
-        for i, p in enumerate(clk_s_params_list):
-            if p in ["a", "an"]:
-                if reset_polarity in ["positive", "negative"]:
-                    clk_s_params_list[i] = "a" if reset_polarity == "positive" else "an"
+    reset_polarity = getattr(iob_globals(), "reset_polarity", "NotSet")
 
     suffix_list = [
         "c",
@@ -50,7 +44,12 @@ def setup(py_params_dict):
         sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
 
     if any([x in clk_s_params_list for x in ["a", "an"]]):
-        arst_con = f"{'arst' if 'a' in clk_s_params_list else '~arst_n'}_i"
+        if reset_polarity == "positive":
+            rst_con = "arst_i"
+        elif reset_polarity == "negative":
+            rst_con = "~arst_n_i"
+        else:
+            arst_con = f"{'arst' if 'a' in clk_s_params_list else '~arst_n'}_i"
         rst_str += f"        if ({arst_con}) begin\n            data_o <= RST_VAL;\n        end"
     if "r" in clk_s_params_list:
         rst_con = "rst_i"

@@ -16,10 +16,9 @@ set_property -dict [list \
     CONFIG.PCW_EN_CLK0_PORT {1} \
     CONFIG.PCW_EN_RST0_PORT {1} \
     CONFIG.PCW_USE_M_AXI_GP0 {0} \
+    CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {100.0}\
    ] [get_ips processing_system7_0]
-
 #    CONFIG.PCW_USE_S_AXI_GP0 {1} \
-
 generate_target all [get_files ./ip/processing_system7_0/processing_system7_0.xci]
 synth_ip [get_files ./ip/processing_system7_0/processing_system7_0.xci]
 

@@ -57,7 +57,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "regarray_read_en_rd", "width": 1},
                     {"name": "regarray_read_addr_rd", "width": 3},
-                    {"name": "regarray_read_data_rd", "width": 4},
+                    {"name": "regarray_read_data_rd", "width": 8},
                     {"name": "regarray_read_ready_rd", "width": 1},
                 ],
             },
@@ -66,10 +66,31 @@ def setup(py_params_dict):
                 "descr": "",
                 "signals": [
                     {"name": "regarray_write_en_wr", "width": 1},
-                    {"name": "regarray_write_strb_wr", "width": 16 / 8},
+                    {"name": "regarray_write_strb_wr", "width": int(32 / 8)},
                     {"name": "regarray_write_addr_wr", "width": 1},
-                    {"name": "regarray_write_data_wr", "width": 16},
+                    {"name": "regarray_write_data_wr", "width": 32},
                     {"name": "regarray_write_ready_wr", "width": 1},
+                ],
+            },
+            {
+                "name": "regarray_rw_r",
+                "descr": "",
+                "signals": [
+                    {"name": "regarray_read_write_en_rd", "width": 1},
+                    {"name": "regarray_read_write_addr_rd", "width": 3},
+                    {"name": "regarray_read_write_data_rd", "width": 16},
+                    {"name": "regarray_read_write_ready_rd", "width": 1},
+                ],
+            },
+            {
+                "name": "regarray_rw_w",
+                "descr": "",
+                "signals": [
+                    {"name": "regarray_read_write_en_wr", "width": 1},
+                    {"name": "regarray_read_write_strb_wr", "width": int(16 / 8)},
+                    {"name": "regarray_read_write_addr_wr", "width": 1},
+                    {"name": "regarray_read_write_data_wr", "width": 16},
+                    {"name": "regarray_read_write_ready_wr", "width": 1},
                 ],
             },
             # FIFO write wires
@@ -479,6 +500,7 @@ def setup(py_params_dict):
                                 "n_bits": 1,
                                 "rst_val": 0,
                                 "log2n_items": 0,
+                                # "asym": 2,  # Currently single registers do not support asym.
                             },
                             {
                                 "name": "single_read",
@@ -507,19 +529,27 @@ def setup(py_params_dict):
                                 "name": "regarray_write",
                                 "descr": "Write regarray with 4 registers",
                                 "mode": "W",
-                                "n_bits": 8,  # register width
+                                "n_bits": 16,  # register width
                                 "rst_val": 0,
                                 "log2n_items": 2,  # log number of items in the array
                                 "asym": 2,  # Internal core interface twice the size as register width
                             },
                             {
                                 "name": "regarray_read",
-                                "descr": "Read regarray with wires for 4 registers (no generated registers)",
+                                "descr": "Read regarray with 4 registers",
                                 "mode": "R",
-                                "n_bits": 8,
+                                "n_bits": 16,
                                 "rst_val": 0,
                                 "log2n_items": 2,  # log number of items in the array
                                 "asym": -2,  # Internal core interface half the size as register width
+                            },
+                            {
+                                "name": "regarray_read_write",
+                                "descr": "Read-Write regarray with 4 registers",
+                                "mode": "RW",
+                                "n_bits": 16,
+                                "rst_val": 0,
+                                "log2n_items": 2,  # log number of items in the array
                             },
                         ],
                     },
@@ -556,6 +586,22 @@ def setup(py_params_dict):
                             },
                         ],
                     },
+                    # Currently, RW FIFOs are not supported.
+                    # {
+                    #     "name": "demo_fifo_read_write",
+                    #     "descr": "demo software accessible registers.",
+                    #     "regs": [
+                    #         {
+                    #             "name": "fifo_read_write",
+                    #             "descr": "Read-Write FIFO",
+                    #             "type": "FIFO",
+                    #             "mode": "RW",
+                    #             "n_bits": 8,  # fifo item width
+                    #             "rst_val": 0,
+                    #             "log2n_items": 4,  # log number of items in the fifo
+                    #         },
+                    #     ],
+                    # },
                     # Asynchronous FIFO
                     {
                         "name": "demo_afifo_write",
@@ -664,6 +710,8 @@ def setup(py_params_dict):
                     # regarray
                     "regarray_write_read_io": "regarray_write",
                     "regarray_read_write_io": "regarray_read",
+                    "regarray_read_write_read_io": "regarray_rw_r",
+                    "regarray_read_write_write_io": "regarray_rw_w",
                     # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
                     "fifo_write_read_io": "fifo_write_read",

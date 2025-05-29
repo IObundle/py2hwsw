@@ -155,7 +155,7 @@ def create_memory_instance(
     # Ports
     #
     if "W" in mode:
-        attributes_dict["ports"].append(
+        attributes_dict["ports"] += [
             {
                 "name": f"{memory_name}_read_io",
                 "descr": "MEMORY read interface.",
@@ -182,7 +182,7 @@ def create_memory_instance(
                     },
                 ],
             }
-        )
+        ]
     if "R" in mode:
         attributes_dict["ports"] += [
             {

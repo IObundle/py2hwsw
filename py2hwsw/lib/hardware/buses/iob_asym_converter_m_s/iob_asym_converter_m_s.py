@@ -101,6 +101,8 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
+   `include "iob_functions.vs"
+
    generate
       if (M_DATA_W >= S_DATA_W) begin : g_manager_larger_dat
          // Manager has larger data width.
@@ -121,6 +123,8 @@ def setup(py_params_dict):
          localparam IDLE = 'd0;
          localparam WRITE_WORD = 'd1;
          localparam READ_WORD = 'd2;
+
+         localparam M_WSTRB_W = M_DATA_W/8;
 
          reg [M_ADDR_W-1:0] current_manager_address;
          integer align_bits;
@@ -174,7 +178,7 @@ def setup(py_params_dict):
 
                      // Extract partial word of subordinate and send it to manager
                      m_en_int = 1;
-                     m_wstrb_int = s_wstrb_i[align_bits/8+:M_DATA_W/8];
+                     m_wstrb_int = s_wstrb_i[align_bits/8+:M_WSTRB_W];
                      m_addr_int = current_manager_address;
                      m_d_int = s_d_i[align_bits+:M_DATA_W];
 

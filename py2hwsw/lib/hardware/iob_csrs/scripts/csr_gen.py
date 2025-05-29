@@ -231,7 +231,9 @@ class csr_gen:
             assert (
                 n_items == 1
             ), "Regfiles (n_items > 1) cannot be generated with auto. This error is a bug, auto regfiles should be handled by previous scripts."
-            # Note: a REG with log2n_items == 0 does not support asym (only regarrays support asym)
+            assert (
+                row.asym == 1
+            ), f"Currently, REG with log2n_items == 0 do support asymetric interfaces. CSR: {name}"
 
             # fill remaining bits of reset value with 0s
             if isinstance(n_bits, str):
@@ -369,7 +371,9 @@ class csr_gen:
             assert (
                 n_items == 1
             ), "Regfiles (n_items > 1) cannot be generated with auto. This error is a bug, auto regfiles should be handled by previous scripts."
-            # Note: a REG with log2n_items == 0 does not support asym (only regarrays support asym)
+            assert (
+                row.asym == 1
+            ), f"Currently, REG with log2n_items == 0 do support asymetric interfaces. CSR: {name}"
 
             # version is not a register, it is an internal constant
             if name == "version":

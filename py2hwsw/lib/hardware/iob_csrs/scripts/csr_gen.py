@@ -599,7 +599,7 @@ class csr_gen:
                         },
                         {
                             "name": f"{name}_wstrb_o",
-                            "width": self.verilog_max(n_bits / 8, 1),
+                            "width": self.verilog_max(f"{n_bits}/8", 1),
                         },
                         {
                             "name": f"{name}_ready_i",

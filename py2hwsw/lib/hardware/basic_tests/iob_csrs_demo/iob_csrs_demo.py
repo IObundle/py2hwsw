@@ -481,6 +481,28 @@ def setup(py_params_dict):
                     {"name": "autoclear_read_rvalid_rd", "width": 1},
                 ],
             },
+            # Interrupts wires
+            {
+                "name": "demo_interrupt_status",
+                "descr": "",
+                "signals": [
+                    {"name": "demo_interrupt_status_rd", "width": 32},
+                ],
+            },
+            {
+                "name": "demo_interrupt_mask",
+                "descr": "",
+                "signals": [
+                    {"name": "demo_interrupt_mask_wr", "width": 32},
+                ],
+            },
+            {
+                "name": "demo_interrupt_clear",
+                "descr": "",
+                "signals": [
+                    {"name": "demo_interrupt_clear_wr", "width": 32},
+                ],
+            },
         ],
         "subblocks": [
             {
@@ -694,7 +716,19 @@ def setup(py_params_dict):
                             },
                         ],
                     },
-                    # Other supported types: "ROM", "REGFILE", "RAM", "INTERRUPT"
+                    # Interrupts
+                    {
+                        "name": "demo_interrupt_csrs",
+                        "descr": "demo software accessible registers.",
+                        "regs": [
+                            {
+                                "name": "demo_interrupt",
+                                "descr": "This CSR will be replaced by common interrupt CSRs: status, mask, and clear",
+                                "type": "INTERRUPT",
+                            },
+                        ],
+                    },
+                    # Other supported types: "ROM", "REGFILE", "RAM"
                 ],
                 "csr_if": "iob",
                 "connect": {
@@ -736,6 +770,10 @@ def setup(py_params_dict):
                     # Auto clear
                     "autoclear_write_io": "autoclear_write",
                     "autoclear_read_io": "autoclear_read",
+                    # Interrupts
+                    "demo_interrupt_status_i": "demo_interrupt_status",
+                    "demo_interrupt_mask_o": "demo_interrupt_mask",
+                    "demo_interrupt_clear_o": "demo_interrupt_clear",
                 },
             },
         ],

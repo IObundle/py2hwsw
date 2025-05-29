@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from copy import deepcopy
+
 interrupt_csrs = [
     {
         "name": "status",
@@ -48,8 +50,13 @@ def find_and_update_interrupt_csrs(csrs_dict):
     if not csr_ref:
         return
 
+    _interrupt_csrs = deepcopy(interrupt_csrs)
+    for csr in _interrupt_csrs:
+        # Update name of csrs to include original csr name as a prefix
+        csr["name"] = f"{csr_ref['name']}_{csr['name']}"
+
     # Add interrupt_csrs to group
-    csr_group_ref["regs"] += interrupt_csrs
+    csr_group_ref["regs"] += _interrupt_csrs
 
     # Remove original csr from csr_group
     csr_group_ref["regs"].remove(csr_ref)

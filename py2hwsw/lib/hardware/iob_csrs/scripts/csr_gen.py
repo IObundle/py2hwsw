@@ -450,9 +450,7 @@ class csr_gen:
                 if type(log2n_items) is not int or log2n_items > 0:
                     lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
 
-            lines += (
-                f"    assign {name}_rready{suffix} = {name}_addressed & rready_int;\n"
-            )
+            lines += f"    assign {name}_rready{suffix} = internal_iob_rready;\n"
 
         return lines, wires
 

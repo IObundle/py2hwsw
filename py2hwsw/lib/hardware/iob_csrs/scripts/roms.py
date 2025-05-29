@@ -30,6 +30,7 @@ def find_and_update_rom_csrs(csrs_dict, attributes_dict):
         # Don't generate standard ports for this CSR.
         # It will be internal to the CSRs module, and have a custom port generated later.
         csr_ref["internal_use"] = True
+        csr_ref["optional_comment"] = f"For use with rom: {csr_ref['name']}"
 
         create_rom_instance(attributes_dict, csr_ref)
 

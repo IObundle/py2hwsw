@@ -199,9 +199,10 @@ class csr_gen:
         auto = row.type != "NOAUTO"
         suffix = "" if row.internal_use else "_o"
         suffix_i = "" if row.internal_use else "_i"
+        optional_comment = row.optional_comment
 
         lines = ""
-        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); AUTO: {auto}\n\n"
+        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); TYPE: {row.type}. {optional_comment}\n\n"
 
         # compute wdata with only the needed bits
         wires.append(
@@ -350,9 +351,10 @@ class csr_gen:
         auto = row.type != "NOAUTO"
         suffix = "" if row.internal_use else "_o"
         suffix_i = "" if row.internal_use else "_i"
+        optional_comment = row.optional_comment
 
         lines = ""
-        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); AUTO: {auto}\n\n"
+        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); TYPE: {row.type}. {optional_comment}\n\n"
 
         if auto:
             # signal to indicate if the register is addressed

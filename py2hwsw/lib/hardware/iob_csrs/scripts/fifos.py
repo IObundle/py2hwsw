@@ -7,6 +7,7 @@ from csr_classes import fail_with_msg
 
 def get_fifo_csrs(csr_ref):
     fifo_csrs = []
+    optional_comment = f"For use with FIFO: {csr_ref['name']}"
     if csr_ref["mode"] == "R":  # FIFO_R
         fifo_csrs += [
             {
@@ -18,6 +19,7 @@ def get_fifo_csrs(csr_ref):
                 "log2n_items": 0,
                 "descr": "Read data from FIFO.",
                 "internal_use": True,
+                "optional_comment": optional_comment,
             },
             {
                 "name": f"{csr_ref['name']}_empty",
@@ -27,6 +29,7 @@ def get_fifo_csrs(csr_ref):
                 "log2n_items": 0,
                 "descr": "Empty (1) or non-empty (0).",
                 "internal_use": True,
+                "optional_comment": optional_comment,
             },
             {
                 "name": f"{csr_ref['name']}_thresh",
@@ -36,6 +39,7 @@ def get_fifo_csrs(csr_ref):
                 "log2n_items": 0,
                 "descr": "Interrupt upper level threshold: an interrupt is triggered when the number of words in the FIFO reaches this upper level threshold.",
                 "internal_use": True,
+                "optional_comment": optional_comment,
             },
         ]
     elif csr_ref["mode"] == "W":  # FIFO_W
@@ -49,6 +53,7 @@ def get_fifo_csrs(csr_ref):
                 "log2n_items": 0,
                 "descr": "Write data to FIFO.",
                 "internal_use": True,
+                "optional_comment": optional_comment,
             },
             {
                 "name": f"{csr_ref['name']}_full",
@@ -58,6 +63,7 @@ def get_fifo_csrs(csr_ref):
                 "log2n_items": 0,
                 "descr": "Full (1), or non-full (0).",
                 "internal_use": True,
+                "optional_comment": optional_comment,
             },
         ]
     else:  # FIFO_RW
@@ -71,6 +77,7 @@ def get_fifo_csrs(csr_ref):
             "log2n_items": 0,
             "descr": "Number of words in FIFO.",
             "internal_use": True,
+            "optional_comment": optional_comment,
         },
     ]
     return fifo_csrs

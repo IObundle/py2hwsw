@@ -39,6 +39,9 @@ def find_and_update_regarray_csrs(csrs_dict, attributes_dict):
                 # Don't generate standard ports for this CSR.
                 # It will be internal to the CSRs module, and have a custom port generated later.
                 csr_ref["internal_use"] = True
+                csr_ref["optional_comment"] = (
+                    f"For use with regarray: {csr_ref['name']}"
+                )
 
                 create_memory_instance(
                     attributes_dict, csr_ref, memory_type="iob_regarray_dp_be"
@@ -67,6 +70,7 @@ def find_and_update_regfile_csrs(csrs_dict, attributes_dict):
         # Don't generate standard ports for this CSR.
         # It will be internal to the CSRs module, and have a custom port generated later.
         csr_ref["internal_use"] = True
+        csr_ref["optional_comment"] = f"For use with regfile: {csr_ref['name']}"
 
         create_memory_instance(attributes_dict, csr_ref, memory_type="iob_ram_tdp_be")
 
@@ -93,6 +97,7 @@ def find_and_update_ram_csrs(csrs_dict, attributes_dict):
         # Don't generate standard ports for this CSR.
         # It will be internal to the CSRs module, and have a custom port generated later.
         csr_ref["internal_use"] = True
+        csr_ref["optional_comment"] = f"For use with ram: {csr_ref['name']}"
 
         create_memory_instance(
             attributes_dict,

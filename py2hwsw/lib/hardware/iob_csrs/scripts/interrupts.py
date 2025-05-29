@@ -54,6 +54,7 @@ def find_and_update_interrupt_csrs(csrs_dict):
     for csr in _interrupt_csrs:
         # Update name of csrs to include original csr name as a prefix
         csr["name"] = f"{csr_ref['name']}_{csr['name']}"
+        csr_ref["optional_comment"] = f"For use with interrupt: {csr_ref['name']}"
 
     # Add interrupt_csrs to group
     csr_group_ref["regs"] += _interrupt_csrs

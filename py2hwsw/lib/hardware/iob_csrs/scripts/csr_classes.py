@@ -31,6 +31,8 @@ class iob_csr:
     # asym >= 1: W_INT = W_EXT * asym
     # asym <= -1: W_INT = W_EXT / (-asym)
     asym: int = 1
+    # Optional comment to include in generated verilog of each csr (inside *_csrs.v)
+    optional_comment: str = ""
 
     def __post_init__(self):
         if not self.name:

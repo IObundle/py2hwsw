@@ -124,12 +124,12 @@ def setup(py_params_dict):
                 --csr_if {CSR_IF}
                 --csr-group macc 
                     -d 'MACC software accessible registers' 
-                        -r en:1 -t W -d 'Enable.'
-                        -r done:1 -t R -d 'Done.'
-                        -r load:1 -t W -d 'Load.'
-                        -r a:8 -t W -d 'Operand A.'
-                        -r b:8 -t W -d 'Operand B.'
-                        -r c:16 -t R -d 'Operand C.'
+                        -r en:1   -m W -d 'Enable.'
+                        -r done:1 -m R -d 'Done.'
+                        -r load:1 -m W -d 'Load.'
+                        -r a:8    -m W -d 'Operand A.'
+                        -r b:8    -m W -d 'Operand B.'
+                        -r c:16   -m R -d 'Operand C.'
             """,
         ],
         "superblocks": [

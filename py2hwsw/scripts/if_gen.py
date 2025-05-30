@@ -423,19 +423,15 @@ def get_iob_ports():
 def get_iob_clk_ports(params: str = None):
     if params is None:
         params = "c_a"
-    params = params.split("_")
-    if all(x in params for x in ["a", "an"]):
-        raise ValueError(
-            "Asynchronous reset cannot be both active-high and active-low at the same time!"
-        )
 
-    # Impose global reset polarity
-    if any(x in params for x in ["a", "an"]):
-        reset_polarity = "negative" if "an" in params else "positive"
-        reset_polarity = iob_globals(reset_polarity=reset_polarity).reset_polarity
-        for i, p in enumerate(params):
-            if p in ["a", "an"]:
-                params[i] = "a" if reset_polarity == "positive" else "an"
+    reset_polarity = getattr(iob_globals(), "reset_polarity", "positive")
+
+    if reset_polarity != "positive":
+        params = params.replace("an","a").replace("a", "an")
+    else:
+        params = params.replace("an", "a")
+
+    params = params.split("_")
 
     ports = [
         iob_signal(

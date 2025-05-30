@@ -219,6 +219,11 @@ class iob_core(iob_module, iob_instance):
             descr="CSR Configuration to use",
         )
 
+        if self.is_top_module and "reset_polarity" not in attributes:
+            # Set default reset polarity to 'positive'
+            if "reset_polarity" not in attributes:
+                attributes["reset_polarity"] = "positive"
+
         self.attributes_dict = copy.deepcopy(attributes)
 
         self.abort_reason = None

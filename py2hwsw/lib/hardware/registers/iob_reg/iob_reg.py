@@ -7,6 +7,7 @@ import sys
 sys.path.append("../../../scripts")
 from iob_globals import iob_globals
 
+
 def setup(py_params_dict):
 
     port_params = (
@@ -16,9 +17,12 @@ def setup(py_params_dict):
     )
     assert "clk_en_rst_s" in port_params, "clk_en_rst_s port is missing"
 
-    clk_s_params_list = [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
+    reset_polarity = getattr(iob_globals(), "reset_polarity", "positive")
 
-    reset_polarity = getattr(iob_globals(), "reset_polarity", "NotSet")
+    if reset_polarity != "positive":
+        port_params["clk_en_rst_s"] = port_params["clk_en_rst_s"].replace("a", "an")
+
+    clk_s_params_list = [x for x in port_params["clk_en_rst_s"].split("_") if x != ""]
 
     suffix_list = [
         "c",
@@ -30,10 +34,6 @@ def setup(py_params_dict):
 
     suffix = "".join([x for x in suffix_list if x in clk_s_params_list])
 
-    if reset_polarity != "NotSet":
-        suffix = suffix.replace('a', 'an' if reset_polarity == "negative" else 'a')
-        suffix = suffix.replace('an', 'a' if reset_polarity == "positive" else 'an')
-
     reg_type = "iob_regn" if "n" in clk_s_params_list else "iob_reg"
 
     reg_name = "_".join(filter(lambda x: x != "", [reg_type, suffix]))
@@ -43,16 +43,13 @@ def setup(py_params_dict):
 
     sensitivity_list = "negedge clk_i" if "n" in clk_s_params_list else "posedge clk_i"
 
+    if "a" in clk_s_params_list:
+        sensitivity_list = f"{sensitivity_list}, posedge arst_i"
+    elif "an" in clk_s_params_list:
+        sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
+
     if any([x in clk_s_params_list for x in ["a", "an"]]):
-        if reset_polarity == "positive":
-            arst_con = "arst_i"
-            sensitivity_list = f"{sensitivity_list}, posedge arst_i"
-        elif reset_polarity == "negative":
-            arst_con = "~arst_n_i"
-            sensitivity_list = f"{sensitivity_list}, negedge arst_n_i"
-        else:
-            arst_con = f"{'arst' if 'a' in clk_s_params_list else '~arst_n'}_i"
-            sensitivity_list = f"{sensitivity_list}, {'posedge arst_i' if 'a' in clk_s_params_list else 'negedge arst_n_i'}"
+        arst_con = f"{'arst' if 'a' in clk_s_params_list else '~arst_n'}_i"
         rst_str += f"        if ({arst_con}) begin\n            data_o <= RST_VAL;\n        end"
 
     if "r" in clk_s_params_list:

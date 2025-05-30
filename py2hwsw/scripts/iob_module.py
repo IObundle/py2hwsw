@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from iob_base import iob_base, process_elements_from_list
+from iob_base import iob_base, process_elements_from_list, fail_with_msg
 from iob_conf import create_conf_group
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
@@ -116,7 +116,13 @@ class iob_module(iob_base):
         )
 
     def set_rst_polarity(self, polarity):
-        create_globals(self, "reset_polarity", polarity)
+        if self.is_top_module:
+            create_globals(self, "reset_polarity", polarity)
+        else:
+            if polarity != getattr(iob_globals(), "reset_polarity", "positive"):
+                fail_with_msg(
+                    f"Reset polarity '{polarity}' is not the same as global reset polarity '{getattr(iob_globals(), 'reset_polarity', 'positive')}'."
+                )
 
     def create_conf_group(self, *args, **kwargs):
         create_conf_group(self, *args, **kwargs)

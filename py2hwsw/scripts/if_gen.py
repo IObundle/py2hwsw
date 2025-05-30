@@ -11,6 +11,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Dict
 from iob_signal import iob_signal, iob_signal_reference
+from iob_globals import iob_globals
 
 mem_if_details = [
     {
@@ -423,16 +424,16 @@ def get_iob_ports():
 def get_iob_clk_ports(params: str = None):
     if params is None:
         params = "c_a"
+
+    reset_polarity = getattr(iob_globals(), "reset_polarity", "positive")
+
+    if reset_polarity != "positive":
+        params = params.replace("a", "an")
+    else:
+        params = params.replace("an", "a")
+
     params = params.split("_")
-    if (
-        all(x in params for x in ["a", "an"])
-        or all(x in params for x in ["r", "rn"])
-        or all(x in params for x in ["e", "en"])
-        or all(x in params for x in ["c", "cn"])
-    ):
-        raise ValueError(
-            "All signals are mutually exclusive with their negated version"
-        )
+
     ports = [
         iob_signal(
             name="clk_o",
@@ -443,13 +444,10 @@ def get_iob_clk_ports(params: str = None):
 
     for param, port, descr in [
         ("c", "cke", "Clock enable"),
-        ("cn", "cke_n", "Active-low clock enable"),
         ("a", "arst", "Asynchronous active-high reset"),
         ("an", "arst_n", "Asynchronous active-low reset"),
         ("r", "rst", "Synchronous active-high reset"),
-        ("rn", "rst_n", "Synchronous active-low reset"),
         ("e", "en", "Enable"),
-        ("en", "en_n", "Active-low enable"),
     ]:
         if param in params:
             ports.append(

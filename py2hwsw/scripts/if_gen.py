@@ -427,7 +427,7 @@ def get_iob_clk_ports(params: str = None):
     reset_polarity = getattr(iob_globals(), "reset_polarity", "positive")
 
     if reset_polarity != "positive":
-        params = params.replace("an","a").replace("a", "an")
+        params = params.replace("a", "an")
     else:
         params = params.replace("an", "a")
 

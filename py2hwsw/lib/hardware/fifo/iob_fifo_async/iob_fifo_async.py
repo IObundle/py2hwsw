@@ -257,10 +257,12 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_ram_at2p",
                 "instance_name": "iob_ram_at2p_inst",
+                "dest_dir": "hardware/simulation/src",
             },
             {
                 "core_name": "iob_clock",
                 "instance_name": "iob_clock_inst",
+                "dest_dir": "hardware/simulation/src",
             },
         ],
     }

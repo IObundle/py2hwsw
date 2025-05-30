@@ -64,8 +64,9 @@ def setup(py_params_dict):
                 "name": "txdata",
                 "descr": "",
                 "signals": [
+                    {"name": "txdata_valid_wr", "width": 1},
                     {"name": "txdata_wdata_wr", "width": 8},
-                    {"name": "txdata_wen_wr", "width": 1},
+                    {"name": "txdata_wstrb_wr", "width": 1},
                     {"name": "txdata_ready_wr", "width": 1},
                 ],
             },
@@ -101,11 +102,11 @@ def setup(py_params_dict):
                 "name": "rxdata",
                 "descr": "",
                 "signals": [
+                    {"name": "rxdata_valid_rd", "width": 1},
                     {"name": "rxdata_rdata_rd", "width": 8},
-                    {"name": "rxdata_rvalid_rd", "width": 1},
                     {"name": "rxdata_rready_rd", "width": 1},
-                    {"name": "rxdata_ren_rd", "width": 1},
                     {"name": "rxdata_ready_rd", "width": 1},
+                    {"name": "rxdata_rvalid_rd", "width": 1},
                 ],
             },
             # RXDATA reg
@@ -152,7 +153,7 @@ def setup(py_params_dict):
                     {"name": "txdata_wdata_wr"},
                     {"name": "rxdata_rdata_rd"},
                     {"name": "txdata_wen_wr"},
-                    {"name": "rxdata_ren_rd"},
+                    {"name": "rxdata_valid_rd"},
                     {"name": "div_wr"},
                 ],
             },
@@ -176,14 +177,14 @@ def setup(py_params_dict):
                 --csr_if {CSR_IF}
                 --csr-group uart 
                     -d 'UART software accessible registers' 
-                        -r softreset:1 -t W -d 'Soft reset'  --rst_val 0 --addr 0 --log2n_items 0
-                        -r div:16 -t W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
-                        -r txdata:8 -t W -d 'TX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
-                        -r txen:1 -t W -d 'TX enable.' --rst_val 0 --addr 5 --log2n_items 0
-                        -r rxen:1 -t W -d 'RX enable.' --rst_val 0 --addr 6 --log2n_items 0
-                        -r txready:1 -t R -d 'TX ready to receive data.' --rst_val 0 --addr 0 --log2n_items 0
-                        -r rxready:1 -t R -d 'RX ready to be read.' --rst_val 0 --addr 1 --log2n_items 0
-                        -r rxdata:8 -t R -d 'RX data.' --rst_val 0 --addr 4 --log2n_items 0 --no_autoreg
+                        -r softreset:1        -m W -d 'Soft reset'                           --rst_val 0 --addr 0 --log2n_items 0
+                        -r div:16             -m W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
+                        -r txdata:8 -t NOAUTO -m W -d 'TX data.'                             --rst_val 0 --addr 4 --log2n_items 0
+                        -r txen:1             -m W -d 'TX enable.'                           --rst_val 0 --addr 5 --log2n_items 0
+                        -r rxen:1             -m W -d 'RX enable.'                           --rst_val 0 --addr 6 --log2n_items 0
+                        -r txready:1          -m R -d 'TX ready to receive data.'            --rst_val 0 --addr 0 --log2n_items 0
+                        -r rxready:1          -m R -d 'RX ready to be read.'                 --rst_val 0 --addr 1 --log2n_items 0
+                        -r rxdata:8 -t NOAUTO -m R -d 'RX data.'                             --rst_val 0 --addr 4 --log2n_items 0
             """,
             {
                 "core_name": "iob_reg",
@@ -235,14 +236,15 @@ def setup(py_params_dict):
                 "verilog_code": """
     // txdata Manual logic
     assign txdata_ready_wr = 1'b1;
+    assign txdata_wen_wr = txdata_valid_wr & txdata_wstrb_wr;
 
     // rxdata Manual logic
     assign rxdata_ready_rd = 1'b1;
 
     // set rxdata on read enable, reset on (rready and rvalid)
-    assign rxdata_rvalid_en = rxdata_ren_rd;
+    assign rxdata_rvalid_en = rxdata_valid_rd;
     assign rxdata_rvalid_rst = rxdata_rvalid_rd & rxdata_rready_rd;
-    assign rxdata_rvalid_nxt = rxdata_ren_rd;
+    assign rxdata_rvalid_nxt = rxdata_valid_rd;
 """,
             },
         ],

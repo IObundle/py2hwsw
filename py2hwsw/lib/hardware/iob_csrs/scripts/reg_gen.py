@@ -41,17 +41,6 @@ def version_str_to_digits(version_str):
     return f"{int(major_ver):02d}{int(minor_ver):02d}"
 
 
-def auto_setup_iob_ctls(core):
-    """Auto-add iob_ctls module to subblocks list"""
-    core["subblocks"].append(
-        {
-            "core_name": "iob_ctls",
-            "instance_name": "iob_ctls_inst",
-            "instantiate": False,
-        },
-    )
-
-
 def build_regs_table(core):
     """Build registers table.
     :returns csr_gen csr_gen_obj: Instance of csr_gen class
@@ -72,12 +61,11 @@ def build_regs_table(core):
         general_regs_table.regs.append(
             iob_csr(
                 name="version",
-                type="R",
+                mode="R",
                 n_bits=16,
                 rst_val=version_str_to_digits(core["version"]),
                 addr=-1,
                 log2n_items=0,
-                autoreg=True,
                 descr="Product version. This 16-bit register uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
                 volatile=False,
             )
@@ -125,5 +113,4 @@ def generate_csr(core, create_files=True):
     if create_files:
         generate_csr_hw(core, csr_gen_obj, reg_table)
         generate_csr_sw(core, csr_gen_obj, reg_table)
-    auto_setup_iob_ctls(core)
     return csr_gen_obj, reg_table

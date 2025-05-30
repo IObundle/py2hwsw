@@ -7,12 +7,12 @@
 `define DATA_W 32
 `define ADDR_W 4
 
-module iob_regfile_sp_tb;
+module iob_regarray_sp_tb;
 
    // Inputs
    reg                 clk;
-   reg arst = 0;
-   reg rst;
+   reg                 arst = 0;
+   reg                 rst;
    reg [  `DATA_W-1:0] w_data;
    reg [  `ADDR_W-1:0] addr;
    reg                 en;
@@ -57,7 +57,8 @@ module iob_regfile_sp_tb;
          w_data = i + seq_ini;
          @(posedge clk) #1;
          if (r_data != i + seq_ini) begin
-            $display("Write ERROR: read error in r_data.\n \t data=%0d; r_data=%0d", i + seq_ini, r_data);
+            $display("Write ERROR: read error in r_data.\n \t data=%0d; r_data=%0d", i + seq_ini,
+                     r_data);
             $finish();
          end
          @(posedge clk) #1;
@@ -72,7 +73,8 @@ module iob_regfile_sp_tb;
          addr = i;
          @(posedge clk) #1;
          if (r_data != i + seq_ini) begin
-            $display("Read ERROR: read error in r_data.\n \t data=%0d; r_data=%0d", i + seq_ini, r_data);
+            $display("Read ERROR: read error in r_data.\n \t data=%0d; r_data=%0d", i + seq_ini,
+                     r_data);
             $finish();
          end
          @(posedge clk) #1;
@@ -106,18 +108,18 @@ module iob_regfile_sp_tb;
    end
 
    // Instantiate the Unit Under Test (UUT)
-   iob_regfile_sp #(
+   iob_regarray_sp #(
       .ADDR_W(`ADDR_W),
       .DATA_W(`DATA_W)
    ) uut (
-      .clk_i   (clk),
-      .cke_i   (1'b1),
-      .arst_i  (arst),
-      .rst_i   (rst),
-      .we_i    (en),
-      .addr_i  (addr),
-      .d_i     (w_data),
-      .d_o     (r_data)
+      .clk_i (clk),
+      .cke_i (1'b1),
+      .arst_i(arst),
+      .rst_i (rst),
+      .we_i  (en),
+      .addr_i(addr),
+      .d_i   (w_data),
+      .d_o   (r_data)
    );
 
    // system clock

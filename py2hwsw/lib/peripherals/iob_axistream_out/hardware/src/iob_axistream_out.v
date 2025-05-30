@@ -63,6 +63,7 @@ module iob_axistream_out #(
    assign sys_tready_o = ~fifo_full_rd & enable_wr & (mode_wr == 1'b1);
 
    //FIFO write
+   assign data_wen_wr = data_valid_wr & data_ready_wr & |data_wstrb_wr;
    assign fifo_write     = ((data_wen_wr & (mode_wr == 1'b0)) |
                            (sys_tvalid_i & (mode_wr == 1'b1))) &
                            enable_wr;

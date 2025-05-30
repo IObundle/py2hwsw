@@ -215,7 +215,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
                 "signals": {
                     "type": "iob",
                     "prefix": f"{peripheral_name}_cbus_",
-                    "ADDR_W": peripheral_addr_w - 2,
+                    "ADDR_W": peripheral_addr_w,
                 },
             },
         )
@@ -232,7 +232,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
             "signals": {
                 "type": "iob",
                 "prefix": "clint_cbus_",
-                "ADDR_W": peripheral_addr_w - 2,
+                "ADDR_W": peripheral_addr_w,
             },
         },
         {
@@ -241,7 +241,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
             "signals": {
                 "type": "iob",
                 "prefix": "plic_cbus_",
-                "ADDR_W": peripheral_addr_w - 2,
+                "ADDR_W": peripheral_addr_w,
             },
         },
     ]

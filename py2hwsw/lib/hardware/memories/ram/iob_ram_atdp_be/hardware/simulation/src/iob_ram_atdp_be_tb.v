@@ -12,13 +12,13 @@ module iob_ram_atdp_be_tb;
    // Inputs
    reg                 clkA;
    reg                 enaA;  // enable access to ram
-   reg [`DATA_W/8-1:0] weA;  // write enable vector
+   reg [`DATA_W/8-1:0] wstrbA;  // write enable vector
    reg [  `ADDR_W-1:0] addrA;
    reg [  `DATA_W-1:0] data_inA;
 
    reg                 clkB;
    reg                 enaB;  // enable access to ram
-   reg [`DATA_W/8-1:0] weB;  // write enable vector
+   reg [`DATA_W/8-1:0] wstrbB;  // write enable vector
    reg [  `ADDR_W-1:0] addrB;
    reg [  `DATA_W-1:0] data_inB;
 
@@ -44,8 +44,8 @@ module iob_ram_atdp_be_tb;
       enaA = 0;
       enaB = 0;
       for (i = 0; i < `DATA_W / 8; i = i + 1) begin
-         weA[i] = 0;
-         weB[i] = 0;
+         wstrbA[i] = 0;
+         wstrbB[i] = 0;
       end
       addrA         = 0;
       addrB         = 0;
@@ -66,7 +66,7 @@ module iob_ram_atdp_be_tb;
       @(posedge clkA) #1;
 
       for (i = 0; i < 2 ** `ADDR_W; i = i + 1) begin
-         weA[i] = 1;
+         wstrbA[i] = 1;
          @(posedge clkA) #1;
          addrA    = i;
          data_inA = i + seq_ini;
@@ -74,7 +74,7 @@ module iob_ram_atdp_be_tb;
       end
 
       @(posedge clkA) #1;
-      for (i = 0; i < `DATA_W / 8; i = i + 1) weA[i] = 0;
+      for (i = 0; i < `DATA_W / 8; i = i + 1) wstrbA[i] = 0;
 
       @(posedge clkA) #1;
       for (i = 0; i < 2 ** `ADDR_W; i = i + 1) begin
@@ -97,7 +97,7 @@ module iob_ram_atdp_be_tb;
       @(posedge clkB) #1;
 
       for (i = 0; i < 2 ** `ADDR_W; i = i + 1) begin
-         weB[i] = 1;
+         wstrbB[i] = 1;
          @(posedge clkB) #1;
          addrB    = i;
          data_inB = i + seq_ini;
@@ -105,7 +105,7 @@ module iob_ram_atdp_be_tb;
       end
 
       @(posedge clkB) #1;
-      for (i = 0; i < `DATA_W / 8; i = i + 1) weB[i] = 0;
+      for (i = 0; i < `DATA_W / 8; i = i + 1) wstrbB[i] = 0;
 
       @(posedge clkB) #1;
       for (i = 0; i < 2 ** `ADDR_W; i = i + 1) begin
@@ -168,19 +168,19 @@ module iob_ram_atdp_be_tb;
       .DATA_W(`DATA_W),
       .ADDR_W(`ADDR_W)
    ) uut (
-      .clkA_i (clkA),
-      .enA_i  (enaA),
-      .weA_i  (weA),
-      .addrA_i(addrA),
-      .dA_i   (data_inA),
-      .dA_o   (data_outA),
+      .clkA_i  (clkA),
+      .enA_i   (enaA),
+      .wstrbA_i(wstrbA),
+      .addrA_i (addrA),
+      .dA_i    (data_inA),
+      .dA_o    (data_outA),
 
-      .clkB_i (clkB),
-      .enB_i  (enaB),
-      .weB_i  (weB),
-      .addrB_i(addrB),
-      .dB_i   (data_inB),
-      .dB_o   (data_outB)
+      .clkB_i  (clkB),
+      .enB_i   (enaB),
+      .wstrbB_i(wstrbB),
+      .addrB_i (addrB),
+      .dB_i    (data_inB),
+      .dB_o    (data_outB)
    );
 
    // system clock

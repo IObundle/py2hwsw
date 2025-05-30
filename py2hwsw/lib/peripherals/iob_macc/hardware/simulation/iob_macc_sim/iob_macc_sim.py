@@ -56,7 +56,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": params["csr_if"],
                 "prefix": "internal_",
-                "ADDR_W": 2,  # Does not include 2 LSBs
+                "ADDR_W": 4,
             },
         },
     ]
@@ -89,12 +89,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "wb_m": "macc_cbus",
-                    "iob_s": (
-                        "macc_s",
-                        [
-                            "iob_addr_i[1:0]",
-                        ],
-                    ),
+                    "iob_s": "macc_s",
                 },
             }
         )
@@ -114,12 +109,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "apb_m": "macc_cbus",
-                    "iob_s": (
-                        "macc_s",
-                        [
-                            "iob_addr_i[3:2]",
-                        ],
-                    ),
+                    "iob_s": "macc_s",
                 },
             }
         )
@@ -137,12 +127,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "axil_m": "macc_cbus",
-                    "iob_s": (
-                        "macc_s",
-                        [
-                            "iob_addr_i[3:2]",
-                        ],
-                    ),
+                    "iob_s": "macc_s",
                 },
             }
         )
@@ -168,12 +153,7 @@ def setup(py_params_dict):
                             "axi_arlock_i[0]",
                         ],
                     ),
-                    "iob_s": (
-                        "macc_s",
-                        [
-                            "iob_addr_i[3:2]",
-                        ],
-                    ),
+                    "iob_s": "macc_s",
                 },
             }
         )
@@ -187,7 +167,7 @@ def setup(py_params_dict):
         snippet_code += """
    // Directly connect cbus IOb port to internal IOb wires
    assign internal_iob_valid = iob_valid_i;
-   assign internal_iob_addr = iob_addr_i[3:2]; // Ignore 2 LSBs
+   assign internal_iob_addr = iob_addr_i;
    assign internal_iob_wdata = iob_wdata_i;
    assign internal_iob_wstrb = iob_wstrb_i;
    assign internal_iob_rready = iob_rready_i;

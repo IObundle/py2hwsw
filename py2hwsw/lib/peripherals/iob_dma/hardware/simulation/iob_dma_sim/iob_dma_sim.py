@@ -171,7 +171,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": "iob",
                 "prefix": "axistream_in_csrs_",
-                "ADDR_W": 5 - 2,
+                "ADDR_W": 5,
             },
         },
         # AXISTREAM OUT
@@ -232,7 +232,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": "iob",
                 "prefix": "axistream_out_csrs_",
-                "ADDR_W": 5 - 2,
+                "ADDR_W": 5,
             },
         },
         # Other
@@ -242,7 +242,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": "iob",
                 "prefix": "dma_csrs_",
-                "ADDR_W": 5 - 2,
+                "ADDR_W": 5,
             },
         },
         {
@@ -343,13 +343,13 @@ def setup(py_params_dict):
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "reset_i": "split_reset",
-                "input_s": ("pbus_s", ["iob_addr_i[6:2]"]),  # Ignore 2 LSBs
+                "input_s": "pbus_s",
                 "output_0_m": "axistream_in_csrs",
                 "output_1_m": "axistream_out_csrs",
                 "output_2_m": "dma_csrs",
             },
             "num_outputs": 3,
-            "addr_w": 7 - 2,
+            "addr_w": 7,
         },
         {
             "core_name": "iob_dma",
@@ -387,8 +387,6 @@ def setup(py_params_dict):
                 # "axi_s": (
                 #     "axi",
                 #     [
-                #         "{axi_araddr, 2'b0}",
-                #         "{axi_awaddr, 2'b0}",
                 #         "{1'b0, axi_arlock}",
                 #         "{1'b0, axi_awlock}",
                 #     ],

@@ -16,7 +16,7 @@ task axil_write;
    begin
       @(posedge clk) #1 axil_awvalid_i = 1;  //sync and assign
       axil_wvalid_i = 1;
-      axil_awaddr_i = `IOB_WORD_ADDR(addr);
+      axil_awaddr_i = addr;
       axil_wdata_i  = `IOB_GET_WDATA(addr, data);
       axil_wstrb_i  = `IOB_GET_WSTRB(addr, width);
 
@@ -43,7 +43,7 @@ task axil_read;
 
    begin
       @(posedge clk) #1 axil_arvalid_i = 1;  //sync and assign
-      axil_araddr_i = `IOB_WORD_ADDR(addr);
+      axil_araddr_i = addr;
       axil_wstrb_i  = 0;
 
       while (!axil_arready_o) #1;

@@ -143,7 +143,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": 1,
@@ -152,7 +152,11 @@ def setup(py_params_dict):
             {
                 "name": "axi_ram_mem",
                 "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
-                "signals": {"type": "ram_t2p_be", "prefix": "ext_mem_"},
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                },
             },
         ]
     if params["use_ethernet"]:
@@ -246,12 +250,7 @@ def setup(py_params_dict):
             "csr_if": "iob",
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "iob_csrs_cbus_s": (
-                    "uart_s",
-                    [
-                        "iob_addr_i[3-1:2]",
-                    ],
-                ),
+                "iob_csrs_cbus_s": "uart_s",
                 "rs232_m": "rs232_invert",
             },
         },
@@ -273,8 +272,6 @@ def setup(py_params_dict):
                     "axi_s": (
                         "axi",
                         [
-                            "{axi_araddr, 2'b0}",
-                            "{axi_awaddr, 2'b0}",
                             "{1'b0, axi_arlock}",
                             "{1'b0, axi_awlock}",
                         ],
@@ -313,12 +310,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_csrs_cbus_s": (
-                        "ethernet_s",
-                        [
-                            "ethernet_iob_addr_i[12-1:2]",
-                        ],
-                    ),
+                    "iob_csrs_cbus_s": "ethernet_s",
                     "axi_m": "eth_axi",
                     "inta_o": "eth_int",
                     "phy_io": "eth_phy_invert",

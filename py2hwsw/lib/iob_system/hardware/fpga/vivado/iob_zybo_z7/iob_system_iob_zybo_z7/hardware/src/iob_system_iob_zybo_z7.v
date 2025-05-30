@@ -31,9 +31,9 @@ module iob_system_iob_zybo_z7 #(
     FIXED_IO_ddr_vrn,
     FIXED_IO_ddr_vrp,
     FIXED_IO_mio,
-    FIXED_IO_ps_clk,
-    FIXED_IO_ps_porb,
-    FIXED_IO_ps_srstb,
+    PS_CLK,
+    PS_PORB,
+    PS_SRSTB,
     uart_txd,
     uart_rxd
 );
@@ -55,9 +55,9 @@ module iob_system_iob_zybo_z7 #(
   inout FIXED_IO_ddr_vrn;
   inout FIXED_IO_ddr_vrp;
   inout [53:0]FIXED_IO_mio;
-  inout FIXED_IO_ps_clk;
-  inout FIXED_IO_ps_porb;
-  inout FIXED_IO_ps_srstb;
+  inout PS_CLK;
+  inout PS_PORB;
+  inout PS_SRSTB;
 
    // UART interface
         output uart_txd;
@@ -81,9 +81,9 @@ module iob_system_iob_zybo_z7 #(
   wire FIXED_IO_ddr_vrn;
   wire FIXED_IO_ddr_vrp;
   wire [53:0]FIXED_IO_mio;
-  wire FIXED_IO_ps_clk;
-  wire FIXED_IO_ps_porb;
-  wire FIXED_IO_ps_srstb;
+  wire PS_CLK;
+  wire PS_PORB;
+  wire PS_SRSTB;
 
    wire uart_txd;
    wire uart_rxd;
@@ -92,9 +92,9 @@ module iob_system_iob_zybo_z7 #(
    
    processing_system7_0 processing_system7_0
      (
-      .PS_CLK(FIXED_IO_ps_clk_io),
-      .PS_PORB(FIXED_IO_ps_porb_io),
-      .PS_SRSTB(FIXED_IO_ps_srstb_io),
+      .PS_CLK(PS_CLK),
+      .PS_PORB(PS_PORB),
+      .PS_SRSTB(PS_SRSTB),
                 
       .FCLK_CLK0(clk),
       .FCLK_RESET0_N(arst_n),

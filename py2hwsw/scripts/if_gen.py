@@ -274,6 +274,7 @@ if_types = [
 ]
 
 
+# NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
 @dataclass
 class interface:
     """Class to represent an interface for generation"""
@@ -464,9 +465,15 @@ def get_mem_ports(
 ):
     suffix = f"_{suffix}" if suffix else ""
     clk_suffix = suffix if async_clk else ""
-    extra_signals = []
+    mem_ports = [
+        iob_signal(
+            name="clk" + clk_suffix + "_o",
+            width=1,
+            descr=f"Clock port {clk_suffix}",
+        ),
+    ]
     if addr:
-        extra_signals.append(
+        mem_ports.append(
             iob_signal(
                 name="addr" + suffix + "_o",
                 width=ADDR_W,
@@ -474,20 +481,14 @@ def get_mem_ports(
             )
         )
     if enable:
-        extra_signals.append(
+        mem_ports.append(
             iob_signal(
                 name="en" + suffix + "_o",
                 width=1,
                 descr=f"Enable port {suffix}",
             )
         )
-    return [
-        iob_signal(
-            name="clk" + clk_suffix + "_o",
-            width=1,
-            descr=f"Clock port {clk_suffix}",
-        ),
-    ] + extra_signals
+    return mem_ports
 
 
 def get_mem_read_ports(
@@ -499,38 +500,38 @@ def get_mem_read_ports(
 ):
     suffix = f"_{suffix}" if suffix else ""
     rd_suffix = suffix if true else ""
-    extra_signals = []
+    mem_read_ports = []
     if enable:
-        extra_signals.append(
+        mem_read_ports.append(
             iob_signal(
                 name="r_en" + suffix + "_o",
                 width=1,
                 descr=f"Read enable port {suffix}",
             )
         )
-    if ready:
-        extra_signals.append(
-            iob_signal(
-                name="r_ready" + suffix + "_i",
-                width=1,
-                descr=f"Read ready port {suffix}",
-            )
-        )
     if addr:
-        extra_signals.append(
+        mem_read_ports.append(
             iob_signal(
                 name="r_addr" + suffix + "_o",
                 width=ADDR_W,
                 descr=f"Read address port {suffix}",
             )
         )
-    mem_read_ports = [
+    mem_read_ports += [
         iob_signal(
             name="r_data" + rd_suffix + "_i",
             width=DATA_W,
             descr=f"Data port {suffix}",
         ),
-    ] + extra_signals
+    ]
+    if ready:
+        mem_read_ports.append(
+            iob_signal(
+                name="r_ready" + suffix + "_i",
+                width=1,
+                descr=f"Read ready port {suffix}",
+            )
+        )
     return mem_read_ports
 
 
@@ -543,25 +544,9 @@ def get_mem_write_ports(
 ):
     suffix = f"_{suffix}" if suffix else ""
     wr_suffix = suffix if true else ""
-    extra_signals = []
-    if ready:
-        extra_signals.append(
-            iob_signal(
-                name="w_ready" + suffix + "_i",
-                width=1,
-                descr=f"Write ready port {suffix}",
-            )
-        )
-    if addr:
-        extra_signals.append(
-            iob_signal(
-                name="w_addr" + suffix + "_o",
-                width=ADDR_W,
-                descr=f"Write address port {suffix}",
-            )
-        )
+    mem_write_ports = []
     if byte_enable:
-        extra_signals.append(
+        mem_write_ports.append(
             iob_signal(
                 name="w_strb" + suffix + "_o",
                 width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
@@ -569,21 +554,37 @@ def get_mem_write_ports(
             )
         )
     else:  # No byte enable
-        extra_signals.append(
+        mem_write_ports.append(
             iob_signal(
                 name="w_en" + suffix + "_o",
                 width=1,
                 descr=f"Write enable port {suffix}",
             )
         )
+    if addr:
+        mem_write_ports.append(
+            iob_signal(
+                name="w_addr" + suffix + "_o",
+                width=ADDR_W,
+                descr=f"Write address port {suffix}",
+            )
+        )
 
-    mem_write_ports = [
+    mem_write_ports += [
         iob_signal(
             name="w_data" + wr_suffix + "_o",
             width=DATA_W,
             descr=f"Data port {suffix}",
         ),
-    ] + extra_signals
+    ]
+    if ready:
+        mem_write_ports.append(
+            iob_signal(
+                name="w_ready" + suffix + "_i",
+                width=1,
+                descr=f"Write ready port {suffix}",
+            )
+        )
     return mem_write_ports
 
 
@@ -596,6 +597,16 @@ def remove_duplicates(ports):
             result.append(d)
     return result
 
+
+# Memory symbols meaning:
+# SP: Single-Port read-write
+# 2P: 2-Port (one read, one write)
+# DP: Dual-Port (two read-write)
+# TDP/T2P: True (Dual-/2-)Port; Can perform transactions in both ports at the same time
+# ATDP/AT2P: Asynchronous ports
+# BE: byte-enable for each byte of data word
+# SE: Single enable for entire data word
+# Xil: Xilinx IP implementation
 
 @parse_widths
 def get_rom_2p_ports():

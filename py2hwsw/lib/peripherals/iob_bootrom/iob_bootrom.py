@@ -57,47 +57,7 @@ def setup(py_params_dict):
                     "type": "iob_clk",
                 },
             },
-            {
-                "name": "ext_rom_bus_m",
-                "descr": "External ROM signals",
-                "signals": {
-                    "type": "rom_sp",
-                    "prefix": "ext_rom_",
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
-            },
-        ],
-        #
-        # Wires
-        #
-        "wires": [
-            {
-                "name": "rom",
-                "descr": "'rom' register interface",
-                "signals": [
-                    {"name": "rom_raddr_rd", "width": BOOTROM_ADDR_W - 2},
-                    {"name": "rom_rdata_rd", "width": "DATA_W"},
-                    {"name": "rom_rvalid_rd", "width": 1},
-                    {"name": "rom_rready_rd", "width": 1},
-                    {"name": "rom_ren_rd", "width": 1},
-                    {"name": "rom_ready_rd", "width": 1},
-                ],
-            },
-            {
-                "name": "rom_rvalid_data_i",
-                "descr": "Register input",
-                "signals": [
-                    {"name": "rom_ren_rd"},
-                ],
-            },
-            {
-                "name": "rom_rvalid_data_o",
-                "descr": "Register output",
-                "signals": [
-                    {"name": "rom_rvalid_rd"},
-                ],
-            },
+            # Implicit 'rom_bus_m' port generated automatically for external memory wrapper
         ],
         #
         # Blocks
@@ -114,12 +74,12 @@ def setup(py_params_dict):
                             {
                                 "name": "rom",
                                 "descr": "Bootloader ROM (read).",
-                                "type": "R",
+                                "type": "ROM",
+                                "mode": "R",
                                 "n_bits": "DATA_W",
                                 "rst_val": 0,
                                 "addr": -1,
                                 "log2n_items": BOOTROM_ADDR_W - 2,
-                                "autoreg": False,
                             },
                         ],
                     }
@@ -132,37 +92,8 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     # 'control_if_m' port connected automatically
-                    # Register interfaces
-                    "rom_io": "rom",
+                    # 'rom_bus_m' port for external memory connected automatically
                 },
-            },
-            {
-                "core_name": "iob_reg",
-                "instance_name": "rom_rvalid_r",
-                "instance_description": "ROM rvalid register",
-                "parameters": {
-                    "DATA_W": 1,
-                    "RST_VAL": "1'b0",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "data_i": "rom_rvalid_data_i",
-                    "data_o": "rom_rvalid_data_o",
-                },
-            },
-        ],
-        #
-        # Snippets
-        #
-        "snippets": [
-            {
-                "verilog_code": """
-   assign ext_rom_clk_o = clk_i;
-   assign ext_rom_en_o   = rom_ren_rd;
-   assign ext_rom_addr_o = rom_raddr_rd;
-   assign rom_rdata_rd   = ext_rom_r_data_i;
-   assign rom_ready_rd  = 1'b1;  // ROM is always ready
-""",
             },
         ],
     }

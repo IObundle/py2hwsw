@@ -15,6 +15,14 @@ def setup(py_params_dict):
                 "max": 32,
                 "descr": "Data bus width",
             },
+            {
+                "name": "REG_ITEMS_W",
+                "type": "P",
+                "val": 4,
+                "min": 0,
+                "max": 8,
+                "descr": "Log2 Number of Items in Reg Array",
+            },
         ],
         "ports": [
             {
@@ -91,6 +99,27 @@ def setup(py_params_dict):
                     {"name": "regarray_read_write_addr_wr", "width": 1},
                     {"name": "regarray_read_write_data_wr", "width": 16},
                     {"name": "regarray_read_write_ready_wr", "width": 1},
+                ],
+            },
+            {
+                "name": "regarray_param_rw_r",
+                "descr": "",
+                "signals": [
+                    {"name": "regarray_read_write_param_en_rd", "width": 1},
+                    {"name": "regarray_read_write_param_addr_rd", "width": 3},
+                    {"name": "regarray_read_write_param_data_rd", "width": 16},
+                    {"name": "regarray_read_write_param_ready_rd", "width": 1},
+                ],
+            },
+            {
+                "name": "regarray_param_rw_w",
+                "descr": "",
+                "signals": [
+                    {"name": "regarray_read_write_param_en_wr", "width": 1},
+                    {"name": "regarray_read_write_param_strb_wr", "width": int(16 / 8)},
+                    {"name": "regarray_read_write_param_addr_wr", "width": 1},
+                    {"name": "regarray_read_write_param_data_wr", "width": 16},
+                    {"name": "regarray_read_write_param_ready_wr", "width": 1},
                 ],
             },
             # FIFO write wires
@@ -573,6 +602,14 @@ def setup(py_params_dict):
                                 "rst_val": 0,
                                 "log2n_items": 2,  # log number of items in the array
                             },
+                            {
+                                "name": "regarray_read_write_param",
+                                "descr": "Read-Write regarray with 4 registers",
+                                "mode": "RW",
+                                "n_bits": 16,
+                                "rst_val": 0,
+                                "log2n_items": "REG_ITEMS_W",  # log number of items in the array
+                            },
                         ],
                     },
                     # FIFO
@@ -746,6 +783,8 @@ def setup(py_params_dict):
                     "regarray_read_write_io": "regarray_read",
                     "regarray_read_write_read_io": "regarray_rw_r",
                     "regarray_read_write_write_io": "regarray_rw_w",
+                    "regarray_read_write_param_read_io": "regarray_param_rw_r",
+                    "regarray_read_write_param_write_io": "regarray_param_rw_w",
                     # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
                     "fifo_write_read_io": "fifo_write_read",

@@ -545,12 +545,8 @@ class csr_gen:
         for row in table:
             name = row.name
             auto = row.type != "NOAUTO"
-            addr = row.addr
             n_bits = row.n_bits
             log2n_items = convert_int(row.log2n_items)
-            n_items = 2 ** eval_param_expression_from_config(
-                log2n_items, self.config, "max"
-            )
             register_signals = []
             port_has_inputs = False
             port_has_outputs = False
@@ -559,9 +555,12 @@ class csr_gen:
             # and how many bits to address each byte in the entire CSR array
             if type(n_bits) is int:
                 num_byte_sel_bits = (ceil(n_bits / 8) - 1).bit_length()
-                internal_addr_w = log2n_items + num_byte_sel_bits
             else:
                 num_byte_sel_bits = f"$clog2({n_bits}/8)"
+
+            if (type(log2n_items) is int) and (type(n_bits) is int):
+                internal_addr_w = log2n_items + num_byte_sel_bits
+            else:
                 internal_addr_w = f"{log2n_items}+{num_byte_sel_bits}"
 
             # version is not a register, it is an internal constant
@@ -1353,7 +1352,8 @@ class csr_gen:
             addr_offset = ""
             if addr_w / n_bytes > 1:
                 addr_arg = "int addr"
-                addr_offset = "+addr"
+                # regfiles are addressed at each n_bits
+                addr_offset = f"+(addr << {int(log2(n_bytes))})"
 
             if "W" in row.mode:
                 waddr_arg = ""

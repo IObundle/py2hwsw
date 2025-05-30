@@ -183,26 +183,23 @@ The following tables describe the IP core configuration. The core may be configu
         for group in confs:
             confs_file.write(
                 """
-\\begin{table}[H]
-  \\centering
-  \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
+\\begin{xltabular}{\\textwidth}{|l|c|c|c|c|X|}
 
-    \\hline
-    \\rowcolor{iob-green}
-    {\\bf Configuration} & {\\bf Type} & {\\bf Min} & {\\bf Typical} & {\\bf Max} & {\\bf Description} \\\\ \\hline \\hline
+  \\hline
+  \\rowcolor{iob-green}
+  {\\bf Configuration} & {\\bf Type} & {\\bf Min} & {\\bf Typical} & {\\bf Max} & {\\bf Description} \\\\ \\hline \\hline
 
-    \\input """
+  \\input """
                 + group.name
                 + """_confs_tab
 
-  \\end{tabularx}
   \\caption{"""
                 + group.descr.replace("_", "\\_")
                 + """}
-  \\label{"""
+\\end{xltabular}
+\\label{"""
                 + group.name
                 + """_confs_tab:is}
-\\end{table}
 """
             )
             if group.doc_clearpage:
@@ -228,7 +225,6 @@ These parameters are listed below:
 """
         )
 
-    confs_file.write("\\clearpage")
     confs_file.close()
 
 

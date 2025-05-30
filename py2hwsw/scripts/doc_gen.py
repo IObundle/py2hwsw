@@ -135,32 +135,28 @@ See the \\textit{Python Parameters} section of the \\href{https://github.com/IOb
     for group in python_parameters:
         py_params_file.write(
             """
-\\begin{table}[H]
-  \\centering
-  \\begin{tabularx}{\\textwidth}{|l|c|X|}
+\\begin{xltabular}{\\textwidth}{|l|c|X|}
 
-    \\hline
-    \\rowcolor{iob-green}
-    {\\bf Name} & {\\bf Default Value} & {\\bf Description} \\\\ \\hline \\hline
+  \\hline
+  \\rowcolor{iob-green}
+  {\\bf Name} & {\\bf Default Value} & {\\bf Description} \\\\ \\hline \\hline
 
-    \\input """
+  \\input """
             + group.name
             + """_py_params_tab
 
-  \\end{tabularx}
   \\caption{"""
             + group.descr.replace("_", "\\_")
             + """}
-  \\label{"""
+\\end{xltabular}
+\\label{"""
             + group.name
             + """_py_params_tab:is}
-\\end{table}
 """
         )
         if group.doc_clearpage:
             py_params_file.write("\\clearpage")
 
-    py_params_file.write("\\clearpage")
     py_params_file.close()
 
     generate_py_params_tex_table(python_parameters, out_dir)

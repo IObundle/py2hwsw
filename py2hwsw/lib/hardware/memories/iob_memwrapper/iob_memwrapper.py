@@ -191,17 +191,14 @@ def generate_mems_tex(mems, out_dir):
 
     mems_file.write(
         """
-    \\begin{table}[H]
-      \\centering
-      \\begin{tabularx}{\\textwidth}{|l|c|c|c|X|}
-        \\hline
-        \\rowcolor{iob-green}
-        {\\bf Name} & {\\bf Type} & {\\bf (Word-)Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
-        \\input mems_tab
-      \\end{tabularx}
+    \\begin{xltabular}{\\textwidth}{|l|c|c|c|X|}
+      \\hline
+      \\rowcolor{iob-green}
+      {\\bf Name} & {\\bf Type} & {\\bf (Word-)Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
+      \\input mems_tab
       \\caption{Table of memories of the core}
-      \\label{mems_tab:is}
-    \\end{table}
+    \\end{xltabular}
+    \\label{mems_tab:is}
 """
     )
 

@@ -28,26 +28,23 @@ def generate_subblocks_table_tex(subblocks, out_dir):
     for group in subblocks:
         subblocks_file.write(
             """
-\\begin{table}[H]
-  \\centering
-  \\begin{tabularx}{\\textwidth}{|l|l|X|}
+\\begin{xltabular}{\\textwidth}{|l|X|}
 
-    \\hline
-    \\rowcolor{iob-green}
-    {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
+  \\hline
+  \\rowcolor{iob-green}
+  {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
 
-    \\input """
+  \\input """
             + group.name
             + """_subblocks_tab
 
-  \\end{tabularx}
   \\caption{"""
             + group.descr.replace("_", "\\_")
             + """}
-  \\label{"""
+\\end{xltabular}
+\\label{"""
             + group.name
             + """_subblocks_tab:is}
-\\end{table}
 """
         )
         if group.doc_clearpage:

@@ -208,25 +208,23 @@ The following tables describe the IP core configuration. The core may be configu
             if group.doc_clearpage:
                 confs_file.write("\\clearpage")
 
-    # Write info about "D" conf type
-    if "D" in conf_types:
-        confs_file.write(
-            """
-The parameters in the top-level Verilog module that are not listed above are
-called Derived Parameters. They are given as function of the primary parameters
-and should never be changed. They are used to simplify the definition of the
-interface and internal signals. The list of derived parameters is given below:
-\\input derived_params
-"""
-        )
-
     # Write info about "C" conf type
     if "C" in conf_types:
         confs_file.write(
             """
-There are also constants that are used in the core in order to improve the readability
-of the code and should not be changed. They are defined as presented in the list below:
+The macros not listed above are constants. They improve the code readability and
+should not be changed by the user. These constants are listed below:
 \\input constants
+"""
+        )
+
+    # Write info about "D" conf type
+    if "D" in conf_types:
+        confs_file.write(
+            """
+The top-level parameters not listed above are constant or derived from the primary parameters. They improve the code readability and should not be changed by the user.
+These parameters are listed below:
+\\input derived_params
 """
         )
 

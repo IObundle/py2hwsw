@@ -47,7 +47,7 @@ def setup(py_params_dict):
                 "descr": "Testbench peripherals CSRs interface",
                 "signals": {
                     "type": "iob",
-                    "ADDR_W": 6,  # Includes 2 LSBs
+                    "ADDR_W": 6,
                 },
             },
         ],
@@ -138,7 +138,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob",
                     "prefix": "axistream_in_csrs_",
-                    "ADDR_W": 5 - 2,
+                    "ADDR_W": 5,
                 },
             },
             # AXISTREAM OUT
@@ -220,7 +220,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob",
                     "prefix": "axistream_out_csrs_",
-                    "ADDR_W": 5 - 2,
+                    "ADDR_W": 5,
                 },
             },
         ],
@@ -269,12 +269,12 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": ("pbus_s", ["iob_addr_i[5:2]"]),  # Ignore 2 LSBs
+                    "input_s": "pbus_s",
                     "output_0_m": "axistream_in_csrs",
                     "output_1_m": "axistream_out_csrs",
                 },
                 "num_outputs": 2,
-                "addr_w": 6 - 2,
+                "addr_w": 6,
             },
         ],
         "snippets": [

@@ -109,7 +109,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": "axi",
                 "ID_W": "AXI_ID_W",
-                "ADDR_W": "AXI_ADDR_W - 2",
+                "ADDR_W": "AXI_ADDR_W",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
             },
@@ -122,7 +122,7 @@ def setup(py_params_dict):
                 "prefix": "mem_",
                 "ID_W": "AXI_ID_W",
                 "LEN_W": "AXI_LEN_W",
-                "ADDR_W": "AXI_ADDR_W - 2",
+                "ADDR_W": "AXI_ADDR_W",
                 "DATA_W": "AXI_DATA_W",
                 "LOCK_W": 1 if params["use_extmem"] else 2,
             },
@@ -158,7 +158,7 @@ def setup(py_params_dict):
             "parameters": {
                 "AXI_ID_W": "AXI_ID_W",
                 "AXI_LEN_W": "AXI_LEN_W",
-                "AXI_ADDR_W": "AXI_ADDR_W - 2",
+                "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
             },
             "connect": {
@@ -182,11 +182,7 @@ def setup(py_params_dict):
             "connect": {
                 "clk_i": "clk",
                 "rst_i": "arst",
-                "axi_s": (
-                    "memory_axi",
-                    "{mem_axi_araddr, 2'b0}",
-                    "{mem_axi_awaddr, 2'b0}",
-                ),
+                "axi_s": "memory_axi",
             },
         },
     ]

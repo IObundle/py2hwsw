@@ -69,7 +69,7 @@ def setup(py_params_dict):
                 "descr": "Memory interface A",
                 "signals": [
                     {"name": "enA_i", "width": 1},
-                    {"name": "weA_i", "width": "DATA_W/8"},
+                    {"name": "wstrbA_i", "width": "DATA_W/8"},
                     {"name": "addrA_i", "width": "ADDR_W"},
                     {"name": "dA_i", "width": "DATA_W"},
                     {"name": "dA_o", "width": "DATA_W"},
@@ -80,7 +80,7 @@ def setup(py_params_dict):
                 "descr": "Memory interface B",
                 "signals": [
                     {"name": "enB_i", "width": 1},
-                    {"name": "weB_i", "width": "DATA_W/8"},
+                    {"name": "wstrbB_i", "width": "DATA_W/8"},
                     {"name": "addrB_i", "width": "ADDR_W"},
                     {"name": "dB_i", "width": "DATA_W"},
                     {"name": "dB_o", "width": "DATA_W"},
@@ -107,7 +107,7 @@ def setup(py_params_dict):
    always @(posedge clk_i) begin
       if (enA_i) begin
          for (i = 0; i < NUM_COL; i = i + 1) begin
-            if (weA_i[i]) begin
+            if (wstrbA_i[i]) begin
                ram_block[addrA_i][i*COL_W+:COL_W] <= dA_i[i*COL_W+:COL_W];
             end
          end
@@ -123,7 +123,7 @@ def setup(py_params_dict):
    always @(posedge clk_i) begin
       if (enB_i) begin
          for (j = 0; j < NUM_COL; j = j + 1) begin
-            if (weB_i[j]) begin
+            if (wstrbB_i[j]) begin
                ram_block[addrB_i][j*COL_W+:COL_W] <= dB_i[j*COL_W+:COL_W];
             end
          end

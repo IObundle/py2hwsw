@@ -44,10 +44,10 @@ attrs = [
                 "-r&regs": [
                     "name:n_bits",
                     ["-t", "type"],
+                    ["-m", "mode"],
                     ["--rst_val", "rst_val"],
                     ["--addr", "addr", {"type": int}],
                     ["--log2n_items", "log2n_items"],
-                    ["--no_autoreg", "autoreg", {"action": "store_false"}],
                 ],
             },
         ]

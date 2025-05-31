@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 # Set project name and paths
 set hw_file "your_hw_platform.xsa"
 set platform_name "zybo_platform"

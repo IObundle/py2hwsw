@@ -88,7 +88,7 @@ module iob_axi_ram #(
    reg                         axi_rvalid_pipe_reg;
 
    // (* RAM_STYLE="BLOCK" *)
-   reg  [      DATA_WIDTH-1:0] mem                 [2**VALID_ADDR_WIDTH];
+   reg  [      DATA_WIDTH-1:0] mem                 [2**VALID_ADDR_WIDTH-1:0];
 
    wire [VALID_ADDR_WIDTH-1:0] read_addr_valid;
    wire [VALID_ADDR_WIDTH-1:0] write_addr_valid;

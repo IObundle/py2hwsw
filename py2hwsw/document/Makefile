@@ -51,6 +51,14 @@ figs:
 pb_figs:
 	make -C ./figures pb_figs
 
+#doxygen documentation
+doxygen:
+ifeq ($(DOXYGEN),1)
+	make -C ./doxygen all
+else
+	@echo "Skipping Doxygen documentation generation. Set DOXYGEN=1 to enable."
+endif
+
 #build document
 build: debug $(DOC).pdf
 
@@ -69,7 +77,7 @@ pbtop.tex:
 	make doctop DOC=pb
 
 #build user guide document type
-ug.pdf: debug results figs ugtop.tex
+ug.pdf: debug results figs doxygen ugtop.tex
 	pdflatex -jobname ug ugtop.tex
 	if [ -f *.bib ]; then bibtex ug; fi
 	pdflatex -jobname ug ugtop.tex
@@ -85,6 +93,7 @@ ugtop.tex:
 	if [ -f mems_tab.tex ]; then echo "\def\MEMS{Y}" >> $@; fi
 	if [ $(ASICSYNTH) == 1 ]; then echo "\def\ASICSYNTH{Y}" >> $@; fi
 	if [ $(FPGACOMP) == 1 ]; then echo "\def\FPGACOMP{Y}" >> $@; fi
+	if [ $(DOXYGEN) == 1 ]; then echo "\def\DOXYGEN{Y}" >> $@; fi
 	make doctop DOC=ug
 
 #include implementation results if available

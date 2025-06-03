@@ -2,11 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-from iob_base import iob_base, process_elements_from_list
+from iob_base import iob_base, process_elements_from_list, fail_with_msg
 from iob_conf import create_conf_group
 from iob_port import create_port
 from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
+from iob_globals import iob_globals, create_globals
 from iob_comb import iob_comb, create_comb
 from iob_fsm import iob_fsm, create_fsm
 from iob_block import create_block_group, iob_block_group
@@ -35,6 +36,13 @@ class iob_module(iob_base):
             "Default description",
             str,
             descr="Description of the module",
+        )
+        self.set_default_attribute(
+            "reset_polarity",
+            None,
+            str,
+            self.set_rst_polarity,
+            "Global reset polarity of the module. Can be 'positive' or 'negative'. (Will override all subblocks' reset polarities).",
         )
         # List of module macros and Verilog (false-)parameters
         self.set_default_attribute(
@@ -106,6 +114,15 @@ class iob_module(iob_base):
             get_list_attr_handler(self.create_sw_instance_group),
             "List of software modules required by this core.",
         )
+
+    def set_rst_polarity(self, polarity):
+        if self.is_top_module:
+            create_globals(self, "reset_polarity", polarity)
+        else:
+            if polarity != getattr(iob_globals(), "reset_polarity", "positive"):
+                fail_with_msg(
+                    f"Reset polarity '{polarity}' is not the same as global reset polarity '{getattr(iob_globals(), 'reset_polarity', 'positive')}'."
+                )
 
     def create_conf_group(self, *args, **kwargs):
         create_conf_group(self, *args, **kwargs)

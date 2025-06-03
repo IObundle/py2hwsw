@@ -72,10 +72,10 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "weA_i",
+                "name": "wstrbA_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "weA_i", "width": "DATA_W/8"},
+                    {"name": "wstrbA_i", "width": "DATA_W/8"},
                 ],
             },
             {
@@ -114,10 +114,10 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "weB_i",
+                "name": "wstrbB_i",
                 "descr": "Input port",
                 "signals": [
-                    {"name": "weB_i", "width": "DATA_W/8"},
+                    {"name": "wstrbB_i", "width": "DATA_W/8"},
                 ],
             },
             {
@@ -168,14 +168,14 @@ def setup(py_params_dict):
                .enA_i  (enA_i),
                .addrA_i(addrA_i),
                .dA_i   (dA_i[i*COL_W+:COL_W]),
-               .weA_i  (weA_i[i]),
+               .wstrbA_i  (wstrbA_i[i]),
                .dA_o   (dA_o[i*COL_W+:COL_W]),
 
                .clkB_i (clkB_i),
                .enB_i  (enB_i),
                .addrB_i(addrB_i),
                .dB_i   (dB_i[i*COL_W+:COL_W]),
-               .weB_i  (weB_i[i]),
+               .wstrbB_i  (wstrbB_i[i]),
                .dB_o   (dB_o[i*COL_W+:COL_W])
             );
          end
@@ -200,7 +200,7 @@ def setup(py_params_dict):
          always @(posedge clkA_i) begin
             if (enA_i) begin
                for (i = 0; i < NUM_COL; i = i + 1) begin
-                  if (weA_i[i]) begin
+                  if (wstrbA_i[i]) begin
                      ram_block[addrA_i][i*COL_W+:COL_W] <= dA_i[i*COL_W+:COL_W];
                   end
                end
@@ -216,7 +216,7 @@ def setup(py_params_dict):
          always @(posedge clkB_i) begin
             if (enB_i) begin
                for (j = 0; j < NUM_COL; j = j + 1) begin
-                  if (weB_i[j]) begin
+                  if (wstrbB_i[j]) begin
                      ram_block[addrB_i][j*COL_W+:COL_W] <= dB_i[j*COL_W+:COL_W];
                   end
                end

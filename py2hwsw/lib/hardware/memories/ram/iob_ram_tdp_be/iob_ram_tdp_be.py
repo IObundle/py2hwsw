@@ -77,7 +77,7 @@ def setup(py_params_dict):
                 "descr": "Memory interface A",
                 "signals": [
                     {"name": "enA_i", "width": 1},
-                    {"name": "weA_i", "width": "DATA_W/8"},
+                    {"name": "wstrbA_i", "width": "DATA_W/8"},
                     {"name": "addrA_i", "width": "ADDR_W"},
                     {"name": "dA_i", "width": "DATA_W"},
                     {"name": "dA_o", "width": "DATA_W"},
@@ -88,7 +88,7 @@ def setup(py_params_dict):
                 "descr": "Memory interface B",
                 "signals": [
                     {"name": "enB_i", "width": 1},
-                    {"name": "weB_i", "width": "DATA_W/8"},
+                    {"name": "wstrbB_i", "width": "DATA_W/8"},
                     {"name": "addrB_i", "width": "ADDR_W"},
                     {"name": "dB_i", "width": "DATA_W"},
                     {"name": "dB_o", "width": "DATA_W"},
@@ -120,13 +120,13 @@ def setup(py_params_dict):
             .enA_i  (enA_i),
             .addrA_i(addrA_i),
             .dA_i   (dA_i[index*COL_W+:COL_W]),
-            .weA_i  (weA_i[index]),
+            .weA_i  (wstrbA_i[index]),
             .dA_o   (dA_o[index*COL_W+:COL_W]),
 
             .enB_i  (enB_i),
             .addrB_i(addrB_i),
             .dB_i   (dB_i[index*COL_W+:COL_W]),
-            .weB_i  (weB_i[index]),
+            .weB_i  (wstrbB_i[index]),
             .dB_o   (dB_o[index*COL_W+:COL_W])
          );
       end

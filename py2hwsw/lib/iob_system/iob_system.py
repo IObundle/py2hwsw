@@ -63,7 +63,7 @@ def setup(py_params_dict):
         "name": params["name"],
         "generate_hw": True,
         "is_system": True,
-        "board_list": ["iob_aes_ku040_db_g", "iob_zybo_z7"],
+        "board_list": ["iob_aes_ku040_db_g", "iob_zybo_z7", "iob_cyclonev_gt_dk"],
         "python_parameters": python_parameters_attribute,
         "confs": [
             # macros
@@ -254,7 +254,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W-2",
+                    "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": 1,
@@ -280,7 +280,7 @@ def setup(py_params_dict):
                 "descr": "IOb subordinate interface for external CPU. Gives direct access to system peripherals",
                 "signals": {
                     "type": "iob",
-                    "ADDR_W": "AXI_ADDR_W-2",
+                    "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                 },
             },
@@ -319,7 +319,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "prefix": "cpu_i_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": params["addr_w"] - 2,
+                    "ADDR_W": params["addr_w"],
                     "DATA_W": params["data_w"],
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": "1",
@@ -332,7 +332,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "prefix": "cpu_d_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": params["addr_w"] - 2,
+                    "ADDR_W": params["addr_w"],
                     "DATA_W": params["data_w"],
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": "1",
@@ -380,7 +380,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "prefix": "int_mem_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": f"{params['mem_addr_w']}-2",
+                    "ADDR_W": f"{params['mem_addr_w']}",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": 1,
@@ -396,8 +396,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "prefix": "bootrom_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": (params["bootrom_addr_w"] + 1)
-                    - 2,  # +1 for csrs; -2 for lsbs
+                    "ADDR_W": params["bootrom_addr_w"] + 1,  # +1 for csrs
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                     "LOCK_W": "1",
@@ -413,7 +412,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "prefix": "periphs_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": params["addr_w"] - 2 - xbar_sel_w,
+                    "ADDR_W": params["addr_w"] - xbar_sel_w,
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                 },
@@ -435,7 +434,7 @@ def setup(py_params_dict):
                     "type": "iob",
                     "prefix": "periphs_",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": params["addr_w"] - 2 - xbar_sel_w,
+                    "ADDR_W": params["addr_w"] - xbar_sel_w,
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                 },
@@ -485,11 +484,11 @@ def setup(py_params_dict):
                     "plic_interrupts_i": "interrupts",
                     "plic_cbus_s": (
                         "plic_cbus",
-                        ["plic_cbus_iob_addr[22-2-1:0]"],
+                        ["plic_cbus_iob_addr[22-1:0]"],
                     ),
                     "clint_cbus_s": (
                         "clint_cbus",
-                        ["clint_cbus_iob_addr[16-2-1:0]"],
+                        ["clint_cbus_iob_addr[16-1:0]"],
                     ),
                 },
             },
@@ -509,7 +508,7 @@ def setup(py_params_dict):
                     "s1_axi_s": "cpu_dbus",
                     # Manager interfaces connected below
                 },
-                "addr_w": params["addr_w"] - 2,
+                "addr_w": params["addr_w"],
                 "data_w": params["data_w"],
                 "lock_w": 1,
                 "num_subordinates": 2,
@@ -575,8 +574,6 @@ def setup(py_params_dict):
                     "axi_s": (
                         "int_mem_axi",
                         [
-                            "{int_mem_axi_araddr, 2'b0}",
-                            "{int_mem_axi_awaddr, 2'b0}",
                             "{1'b0, int_mem_axi_arlock}",
                             "{1'b0, int_mem_axi_awlock}",
                         ],
@@ -604,7 +601,7 @@ def setup(py_params_dict):
                             "{1'b0, bootrom_axi_awlock}",
                         ],
                     ),
-                    "ext_rom_bus_m": "rom_bus_m",
+                    "rom_bus_m": "rom_bus_m",
                 },
                 "bootrom_addr_w": params["bootrom_addr_w"],
                 "soc_name": params["name"],
@@ -619,7 +616,7 @@ def setup(py_params_dict):
                 "parameters": {
                     "AXI_ID_WIDTH": "AXI_ID_W",
                     "AXI_LEN_WIDTH": "AXI_LEN_W",
-                    "ADDR_WIDTH": params["addr_w"] - 2 - xbar_sel_w,
+                    "ADDR_WIDTH": params["addr_w"] - xbar_sel_w,
                     "DATA_WIDTH": "AXI_DATA_W",
                 },
                 "connect": {
@@ -651,7 +648,7 @@ def setup(py_params_dict):
                     # Peripherals cbus connections added automatically
                 },
                 "num_outputs": 0,  # Num outputs configured automatically
-                "addr_w": params["addr_w"] - 2 - xbar_sel_w,
+                "addr_w": params["addr_w"] - xbar_sel_w,
             },
             # Peripherals
             {

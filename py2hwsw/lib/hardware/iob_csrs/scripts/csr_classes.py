@@ -13,12 +13,12 @@ class iob_csr:
     """Class to represent a Control/Status Register."""
 
     name: str = ""
-    type: str = ""
+    type: str = "REG"
+    mode: str = ""
     n_bits: str or int = 1
     rst_val: int = 0
     addr: int = -1
     log2n_items: int = 0
-    autoreg: bool = True
     descr: str = "Default description"
     # Select if should generate internal wires or ports for this CSR
     internal_use: bool = False
@@ -27,13 +27,29 @@ class iob_csr:
     volatile: bool = True
     # Bit fields
     fields: list or None = None
+    # Asymetric ration between internal and external interfaces address
+    # asym >= 1: W_INT = W_EXT * asym
+    # asym <= -1: W_INT = W_EXT / (-asym)
+    asym: int = 1
+    # Optional comment to include in generated verilog of each csr (inside *_csrs.v)
+    optional_comment: str = ""
 
     def __post_init__(self):
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
 
-        if self.type not in ["R", "W", "RW"]:
+        if self.type not in ["REG", "NOAUTO"]:
+            # FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
             fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
+
+        if self.mode not in ["R", "W", "RW"]:
+            fail_with_msg(f"Invalid CSR mode: '{self.mode}'", ValueError)
+
+        if self.asym == 0:
+            fail_with_msg(
+                "CSR asym attribute cannot be 0. Must be either >= 1 or <= -1.",
+                ValueError,
+            )
 
         # try to convert n_bits to int
         try:
@@ -45,7 +61,7 @@ class iob_csr:
             self.fields = [
                 csr_field(
                     name=self.name,
-                    type=self.type,
+                    mode=self.mode,
                     base_bit=0,
                     width=self.n_bits,
                     volatile=self.volatile,
@@ -53,17 +69,19 @@ class iob_csr:
                 )
             ]
             # fail_with_msg(f"CSR '{self.name}' has no bit fields", ValueError)
+        else:  # Convert fields to objects
+            self.fields = convert_dict2obj_list(self.fields, csr_field)
 
         # Check if fields properties match CSR properties
         for _field in self.fields:
-            if self.type == "R" and _field.type != "R":
+            if self.mode == "R" and _field.mode != "R":
                 fail_with_msg(
-                    f"CSR '{self.name}' defined with type '{self.type}' has invalid field type '{_field.type}'.",
+                    f"CSR '{self.name}' defined with mode '{self.mode}' has invalid field mode '{_field.mode}'.",
                     ValueError,
                 )
-            elif self.type == "W" and _field.type != "W":
+            elif self.mode == "W" and _field.mode != "W":
                 fail_with_msg(
-                    f"CSR '{self.name}' defined with type '{self.type}' has invalid field type '{_field.type}'.",
+                    f"CSR '{self.name}' defined with mode '{self.mode}' has invalid field mode '{_field.mode}'.",
                     ValueError,
                 )
 
@@ -101,7 +119,7 @@ class iob_csr:
             elif width > 0:
                 self.fields.append(
                     csr_field(
-                        name="RSVD", type=self.type, base_bit=idx - width, width=width
+                        name="RSVD", mode=self.mode, base_bit=idx - width, width=width
                     )
                 )
                 width = 0
@@ -109,7 +127,7 @@ class iob_csr:
             self.fields.append(
                 csr_field(
                     name="RSVD",
-                    type=self.type,
+                    mode=self.mode,
                     base_bit=len(used_bits) - width,
                     width=width,
                 )
@@ -119,18 +137,47 @@ class iob_csr:
 @dataclass
 class csr_field:
     name: str = ""
-    type: str = ""
+    mode: str = ""
     base_bit: int = 0
     width: int = 1
     volatile: bool = True
     rst_val: int = 0
+    # Similar to 'modifiedWriteValue' in IPxact.
+    write_action: str = ""
+    # SImilar to 'readAction' in IPxact
+    read_action: str = ""
 
     def __post_init__(self):
         if not self.name:
             fail_with_msg("CSR field name is not set", ValueError)
 
-        if self.type not in ["R", "W", "RW"]:
-            fail_with_msg(f"Invalid CSR field type: '{self.type}'", ValueError)
+        if self.mode not in ["R", "W", "RW"]:
+            fail_with_msg(
+                f"Invalid CSR field mode '{self.mode}' in field '{self.name}'",
+                ValueError,
+            )
+
+        if self.write_action not in [
+            "",  # Indicates that the value written to a field is the value stored in the field. This is the default.
+            "oneToClear",  # Each written '1' bit will assign the corresponding bit to '0'.
+            "oneToSet",  # Each written '1' bit will assign the corresponding bit to '1'.
+            "oneToToggle",  # Each written '1' bit will toggle the corresponding bit.
+            "zeroToClear, zeroToSet, zeroToToggle",  # Similar to previous ones, except that written '0' bit triggers the action.
+            "clear",  # Each write operation will clear all bits in the field to '0'.
+            "set",  # Each write operation will set all bits in the field to '1'.
+            "modify",  # Indicates that after a write operation all bits in the field can be modified.
+        ]:
+            fail_with_msg(
+                f"Invalid CSR write_action: '{self.write_action}'", ValueError
+            )
+
+        if self.read_action not in [
+            "",  # Indicates that field is not modified after a read operation. This is the default.
+            "clear",  # All bits in the field are cleared to '0' after a read operation.
+            "set",  # All bits in the field are set to '1' after a read operation.
+            "modify",  # Indicates that the bits in the field are modified in some way after a read operation.
+        ]:
+            fail_with_msg(f"Invalid CSR read_action: '{self.read_action}'", ValueError)
 
 
 def fail_with_msg(msg, exception_type=Exception):

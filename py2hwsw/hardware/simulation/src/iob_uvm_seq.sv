@@ -9,7 +9,6 @@
 `define F 2
 
 `define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))
-`define IOB_WORD_ADDRESS(ADDR) ((ADDR>>2)<<2)
 
 `define IOB_BYTE_OFFSET(ADDR) (ADDR%(32/8))
 
@@ -85,7 +84,7 @@ class iob_sequence extends uvm_sequence #(iob_transaction);
                         return;
                      end else if (mode == `R) begin  // Read request
                         trans.valid = 1;
-                        trans.addr  = `IOB_WORD_ADDRESS(address);
+                        trans.addr  = address;
                         trans.wstrb = 0;
                         `uvm_info("SEQ", $sformatf("Read request received: addr=%08x wstrb=%08x",
                                                    trans.addr, trans.wstrb), UVM_LOW)
@@ -102,7 +101,7 @@ class iob_sequence extends uvm_sequence #(iob_transaction);
                                 ack, mode, address, data_w, trans.rdata), UVM_LOW)
                      end else if (mode == `W) begin  // Write request
                         trans.valid = 1;
-                        trans.addr  = `IOB_WORD_ADDRESS(address);
+                        trans.addr  = address;
                         trans.wdata = `IOB_GET_WDATA(address, data);
                         trans.wstrb = `IOB_GET_WSTRB(address, data_w);
                         `uvm_info(

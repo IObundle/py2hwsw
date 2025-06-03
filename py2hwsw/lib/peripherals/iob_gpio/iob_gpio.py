@@ -144,11 +144,10 @@ def setup(py_params_dict):
         regs.append(
             {
                 "name": "input_" + str(idx),
-                "type": "R",
+                "mode": "R",
                 "n_bits": 32,
                 "rst_val": 0,
                 "log2n_items": 0,
-                "autoreg": True,
                 "descr": "Value of GPIO input port " + str(idx),
             }
         )
@@ -160,11 +159,10 @@ def setup(py_params_dict):
         regs.append(
             {
                 "name": "output_" + str(idx),
-                "type": "W",
+                "mode": "W",
                 "n_bits": 32,
                 "rst_val": 0,
                 "log2n_items": 0,
-                "autoreg": True,
                 "descr": "Value of GPIO output port " + str(idx),
             }
         )
@@ -172,11 +170,10 @@ def setup(py_params_dict):
             regs.append(
                 {
                     "name": "output_enable_" + str(idx),
-                    "type": "W",
+                    "mode": "W",
                     "n_bits": 32,
                     "rst_val": 0,
                     "log2n_items": 0,
-                    "autoreg": True,
                     "descr": f'32 bits: 1 bit for each bit in GPIO output {idx}. Bits with "1" are driven with output value, bits with "0" are in tristate.',
                 }
             )

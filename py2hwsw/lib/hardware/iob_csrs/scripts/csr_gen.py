@@ -1492,35 +1492,31 @@ tables. The tables give information on the name, read/write capability, address,
             for csr_group in doc_table:
                 csrs_file.write(
                     """
-\\begin{table}[H]
-  \\centering
-  \\begin{tabularx}{\\textwidth}{|l|c|c|c|c|X|}
+\\begin{xltabular}{\\textwidth}{|l|c|c|c|c|X|}
 
-    \\hline
-    \\rowcolor{iob-green}
-    {\\bf Name} & {\\bf R/W} & {\\bf Addr} & {\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ \\hline
+  \\hline
+  \\rowcolor{iob-green}
+  {\\bf Name} & {\\bf R/W} & {\\bf Addr} & {\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ \\hline
 
-    \\input """
+  \\input """
                     + doc_conf
                     + f"_{csr_group.name}"
                     + """_csrs_tab
 
-  \\end{tabularx}
   \\caption{"""
                     + csr_group.descr.replace("_", "\\_")
                     + """}
-  \\label{"""
+\\end{xltabular}
+\\label{"""
                     + doc_conf
                     + f"_{csr_group.name}"
                     + """_csrs_tab:is}
-\\end{table}
 """
                 )
 
                 if csr_group.doc_clearpage:
                     csrs_file.write("\\clearpage")
 
-        csrs_file.write("\\clearpage")
         csrs_file.close()
 
     # Generate TeX tables of registers

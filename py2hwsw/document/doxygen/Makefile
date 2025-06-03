@@ -14,7 +14,7 @@ DOXYGEN_INPUT = $(shell grep -rl "@file" ${INPUT_PATH})
 
 REFMAN_TEX ?= $(LATEX_DIR)/refman.tex
 
-all: clean $(REFMAN_TEX)
+all: clean doxygen.tex
 
 $(REFMAN_TEX):
 	export DOXYGEN_NAME="$(DOXYGEN_NAME)";\
@@ -22,10 +22,11 @@ $(REFMAN_TEX):
 	export DOXYGEN_INPUT="$(DOXYGEN_INPUT)";\
 		doxygen Doxyfile
 
-list-doxygen-file-docs: $(REFMAN_TEX)
-	@sed -n '/^\\chapter{File Documentation}/,/^%--- End generated contents ---/p' $(REFMAN_TEX) | grep input
+doxygen.tex: $(REFMAN_TEX)
+	@sed -n '/^\\chapter{File Documentation}/,/^%--- End generated contents ---/p' $(REFMAN_TEX) |\
+		grep input > $@
 
 clean:
-	rm -rf $(LATEX_DIR)
+	rm -rf $(LATEX_DIR) doxygen.tex
 
 .PHONY: all clean list-doxygen-file-docs

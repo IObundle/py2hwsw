@@ -52,11 +52,15 @@ pb_figs:
 	make -C ./figures pb_figs
 
 #doxygen documentation
-doxygen:
 ifeq ($(DOXYGEN),1)
+TSRC+=doxygen.tex
+doxygen.tex: doxygen
+	cp doxygen/doxygen.tex $@
+	cp doxygen/latex/*.tex .
+	cp doxygen/latex/*.sty .
+
+doxygen:
 	make -C ./doxygen all
-else
-	@echo "Skipping Doxygen documentation generation. Set DOXYGEN=1 to enable."
 endif
 
 #build document
@@ -77,7 +81,7 @@ pbtop.tex:
 	make doctop DOC=pb
 
 #build user guide document type
-ug.pdf: debug results figs doxygen ugtop.tex
+ug.pdf: debug results figs ugtop.tex
 	pdflatex -jobname ug ugtop.tex
 	if [ -f *.bib ]; then bibtex ug; fi
 	pdflatex -jobname ug ugtop.tex
@@ -153,5 +157,5 @@ debug: $(TSRC)
 	@echo AMD_FPGA=$(AMD_FPGA)
 	@echo ASIC_NODE=$(ASIC_NODE)
 
-.PHONY: view doctop figs results build clean test debug
+.PHONY: view doctop figs results build clean test debug doxygen
 

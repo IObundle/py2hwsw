@@ -22,7 +22,6 @@
 \RequirePackage[all]{nowidow}
 \RequirePackage{enumerate}
 \RequirePackage{enumitem}
-\RequirePackage{longtable}
 
 \RequirePackage{float}
 \RequirePackage{color, colortbl}
@@ -34,6 +33,21 @@
 \RequirePackage[binary-units=true]{siunitx}
 \RequirePackage[all]{nowidow}
 \RequirePackage{lscape}
+
+\ifdefined\DOXYGEN
+%% moved from doxygen.sty due to workaround for LaTex 2019 version and unmaintained tabu package
+\RequirePackage{ifthen}
+
+\RequirePackage{doxygen}
+
+% Doxygen uses this command to escape underscore expressions, 
+% is generated directly in refman.tex
+\newcommand{\+}{\discretionary{\mbox{\scriptsize$\hookleftarrow$}}{}{}}
+\else
+\RequirePackage{longtable}
+\RequirePackage{xltabular}
+
+\fi
 
 \widowpenalty10000
 \clubpenalty10000

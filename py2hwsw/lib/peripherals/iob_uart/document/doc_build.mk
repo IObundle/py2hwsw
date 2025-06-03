@@ -8,4 +8,4 @@
 #
 
 #Set DOXYGEN to 1 to include software documentation section from Doxygen
-DOXYGEN?=0
+DOXYGEN?=1

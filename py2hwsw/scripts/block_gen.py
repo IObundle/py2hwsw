@@ -28,7 +28,7 @@ def generate_subblocks_table_tex(subblocks, out_dir):
     for group in subblocks:
         subblocks_file.write(
             """
-\\begin{xltabular}{\\textwidth}{|l|X|}
+\\begin{xltabular}{\\textwidth}{|l|l|X|}
 
   \\hline
   \\rowcolor{iob-green}

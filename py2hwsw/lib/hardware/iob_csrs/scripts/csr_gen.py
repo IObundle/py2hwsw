@@ -1543,14 +1543,14 @@ not have any effect.
             for csr_group in doc_table:
                 tex_table = []
                 for reg in csr_group.regs:
-                    sw_width = self.bceil(reg["n_bits"], 3)
+                    sw_width = self.bceil(reg.n_bits, 3)
                     if sw_width == 24:
                         sw_width = 32
                     tex_table.append(
                         [
                             reg.name.upper(),
                             reg.mode,
-                            f"0x{reg['addr']:X}",  # Capitalized hex
+                            f"0x{reg.addr:X}",  # Capitalized hex
                             str(reg.n_bits),
                             str(sw_width),
                             str(reg.rst_val),

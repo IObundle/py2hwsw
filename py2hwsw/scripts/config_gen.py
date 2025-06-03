@@ -85,8 +85,6 @@ def conf_vh(macros, top_module, out_dir):
             if macro.if_defined or macro.if_not_defined:
                 file2create.write("`endif\n")
 
-    # file2create.write(f"\n`endif // VH_{fname}_VH\n")
-
 
 def conf_h(macros, top_module, out_dir):
     """Given a list with groups of macros, generate a `*_conf.h` file with the software macro definitions.
@@ -297,9 +295,22 @@ def generate_confs_tex(confs, out_dir):
                 constant[i] = str(constant[i]).replace("_", "\\_")
                 constant[i] = str(constant[i]).replace("$clog2", "log2")
             # write the line
-            file2create.write(
-                f"  \\item[{constant[0]}] {constant[2]} Value: {constant[1]}.\n"
-            )
+            if constant[0] == "VERSION":
+                # Version is special, it must have the version as a string after the value
+                # Remove the 16'h prefix and first 0 if present, add . before the last 2 digits and add V at the start
+                version = str(constant[1]).replace("16'h", "")
+                if version.startswith("0"):
+                    version = version[1:]
+                version = (
+                    version[:-2] + "." + version[-2:]
+                )  # Add . before last 2 digits
+                file2create.write(
+                    f"  \\item[{constant[0]}] {constant[2]} Value: {constant[1]} = V{version}.\n"
+                )
+            else:
+                file2create.write(
+                    f"  \\item[{constant[0]}] {constant[2]} Value: {constant[1]}.\n"
+                )
         file2create.write("\\end{description}\n")
 
 

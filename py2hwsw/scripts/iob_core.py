@@ -271,7 +271,7 @@ class iob_core(iob_module, iob_instance):
             name="VERSION",
             type="C",
             val="16'h" + self.version_str_to_digits(self.version),
-            descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
+            descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part.",
         )
 
         # Ensure superblocks are set up last

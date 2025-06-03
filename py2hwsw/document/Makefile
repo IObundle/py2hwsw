@@ -56,6 +56,7 @@ ifeq ($(DOXYGEN),1)
 TSRC+=doxygen.tex
 doxygen.tex: doxygen
 	cp doxygen/doxygen.tex $@
+	cp doxygen/*.sty .
 	cp doxygen/latex/*.tex .
 	cp doxygen/latex/*.sty .
 

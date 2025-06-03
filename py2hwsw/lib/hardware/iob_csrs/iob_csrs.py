@@ -13,6 +13,11 @@ from reg_gen import generate_csr
 from csr_classes import create_csr_group
 from interrupts import find_and_update_interrupt_csrs
 from fifos import find_and_update_fifo_csrs
+from roms import find_and_update_rom_csrs
+from memories import find_and_update_regarray_csrs
+from memories import find_and_update_regfile_csrs
+from memories import find_and_update_ram_csrs
+from special_csrs import find_and_update_autoclear_csrs
 
 # Static (shared) dictionary to store reg tables of generated csrs
 # May be read by other python modules
@@ -30,11 +35,10 @@ def setup(py_params_dict):
                 "regs": [
                     {
                         "name": "dummy_reg",
-                        "type": "W",
+                        "mode": "W",
                         "n_bits": 1,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "autoreg": True,
                         "descr": "Dummy register for demo",
                     },
                 ],
@@ -163,7 +167,67 @@ def setup(py_params_dict):
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",
             },
         ],
-        "wires": [],
+        "wires": [
+            {
+                "name": "internal_iob",
+                "descr": "Internal iob interface",
+                "signals": {
+                    "type": "iob",
+                    "prefix": "internal_",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
+            },
+            {
+                "name": "state",
+                "descr": "",
+                "signals": [
+                    {"name": "state", "width": 1},
+                ],
+            },
+            {
+                "name": "state_nxt",
+                "descr": "",
+                "signals": [
+                    {"name": "state_nxt", "width": 1, "isvar": True, "isreg": True},
+                ],
+            },
+            {
+                "name": "write_en",
+                "descr": "",
+                "signals": [
+                    {"name": "write_en", "width": 1},
+                ],
+            },
+            {
+                "name": "internal_iob_addr",
+                "descr": "",
+                "signals": [
+                    {"name": "internal_iob_addr"},
+                ],
+            },
+            {
+                "name": "internal_iob_addr_stable",
+                "descr": "",
+                "signals": [
+                    {"name": "internal_iob_addr_stable", "width": "ADDR_W"},
+                ],
+            },
+            {
+                "name": "internal_iob_addr_reg",
+                "descr": "",
+                "signals": [
+                    {"name": "internal_iob_addr_reg", "width": "ADDR_W"},
+                ],
+            },
+            {
+                "name": "internal_iob_addr_reg_en",
+                "descr": "",
+                "signals": [
+                    {"name": "internal_iob_addr_reg_en", "width": 1},
+                ],
+            },
+        ],
         "subblocks": [
             {
                 "core_name": "iob_functions",
@@ -182,13 +246,94 @@ def setup(py_params_dict):
                 },
                 "instantiate": False,
             },
+            {
+                "core_name": "iob_ctls",
+                "instance_name": "iob_ctls_inst",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_reg",
+                "instance_name": "internal_addr_reg",
+                "instance_description": "store iob addr",
+                "parameters": {
+                    "DATA_W": "ADDR_W",
+                    "RST_VAL": "{ADDR_W{1'b0}}",
+                },
+                "port_params": {
+                    "clk_en_rst_s": "c_a_e",
+                },
+                "connect": {
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "en_i:internal_iob_addr_reg_en",
+                        ],
+                    ),
+                    "data_i": "internal_iob_addr",
+                    "data_o": "internal_iob_addr_reg",
+                },
+            },
+            {
+                "core_name": "iob_reg",
+                "instance_name": "state_reg",
+                "instance_description": "state register",
+                "parameters": {
+                    "DATA_W": 1,
+                    "RST_VAL": "1'b0",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "data_i": "state_nxt",
+                    "data_o": "state",
+                },
+            },
         ],
-        "snippets": [],
+        "snippets": [
+            {
+                "verilog_code": """
+    // Include iob_functions for use in parameters
+    `include "iob_functions.vs"
+    `define IOB_NBYTES (DATA_W/8)
+    `define IOB_NBYTES_W $clog2(`IOB_NBYTES)
+    `define IOB_WORD_ADDR(ADDR) ((ADDR>>`IOB_NBYTES_W)<<`IOB_NBYTES_W)\n
+    localparam WSTRB_W = DATA_W/8;
+
+    //FSM states
+    localparam WAIT_REQ = 1'd0;
+    localparam WAIT_RVALID = 1'd1;
+
+
+    assign internal_iob_addr_reg_en = (state == WAIT_REQ);
+    assign internal_iob_addr_stable = (state == WAIT_RVALID) ? internal_iob_addr_reg : internal_iob_addr;
+
+    assign write_en = |internal_iob_wstrb;
+
+    //write address
+    wire [($clog2(WSTRB_W)+1)-1:0] byte_offset;
+    iob_ctls #(.W(WSTRB_W), .MODE(0), .SYMBOL(0)) bo_inst (.data_i(internal_iob_wstrb), .count_o(byte_offset));
+"""
+            }
+        ],
     }
 
     params["csrs"] = create_group_for_ungrouped_csrs(params["csrs"])
-    find_and_update_interrupt_csrs(params["csrs"])
-    find_and_update_fifo_csrs(params["csrs"], attributes_dict)
+
+    #
+    # Layer 1 CSRs: Adds support for special CSRs. All of these will be converted into Layer 0 CSRs with extra logic.
+    #
+    find_and_update_interrupt_csrs(params["csrs"])  # "INTERUPT"
+    find_and_update_fifo_csrs(params["csrs"], attributes_dict)  # "FIFO", "AFIFO"
+    find_and_update_rom_csrs(params["csrs"], attributes_dict)  # "ROM"
+    # "REG" with log2n_items > 0
+    find_and_update_regarray_csrs(params["csrs"], attributes_dict)
+    find_and_update_regfile_csrs(params["csrs"], attributes_dict)  # "REGFILE"
+    find_and_update_ram_csrs(params["csrs"], attributes_dict)  # "RAM"
+    # "NOAUTO" with autoclear = True
+    find_and_update_autoclear_csrs(params["csrs"], attributes_dict)
+
+    #
+    # Layer 0 CSRs: From this point, params["csrs"] only contains basic Layer 0 CSRs: "REG", "NOAUTO"
+    #
 
     # Convert csrs dictionaries to objects
     csrs_obj_list = []
@@ -249,10 +394,8 @@ def setup(py_params_dict):
 
     # Set correct address width in ADDR_W (false-)parameter
     attributes_dict["confs"][0]["val"] = csr_gen_obj.core_addr_w
-    # Set correct address width in control_if port (ADDR_W - 2 lsbs)
-    attributes_dict["ports"][1]["signals"]["ADDR_W"] = max(
-        1, csr_gen_obj.core_addr_w - 2
-    )
+    # Set correct address width in control_if port
+    attributes_dict["ports"][1]["signals"]["ADDR_W"] = max(1, csr_gen_obj.core_addr_w)
 
     return attributes_dict
 

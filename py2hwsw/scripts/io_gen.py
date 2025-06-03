@@ -95,32 +95,28 @@ Note that the ouput signals are registered in the core, while the input signals 
     for port in ports:
         if_file.write(
             """
-\\begin{table}[H]
-  \\centering
-  \\begin{tabularx}{\\textwidth}{|l|l|r|X|}
+\\begin{xltabular}{\\textwidth}{|l|l|r|X|}
 
-    \\hline
-    \\rowcolor{iob-green}
-    {\\bf Name} & {\\bf Direction} & {\\bf Width} & {\\bf Description}  \\\\ \\hline \\hline
+  \\hline
+  \\rowcolor{iob-green}
+  {\\bf Name} & {\\bf Direction} & {\\bf Width} & {\\bf Description}  \\\\ \\hline \\hline
 
-    \\input """
+  \\input """
             + port.name
             + """_if_tab
 
-  \\end{tabularx}
   \\caption{"""
             + port.descr.replace("_", "\\_")
             + """}
-  \\label{"""
+\\end{xltabular}
+\\label{"""
             + port.name
             + """_if_tab:is}
-\\end{table}
 """
         )
         if port.doc_clearpage:
             if_file.write("\\clearpage")
 
-    if_file.write("\\clearpage")
     if_file.close()
 
 

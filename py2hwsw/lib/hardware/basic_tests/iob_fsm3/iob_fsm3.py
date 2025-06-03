@@ -6,6 +6,7 @@
 def setup(py_params_dict):
     attributes_dict = {
         "generate_hw": True,
+        "reset_polarity": "negative",
         "ports": [
             {
                 "name": "a_o",

@@ -175,7 +175,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob",
                     "prefix": "control_",
-                    "ADDR_W": 2,
+                    "ADDR_W": 4,
                 },
             },
             {
@@ -280,7 +280,7 @@ def setup(py_params_dict):
             {
                 "verilog_code": """
             assign control_iob_valid = split_control_iob_valid;
-            assign control_iob_addr = split_control_iob_addr[2+:2];
+            assign control_iob_addr = split_control_iob_addr[3:0];
             assign control_iob_wdata = split_control_iob_wdata;
             assign control_iob_wstrb = split_control_iob_wstrb;
             assign split_control_iob_rvalid = control_iob_rvalid;

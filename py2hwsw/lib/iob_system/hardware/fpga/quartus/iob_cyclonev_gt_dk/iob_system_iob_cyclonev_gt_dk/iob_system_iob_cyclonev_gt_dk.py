@@ -195,7 +195,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
                 },
@@ -315,13 +315,7 @@ def setup(py_params_dict):
                     "clk_rst_i": "ddr3_ctr_clk_rst",
                     "general_io": "ddr3_ctr_general",
                     "ddr3_io": "ddr3_io",
-                    "s0_axi_s": (
-                        "axi",
-                        [
-                            "{axi_araddr, 2'b0}",
-                            "{axi_awaddr, 2'b0}",
-                        ],
-                    ),
+                    "s0_axi_s": "axi",
                 },
             },
         ]

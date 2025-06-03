@@ -206,9 +206,9 @@ class SwRegister:
         fields_xml = ""
         for csr_field in self.fields:
             # set the access type
-            if csr_field.type == "R":
+            if csr_field.mode == "R":
                 field_access_type = "read-only"
-            elif csr_field.type == "W":
+            elif csr_field.mode == "W":
                 field_access_type = "write-only"
             else:
                 field_access_type = "read-write"
@@ -224,6 +224,8 @@ class SwRegister:
 						<ipxact:bitWidth>{csr_field.width}</ipxact:bitWidth>
 						<ipxact:volatile>{str(csr_field.volatile).lower()}</ipxact:volatile>
 						<ipxact:access>{field_access_type}</ipxact:access>
+						<ipxact:modifiedWriteValue>{csr_field.write_action}</ipxact:modifiedWriteValue>
+						<ipxact:readAction>{csr_field.read_action}</ipxact:readAction>
 					</ipxact:field>
 """
 
@@ -510,7 +512,7 @@ def gen_memory_map_xml(sw_regs, parameters_list):
             sw_reg.name,
             sw_reg.addr,
             sw_reg.n_bits,
-            sw_reg.type,
+            sw_reg.mode,
             "arst_i",
             sw_reg.rst_val,
             sw_reg.volatile,

@@ -1293,14 +1293,6 @@ class csr_gen:
 
         fswhdr.write("//Addresses\n")
 
-        fswhdr.write("/**\n")
-        fswhdr.write(f" * @defgroup {doxygen_core}_address_macros\n")
-        fswhdr.write(
-            f" * @brief {doxygen_core} Control and Status Register Address definitions.\n"
-        )
-        fswhdr.write(" * @{\n")
-        fswhdr.write(" */\n")
-
         for row in table:
             name = row.name.upper()
             if "W" in row.mode or "R" in row.mode:
@@ -1311,17 +1303,8 @@ class csr_gen:
                 fswhdr.write(" */\n")
                 fswhdr.write(f"#define {addr_macro} {row.addr}\n")
 
-        fswhdr.write(f"/** @}} */ // end of {doxygen_core} CSR Addresses group")
-
         fswhdr.write("\n//Data widths (bit)\n")
 
-        fswhdr.write("/**\n")
-        fswhdr.write(f" * @defgroup {doxygen_core}_width_macros\n")
-        fswhdr.write(
-            f" * @brief {doxygen_core} Control and Status Register Width definitions.\n"
-        )
-        fswhdr.write(" * @{\n")
-        fswhdr.write(" */\n")
         for row in table:
             name = row.name.upper()
             n_bits = row.n_bits
@@ -1335,8 +1318,6 @@ class csr_gen:
                 fswhdr.write(f" * @brief {row.name} CSR Width.\n")
                 fswhdr.write(" */\n")
                 fswhdr.write(f"#define {width_macro} {n_bytes*8}\n")
-
-        fswhdr.write(f"/** @}} */ // end of {doxygen_core} CSR Widths group")
 
         fswhdr.write("\n// Base Address\n")
 
@@ -1375,20 +1356,6 @@ class csr_gen:
 
         fswhdr.write("\n// Core Setters and Getters\n")
 
-        fswhdr.write("/**\n")
-        fswhdr.write(f" * @defgroup {doxygen_core}_setters_getters\n")
-        fswhdr.write(
-            f" * @brief Core functions for setting and getting {doxygen_core} CSR values.\n"
-        )
-        fswhdr.write(" *\n")
-        fswhdr.write(
-            f" * These functions provide the necessary interface to interact with the {doxygen_core}\n"
-        )
-        fswhdr.write(
-            " * CSRs, allowing for configuration and monitoring of the iob_uart module.\n"
-        )
-        fswhdr.write(" * @{\n")
-        fswhdr.write(" */\n")
         for row in table:
             name = row.name
             n_bits = row.n_bits
@@ -1425,8 +1392,6 @@ class csr_gen:
                 fswhdr.write(f" * @return {sw_type} {name} value.\n")
                 fswhdr.write(" */\n")
                 fswhdr.write(f"{sw_type} {core_prefix}get_{name}({addr_arg});\n")
-
-        fswhdr.write(f"/** @}} */ // end of {doxygen_core} setters and getters group\n")
 
         fswhdr.write(f"\n#endif // H_{core_prefix_upper}_CSRS_H\n")
 

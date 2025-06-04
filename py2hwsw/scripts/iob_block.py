@@ -51,6 +51,12 @@ def create_block(
     param core_name: Name of the core
     param instance_name: Verilog instance name
     """
+    # Create "iob_csrs" even when abort_reason is "ipxact_gen" in order to create CSRs memory map
+    # Skip all other blocks
+    if core.abort_reason and not (
+        core.abort_reason == "ipxact_gen" and core_name == "iob_csrs"
+    ):
+        return
     # Don't setup other destinations (like simulation) if this is a submodule and
     # the sub-submodule (we are trying to setup) is not for hardware/src/
     if (

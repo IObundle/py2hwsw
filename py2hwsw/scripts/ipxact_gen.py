@@ -710,12 +710,9 @@ def generate_ipxact_xml(core, dest_dir):
 
     csr_block = None
     # Find iob_csrs block in subblocks list
-    for block_group in core.subblocks:
-        for block in block_group.blocks:
-            if block.original_name == "iob_csrs":
-                csr_block = block
-                break
-        if csr_block:
+    for block in core.subblocks:
+        if block.original_name == "iob_csrs":
+            csr_block = block
             break
 
     # Add the CSR IF,

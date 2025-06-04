@@ -114,7 +114,7 @@ class iob_port(iob_wire):
         if isinstance(wire, str):
             if len(self.signals) != 1:
                 fail_with_msg(
-                    f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has more than one signal but is connected to one constant value '{port.e_connect}'!{iob_colors.ENDC}",
+                    f"{iob_colors.FAIL}Port '{self.name}' has more than one signal but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
                     ValueError,
                 )
             else:

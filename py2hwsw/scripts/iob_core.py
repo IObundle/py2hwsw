@@ -540,25 +540,24 @@ class iob_core(iob_module, iob_instance):
         assert (
             self.is_system
         ), "Internal error: only iob_system type cores need fixing cbus width"
-        for subblock_group in self.subblocks:
-            for subblock in subblock_group.blocks:
-                for port in subblock.ports:
-                    if (
-                        port.name == "iob_csrs_cbus_s"
-                        and port.interface.type == "iob"
-                        and port.e_connect
-                    ):
-                        # print(
-                        #     "DEBUG",
-                        #     self.name,
-                        #     port,
-                        #     file=sys.stderr,
-                        # )
-                        port_width = port.interface.widths["ADDR_W"]
-                        external_wire_prefix = port.e_connect.interface.prefix
-                        port.e_connect_bit_slices = [
-                            f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
-                        ]
+        for subblock in self.subblocks:
+            for port in subblock.ports:
+                if (
+                    port.name == "iob_csrs_cbus_s"
+                    and port.interface.type == "iob"
+                    and port.e_connect
+                ):
+                    # print(
+                    #     "DEBUG",
+                    #     self.name,
+                    #     port,
+                    #     file=sys.stderr,
+                    # )
+                    port_width = port.interface.widths["ADDR_W"]
+                    external_wire_prefix = port.e_connect.interface.prefix
+                    port.e_connect_bit_slices = [
+                        f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
+                    ]
 
     def __connect_memory(self, port, instantiator):
         """Create memory port in instantiatior and connect it to self"""

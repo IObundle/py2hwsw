@@ -33,15 +33,14 @@
 \RequirePackage[binary-units=true]{siunitx}
 \RequirePackage[all]{nowidow}
 \RequirePackage{lscape}
+\RequirePackage{longtable}
+\RequirePackage{xltabular}
 
 \ifdefined\DOXYGEN
 %% moved from doxygen.sty due to workaround for LaTex 2019 version and unmaintained tabu package
 \RequirePackage{ifthen}
 \RequirePackage{doxygen}
 \RequirePackage{doxygenfixes}
-\else
-\RequirePackage{longtable}
-\RequirePackage{xltabular}
 \fi
 
 \widowpenalty10000

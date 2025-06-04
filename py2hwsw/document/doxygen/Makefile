@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
+
 include ../../config_build.mk
 
 LATEX_DIR = ./latex
@@ -29,4 +30,4 @@ doxygen.tex: $(REFMAN_TEX)
 clean:
 	rm -rf $(LATEX_DIR) doxygen.tex
 
-.PHONY: all clean list-doxygen-file-docs
+.PHONY: all clean

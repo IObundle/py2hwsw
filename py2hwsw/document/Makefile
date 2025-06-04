@@ -55,10 +55,10 @@ pb_figs:
 ifeq ($(DOXYGEN),1)
 TSRC+=doxygen.tex
 doxygen.tex: doxygen
-	cp doxygen/doxygen.tex $@
-	cp doxygen/*.sty .
 	cp doxygen/latex/*.tex .
 	cp doxygen/latex/*.sty .
+	cp doxygen/*.sty . # copy custom .sty files after generated doxygen .sty
+	cp doxygen/doxygen.tex $@
 
 doxygen:
 	make -C ./doxygen all

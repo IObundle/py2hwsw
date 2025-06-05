@@ -84,7 +84,7 @@ def generate_subblocks(core):
 {param_gen.generate_inst_params(instance)}\
     ) """
 
-            code += f"""\
+        code += f"""\
         // {instance.instance_description}
         {instance.name} {params_str}{instance.instance_name} (
     {get_instance_port_connections(instance)}\

@@ -292,7 +292,7 @@ class csr_gen:
 
                 lines += (
                     f"    assign {name}_rdata = {name}{suffix};\n"
-                    f"    assign {name}_reg_en = {name}_w_valid | {name}_r_valid;\n"
+                    f"    assign {name}_reg_en = {name}_w_valid | {name}_wen_i;\n"
                     f"    assign {name}_reg_data = {name}_w_valid ? {name}_wdata : {name}{suffix_i};\n"
                 )
 
@@ -404,13 +404,6 @@ class csr_gen:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
             wires += [
                 {
-                    "name": f"{name}_r_valid",
-                    "descr": "",
-                    "signals": [
-                        {"name": f"{name}_r_valid", "width": 1},
-                    ],
-                },
-                {
                     "name": f"{name}_rdata",
                     "descr": "",
                     "signals": [
@@ -419,18 +412,15 @@ class csr_gen:
                 },
             ]
 
-            lines += f"    assign {name}_r_valid = internal_iob_valid & (!write_en & {name}_addressed_r);\n"
-
             # Create reg only if this is not a "RW" CSR. For "RW" we reuse CSR created previously.
             if "W" not in row.mode:
-                lines += "    iob_reg_cae #(\n"
+                lines += "    iob_reg_ca #(\n"
                 lines += f"      .DATA_W({n_bits}),\n"
                 lines += f"      .RST_VAL({rst_val_str})\n"
                 lines += f"    ) {name}_datareg_rd (\n"
                 lines += "      .clk_i  (clk_i),\n"
                 lines += "      .cke_i  (cke_i),\n"
                 lines += "      .arst_i (arst_i),\n"
-                lines += f"      .en_i   ({name}_r_valid),\n"
                 lines += f"      .data_i ({name}{suffix_i}),\n"
                 lines += f"      .data_o ({name}_rdata)\n"
                 lines += "    );\n\n"
@@ -623,7 +613,7 @@ class csr_gen:
                         register_signals.append(
                             {
                                 "name": name + "_wen_i",
-                                "width": self.verilog_max(n_bits, 1),
+                                "width": 1,
                             }
                         )
                     port_has_inputs = True
@@ -1030,13 +1020,13 @@ class csr_gen:
                 if name == "version":
                     pass
                 elif auto:
-                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}{suffix};\n"
-                    snippet += f"assign byte_aligned_{name}{suffix} = {name}_rdata;\n"
+                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name};\n"
+                    snippet += f"assign byte_aligned_{name} = {name}_rdata;\n"
                 else:
+                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata;\n"
                     snippet += (
-                        f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata{suffix};\n"
+                        f"assign byte_aligned_{name}_rdata = {name}_rdata{suffix};\n"
                     )
-                    snippet += f"assign byte_aligned_{name}_rdata{suffix} = {name}_rdata{suffix};\n"
 
         # Response signals switch logic
         if all_auto:
@@ -1106,10 +1096,10 @@ class csr_gen:
                     rst_val = row.rst_val
                     snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {8*n_bytes}'h{rst_val}|{8*n_bytes}'d0;\n"
                 elif auto:
-                    snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}{suffix}|{8*n_bytes}'d0;\n"
+                    snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}|{8*n_bytes}'d0;\n"
                 else:
                     snippet += f"""
-            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}_rdata{suffix}|{8*n_bytes}'d0;
+            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}_rdata|{8*n_bytes}'d0;
             rvalid_int = {name}_rvalid{suffix};
 """
                 if not auto:

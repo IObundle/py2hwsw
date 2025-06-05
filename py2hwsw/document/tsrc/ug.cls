@@ -22,7 +22,6 @@
 \RequirePackage[all]{nowidow}
 \RequirePackage{enumerate}
 \RequirePackage{enumitem}
-\RequirePackage{longtable}
 
 \RequirePackage{float}
 \RequirePackage{color, colortbl}
@@ -34,6 +33,15 @@
 \RequirePackage[binary-units=true]{siunitx}
 \RequirePackage[all]{nowidow}
 \RequirePackage{lscape}
+\RequirePackage{longtable}
+\RequirePackage{xltabular}
+
+\ifdefined\DOXYGEN
+%% moved from doxygen.sty due to workaround for LaTex 2019 version and unmaintained tabu package
+\RequirePackage{ifthen}
+\RequirePackage{doxygen}
+\RequirePackage{doxygenfixes}
+\fi
 
 \widowpenalty10000
 \clubpenalty10000

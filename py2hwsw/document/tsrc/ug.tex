@@ -3,8 +3,6 @@
 % SPDX-License-Identifier: MIT
 
 \documentclass{ug}
-\usepackage{xltabular}
-\hypersetup{bookmarksnumbered=true}
 
 \input{ug_title}
 \date{\today}
@@ -133,6 +131,12 @@ Registers (CSR) are outlined and explained.
 \section{Implementation Results}
 \label{sec:results}
 \input{results}
+\fi
+
+\ifdefined\DOXYGEN
+\section{Baremetal Drivers}
+\label{sec:baremetal}
+\input{doxygen}
 \fi
 
 \ifdefined\CUSTOM

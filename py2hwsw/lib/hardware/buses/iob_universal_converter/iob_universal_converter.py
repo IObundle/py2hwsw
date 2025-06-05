@@ -43,6 +43,28 @@ def setup(py_params_dict):
                 "max": 32,
             },
         ],
+    }
+    # Add AXI parameters if needed
+    if params["subordinate_if"] == "axi" or params["manager_if"] == "axi":
+        attributes_dict["confs"] += [
+            {
+                "name": "AXI_ID_W",
+                "descr": "AXI ID bus width",
+                "type": "P",
+                "val": 1,
+                "min": 1,
+                "max": 32,
+            },
+            {
+                "name": "AXI_LEN_W",
+                "descr": "AXI burst length width",
+                "type": "P",
+                "val": 8,
+                "min": 1,
+                "max": 8,
+            },
+        ]
+    attributes_dict |= {
         "ports": [
             {
                 "name": "clk_en_rst_s",
@@ -83,6 +105,7 @@ def setup(py_params_dict):
     #
     # Blocks
     #
+    attributes_dict["subblocks"] = []
     # Subordinate interface converters
     if params["subordinate_if"] == "wb":
         # "Wishbone" interface
@@ -98,7 +121,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "wb_s": "s_s",
-                    "iob_m": "iob",
+                    "iob_m": "internal_iob",
                 },
             }
         )
@@ -118,7 +141,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "apb_s": "s_s",
-                    "iob_m": "iob",
+                    "iob_m": "internal_iob",
                 },
             }
         )
@@ -136,7 +159,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "axil_s": "s_s",
-                    "iob_m": "iob",
+                    "iob_m": "internal_iob",
                 },
             }
         )
@@ -162,7 +185,7 @@ def setup(py_params_dict):
                             "axi_arlock_i[0]",
                         ],
                     ),
-                    "iob_m": "iob",
+                    "iob_m": "internal_iob",
                 },
             }
         )
@@ -180,8 +203,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "wb_m": "m_m",
                     "iob_s": "internal_iob",
+                    "wb_m": "m_m",
                 },
             }
         )
@@ -200,8 +223,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "apb_m": "m_m",
                     "iob_s": "internal_iob",
+                    "apb_m": "m_m",
                 },
             }
         )
@@ -218,8 +241,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "axil_m": "m_m",
                     "iob_s": "internal_iob",
+                    "axil_m": "m_m",
                 },
             }
         )
@@ -238,6 +261,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
+                    "iob_s": "internal_iob",
                     "axi_m": (
                         "m_m",
                         [
@@ -245,7 +269,6 @@ def setup(py_params_dict):
                             "axi_arlock_i[0]",
                         ],
                     ),
-                    "iob_s": "internal_iob",
                 },
             }
         )

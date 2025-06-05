@@ -738,97 +738,42 @@ class csr_gen:
                 }
             )
 
-        # TODO: These converters should be handled by a single universal converter as specified in: https://github.com/IObundle/py2hwsw/issues/259
-        if core_attributes["csr_if"] == "iob":
-            # "IOb" CSR_IF
-            snippet += """
-   assign internal_iob_valid = iob_valid_i;
-   assign internal_iob_addr = iob_addr_i;
-   assign internal_iob_wdata = iob_wdata_i;
-   assign internal_iob_wstrb = iob_wstrb_i;
-   assign internal_iob_rready = iob_rready_i;
-   assign iob_rvalid_o = internal_iob_rvalid;
-   assign iob_rdata_o = internal_iob_rdata;
-   assign iob_ready_o = internal_iob_ready;
-"""
-        elif core_attributes["csr_if"] == "apb":
-            # "APB" CSR_IF
-            subblocks.append(
+        subblocks.append(
+            {
+                "core_name": "iob_universal_converter",
+                "instance_name": "iob_universal_converter",
+                "instance_description": "Convert IOb port from testbench into correct interface for UART CSRs bus",
+                "subordinate_if": core_attributes["csr_if"],
+                "manager_if": "iob",
+                "parameters": {
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "s_s": "control_if_s",
+                    "m_m": "internal_iob",
+                },
+            }
+        )
+        if core_attributes["csr_if"] == "axi":
+            # Append AXI_ID and AXI_LEN parameters
+            subblocks[-1]["parameters"].update(
                 {
-                    "core_name": "iob_apb2iob",
-                    "instance_name": "iob_apb2iob_coverter",
-                    "instance_description": "Convert APB port into internal IOb interface",
-                    "parameters": {
-                        "APB_ADDR_W": "ADDR_W",
-                        "APB_DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "apb_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
+                    "AXI_ID_W": "AXI_ID_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
                 }
             )
-        elif core_attributes["csr_if"] == "axil":
-            # "AXI_Lite" CSR_IF
-            subblocks.append(
+            # Add bit slices for lock signals
+            subblocks[-1]["connect"].update(
                 {
-                    "core_name": "iob_axil2iob",
-                    "instance_name": "iob_axil2iob_coverter",
-                    "instance_description": "Convert AXI-Lite port into internal IOb interface",
-                    "parameters": {
-                        "AXIL_ADDR_W": "ADDR_W",
-                        "AXIL_DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "axil_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
-                }
-            )
-        elif core_attributes["csr_if"] == "axi":
-            # "AXI" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_axi2iob",
-                    "instance_name": "iob_axi2iob_coverter",
-                    "instance_description": "Convert AXI port into internal IOb interface",
-                    "parameters": {
-                        "ADDR_WIDTH": "ADDR_W",
-                        "DATA_WIDTH": "DATA_W",
-                        "AXI_ID_WIDTH": "AXI_ID_W",
-                        "AXI_LEN_WIDTH": "AXI_LEN_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "axi_s": (
-                            "control_if_s",
-                            [
-                                "axi_awlock_i[0]",
-                                "axi_arlock_i[0]",
-                            ],
-                        ),
-                        "iob_m": "internal_iob",
-                    },
-                }
-            )
-        elif core_attributes["csr_if"] == "wb":
-            # "wb" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_wishbone2iob",
-                    "instance_name": "iob_wishbone2iob_coverter",
-                    "instance_description": "Convert Wishbone port into internal IOb interface",
-                    "parameters": {
-                        "ADDR_W": "ADDR_W",
-                        "DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "wb_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
+                    "s_s": (
+                        "control_if_s",
+                        [
+                            "axi_awlock_i[0]",
+                            "axi_arlock_i[0]",
+                        ],
+                    ),
                 }
             )
 

@@ -83,9 +83,10 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_iob2core",
-            "instance_name": "iob_iob2core_coverter",
+            "core_name": "iob_universal_converter",
+            "instance_name": "iob_universal_converter",
             "instance_description": "Convert IOb port from testbench into correct interface for UART CSRs bus",
+            "subordinate_if": "iob",
             "manager_if": params["csr_if"],
             "parameters": {
                 "ADDR_W": 3,
@@ -93,8 +94,8 @@ def setup(py_params_dict):
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
+                "s_s": "uart_s",
                 "m_m": "uart_cbus",
-                "iob_s": "uart_s",
             },
         },
     ]

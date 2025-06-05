@@ -694,6 +694,19 @@ class iob_core(iob_module, iob_instance):
         # Connect newly created port to self
         csrs_port.connect_external(instantiator.ports[-1], bit_slices=[])
 
+        # Add port to instantiator's attributes_dict
+        instantiator.attributes_dict["ports"].append(
+            {
+                "name": f"{self.instance_name}_cbus_s",
+                "signals": {
+                    "type": csrs_port.interface.type,
+                    "prefix": self.instance_name + "_",
+                    **csrs_port.interface.widths,
+                },
+                "descr": "Control and Status Registers interface (auto-generated)",
+            }
+        )
+
     def __create_memwrapper(self, superblocks):
         """Create memory wrapper for top module"""
         new_superblocks = [

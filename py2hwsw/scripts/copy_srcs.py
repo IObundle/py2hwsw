@@ -347,22 +347,15 @@ def python_setup(build_dir):
 def doc_setup(python_module):
     build_dir = python_module.build_dir
 
-    # Copy LIB tex files if not present
-    os.makedirs(f"{build_dir}/document/tsrc", exist_ok=True)
-    for file in os.listdir(f"{get_lib_dir()}/document/tsrc"):
-        shutil.copy2(
-            f"{get_lib_dir()}/document/tsrc/{file}", f"{build_dir}/document/tsrc/{file}"
-        )
-        nix_permission_hack(f"{build_dir}/document/tsrc/{file}")
-
-    # Copy LIB figures
-    os.makedirs(f"{build_dir}/document/figures", exist_ok=True)
-    for file in os.listdir(f"{get_lib_dir()}/document/figures"):
-        shutil.copy2(
-            f"{get_lib_dir()}/document/figures/{file}",
-            f"{build_dir}/document/figures/{file}",
-        )
-        nix_permission_hack(f"{build_dir}/document/figures/{file}")
+    doc_subdirs = ["tsrc", "figures", "doxygen"]
+    for subdir in doc_subdirs:
+        # Copy LIB tex subdir files if not present
+        os.makedirs(f"{build_dir}/document/{subdir}", exist_ok=True)
+        for file in os.listdir(f"{get_lib_dir()}/document/{subdir}"):
+            shutil.copy2(
+                f"{get_lib_dir()}/document/{subdir}/{file}", f"{build_dir}/document/{subdir}/{file}"
+            )
+            nix_permission_hack(f"{build_dir}/document/{subdir}/{file}")
 
     # Copy document Makefile
     shutil.copy2(f"{get_lib_dir()}/document/Makefile", f"{build_dir}/document/Makefile")

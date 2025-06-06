@@ -46,6 +46,7 @@ from iob_license import iob_license, update_license
 import sw_tools
 import verilog_format
 import verilog_lint
+from manage_headers import generate_headers
 
 
 class iob_core(iob_module, iob_instance):
@@ -393,6 +394,17 @@ class iob_core(iob_module, iob_instance):
         print(
             f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
         )
+        # Add SPDX license headers to every file in build dir
+        generate_headers(
+            root=self.build_dir,
+            copyright_holder="IObundle",
+            license_name="MIT",
+            header_template="spdx",
+            # ignore_existing_headers=True,
+            # verbose=False,
+            #debug=True,
+        )
+
 
     def create_python_parameter_group(self, *args, **kwargs):
         create_python_parameter_group(self, *args, **kwargs)

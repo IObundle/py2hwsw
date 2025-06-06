@@ -1,7 +1,9 @@
 # SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
+
 from iob_base import fail_with_msg
+
 
 class iob_globals:
     _instance = None
@@ -30,10 +32,13 @@ class iob_globals:
             )
         super().__setattr__(key, value)
 
-def create_globals(core,attr_name,value):
+
+def create_globals(core, attr_name, value):
     """
     Create a singleton instance of iob_globals with the given attributes.
     If the instance already exists, it will not be modified.
     """
     if core.is_top_module:
-        core.set_default_attribute(attr_name, getattr(iob_globals(**{attr_name: value}), attr_name))
+        core.set_default_attribute(
+            attr_name, getattr(iob_globals(**{attr_name: value}), attr_name)
+        )

@@ -342,6 +342,10 @@ def modify_file_header(
                     print(f"Header skipped in {filepath}")
                 return
 
+            # Only delete headers if they are recognized as old versions of the new header.
+            # Otherwise, they may just be comments that happen to be at the start of the file, so they should not be deleted.
+            # if update_headers_only and header_recognize( "".join(lines[header_start_index:]), new_header):
+
             # Multi-line
             if is_multiline and lines[header_start_index].startswith(comment_char):
                 body_comment_char = multiline_comments[comment_char][0]

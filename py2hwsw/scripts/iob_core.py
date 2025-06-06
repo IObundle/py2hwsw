@@ -400,7 +400,7 @@ class iob_core(iob_module, iob_instance):
             copyright_holder="IObundle",
             license_name="MIT",
             header_template="spdx",
-            # ignore_existing_headers=True,
+            skip_existing_headers=True,
             # verbose=False,
             #debug=True,
         )

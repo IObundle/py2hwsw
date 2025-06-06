@@ -152,6 +152,11 @@ def main():
         nargs="+",
         help="List of paths to ignore",
     )
+    parser.add_argument(
+        "--skip-existing-headers",
+        default=False,
+        help="Skip files with existing headers",
+    )
 
     # SPDX header template arguments
     parser.add_argument(
@@ -180,6 +185,7 @@ def main():
         header_template=args.header,
         list_files_only=args.list_files_only,
         delete_only=args.delete_only,
+        skip_existing_headers=args.skip_existing_headers,
         verbose=args.verbose,
         debug=args.debug,
     )
@@ -193,7 +199,8 @@ def generate_headers(
     header_template="spdx",
     list_files_only=False,
     delete_only=False,
-    verbose=False,
+    skip_existing_headers=True,  # TODO:
+    verbose=True,
     debug=False,
 ):
     if debug:
@@ -322,15 +329,22 @@ def modify_file_header(filepath, new_header, comment_char="#", delete_only=False
                     lines.pop(header_start_index)
                 # Remove multiline end
                 lines.pop(header_start_index)
-                # Remove blank line after header
-                lines.pop(header_start_index)
+                # Remove blank line after header (if any)
+                if (
+                    len(lines) > header_start_index
+                    and not lines[header_start_index].strip()
+                ):
+                    lines.pop(header_start_index)
             # Not multi-line
             elif lines[header_start_index].startswith(comment_char):
                 # Remove old header
                 while len(lines) and lines[header_start_index].startswith(comment_char):
                     lines.pop(header_start_index)
                 # Remove blank line after header (if any)
-                if len(lines):
+                if (
+                    len(lines) > header_start_index
+                    and not lines[header_start_index].strip()
+                ):
                     lines.pop(header_start_index)
 
         # Create the new header lines

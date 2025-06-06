@@ -97,11 +97,11 @@ headers = {
 {{ copyright_line }}
 {% endfor %}
 {%- for contributor_line in contributor_lines %}
-SPDX-FileContributor: {{ contributor_line }}
+{{ spdx_prefix }}-FileContributor: {{ contributor_line }}
 {% endfor %}
 
 {%- for expression in spdx_expressions %}
-SPDX-License-Identifier: {{ expression }}
+{{ spdx_prefix }}-License-Identifier: {{ expression }}
 {% endfor %}
 """,
     # NOTE: Add other header templates here
@@ -251,6 +251,8 @@ def generate_headers(
         ],
         "contributor_lines": [],
         "spdx_expressions": [license_name],
+        # Note: spdx_prefix is only needed because otherwise the `reuse` tool has a bug that would miss identify the template line as legitimate SPDX header for this file.
+        "spdx_prefix": "SPDX",
     }
 
     header = render_jinja_template(headers[header_template], template_context)

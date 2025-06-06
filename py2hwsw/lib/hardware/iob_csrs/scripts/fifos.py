@@ -640,7 +640,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "verilog_code": f"""
    // Connect FIFO level status to CSRs
-   assign {fifo_name}_level = {fifo_name}_current_level_o;
+   assign {fifo_name}_level_wdata = {fifo_name}_current_level_o;
 
 """,
             }
@@ -650,7 +650,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "verilog_code": f"""
    // Generate interrupt signal
-   assign {fifo_name}_interrupt_o ={fifo_name}_current_level_o >= {fifo_name}_thresh;
+   assign {fifo_name}_interrupt_o ={fifo_name}_current_level_o >= {fifo_name}_thresh_rdata;
 """,
             }
         )

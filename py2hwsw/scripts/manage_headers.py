@@ -61,6 +61,7 @@ comment_char = {
     ".ccf": "#",
     ".service": "#",
     "Dockerfile": "#",
+    ".xml": "<!--",
 }
 
 # File extensions with independent license headers
@@ -103,6 +104,9 @@ headers = {
 {%- for expression in spdx_expressions %}
 {{ spdx_prefix }}-License-Identifier: {{ expression }}
 {% endfor %}
+{%- if custom_header_suffix %}
+{{ custom_header_suffix }}
+{% endif %}
 """,
     # NOTE: Add other header templates here
 }
@@ -197,6 +201,7 @@ def generate_headers(
     copyright_holder="IObundle",
     license_name="MIT",
     header_template="spdx",
+    custom_header_suffix="",
     list_files_only=False,
     delete_only=False,
     skip_existing_headers=True,  # TODO:
@@ -251,6 +256,7 @@ def generate_headers(
         ],
         "contributor_lines": [],
         "spdx_expressions": [license_name],
+        "custom_header_suffix": custom_header_suffix,
         # Note: spdx_prefix is only needed because otherwise the `reuse` tool has a bug that would miss identify the template line as legitimate SPDX header for this file.
         "spdx_prefix": "SPDX",
     }
@@ -277,6 +283,10 @@ def generate_headers(
 
     for file in files:
         write_independent_lic_file(file, header)
+
+    # Download license using `reuse` tool
+    if not os.path.isfile(os.path.join(root, f"LICENSES/{license_name}.txt")):
+        os.system(f"reuse --root {root} download {license_name}")
 
 
 def write_independent_lic_file(file, header):

@@ -403,8 +403,7 @@ class iob_core(iob_module, iob_instance):
             header_template="spdx",
             custom_header_suffix=custom_header,
             skip_existing_headers=True,
-            # verbose=False,
-            #debug=True,
+            verbose=False,
         )
 
 

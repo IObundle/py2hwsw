@@ -204,7 +204,7 @@ def generate_headers(
     custom_header_suffix="",
     list_files_only=False,
     delete_only=False,
-    skip_existing_headers=True,  # TODO:
+    skip_existing_headers=False,
     verbose=True,
     debug=False,
 ):
@@ -270,6 +270,7 @@ def generate_headers(
             comment_char=comment_char[
                 next(ext for ext in comment_char if file.endswith(ext))
             ],
+            skip_existing_headers=skip_existing_headers,
             delete_only=delete_only,
         )
 
@@ -295,7 +296,13 @@ def write_independent_lic_file(file, header):
         f.writelines(header)
 
 
-def modify_file_header(filepath, new_header, comment_char="#", delete_only=False):
+def modify_file_header(
+    filepath,
+    new_header,
+    comment_char="#",
+    skip_existing_headers=False,
+    delete_only=False,
+):
     """
     Modifies the header of a file, replacing it with a new header.
 
@@ -328,6 +335,13 @@ def modify_file_header(filepath, new_header, comment_char="#", delete_only=False
                 lines.pop(header_start_index)
 
             # Check if file already has a header
+            if skip_existing_headers and lines[header_start_index].startswith(
+                comment_char
+            ):
+                if VERBOSE:
+                    print(f"Header skipped in {filepath}")
+                return
+
             # Multi-line
             if is_multiline and lines[header_start_index].startswith(comment_char):
                 body_comment_char = multiline_comments[comment_char][0]

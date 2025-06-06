@@ -291,9 +291,9 @@ class csr_gen:
                 ]
 
                 lines += (
-                    f"    assign {name}_rdata = {name}{suffix};\n"
-                    f"    assign {name}_reg_en = {name}_w_valid | {name}_wen_i;\n"
-                    f"    assign {name}_reg_data = {name}_w_valid ? {name}_wdata : {name}{suffix_i};\n"
+                    f"    assign {name}_rdata = {name}_rdata{suffix};\n"
+                    f"    assign {name}_reg_en = {name}_w_valid | (|{name}_wstrb_i);\n"
+                    f"    assign {name}_reg_data = {name}_w_valid ? {name}_wdata : {name}_wdata{suffix_i};\n"
                 )
 
             # Create reg
@@ -316,7 +316,7 @@ class csr_gen:
                     f"      .en_i   ({name}_w_valid),\n"
                     f"      .data_i ({name}_wdata),\n"
                 )
-            lines += f"      .data_o ({name}{suffix})\n" "    );\n\n"
+            lines += f"      .data_o ({name}_rdata{suffix})\n" "    );\n\n"
         else:  # not auto: compute valid
             # signal to indicate if the register is addressed
             lines += f"    wire {name}_addressed;\n"
@@ -421,7 +421,7 @@ class csr_gen:
                 lines += "      .clk_i  (clk_i),\n"
                 lines += "      .cke_i  (cke_i),\n"
                 lines += "      .arst_i (arst_i),\n"
-                lines += f"      .data_i ({name}{suffix_i}),\n"
+                lines += f"      .data_i ({name}_wdata{suffix_i}),\n"
                 lines += f"      .data_o ({name}_rdata)\n"
                 lines += "    );\n\n"
         else:  # not auto: output read enable
@@ -562,7 +562,7 @@ class csr_gen:
                 if auto:
                     register_signals.append(
                         {
-                            "name": name + "_o",
+                            "name": name + "_rdata_o",
                             "width": self.verilog_max(n_bits, 1),
                         }
                     )
@@ -604,16 +604,16 @@ class csr_gen:
                 if auto:
                     register_signals.append(
                         {
-                            "name": name + "_i",
+                            "name": name + "_wdata_i",
                             "width": self.verilog_max(n_bits, 1),
                         }
                     )
-                    # If CSR mode is "RW", then also include a wen signal (to mux input of single RW CSR)
+                    # If CSR mode is "RW", then also include a wstrb signal (to mux input of single RW CSR)
                     if "W" in row.mode:
                         register_signals.append(
                             {
-                                "name": name + "_wen_i",
-                                "width": 1,
+                                "name": name + "_wstrb_i",
+                                "width": self.verilog_max(f"{n_bits}/8", 1),
                             }
                         )
                     port_has_inputs = True

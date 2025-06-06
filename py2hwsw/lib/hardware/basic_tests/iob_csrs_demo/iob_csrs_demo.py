@@ -55,7 +55,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "single_read_write_wrrd_o", "width": 1},
                     {"name": "single_read_write_wrrd_i", "width": 1},
-                    {"name": "single_read_write_wrrd_wen", "width": 1},
+                    {"name": "single_read_write_wrrd_wstrb", "width": 1},
                 ],
             },
             {
@@ -64,7 +64,7 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "multi_read_write_wrrd_o", "width": 23},
                     {"name": "multi_read_write_wrrd_i", "width": 23},
-                    {"name": "multi_read_write_wrrd_wen", "width": 1},
+                    {"name": "multi_read_write_wrrd_wstrb", "width": 3},
                 ],
             },
             # Regarray wires

@@ -13,7 +13,7 @@ class iob_csr:
     """Class to represent a Control/Status Register."""
 
     name: str = ""
-    type: str = "REG"
+    csr_type: str = "REG"
     mode: str = ""
     n_bits: str or int = 1
     rst_val: int = 0
@@ -38,9 +38,9 @@ class iob_csr:
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
 
-        if self.type not in ["REG", "NOAUTO"]:
+        if self.csr_type not in ["REG", "NOAUTO"]:
             # FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
-            fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
+            fail_with_msg(f"Invalid CSR type: '{self.csr_type}'", ValueError)
 
         if self.mode not in ["R", "W", "RW"]:
             fail_with_msg(f"Invalid CSR mode: '{self.mode}'", ValueError)

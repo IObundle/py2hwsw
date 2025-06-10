@@ -13,14 +13,14 @@ from iob_base import assert_attributes
 class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
 
-    type: str = "prog"
+    fsm_type: str = "prog"
     default_assignments: str = ""
     state_descriptions: str = ""
 
     def __post_init__(self):
-        if self.type not in ["prog", "fsm"]:
+        if self.fsm_type not in ["prog", "fsm"]:
             raise ValueError("type must be either 'prog' or 'fsm'")
-        if self.type == "fsm":
+        if self.fsm_type == "fsm":
             self.state_reg_name = "state"
             update_statement = "state_nxt = state;"
         else:
@@ -38,7 +38,7 @@ class iob_fsm(iob_comb):
                 for_loop = re.search(r"for\s*\(([^)]+)\)", state)
                 for_loop = for_loop.group(1) if for_loop else None
                 if for_loop:
-                    if self.type == "fsm":
+                    if self.fsm_type == "fsm":
                         raise ValueError("for loops are not suported in FSMs")
                     init, cond, update = for_loop.split(";")
                     _for_loops[tag] = {"init": init, "cond": cond, "update": update}
@@ -92,7 +92,7 @@ def create_fsm(core, *args, **kwargs):
     core.set_default_attribute("fsm", None)
 
     default_assignments = kwargs.get("default_assignments", "")
-    type = kwargs.get("type", "prog")
+    fsm_type = kwargs.get("type", "prog")
     state_descriptions = kwargs.get("state_descriptions", "")
 
     assert_attributes(
@@ -101,7 +101,7 @@ def create_fsm(core, *args, **kwargs):
         error_msg=f"Invalid {kwargs.get('name', '')} fsm attribute '[arg]'!",
     )
     fsm = iob_fsm(
-        type=type,
+        fsm_type=fsm_type,
         default_assignments=default_assignments,
         state_descriptions=state_descriptions,
     )

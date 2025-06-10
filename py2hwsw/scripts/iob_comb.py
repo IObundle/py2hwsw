@@ -97,7 +97,7 @@ class iob_comb(iob_snippet):
                     # and overwrite the default one
                     for port in core.ports:
                         if port.interface:
-                            if port.interface.type == "iob_clk":
+                            if port.interface.if_type == "iob_clk":
                                 clk_if_name = port.name
 
                     # Connect the register

@@ -280,7 +280,7 @@ class interface:
     """Class to represent an interface for generation"""
 
     # Type/Name of interface to generate
-    type: str = ""
+    if_type: str = ""
     # Prefix for signals of the interface
     prefix: str = ""
     # Width multiplier. Used when concatenating multiple instances of the interface.
@@ -1600,7 +1600,7 @@ def get_signals(name, if_type="", mult=1, widths={}, params=None, signal_prefix=
 
 def gen_if(interface):
     """Generate verilog snippets for all possible subtypes of a given interface"""
-    name = interface.type
+    name = interface.if_type
     file_prefix = interface.file_prefix
     portmap_port_prefix = interface.portmap_port_prefix
     prefix = interface.prefix
@@ -1643,7 +1643,7 @@ def gen_if(interface):
 
 def gen_wires(interface):
     """Generate wires snippet for given interface"""
-    name = interface.type
+    name = interface.if_type
     file_prefix = interface.file_prefix
     prefix = interface.prefix
     mult = interface.mult

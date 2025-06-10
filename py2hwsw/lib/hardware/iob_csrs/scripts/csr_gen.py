@@ -764,18 +764,6 @@ class csr_gen:
                     "AXI_LEN_W": "AXI_LEN_W",
                 }
             )
-            # Add bit slices for lock signals
-            subblocks[-1]["connect"].update(
-                {
-                    "s_s": (
-                        "control_if_s",
-                        [
-                            "axi_awlock_i[0]",
-                            "axi_arlock_i[0]",
-                        ],
-                    ),
-                }
-            )
 
         for row in table:
             if "W" in row.mode:

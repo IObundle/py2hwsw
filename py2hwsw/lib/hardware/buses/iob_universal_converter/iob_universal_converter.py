@@ -64,44 +64,59 @@ def setup(py_params_dict):
                 "max": 8,
             },
         ]
-    attributes_dict |= {
-        "ports": [
-            {
-                "name": "clk_en_rst_s",
-                "descr": "Clock, clock enable and reset",
-                "signals": {"type": "iob_clk"},
+    #
+    # Ports
+    #
+    attributes_dict["ports"] = [
+        {
+            "name": "clk_en_rst_s",
+            "descr": "Clock, clock enable and reset",
+            "signals": {"type": "iob_clk"},
+        },
+        {
+            "name": "s_s",
+            "descr": "Subordinate port",
+            "signals": {
+                "type": params["subordinate_if"],
+                "ADDR_W": "ADDR_W",
+                "DATA_W": "DATA_W",
             },
-            {
-                "name": "s_s",
-                "descr": "Subordinate port",
-                "signals": {
-                    "type": params["subordinate_if"],
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
+        },
+        {
+            "name": "m_m",
+            "descr": "Manager port",
+            "signals": {
+                "type": params["manager_if"],
+                "ADDR_W": "ADDR_W",
+                "DATA_W": "DATA_W",
             },
-            {
-                "name": "m_m",
-                "descr": "Manager port",
-                "signals": {
-                    "type": params["manager_if"],
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
+        },
+    ]
+    # Append ID_W and LEN_W when using AXI interfaces
+    if params["subordinate_if"] == "axi":
+        attributes_dict["ports"][-2]["signals"] |= {
+            "ID_W": "AXI_ID_W",
+            "LEN_W": "AXI_LEN_W",
+        }
+    if params["manager_if"] == "axi":
+        attributes_dict["ports"][-1]["signals"] |= {
+            "ID_W": "AXI_ID_W",
+            "LEN_W": "AXI_LEN_W",
+        }
+    #
+    # Wires
+    #
+    attributes_dict["wires"] = [
+        {
+            "name": "internal_iob",
+            "descr": "Internal IOb wire",
+            "signals": {
+                "type": "iob",
+                "ADDR_W": "ADDR_W",
+                "DATA_W": "DATA_W",
             },
-        ],
-        "wires": [
-            {
-                "name": "internal_iob",
-                "descr": "Internal IOb wire",
-                "signals": {
-                    "type": "iob",
-                    "ADDR_W": "ADDR_W",
-                    "DATA_W": "DATA_W",
-                },
-            },
-        ],
-    }
+        },
+    ]
     #
     # Blocks
     #

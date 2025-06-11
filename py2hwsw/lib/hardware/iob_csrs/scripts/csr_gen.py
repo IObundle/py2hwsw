@@ -728,97 +728,30 @@ class csr_gen:
                 }
             )
 
-        # TODO: These converters should be handled by a single universal converter as specified in: https://github.com/IObundle/py2hwsw/issues/259
-        if core_attributes["csr_if"] == "iob":
-            # "IOb" CSR_IF
-            snippet += """
-   assign internal_iob_valid = iob_valid_i;
-   assign internal_iob_addr = iob_addr_i;
-   assign internal_iob_wdata = iob_wdata_i;
-   assign internal_iob_wstrb = iob_wstrb_i;
-   assign internal_iob_rready = iob_rready_i;
-   assign iob_rvalid_o = internal_iob_rvalid;
-   assign iob_rdata_o = internal_iob_rdata;
-   assign iob_ready_o = internal_iob_ready;
-"""
-        elif core_attributes["csr_if"] == "apb":
-            # "APB" CSR_IF
-            subblocks.append(
+        subblocks.append(
+            {
+                "core_name": "iob_universal_converter",
+                "instance_name": "iob_universal_converter",
+                "instance_description": "Convert IOb port from testbench into correct interface for UART CSRs bus",
+                "subordinate_if": core_attributes["csr_if"],
+                "manager_if": "iob",
+                "parameters": {
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "s_s": "control_if_s",
+                    "m_m": "internal_iob",
+                },
+            }
+        )
+        if core_attributes["csr_if"] == "axi":
+            # Append AXI_ID and AXI_LEN parameters
+            subblocks[-1]["parameters"].update(
                 {
-                    "core_name": "iob_apb2iob",
-                    "instance_name": "iob_apb2iob_coverter",
-                    "instance_description": "Convert APB port into internal IOb interface",
-                    "parameters": {
-                        "APB_ADDR_W": "ADDR_W",
-                        "APB_DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "apb_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
-                }
-            )
-        elif core_attributes["csr_if"] == "axil":
-            # "AXI_Lite" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_axil2iob",
-                    "instance_name": "iob_axil2iob_coverter",
-                    "instance_description": "Convert AXI-Lite port into internal IOb interface",
-                    "parameters": {
-                        "AXIL_ADDR_W": "ADDR_W",
-                        "AXIL_DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "axil_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
-                }
-            )
-        elif core_attributes["csr_if"] == "axi":
-            # "AXI" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_axi2iob",
-                    "instance_name": "iob_axi2iob_coverter",
-                    "instance_description": "Convert AXI port into internal IOb interface",
-                    "parameters": {
-                        "ADDR_WIDTH": "ADDR_W",
-                        "DATA_WIDTH": "DATA_W",
-                        "AXI_ID_WIDTH": "AXI_ID_W",
-                        "AXI_LEN_WIDTH": "AXI_LEN_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "axi_s": (
-                            "control_if_s",
-                            [
-                                "axi_awlock_i[0]",
-                                "axi_arlock_i[0]",
-                            ],
-                        ),
-                        "iob_m": "internal_iob",
-                    },
-                }
-            )
-        elif core_attributes["csr_if"] == "wb":
-            # "wb" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_wishbone2iob",
-                    "instance_name": "iob_wishbone2iob_coverter",
-                    "instance_description": "Convert Wishbone port into internal IOb interface",
-                    "parameters": {
-                        "ADDR_W": "ADDR_W",
-                        "DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "wb_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
+                    "AXI_ID_W": "AXI_ID_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
                 }
             )
 
@@ -1548,7 +1481,16 @@ class csr_gen:
         csrs_file.write(
             """
 The software accessible registers of the core are described in the following
-tables. The tables give information on the name, read/write capability, address, width in bits, and a textual description.
+tables. Each subsection corresponds to a specific configuration of the core, since
+different configurations have different registers available. 
+The tables give information on the name, read/write capability, address, hardware and software width, and a 
+textual description. The addresses are byte aligned and given in decimal format.
+The hardware width is the number of bits that the register occupies in the hardware, while the
+software width is the number of bits that the register occupies in the software.
+In each address, the right-justified field having "Hw width" bits conveys the relevant information. 
+Each register has only one type of access, either read or write, meaning that reading from 
+a write-only register will produce invalid data or writing to a read-only register will 
+not have any effect.
 """
         )
 
@@ -1558,11 +1500,13 @@ tables. The tables give information on the name, read/write capability, address,
             for csr_group in doc_table:
                 csrs_file.write(
                     """
-\\begin{xltabular}{\\textwidth}{|l|c|c|c|c|X|}
+\\begin{xltabular}{\\textwidth}{|l|c|c|c|c|c|X|}
 
   \\hline
   \\rowcolor{iob-green}
-  {\\bf Name} & {\\bf R/W} & {\\bf Addr} & {\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ \\hline
+  {\\bf Name} & {\\bf R/W} & {\\bf Addr} & \multicolumn{2}{c|}{\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ 
+              &            &             & {\\bf Hw}       & {\\bf Sw}     &                &                    \\\\
+  \\hline
 
   \\input """
                     + doc_conf
@@ -1589,7 +1533,6 @@ tables. The tables give information on the name, read/write capability, address,
     # doc_tables: dictionary of doc_conf tables,
     #    each ['doc_conf'] key as respective doc_table only with valid registers
     # out_dir: output directory
-    @classmethod
     def generate_regs_tex(self, doc_tables, out_dir):
         os.makedirs(out_dir, exist_ok=True)
         # Create csrs.tex file
@@ -1599,12 +1542,16 @@ tables. The tables give information on the name, read/write capability, address,
             for csr_group in doc_table:
                 tex_table = []
                 for reg in csr_group.regs:
+                    sw_width = self.bceil(reg.n_bits, 3)
+                    if sw_width == 24:
+                        sw_width = 32
                     tex_table.append(
                         [
                             reg.name.upper(),
                             reg.mode,
-                            str(reg.addr),
+                            f"0x{reg.addr:X}",  # Capitalized hex
                             str(reg.n_bits),
+                            str(sw_width),
                             str(reg.rst_val),
                             reg.descr,
                         ]

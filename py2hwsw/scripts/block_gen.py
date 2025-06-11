@@ -7,10 +7,8 @@
 #
 
 from latex import write_table
-import sys
 
 import iob_colors
-from iob_base import fail_with_msg
 from iob_signal import get_real_signal, iob_signal
 import param_gen
 
@@ -25,30 +23,21 @@ def generate_subblocks_table_tex(subblocks, out_dir):
         the subblocks in the Block Diagram.\n"
     )
 
-    for group in subblocks:
-        subblocks_file.write(
-            """
+    subblocks_file.write(
+        """
 \\begin{xltabular}{\\textwidth}{|l|l|X|}
 
   \\hline
   \\rowcolor{iob-green}
   {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
 
-  \\input """
-            + group.name
-            + """_subblocks_tab
+  \\input subblocks_tab
 
-  \\caption{"""
-            + group.descr.replace("_", "\\_")
-            + """}
+  \\caption{Table of subblocks in the core.}
 \\end{xltabular}
-\\label{"""
-            + group.name
-            + """_subblocks_tab:is}
+\\label{subblocks_tab:is}
 """
-        )
-        if group.doc_clearpage:
-            subblocks_file.write("\\clearpage")
+    )
 
     subblocks_file.write("\\clearpage")
     subblocks_file.close()
@@ -59,21 +48,20 @@ def generate_subblocks_tex(subblocks, out_dir):
     # Create subblocks.tex file
     generate_subblocks_table_tex(subblocks, out_dir)
 
-    # Create table for each group
-    for group in subblocks:
-        tex_table = []
-        for block in group.blocks:
-            if not block.instantiate:
-                continue
-            tex_table.append(
-                [
-                    block.name,
-                    block.instance_name,
-                    block.instance_description,
-                ]
-            )
+    # Create table for subblocks
+    tex_table = []
+    for block in subblocks:
+        if not block.instantiate:
+            continue
+        tex_table.append(
+            [
+                block.name,
+                block.instance_name,
+                block.instance_description,
+            ]
+        )
 
-        write_table(f"{out_dir}/{group.name}_subblocks", tex_table)
+    write_table(f"{out_dir}/subblocks", tex_table)
 
 
 def generate_subblocks(core):
@@ -81,32 +69,31 @@ def generate_subblocks(core):
     returns: Generated verilog code
     """
     code = ""
-    for group in core.subblocks:
-        for instance in group.blocks:
-            if not instance.instantiate:
-                continue
-            # Open ifdef if conditional interface
-            if instance.if_defined:
-                code += f"`ifdef {instance.if_defined}\n"
-            if instance.if_not_defined:
-                code += f"`ifndef {instance.if_not_defined}\n"
+    for instance in core.subblocks:
+        if not instance.instantiate:
+            continue
+        # Open ifdef if conditional interface
+        if instance.if_defined:
+            code += f"`ifdef {instance.if_defined}\n"
+        if instance.if_not_defined:
+            code += f"`ifndef {instance.if_not_defined}\n"
 
-            params_str = ""
-            if instance.parameters:
-                params_str = f"""#(
+        params_str = ""
+        if instance.parameters:
+            params_str = f"""#(
 {param_gen.generate_inst_params(instance)}\
     ) """
 
-            code += f"""\
+        code += f"""\
         // {instance.instance_description}
         {instance.name} {params_str}{instance.instance_name} (
     {get_instance_port_connections(instance)}\
         );
 
     """
-            # Close ifdef if conditional interface
-            if instance.if_defined or instance.if_not_defined:
-                code += "`endif\n"
+        # Close ifdef if conditional interface
+        if instance.if_defined or instance.if_not_defined:
+            code += "`endif\n"
 
     return code
 

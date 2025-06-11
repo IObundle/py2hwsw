@@ -180,14 +180,13 @@ class iob_comb(iob_snippet):
                     if bit_slices:
                         connect["clk_en_rst_s"] = (clk_if_name, bit_slices)
 
-                    # Create the subblock group for the register
+                    # Create the subblock for the register
                     # if it does not already exist
                     if not any(
                         block.instance_name == f"{signal.name}_reg"
-                        for group in core.subblocks
-                        for block in group.blocks
+                        for block in core.subblocks
                     ):
-                        core.create_subblock_group(
+                        core.create_subblock(
                             core_name="iob_reg",
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},

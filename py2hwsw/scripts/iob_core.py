@@ -46,6 +46,7 @@ from iob_license import iob_license, update_license
 import sw_tools
 import verilog_format
 import verilog_lint
+from manage_headers import generate_headers
 
 
 class iob_core(iob_module, iob_instance):
@@ -271,7 +272,7 @@ class iob_core(iob_module, iob_instance):
             name="VERSION",
             type="C",
             val="16'h" + self.version_str_to_digits(self.version),
-            descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.",
+            descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part.",
         )
 
         # Ensure superblocks are set up last
@@ -393,6 +394,18 @@ class iob_core(iob_module, iob_instance):
         print(
             f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
         )
+        # Add SPDX license headers to every file in build dir
+        custom_header=f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
+        generate_headers(
+            root=self.build_dir,
+            copyright_holder="IObundle",
+            license_name="MIT",
+            header_template="spdx",
+            custom_header_suffix=custom_header,
+            skip_existing_headers=True,
+            verbose=False,
+        )
+
 
     def create_python_parameter_group(self, *args, **kwargs):
         create_python_parameter_group(self, *args, **kwargs)
@@ -540,25 +553,24 @@ class iob_core(iob_module, iob_instance):
         assert (
             self.is_system
         ), "Internal error: only iob_system type cores need fixing cbus width"
-        for subblock_group in self.subblocks:
-            for subblock in subblock_group.blocks:
-                for port in subblock.ports:
-                    if (
-                        port.name == "iob_csrs_cbus_s"
-                        and port.interface.type == "iob"
-                        and port.e_connect
-                    ):
-                        # print(
-                        #     "DEBUG",
-                        #     self.name,
-                        #     port,
-                        #     file=sys.stderr,
-                        # )
-                        port_width = port.interface.widths["ADDR_W"]
-                        external_wire_prefix = port.e_connect.interface.prefix
-                        port.e_connect_bit_slices = [
-                            f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
-                        ]
+        for subblock in self.subblocks:
+            for port in subblock.ports:
+                if (
+                    port.name == "iob_csrs_cbus_s"
+                    and port.interface.type == "iob"
+                    and port.e_connect
+                ):
+                    # print(
+                    #     "DEBUG",
+                    #     self.name,
+                    #     port,
+                    #     file=sys.stderr,
+                    # )
+                    port_width = port.interface.widths["ADDR_W"]
+                    external_wire_prefix = port.e_connect.interface.prefix
+                    port.e_connect_bit_slices = [
+                        f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
+                    ]
 
     def __connect_memory(self, port, instantiator):
         """Create memory port in instantiatior and connect it to self"""

@@ -385,7 +385,7 @@ def get_iob_ports():
         iob_signal(
             name="iob_addr_o",
             width=ADDR_W,
-            descr="Address.",
+            descr="Byte address.",
         ),
         iob_signal(
             name="iob_wdata_o",
@@ -813,7 +813,7 @@ def get_axil_write_ports(params: str = None):
         iob_signal(
             name="axil_awaddr_o",
             width=ADDR_W,
-            descr="Address write channel address.",
+            descr="Address write channel byte address.",
         ),
     ]
     if "prot" in params:
@@ -884,7 +884,7 @@ def get_axil_read_ports(params: str = None):
         iob_signal(
             name="axil_araddr_o",
             width=ADDR_W,
-            descr="Address read channel address.",
+            descr="Address read channel byte address.",
         ),
     ]
     if "prot" in params:

@@ -178,8 +178,12 @@ class SwRegister:
                     max_size = eval(max_size)
                     break
 
-        # Compute the the size of the register in steps of 8 bits, rounding up
-        self.sw_size = 8 * math.ceil(max_size / 8)
+        # Compute the size of the register in steps of 8 bits, rounding up
+        sw_size = 8 * math.ceil(max_size / 8)
+        # If the size is 24 bits, set it to 32 bits
+        if sw_size == 24:
+            sw_size = 32
+        self.sw_size = sw_size
 
         self.access = access
         self.rst = rst
@@ -233,7 +237,7 @@ class SwRegister:
         xml_code = f"""<ipxact:register>
 					<ipxact:name>{self.name}</ipxact:name>
 					<ipxact:description>{self.description}</ipxact:description>
-					<ipxact:addressOffset>{self.address}</ipxact:addressOffset>
+					<ipxact:addressOffset>"0x{self.address:X}</ipxact:addressOffset>
 					<ipxact:size>{self.sw_size}</ipxact:size>
 					<ipxact:volatile>{str(self.volatile).lower()}</ipxact:volatile>
 					<ipxact:access>{access_type}</ipxact:access>
@@ -706,12 +710,9 @@ def generate_ipxact_xml(core, dest_dir):
 
     csr_block = None
     # Find iob_csrs block in subblocks list
-    for block_group in core.subblocks:
-        for block in block_group.blocks:
-            if block.original_name == "iob_csrs":
-                csr_block = block
-                break
-        if csr_block:
+    for block in core.subblocks:
+        if block.original_name == "iob_csrs":
+            csr_block = block
             break
 
     # Add the CSR IF,

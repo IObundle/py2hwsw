@@ -405,8 +405,9 @@ class iob_core(iob_module, iob_instance):
         custom_header=f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
         generate_headers(
             root=self.build_dir,
-            copyright_holder="IObundle",
-            license_name="MIT",
+            copyright_holder=self.license.author,
+            copyright_year=self.license.year,
+            license_name=self.license.name,
             header_template="spdx",
             custom_header_suffix=custom_header,
             skip_existing_headers=True,

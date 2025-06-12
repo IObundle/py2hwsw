@@ -16,7 +16,7 @@ def get_core_params(confs):
     core_parameters = []
     for group in confs:
         for conf in group.confs:
-            if conf.conf_type in ["P", "D"]:
+            if conf.kind in ["P", "D"]:
                 core_parameters.append(conf)
     return core_parameters
 
@@ -39,7 +39,7 @@ def generate_params(core):
 
         p_name = parameter.name.upper()
         p_comment = ""
-        if parameter.conf_type == "D":
+        if parameter.kind == "D":
             p_comment = "  // Don't change this parameter value!"
         lines.append(f"    parameter {p_name} = `{core_prefix}{p_name},{p_comment}\n")
 

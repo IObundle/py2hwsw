@@ -40,8 +40,8 @@ class iob_wire:
 
         if self.interface:
             self.signals += if_gen.get_signals(
-                name=self.interface.if_type,
-                if_type="",
+                name=self.interface.kind,
+                kind="",
                 mult=self.interface.mult,
                 params=self.interface.params,
                 widths=self.interface.widths,

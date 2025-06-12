@@ -280,7 +280,7 @@ class interface:
     """Class to represent an interface for generation"""
 
     # Type/Name of interface to generate
-    if_type: str = ""
+    kind: str = ""
     # Prefix for signals of the interface
     prefix: str = ""
     # Width multiplier. Used when concatenating multiple instances of the interface.
@@ -1571,9 +1571,9 @@ def write_s_tb_wire(fout, prefix, wires):
 #
 
 
-def get_signals(name, if_type="", mult=1, widths={}, params=None, signal_prefix=""):
+def get_signals(name, kind="", mult=1, widths={}, params=None, signal_prefix=""):
     """Get list of signals for given interface
-    param if_type: Type of interface.
+    param kind: Type of interface.
                    Examples: '' (unspecified), 'manager', 'subordinate', ...
     param mult: Multiplication factor for all signal widths.
     param widths: Dictionary for configuration of specific signal widths.
@@ -1582,10 +1582,10 @@ def get_signals(name, if_type="", mult=1, widths={}, params=None, signal_prefix=
     # print(eval_str)
     signals = eval(eval_str)
 
-    # Set direction according to if_type
-    if if_type == "subordinate":
+    # Set direction according to kind
+    if kind == "subordinate":
         signals = reverse_signals_dir(signals)
-    # TODO: Code to support other if_types
+    # TODO: Code to support other kinds
     # For example, the rs232 has not type.
 
     if mult != 1:
@@ -1600,7 +1600,7 @@ def get_signals(name, if_type="", mult=1, widths={}, params=None, signal_prefix=
 
 def gen_if(interface):
     """Generate verilog snippets for all possible subtypes of a given interface"""
-    name = interface.if_type
+    name = interface.kind
     file_prefix = interface.file_prefix
     portmap_port_prefix = interface.portmap_port_prefix
     prefix = interface.prefix
@@ -1611,31 +1611,31 @@ def gen_if(interface):
     #
     # GENERATE SNIPPETS FOR ALL TYPES OF PORTS AND WIRES
     #
-    for if_type in if_types:
-        fout = open(file_prefix + name + "_" + if_type + ".vs", "w")
+    for kind in if_types:
+        fout = open(file_prefix + name + "_" + kind + ".vs", "w")
 
         # get prefixes
         prefix1 = prefix
         prefix2_str = ""
-        if "portmap" in if_type:
+        if "portmap" in kind:
             prefix1 = portmap_port_prefix
             prefix2_str = " prefix,"
 
         # get ports
-        if if_type.startswith("s"):
+        if kind.startswith("s"):
             ports = get_signals(
                 name=name,
-                if_type="subordinate",
+                kind="subordinate",
                 mult=mult,
                 widths=widths,
                 params=params,
             )
         else:
             ports = get_signals(
-                name=name, if_type="manager", mult=mult, widths=widths, params=params
+                name=name, kind="manager", mult=mult, widths=widths, params=params
             )
 
-        eval_str = f"write_{if_type}(fout, prefix1,{prefix2_str} ports)"
+        eval_str = f"write_{kind}(fout, prefix1,{prefix2_str} ports)"
         # print(eval_str, prefix1)
         eval(eval_str)
         fout.close()
@@ -1643,7 +1643,7 @@ def gen_if(interface):
 
 def gen_wires(interface):
     """Generate wires snippet for given interface"""
-    name = interface.if_type
+    name = interface.kind
     file_prefix = interface.file_prefix
     prefix = interface.prefix
     mult = interface.mult
@@ -1651,7 +1651,7 @@ def gen_wires(interface):
     widths = interface.widths
 
     signals = get_signals(
-        name=name, if_type="", mult=mult, widths=widths, params=params
+        name=name, kind="", mult=mult, widths=widths, params=params
     )
 
     fout = open(file_prefix + name + "_wire.vs", "w")

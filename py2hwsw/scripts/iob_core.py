@@ -260,7 +260,7 @@ class iob_core(iob_module, iob_instance):
         # Create memory wrapper for top module if any memory interfaces are used
         if self.is_top_module or self.is_tester:
             if any(
-                (port.interface.if_type in mem_if_names and port.name.endswith("m"))
+                (port.interface.kind in mem_if_names and port.name.endswith("m"))
                 for port in self.ports
                 if port.interface
             ):
@@ -545,7 +545,7 @@ class iob_core(iob_module, iob_instance):
                 for port in subblock.ports:
                     if (
                         port.name == "iob_csrs_cbus_s"
-                        and port.interface.if_type == "iob"
+                        and port.interface.kind == "iob"
                         and port.e_connect
                     ):
                         # print(
@@ -591,7 +591,7 @@ class iob_core(iob_module, iob_instance):
         for p in instantiator.ports:
             if p.interface:
                 if (
-                    p.interface.if_type == port.interface.if_type
+                    p.interface.kind == port.interface.kind
                     and p.interface.prefix == port.interface.prefix
                 ):
                     if p.interface.params != port.interface.params:
@@ -654,14 +654,14 @@ class iob_core(iob_module, iob_instance):
         for port in self.ports:
             if not port.e_connect and port.interface:
                 if (
-                    port.interface.if_type in mem_if_names
+                    port.interface.kind in mem_if_names
                     and instantiator
                     and not self.is_tester
                 ):
                     # print(f"DEBUG: Creating port '{port.name}' in '{instantiator.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
                     self.__connect_memory(port, instantiator)
                 elif (
-                    port.interface.if_type == "iob_clk"
+                    port.interface.kind == "iob_clk"
                     and instantiator
                     and not self.is_tester
                 ):
@@ -686,7 +686,7 @@ class iob_core(iob_module, iob_instance):
         instantiator.create_port(
             name=f"{self.instance_name}_cbus_s",
             signals={
-                "type": csrs_port.interface.if_type,
+                "type": csrs_port.interface.kind,
                 "prefix": self.instance_name + "_",
                 **csrs_port.interface.widths,
             },
@@ -700,7 +700,7 @@ class iob_core(iob_module, iob_instance):
             {
                 "name": f"{self.instance_name}_cbus_s",
                 "signals": {
-                    "type": csrs_port.interface.if_type,
+                    "type": csrs_port.interface.kind,
                     "prefix": self.instance_name + "_",
                     **csrs_port.interface.widths,
                 },

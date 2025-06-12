@@ -89,9 +89,9 @@ class Parameter:
 
     """
 
-    def __init__(self, name, param_type, def_value, min_value, max_value, description):
+    def __init__(self, name, kind, def_value, min_value, max_value, description):
         self.name = name
-        self.param_type = param_type
+        self.kind = kind
         self.def_value = def_value
         self.min_value = min_value
         self.max_value = max_value
@@ -417,7 +417,7 @@ def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
 """
 
         # Find interface details (including VLNV)
-        bus_details = next(i for i in if_details if i["name"] == bus_interface.if_type)
+        bus_details = next(i for i in if_details if i["name"] == bus_interface.kind)
         if_mode = "master" if port_name.endswith("_m") else "slave"
         bus_interfaces_xml += f"""\
 		<ipxact:busInterface>
@@ -448,7 +448,7 @@ def gen_bus_interface_xml_file(bus_interface, dest_dir):
     @param dest_dir: destination directory
     """
     # Find interface details (including VLNV)
-    bus_details = next(i for i in if_details if i["name"] == bus_interface.if_type)
+    bus_details = next(i for i in if_details if i["name"] == bus_interface.kind)
 
     # Create the destination directory if it doesn't exist
     if not os.path.exists(dest_dir):
@@ -456,7 +456,7 @@ def gen_bus_interface_xml_file(bus_interface, dest_dir):
 
     # Create the Bus Definition file for the interface
     with open(
-        f"{dest_dir}/interface_{bus_interface.if_type}.{bus_details['version']}.xml", "w"
+        f"{dest_dir}/interface_{bus_interface.kind}.{bus_details['version']}.xml", "w"
     ) as f:
         f.write(
             f"""\
@@ -479,7 +479,7 @@ def gen_bus_interface_xml_file(bus_interface, dest_dir):
 
 
 #    # Create the Abstraction Definition file for the interface
-#    with open(f"{dest_dir}/interface_{bus_interface.if_type}.{bus_details['version']}.absDef.xml", "w") as f:
+#    with open(f"{dest_dir}/interface_{bus_interface.kind}.{bus_details['version']}.absDef.xml", "w") as f:
 #        f.write(f"""\
 # <?xml version="1.0" encoding="UTF-8"?>
 # <ipxact:abstractionDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
@@ -582,11 +582,11 @@ def gen_parameters_list(core):
             # Skip doc_only confs
             if conf.doc_only:
                 continue
-            if conf.conf_type != ["M", "C"]:
+            if conf.kind != ["M", "C"]:
                 parameters_list.append(
                     Parameter(
                         conf.name,
-                        conf.param_type,
+                        conf.kind,
                         conf.val,
                         conf.min,
                         conf.max,

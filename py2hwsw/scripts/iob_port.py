@@ -56,8 +56,8 @@ class iob_port(iob_wire):
 
         if self.interface:
             self.signals += if_gen.get_signals(
-                name=self.interface.if_type,
-                if_type=_direction,
+                name=self.interface.kind,
+                kind=_direction,
                 mult=self.interface.mult,
                 widths=self.interface.widths,
                 params=self.interface.params,
@@ -121,7 +121,7 @@ class iob_port(iob_wire):
                 validate_verilog_const(value=wire, direction=self.signals[0].direction)
         elif isinstance(wire, iob_wire):
             if self.interface and wire.interface:
-                if self.interface.if_type == wire.interface.if_type:
+                if self.interface.kind == wire.interface.kind:
                     for signal in self.signals:
                         search_name = signal.name.replace(
                             self.interface.prefix, wire.interface.prefix, 1

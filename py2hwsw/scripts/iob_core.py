@@ -220,6 +220,12 @@ class iob_core(iob_module, iob_instance):
             str,
             descr="CSR Configuration to use",
         )
+        self.set_default_attribute(
+            "title",
+            attributes.get("original_name", self.__class__.__name__),
+            str,
+            descr="Tile of this core. Used for documentation.",
+        )
 
         if self.is_top_module and "reset_polarity" not in attributes:
             # Set default reset polarity to 'positive'

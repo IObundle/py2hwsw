@@ -30,8 +30,6 @@ TSRC = $(patsubst tsrc/%, ./%, $(wildcard tsrc/*))
 	cp $< $@
 
 TSRC+=name.tex
-name.tex:
-	@echo $(NAME) | sed 's/_/\\_/g' > $@
 
 TSRC+=signature.tex
 signature.tex: $(DOC)_signature.tex

@@ -11,7 +11,7 @@ import config_gen
 import io_gen
 import block_gen
 
-from latex import write_table
+from latex import write_table, escape_latex
 from iob_base import fail_with_msg, find_path, get_lib_cores
 
 
@@ -26,8 +26,13 @@ def generate_docs(core):
         generate_py_params_tex(
             core.python_parameters, core.build_dir + "/document/tsrc"
         )
-        generate_tex_file(core.build_dir + "/document/tsrc/rn_overview.tex", core.description)
+        generate_tex_file(
+            core.build_dir + "/document/tsrc/rn_overview.tex", core.description
+        )
         generate_tex_file(core.build_dir + "/document/tsrc/name.tex", core.title)
+        generate_tex_file(
+            core.build_dir + "/document/tsrc/description.tex", core.description
+        )
 
 
 def generate_tex_file(file_path, contents):
@@ -36,7 +41,7 @@ def generate_tex_file(file_path, contents):
     :param str contents: TeX contents
     """
     with open(file_path, "w") as f:
-        f.write(contents)
+        f.write(escape_latex(contents))
 
 
 def generate_tex_py2hwsw_attributes(iob_core_instance, out_dir):

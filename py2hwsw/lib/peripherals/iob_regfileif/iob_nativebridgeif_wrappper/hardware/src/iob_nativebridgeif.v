@@ -21,7 +21,6 @@ module iob_nativebridgeif #(
    assign iob_rdata_o  = iob_rdata_i;
    assign iob_ready_o  = iob_ready_i;
    assign iob_rvalid_o = iob_rvalid_i;
-   assign iob_rready_i = iob_rready_o;
 
 endmodule
 

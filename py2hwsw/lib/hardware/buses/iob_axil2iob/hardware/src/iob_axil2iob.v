@@ -35,8 +35,6 @@ module iob_axil2iob #(
    reg [ADDR_W-1:0]    iob_addr_nxt;
    reg [WSTRB_W-1:0]   iob_wstrb_nxt;
    reg [DATA_W-1:0]    iob_wdata_nxt;
-   assign iob_rready_o = 1'b1;
-   
    
    always @* begin
 

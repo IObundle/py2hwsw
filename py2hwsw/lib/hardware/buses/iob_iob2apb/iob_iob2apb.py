@@ -72,14 +72,14 @@ def setup(py_params_dict):
                 "name": "pc_int",
                 "descr": "pc_int wire",
                 "signals": [
-                    {"name": "pc_int", "width": 2},
+                    {"name": "pc_int", "width": 1},
                 ],
             },
             {
                 "name": "pc_nxt_int",
                 "descr": "pc_nxt_int wire",
                 "signals": [
-                    {"name": "pc_nxt_int", "width": 2},
+                    {"name": "pc_nxt_int", "width": 1},
                 ],
             },
             {
@@ -123,7 +123,7 @@ def setup(py_params_dict):
                 "core_name": "iob_reg",
                 "instance_name": "pc_reg",
                 "parameters": {
-                    "DATA_W": 2,
+                    "DATA_W": 1,
                     "RST_VAL": 0,
                 },
                 "connect": {
@@ -170,13 +170,12 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-        localparam WAIT_VALID  = 2'd0;
-        localparam WAIT_READY  = 2'd1;
-        localparam WAIT_RREADY = 2'd2;
+        localparam WAIT_VALID  = 1'd0;
+        localparam WAIT_READY  = 1'd1;
 
-        reg  [1:0] pcnt_nxt;
-        reg  [1:0] apb_enable;
-        reg        iob_rvalid_nxt;
+        reg pcnt_nxt;
+        reg apb_enable;
+        reg iob_rvalid_nxt;
 
         //IOb outputs
         assign iob_ready_o = apb_ready_i;
@@ -215,14 +214,6 @@ def setup(py_params_dict):
         end else begin
            iob_rvalid_nxt = 1'd1;
         end
-      end
-      default: begin // WAIT_RREADY
-         if (iob_rready_i) begin
-            pcnt_nxt = WAIT_VALID;
-         end else begin
-            iob_rvalid_nxt = iob_rvalid_o;
-            pcnt_nxt         = pc_int;
-         end
       end
     endcase
   end

@@ -60,6 +60,7 @@ module iob_axistream_in #(
    `include "iob_axistream_in_subblocks.vs"
 
    wire tlast_detected_reg;
+   wire data_valid_reg;
 
    //CPU INTERFACE
    assign data_ready_rd  = int_tvalid;
@@ -72,7 +73,19 @@ module iob_axistream_in #(
    assign sys_tvalid_o   = int_tvalid & mode_wr;
    assign sys_tdata_o    = int_tdata;
 
-   assign int_tready     = (mode_wr) ? sys_tready_i : data_rready_rd;
+   assign int_tready     = (mode_wr) ? sys_tready_i : data_valid_reg;
+
+   iob_reg_ca #(
+    .DATA_W (1),
+    .RST_VAL(1'd0)
+   ) data_valid_reg_inst (
+       .clk_i (clk_i),
+       .cke_i (cke_i),
+       .arst_i(arst_i),
+       .data_i(data_valid_rd),
+       .data_o(data_valid_reg)
+   );
+        
 
    // empty = fifo empty + no data in fifo2axis
    assign fifo_empty_rd  = fifo_empty & (~int_tvalid);

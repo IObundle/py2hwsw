@@ -33,7 +33,6 @@ module iob_v_tb;
    reg     [                31:0] iob_wdata_i;
    reg     [`IOB_CSRS_ADDR_W-1:0] iob_addr_i;
    reg     [                 3:0] iob_wstrb_i;
-   reg                            iob_rready_i;
    wire                           iob_rvalid_o;
    wire    [                31:0] iob_rdata_o;
    wire                           iob_ready_o;
@@ -55,7 +54,6 @@ module iob_v_tb;
       iob_wdata_i  = 0;
       iob_addr_i   = 0;
       iob_wstrb_i  = 0;
-      iob_rready_i = 0;
 
       clk          = 0;
       cke          = 1;
@@ -133,7 +131,6 @@ module iob_v_tb;
       .iob_addr_i  (iob_addr_i),
       .iob_wdata_i (iob_wdata_i),
       .iob_wstrb_i (iob_wstrb_i),
-      .iob_rready_i(iob_rready_i),
       .iob_rvalid_o(iob_rvalid_o),
       .iob_rdata_o (iob_rdata_o),
       .iob_ready_o (iob_ready_o)
@@ -171,11 +168,9 @@ module iob_v_tb;
 
          #1 while (!iob_ready_o) #1;
          @(posedge clk) #1 iob_valid_i = 0;
-         @(posedge clk) #1 iob_rready_i = 1;
 
          while (!iob_rvalid_o) #1;
          data = #1 `IOB_GET_RDATA(addr, iob_rdata_o, width);
-         @(posedge clk) #1 iob_rready_i = 0;
       end
    endtask
 

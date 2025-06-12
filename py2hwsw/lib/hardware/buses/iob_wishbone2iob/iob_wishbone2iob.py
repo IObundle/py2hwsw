@@ -180,7 +180,6 @@ def setup(py_params_dict):
    assign iob_wdata_o = wb_datout_i;
    assign iob_wstrb_o = wstrb;
    assign wstrb = wb_we_i ? wb_sel_i : 4'h0;
-   assign iob_rready_o = 1'b1;
 
    assign wb_dat_o = (iob_rdata_i) & (wb_data_mask);
    assign wb_data_mask = {{8{wb_sel_i[3]}}, {8{wb_sel_i[2]}}, {8{wb_sel_i[1]}}, {8{wb_sel_i[0]}}};

@@ -286,7 +286,6 @@ def setup(py_params_dict):
             assign split_control_iob_rvalid = control_iob_rvalid;
             assign split_control_iob_rdata = control_iob_rdata;
             assign split_control_iob_ready = control_iob_ready;
-            assign control_iob_rready = split_control_iob_rready;
             """
             },
         ],

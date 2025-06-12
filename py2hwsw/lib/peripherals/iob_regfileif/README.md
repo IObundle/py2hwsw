@@ -112,7 +112,6 @@ To connect the external IOb-native (subordinate) interface of the REGFILEIF of t
         ({'corename':'SUT0', 'if_name':'REGFILEIF0', 'port':'external_iob_rvalid_o', 'bits':[]}, {'corename':'IOBNATIVEBRIDGEIF0', 'if_name':'iob_m_port', 'port':'iob_rvalid_i', 'bits':[]}),
         ({'corename':'SUT0', 'if_name':'REGFILEIF0', 'port':'external_iob_rdata_o', 'bits':[]}, {'corename':'IOBNATIVEBRIDGEIF0', 'if_name':'iob_m_port', 'port':'iob_rdata_i', 'bits':[]}),
         ({'corename':'SUT0', 'if_name':'REGFILEIF0', 'port':'external_iob_ready_o', 'bits':[]}, {'corename':'IOBNATIVEBRIDGEIF0', 'if_name':'iob_m_port', 'port':'iob_ready_i', 'bits':[]}),
-        ({'corename':'SUT0', 'if_name':'REGFILEIF0', 'port':'external_iob_rready_i', 'bits':[]}, {'corename':'IOBNATIVEBRIDGEIF0', 'if_name':'iob_m_port', 'port':'iob_rready_o', 'bits':[]}),
 
         # Other portmap entries here...
     ],

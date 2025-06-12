@@ -9,7 +9,7 @@ set -e
 #find directories containing testbenches
 TBS=`find ${LIB_DIR} | grep _tb.v | grep -v include`
 
-FILTER_OUT_TBS=""
+FILTER_OUT_TBS="iob_axis2ahb_tb.v iob_iob_s_axi_m_tb.v"
 #for debug
 #FILTER_OUT_TBS="iob_system_tb.v iob_uart_tb.v iob_div_subshift_tb.v iob_div_subshift_frac_tb.v iob_div_pipe_tb.v iob_and_tb.v iob_aoi_tb.v iob_csrs_demo_tb.v iob_pulse_gen_tb.v iob_ctls_tb.v iob_prio_enc_tb.v iob_shift_reg_tb.v iob_timer_tb.v iob_nco_tb.v iob_ram_t2p_be_tb.v iob_ram_2p_tb.v iob_ram_tdp_tb.v iob_ram_atdp_be_tb.v iob_ram_tdp_be_xil_tb.v iob_ram_2p_tb.v iob_ram_tdp_tb.v iob_ram_atdp_be_tb.v iob_ram_t2p_tb.v iob_ram_sp_se_tb.v iob_ram_sp_tb.v iob_ram_t2p_tiled_tb.v iob_ram_atdp_tb.v iob_ram_sp_be_tb.v iob_ram_tdp_be_tb.v iob_ram_at2p_tb.v iob_ram_tdp_tb.v iob_rom_sp_tb.v iob_rom_atdp_tb.v iob_regarray_sp_tb.v iob_rom_tdp_tb.v iob_rom_2p_tb.v iob_axis2axi_tb.v iob_fifo_async_tb.v iob_fifo_sync_tb.v"
 

@@ -326,7 +326,6 @@ def get_manual_signals(name, mode, data_width):
         signals += [
             {"name": name + "_rdata_i", "width": data_width},
             {"name": name + "_rvalid_i", "width": 1},
-            {"name": name + "_rready_o", "width": 1},
             {"name": name + "_ren_o", "width": 1},
             {"name": name + "_ready_i", "width": 1},
         ]

@@ -8,5 +8,4 @@
   {name: 'rdata_o', wave: 'x...........'},
   {name: 'rvalid_o', wave: '0...........'},
   {name: 'ready_o', wave: '0....1..01..'},
-  {name: 'rready_i', wave: 'x...........'},
 ]}

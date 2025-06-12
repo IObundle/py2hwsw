@@ -300,7 +300,6 @@ def setup(py_params_dict):
    assign iob_addr = iob_addr_i;
    assign iob_wdata = iob_wdata_i;
    assign iob_wstrb = iob_wstrb_i;
-   assign iob_rready = iob_rready_i;
    assign iob_rvalid_o = iob_rvalid;
    assign iob_rdata_o = iob_rdata;
    assign iob_ready_o = iob_ready;
@@ -313,7 +312,6 @@ def setup(py_params_dict):
    assign iob_addr_o = iob_addr;
    assign iob_wdata_o = iob_wdata;
    assign iob_wstrb_o = iob_wstrb;
-   assign iob_rready_o = iob_rready;
    assign iob_rvalid = iob_rvalid_i;
    assign iob_rdata = iob_rdata_i;
    assign iob_ready = iob_ready_i;

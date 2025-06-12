@@ -479,7 +479,6 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "noauto_read_valid_rd", "width": 1},
                     {"name": "noauto_read_rdata_rd", "width": 1},
-                    {"name": "noauto_read_rready_rd", "width": 1},
                     {"name": "noauto_read_ready_rd", "width": 1},
                     {"name": "noauto_read_rvalid_rd", "width": 1},
                 ],
@@ -493,7 +492,6 @@ def setup(py_params_dict):
                     {"name": "noauto_read_write_wstrb_wrrd", "width": 1},
                     {"name": "noauto_read_write_ready_wrrd", "width": 1},
                     {"name": "noauto_read_write_rdata_wrrd", "width": 1},
-                    {"name": "noauto_read_write_rready_wrrd", "width": 1},
                     {"name": "noauto_read_write_rvalid_wrrd", "width": 1},
                 ],
             },
@@ -514,7 +512,6 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "autoclear_read_valid_rd", "width": 1},
                     {"name": "autoclear_read_rdata_rd", "width": 1},
-                    {"name": "autoclear_read_rready_rd", "width": 1},
                     {"name": "autoclear_read_ready_rd", "width": 1},
                     {"name": "autoclear_read_rvalid_rd", "width": 1},
                 ],

@@ -587,9 +587,9 @@ def gen_parameters_list(core):
                     Parameter(
                         conf.name,
                         conf.kind,
-                        conf.val,
-                        conf.min,
-                        conf.max,
+                        conf.value,
+                        conf.min_value,
+                        conf.max_value,
                         conf.descr,
                     )
                 )

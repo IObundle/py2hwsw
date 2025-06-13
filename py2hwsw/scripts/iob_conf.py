@@ -23,11 +23,11 @@ class iob_conf:
     # False-parameters are the same as verilog parameters except that the its value must not be overriden.
     kind: str = "P"
     # Value of the configuration option.
-    val: str | int | bool = ""
+    value: str | int | bool = ""
     # Minimum value supported by the configuration option (NA if not applicable).
-    min: str | int = "NA"
+    min_value: str | int = "NA"
     # Maximum value supported by the configuration option (NA if not applicable).
-    max: str | int = "NA"
+    max_value: str | int = "NA"
     # Description of the configuration option.
     descr: str = "Default description"
     # Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is defined/undefined.
@@ -45,12 +45,12 @@ class iob_conf:
             )
 
         try:
-            val = int(self.val)
-            min = int(self.min)
-            max = int(self.max)
-            if val < min or val > max:
+            value = int(self.value)
+            min_value = int(self.min_value)
+            max_value = int(self.max_value)
+            if value < min_value or value > max_value:
                 fail_with_msg(
-                    f"Conf '{self.name}' value '{val}' must be between {min} and {max}!"
+                    f"Conf '{self.name}' value '{value}' must be between {min_value} and {max_value}!"
                 )
         except ValueError:
             pass

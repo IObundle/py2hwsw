@@ -90,11 +90,11 @@ def validate_params(core):
         conf = find_obj_in_list(core_parameters, p_name)
 
         try:
-            min_val = int(conf.min)
+            min_val = int(conf.min_value)
         except Exception:
             min_val = 0
         try:
-            max_val = int(conf.max)
+            max_val = int(conf.max_value)
         except Exception:
             max_val = 2**31 - 1
         if p_value < min_val or p_value > max_val:

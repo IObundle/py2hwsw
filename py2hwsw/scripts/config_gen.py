@@ -75,11 +75,11 @@ def conf_vh(macros, top_module, out_dir):
                 file2create.write(f"`ifndef {macro.if_not_defined}\n")
 
             # Only insert macro if its is not a bool define, and if so only insert it if it is true
-            if type(macro.val) is not bool:
+            if type(macro.value) is not bool:
                 m_name = macro.name.upper()
-                m_default_val = macro.val
+                m_default_val = macro.value
                 file2create.write(f"`define {core_prefix}{m_name} {m_default_val}\n")
-            elif macro.val:
+            elif macro.value:
                 m_name = macro.name.upper()
                 file2create.write(f"`define {core_prefix}{m_name} 1\n")
             if macro.if_defined or macro.if_not_defined:
@@ -111,15 +111,15 @@ def conf_h(macros, top_module, out_dir):
             if macro.doc_only:
                 continue
             # Only insert macro if its is not a bool define, and if so only insert it if it is true
-            if type(macro.val) is not bool:
+            if type(macro.value) is not bool:
                 m_name = macro.name.upper()
                 # Replace any Verilog specific syntax by equivalent C syntax
-                m_default_val = re.sub("\\d+'h", "0x", str(macro.val))
+                m_default_val = re.sub("\\d+'h", "0x", str(macro.value))
                 # Remove Verilog macros ('`')
                 file2create.write(
                     f"#define {core_prefix}{m_name} {str(m_default_val).replace('`', '')}\n"
                 )
-            elif macro.val:
+            elif macro.value:
                 m_name = macro.name.upper()
                 file2create.write(f"#define {core_prefix}{m_name} 1\n")
     file2create.write(f"\n#endif // H_{fname}_H\n")
@@ -239,16 +239,16 @@ def generate_confs_tex(confs, out_dir):
         derv_params = []
         constants = []
         for conf in group.confs:
-            conf_val = conf.val if type(conf.val) is not bool else "1"
+            conf_value = conf.value if type(conf.value) is not bool else "1"
             # Macros and parameters are added to the table
             if conf.kind in ["P", "M"]:
                 tex_table.append(
                     [
                         conf.name,
                         conf.kind,
-                        conf.min,
-                        conf_val,
-                        conf.max,
+                        conf.min_value,
+                        conf_value,
+                        conf.max_value,
                         conf.descr,
                     ]
                 )
@@ -257,7 +257,7 @@ def generate_confs_tex(confs, out_dir):
                 constants.append(
                     [
                         conf.name,
-                        conf_val,
+                        conf_value,
                         conf.descr,
                     ]
                 )
@@ -266,7 +266,7 @@ def generate_confs_tex(confs, out_dir):
                 derv_params.append(
                     [
                         conf.name,
-                        conf_val,
+                        conf_value,
                         conf.descr,
                     ]
                 )

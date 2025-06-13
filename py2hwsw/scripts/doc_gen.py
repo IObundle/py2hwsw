@@ -174,7 +174,7 @@ def generate_py_params_tex_table(python_parameters, out_dir):
             tex_table.append(
                 [
                     param.name,
-                    param.val,
+                    param.value,
                     param.descr,
                 ]
             )

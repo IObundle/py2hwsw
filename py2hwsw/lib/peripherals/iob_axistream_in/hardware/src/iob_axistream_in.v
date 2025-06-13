@@ -60,7 +60,8 @@ module iob_axistream_in #(
    `include "iob_axistream_in_subblocks.vs"
 
    wire tlast_detected_reg;
-   wire data_valid_reg;
+   wire data_read_nxt;
+   wire data_read;
 
    //CPU INTERFACE
    assign data_ready_rd  = int_tvalid;
@@ -73,8 +74,10 @@ module iob_axistream_in #(
    assign sys_tvalid_o   = int_tvalid & mode_wr;
    assign sys_tdata_o    = int_tdata;
 
-   assign int_tready     = (mode_wr) ? sys_tready_i : data_valid_reg;
+   assign int_tready     = (mode_wr) ? sys_tready_i : data_read;
 
+   // read data only after valid + ready handshake
+   assign data_read_nxt = data_valid_rd & data_ready_rd;
    iob_reg_ca #(
     .DATA_W (1),
     .RST_VAL(1'd0)
@@ -82,8 +85,8 @@ module iob_axistream_in #(
        .clk_i (clk_i),
        .cke_i (cke_i),
        .arst_i(arst_i),
-       .data_i(data_valid_rd),
-       .data_o(data_valid_reg)
+       .data_i(data_read_nxt),
+       .data_o(data_read)
    );
         
 

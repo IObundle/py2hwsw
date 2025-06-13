@@ -37,7 +37,6 @@ class iob_driver extends uvm_driver #(iob_transaction);
       vif.iob_addr_i   <= 32'd0;
       vif.iob_wdata_i  <= 32'd0;
       vif.iob_wstrb_i  <= 4'd0;
-      vif.iob_rready_i <= 1'd0;
 
       forever begin
 
@@ -61,7 +60,6 @@ class iob_driver extends uvm_driver #(iob_transaction);
          while (!vif.iob_ready_o) @(posedge vif.clk_i);
 
          vif.iob_valid_i  = 0;
-         vif.iob_rready_i = 1;
 
          // If it's a read transaction, wait for iob_rvalid_o
          if (trans.wstrb == 0) begin
@@ -70,7 +68,6 @@ class iob_driver extends uvm_driver #(iob_transaction);
          end
 
          @(posedge vif.clk_i);
-         vif.iob_rready_i = 0;
          //`uvm_info("DR", "Transaction done", UVM_MEDIUM);
 
          // Signal that the transaction is complete

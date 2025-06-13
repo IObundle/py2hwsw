@@ -442,8 +442,6 @@ class csr_gen:
                 if type(log2n_items) is not int or log2n_items > 0:
                     lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
 
-            lines += f"    assign {name}_rready{suffix} = internal_iob_rready;\n"
-
         return lines, wires
 
     # auxiliar read register case name
@@ -492,7 +490,6 @@ class csr_gen:
     wire [{self.verilog_max(n_bits,1)}-1:0] {name}_rdata_rd;
     wire {name}_rvalid_rd;
     wire {name}_valid_rd;
-    wire {name}_rready_rd;
     wire {name}_ready_rd;
 """
                         )
@@ -521,7 +518,6 @@ class csr_gen:
                             f"""
     .{name}_rdata_i({name}_rdata_rd),
     .{name}_rvalid_i({name}_rvalid_rd),
-    .{name}_rready_o({name}_rready_rd),
     .{name}_ren_o({name}_valid_rd),
     .{name}_ready_i({name}_ready_rd),
 """
@@ -638,10 +634,6 @@ class csr_gen:
                             "name": f"{name}_rdata_i",
                             "width": self.verilog_max(n_bits, 1),
                         },
-                        {
-                            "name": f"{name}_rready_o",
-                            "width": 1,
-                        },
                     ]
                     if "W" not in row.mode:
                         register_signals += [
@@ -707,7 +699,7 @@ class csr_gen:
         wires = []
         subblocks = []
         snippet = ""
-        # check if all registers are auto and add rready_int if not
+        # check if all registers are auto
         all_auto = True
         all_reads_auto = True
         for row in table:
@@ -716,17 +708,6 @@ class csr_gen:
                 if "R" in row.mode:
                     all_reads_auto = False
                     break
-
-        if not all_reads_auto:
-            wires.append(
-                {
-                    "name": "rready_int",
-                    "descr": "",
-                    "signals": [
-                        {"name": "rready_int", "width": 1, "isvar": True},
-                    ],
-                }
-            )
 
         subblocks.append(
             {
@@ -1078,10 +1059,6 @@ class csr_gen:
         iob_rvalid_nxt = 1'b0;
         state_nxt = state;
 """
-        if not all_reads_auto:
-            snippet += """
-        rready_int = 1'b0;
-"""
         snippet += """
 
         //FSM state machine
@@ -1106,11 +1083,7 @@ class csr_gen:
             end
 
             default: begin  // WAIT_RVALID
-                if (internal_iob_rready & internal_iob_rvalid) begin // Transfer done
-"""
-        if not all_reads_auto:
-            snippet += """
-                    rready_int = 1'b1;
+                if (internal_iob_rvalid) begin // Transfer done
 """
         snippet += """
                     iob_rvalid_nxt = 1'b0;

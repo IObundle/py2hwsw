@@ -146,7 +146,6 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "data_valid_rd", "width": 1},  # Unused
                     {"name": "data_rdata_rd", "width": 32},
-                    {"name": "data_rready_rd", "width": 1},
                     {"name": "data_ready_rd", "width": 1},
                     {"name": "data_rvalid_rd", "width": 1},
                 ],
@@ -329,6 +328,10 @@ def setup(py_params_dict):
             },
             {
                 "core_name": "iob_fifo_async",
+                "instantiate": False,
+            },
+            {
+                "core_name": "iob_reg",
                 "instantiate": False,
             },
             {

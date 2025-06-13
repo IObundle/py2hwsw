@@ -194,11 +194,32 @@ def setup(py_params_dict):
             "signals": [{"name": "start_read_transfer", "isvar": True}],
         },
         {
+            "name": "read_data_ready_rst",
+            "descr": "Read data ready reset",
+            "signals": [
+                {"name": "read_data_ready_rst"},
+            ],
+        },
+        {
+            "name": "read_data_ready_en",
+            "descr": "Read data ready enable",
+            "signals": [
+                {"name": "read_data_ready_en"},
+            ],
+        },
+        {
+            "name": "read_data_ready",
+            "descr": "Read data ready signal",
+            "signals": [
+                {"name": "read_data_ready"},
+            ],
+        },
+        {
             "name": "read_data_axis",
             "descr": "Read data AXI-Stream signals",
             "signals": [
                 {"name": "iob_rvalid_o"},
-                {"name": "iob_rready_i"},
+                {"name": "read_data_ready"},
                 {"name": "iob_rdata_o", "width": "DATA_W"},
             ],
         },
@@ -314,6 +335,29 @@ def setup(py_params_dict):
                 "axi_read_m": "axi_read",
             },
         },
+        {
+            "core_name": "iob_reg",
+            "instance_name": "read_data_ready_reg",
+            "instance_description": "Register for read data ready logic",
+            "parameters": {
+                "DATA_W": 1,
+                "RST_VAL": "1'b0",
+            },
+            "port_params": {
+                "clk_en_rst_s": "c_a_r_e",
+            },
+            "connect": {
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "en_i:read_data_ready_en",
+                        "rst_i:read_data_ready_rst",
+                    ],
+                ),
+                "data_i": "read_data_ready_en",
+                "data_o": "read_data_ready",
+            },
+        },
     ]
 
     # FSM List
@@ -379,6 +423,8 @@ def setup(py_params_dict):
         {
             "verilog_code": """
         assign iob_ready_o = ready;
+        assign read_data_ready_en = iob_valid_i & (!en_write) & iob_ready_o;
+        assign read_data_ready_rst = iob_rvalid_o & read_data_ready;
         """
         },
     ]

@@ -412,11 +412,6 @@ def get_iob_ports():
             width=1,
             descr="Interface ready.",
         ),
-        iob_signal(
-            name="iob_rready_o",
-            width=1,
-            descr="Read data ready.",
-        ),
     ]
 
 

@@ -359,7 +359,6 @@ def create_memory_instance(
         snippet = f"""
     // Read signals
     assign {memory_name}_rdata = dA_o;
-    // {memory_name}_rready unused
     assign {memory_name}_rvalid = 1'b1;
 """
 

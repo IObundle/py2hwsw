@@ -74,8 +74,7 @@ module iob_axi2iob #(
    output wire [STRB_WIDTH-1:0] iob_wstrb_o,
    input  wire                  iob_rvalid_i,
    input  wire [DATA_WIDTH-1:0] iob_rdata_i,
-   input  wire                  iob_ready_i,
-   output wire                  iob_rready_o
+   input  wire                  iob_ready_i
 );
 
    localparam [1:0] STATE_IDLE = 2'd0, STATE_DATA = 2'd1, STATE_RESP = 2'd2;
@@ -147,7 +146,6 @@ module iob_axi2iob #(
    assign iob_addr_o = m_axil_arvalid ? m_axil_araddr : (m_axil_awvalid ? m_axil_awaddr : m_axil_awaddr_q);
    assign iob_wdata_o = m_axil_wdata;
    assign iob_wstrb_o = m_axil_arvalid ? {STRB_WIDTH{1'b0}} : m_axil_wstrb;
-   assign iob_rready_o = 1'b1;
 
    iob_reg_care #(
       .DATA_W (ADDR_WIDTH),

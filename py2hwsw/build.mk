@@ -19,6 +19,9 @@ SYN_DIR=hardware/syn
 
 ifeq (fpga,$(findstring fpga,$(MAKECMDGOALS)))
   USE_FPGA = 1
+ifeq ($(BOARD_DIR),)
+  $(error ERROR: Board directory for board '$(BOARD)' not found under hardware/fpga/! Is the board name correct? )
+endif
 endif
 
 # 

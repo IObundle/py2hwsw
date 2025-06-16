@@ -109,17 +109,17 @@ make_bd_pins_external [get_bd_pins $NAME\_0/rs232_rxd_i]
 #make_bd_pins_external [get_bd_pins $NAME\_0/led3]
 
 puts "Synthesizing for FPGA"
-if {[file exists "vivado/$BOARD/$SDC_PREFIX\_dev.sdc"]} {
-    add_files -fileset constrs_1 vivado/$BOARD/$SDC_PREFIX\_dev.sdc
+if {[file exists "vivado/$BOARD/$NAME\_dev.sdc"]} {
+    add_files -fileset constrs_1 vivado/$BOARD/$NAME\_dev.sdc
 }
-if {[file exists "../src/$SDC_PREFIX.sdc"]} {
-    add_files -fileset constrs_1 ../src/$SDC_PREFIX.sdc
+if {[file exists "../src/$NAME.sdc"]} {
+    add_files -fileset constrs_1 ../src/$NAME.sdc
 }
-if {[file exists "../../src/$SDC_PREFIX\_$CSR_IF.sdc"]} {
-    add_files -fileset constrs_1 ../src/$SDC_PREFIX\_$CSR_IF.sdc
+if {[file exists "../../src/$NAME\_$CSR_IF.sdc"]} {
+    add_files -fileset constrs_1 ../src/$NAME\_$CSR_IF.sdc
 }
-if {[file exists "vivado/$SDC_PREFIX\_tool.sdc"]} {
-    add_files -fileset constrs_1 vivado/$SDC_PREFIX\_tool.sdc
+if {[file exists "vivado/$NAME\_tool.sdc"]} {
+    add_files -fileset constrs_1 vivado/$NAME\_tool.sdc
 }
 
 

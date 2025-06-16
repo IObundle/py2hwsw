@@ -25,7 +25,7 @@ class iob_module(iob_base):
             "original_name",
             "",
             str,
-            descr="Original name of the module. (The module name commonly used in the files of the setup dir.)",
+            descr="Original name of the module. Should match name of module's *.py/*.json file. (The module name commonly used in the files of the setup dir.)",
         )
         # Name of the generated module
         self.set_default_attribute(

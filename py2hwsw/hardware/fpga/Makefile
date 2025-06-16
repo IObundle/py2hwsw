@@ -36,7 +36,6 @@ endif
 
 
 FPGA_TOP ?=$(NAME)_$(BOARD)
-SDC_PREFIX ?=$(NAME)
 
 
 include $(FPGA_TOOL)/$(BOARD)/board.mk

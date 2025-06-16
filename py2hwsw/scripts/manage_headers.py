@@ -199,6 +199,7 @@ def generate_headers(
     root=".",
     ignore_paths=[],
     copyright_holder="IObundle",
+    copyright_year=datetime.now().year,
     license_name="MIT",
     header_template="spdx",
     custom_header_suffix="",
@@ -252,7 +253,7 @@ def generate_headers(
 
     template_context = {
         "copyright_lines": [
-            f"SPDX-FileCopyrightText: {datetime.now().year} {copyright_holder}",
+            f"SPDX-FileCopyrightText: {copyright_year} {copyright_holder}",
         ],
         "contributor_lines": [],
         "spdx_expressions": [license_name],

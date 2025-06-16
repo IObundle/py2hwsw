@@ -47,6 +47,7 @@ import sw_tools
 import verilog_format
 import verilog_lint
 from manage_headers import generate_headers
+from iob_signal import remove_signal_direction_suffixes
 
 
 class iob_core(iob_module, iob_instance):
@@ -218,6 +219,12 @@ class iob_core(iob_module, iob_instance):
             "",
             str,
             descr="CSR Configuration to use",
+        )
+        self.set_default_attribute(
+            "title",
+            attributes.get("original_name", self.__class__.__name__),
+            str,
+            descr="Tile of this core. Used for documentation.",
         )
 
         if self.is_top_module and "reset_polarity" not in attributes:
@@ -398,8 +405,9 @@ class iob_core(iob_module, iob_instance):
         custom_header=f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
         generate_headers(
             root=self.build_dir,
-            copyright_holder="IObundle",
-            license_name="MIT",
+            copyright_holder=self.license.author,
+            copyright_year=self.license.year,
+            license_name=self.license.name,
             header_template="spdx",
             custom_header_suffix=custom_header,
             skip_existing_headers=True,
@@ -659,9 +667,19 @@ class iob_core(iob_module, iob_instance):
                     instantiator.wires, wire_name
                 ) or find_obj_in_list(instantiator.ports, wire_name)
                 if not wire:
-                    fail_with_msg(
-                        f"Wire/port '{wire_name}' not found in module '{instantiator.name}'!"
+                    debug(f"Creating implicit wire '{port.name}' in '{instantiator.name}'.", 1)
+                    # Add wire to instantiator
+                    wire_signals = remove_signal_direction_suffixes(port.signals)
+                    instantiator.create_wire(name=wire_name, signals=wire_signals, descr=port.descr)
+                    # Add wire to attributes_dict as well
+                    instantiator.attributes_dict["wires"].append(
+                        {
+                            "name": wire_name,
+                            "signals": wire_signals,
+                            "descr": port.descr,
+                        }
                     )
+                    wire = instantiator.wires[-1]
             port.connect_external(wire, bit_slices=bit_slices)
         for port in self.ports:
             if not port.e_connect and port.interface:

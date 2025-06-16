@@ -11,7 +11,7 @@ import config_gen
 import io_gen
 import block_gen
 
-from latex import write_table
+from latex import write_table, escape_latex
 from iob_base import fail_with_msg, find_path, get_lib_cores
 
 
@@ -26,7 +26,22 @@ def generate_docs(core):
         generate_py_params_tex(
             core.python_parameters, core.build_dir + "/document/tsrc"
         )
-        generate_rn_overview_tex(core.description, core.build_dir + "/document/tsrc")
+        generate_tex_file(
+            core.build_dir + "/document/tsrc/rn_overview.tex", core.description
+        )
+        generate_tex_file(core.build_dir + "/document/tsrc/name.tex", core.title)
+        generate_tex_file(
+            core.build_dir + "/document/tsrc/description.tex", core.description
+        )
+
+
+def generate_tex_file(file_path, contents):
+    """Generate TeX file with given contents
+    :param str file_path: Path to the file
+    :param str contents: TeX contents
+    """
+    with open(file_path, "w") as f:
+        f.write(escape_latex(contents))
 
 
 def generate_tex_py2hwsw_attributes(iob_core_instance, out_dir):
@@ -101,16 +116,6 @@ def generate_tex_core_lib(out_dir):
         tex_table.append([os.path.splitext(file)[0], os.path.relpath(dir, lib_path)])
 
     write_table(f"{out_dir}/py2hwsw_core_lib", tex_table)
-
-
-def generate_rn_overview_tex(description, out_dir):
-    """Generate TeX Release Notes Overview cell text for given core.
-    :param str description: brief core description/overview
-    :param str out_dir: path to output directory
-    """
-
-    with open(f"{out_dir}/rn_overview.tex", "w") as rn_overview_file:
-        rn_overview_file.write(description)
 
 
 def generate_py_params_tex(python_parameters, out_dir):

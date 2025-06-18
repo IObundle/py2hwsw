@@ -375,6 +375,7 @@ def write_git_revision_short_hash(dst_dir):
             setup_dir_file,
             f"{dst_dir}/{file_name}",
         )
+        nix_permission_hack(f"{dst_dir}/{file_name}")
         return
 
     # Alternatively generate short hash based on git command

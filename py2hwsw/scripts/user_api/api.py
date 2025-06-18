@@ -71,25 +71,30 @@ short2python = [
 
 @dataclass
 class iob_conf:
-    """Class to represent a configuration option."""
+    """
+    Class to represent a configuration option.
 
-    # Identifier name for the configuration option.
+    Attributes:
+        name (str): Configuration identifier name.
+        kind (str): Configuration type, either M (Verilog macro), P (Verilog parameter), C (Constant) or D (Derived Parameter).
+                    False-parameters are the same as verilog parameters except that the its value must not be overriden.
+        value (str): Configuration value.
+        min_value (str): Minimum value supported by the configuration option (NA if not applicable).
+        max_value (str): Maximum value supported by the configuration option (NA if not applicable).
+        descr (str): Description of the configuration option.
+        if_defined (str): Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is defined.
+        if_not_defined (str): Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is undefined.
+        doc_only (bool): If enabled, configuration option will only appear in documentation. Not in the verilog code.
+    """
+
     name: str = ""
-    # Type of configuration option, either M (Verilog macro), P (Verilog parameter), C (Constant) or D (Derived Parameter).
-    # False-parameters are the same as verilog parameters except that the its value must not be overriden.
     kind: str = "P"
-    # Value of the configuration option.
     value: str | int | bool = ""
-    # Minimum value supported by the configuration option (NA if not applicable).
     min_value: str | int = "NA"
-    # Maximum value supported by the configuration option (NA if not applicable).
     max_value: str | int = "NA"
-    # Description of the configuration option.
     descr: str = "Default description"
-    # Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is defined/undefined.
     if_defined: str = ""
     if_not_defined: str = ""
-    # If enabled, configuration option will only appear in documentation. Not in the verilog code.
     doc_only: bool = False
 
 

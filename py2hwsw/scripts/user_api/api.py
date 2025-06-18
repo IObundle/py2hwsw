@@ -4,6 +4,18 @@
 # - Dictionary/JSON interface
 # - Short notation interface
 # - API interface
+#
+# The classes specify the API interface. User may instantiate/use any of the classes,
+# their attributes, and methods.
+#
+# The 'dict2python' dictionary maps between the dictionary/JSON interface and the API
+# interface.
+# The 'short2python' dictionary maps between the short notation interface and the API
+# interface.
+#
+# The mapping between the two interfaces does not have to be 1:1. Some mapping keys
+# may call special conversion methods instead of setting the attribute directly.
+
 
 # To achieve backwards compatibility, consider the following best practices:
 #
@@ -34,6 +46,28 @@ API_VERSION = "1.0"
 # Confs
 #
 
+# Convert dict keys to python attributes
+dict2python = {
+    "name": "name",
+    "type": "kind",
+    "val": "value",
+    "min": "min_value",
+    "max": "max_value",
+    "descr": "descr",
+    "if_defined": "if_defined",
+    "if_not_defined": "if_not_defined",
+    "doc_only": "doc_only",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    "name",
+    ["-t", "kind"],
+    ["-v", "value"],
+    ["-m", "min_value"],
+    ["-M", "max_value"],
+]
+
 
 @dataclass
 class iob_conf:
@@ -59,6 +93,22 @@ class iob_conf:
     doc_only: bool = False
 
 
+# Convert dict keys to python attributes
+dict2python = {
+    "name": "name",
+    "descr": "descr",
+    "confs": "confs",
+    "doc_only": "doc_only",
+    "doc_clearpage": "doc_clearpage",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    "name",
+    ["-c", "confs", {"nargs": "+"}],
+]
+
+
 @dataclass
 class iob_conf_group:
     """Class to represent a group of configurations."""
@@ -78,6 +128,22 @@ class iob_conf_group:
 #
 # Signals
 #
+
+# Convert dict keys to python attributes
+dict2python = {
+    "name": "name",
+    "width": "width",
+    "descr": "descr",
+    "isvar": "isvar",
+    "isreg": "isreg",
+    "reg_signals": "reg_signals",
+    "val": "value",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    # TODO:
+]
 
 
 @dataclass
@@ -106,6 +172,24 @@ class iob_signal:
 #
 # if_gen
 #
+
+# Convert dict keys to python attributes
+dict2python = {
+    "type": "kind",
+    "prefix": "prefix",
+    "mult": "mult",
+    "params": "params",
+    "widths": "widths",
+    "file_prefix": "file_prefix",
+    "portmap_port_prefix": "portmap_port_prefix",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    # TODO:
+]
+
+
 # NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
 @dataclass
 class interface:
@@ -130,6 +214,25 @@ class interface:
 #
 # Wires
 #
+
+# Convert dict keys to python attributes
+dict2python = {
+    "type": "kind",
+    "interface": "interface",
+    "descr": "descr",
+    "if_defined": "if_defined",
+    "if_not_defined": "if_not_defined",
+    "signals": "signals",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    "name",
+    ["-i", "signals&i", {"nargs": 1}, ("type",)],
+    ["-s", "signals&s", {"nargs": "+"}, ["name:width"]],
+]
+
+
 @dataclass
 class iob_wire:
     """Class to represent a wire in an iob module"""
@@ -151,6 +254,21 @@ class iob_wire:
 #
 # Ports
 #
+# Convert dict keys to python attributes
+dict2python = {
+    "e_connect": "e_connect",
+    "e_connect_bit_slices": "e_connect_bit_slices",
+    "doc_only": "doc_only",
+    "doc_clearpage": "doc_clearpage",
+    # And others inherited from iob_wire
+}
+
+# Convert short notation to python attributes
+short2python = [
+    # Inherited from iob_wire
+]
+
+
 @dataclass
 class iob_port(iob_wire):
     """Describes an IO port."""

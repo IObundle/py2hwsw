@@ -19,6 +19,7 @@ class iob_instance(iob_base):
         if_defined: str = None,
         if_not_defined: str = None,
         instantiate: bool = True,
+        connect: dict = [],
         **kwargs,
     ):
         """Build a (Verilog) instance
@@ -62,4 +63,10 @@ class iob_instance(iob_base):
             instantiate,
             bool,
             descr="Select if should intantiate the module inside another Verilog module.",
+        )
+        self.set_default_attribute(
+            "connect",
+            connect,
+            dict,
+            descr="Connections for ports of the instance.",
         )

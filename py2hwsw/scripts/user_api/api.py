@@ -39,8 +39,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 import date
 
-# NOTE: Update version every time API changes!
-API_VERSION = "1.0"
+# NOTE: Update py2hwsw version every time API changes!
+#       Must change major version new API is not backwards compatible.
+#       Change minor version when adding new API methods or other non-breaking changes.
 
 #
 # Confs
@@ -259,6 +260,7 @@ class iob_wire:
 #
 # Ports
 #
+
 # Convert dict keys to python attributes
 dict2python = {
     "e_connect": "e_connect",
@@ -291,6 +293,18 @@ class iob_port(iob_wire):
 #
 # Snippets
 #
+
+# Convert dict keys to python attributes
+dict2python = {
+    "verilog_code": "verilog_code",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    # TODO:
+]
+
+
 @dataclass
 class iob_snippet:
     """Class to represent a Verilog snippet in an iob module"""
@@ -302,6 +316,19 @@ class iob_snippet:
 #
 # Comb
 #
+
+# Convert dict keys to python attributes
+dict2python = {
+    "code": "code",
+    "clk_if": "clk_if",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    # TODO:
+]
+
+
 @dataclass
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
@@ -313,6 +340,20 @@ class iob_comb(iob_snippet):
 #
 # FSM
 #
+
+# Convert dict keys to python attributes
+dict2python = {
+    "type": "kind",
+    "default_assignments": "default_assignments",
+    "state_descriptions": "state_descriptions",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    # TODO:
+]
+
+
 @dataclass
 class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
@@ -331,6 +372,21 @@ class iob_core:
     pass
 
 
+# Convert dict keys to python attributes
+dict2python = {
+    "name": "name",
+    "descr": "descr",
+    "blocks": "blocks",
+    "doc_clearpage": "doc_clearpage",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    "name",
+    ["-b", "blocks", {"nargs": "+"}],
+]
+
+
 @dataclass
 class iob_block_group:
     """Class to represent a group of blocks."""
@@ -344,6 +400,20 @@ class iob_block_group:
 #
 # License
 #
+
+# Convert dict keys to python attributes
+dict2python = {
+    "name": "name",
+    "year": "year",
+    "author": "author",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    # TODO:
+]
+
+
 @dataclass
 class iob_license:
     """Class that represents a license attribute"""
@@ -359,6 +429,30 @@ class iob_license:
 #
 # Core
 #
+
+# Convert dict keys to python attributes
+dict2python = {
+    "original_name": "original_name",
+    "name": "name",
+    "description": "description",
+    "reset_polarity": "reset_polarity",
+    "confs": "confs",
+    "ports": "ports",
+    "wires": "wires",
+    "snippets": "snippets",
+    "comb": "comb",
+    "fsm": "fsm",
+    "subblocks": "subblocks",
+    "superblocks": "superblocks",
+    "sw_modules": "sw_modules",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    "original_name",
+]
+
+
 @dataclass
 class iob_module:
     """Class to describe a (Verilog) module"""
@@ -378,6 +472,26 @@ class iob_module:
     sw_modules: list[iob_block_group]
 
 
+# Convert dict keys to python attributes
+dict2python = {
+    "instance_name": "instance_name",
+    "instance_description": "instance_description",
+    "parameters": "parameters",
+    "if_defined": "if_defined",
+    "if_not_defined": "if_not_defined",
+    "instantiate": "instantiate",
+    "connect": "connect",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    "instance_name",
+    ["-p", "parameters", {"nargs": "+"}, "pairs"],
+    ["--no_instance", "instantiate", {"action": "store_false"}],
+    ["-c", "connect", {"nargs": "+"}, "pairs"],
+]
+
+
 @dataclass
 class iob_instance:
     """Class to describe a module's (Verilog) instance"""
@@ -388,6 +502,54 @@ class iob_instance:
     if_defined: str
     if_not_defined: str
     instantiate: bool
+    connect: dict[str, str]
+
+
+# Convert dict keys to python attributes
+dict2python = {
+    "version": "version",
+    "previous_version": "previous_version",
+    "setup_dir": "setup_dir",
+    "build_dir": "build_dir",
+    "use_netlist": "use_netlist",
+    "is_system": "is_system",
+    "board_list": "board_list",
+    "dest_dir": "dest_dir",
+    "ignore_snippets": "ignore_snippets",
+    "generate_hw": "generate_hw",
+    "parent": "parent",
+    "is_top_module": "is_top_module",
+    "is_superblock": "is_superblock",
+    "is_tester": "is_tester",
+    "python_parameters": "python_parameters",
+    "license": "license",
+    "doc_conf": "doc_conf",
+    "title": "title",
+}
+
+# Convert short notation to python attributes
+short2python = [
+    ["--dest_dir", "dest_dir"],
+    # Should short notation for CSRs be here?
+    ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
+    ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
+    ["--csr_if", "csr_if"],
+    {
+        "--csr-group&csrs": [
+            "name",
+            {
+                "-r&regs": [
+                    "name:n_bits",
+                    ["-t", "type"],
+                    ["-m", "mode"],
+                    ["--rst_val", "rst_val"],
+                    ["--addr", "addr", {"type": int}],
+                    ["--log2n_items", "log2n_items"],
+                ],
+            },
+        ]
+    },
+]
 
 
 @dataclass

@@ -140,5 +140,6 @@ pkgs.mkShell {
   buildInputs = py2hwsw_dependencies;
   shellHook = ''
     export PATH="$PATH:${bin_path}"
+    export PYTHONPATH="$PYTHONPATH:${bin_path}"
   '';
 }

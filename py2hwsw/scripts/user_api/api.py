@@ -37,7 +37,7 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-import date
+from datetime import date
 
 # NOTE: Update py2hwsw version every time API changes!
 #       Must change major version new API is not backwards compatible.
@@ -48,7 +48,7 @@ import date
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+conf_dict2python = {
     "name": "name",
     "type": "kind",
     "val": "value",
@@ -61,7 +61,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+conf_short2python = [
     "name",
     ["-t", "kind"],
     ["-v", "value"],
@@ -100,7 +100,7 @@ class iob_conf:
 
 
 # Convert dict keys to python attributes
-dict2python = {
+conf_group_dict2python = {
     "name": "name",
     "descr": "descr",
     "confs": "confs",
@@ -109,7 +109,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+conf_group_short2python = [
     "name",
     ["-c", "confs", {"nargs": "+"}],
 ]
@@ -136,7 +136,7 @@ class iob_conf_group:
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+signal_dict2python = {
     "name": "name",
     "width": "width",
     "descr": "descr",
@@ -147,7 +147,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+signal_short2python = [
     # TODO:
 ]
 
@@ -180,7 +180,7 @@ class iob_signal:
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+interface_dict2python = {
     "type": "kind",
     "prefix": "prefix",
     "mult": "mult",
@@ -191,7 +191,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+interface_short2python = [
     # TODO:
 ]
 
@@ -222,7 +222,7 @@ class interface:
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+wire_dict2python = {
     "type": "kind",
     "interface": "interface",
     "descr": "descr",
@@ -232,7 +232,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+wire_short2python = [
     "name",
     ["-i", "signals&i", {"nargs": 1}, ("type",)],
     ["-s", "signals&s", {"nargs": "+"}, ["name:width"]],
@@ -262,7 +262,7 @@ class iob_wire:
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+port_dict2python = {
     "e_connect": "e_connect",
     "e_connect_bit_slices": "e_connect_bit_slices",
     "doc_only": "doc_only",
@@ -271,7 +271,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+port_short2python = [
     # Inherited from iob_wire
 ]
 
@@ -295,12 +295,12 @@ class iob_port(iob_wire):
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+snippet_dict2python = {
     "verilog_code": "verilog_code",
 }
 
 # Convert short notation to python attributes
-short2python = [
+snippet_short2python = [
     # TODO:
 ]
 
@@ -318,13 +318,13 @@ class iob_snippet:
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+comb_dict2python = {
     "code": "code",
     "clk_if": "clk_if",
 }
 
 # Convert short notation to python attributes
-short2python = [
+comb_short2python = [
     # TODO:
 ]
 
@@ -342,14 +342,14 @@ class iob_comb(iob_snippet):
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+fsm_dict2python = {
     "type": "kind",
     "default_assignments": "default_assignments",
     "state_descriptions": "state_descriptions",
 }
 
 # Convert short notation to python attributes
-short2python = [
+fsm_short2python = [
     # TODO:
 ]
 
@@ -373,7 +373,7 @@ class iob_core:
 
 
 # Convert dict keys to python attributes
-dict2python = {
+block_group_dict2python = {
     "name": "name",
     "descr": "descr",
     "blocks": "blocks",
@@ -381,7 +381,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+block_group_short2python = [
     "name",
     ["-b", "blocks", {"nargs": "+"}],
 ]
@@ -402,14 +402,14 @@ class iob_block_group:
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+license_dict2python = {
     "name": "name",
     "year": "year",
     "author": "author",
 }
 
 # Convert short notation to python attributes
-short2python = [
+license_short2python = [
     # TODO:
 ]
 
@@ -431,7 +431,7 @@ class iob_license:
 #
 
 # Convert dict keys to python attributes
-dict2python = {
+module_dict2python = {
     "original_name": "original_name",
     "name": "name",
     "description": "description",
@@ -448,7 +448,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+module_short2python = [
     "original_name",
 ]
 
@@ -473,7 +473,7 @@ class iob_module:
 
 
 # Convert dict keys to python attributes
-dict2python = {
+instance_dict2python = {
     "instance_name": "instance_name",
     "instance_description": "instance_description",
     "parameters": "parameters",
@@ -484,7 +484,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+instance_short2python = [
     "instance_name",
     ["-p", "parameters", {"nargs": "+"}, "pairs"],
     ["--no_instance", "instantiate", {"action": "store_false"}],
@@ -506,7 +506,7 @@ class iob_instance:
 
 
 # Convert dict keys to python attributes
-dict2python = {
+core_dict2python = {
     "version": "version",
     "previous_version": "previous_version",
     "setup_dir": "setup_dir",
@@ -528,7 +528,7 @@ dict2python = {
 }
 
 # Convert short notation to python attributes
-short2python = [
+core_short2python = [
     ["--dest_dir", "dest_dir"],
     # Should short notation for CSRs be here?
     ["--no_autoaddr", "autoaddr", {"action": "store_false"}],

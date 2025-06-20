@@ -49,7 +49,7 @@ def _empty_dict():
 
 
 # NOTE: Update py2hwsw version every time API changes!
-#       Must change major version new API is not backwards compatible.
+#       Must change major version if new API is not backwards compatible.
 #       Change minor version when adding new API methods or other non-breaking changes.
 
 #
@@ -80,7 +80,7 @@ conf_short2python = [
 
 
 @dataclass
-class iob_conf:
+class iob_conf(ABC):
     """
     Class to represent a configuration option.
 
@@ -125,7 +125,7 @@ conf_group_short2python = [
 
 
 @dataclass
-class iob_conf_group:
+class iob_conf_group(ABC):
     """
     Class to represent a group of configurations.
 
@@ -166,7 +166,7 @@ signal_short2python = [
 
 
 @dataclass
-class iob_signal:
+class iob_signal(ABC):
     """
     Class that represents a wire/port signal.
 
@@ -218,7 +218,7 @@ interface_short2python = [
 
 # NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
 @dataclass
-class interface:
+class interface(ABC):
     """
     Class to represent an interface for generation.
 
@@ -264,7 +264,7 @@ wire_short2python = [
 
 
 @dataclass
-class iob_wire:
+class iob_wire(ABC):
     """
     Class to represent a wire in an iob module.
 
@@ -284,6 +284,19 @@ class iob_wire:
     if_defined: str = ""
     if_not_defined: str = ""
     signals: list[iob_signal] = _empty_list()
+
+    @abstractmethod
+    def get_signal(self, signal_name: str) -> iob_signal:
+        """
+        Find a signal by name and return it.
+
+        Args:
+            signal_name (str): Name of the signal to find
+
+        Returns:
+            iob_signal: The found signal.
+        """
+        pass
 
 
 #
@@ -340,7 +353,7 @@ snippet_short2python = [
 
 
 @dataclass
-class iob_snippet:
+class iob_snippet(ABC):
     """
     Class to represent a Verilog snippet in an iob module.
 
@@ -417,7 +430,7 @@ class iob_fsm(iob_comb):
 #
 # Blocks
 #
-class iob_core:
+class iob_core(ABC):
     """Forward reference of iob_core class. Full declaration of iob_core class is available in below."""
 
     pass
@@ -439,7 +452,7 @@ block_group_short2python = [
 
 
 @dataclass
-class iob_block_group:
+class iob_block_group(ABC):
     """
     Class to represent a group of blocks.
 
@@ -474,7 +487,7 @@ license_short2python = [
 
 
 @dataclass
-class iob_license:
+class iob_license(ABC):
     """
     Class that represents a license attribute.
 
@@ -517,7 +530,7 @@ module_short2python = [
 
 
 @dataclass
-class iob_module:
+class iob_module(ABC):
     """
     Class to describe a (Verilog) module.
 
@@ -573,7 +586,7 @@ instance_short2python = [
 
 
 @dataclass
-class iob_instance:
+class iob_instance(ABC):
     """
     Class to describe a module's (Verilog) instance.
 

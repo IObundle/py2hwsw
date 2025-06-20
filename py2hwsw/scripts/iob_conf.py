@@ -12,29 +12,12 @@ from iob_base import (
     find_obj_in_list,
 )
 
+from user_api import api
+
 
 @dataclass
-class iob_conf:
+class iob_conf(api.iob_conf):
     """Class to represent a configuration option."""
-
-    # Identifier name for the configuration option.
-    name: str = ""
-    # Type of configuration option, either M (Verilog macro), P (Verilog parameter), C (Constant) or D (Derived Parameter).
-    # False-parameters are the same as verilog parameters except that the its value must not be overriden.
-    kind: str = "P"
-    # Value of the configuration option.
-    value: str | int | bool = ""
-    # Minimum value supported by the configuration option (NA if not applicable).
-    min_value: str | int = "NA"
-    # Maximum value supported by the configuration option (NA if not applicable).
-    max_value: str | int = "NA"
-    # Description of the configuration option.
-    descr: str = "Default description"
-    # Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is defined/undefined.
-    if_defined: str = ""
-    if_not_defined: str = ""
-    # If enabled, configuration option will only appear in documentation. Not in the verilog code.
-    doc_only: bool = False
 
     def __post_init__(self):
         if not self.name:
@@ -57,19 +40,8 @@ class iob_conf:
 
 
 @dataclass
-class iob_conf_group:
+class iob_conf_group(api.iob_conf_group):
     """Class to represent a group of configurations."""
-
-    # Identifier name for the group of configurations.
-    name: str = ""
-    # Description of the configuration group.
-    descr: str = "Default description"
-    # List of configuration objects.
-    confs: list = field(default_factory=list)
-    # If enabled, configuration group will only appear in documentation. Not in the verilog code.
-    doc_only: bool = False
-    # If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
-    doc_clearpage: bool = False
 
     def __post_init__(self):
         if not self.name:

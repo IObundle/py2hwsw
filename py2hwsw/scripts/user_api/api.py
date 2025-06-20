@@ -39,6 +39,15 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import date
 
+
+def _empty_list():
+    return field(default_factory=list)
+
+
+def _empty_dict():
+    return field(default_factory=dict)
+
+
 # NOTE: Update py2hwsw version every time API changes!
 #       Must change major version new API is not backwards compatible.
 #       Change minor version when adding new API methods or other non-breaking changes.
@@ -117,17 +126,21 @@ conf_group_short2python = [
 
 @dataclass
 class iob_conf_group:
-    """Class to represent a group of configurations."""
+    """
+    Class to represent a group of configurations.
 
-    # Identifier name for the group of configurations.
+    Attributes:
+        name (str): Configuration group identifier name.
+        descr (str): Description of the configuration group.
+        confs (list): List of configuration objects.
+        doc_only (bool): If enabled, configuration group will only appear in documentation. Not in the verilog code.
+        doc_clearpage (bool): If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
+    """
+
     name: str = ""
-    # Description of the configuration group.
     descr: str = "Default description"
-    # List of configuration objects.
-    confs: list[iob_conf]
-    # If enabled, configuration group will only appear in documentation. Not in the verilog code.
+    confs: list[iob_conf] = _empty_list()
     doc_only: bool = False
-    # If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
     doc_clearpage: bool = False
 
 
@@ -154,25 +167,32 @@ signal_short2python = [
 
 @dataclass
 class iob_signal:
-    """Class that represents a wire/port signal"""
+    """
+    Class that represents a wire/port signal.
 
-    # Identifier name for the signal.
+    Attributes:
+        name (str): Identifier name for the signal.
+        width (str or int): Number of bits in the signal.
+        descr (str): Description of the signal.
+        isvar (bool): If enabled, signal will be generated with type `reg` in Verilog.
+        # isreg (bool): Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
+        # reg_signals (list): Used for `iob_comb`: List of signals associated to the infered register.
+        # value (str or int): Logic value for future simulation effort using global signals list.
+    """
+
     name: str = ""
-    # Number of bits in the signal.
     width: str or int = 1
-    # Description of the signal.
     descr: str = "Default description"
-    # If enabled, signal will be generated with type `reg` in Verilog.
     isvar: bool = False
 
-    # Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
-    isreg: bool = False
-    # Used for `iob_comb`: List of signals associated to the infered register.
-    reg_signals: list[str] = field(default_factory=list)
+    # # Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
+    # isreg: bool = False
+    # # Used for `iob_comb`: List of signals associated to the infered register.
+    # reg_signals: list[str] = _empty_list()
 
     # Logic value for future simulation effort using global signals list.
     # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
-    value: str or int = 0
+    # value: str or int = 0
 
 
 #
@@ -199,21 +219,25 @@ interface_short2python = [
 # NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
 @dataclass
 class interface:
-    """Class to represent an interface for generation"""
+    """
+    Class to represent an interface for generation.
 
-    # Type/Name of interface to generate
+    Attributes:
+        kind (str): Type/Name of interface to generate.
+        prefix (str): Prefix for signals of the interface.
+        mult (str or int): Width multiplier. Used when concatenating multiple instances of the interface.
+        params (str): Generic string parameter that is passed to "get_<interface>_ports" function
+        widths (dict[str, str]): Dictionary of width properties of interface.
+        file_prefix (str): Prefix for generated "Verilog Snippets" of this interface.
+        portmap_port_prefix (str): Prefix for "Verilog snippets" of portmaps of this interface:
+    """
+
     kind: str = ""
-    # Prefix for signals of the interface
     prefix: str = ""
-    # Width multiplier. Used when concatenating multiple instances of the interface.
     mult: str | int = 1
-    # Generic string parameter that is passed to "get_<interface>_ports" function
     params: str = None
-    # Dictionary of width properties of interface
-    widths: dict[str, str] = field(default_factory=dict)
-    # Prefix for generated "Verilog Snippets" of this interface
+    widths: dict[str, str] = _empty_dict()
     file_prefix: str = ""
-    # Prefix for "Verilog snippets" of portmaps of this interface:
     portmap_port_prefix: str = ""
 
 
@@ -241,20 +265,25 @@ wire_short2python = [
 
 @dataclass
 class iob_wire:
-    """Class to represent a wire in an iob module"""
+    """
+    Class to represent a wire in an iob module.
 
-    # Identifier name for the wire.
+    Attributes:
+        name (str): Identifier name for the wire.
+        interface (interface): Name of the standard interface to auto-generate with `if_gen.py` script.
+        descr (str): Description of the wire.
+        if_defined (str): Conditionally define this wire if the specified Verilog macro is defined/undefined.
+        if_not_defined (str): Conditionally define this wire if the specified Verilog macro is defined/undefined.
+        signals (list): List of signals belonging to this wire
+                        (each signal represents a hardware Verilog wire).
+    """
+
     name: str = ""
-    # Name of the standard interface to auto-generate with `if_gen.py` script.
     interface: interface = None
-    # Description of the wire.
     descr: str = "Default description"
-    # Conditionally define this wire if the specified Verilog macro is defined/undefined.
     if_defined: str = ""
     if_not_defined: str = ""
-    # List of signals belonging to this wire
-    # (each signal represents a hardware Verilog wire).
-    signals: list[iob_signal]
+    signals: list[iob_signal] = _empty_list()
 
 
 #
@@ -278,15 +307,20 @@ port_short2python = [
 
 @dataclass
 class iob_port(iob_wire):
-    """Describes an IO port."""
+    """
+    Describes an IO port.
 
-    # External wire that connects this port
-    e_connect: iob_wire
-    # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
-    e_connect_bit_slices: list[object]  # FIXME: Constrain values received by bit slices
-    # If enabled, port will only appear in documentation. Not in the verilog code.
+    Attributes:
+        e_connect (iob_wire): External wire to connect to.
+        e_connect_bit_slices (list): List of bit slices of signals in e_connect
+        doc_only (bool): Only add to documentation
+        doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
+    """
+
+    e_connect: iob_wire = None
+    # FIXME: Constrain values received by bit slices
+    e_connect_bit_slices: list[object] = _empty_list()
     doc_only: bool = False
-    # If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     doc_clearpage: bool = False
 
 
@@ -307,9 +341,13 @@ snippet_short2python = [
 
 @dataclass
 class iob_snippet:
-    """Class to represent a Verilog snippet in an iob module"""
+    """
+    Class to represent a Verilog snippet in an iob module.
 
-    # List of outputs of this snippet (use to generate global wires)
+    Attributes:
+        verilog_code (str): Verilog code string
+    """
+
     verilog_code: str = ""
 
 
@@ -331,7 +369,13 @@ comb_short2python = [
 
 @dataclass
 class iob_comb(iob_snippet):
-    """Class to represent a Verilog combinatory circuit in an iob module"""
+    """
+    Class to represent a Verilog combinatory circuit in an iob module.
+
+    Attributes:
+        code (str): Verilog code string
+        clk_if (str): Clock interface
+    """
 
     code: str = ""
     clk_if: str = "c_a"
@@ -356,7 +400,14 @@ fsm_short2python = [
 
 @dataclass
 class iob_fsm(iob_comb):
-    """Class to represent a Verilog finite state machine in an iob module"""
+    """
+    Class to represent a Verilog finite state machine in an iob module.
+
+    Attributes:
+        kind (str): Type of the finite state machine.
+        default_assignments (str): Verilog code string to be assigned to the state register on reset.
+        state_descriptions (str): Verilog code string to be used for state description
+    """
 
     kind: str = "prog"
     default_assignments: str = ""
@@ -389,11 +440,19 @@ block_group_short2python = [
 
 @dataclass
 class iob_block_group:
-    """Class to represent a group of blocks."""
+    """
+    Class to represent a group of blocks.
+
+    Attributes:
+        name (str): Name of the block group.
+        descr (str): Description of the block group.
+        blocks (list): List of blocks in the block group.
+        doc_clearpage (bool): If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
+    """
 
     name: str = ""
     descr: str = "Default description"
-    blocks: list[iob_core] = field(default_factory=list)
+    blocks: list[iob_core] = _empty_list()
     doc_clearpage: bool = False
 
 
@@ -416,13 +475,17 @@ license_short2python = [
 
 @dataclass
 class iob_license:
-    """Class that represents a license attribute"""
+    """
+    Class that represents a license attribute.
 
-    # Identifier name for the license.
+    Attributes:
+        name (str): Name of the license.
+        year (int): Year of the license.
+        author (str): Author of the license.
+    """
+
     name: str = "MIT"
-    # Year of the license.
     year: int = date.today().year
-    # Author of the license.
     author: str = "IObundle, Lda"
 
 
@@ -455,21 +518,38 @@ module_short2python = [
 
 @dataclass
 class iob_module:
-    """Class to describe a (Verilog) module"""
+    """
+    Class to describe a (Verilog) module.
 
-    original_name: str
-    name: str
-    description: str
-    reset_polarity: str
-    confs: list[iob_conf_group]
-    ports: list[iob_port]
-    wires: list[iob_wire]
-    snippets: list[iob_snippet]
-    comb: iob_comb
-    fsm: iob_fsm
-    subblocks: list[iob_block_group]
-    superblocks: list[iob_block_group]
-    sw_modules: list[iob_block_group]
+    Attributes:
+        original_name (str): Original name of the module. (The module name commonly used in the files of the setup dir.)
+        name (str): Name of the generated module.
+        description (str): Description of the module.
+        reset_polarity (str): Global reset polarity of the module. Can be 'positive' or 'negative'. (Will override all subblocks' reset polarities).
+        confs (list): List of module macros and Verilog (false-)parameters
+        ports (list): List of module ports
+        wires (list): List of wires
+        snippets (list): List of Verilog code snippets
+        comb (iob_comb): Combinational circuit
+        fsm (iob_fsm): Finite state machine
+        subblocks (list): List of instances of other cores inside this core.
+        superblocks (list): List of wrappers for this core. Will only be setup if this core is a top module, or a wrapper of the top module.
+        sw_modules (list): List of software modules required by this core.
+    """
+
+    original_name: str = None
+    name: str = ""
+    description: str = "Default description"
+    reset_polarity: str = None
+    confs: list[iob_conf_group] = _empty_list()
+    ports: list[iob_port] = _empty_list()
+    wires: list[iob_wire] = _empty_list()
+    snippets: list[iob_snippet] = _empty_list()
+    comb: iob_comb = None
+    fsm: iob_fsm = None
+    subblocks: list[iob_block_group] = _empty_list()
+    superblocks: list[iob_block_group] = _empty_list()
+    sw_modules: list[iob_block_group] = _empty_list()
 
 
 # Convert dict keys to python attributes
@@ -494,15 +574,26 @@ instance_short2python = [
 
 @dataclass
 class iob_instance:
-    """Class to describe a module's (Verilog) instance"""
+    """
+    Class to describe a module's (Verilog) instance.
 
-    instance_name: str
-    instance_description: str
-    parameters: dict[str, int | str]
-    if_defined: str
-    if_not_defined: str
-    instantiate: bool
-    connect: dict[str, str]
+    Attributes:
+        instance_name (str): Name of the instance. (Will be used as the instance's name in the Verilog module).
+        instance_description (str): Description of the instance.
+        parameters (dict): Verilog parameter values for this instance.
+        if_defined (str): Only use this instance in Verilog if given Verilog macro is defined.
+        if_not_defined (str): Only use this instance in Verilog if given Verilog macro is not defined.
+        instantiate (bool): Select if should intantiate the module inside another Verilog module.
+        connect (dict): Connections for ports of the instance.
+    """
+
+    instance_name: str = None
+    instance_description: str = ""
+    parameters: dict[str, int | str] = _empty_dict()
+    if_defined: str = ""
+    if_not_defined: str = ""
+    instantiate: bool = ""
+    connect: dict[str, str] = _empty_dict()
 
 
 # Convert dict keys to python attributes
@@ -554,24 +645,47 @@ core_short2python = [
 
 @dataclass
 class iob_core(iob_module, iob_instance):
-    """Generic class to describe how to generate a base IOb IP core"""
+    """
+    Generic class to describe how to generate a base IOb IP core.
 
-    version: str
-    previous_version: str
-    setup_dir: str
-    build_dir: str
-    # instance_name: str
-    use_netlist: bool
-    is_system: bool
-    board_list: list[str]
-    dest_dir: str
-    ignore_snippets: list[str]
-    generate_hw: bool
-    parent: dict  # FIXME: not sure if this will be needed in pythase?
-    is_top_module: bool
-    is_superblock: bool
-    is_tester: bool
-    python_parameters: list[object]
-    license: iob_license
-    doc_conf: str
-    title: str
+    Attributes:
+        version (str): Core version. By default is the same as Py2HWSW version.",
+        previous_version (str): Core previous version.",
+        setup_dir (str): Path to root setup folder of the core.",
+        build_dir (str): Path to folder of build directory to be generated for this project.",
+        # instance_name (str): Name of an instance of this class.",
+        use_netlist (bool): Copy `<SETUP_DIR>/CORE.v` netlist instead of `<SETUP_DIR>/hardware/src/*`",
+        is_system (bool): Sets `IS_FPGA=1` in config_build.mk",
+        board_list (list): List of FPGAs supported by this core. A standard folder will be created for each board in this list.",
+        dest_dir (str): Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`",
+        ignore_snippets (list): List of `.vs` file includes in verilog to ignore.",
+        generate_hw (bool): Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.",
+        parent (dict): Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
+        is_top_module (bool): Selects if core is top module. Auto-filled. DO NOT CHANGE.",
+        is_superblock (bool): Selects if core is superblock of another. Auto-filled. DO NOT CHANGE.",
+        is_tester (bool): Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).",
+        python_parameters (list): List of core Python Parameters. Used for documentation.",
+        license (iob_license): License for the core.",
+        doc_conf (str): CSR Configuration to use.",
+        title (str): Title of this core. Used for documentation.",
+    """
+
+    version: str = None
+    previous_version: str = None
+    setup_dir: str = None
+    build_dir: str = None
+    # instance_name: str = None
+    use_netlist: bool = False
+    is_system: bool = False
+    board_list: list[str] = _empty_list()
+    dest_dir: str = ""
+    ignore_snippets: list[str] = _empty_list()
+    generate_hw: bool = False
+    parent: dict = _empty_dict()  # FIXME: not sure if this will be needed in pythase?
+    is_top_module: bool = False
+    is_superblock: bool = False
+    is_tester: bool = False
+    python_parameters: list[object] = _empty_list()
+    license: iob_license = None
+    doc_conf: str = ""
+    title: str = ""

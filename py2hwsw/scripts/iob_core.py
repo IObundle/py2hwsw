@@ -95,7 +95,7 @@ class iob_core(iob_module, iob_instance):
         attributes = kwargs.get("attributes", {})
         connect = kwargs.get("connect", {})
         self.instantiator = kwargs.get("instantiator", None)
-        is_parent = kwargs.get("is_parent", False)
+        self.is_parent = kwargs.get("is_parent", False)
 
         # Store kwargs to allow access to python parameters after object has been created
         self.received_python_parameters = kwargs
@@ -255,7 +255,7 @@ class iob_core(iob_module, iob_instance):
 
         # Read 'attributes' dictionary and set corresponding core attributes
         superblocks = attributes.pop("superblocks", [])
-        # Note: Parsing attributes (specifically the subblocks list) also causes the setup process for subblocks to run
+        # Note: Parsing attributes (specifically the subblocks list) also initializes subblocks
         self.parse_attributes_dict(attributes)
 
         # Connect ports of this instance to external wires (wires of the instantiator)
@@ -282,7 +282,7 @@ class iob_core(iob_module, iob_instance):
             descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part.",
         )
 
-        # Ensure superblocks are set up last
+        # Ensure superblocks are instanciated last
         # and only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
             self.parse_attributes_dict({"superblocks": superblocks})
@@ -304,7 +304,146 @@ class iob_core(iob_module, iob_instance):
         if self.abort_reason:
             return
 
+
+    def post_setup(self):
+        """Scripts to run at the end of the top module's setup"""
+        # Replace Verilog snippet includes
+        self._replace_snippet_includes()
+        # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
+        self._remove_duplicate_sources()
+        if self.is_tester:
+            # Add callback to: Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
+            __class__.global_post_setup_callbacks.append(
+                lambda: self._remove_duplicate_sources(
+                    main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
+                    subfolders=[
+                        "hardware/src",
+                        "hardware/simulation/src",
+                        "hardware/fpga/src",
+                        "hardware/common_src",
+                    ],
+                )
+            )
+        else:  # Not tester
+            # Run post setup callbacks
+            for callback in __class__.global_post_setup_callbacks:
+                callback()
+        # Generate docs
+        doc_gen.generate_docs(self)
+        # Generate ipxact file
+        ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
+        # Remove 'iob_v_tb.v' from build dir if 'iob_v_tb.vh' does not exist
+        sim_src_dir = "hardware/simulation/src"
+        if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
+            os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
+        # Lint and format sources
+        self.lint_and_format()
+        print(
+            f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
+        )
+        # Add SPDX license headers to every file in build dir
+        custom_header=f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
+        generate_headers(
+            root=self.build_dir,
+            copyright_holder=self.license.author,
+            copyright_year=self.license.year,
+            license_name=self.license.name,
+            header_template="spdx",
+            custom_header_suffix=custom_header,
+            skip_existing_headers=True,
+            verbose=False,
+        )
+
+    def create_python_parameter_group(self, *args, **kwargs):
+        create_python_parameter_group(self, *args, **kwargs)
+
+    def handle_parent(self, *args, **kwargs):
+        """Create a new core based on parent core.
+        returns: True if parent core was used. False otherwise.
+        """
+        attributes = kwargs.pop("attributes", {})
+        child_attributes = kwargs.pop("child_attributes", {})
+        if self.is_parent:
+            self.append_child_attributes(attributes, child_attributes)
+
+        # Don't setup parent core if this one does not have parent
+        parent = attributes.get("parent")
+        if not parent:
+            return False
+
+        assert parent["core_name"] != attributes["original_name"], fail_with_msg(
+            f"Parent and child cannot have the same name: '{parent['core_name']}'"
+        )
+
+        belongs_to_top_module = not __class__.global_top_module
+        # Check if this child module is the first one called (It is the leaf child of the top module. Does not have any other childs.)
+        is_first_module_called = belongs_to_top_module and not self.is_parent
+
+        name = attributes.get("name", attributes["original_name"])
+        # Update global build dir to match this module's name and version
+        if is_first_module_called and not __class__.global_build_dir:
+            version = attributes.get("version", PY2HWSW_VERSION)
+            __class__.global_build_dir = f"../{name}_V{version}"
+
+        filtered_parent_py_params = dict(parent)
+        filtered_parent_py_params.pop("core_name", None)
+        filtered_parent_py_params.pop("py2hwsw_target", None)
+        filtered_parent_py_params.pop("build_dir", None)
+        filtered_parent_py_params.pop("instantiator", None)
+        filtered_parent_py_params.pop("py2hwsw_version", None)
+        filtered_parent_py_params.pop("connect", None)
+        filtered_parent_py_params.pop("parameters", None)
+        filtered_parent_py_params.pop("is_superblock", None)
+        if "name" not in filtered_parent_py_params:
+            filtered_parent_py_params["name"] = name
+
+        # print("DEBUG1", kwargs, file=sys.stderr)
+        # print("DEBUG2", filtered_parent_py_params, file=sys.stderr)
+
+        # Setup parent core
+        parent_module = self.get_core_obj(
+            parent["core_name"],
+            **filtered_parent_py_params,
+            is_parent=True,
+            child_attributes=attributes,
+            instantiator=kwargs.get("instantiator", None),
+            connect=kwargs.get("connect", {}),
+            parameters=kwargs.get("parameters", {}),
+            is_superblock=kwargs.get("is_superblock", False),
+        )
+
+        # Copy (some) parent attributes to child
+        self.__dict__.update(parent_module.__dict__)
+        self.original_name = attributes["original_name"]
+        self.setup_dir = attributes["setup_dir"]
+
+        if self.abort_reason:
+            return True
+
+        # Copy files from the module's setup dir
+        copy_srcs.copy_rename_setup_directory(self)
+
+        # Run post setup
+        if is_first_module_called:
+            self.post_setup()
+
+        return True
+
+    def generate_build_dir(self, **kwargs):
+
         self.__create_build_dir()
+
+        print(f"DEBUG: generate_build_dir() for {self.name}")
+
+        breakpoint()
+        # subblock setup process
+        for subblock in self.subblocks:
+            subblock.generate_build_dir()
+
+        # Ensure superblocks are set up only for top module (or wrappers of it)
+        if self.is_top_module or self.is_superblock:
+            for superblock in self.superblocks:
+                superblock.generate_build_dir()
 
         if self.is_tester:
             self.relative_path_to_UUT = os.path.relpath(
@@ -362,134 +501,8 @@ class iob_core(iob_module, iob_instance):
         # TODO as well: Each module has a local `snippets` list.
         # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
-        if (self.is_top_module and not is_parent) or self.is_tester:
+        if (self.is_top_module and not self.is_parent) or self.is_tester:
             self.post_setup()
-
-    def post_setup(self):
-        """Scripts to run at the end of the top module's setup"""
-        # Replace Verilog snippet includes
-        self._replace_snippet_includes()
-        # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
-        self._remove_duplicate_sources()
-        if self.is_tester:
-            # Add callback to: Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
-            __class__.global_post_setup_callbacks.append(
-                lambda: self._remove_duplicate_sources(
-                    main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
-                    subfolders=[
-                        "hardware/src",
-                        "hardware/simulation/src",
-                        "hardware/fpga/src",
-                        "hardware/common_src",
-                    ],
-                )
-            )
-        else:  # Not tester
-            # Run post setup callbacks
-            for callback in __class__.global_post_setup_callbacks:
-                callback()
-        # Generate docs
-        doc_gen.generate_docs(self)
-        # Generate ipxact file
-        ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
-        # Remove 'iob_v_tb.v' from build dir if 'iob_v_tb.vh' does not exist
-        sim_src_dir = "hardware/simulation/src"
-        if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
-            os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
-        # Lint and format sources
-        self.lint_and_format()
-        print(
-            f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
-        )
-        # Add SPDX license headers to every file in build dir
-        custom_header=f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
-        generate_headers(
-            root=self.build_dir,
-            copyright_holder=self.license.author,
-            copyright_year=self.license.year,
-            license_name=self.license.name,
-            header_template="spdx",
-            custom_header_suffix=custom_header,
-            skip_existing_headers=True,
-            verbose=False,
-        )
-
-
-    def create_python_parameter_group(self, *args, **kwargs):
-        create_python_parameter_group(self, *args, **kwargs)
-
-    def handle_parent(self, *args, **kwargs):
-        """Create a new core based on parent core.
-        returns: True if parent core was used. False otherwise.
-        """
-        is_parent = kwargs.pop("is_parent", False)
-        attributes = kwargs.pop("attributes", {})
-        child_attributes = kwargs.pop("child_attributes", {})
-        if is_parent:
-            self.append_child_attributes(attributes, child_attributes)
-
-        # Don't setup parent core if this one does not have parent
-        parent = attributes.get("parent")
-        if not parent:
-            return False
-
-        assert parent["core_name"] != attributes["original_name"], fail_with_msg(
-            f"Parent and child cannot have the same name: '{parent['core_name']}'"
-        )
-
-        belongs_to_top_module = not __class__.global_top_module
-        # Check if this child module is the first one called (It is the leaf child of the top module. Does not have any other childs.)
-        is_first_module_called = belongs_to_top_module and not is_parent
-
-        name = attributes.get("name", attributes["original_name"])
-        # Update global build dir to match this module's name and version
-        if is_first_module_called and not __class__.global_build_dir:
-            version = attributes.get("version", PY2HWSW_VERSION)
-            __class__.global_build_dir = f"../{name}_V{version}"
-
-        filtered_parent_py_params = dict(parent)
-        filtered_parent_py_params.pop("core_name", None)
-        filtered_parent_py_params.pop("py2hwsw_target", None)
-        filtered_parent_py_params.pop("build_dir", None)
-        filtered_parent_py_params.pop("instantiator", None)
-        filtered_parent_py_params.pop("py2hwsw_version", None)
-        filtered_parent_py_params.pop("connect", None)
-        filtered_parent_py_params.pop("parameters", None)
-        filtered_parent_py_params.pop("is_superblock", None)
-        if "name" not in filtered_parent_py_params:
-            filtered_parent_py_params["name"] = name
-
-        # print("DEBUG1", kwargs, file=sys.stderr)
-        # print("DEBUG2", filtered_parent_py_params, file=sys.stderr)
-
-        # Setup parent core
-        parent_module = self.get_core_obj(
-            parent["core_name"],
-            **filtered_parent_py_params,
-            is_parent=True,
-            child_attributes=attributes,
-            instantiator=kwargs.get("instantiator", None),
-            connect=kwargs.get("connect", {}),
-            parameters=kwargs.get("parameters", {}),
-            is_superblock=kwargs.get("is_superblock", False),
-        )
-
-        # Copy (some) parent attributes to child
-        self.__dict__.update(parent_module.__dict__)
-        self.original_name = attributes["original_name"]
-        self.setup_dir = attributes["setup_dir"]
-
-        if self.abort_reason:
-            return True
-
-        # Copy files from the module's setup dir
-        copy_srcs.copy_rename_setup_directory(self)
-
-        # Run post setup
-        if is_first_module_called:
-            self.post_setup()
-
-        return True
 
     @staticmethod
     def append_child_attributes(parent_attributes, child_attributes):

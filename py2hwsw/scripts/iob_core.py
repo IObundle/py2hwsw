@@ -304,7 +304,6 @@ class iob_core(iob_module, iob_instance):
         if self.abort_reason:
             return
 
-
     def post_setup(self):
         """Scripts to run at the end of the top module's setup"""
         # Replace Verilog snippet includes
@@ -433,11 +432,12 @@ class iob_core(iob_module, iob_instance):
 
         self.__create_build_dir()
 
-        print(f"DEBUG: generate_build_dir() for {self.name}")
-
-        breakpoint()
         # subblock setup process
         for subblock in self.subblocks:
+            if self.is_superblock:
+                if subblock.original_name == self.instantiator.original_name:
+                    # skip build dir generation for instantiator subblocks
+                    continue
             subblock.generate_build_dir()
 
         # Ensure superblocks are set up only for top module (or wrappers of it)

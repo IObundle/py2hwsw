@@ -1,26 +1,21 @@
+#!/usr/bin/env python3
+
 # SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
+import py2hwsw_api as py2hwsw
 
-def setup(py_params_dict):
-    """Standard py2hwsw setup method
-    This method is called during the py2hwsw setup process to obtain the dictionary of
-    attributes for this core.
-    param py_params_dict: Dictionary of py2hwsw instance parameters
-    returns: Py2hwsw dictionary of core attributes
-    """
-    # Dictionary that describes this core using the py2hw dictionary interface
-    attributes_dict = {
-        "generate_hw": True,
-        "confs": [
-            """
+core_dictionary = {
+    "generate_hw": True,
+    "confs": [
+        """
             W -t P -v 1 -m 1 -M 32
             -d 'Ports width'
             """
-        ],
-        "ports": [
-            """
+    ],
+    "ports": [
+        """
             a_i -s a_i:W
             -d 'Input port a'
 
@@ -36,9 +31,9 @@ def setup(py_params_dict):
             y_o -s y_o:W
             -d 'Output port y'
             """
-        ],
-        "wires": [
-            """
+    ],
+    "wires": [
+        """
             and_ab_out -s aab:W
             -d 'and ab output'
 
@@ -48,9 +43,9 @@ def setup(py_params_dict):
             or_out -s oab:1
             -d 'or output'
             """,
-        ],
-        "subblocks": [
-            """
+    ],
+    "subblocks": [
+        """
             iob_and iob_and_ab -p W:W -c
             a_i:a_i
             b_i:b_i
@@ -74,15 +69,23 @@ def setup(py_params_dict):
             y_o:y_o
             -d 'Inverter'
             """,
-        ],
-        "superblocks": [
-            # Tester
-            {
-                "core_name": "iob_aoi_tester",
-                "instance_name": "iob_tester",
-                "dest_dir": "tester",
-            },
-        ],
-    }
+    ],
+    "superblocks": [
+        # Tester
+        {
+            "core_name": "iob_aoi_tester",
+            "instance_name": "iob_tester",
+            "dest_dir": "tester",
+        },
+    ],
+}
 
-    return attributes_dict
+
+class iob_aoi(py2hwsw.iob_core):
+    def __init__(self):
+        super().__init__(**core_dictionary)
+
+
+if __name__ == "__main__":
+    iob_aoi_obj = iob_aoi()
+    iob_aoi.generate_build_dir()

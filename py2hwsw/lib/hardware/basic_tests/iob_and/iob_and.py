@@ -58,7 +58,6 @@ class iob_and(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     conf_obj = py2hwsw.iob_conf(name="a")
-    conf_obj.name = 2
     print(conf_obj)
     iob_and_obj = iob_and()
     print(iob_and_obj)

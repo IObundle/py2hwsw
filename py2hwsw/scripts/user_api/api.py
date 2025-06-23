@@ -37,7 +37,12 @@
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from pydantic import BaseModel
 from datetime import date
+
+#
+# Utilities used by API
+#
 
 
 def _empty_list():
@@ -46,6 +51,16 @@ def _empty_list():
 
 def _empty_dict():
     return field(default_factory=dict)
+
+
+class ValidatingBaseModel(BaseModel):
+    """
+    Similar to BaseModel class of pydantic, but with validate_assignment=True.
+    This will validate all value types when attributes are set.
+    """
+
+    class Config:
+        validate_assignment = True
 
 
 # NOTE: Update py2hwsw version every time API changes!
@@ -79,8 +94,7 @@ conf_short2python = [
 ]
 
 
-@dataclass
-class iob_conf(ABC):
+class iob_conf(ABC, ValidatingBaseModel):
     """
     Class to represent a configuration option.
 

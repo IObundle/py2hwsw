@@ -53,10 +53,13 @@ core_dictionary = {
 
 class iob_and(py2hwsw.iob_core):
     def __init__(self):
-        super().__init__(core_dictionary)
+        super().__init__(**core_dictionary)
 
 
 if __name__ == "__main__":
-    print(py2hwsw.__dict__)
-    # iob_and_obj = iob_and()
+    conf_obj = py2hwsw.iob_conf(name="a")
+    conf_obj.name = 2
+    print(conf_obj)
+    iob_and_obj = iob_and()
+    print(iob_and_obj)
     # iob_and.generate_build_dir()

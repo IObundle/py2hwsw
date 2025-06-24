@@ -96,6 +96,31 @@ conf_short2python = [
 ]
 
 
+# These functions should be called by py2 every time it exchanges objects with user.
+def convert2api(internal_obj):
+    """
+    Convert given internal object to corresponding API object.
+
+    Attributes:
+        internal_obj (object): internal object
+    Returns:
+        object: api object
+    """
+    pass
+
+
+def convert2internal(api_obj):
+    """
+    Convert given API object to corresponding internal object.
+
+    Attributes:
+        api_obj (object): API object
+    Returns:
+        object: internal object
+    """
+    pass
+
+
 def api_for(internal_cls):
     """
     Decorator for creating API interface. Apply this decorator to every function in the API.
@@ -117,21 +142,19 @@ def api_for(internal_cls):
     When the user needs to pass objects to py2, he passes API objects, which py2 will convert to internal objects.
 
     Attributes:
-        internal_cls: Reference to internal class that will extend functionality of API class being decorated.
+        internal_cls (class): Reference to internal class that will extend functionality of API class being decorated.
+    Returns:
+        class: Updated API class
     """
 
     def decorator(cls):
-        # You can add new methods or modify existing ones here
-        class WrapperClass(cls):
-            def __init__(self, *args, **kwargs):
-                super().__init__(*args, **kwargs)
-                print("Initialized from the decorator")
+        def new_init(self, *args, **kwargs):
+            print("New constructor called")
 
-            # Example of adding a new method
-            def new_method(self):
-                print("This is a new method added by the decorator")
+        cls.__init__ = new_init()
 
-        return WrapperClass
+        return cls
+
     return decorator
 
 
@@ -180,6 +203,7 @@ conf_group_short2python = [
 ]
 
 
+@api_for(internal_conf.iob_conf_group)
 @dataclass
 class iob_conf_group(ABC):
     """

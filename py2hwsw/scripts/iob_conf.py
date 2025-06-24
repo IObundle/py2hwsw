@@ -13,6 +13,18 @@ from iob_base import (
 )
 
 
+def api_method(cls):
+    """
+    Decorator for methods extend functionality of API methods.
+    This decorator adds constructor that accepts new attributes/methods as arguments (the ones defined in the API class).
+
+    Attributes received by constructor will be added to this internal class.
+
+    """
+    return cls
+
+
+@api_method
 @dataclass
 class iob_conf:
     """Class to represent a configuration option."""
@@ -38,7 +50,7 @@ class iob_conf:
 
 
 @dataclass
-class iob_conf_group(api.iob_conf_group):
+class iob_conf_group:
     """Class to represent a group of configurations."""
 
     def __post_init__(self):

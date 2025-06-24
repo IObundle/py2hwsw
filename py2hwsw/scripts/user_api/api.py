@@ -39,10 +39,12 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pydantic import BaseModel
 from datetime import date
+import iob_conf as internal_conf
 
 #
 # Utilities used by API
 #
+# TODO: Move these utilities to another file (maybe iob_base.py)
 
 
 def _empty_list():
@@ -94,6 +96,46 @@ conf_short2python = [
 ]
 
 
+def api_for(internal_cls):
+    """
+    Decorator for creating API interface. Apply this decorator to every function in the API.
+
+    This decorator:
+    1) Adds attributes (and methods?) defined in the API class to the internal class (by passing them as arguments to constructor of internal class).
+    2) Removes attributes from API class?
+    3) Creates setters/getters for every attribute of API class, but actually accessing internal class's attributes
+    4) Create some id? attribute to allow referencing API object to internal object (when user passes API object to py2, it may need to convert it to the internal object for more advanced features).
+
+    From point of view of the user (even when checking api.py code), he only sees API class with the attributes/methods defined in it.
+    The user may instantiate any API class and use its attributes/methods. This decorator will handle the instantiation of the internal class and hide it from user.
+
+    With this decorator, when the user instantiates API class, two objects are created: the API object and the internal object.
+    The API object is returned to user. The internal object is stored internally by py2.
+    The API and internal objects have a unique id and are associated with each other in a mapping stored internally by py2.
+
+    When py2 needs to pass objects to the user, py2 should only pass API objects (converting from internal objects if needed).
+    When the user needs to pass objects to py2, he passes API objects, which py2 will convert to internal objects.
+
+    Attributes:
+        internal_cls: Reference to internal class that will extend functionality of API class being decorated.
+    """
+
+    def decorator(cls):
+        # You can add new methods or modify existing ones here
+        class WrapperClass(cls):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+                print("Initialized from the decorator")
+
+            # Example of adding a new method
+            def new_method(self):
+                print("This is a new method added by the decorator")
+
+        return WrapperClass
+    return decorator
+
+
+@api_for(internal_conf.iob_conf)
 class iob_conf(ABC, ValidatingBaseModel):
     """
     Class to represent a configuration option.

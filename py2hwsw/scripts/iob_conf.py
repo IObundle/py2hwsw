@@ -12,11 +12,9 @@ from iob_base import (
     find_obj_in_list,
 )
 
-from user_api import api
-
 
 @dataclass
-class iob_conf(api.iob_conf):
+class iob_conf:
     """Class to represent a configuration option."""
 
     def __post_init__(self):

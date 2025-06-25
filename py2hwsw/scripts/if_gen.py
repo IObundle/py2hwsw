@@ -458,13 +458,13 @@ def get_iob_clk_ports(params: str = None):
 def get_mem_ports(
     suffix: str, async_clk: bool = False, addr: bool = True, enable: bool = True
 ):
+    clk_prefix = f"{suffix}_" if async_clk else ""
     suffix = f"_{suffix}" if suffix else ""
-    clk_suffix = suffix if async_clk else ""
     mem_ports = [
         iob_signal(
-            name="clk" + clk_suffix + "_o",
+            name=clk_prefix + "clk" + "_o",
             width=1,
-            descr=f"Clock port {clk_suffix}",
+            descr=f"Clock port {clk_prefix}",
         ),
     ]
     if addr:
@@ -633,8 +633,8 @@ def get_rom_tdp_ports():
 def get_rom_atdp_ports():
     ports = (
         get_mem_ports("a", async_clk=True)
-        + get_mem_ports("b", async_clk=True)
         + get_mem_read_ports("a", true=True)
+        + get_mem_ports("b", async_clk=True)
         + get_mem_read_ports("b", true=True)
     )
     return remove_duplicates(ports)
@@ -654,8 +654,8 @@ def get_ram_2p_ports():
 def get_ram_at2p_ports():
     ports = (
         get_mem_ports("r", async_clk=True, addr=False, enable=False)
-        + get_mem_ports("w", async_clk=True, addr=False, enable=False)
         + get_mem_read_ports("", enable=True, addr=True)
+        + get_mem_ports("w", async_clk=True, addr=False, enable=False)
         + get_mem_write_ports("", addr=True)
     )
     return remove_duplicates(ports)
@@ -665,10 +665,10 @@ def get_ram_at2p_ports():
 def get_ram_atdp_ports():
     ports = (
         get_mem_ports("a", async_clk=True)
-        + get_mem_ports("b", async_clk=True)
         + get_mem_read_ports("a", true=True)
-        + get_mem_read_ports("b", true=True)
         + get_mem_write_ports("a", true=True)
+        + get_mem_ports("b", async_clk=True)
+        + get_mem_read_ports("b", true=True)
         + get_mem_write_ports("b", true=True)
     )
     return remove_duplicates(ports)
@@ -678,10 +678,10 @@ def get_ram_atdp_ports():
 def get_ram_atdp_be_ports():
     ports = (
         get_mem_ports("a", async_clk=True)
-        + get_mem_ports("b", async_clk=True)
         + get_mem_read_ports("a", true=True)
-        + get_mem_read_ports("b", true=True)
         + get_mem_write_ports("a", true=True, byte_enable=True)
+        + get_mem_ports("b", async_clk=True)
+        + get_mem_read_ports("b", true=True)
         + get_mem_write_ports("b", true=True, byte_enable=True)
     )
     return remove_duplicates(ports)
@@ -742,10 +742,10 @@ def get_ram_t2p_tiled_ports():
 def get_ram_tdp_ports():
     ports = (
         get_mem_ports("a")
-        + get_mem_ports("b")
         + get_mem_read_ports("a")
-        + get_mem_read_ports("b")
         + get_mem_write_ports("a")
+        + get_mem_ports("b")
+        + get_mem_read_ports("b")
         + get_mem_write_ports("b")
     )
     return remove_duplicates(ports)
@@ -755,10 +755,10 @@ def get_ram_tdp_ports():
 def get_ram_tdp_be_ports():
     ports = (
         get_mem_ports("a")
-        + get_mem_ports("b")
         + get_mem_read_ports("a")
-        + get_mem_read_ports("b")
         + get_mem_write_ports("a", byte_enable=True)
+        + get_mem_ports("b")
+        + get_mem_read_ports("b")
         + get_mem_write_ports("b", byte_enable=True)
     )
     return remove_duplicates(ports)

@@ -17,6 +17,7 @@ class iob_comb(iob_snippet):
 
     code: str = ""
     clk_if: str = "c_a"
+    clk_prefix: str = ""
 
     def __post_init__(self):
         """Wrap verilog code with the always block"""
@@ -26,14 +27,18 @@ class iob_comb(iob_snippet):
             + self.code
             + """\n\t\tend"""
         )
+        if "clk_i:" in self.clk_if:
+            self.clk_prefix, self.clk_if = self.clk_if.split("clk_i:")
 
     def set_needed_reg(self, core):
         blocking_regex = re.compile(r"^\s*(\w+)\s*(?:\[[^\]]*\])?\s*=", re.MULTILINE)
         non_blocking_regex = re.compile(
             r"^\s*(\w+)\s*(?:\[[^\]]*\])?\s*<=", re.MULTILINE
         )
+        nxt_regex = re.compile(r"[a-zA-Z0-9_$]+_nxt", re.MULTILINE)
 
         outputs = set()
+        nxt_vars = set()
 
         for match in blocking_regex.findall(self.verilog_code):
             outputs.add(match)
@@ -41,7 +46,10 @@ class iob_comb(iob_snippet):
         for match in non_blocking_regex.findall(self.verilog_code):
             outputs.add(match)
 
-        for signal_name in outputs:
+        for match in nxt_regex.findall(self.verilog_code):
+            nxt_vars.add(match)
+
+        for signal_name in outputs | nxt_vars:
             if signal_name.endswith("_o"):
                 signal = find_signal_in_wires(
                     core.ports,
@@ -85,6 +93,16 @@ class iob_comb(iob_snippet):
             if signal is None:
                 fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
 
+        for signal_name in nxt_vars - outputs:
+            insert_point = self.verilog_code.find("\t\t\t")
+            if insert_point != -1:
+                self.verilog_code = (
+                    self.verilog_code[:insert_point]
+                    + f"\t\t\t{signal_name} = {signal_name[:-4]};\n"
+                    + self.verilog_code[insert_point:]
+                ) 
+
+
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""
 
@@ -97,8 +115,12 @@ class iob_comb(iob_snippet):
                     # and overwrite the default one
                     for port in core.ports:
                         if port.interface:
-                            if port.interface.type == "iob_clk":
+                            if port.interface.type == "iob_clk" and port.interface.prefix == self.clk_prefix:
                                 clk_if_name = port.name
+                                if port.interface.params:
+                                    port_params = port.interface.params
+                                else:
+                                    port_params = "c_a"
 
                     # Connect the register
                     connect = {
@@ -132,7 +154,9 @@ class iob_comb(iob_snippet):
 
                     _reg_signals = []
                     bit_slices = []
-                    port_params = self.clk_if
+
+                    if self.clk_if:
+                        port_params = self.clk_if
 
                     # Find, create and connect the enable and reset signals (if they exist)
                     if any(reg_signal == "_en" for reg_signal in signal.reg_signals):

@@ -766,12 +766,12 @@ class iob_core(iob_module, iob_instance):
     version: str = None
     previous_version: str = None
     setup_dir: str = None
-    build_dir: str = None
+    build_dir: str = "build"
     # instance_name: str = None
     use_netlist: bool = False
     is_system: bool = False
     board_list: list[str] = _empty_list()
-    dest_dir: str = ""
+    # dest_dir: str = "" # Should not be visible to the user
     ignore_snippets: list[str] = _empty_list()
     generate_hw: bool = False
     parent: dict = _empty_dict()  # FIXME: not sure if this will be needed in pythase?
@@ -782,3 +782,21 @@ class iob_core(iob_module, iob_instance):
     license: iob_license = None
     doc_conf: str = ""
     title: str = ""
+
+    @abstractmethod
+    def __init__(self, core_dictionary: dict = {}):
+        """
+        Constructor for cores.
+
+        Attributes:
+            core_dictionary (dict): Optional dictionary to initialize core attributes.
+        """
+        pass
+
+    @abstractmethod
+    def generate_build_dir(self):
+        """
+        Standard method to generate build directory.
+        May be overridden by user subclasses to generate custom files or run scripts during the build directory generation process.
+        """
+        pass

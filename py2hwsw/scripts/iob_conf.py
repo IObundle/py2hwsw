@@ -21,6 +21,18 @@ def api_method(cls):
     Attributes received by constructor will be added to this internal class.
 
     """
+
+    def new_init(self, new_attributes):
+        print("API internal method called")
+
+        # Update internal class attributes
+        self.__class__.__annotations__ |= new_attributes
+
+        # Update the dataclass
+        # Person = make_dataclass("Person", fields(Person))
+
+    cls.__init__ = new_init
+
     return cls
 
 

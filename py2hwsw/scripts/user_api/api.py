@@ -39,6 +39,11 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pydantic import BaseModel
 from datetime import date
+import os
+import sys
+import inspect
+from typing import get_type_hints
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')))
 import iob_conf as internal_conf
 
 #
@@ -121,6 +126,27 @@ def convert2internal(api_obj):
     pass
 
 
+def get_methods(cls):
+    """
+    Returns all non-default methods in a class
+
+    Attributes:
+        cls (class): class
+    Returns:
+        dict: methods of the class and their type hints
+    """
+    methods = {}
+    for name in dir(cls):
+        attr = getattr(cls, name)
+        if inspect.isfunction(attr) and not name.startswith("__"):
+            signature = inspect.signature(attr)
+            type_hints = get_type_hints(attr)
+            methods[name] = {
+                "signature": signature,
+                "type_hints": type_hints,
+            }
+    return methods
+
 def api_for(internal_cls):
     """
     Decorator for creating API interface. Apply this decorator to every function in the API.
@@ -150,8 +176,17 @@ def api_for(internal_cls):
     def decorator(cls):
         def new_init(self, *args, **kwargs):
             print("New constructor called")
+            print(cls.__annotations__) # Dictionary with attributes and their types
+            print(dir(cls))
+            print(get_methods(cls))
 
-        cls.__init__ = new_init()
+            # Instantiate internal class
+            internal_obj = internal_cls(cls.__annotations__)
+
+            # Set internal object
+            self._internal_obj = internal_obj
+
+        cls.__init__ = new_init
 
         return cls
 
@@ -159,7 +194,7 @@ def api_for(internal_cls):
 
 
 @api_for(internal_conf.iob_conf)
-class iob_conf(ABC, ValidatingBaseModel):
+class iob_conf():
     """
     Class to represent a configuration option.
 
@@ -186,6 +221,8 @@ class iob_conf(ABC, ValidatingBaseModel):
     if_not_defined: str = ""
     doc_only: bool = False
 
+    def test_method(self) -> None:
+        pass
 
 # Convert dict keys to python attributes
 conf_group_dict2python = {

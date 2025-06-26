@@ -22,8 +22,10 @@ def api_method(cls):
 
     """
 
-    def new_init(self, new_attributes):
-        print("API internal method called")
+    def new_init(self, new_attributes: dict, new_methods: dict):
+        print("Internal class constructor called: ", cls.__name__)
+        print("Received attributes: ", new_attributes)
+        print("Received methods: ", new_methods)
 
         # Update internal class attributes
         self.__class__.__annotations__ |= new_attributes

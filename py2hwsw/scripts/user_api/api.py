@@ -42,7 +42,6 @@ from datetime import date
 import os
 import sys
 import inspect
-from typing import get_type_hints
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')))
 import iob_conf as internal_conf
 
@@ -63,11 +62,23 @@ def _empty_dict():
 class ValidatingBaseModel(BaseModel):
     """
     Similar to BaseModel class of pydantic, but with validate_assignment=True.
-    This will validate all value types when attributes are set.
+    Also add '__post_init__' method for subclasses, for similar purpose as dataclasses __post_init__.
     """
 
+    # Configure validate_assignment to validate all attributes when they are set.
     class Config:
         validate_assignment = True
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        # Additional initialization logic here
+        self.__post_init__(**data)
+
+    def __post_init__(self, **data):
+        """
+        A __post_init__ method, similar to the one in dataclasses, that can be overridden in subclasses.
+        """
+        pass
 
 
 # NOTE: Update py2hwsw version every time API changes!
@@ -128,7 +139,7 @@ def convert2internal(api_obj):
 
 def get_methods(cls):
     """
-    Returns all non-default methods in a class
+    Returns all non-default methods in a class (includes ones inherited from superclasses)
 
     Attributes:
         cls (class): class
@@ -140,12 +151,23 @@ def get_methods(cls):
         attr = getattr(cls, name)
         if inspect.isfunction(attr) and not name.startswith("__"):
             signature = inspect.signature(attr)
-            type_hints = get_type_hints(attr)
-            methods[name] = {
-                "signature": signature,
-                "type_hints": type_hints,
-            }
+            methods[name] = signature
     return methods
+
+
+def get_subclass_methods(cls):
+    """
+    Returns all methods that are not in the parent class
+
+    Attributes:
+        cls (class): class
+    Returns:
+        dict: methods of the class and their type hints
+    """
+    cls_methods = get_methods(cls)
+    parent_methods = get_methods(cls.__base__)
+    return {k: v for k, v in cls_methods.items() if k not in parent_methods}
+
 
 def api_for(internal_cls):
     """
@@ -173,20 +195,28 @@ def api_for(internal_cls):
         class: Updated API class
     """
 
+    # Create decorator dynamically for API class
     def decorator(cls):
+        # Update constructor of API class
         def new_init(self, *args, **kwargs):
-            print("New constructor called")
-            print(cls.__annotations__) # Dictionary with attributes and their types
-            print(dir(cls))
-            print(get_methods(cls))
+            print("API class constructor called: ", cls.__name__)
+            print("Attributes: ", cls.__annotations__) # Dictionary with attributes and their types
+            print("Methods: ", get_subclass_methods(cls)) # Dictionary with methods and their types
 
-            # Instantiate internal class
-            internal_obj = internal_cls(cls.__annotations__)
+            # Instantiate internal class, with API attributes and methods
+            internal_obj = internal_cls(cls.__annotations__, get_subclass_methods(cls))
 
-            # Set internal object
-            self._internal_obj = internal_obj
+            # Store reference to internal object
+            self.__internal_obj = internal_obj
+            # TODO: Add some way to convert2internal
 
-        cls.__init__ = new_init
+        cls.__post_init__ = new_init
+
+        # Add instance attributes to API class pointing to internal class attributes
+
+
+        # Remove class attributes from API class
+        # This will make sure user doesn't try to access them directly
 
         return cls
 
@@ -194,7 +224,7 @@ def api_for(internal_cls):
 
 
 @api_for(internal_conf.iob_conf)
-class iob_conf():
+class iob_conf(ValidatingBaseModel):
     """
     Class to represent a configuration option.
 
@@ -211,17 +241,17 @@ class iob_conf():
         doc_only (bool): If enabled, configuration option will only appear in documentation. Not in the verilog code.
     """
 
-    name: str = ""
-    kind: str = "P"
-    value: str | int | bool = ""
-    min_value: str | int = "NA"
-    max_value: str | int = "NA"
-    descr: str = "Default description"
-    if_defined: str = ""
-    if_not_defined: str = ""
-    doc_only: bool = False
+    __name: str = ""
+    __kind: str = "P"
+    __value: str | int | bool = ""
+    __min_value: str | int = "NA"
+    __max_value: str | int = "NA"
+    __descr: str = "Default description"
+    __if_defined: str = ""
+    __if_not_defined: str = ""
+    __doc_only: bool = False
 
-    def test_method(self) -> None:
+    def test_method(self, var1: str, var2: int) -> list:
         pass
 
 # Convert dict keys to python attributes

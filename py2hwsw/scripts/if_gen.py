@@ -10,6 +10,9 @@
 from copy import deepcopy
 from dataclasses import dataclass, field
 from encodings.punycode import T
+from pydoc import describe
+import re
+from sys import prefix
 from turtle import reset
 from typing import Dict
 from unittest import result, signals
@@ -279,43 +282,11 @@ if_types = [
 ]
 
 
-def dict2interface(interface_dict):
-    """Convert dictionary to an interface.
-    Example interface dict:
-    {
-        "name": "cpu_m",
-        "descr": "cpu instruction bus",
-        "signals": {
-            "type": "iob",
-            # Generic string parameter
-            "params": "",
-            # Widths/Other parameters
-            "DATA_W": "DATA_W",
-            "ADDR_W": "ADDR_W",
-        },
-    },
-    """
-    if not interface_dict:
-        return None
-    interface_attributes = interface.__dataclass_fields__.keys()
-    # Extract 'widths' from dictionary
-    widths = {}
-    new_interface_dict = {}
-    for k, v in interface_dict.items():
-        if k not in interface_attributes:
-            widths[k] = v
-        else:
-            new_interface_dict[k] = v
-
-    return interface(**new_interface_dict, widths=widths)
-
 
 @dataclass
 class _Interface:
     """Class to represent an interface for generation"""
 
-    # Type/Name of interface to generate
-    type: str = ""
     # Prefix for signals of the interface
     prefix: str = ""
     # Width multiplier. Used when concatenating multiple instances of the interface.
@@ -324,7 +295,6 @@ class _Interface:
     file_prefix: str = ""
     # Prefix for "Verilog snippets" of portmaps of this interface:
     portmap_port_prefix: str = ""
-
     # List of signals for this interface (Internal, used for generation)
     _signals: list = []
 
@@ -382,7 +352,6 @@ class IobInterface(_Interface):
 
     # Widths for the IOb interface
     data_w: int = 32
-    data_section_w: int = 8
     # Only address width is configurable, data width is fixed
     addr_w: str or int = 32
 
@@ -394,7 +363,7 @@ class IobInterface(_Interface):
 
     def __set_signals(self):
         """Set signals for the IOb interface."""
-        wstrb_w = self.data_w // self.data_section_w
+        wstrb_w = self.data_w // 8
 
         self._signals = self._signals + [
             iob_signal(name="iob_valid_o", descr="Request address is valid."),
@@ -427,8 +396,10 @@ class _MemInterface(_Interface):
 
     # Width for the memory interface
     addr_w: int or str = 32
-    # Memory atributes
-    is_async: bool = False
+    # Asynchronous memory interface
+    _is_async: bool = False
+    # Memory type
+    type: str = "ram_sp"
 
 
     def _set_mem_signals(
@@ -436,7 +407,7 @@ class _MemInterface(_Interface):
     ):
         """Get common signals for the memory interface."""
 
-        clk_prefix = f"{suffix}_" if self.is_async else ""
+        clk_prefix = f"{suffix}_" if self._is_async else ""
         suffix = f"_{suffix}" if suffix else ""
 
         self._signals.append(
@@ -496,7 +467,7 @@ class SymMemInterface(_MemInterface):
                 self.__set_mem_read_signals("a", has_enable=True, has_addr=True, is_true_port=True)
                 self.__set_mem_read_signals("b", hasEnable=True, has_addr=True, is_true_port=True)
             case "rom_atdp":
-                self.is_async = True
+                self._is_async = True
                 self._set_mem_signals("a")
                 self.__set_mem_read_signals("a", is_true_port=True)
                 self._set_mem_signals("b")
@@ -506,13 +477,13 @@ class SymMemInterface(_MemInterface):
                 self.__set_mem_read_signals("", hasEnable=True, has_ready=True, has_addr=True)
                 self.__set_mem_write_signals("", has_ready=True, has_addr=True)
             case "ram_at2p":
-                self.is_async = True
+                self._is_async = True
                 self._set_mem_signals("r", hasAddr=False, hasEnable=False)
                 self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
                 self._set_mem_signals("w", hasAddr=False, hasEnable=False)
                 self.__set_mem_write_signals("", hasAddr=True)
             case "ram_atdp":
-                self.is_async = True
+                self._is_async = True
                 self._set_mem_signals("a")
                 self.__set_mem_read_signals("a", is_true_port=True)
                 self.__set_mem_write_signals("a", is_true_port=True)
@@ -520,7 +491,7 @@ class SymMemInterface(_MemInterface):
                 self.__set_mem_read_signals("b", is_true_port=True)
                 self.__set_mem_write_signals("b", is_true_port=True)
             case "ram_atdp_be":
-                self.is_async = True
+                self._is_async = True
                 self._set_mem_signals("a")
                 self.__set_mem_read_signals("a", is_true_port=True)
                 self.__set_mem_write_signals("a", is_true_port=True, byte_enable=True)
@@ -611,7 +582,6 @@ class SymMemInterface(_MemInterface):
 
     def __set_mem_write_signals(
         self,
-        data_section_w: int = 8,
         suffix: str = "",
         has_ready: bool = False,
         has_addr: bool = False,
@@ -624,7 +594,7 @@ class SymMemInterface(_MemInterface):
         wr_suffix = suffix if is_true_port else ""
 
         if has_byte_enable:
-            wstrb_w = self.data_w // data_section_w
+            wstrb_w = self.data_w // 8
             self._signals.append(
                 iob_signal(
                     name="w_strb" + suffix + "_o",
@@ -710,7 +680,7 @@ class AsymMemInterface(_MemInterface):
                 self.__set_mem_read_signals("a", has_enable=True, has_addr=True, is_true_port=True)
                 self.__set_mem_read_signals("b", hasEnable=True, has_addr=True, is_true_port=True)
             case "rom_atdp":
-                self.is_async = True
+                self._is_async = True
                 self._set_mem_signals("a")
                 self.__set_mem_read_signals("a", is_true_port=True)
                 self._set_mem_signals("b")
@@ -720,13 +690,13 @@ class AsymMemInterface(_MemInterface):
                 self.__set_mem_read_signals("", hasEnable=True, has_ready=True, has_addr=True)
                 self.__set_mem_write_signals("", has_ready=True, has_addr=True)
             case "ram_at2p":
-                self.is_async = True
+                self._is_async = True
                 self._set_mem_signals("r", hasAddr=False, hasEnable=False)
                 self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
                 self._set_mem_signals("w", hasAddr=False, hasEnable=False)
                 self.__set_mem_write_signals("", hasAddr=True)
             case "ram_atdp":
-                self.is_async = True
+                self._is_async = True
                 self._set_mem_signals("a")
                 self.__set_mem_read_signals("a", is_true_port=True)
                 self.__set_mem_write_signals("a", is_true_port=True)
@@ -1585,10 +1555,11 @@ class WishboneInterface(_Interface):
                 ),
             ]
 
+
+
 #
 # Handle signal direction
 #
-
 
 # reverse direction in name's suffix
 def reverse_name_direction(name):
@@ -1845,6 +1816,335 @@ def gen_wires(interface):
     fout = open(file_prefix + name + "_wire.vs", "w")
     write_wire(fout, prefix, signals)
     fout.close()
+
+
+
+#
+# Convert interface dictionary to an interface object
+# Note: This function is to be deprecated in the future, since objects should be created directly for
+# each interface type.
+#
+def dict2interface(interface_dict):
+    """Convert dictionary to an interface.
+    Example interface dict:
+    {
+        "name": "cpu_m",
+        "descr": "cpu instruction bus",
+        "signals": {
+            "type": "iob",
+            # Generic string parameter
+            "params": "",
+            # Widths/Other parameters
+            "DATA_W": "DATA_W",
+            "ADDR_W": "ADDR_W",
+        },
+    },
+    To use an assymmetric memory interface, the dictionary should look like this:
+    {
+        "name": "mem_m",
+        "descr": "Memory interface",
+        "signals": {
+            "type": "ram_at2p",
+            # Generic string parameter
+            "params": "",
+            # Widths/Other parameters
+            "ADDR_W": "ADDR_W",
+            "W_DATA_W": "W_DATA_W",
+            "R_DATA_W": "R_DATA_W",
+        },
+    """
+    if not interface_dict:
+        return None
+    
+    signals_dict = interface_dict.get("signals", {})
+
+    if "type" not in signals_dict:
+        raise ValueError("Interface dictionary must contain a 'type' key.")
+    
+    type = signals_dict["type"]
+    prefix = signals_dict.get("prefix", "")
+    mult = signals_dict.get("mult", 1)
+    params = signals_dict.get("params", None)
+    params = params.split("_")
+    file_prefix = signals_dict.get("file_prefix", "")
+    portmap_port_prefix = signals_dict.get("portmap_port_prefix", "")
+    # Remaining entries in the interface_dict
+    remaining_entries = {
+        k: v for k, v in signals_dict.items() if k not in ["type", "prefix", "mult", "params", "file_prefix", "portmap_port_prefix"]
+    }
+
+    # Retrieve widths and parameters even if not needed
+    # IOb
+    data_w = remaining_entries.get("DATA_W", 32)
+    addr_w = remaining_entries.get("ADDR_W", 32)
+    # Memory
+    w_data_w = remaining_entries.get("W_DATA_W", 32)
+    r_data_w = remaining_entries.get("R_DATA_W", 32)
+    # AXI  
+    id_w = remaining_entries.get("ID_W", 1)
+    size_w = remaining_entries.get("SIZE_W", 3)
+    burst_w = remaining_entries.get("BURST_W", 2)
+    lock_w = remaining_entries.get("LOCK_W", 2)
+    cache_w = remaining_entries.get("CACHE_W", 4)
+    prot_w = remaining_entries.get("PROT_W", 3)
+    qos_w = remaining_entries.get("QOS_W", 4)
+    resp_w = remaining_entries.get("RESP_W", 2)
+    len_w = remaining_entries.get("LEN_W", 8)
+    # AXIStream
+    has_tlast = "tlast" in params
+    # AHB
+    ahb_prot_w = remaining_entries.get("AHB_PROT_W", 4)
+    ahb_burst_w = remaining_entries.get("AHB_BURST_W", 3)
+    ahb_trans_w = remaining_entries.get("AHB_TRANS_W", 2)
+    ahb_size_w = remaining_entries.get("AHB_SIZE_W", 3)
+    # rs232
+    n_pins = remaining_entries.get("N_PINS", 4)
+
+
+    # Check if widths are integers
+    if not isinstance(data_w, int):
+        raise ValueError("DATA_W must be an integer.")
+    if not isinstance(addr_w, int) and not isinstance(addr_w, str):
+        raise ValueError("ADDR_W must be an integer or a string.")
+    if not isinstance(w_data_w, int):
+        raise ValueError("W_DATA_W must be an integer.")
+    if not isinstance(r_data_w, int):
+        raise ValueError("R_DATA_W must be an integer.")
+    if not isinstance(id_w, int):
+        raise ValueError("ID_W must be an integer.")
+    if not isinstance(size_w, int):
+        raise ValueError("SIZE_W must be an integer.")
+    if not isinstance(burst_w, int):
+        raise ValueError("BURST_W must be an integer.")
+    if not isinstance(lock_w, int):
+        raise ValueError("LOCK_W must be an integer.")
+    if not isinstance(cache_w, int):
+        raise ValueError("CACHE_W must be an integer.")
+    if not isinstance(prot_w, int):
+        raise ValueError("PROT_W must be an integer.")
+    if not isinstance(qos_w, int):
+        raise ValueError("QOS_W must be an integer.")
+    if not isinstance(resp_w, int):
+        raise ValueError("RESP_W must be an integer.")
+    if not isinstance(len_w, int):
+        raise ValueError("LEN_W must be an integer.")
+
+    match type:
+        case "iob_clk":
+            # Check the params for the IOb clock interface
+            has_cke = False
+            has_arst = False
+            has_rst = False
+            has_en = False
+            for param in params:
+                if param == "c":
+                    has_cke = True
+                elif param == "a":
+                    has_arst = True
+                elif param == "r":
+                    has_rst = True
+                elif param == "e":
+                    has_en = True
+                else:
+                    raise ValueError(f"Unknown parameter '{param}' for IOb clock interface.")
+    
+            interface = IobClkInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                has_cke=has_cke,
+                has_arst=has_arst,
+                has_rst=has_rst,
+                has_en=has_en,
+            )
+        case "iob":
+            interface = IobInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+            )
+        case mem if mem in mem_if_names:
+            if "W_DATA_W" in remaining_entries and "R_DATA_W" in remaining_entries:                
+                interface = AsymMemInterface(
+                    prefix=prefix,
+                    mult=mult,
+                    file_prefix=file_prefix,
+                    portmap_port_prefix=portmap_port_prefix,
+                    addr_w=remaining_entries.get("ADDR_W", 32),
+                    type=type,
+                    w_data_w=w_data_w,
+                    r_data_w=r_data_w,
+                )
+            else:
+                # Symmetric memory interface
+                interface = SymMemInterface(
+                    prefix=prefix,
+                    mult=mult,
+                    file_prefix=file_prefix,
+                    portmap_port_prefix=portmap_port_prefix,
+                    addr_w=addr_w,
+                    type=type,
+                    data_w=data_w,
+                )
+        case "axis":
+            interface = AXIStreamInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                has_tlast=has_tlast
+            )
+        case "axil_read":
+            interface = AXILiteInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                prot_w=prot_w,
+                resp_w=resp_w,
+                has_write_if=False,
+                has_prot="PROT_W" in remaining_entries,
+            )
+        case "axil_write":
+            interface = AXIInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                prot_w=prot_w,
+                resp_w=resp_w,
+                has_read_if=False,
+                has_prot="PROT_W" in remaining_entries,
+            )
+        case "axil":
+            interface = AXILiteInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                prot_w=prot_w,
+                resp_w=resp_w,
+            )
+        case "axi_read":
+            interface = AXIInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                id_w=id_w,
+                size_w=size_w,
+                burst_w=burst_w,
+                lock_w=lock_w,
+                cache_w=cache_w,
+                prot_w=prot_w,
+                qos_w=qos_w,
+                resp_w=resp_w,
+                len_w=len_w,
+                has_write_if=False,
+            )
+        case "axi_write":
+            interface = AXIInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                id_w=id_w,
+                size_w=size_w,
+                burst_w=burst_w,
+                lock_w=lock_w,
+                cache_w=cache_w,
+                prot_w=prot_w,
+                qos_w=qos_w,
+                resp_w=resp_w,
+                len_w=len_w,
+                has_read_if=False,
+            )
+        case "axi":
+            interface = AXIInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                id_w=id_w,
+                size_w=size_w,
+                burst_w=burst_w,
+                lock_w=lock_w,
+                cache_w=cache_w,
+                prot_w=prot_w,
+                qos_w=qos_w,
+                resp_w=resp_w,
+                len_w=len_w,
+            )
+        case "apb":
+            interface = APBInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+            )
+        case "ahb":
+            interface = AHBInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                prot_w=ahb_prot_w,
+                burst_w=ahb_burst_w,
+                trans_w=ahb_trans_w,
+                size_w=ahb_size_w,
+            )
+        case "rs232":
+            interface = RS232Interface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                n_pins=n_pins,
+            )
+        case "wb":
+            interface = WishboneInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w
+            )
+        case "wb_full":
+            interface = WishboneInterface(
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                is_full=True
+            )
+        case _:
+            raise ValueError(f"Unknown interface type: {type}")
+
+    return interface
 
 
 #

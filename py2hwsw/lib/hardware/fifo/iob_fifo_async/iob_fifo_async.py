@@ -184,52 +184,14 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "extmem_io",
+                "name": "extmem_m",
                 "descr": "External memory interface",
-                "signals": [
-                    #  Write port
-                    {
-                        "name": "ext_mem_w_clk_o",
-                        "width": 1,
-                        "descr": "Memory clock",
-                    },
-                    {
-                        "name": "ext_mem_w_en_o",
-                        "width": "R",
-                        "descr": "Memory write enable",
-                    },
-                    {
-                        "name": "ext_mem_w_addr_o",
-                        "width": "MINADDR_W",
-                        "descr": "Memory write address",
-                    },
-                    {
-                        "name": "ext_mem_w_data_o",
-                        "width": "MAXDATA_W",
-                        "descr": "Memory write data",
-                    },
-                    #  Read port
-                    {
-                        "name": "ext_mem_r_clk_o",
-                        "width": 1,
-                        "descr": "Memory clock",
-                    },
-                    {
-                        "name": "ext_mem_r_en_o",
-                        "width": "R",
-                        "descr": "Memory read enable",
-                    },
-                    {
-                        "name": "ext_mem_r_addr_o",
-                        "width": "MINADDR_W",
-                        "descr": "Memory read address",
-                    },
-                    {
-                        "name": "ext_mem_r_data_i",
-                        "width": "MAXDATA_W",
-                        "descr": "Memory read data",
-                    },
-                ],
+                "signals": {
+                    "type": "ram_at2p",
+                    "prefix": "ext_mem_",
+                    "ADDR_W": "MINADDR_W",
+                    "DATA_W": "MAXDATA_W",
+                },
             },
         ],
         "subblocks": [

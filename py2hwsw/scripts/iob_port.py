@@ -218,7 +218,7 @@ def create_port(core, *args, signals=[], **kwargs):
         # Convert user signal dictionaries into 'iob_signal' objects
         sig_obj_list = convert_dict2obj_list(signals, iob_signal)
     elif type(signals) is dict:
-        # Convert user interface dictionary into 'if_gen.interface' object
+        # Convert user interface dictionary into an interface object
         interface_obj = if_gen.dict2interface(signals)
         if interface_obj and not interface_obj.file_prefix:
             interface_obj.file_prefix = core.name + "_"

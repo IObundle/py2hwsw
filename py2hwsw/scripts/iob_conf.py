@@ -13,25 +13,45 @@ from iob_base import (
 )
 
 
+# TODO: Move this method to iob_base
 def api_method(cls):
     """
-    Decorator for methods extend functionality of API methods.
-    This decorator adds constructor that accepts new attributes/methods as arguments (the ones defined in the API class).
+    Decorator for internal methods that extend functionality of API methods.
+
+    This decorator:
+    1) Adds constructor that accepts new attributes/methods as arguments (the ones defined in the API class).
+    2) Does input validation?
 
     Attributes received by constructor will be added to this internal class.
 
     """
 
-    def new_init(self, new_attributes: dict, new_methods: dict):
+    original_init = cls.__init__
+
+    # Update constructor of the internal class
+    def new_init(
+        self,
+        new_attributes: dict,
+        new_attributes_annotations: dict,
+        new_methods: dict,
+        args: list,
+        kwargs: dict,
+    ):
         print("Internal class constructor called: ", cls.__name__)
         print("Received attributes: ", new_attributes)
         print("Received methods: ", new_methods)
 
         # Update internal class attributes
-        self.__class__.__annotations__ |= new_attributes
+        for attribute_name, default_value in new_attributes.items():
+            setattr(self, attribute_name, kwargs.pop(attribute_name, default_value))
+        # Update attributes type hints
+        self.__class__.__annotations__ |= new_attributes_annotations
 
-        # Update the dataclass
-        # Person = make_dataclass("Person", fields(Person))
+        # TODO: Update internal class methods
+        # self.__class__.__dict__.update(new_methods)
+
+        # Call original init
+        original_init(self)
 
     cls.__init__ = new_init
 

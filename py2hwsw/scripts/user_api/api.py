@@ -182,14 +182,18 @@ def api_for(internal_cls):
 
     # Create decorator dynamically for the API class
     def decorator(cls):
+        # Get attributes and their default values
+        attributes = {k: cls.__dict__[k] for k in cls.__annotations__}
+
         # Update constructor of the API class
         def new_init(self, *args, **kwargs):
             print("API class constructor called: ", cls.__name__)
-            print("Attributes: ", cls.__annotations__) # Dictionary with attributes and their types
+            print("Attributes: ", attributes) # Dictionary with attributes and their types
+            print("Annotations: ", cls.__annotations__) # Dictionary with attributes and their types
             print("Methods: ", get_methods(cls)) # Dictionary with methods and their types
 
             # Instantiate internal class, with API attributes and methods
-            internal_obj = internal_cls(cls.__annotations__, get_methods(cls))
+            internal_obj = internal_cls(attributes, cls.__annotations__, get_methods(cls), args, kwargs)
 
             # Store reference to internal object
             self.__internal_obj = internal_obj

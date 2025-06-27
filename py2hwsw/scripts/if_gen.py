@@ -4,12 +4,17 @@
 #
 # SPDX-License-Identifier: MIT
 
-# this script generates interfaces for Verilog modules and testbenches to add a
+# This script generates interfaces for Verilog modules and testbenches to add a
 # new standard interface, add the name to the interface_names list, and an
-# interface dictionary as below run this script with the -h option for help
+# interface dictionary as below. Run this script with the -h option for help
 from copy import deepcopy
 from dataclasses import dataclass, field
+from encodings.punycode import T
+from turtle import reset
 from typing import Dict
+from unittest import result, signals
+
+from numpy import add, size
 from iob_signal import iob_signal, iob_signal_reference
 from iob_globals import iob_globals
 
@@ -274,33 +279,8 @@ if_types = [
 ]
 
 
-# NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
-@dataclass
-class interface:
-    """Class to represent an interface for generation"""
-
-    # Type/Name of interface to generate
-    type: str = ""
-    # Prefix for signals of the interface
-    prefix: str = ""
-    # Width multiplier. Used when concatenating multiple instances of the interface.
-    mult: str | int = 1
-    # Generic string parameter that is passed to "get_<interface>_ports" function
-    params: str = None
-    # Dictionary of width properties of interface
-    widths: Dict[str, str] = field(default_factory=dict)
-    # Prefix for generated "Verilog Snippets" of this interface
-    file_prefix: str = ""
-    # Prefix for "Verilog snippets" of portmaps of this interface:
-    portmap_port_prefix: str = ""
-
-    def __post_init__(self):
-        if not self.file_prefix:
-            self.file_prefix = self.portmap_port_prefix + self.prefix
-
-
 def dict2interface(interface_dict):
-    """Convert dictionary to 'interface' class instance.
+    """Convert dictionary to an interface.
     Example interface dict:
     {
         "name": "cpu_m",
@@ -330,268 +310,106 @@ def dict2interface(interface_dict):
     return interface(**new_interface_dict, widths=widths)
 
 
-def parse_widths(func):
-    """Decorator to temporarily change values of global variables based on `widths` dictionary."""
+@dataclass
+class _Interface:
+    """Class to represent an interface for generation"""
 
-    def inner(widths={}, params=None):
-        vars_backup = {}
-        interface_name = func.__name__[4:-6]
-        # Backup global variables
-        for k, v in widths.items():
-            assert (
-                k in globals()
-            ), f"The provided width variable '{k}' does not exist for interface '{interface_name}'!"
-            vars_backup[k] = globals()[k]
-            globals()[k] = v
-        # Call the function
-        if params is not None:
-            return_obj = func(params)
-        else:
-            return_obj = func()
-        # Restore global variables
-        for k in widths:
-            globals()[k] = vars_backup[k]
-        return return_obj
+    # Type/Name of interface to generate
+    type: str = ""
+    # Prefix for signals of the interface
+    prefix: str = ""
+    # Width multiplier. Used when concatenating multiple instances of the interface.
+    mult: str | int = 1
+    # Prefix for generated "Verilog Snippets" of this interface
+    file_prefix: str = ""
+    # Prefix for "Verilog snippets" of portmaps of this interface:
+    portmap_port_prefix: str = ""
 
-    return inner
+    # List of signals for this interface (Internal, used for generation)
+    _signals: list = []
 
 
-def try_math_eval(expr):
-    """Try to evaluate math expressions, otherwise return the input."""
-    try:
-        return int(eval(expr, {"__builtins__": None}, {}))
-    except TypeError:
-        return expr
+    def __post_init__(self):
+        if not self.file_prefix:
+            self.file_prefix = self.portmap_port_prefix + self.prefix
 
 
-DATA_W = 32
-DATA_SECTION_W = 8
-ADDR_W = 32
+    def get_signals(self):
+        return self._signals
+
 
 #
-# below are functions that return interface ports for each interface type
-# the port direction is relative to the manager module (driver)
+# IOb
 #
 
-
-@parse_widths
-def get_iob_ports():
-    return [
-        iob_signal(
-            name="iob_valid_o",
-            width=1,
-            descr="Request address is valid.",
-        ),
-        iob_signal(
-            name="iob_addr_o",
-            width=ADDR_W,
-            descr="Byte address.",
-        ),
-        iob_signal(
-            name="iob_wdata_o",
-            width=DATA_W,
-            descr="Write data.",
-        ),
-        iob_signal(
-            name="iob_wstrb_o",
-            width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
-            descr="Write strobe.",
-        ),
-        iob_signal(
-            name="iob_rvalid_i",
-            width=1,
-            descr="Read data valid.",
-        ),
-        iob_signal(
-            name="iob_rdata_i",
-            width=DATA_W,
-            descr="Read data.",
-        ),
-        iob_signal(
-            name="iob_ready_i",
-            width=1,
-            descr="Interface ready.",
-        ),
-    ]
+@dataclass
+class IobClkInterface(_Interface):
+    """Class to represent an IOb clock interface for generation"""
+    has_cke: bool = True
+    has_arst: bool = True
+    has_rst: bool = False
+    has_en: bool = False
 
 
-@parse_widths
-def get_iob_clk_ports(params: str = None):
-    if params is None:
-        params = "c_a"
-
-    reset_polarity = getattr(iob_globals(), "reset_polarity", "positive")
-
-    if reset_polarity != "positive":
-        params = params.replace("a", "an")
-    else:
-        params = params.replace("an", "a")
-
-    params = params.split("_")
-
-    ports = [
-        iob_signal(
-            name="clk_o",
-            width=1,
-            descr="Clock",
-        )
-    ]
-
-    for param, port, descr in [
-        ("c", "cke", "Clock enable"),
-        ("a", "arst", "Asynchronous active-high reset"),
-        ("an", "arst_n", "Asynchronous active-low reset"),
-        ("r", "rst", "Synchronous active-high reset"),
-        ("e", "en", "Enable"),
-    ]:
-        if param in params:
-            ports.append(
-                iob_signal(
-                    name=port + "_o",
-                    width=1,
-                    descr=descr,
-                )
-            )
-    return ports
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
 
 
-def get_mem_ports(
-    suffix: str, async_clk: bool = False, addr: bool = True, enable: bool = True
-):
-    clk_prefix = f"{suffix}_" if async_clk else ""
-    suffix = f"_{suffix}" if suffix else ""
-    mem_ports = [
-        iob_signal(
-            name=clk_prefix + "clk" + "_o",
-            width=1,
-            descr=f"Clock port {clk_prefix}",
-        ),
-    ]
-    if addr:
-        mem_ports.append(
-            iob_signal(
-                name="addr" + suffix + "_o",
-                width=ADDR_W,
-                descr=f"Address port {suffix}",
-            )
-        )
-    if enable:
-        mem_ports.append(
-            iob_signal(
-                name="en" + suffix + "_o",
-                width=1,
-                descr=f"Enable port {suffix}",
-            )
-        )
-    return mem_ports
+    def __set_signals(self):
+        """Set signals for the IOb clock interface."""
+
+        arst_polarity = getattr(iob_globals(), "reset_polarity", "positive")
+
+        self._signals.append(iob_signal(name="clk_o", descr="Clock"))
+
+        if self.has_cke:
+            self._signals.append(iob_signal(name="cke_o", descr="Clock enable"))
+        if self.has_arst:
+            if arst_polarity == "positive":
+                self._signals.append(iob_signal(name="arst_o", descr="Asynchronous active-high reset"))
+            else:
+                self._signals.append(iob_signal(name="arst_n_o", descr="Asynchronous active-low reset"))
+        if self.has_rst:
+            self._signals.append(iob_signal(name="rst_o", descr="Synchronous active-high reset"))
+        if self.has_en:
+            self._signals.append(iob_signal(name="en_o", descr="Enable"))
 
 
-def get_mem_read_ports(
-    suffix: str,
-    enable: bool = False,
-    ready: bool = False,
-    addr: bool = False,
-    true: bool = False,
-):
-    suffix = f"_{suffix}" if suffix else ""
-    rd_suffix = suffix if true else ""
-    mem_read_ports = []
-    if enable:
-        mem_read_ports.append(
-            iob_signal(
-                name="r_en" + suffix + "_o",
-                width=1,
-                descr=f"Read enable port {suffix}",
-            )
-        )
-    if addr:
-        mem_read_ports.append(
-            iob_signal(
-                name="r_addr" + suffix + "_o",
-                width=ADDR_W,
-                descr=f"Read address port {suffix}",
-            )
-        )
-    mem_read_ports += [
-        iob_signal(
-            name="r_data" + rd_suffix + "_i",
-            width=DATA_W,
-            descr=f"Data port {suffix}",
-        ),
-    ]
-    if ready:
-        mem_read_ports.append(
-            iob_signal(
-                name="r_ready" + suffix + "_i",
-                width=1,
-                descr=f"Read ready port {suffix}",
-            )
-        )
-    return mem_read_ports
+@dataclass
+class IobInterface(_Interface):
+    """Class to represent an IOb interface for generation"""
+
+    # Widths for the IOb interface
+    data_w: int = 32
+    data_section_w: int = 8
+    # Only address width is configurable, data width is fixed
+    addr_w: str or int = 32
 
 
-def get_mem_write_ports(
-    suffix: str,
-    ready: bool = False,
-    addr: bool = False,
-    true: bool = False,
-    byte_enable: bool = False,
-):
-    suffix = f"_{suffix}" if suffix else ""
-    wr_suffix = suffix if true else ""
-    mem_write_ports = []
-    if byte_enable:
-        mem_write_ports.append(
-            iob_signal(
-                name="w_strb" + suffix + "_o",
-                width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
-                descr=f"Write strobe port {suffix}",
-            )
-        )
-    else:  # No byte enable
-        mem_write_ports.append(
-            iob_signal(
-                name="w_en" + suffix + "_o",
-                width=1,
-                descr=f"Write enable port {suffix}",
-            )
-        )
-    if addr:
-        mem_write_ports.append(
-            iob_signal(
-                name="w_addr" + suffix + "_o",
-                width=ADDR_W,
-                descr=f"Write address port {suffix}",
-            )
-        )
-
-    mem_write_ports += [
-        iob_signal(
-            name="w_data" + wr_suffix + "_o",
-            width=DATA_W,
-            descr=f"Data port {suffix}",
-        ),
-    ]
-    if ready:
-        mem_write_ports.append(
-            iob_signal(
-                name="w_ready" + suffix + "_i",
-                width=1,
-                descr=f"Write ready port {suffix}",
-            )
-        )
-    return mem_write_ports
+    def __post_init__(self):
+        super.post__init__()
+        self.__set_signals()
 
 
-def remove_duplicates(ports):
-    seen_dicts = []
-    result = []
-    for d in ports:
-        if d not in seen_dicts:
-            seen_dicts.append(d)
-            result.append(d)
-    return result
+    def __set_signals(self):
+        """Set signals for the IOb interface."""
+        wstrb_w = self.data_w // self.data_section_w
 
+        self._signals = self._signals + [
+            iob_signal(name="iob_valid_o", descr="Request address is valid."),
+            iob_signal(name="iob_addr_o", width=self.addr_w, descr="Byte address."),
+            iob_signal(name="iob_wdata_o", width=self.data_w, descr="Write data."),
+            iob_signal(name="iob_wstrb_o", width=wstrb_w, descr="Write strobe."),
+            iob_signal(name="iob_rvalid_i", descr="Read data valid."),
+            iob_signal(name="iob_rdata_i", width=self.data_w, descr="Read data."),
+            iob_signal(name="iob_ready_i", descr="Interface ready."),
+        ]
+
+
+#
+# Memory interfaces
+#
 
 # Memory symbols meaning:
 # SP: Single-Port read-write
@@ -603,794 +421,1169 @@ def remove_duplicates(ports):
 # SE: Single enable for entire data word
 # Xil: Xilinx IP implementation
 
-@parse_widths
-def get_rom_2p_ports():
-    ports = (
-        get_mem_ports("", addr=False, enable=False)
-        + get_mem_read_ports("a", enable=True, ready=True, addr=True)
-        + get_mem_read_ports("b", enable=True, ready=True, addr=True)
-    )
-    return remove_duplicates(ports)
+@dataclass
+class _MemInterface(_Interface):
+    """Class to represent a memory interface for generation"""
+
+    # Width for the memory interface
+    addr_w: int or str = 32
+    # Memory atributes
+    is_async: bool = False
 
 
-@parse_widths
-def get_rom_sp_ports():
-    ports = get_mem_ports("") + get_mem_read_ports("")
-    return remove_duplicates(ports)
+    def _set_mem_signals(
+        self, suffix: str, has_addr: bool = True, has_enable: bool = True
+    ):
+        """Get common signals for the memory interface."""
+
+        clk_prefix = f"{suffix}_" if self.is_async else ""
+        suffix = f"_{suffix}" if suffix else ""
+
+        self._signals.append(
+            iob_signal(name=clk_prefix + "clk" + "_o", descr=f"Clock port {suffix}")
+        )
+        if has_addr:
+            self._signals.append(
+                iob_signal(
+                    name="addr" + suffix + "_o",
+                    width=self.addr_w,
+                    descr=f"Address port {suffix}",
+                )
+            )
+        if has_enable:
+            self._signals.append(
+                iob_signal(name="en" + suffix + "_o", descr=f"Enable port {suffix}")
+            )
 
 
-@parse_widths
-def get_rom_tdp_ports():
-    ports = (
-        get_mem_ports("", enable=False, addr=False)
-        + get_mem_read_ports("a", enable=True, addr=True, true=True)
-        + get_mem_read_ports("b", enable=True, addr=True, true=True)
-    )
-    return remove_duplicates(ports)
+    def _remove_duplicate_signals(self):
+        """Remove duplicate signals from the interface."""
+        result = []
+        for signal in self._signals:
+            if signal not in result:
+                result.append(signal)
+        
+        self._signals = result
 
 
-@parse_widths
-def get_rom_atdp_ports():
-    ports = (
-        get_mem_ports("a", async_clk=True)
-        + get_mem_read_ports("a", true=True)
-        + get_mem_ports("b", async_clk=True)
-        + get_mem_read_ports("b", true=True)
-    )
-    return remove_duplicates(ports)
+@dataclass
+class SymMemInterface(_MemInterface):
+    """Class to represent a symmetric memory interface for generation"""
+
+    # Data width for the memory interface
+    data_w: int = 32
 
 
-@parse_widths
-def get_ram_2p_ports():
-    ports = (
-        get_mem_ports("", addr=False, enable=False)
-        + get_mem_read_ports("", enable=True, ready=True, addr=True)
-        + get_mem_write_ports("", ready=True, addr=True)
-    )
-    return remove_duplicates(ports)
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
 
 
-@parse_widths
-def get_ram_at2p_ports():
-    ports = (
-        get_mem_ports("r", async_clk=True, addr=False, enable=False)
-        + get_mem_read_ports("", enable=True, addr=True)
-        + get_mem_ports("w", async_clk=True, addr=False, enable=False)
-        + get_mem_write_ports("", addr=True)
-    )
-    return remove_duplicates(ports)
+    def __set_signals(self):
+        """Set signals for the symmetric memory interface based on the memory type."""
+
+        # Replace the long if-elif-else chain with a match-case statement (Python 3.10+)
+        match self.type:
+            case "rom_2p":
+                self._set_mem_signals("", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("a", has_enable=True, has_ready=True, has_addr=True)
+                self.__set_mem_read_signals("b", has_enable=True, has_ready=True, has_addr=True)
+            case "rom_sp":
+                self._set_mem_signals("")
+                self.__set_mem_read_signals("")
+            case "rom_tdp":
+                self._set_mem_signals("", has_enable=False, has_addr=False)
+                self.__set_mem_read_signals("a", has_enable=True, has_addr=True, is_true_port=True)
+                self.__set_mem_read_signals("b", hasEnable=True, has_addr=True, is_true_port=True)
+            case "rom_atdp":
+                self.is_async = True
+                self._set_mem_signals("a")
+                self.__set_mem_read_signals("a", is_true_port=True)
+                self._set_mem_signals("b")
+                self.__set_mem_read_signals("b", is_true_port=True)
+            case "ram_2p":
+                self._set_mem_signals("", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("", hasEnable=True, has_ready=True, has_addr=True)
+                self.__set_mem_write_signals("", has_ready=True, has_addr=True)
+            case "ram_at2p":
+                self.is_async = True
+                self._set_mem_signals("r", hasAddr=False, hasEnable=False)
+                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
+                self._set_mem_signals("w", hasAddr=False, hasEnable=False)
+                self.__set_mem_write_signals("", hasAddr=True)
+            case "ram_atdp":
+                self.is_async = True
+                self._set_mem_signals("a")
+                self.__set_mem_read_signals("a", is_true_port=True)
+                self.__set_mem_write_signals("a", is_true_port=True)
+                self._set_mem_signals("b")
+                self.__set_mem_read_signals("b", is_true_port=True)
+                self.__set_mem_write_signals("b", is_true_port=True)
+            case "ram_atdp_be":
+                self.is_async = True
+                self._set_mem_signals("a")
+                self.__set_mem_read_signals("a", is_true_port=True)
+                self.__set_mem_write_signals("a", is_true_port=True, byte_enable=True)
+                self._set_mem_signals("b")
+                self.__set_mem_read_signals("b", is_true_port=True)
+                self.__set_mem_write_signals("b", is_true_port=True, byte_enable=True)
+            case "ram_sp" | "ram_sp_se":
+                self._set_mem_signals("")
+                self.__set_mem_read_signals("")
+                self.__set_mem_write_signals("")
+            case "ram_sp_be":
+                self._set_mem_signals("")
+                self.__set_mem_read_signals("")
+                self.__set_mem_write_signals("", byte_enable=True)
+            case "ram_t2p":
+                self._set_mem_signals("", hasAddr=False, hasEnable=False)
+                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
+                self.__set_mem_write_signals("", hasAddr=True)
+            case "ram_t2p_be":
+                self._set_mem_signals("", hasAddr=False, hasEnable=False)
+                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
+                self.__set_mem_write_signals("", hasAddr=True, byte_enable=True)
+            case "ram_t2p_tiled":
+                self._set_mem_signals("", hasEnable=False)
+                self.__set_mem_read_signals("", hasEnable=True)
+                self.__set_mem_write_signals("")
+            case "ram_tdp":
+                self._set_mem_signals("a")
+                self.__set_mem_read_signals("a")
+                self.__set_mem_write_signals("a")
+                self._set_mem_signals("b")
+                self.__set_mem_read_signals("b")
+                self.__set_mem_write_signals("b")
+            case "ram_tdp_be" | "ram_tdp_be_xil":
+                self._set_mem_signals("a")
+                self.__set_mem_read_signals("a")
+                self.__set_mem_write_signals("a", byte_enable=True)
+                self._set_mem_signals("b")
+                self.__set_mem_read_signals("b")
+                self.__set_mem_write_signals("b", byte_enable=True)
+            case _:
+                raise ValueError(f"Unknown memory interface type: {self.type}")
+
+        self._signals = self._remove_duplicate_signals(self._signals)
 
 
-@parse_widths
-def get_ram_atdp_ports():
-    ports = (
-        get_mem_ports("a", async_clk=True)
-        + get_mem_read_ports("a", true=True)
-        + get_mem_write_ports("a", true=True)
-        + get_mem_ports("b", async_clk=True)
-        + get_mem_read_ports("b", true=True)
-        + get_mem_write_ports("b", true=True)
-    )
-    return remove_duplicates(ports)
+    def __set_mem_read_signals(
+        self,
+        suffix: str = "",
+        has_enable: bool = False,
+        has_ready: bool = False,
+        has_addr: bool = False,
+        is_true_port: bool = False,
+    ):
+        """Get read ports for the memory interface."""
 
+        suffix = f"_{suffix}" if suffix else ""
+        rd_suffix = suffix if is_true_port else ""
 
-@parse_widths
-def get_ram_atdp_be_ports():
-    ports = (
-        get_mem_ports("a", async_clk=True)
-        + get_mem_read_ports("a", true=True)
-        + get_mem_write_ports("a", true=True, byte_enable=True)
-        + get_mem_ports("b", async_clk=True)
-        + get_mem_read_ports("b", true=True)
-        + get_mem_write_ports("b", true=True, byte_enable=True)
-    )
-    return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_sp_ports():
-    ports = get_mem_ports("") + get_mem_read_ports("") + get_mem_write_ports("")
-    return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_sp_be_ports():
-    ports = (
-        get_mem_ports("")
-        + get_mem_read_ports("")
-        + get_mem_write_ports("", byte_enable=True)
-    )
-    return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_sp_se_ports():
-    return get_ram_sp_ports()
-
-
-@parse_widths
-def get_ram_t2p_ports():
-    ports = (
-        get_mem_ports("", addr=False, enable=False)
-        + get_mem_read_ports("", enable=True, addr=True)
-        + get_mem_write_ports("", addr=True)
-    )
-    return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_t2p_be_ports():
-    ports = (
-        get_mem_ports("", addr=False, enable=False)
-        + get_mem_read_ports("", enable=True, addr=True)
-        + get_mem_write_ports("", addr=True, byte_enable=True)
-    )
-    return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_t2p_tiled_ports():
-    ports = (
-        get_mem_ports("", enable=False)
-        + get_mem_read_ports("", enable=True)
-        + get_mem_write_ports("")
-    )
-    return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_tdp_ports():
-    ports = (
-        get_mem_ports("a")
-        + get_mem_read_ports("a")
-        + get_mem_write_ports("a")
-        + get_mem_ports("b")
-        + get_mem_read_ports("b")
-        + get_mem_write_ports("b")
-    )
-    return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_tdp_be_ports():
-    ports = (
-        get_mem_ports("a")
-        + get_mem_read_ports("a")
-        + get_mem_write_ports("a", byte_enable=True)
-        + get_mem_ports("b")
-        + get_mem_read_ports("b")
-        + get_mem_write_ports("b", byte_enable=True)
-    )
-    return remove_duplicates(ports)
-
-
-@parse_widths
-def get_ram_tdp_be_xil_ports():
-    return get_ram_tdp_be_ports()
-
-
-@parse_widths
-def get_regfile_2p_ports():
-    raise NotImplementedError("REGFILE 2P not interface implemented")
-
-
-@parse_widths
-def get_regfile_at2p_ports():
-    raise NotImplementedError("REGFILE AT2P not interface implemented")
-
-
-@parse_widths
-def get_regfile_sp_ports():
-    raise NotImplementedError("REGFILE SP not interface implemented")
-
-
-#
-# AXI4
-#
-ID_W = 1
-SIZE_W = 3
-BURST_W = 2
-LOCK_W = 2
-CACHE_W = 4
-PROT_W = 3
-QOS_W = 4
-RESP_W = 2
-LEN_W = 8
-
-
-@parse_widths
-def get_axil_write_ports(params: str = None):
-    if params is None:
-        params = ""
-    params = params.split("_")
-
-    signals = [
-        iob_signal(
-            name="axil_awaddr_o",
-            width=ADDR_W,
-            descr="Address write channel byte address.",
-        ),
-    ]
-    if "prot" in params:
-        signals += [
+        if has_enable:
+            self._signals.append(
+                iob_signal(
+                    name="r_en" + suffix + "_o", descr=f"Read enable port {suffix}"
+                )
+            )
+        if has_addr:
+            self._signals.append(
+                iob_signal(
+                    name="r_addr" + suffix + "_o",
+                    width=self.addr_w,
+                    descr=f"Read address port {suffix}",
+                )
+            )
+        self._signals.append(
             iob_signal(
-                name="axil_awprot_o",
-                width=PROT_W,
-                descr="Address write channel protection type. Set to 000 if manager output; ignored if subordinate input.",
+                name="r_data" + rd_suffix + "_i",
+                width=self.data_w,
+                descr=f"Data port {suffix}",
+            )
+        )
+        if has_ready:
+            self._signals.append(
+                iob_signal(
+                    name="r_ready" + suffix + "_i", descr=f"Read ready port {suffix}"
+                )
+            )
+
+
+    def __set_mem_write_signals(
+        self,
+        data_section_w: int = 8,
+        suffix: str = "",
+        has_ready: bool = False,
+        has_addr: bool = False,
+        is_true_port: bool = False,
+        has_byte_enable: bool = False,
+    ):
+        """Set write signals for the memory interface."""
+
+        suffix = f"_{suffix}" if suffix else ""
+        wr_suffix = suffix if is_true_port else ""
+
+        if has_byte_enable:
+            wstrb_w = self.data_w // data_section_w
+            self._signals.append(
+                iob_signal(
+                    name="w_strb" + suffix + "_o",
+                    width=wstrb_w,
+                    descr=f"Write strobe port {suffix}",
+                )
+            )
+        else:  # No byte enable
+            self._signals.append(
+                iob_signal(
+                    name="w_en" + suffix + "_o", descr=f"Write enable port {suffix}"
+                )
+            )
+        if has_addr:
+            self._signals.append(
+                iob_signal(
+                    name="w_addr" + suffix + "_o",
+                    width=self.addr_w,
+                    descr=f"Write address port {suffix}",
+                )
+            )
+        self._signals.append(
+            iob_signal(
+                name="w_data" + wr_suffix + "_o",
+                width=self.data_w,
+                descr=f"Data port {suffix}",
+            )
+        )
+        if has_ready:
+            self._signals.append(
+                iob_signal(
+                    name="w_ready" + suffix + "_i", descr=f"Write ready port {suffix}"
+                )
+            )
+
+
+@dataclass
+class AsymMemInterface(_MemInterface):
+    """Class to represent an asymmetric memory interface for generation"""
+
+    # Data widths for the memory interface
+    w_data_w: int = 32
+    r_data_w: int = 32
+
+    __block_data_w: int = field(init=False, default=32)
+    __block_addr_w: int = field(init=False, default=32)
+    __data_ratio: int = field(init=False)
+
+
+    def __post_init__(self):
+        super().__post_init__()
+        
+        max_data_w = max(self.w_data_w, self.r_data_w)
+        min_data_w = min(self.w_data_w, self.r_data_w)
+
+        ratio = max_data_w // min_data_w
+
+        # Check if data widths are a multiple of each other and the ratio is a power of two
+        if max_data_w % min_data_w != 0 or ratio & (ratio - 1) != 0:
+            raise ValueError("Data widths must be a multiple of each other and the ratio must be a power of two.")
+
+        if ratio <= 1:
+            raise ValueError("Data widths must be different.")
+
+        self.__data_ratio = ratio
+        self.__block_data_w = max_data_w
+        # Calculate address width based on the ratio (same as min_addr_w)
+        self.__block_addr_w = self.addr_w - (ratio.bit_length() - 1)
+
+        self.__set_signals()
+
+
+    def __set_signals(self):
+        """Set signals for the asymmetric memory interface based on the memory type."""
+
+        match self.type:
+            case "rom_2p":
+                self._set_mem_signals("", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("a", has_enable=True, has_ready=True, has_addr=True)
+                self.__set_mem_read_signals("b", has_enable=True, has_ready=True, has_addr=True)
+            case "rom_tdp":
+                self._set_mem_signals("", has_enable=False, has_addr=False)
+                self.__set_mem_read_signals("a", has_enable=True, has_addr=True, is_true_port=True)
+                self.__set_mem_read_signals("b", hasEnable=True, has_addr=True, is_true_port=True)
+            case "rom_atdp":
+                self.is_async = True
+                self._set_mem_signals("a")
+                self.__set_mem_read_signals("a", is_true_port=True)
+                self._set_mem_signals("b")
+                self.__set_mem_read_signals("b", is_true_port=True)
+            case "ram_2p":
+                self._set_mem_signals("", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("", hasEnable=True, has_ready=True, has_addr=True)
+                self.__set_mem_write_signals("", has_ready=True, has_addr=True)
+            case "ram_at2p":
+                self.is_async = True
+                self._set_mem_signals("r", hasAddr=False, hasEnable=False)
+                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
+                self._set_mem_signals("w", hasAddr=False, hasEnable=False)
+                self.__set_mem_write_signals("", hasAddr=True)
+            case "ram_atdp":
+                self.is_async = True
+                self._set_mem_signals("a")
+                self.__set_mem_read_signals("a", is_true_port=True)
+                self.__set_mem_write_signals("a", is_true_port=True)
+                self._set_mem_signals("b")
+                self.__set_mem_read_signals("b", is_true_port=True)
+                self.__set_mem_write_signals("b", is_true_port=True)
+            case "ram_t2p":
+                self._set_mem_signals("", hasAddr=False, hasEnable=False)
+                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
+                self.__set_mem_write_signals("", hasAddr=True)
+            case "ram_tdp":
+                self._set_mem_signals("a")
+                self.__set_mem_read_signals("a")
+                self.__set_mem_write_signals("a")
+                self._set_mem_signals("b")
+                self.__set_mem_read_signals("b")
+                self.__set_mem_write_signals("b")
+            case _:
+                raise ValueError(f"Unknown memory interface type: {self.type}")
+
+        self._signals = self._remove_duplicate_signals(self._signals)
+
+
+    def __set_mem_read_signals(
+        self,
+        suffix: str = "",
+        has_enable: bool = False,
+        has_ready: bool = False,
+        has_addr: bool = False,
+        is_true_port: bool = False,
+    ):
+        """Get read ports for the memory interface."""
+
+        suffix = f"_{suffix}" if suffix else ""
+        rd_suffix = suffix if is_true_port else ""
+
+        if has_enable:
+            self._signals.append(
+                iob_signal(
+                    name="r_en" + suffix + "_o",
+                    width=self.__data_ratio,
+                    descr=f"Read enable port {suffix}"
+                )
+            )
+        if has_addr:
+            self._signals.append(
+                iob_signal(
+                    name="r_addr" + suffix + "_o",
+                    width=self.__block_addr_w,
+                    descr=f"Read address port {suffix}",
+                )
+            )
+        self._signals.append(
+            iob_signal(
+                name="r_data" + rd_suffix + "_i",
+                width=self.__block_data_w,
+                descr=f"Data port {suffix}",
+            )
+        )
+        if has_ready:
+            self._signals.append(
+                iob_signal(
+                    name="r_ready" + suffix + "_i", descr=f"Read ready port {suffix}"
+                )
+            )
+
+
+    def __set_mem_write_signals(
+        self,
+        suffix: str = "",
+        has_ready: bool = False,
+        has_addr: bool = False,
+        is_true_port: bool = False,
+    ):
+        """Set write signals for the memory interface."""
+
+        suffix = f"_{suffix}" if suffix else ""
+        wr_suffix = suffix if is_true_port else ""
+
+        self._signals.append(
+            iob_signal(
+                name="w_en" + suffix + "_o",
+                width=self.__data_ratio, 
+                descr=f"Write enable port {suffix}"
+            )
+        )
+        if has_addr:
+            self._signals.append(
+                iob_signal(
+                    name="w_addr" + suffix + "_o",
+                    width=self.__block_addr_w,
+                    descr=f"Write address port {suffix}",
+                )
+            )
+        self._signals.append(
+            iob_signal(
+                name="w_data" + wr_suffix + "_o",
+                width=self.__block_data_w,
+                descr=f"Data port {suffix}",
+            )
+        )
+        if has_ready:
+            self._signals.append(
+                iob_signal(
+                    name="w_ready" + suffix + "_i", descr=f"Write ready port {suffix}"
+                )
+            )
+
+#
+# AXI interfaces
+#
+
+@dataclass
+class AXIStreamInterface(_Interface):
+    """Class to represent an AXI-Stream interface for generation"""
+
+    # Data width for the AXI-Stream interface
+    data_w: int = 32
+    # Signal to indicate if the interface has a last signal
+    has_tlast: bool = False
+
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
+
+
+    def __set_signals(self):
+        """Set signals for the AXI-Stream interface."""
+        self._signals += [
+            iob_signal(
+                name="axis_tdata_o",
+                width=self.data_w,
+                descr="AXI-Stream data output.",
+            ),
+            iob_signal(
+                name="axis_tvalid_o",
+                descr="AXI-Stream valid output.",
+            ),
+            iob_signal(
+                name="axis_tready_i",
+                descr="AXI-Stream ready input.",
             ),
         ]
-    signals += [
-        iob_signal(
-            name="axil_awvalid_o",
-            width=1,
-            descr="Address write channel valid.",
-        ),
-        iob_signal(
-            name="axil_awready_i",
-            width=1,
-            descr="Address write channel ready.",
-        ),
-        iob_signal(
-            name="axil_wdata_o",
-            width=DATA_W,
-            descr="Write channel data.",
-        ),
-        iob_signal(
-            name="axil_wstrb_o",
-            width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
-            descr="Write channel write strobe.",
-        ),
-        iob_signal(
-            name="axil_wvalid_o",
-            width=1,
-            descr="Write channel valid.",
-        ),
-        iob_signal(
-            name="axil_wready_i",
-            width=1,
-            descr="Write channel ready.",
-        ),
-        iob_signal(
-            name="axil_bresp_i",
-            width=RESP_W,
-            descr="Write response channel response.",
-        ),
-        iob_signal(
-            name="axil_bvalid_i",
-            width=1,
-            descr="Write response channel valid.",
-        ),
-        iob_signal(
-            name="axil_bready_o",
-            width=1,
-            descr="Write response channel ready.",
-        ),
-    ]
-    return signals
+
+        if self.has_tlast:
+            self._signals.append(
+                iob_signal(
+                    name="axis_tlast_o",
+                    descr="AXI-Stream last signal output.",
+                )
+            )
 
 
-@parse_widths
-def get_axil_read_ports(params: str = None):
-    if params is None:
-        params = ""
-    params = params.split("_")
+@dataclass
+class AXILiteInterface(_Interface):
+    """Class to represent an AXI-Lite interface for generation"""
 
-    signals = [
-        iob_signal(
-            name="axil_araddr_o",
-            width=ADDR_W,
-            descr="Address read channel byte address.",
-        ),
-    ]
-    if "prot" in params:
-        signals += [
+    # Data width for the AXI-Lite interface
+    data_w: int = 32
+    # Address width for the AXI-Lite interface
+    addr_w: int = 32
+    # AXI-Lite parameters
+    resp_w: int = 2
+    prot_w: int = 3
+    # Interfaces/Ports to include in the AXI-Lite interface
+    has_read_if: bool = True
+    has_write_if: bool = True
+    has_prot: bool = True
+
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
+
+
+    def __set_signals(self):
+        """Set signals for the AXI-Lite interface."""
+
+        if self.has_read_if:
+            self.__set_write_signals()
+        if self.has_write_if:
+            self.__set_read_signals()
+
+
+    def __set_write_signals(self):
+        """Set write signals for the AXI-Lite interface."""
+        self._signals += [
             iob_signal(
-                name="axil_arprot_o",
-                width=PROT_W,
-                descr="Address read channel protection type. Set to 000 if manager output; ignored if subordinate input.",
+                name="axil_awaddr_o",
+                width=self.addr_w,
+                descr="AXI-Lite address write channel byte address.",
             ),
         ]
-    signals += [
-        iob_signal(
-            name="axil_arvalid_o",
-            width=1,
-            descr="Address read channel valid.",
-        ),
-        iob_signal(
-            name="axil_arready_i",
-            width=1,
-            descr="Address read channel ready.",
-        ),
-        iob_signal(
-            name="axil_rdata_i",
-            width=DATA_W,
-            descr="Read channel data.",
-        ),
-        iob_signal(
-            name="axil_rresp_i",
-            width=RESP_W,
-            descr="Read channel response.",
-        ),
-        iob_signal(
-            name="axil_rvalid_i",
-            width=1,
-            descr="Read channel valid.",
-        ),
-        iob_signal(
-            name="axil_rready_o",
-            width=1,
-            descr="Read channel ready.",
-        ),
-    ]
-    return signals
-
-
-@parse_widths
-def get_axil_ports(params: str = None):
-    return get_axil_read_ports(params=params) + get_axil_write_ports(params=params)
-
-
-@parse_widths
-def get_axi_write_ports(params: str = None):
-    axil_write = get_axil_write_ports(params=params)
-
-    for port in axil_write:
-        port.name = port.name.replace("axil", "axi")
-
-    return axil_write + [
-        iob_signal(
-            name="axi_awid_o",
-            width=ID_W,
-            descr="Address write channel ID.",
-        ),
-        iob_signal(
-            name="axi_awlen_o",
-            width=LEN_W,
-            descr="Address write channel burst length.",
-        ),
-        iob_signal(
-            name="axi_awsize_o",
-            width=SIZE_W,
-            descr="Address write channel burst size. This signal indicates the size of each transfer in the burst.",
-        ),
-        iob_signal(
-            name="axi_awburst_o",
-            width=BURST_W,
-            descr="Address write channel burst type.",
-        ),
-        iob_signal(
-            name="axi_awlock_o",
-            width=LOCK_W,
-            descr="Address write channel lock type.",
-        ),
-        iob_signal(
-            name="axi_awcache_o",
-            width=CACHE_W,
-            descr="Address write channel memory type. Set to 0000 if manager output; ignored if subordinate input.",
-        ),
-        iob_signal(
-            name="axi_awqos_o",
-            width=QOS_W,
-            descr="Address write channel quality of service.",
-        ),
-        iob_signal(
-            name="axi_wlast_o",
-            width=1,
-            descr="Write channel last word flag.",
-        ),
-        iob_signal(
-            name="axi_bid_i",
-            width=ID_W,
-            descr="Write response channel ID.",
-        ),
-    ]
-
-
-@parse_widths
-def get_axi_read_ports(params: str = None):
-    axil_read = get_axil_read_ports(params=params)
-
-    for port in axil_read:
-        port.name = port.name.replace("axil", "axi")
-
-    return axil_read + [
-        iob_signal(
-            name="axi_arid_o",
-            width=ID_W,
-            descr="Address read channel ID.",
-        ),
-        iob_signal(
-            name="axi_arlen_o",
-            width=LEN_W,
-            descr="Address read channel burst length.",
-        ),
-        iob_signal(
-            name="axi_arsize_o",
-            width=SIZE_W,
-            descr="Address read channel burst size. This signal indicates the size of each transfer in the burst.",
-        ),
-        iob_signal(
-            name="axi_arburst_o",
-            width=BURST_W,
-            descr="Address read channel burst type.",
-        ),
-        iob_signal(
-            name="axi_arlock_o",
-            width=LOCK_W,
-            descr="Address read channel lock type.",
-        ),
-        iob_signal(
-            name="axi_arcache_o",
-            width=CACHE_W,
-            descr="Address read channel memory type. Set to 0000 if manager output; ignored if subordinate input.",
-        ),
-        iob_signal(
-            name="axi_arqos_o",
-            width=QOS_W,
-            descr="Address read channel quality of service.",
-        ),
-        iob_signal(
-            name="axi_rid_i",
-            width=ID_W,
-            descr="Read channel ID.",
-        ),
-        iob_signal(
-            name="axi_rlast_i",
-            width=1,
-            descr="Read channel last word.",
-        ),
-    ]
-
-
-@parse_widths
-def get_axi_ports(params: str = None):
-    return get_axi_read_ports(params=params) + get_axi_write_ports(params=params)
-
-
-@parse_widths
-def get_axis_ports(params: str = None):
-    if params is None:
-        params = ""
-    params = params.split("_")
-
-    signals = [
-        iob_signal(
-            name="axis_tvalid_o",
-            width=1,
-            descr="axis stream valid.",
-        ),
-        iob_signal(
-            name="axis_tready_i",
-            width=1,
-            descr="axis stream ready.",
-        ),
-        iob_signal(
-            name="axis_tdata_o",
-            width=DATA_W,
-            descr="axis stream data.",
-        ),
-    ]
-    if "tlast" in params:
-        signals += [
+        if self.has_prot:
+            self._signals.append(
+                iob_signal(
+                    name="axil_awprot_o",
+                    width=self.prot_w,
+                    descr="AXI-Lite address write channel protection type.",
+                )
+            )
+        self._signals += [
             iob_signal(
-                name="axis_tlast_o",
-                width=1,
-                descr="axis stream last.",
+                name="axil_awvalid_o",
+                descr="AXI-Lite address write channel valid.",
+            ),
+            iob_signal(
+                name="axil_awready_i",
+                descr="AXI-Lite address write channel ready.",
+            ),
+            iob_signal(
+                name="axil_wdata_o",
+                width=self.data_w,
+                descr="AXI-Lite write channel data.",
+            ),
+            iob_signal(
+                name="axil_wstrb_o",
+                width=self.data_w // 8,
+                descr="AXI-Lite write channel write strobe.",
+            ),
+            iob_signal(
+                name="axil_wvalid_o",
+                descr="AXI-Lite write channel valid.",
+            ),
+            iob_signal(
+                name="axil_wready_i",
+                descr="AXI-Lite write channel ready.",
+            ),
+            iob_signal(
+                name="axil_bresp_i",
+                width=self.resp_w,
+                descr="AXI-Lite write response channel response.",
+            ),
+            iob_signal(
+                name="axil_bvalid_i",
+                descr="AXI-Lite write response channel valid.",
+            ),
+            iob_signal(
+                name="axil_bready_o",
+                descr="AXI-Lite write response channel ready.",
             ),
         ]
-    return signals
 
+
+    def __set_read_signals(self):
+        """Set read signals for the AXI-Lite interface."""
+        self._signals += [
+            iob_signal(
+                name="axil_araddr_o",
+                width=self.addr_w,
+                descr="AXI-Lite address read channel byte address.",
+            ),
+        ]
+        if self.has_prot:
+            self._signals.append(
+                iob_signal(
+                    name="axil_arprot_o",
+                    width=self.prot_w,
+                    descr="AXI-Lite address read channel protection type.",
+                )
+            )
+        self._signals += [
+            iob_signal(
+                name="axil_arvalid_o",
+                descr="AXI-Lite address read channel valid.",
+            ),
+            iob_signal(
+                name="axil_arready_i",
+                descr="AXI-Lite address read channel ready.",
+            ),
+            iob_signal(
+                name="axil_rdata_i",
+                width=self.data_w,
+                descr="AXI-Lite read channel data.",
+            ),
+            iob_signal(
+                name="axil_rresp_i",
+                width=self.resp_w,
+                descr="AXI-Lite read channel response.",
+            ),
+            iob_signal(
+                name="axil_rvalid_i",
+                descr="AXI-Lite read channel valid.",
+            ),
+            iob_signal(
+                name="axil_rready_o",
+                descr="AXI-Lite read channel ready.",
+            ),
+        ]
+
+
+@dataclass
+class AXIInterface(_Interface):
+    """Class to represent an AXI interface for generation"""
+
+    # Data width for the AXI interface
+    data_w: int = 32
+    # Address width for the AXI interface
+    addr_w: int = 32
+    # AXI parameters
+    id_w: int = 1
+    size_w: int = 3
+    burst_w: int = 2
+    lock_w: int = 2
+    cache_w: int = 4
+    prot_w: int = 3
+    qos_w: int = 4
+    resp_w: int = 2
+    len_w: int = 8
+    # Interfaces/Ports to include in the AXI-Lite interface
+    has_read_if: bool = True
+    has_write_if: bool = True
+    has_prot: bool = True
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
+
+    def __set_signals(self):
+        """Set signals for the AXI interface."""
+
+        if self.has_read_if:
+            self.__set_write_signals()
+        if self.has_write_if:
+            self.__set_read_signals()
+
+    def __set_write_signals(self):
+        """Set write signals for the AXI interface."""
+
+        # AXI-Lite write signals
+        self._signals += [
+            iob_signal(
+                name="axi_awaddr_o",
+                width=self.addr_w,
+                descr="AXI address write channel byte address.",
+            ),
+        ]
+        if self.has_prot:
+            self._signals.append(
+                iob_signal(
+                    name="axi_awprot_o",
+                    width=self.prot_w,
+                    descr="AXI address write channel protection type.",
+                )
+            )
+        self._signals += [
+            iob_signal(
+                name="axi_awvalid_o",
+                descr="AXI address write channel valid.",
+            ),
+            iob_signal(
+                name="axil_awready_i",
+                descr="AXI address write channel ready.",
+            ),
+            iob_signal(
+                name="axi_wdata_o",
+                width=self.data_w,
+                descr="AXI write channel data.",
+            ),
+            iob_signal(
+                name="axi_wstrb_o",
+                width=self.data_w // 8,
+                descr="AXI write channel write strobe.",
+            ),
+            iob_signal(
+                name="axi_wvalid_o",
+                descr="AXI write channel valid.",
+            ),
+            iob_signal(
+                name="axi_wready_i",
+                descr="AXI write channel ready.",
+            ),
+            iob_signal(
+                name="axi_bresp_i",
+                width=self.resp_w,
+                descr="AXI write response channel response.",
+            ),
+            iob_signal(
+                name="axi_bvalid_i",
+                descr="AXI write response channel valid.",
+            ),
+            iob_signal(
+                name="axi_bready_o",
+                descr="AXI write response channel ready.",
+            ),
+        ]
+
+        # AXI write channel signals
+        self._signals += [
+            iob_signal(
+                name="axi_awid_o",
+                width=self.id_w,
+                descr="AXI address write channel ID.",
+            ),
+            iob_signal(
+                name="axi_awlen_o",
+                width=self.len_w,
+                descr="AXI address write channel burst length.",
+            ),
+            iob_signal(
+                name="axi_awsize_o",
+                width=self.size_w,
+                descr="AXI address write channel burst size.",
+            ),
+            iob_signal(
+                name="axi_awburst_o",
+                width=self.burst_w,
+                descr="AXI address write channel burst type.",
+            ),
+            iob_signal(
+                name="axi_awlock_o",
+                width=self.lock_w,
+                descr="AXI address write channel lock type.",
+            ),
+            iob_signal(
+                name="axi_awcache_o",
+                width=self.cache_w,
+                descr="AXI address write channel memory type.",
+            ),
+            iob_signal(
+                name="axi_awqos_o",
+                width=self.qos_w,
+                descr="AXI address write channel quality of service.",
+            ),
+            iob_signal(
+                name="axi_wlast_o",
+                descr="AXI Write channel last word flag.",
+            ),
+            iob_signal(
+                name="axi_bid_i",
+                width=self.id_w,
+                descr="AXI Write response channel ID.",
+            ),
+        ]
+
+    def __set_read_signals(self):
+        """Set read signals for the AXI interface."""
+
+        # AXI-Lite read signals
+        self._signals += [
+            iob_signal(
+                name="axi_araddr_o",
+                width=self.addr_w,
+                descr="AXI address read channel byte address.",
+            ),
+        ]
+        if self.has_prot:
+            self._signals.append(
+                iob_signal(
+                    name="axi_arprot_o",
+                    width=self.prot_w,
+                    descr="AXI address read channel protection type.",
+                )
+            )
+        self._signals += [
+            iob_signal(
+                name="axi_arvalid_o",
+                descr="AXI address read channel valid.",
+            ),
+            iob_signal(
+                name="axi_arready_i",
+                descr="AXI address read channel ready.",
+            ),
+            iob_signal(
+                name="axi_rdata_i",
+                width=self.data_w,
+                descr="AXI read channel data.",
+            ),
+            iob_signal(
+                name="axi_rresp_i",
+                width=self.resp_w,
+                descr="AXI read channel response.",
+            ),
+            iob_signal(
+                name="axi_rvalid_i",
+                descr="AXI read channel valid.",
+            ),
+            iob_signal(
+                name="axi_rready_o",
+                descr="AXI read channel ready.",
+            ),
+        ]
+
+        # AXI read channel signals
+        self._signals += [
+            iob_signal(
+                name="axi_arid_o",
+                width=self.id_w,
+                descr="AXI address read channel ID.",
+            ),
+            iob_signal(
+                name="axi_arlen_o",
+                width=self.len_w,
+                descr="AXI address read channel burst length.",
+            ),
+            iob_signal(
+                name="axi_arsize_o",
+                width=self.size_w,
+                descr="AXI address read channel burst size.",
+            ),
+            iob_signal(
+                name="axi_arburst_o",
+                width=self.burst_w,
+                descr="AXI address read channel burst type.",
+            ),
+            iob_signal(
+                name="axi_arlock_o",
+                width=self.lock_w,
+                descr="AXI address read channel lock type.",
+            ),
+            iob_signal(
+                name="axi_arcache_o",
+                width=self.cache_w,
+                descr="AXI address read channel memory type.",
+            ),
+            iob_signal(
+                name="axi_arqos_o",
+                width=self.qos_w,
+                descr="AXI address read channel quality of service.",
+            ),
+            iob_signal(
+                name="axi_rid_i",
+                width=self.id_w,
+                descr="AXI Read channel ID.",
+            ),
+            iob_signal(
+                name="axi_rlast_i",
+                descr="AXI Read channel last word.",
+            ),
+        ]
 
 #
-# APB
+# APB interfaces
 #
 
+@dataclass
+class APBInterface(_Interface):
+    """Class to represent an APB interface for generation"""
 
-@parse_widths
-def get_apb_ports():
-    return [
-        iob_signal(
-            name="apb_addr_o",
-            width=ADDR_W,
-            descr="Byte address of the transfer.",
-        ),
-        iob_signal(
-            name="apb_sel_o",
-            width=1,
-            descr="Subordinate select.",
-        ),
-        iob_signal(
-            name="apb_enable_o",
-            width=1,
-            descr="Enable. Indicates the number of clock cycles of the transfer.",
-        ),
-        iob_signal(
-            name="apb_write_o",
-            width=1,
-            descr="Write. Indicates the direction of the operation.",
-        ),
-        iob_signal(
-            name="apb_wdata_o",
-            width=DATA_W,
-            descr="Write data.",
-        ),
-        iob_signal(
-            name="apb_wstrb_o",
-            width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
-            descr="Write strobe.",
-        ),
-        iob_signal(
-            name="apb_rdata_i",
-            width=DATA_W,
-            descr="Read data.",
-        ),
-        iob_signal(
-            name="apb_ready_i",
-            width=1,
-            descr="Ready. Indicates the end of a transfer.",
-        ),
-    ]
+    # Data width for the APB interface
+    data_w: int = 32
+    # Address width for the APB interface
+    addr_w: int = 32
 
 
-#
-# AHB
-#
-AHB_PROT_W = 4
-AHB_BURST_W = 3
-AHB_TRANS_W = 2
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
 
 
-@parse_widths
-def get_ahb_ports():
-    return [
-        iob_signal(
-            name="ahb_addr_o",
-            width=ADDR_W,
-            descr="Byte address of the transfer.",
-        ),
-        iob_signal(
-            name="ahb_burst_o",
-            width=AHB_BURST_W,
-            descr="Burst size.",
-        ),
-        iob_signal(
-            name="ahb_mastlock_o",
-            width=1,
-            descr="Current transfer is locked sequence.",
-        ),
-        iob_signal(
-            name="ahb_prot_o",
-            width=AHB_PROT_W,
-            descr="Byte address of the transfer.",
-        ),
-        iob_signal(
-            name="ahb_size_o",
-            width=SIZE_W,
-            descr="Size of transfer.",
-        ),
-        iob_signal(
-            name="ahb_trans_o",
-            width=AHB_TRANS_W,
-            descr="Transfer type.",
-        ),
-        iob_signal(
-            name="ahb_wdata_o",
-            width=DATA_W,
-            descr="Write data.",
-        ),
-        iob_signal(
-            name="ahb_wstrb_o",
-            width=try_math_eval(f"{DATA_W}/{8}"),
-            descr="Write strobe.",
-        ),
-        iob_signal(
-            name="ahb_write_o",
-            width=1,
-            descr="Transfer direction: (1) Write; (0) Read.",
-        ),
-        iob_signal(
-            name="ahb_rdata_i",
-            width=DATA_W,
-            descr="Read data.",
-        ),
-        iob_signal(
-            name="ahb_readyout_i",
-            width=1,
-            descr="Transfer finished on the bus.",
-        ),
-        iob_signal(
-            name="ahb_resp_i",
-            width=1,
-            descr="Transfer response: (0) Okay; (1) Error.",
-        ),
-        iob_signal(
-            name="ahb_sel_o",
-            width=1,
-            descr="Subordinate select.",
-        ),
-    ]
+    def __set_signals(self):
+        """Set signals for the APB interface."""
+        self._signals += [
+            iob_signal(
+                name="apb_addr_o",
+                width=self.addr_w,
+                descr="APB address output.",
+            ),
+            iob_signal(
+                name="apb_sel_o",
+                descr="APB subordinate select.",
+            ),
+            iob_signal(
+                name="apb_enable_o",
+                descr="APB enable. Indicates the number of clock cycles of the transfer.",
+            ),
+            iob_signal(
+                name="apb_write_o",
+                descr="APB write. Indicates the direction of the operation.",
+            ),
+            iob_signal(
+                name="apb_wdata_o",
+                width=self.data_w,
+                descr="APB write data.",
+            ),
+            iob_signal(
+                name="apb_wstrb_o",
+                width=self.data_w // 8,
+                descr="APB write strobe.",
+            ),
+            iob_signal(
+                name="apb_rdata_i",
+                width=self.data_w,
+                descr="APB read data.",
+            ),
+            iob_signal(
+                name="apb_ready_i",
+                descr="APB ready. Indicates the end of a transfer.",
+            ),
+        ]
 
+@dataclass
+class AHBInterface(_Interface):
+    """Class to represent an AHB interface for generation"""
+
+    # Data width for the AHB interface
+    data_w: int = 32
+    # Address width for the AHB interface
+    addr_w: int = 32
+    # AHB parameters
+    prot_w: int = 4
+    burst_w: int = 3
+    trans_w: int = 2
+    size_w: int = 3
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
+
+    def __set_signals(self):
+        """Set signals for the AHB interface."""
+        self._signals += [
+            iob_signal(
+                name="ahb_addr_o",
+                width=self.addr_w,
+                descr="AHB address output.",
+            ),
+            iob_signal(
+                name="ahb_burst_o",
+                width=self.burst_w,
+                descr="AHB burst size.",
+            ),
+            iob_signal(
+                name="ahb_mastlock_o",
+                descr="AHB master lock signal.",
+            ),
+            iob_signal(
+                name="ahb_prot_o",
+                width=self.prot_w,
+                descr="AHB protection type.",
+            ),
+            iob_signal(
+                name="ahb_size_o",
+                width=self.size_w,  # Size is typically 3 bits in AHB
+                descr="AHB transfer size.",
+            ),
+            iob_signal(
+                name="ahb_trans_o",
+                width=self.trans_w,
+                descr="AHB transfer type.",
+            ),
+            iob_signal(
+                name="ahb_wdata_o",
+                width=self.data_w,
+                descr="AHB write data.",
+            ),
+            iob_signal(
+                name="ahb_wstrb_o",
+                width=self.data_w // 8,
+                descr="AHB write strobe.",
+            ),
+            iob_signal(
+                name="ahb_write_o",
+                descr="AHB write signal. Transfer direction: (1) Write; (0) Read.",
+            ),
+            iob_signal(
+                name="ahb_rdata_i",
+                width=self.data_w,
+                descr="AHB read data.",
+            ),
+            iob_signal(
+                name="ahb_readyout_i",
+                descr="AHB ready output. Indicates transfer finished on the bus.",
+            ),
+            iob_signal(
+                name="ahb_resp_i",
+                descr="AHB response input. Transfer response: (0) Okay; (1) Error.",
+            ),
+            iob_signal(
+                name="ahb_sel_o",
+                descr="AHB subordinate select.",
+            ),
+        ]
 
 #
 # RS232
 #
-N_PINS = 4
+
+@dataclass
+class RS232Interface(_Interface):
+    """Class to represent an RS232 interface for generation"""
+
+    # Number of pins for the RS232 interface
+    n_pins: int = 4
 
 
-@parse_widths
-def get_rs232_ports():
-    assert N_PINS in [2, 4, 9], "rs232 'N_PINS' must be 2, 4 or 9!"
-    ports = []
-    if N_PINS == 9:
-        ports += [
-            iob_signal(
-                name="rs232_dcd_i",
-                width=1,
-                descr="Data carrier detect.",
-            ),
-        ]
-    if N_PINS in [2, 4]:
-        ports += [
-            iob_signal(
-                name="rs232_rxd_i",
-                width=1,
-                descr="Receive data.",
-            ),
-            iob_signal(
-                name="rs232_txd_o",
-                width=1,
-                descr="Transmit data.",
-            ),
-        ]
-    if N_PINS == 9:
-        ports += [
-            iob_signal(
-                name="rs232_dtr_o",
-                width=1,
-                descr="Data terminal ready.",
-            ),
-            iob_signal(
-                name="rs232_gnd_i",
-                width=1,
-                descr="Ground.",
-            ),
-            iob_signal(
-                name="rs232_dsr_i",
-                width=1,
-                descr="Data set ready.",
-            ),
-        ]
-    if N_PINS == 4:
-        ports += [
-            iob_signal(
-                name="rs232_rts_o",
-                width=1,
-                descr="Request to send.",
-            ),
-            iob_signal(
-                name="rs232_cts_i",
-                width=1,
-                descr="Clear to send.",
-            ),
-        ]
-    if N_PINS == 9:
-        ports += [
-            iob_signal(
-                name="rs232_ri_i",
-                width=1,
-                descr="Ring indicator.",
-            ),
-        ]
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
 
-    return ports
+    def __set_signals(self):
+        """Set signals for the RS232 interface."""
+        if self.n_pins not in [2, 4, 9]:
+            raise ValueError("RS232 interface must have 2, 4, or 9 pins.")
 
+        if self.n_pins == 9:
+            self._signals += [
+                iob_signal(
+                    name="rs232_dcd_i",
+                    width=1,
+                    descr="Data carrier detect.",
+                ),
+            ]
+        if self.n_pins in [2, 4]:
+            self._signals += [
+                iob_signal(
+                    name="rs232_rxd_i",
+                    width=1,
+                    descr="Receive data.",
+                ),
+                iob_signal(
+                    name="rs232_txd_o",
+                    width=1,
+                    descr="Transmit data.",
+                ),
+            ]
+        if self.n_pins == 9:
+            self._signals += [
+                iob_signal(
+                    name="rs232_dtr_o",
+                    width=1,
+                    descr="Data terminal ready.",
+                ),
+                iob_signal(
+                    name="rs232_gnd_i",
+                    width=1,
+                    descr="Ground.",
+                ),
+                iob_signal(
+                    name="rs232_dsr_i",
+                    width=1,
+                    descr="Data set ready.",
+                ),
+            ]
+        if self.n_pins == 4:
+            self._signals += [
+                iob_signal(
+                    name="rs232_rts_o",
+                    width=1,
+                    descr="Request to send.",
+                ),
+                iob_signal(
+                    name="rs232_cts_i",
+                    width=1,
+                    descr="Clear to send.",
+                ),
+            ]
+        if self.n_pins == 9:
+            self._signals += [
+                iob_signal(
+                    name="rs232_ri_i",
+                    width=1,
+                    descr="Ring indicator.",
+                ),
+            ]
 
 #
 # Wishbone
 #
 
+@dataclass
+class WishboneInterface(_Interface):
+    """Class to represent a Wishbone interface for generation"""
 
-@parse_widths
-def get_wb_ports():
-    ports = [
-        iob_signal(
-            name="wb_dat_i",
-            width=DATA_W,
-            descr="Data input.",
-        ),
-        iob_signal(
-            name="wb_datout_o",
-            width=DATA_W,
-            descr="Data output.",
-        ),
-        iob_signal(
-            name="wb_ack_i",
-            width=1,
-            descr="Acknowledge input. Indicates normal termination of a bus cycle.",
-        ),
-        iob_signal(
-            name="wb_adr_o",
-            width=ADDR_W,
-            descr="Address output. Passes binary address.",
-        ),
-        iob_signal(
-            name="wb_cyc_o",
-            width=1,
-            descr="Cycle output. Indicates a valid bus cycle.",
-        ),
-        iob_signal(
-            name="wb_sel_o",
-            width=try_math_eval(f"{DATA_W}/{DATA_SECTION_W}"),
-            descr="Select output. Indicates where valid data is expected on the data bus.",
-        ),
-        iob_signal(
-            name="wb_stb_o",
-            width=1,
-            descr="Strobe output. Indicates valid access.",
-        ),
-        iob_signal(
-            name="wb_we_o",
-            width=1,
-            descr="Write enable. Indicates write access.",
-        ),
-    ]
+    # Data width for the Wishbone interface
+    data_w: int = 32
+    # Address width for the Wishbone interface
+    addr_w: int = 32
+    # Sets if it is a full Wishbone interface
+    is_full: bool = False
 
-    return ports
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
 
+        
+    def __set_signals(self):
+        """Set signals for the Wishbone interface."""
+        self._signals += [
+            iob_signal(
+                name="wb_dat_i",
+                width=self.data_w,
+                descr="Data input.",
+            ),
+            iob_signal(
+                name="wb_datout_o",
+                width=self.data_w,
+                descr="Data output.",
+            ),
+            iob_signal(
+                name="wb_ack_i",
+                descr="Acknowledge input. Indicates normal termination of a bus cycle.",
+            ),
+            iob_signal(
+                name="wb_adr_o",
+                width=self.addr_w,
+                descr="Address output. Passes binary address.",
+            ),
+            iob_signal(
+                name="wb_cyc_o",
+                descr="Cycle output. Indicates a valid bus cycle.",
+            ),
+            iob_signal(
+                name="wb_sel_o",
+                width=self.data_w // 8,
+                descr="Select output. Indicates where valid data is expected on the data bus.",
+            ),
+            iob_signal(
+                name="wb_stb_o",
+                descr="Strobe output. Indicates valid access.",
+            ),
+            iob_signal(
+                name="wb_we_o",
+                descr="Write enable. Indicates write access.",
+            ),
+        ]
 
-@parse_widths
-def get_wb_full_ports():
-    ports = get_wb_ports()
-    ports += [
-        iob_signal(
-            name="wb_clk_i",
-            width=1,
-            descr="Clock input.",
-        ),
-        iob_signal(
-            name="wb_rst_i",
-            width=1,
-            descr="Reset input.",
-        ),
-        iob_signal(
-            name="wb_tgd_i",
-            width=1,
-            descr="Data tag type. Contains information associated with data lines [dat] and [strb].",
-        ),
-        iob_signal(
-            name="wb_tgd_o",
-            width=1,
-            descr="Data tag type. Contains information associated with data lines [dat] and [strb].",
-        ),
-        iob_signal(
-            name="wb_err_i",
-            width=1,
-            descr="Error input. Indicates abnormal cycle termination.",
-        ),
-        iob_signal(
-            name="wb_lock_o",
-            width=1,
-            descr="Lock output. Indicates current bus cycle is uninterruptable.",
-        ),
-        iob_signal(
-            name="wb_rty_i",
-            width=1,
-            descr="Retry input. Indicates interface is not ready to accept or send data, and cycle should be retried.",
-        ),
-        iob_signal(
-            name="wb_tga_o",
-            width=1,
-            descr="Address tag type. Contains information associated with address lines [adr], and is qualified by signal [stb].",
-        ),
-        iob_signal(
-            name="wb_tgc_o",
-            width=1,
-            descr="Cycle tag type. Contains information associated with bus cycles, and is qualified by signal [cyc].",
-        ),
-    ]
-
-    return ports
-
+        if self.is_full:
+            self._signals += [
+                iob_signal(
+                    name="wb_clk_i",
+                    descr="Clock input.",
+                ),
+                iob_signal(
+                    name="wb_rst_i",
+                    descr="Reset input.",
+                ),
+                iob_signal(
+                    name="wb_tgd_i",
+                    descr="Data tag type. Contains information associated with data lines [dat] and [strb].",
+                ),
+                iob_signal(
+                    name="wb_tgd_o",
+                    descr="Data tag type. Contains information associated with data lines [dat] and [strb].",
+                ),
+                iob_signal(
+                    name="wb_err_i",
+                    descr="Error input. Indicates abnormal cycle termination.",
+                ),
+                iob_signal(
+                    name="wb_lock_o",
+                    descr="Lock output. Indicates current bus cycle is uninterruptable.",
+                ),
+                iob_signal(
+                    name="wb_rty_i",
+                    descr="Retry input. Indicates interface is not ready to accept or send data, and cycle should be retried.",
+                ),
+                iob_signal(
+                    name="wb_tga_o",
+                    descr="Address tag type. Contains information associated with address lines [adr], and is qualified by signal [stb].",
+                ),
+                iob_signal(
+                    name="wb_tgc_o",
+                    descr="Cycle tag type. Contains information associated with bus cycles, and is qualified by signal [cyc].",
+                ),
+            ]
 
 #
 # Handle signal direction

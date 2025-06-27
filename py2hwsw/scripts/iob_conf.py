@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
@@ -12,49 +12,7 @@ from iob_base import (
     find_obj_in_list,
 )
 
-
-# TODO: Move this method to iob_base
-def api_method(cls):
-    """
-    Decorator for internal methods that extend functionality of API methods.
-
-    This decorator:
-    1) Adds constructor that accepts new attributes via arguments (the ones defined in the API class).
-
-    Attributes received by constructor will be added to this internal class.
-
-    """
-
-    original_init = cls.__init__
-
-    # Update constructor of the internal class
-    def new_init(
-        self,
-        new_attributes: dict,
-        new_attributes_annotations: dict,
-        args: list,
-        kwargs: dict,
-    ):
-        print("Internal class constructor called: ", cls.__name__)
-        print("Received attributes: ", new_attributes)
-
-        # Update internal class attributes
-        for attribute_name, default_value in new_attributes.items():
-            setattr(self, attribute_name, kwargs.pop(attribute_name, default_value))
-        # Update attributes type hints
-        self.__class__.__annotations__ |= new_attributes_annotations
-
-        if args:
-            fail_with_msg(f"Unknown constructor arguments: {args}")
-        if kwargs:
-            fail_with_msg(f"Unknown constructor arguments: {kwargs}")
-
-        # Call original init
-        original_init(self)
-
-    cls.__init__ = new_init
-
-    return cls
+from api_base import api_method
 
 
 @api_method

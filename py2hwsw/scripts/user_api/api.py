@@ -155,6 +155,19 @@ def get_methods(cls):
     return methods
 
 
+def has_body(func):
+    """Check if a function has a body."""
+    source = inspect.getsource(func)
+    # Remove leading and trailing whitespace
+    source = source.strip()
+    # Remove the function definition line
+    lines = source.split('\n')
+    if len(lines) < 2:
+        return False
+    body = '\n'.join(lines[1:])
+    return body.strip() != 'pass'
+
+
 def api_for(internal_cls):
     """
     Decorator for creating API interface. Apply this decorator to every function in the API.
@@ -184,16 +197,17 @@ def api_for(internal_cls):
     def decorator(cls):
         # Get attributes and their default values
         attributes = {k: cls.__dict__[k] for k in cls.__annotations__}
+        methods = get_methods(cls)
 
         # Update constructor of the API class
         def new_init(self, *args, **kwargs):
             print("API class constructor called: ", cls.__name__)
             print("Attributes: ", attributes) # Dictionary with attributes and their types
             print("Annotations: ", cls.__annotations__) # Dictionary with attributes and their types
-            print("Methods: ", get_methods(cls)) # Dictionary with methods and their types
+            print("Methods: ", methods) # Dictionary with methods and their types
 
             # Instantiate internal class, with API attributes and methods
-            internal_obj = internal_cls(attributes, cls.__annotations__, get_methods(cls), args, kwargs)
+            internal_obj = internal_cls(attributes, cls.__annotations__, methods, args, kwargs)
 
             # Store reference to internal object
             self.__internal_obj = internal_obj
@@ -223,10 +237,30 @@ def api_for(internal_cls):
                 return getattr(self.__internal_obj, attribute_name)
             return getter
 
+        def _generate_method_wrapper(method_name):
+            """
+            Function to generate wrapper for a given method.
+            Wrapper will call the corresponding method in the internal object.
+            """
+
+            def wrapper(self, *args, **kwargs):
+                assert hasattr(self.__internal_obj, method_name), f"[Py2HWSW bug]: Missing implementation for API method '{method_name}' of class '{cls.__name__}'!"
+                # print("Method called: ", method_name)
+                return getattr(self.__internal_obj, method_name)(*args, **kwargs)
+            return wrapper
+
         # Generate and add setters/getters for each attribute of API class, referencing values from corresponding attribute in internal object
         for name in cls.__annotations__:
             setattr(cls, f"set_{name}", _generate_setter(name))
             setattr(cls, f"get_{name}", _generate_getter(name))
+
+        # Replace API methods by calls to the internal methods
+        for name in methods:
+            # Ensure method is abstract (does not have body) in API class
+            assert not has_body(getattr(cls, name)), f"API method '{name}' must be abstract."
+
+            # Call corresponding method in internal class
+            setattr(cls, name, _generate_method_wrapper(name))
 
         # Remove class attributes from API class
         # This will make sure user cannot access them directly.

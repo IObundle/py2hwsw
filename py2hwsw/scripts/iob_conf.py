@@ -19,8 +19,7 @@ def api_method(cls):
     Decorator for internal methods that extend functionality of API methods.
 
     This decorator:
-    1) Adds constructor that accepts new attributes/methods as arguments (the ones defined in the API class).
-    2) Does input validation?
+    1) Adds constructor that accepts new attributes via arguments (the ones defined in the API class).
 
     Attributes received by constructor will be added to this internal class.
 
@@ -33,13 +32,11 @@ def api_method(cls):
         self,
         new_attributes: dict,
         new_attributes_annotations: dict,
-        new_methods: dict,
         args: list,
         kwargs: dict,
     ):
         print("Internal class constructor called: ", cls.__name__)
         print("Received attributes: ", new_attributes)
-        print("Received methods: ", new_methods)
 
         # Update internal class attributes
         for attribute_name, default_value in new_attributes.items():
@@ -47,8 +44,10 @@ def api_method(cls):
         # Update attributes type hints
         self.__class__.__annotations__ |= new_attributes_annotations
 
-        # TODO: Update internal class methods
-        # self.__class__.__dict__.update(new_methods)
+        if args:
+            fail_with_msg(f"Unknown constructor arguments: {args}")
+        if kwargs:
+            fail_with_msg(f"Unknown constructor arguments: {kwargs}")
 
         # Call original init
         original_init(self)

@@ -173,9 +173,10 @@ def api_for(internal_cls):
     Decorator for creating API interface. Apply this decorator to every function in the API.
 
     This decorator:
-    1) Passes attributes and methods defined in the API class to the internal class (via arguments to the internal classes's constructor)
+    1) Passes attributes defined in the API class to the internal class (via arguments to the internal classes's constructor)
     2) Creates setters/getters for every attribute of API class, but actually accessing internal classes's attributes.
-    3) Removes attributes from API class. This prevents user from trying to access attributes directly.
+    3) Replaces (abstract) API methods with functions that call the corresponding internal class methods.
+    4) Removes attributes from API class. This prevents user from trying to access attributes directly.
 
     From point of view of the user (even when checking api.py code), he only sees API class with the (getters/setters of the) attributes and methods defined in it.
     The user may instantiate any API class and use its attributes/methods. This decorator will handle the instantiation of the internal class and hide it from user.
@@ -206,8 +207,8 @@ def api_for(internal_cls):
             print("Annotations: ", cls.__annotations__) # Dictionary with attributes and their types
             print("Methods: ", methods) # Dictionary with methods and their types
 
-            # Instantiate internal class, with API attributes and methods
-            internal_obj = internal_cls(attributes, cls.__annotations__, methods, args, kwargs)
+            # Instantiate internal class with API attributes
+            internal_obj = internal_cls(attributes, cls.__annotations__, args, kwargs)
 
             # Store reference to internal object
             self.__internal_obj = internal_obj

@@ -735,3 +735,11 @@ class iob_core(iob_module, iob_instance):
         May be overridden by user subclasses to generate custom files or run scripts during the build directory generation process.
         """
         pass
+
+
+#@api_for(internal_load_short_notation_file)
+#def load_short_notation_file(short_notation_file_path):
+#    """
+#    Reads a short notation file and returns a dictionary with parsed data.
+#    """
+#    pass

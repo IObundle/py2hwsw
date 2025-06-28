@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-import sys
-import os
 import inspect
 
 from dataclasses import field
+
+from iob_base import fail_with_msg
 
 #
 # Utility functions
@@ -86,9 +86,21 @@ def has_body(func):
     return body.strip() != "pass"
 
 
-def api_for(internal_cls):
+def api_for(internal_reference):
     """
-    Decorator for creating API interface. Apply this decorator to every function in the API.
+    Decorator for API classes and methods.
+    """
+    # Check if reference is class
+    if isinstance(internal_reference, type):
+        return api_class_for(internal_reference)
+    # Check if reference is function
+    elif callable(internal_reference):
+        return api_method_for(internal_reference)
+
+
+def api_class_for(internal_cls):
+    """
+    Decorator for creating class API interface. Apply this decorator to every class in the API.
 
     This decorator:
     1) Passes attributes defined in the API class to the internal class (via arguments to the internal classes's constructor)
@@ -202,6 +214,22 @@ def api_for(internal_cls):
     return decorator
 
 
+def api_method_for(internal_method):
+    """
+    Decorator for creating method API interface. Apply this decorator to every isolated method in the API.
+
+    This decorator:
+    1) Replaces the (abstract) API method with a new one that calls the corresponding internal method.
+
+    """
+
+    # Create decorator dynamically for the API class
+    def decorator(func):
+        return internal_method
+
+    return decorator
+
+
 #
 # Internal functions
 #
@@ -238,9 +266,13 @@ def api_method(cls):
         self.__class__.__annotations__ |= new_attributes_annotations
 
         if args:
-            fail_with_msg(f"Unknown constructor arguments: {args}")
+            fail_with_msg(
+                f"Unknown constructor arguments for class '{cls.__name__}': {args}"
+            )
         if kwargs:
-            fail_with_msg(f"Unknown constructor arguments: {kwargs}")
+            fail_with_msg(
+                f"Unknown constructor arguments for class '{cls.__name__}': {kwargs}"
+            )
 
         # Call original init
         original_init(self)

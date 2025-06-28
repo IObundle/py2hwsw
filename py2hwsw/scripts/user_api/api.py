@@ -46,7 +46,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')))
-from api_base import api_for, empty_list, empty_dict
+from api_base import api_for, prevent_instantiation, empty_list, empty_dict
 import iob_conf as internal_conf
 
 
@@ -138,7 +138,7 @@ conf_group_short2python = [
 
 
 @api_for(internal_conf.iob_conf_group)
-class iob_conf_group(ABC):
+class iob_conf_group():
     """
     Class to represent a group of configurations.
 
@@ -542,9 +542,8 @@ module_short2python = [
 ]
 
 
-# We should prevent users from instantiating this class (they should instantiate iob_core instead)
-@dataclass
-class iob_module(ABC):
+@prevent_instantiation
+class iob_module():
     """
     Class to describe a (Verilog) module.
 
@@ -599,9 +598,8 @@ instance_short2python = [
 ]
 
 
-# We should prevent users from instantiating this class (they should instantiate iob_core instead)
-@dataclass
-class iob_instance(ABC):
+@prevent_instantiation
+class iob_instance():
     """
     Class to describe a module's (Verilog) instance.
 

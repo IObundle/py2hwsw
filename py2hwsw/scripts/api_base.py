@@ -55,6 +55,18 @@ def convert2internal(api_obj):
 #
 
 
+def prevent_instantiation(cls):
+    """
+    Decorator to prevent class instantiation
+    """
+
+    def new_init(*args, **kwargs):
+        raise TypeError(f"Class {cls.__name__} cannot be instantiated")
+
+    cls.__init__ = new_init
+    return cls
+
+
 def get_methods(cls):
     """
     Returns all non-default methods in a class (includes ones inherited from superclasses)

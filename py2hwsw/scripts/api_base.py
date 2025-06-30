@@ -152,7 +152,9 @@ def api_class_for(internal_cls):
             print("Methods: ", methods)  # Dictionary with methods and their types
 
             # Instantiate internal class with API attributes
-            internal_obj = internal_cls(attributes, cls.__annotations__, args, kwargs)
+            internal_obj = internal_cls(
+                self, attributes, cls.__annotations__, args, kwargs
+            )
 
             # Store reference to internal object
             self.__internal_obj = internal_obj
@@ -219,6 +221,23 @@ def api_class_for(internal_cls):
         for name in cls.__annotations__:
             delattr(cls, name)
 
+        # Create getter to obtain internal object
+        # Method name start with '_' to signal that user should not call it. Maybe we could find a way to prevent the user from calling it entirely?
+        def _get_py2hwsw_internal_obj(self):
+            """
+            Method to convert API object to internal Py2HWSW object.
+            This method should NOT be called by user code!
+
+            Py2HWSW may call this method for API objects obtained from the user. This allows Py2HWSW to access extended functionality of internal objects.
+            User should never have access to internal objects, so this method is reserved for Py2HWSW.
+
+            Returns:
+                internal_obj (object): internal Py2HWSW object
+            """
+            return self.__internal_obj
+
+        cls._get_py2hwsw_internal_obj = _get_py2hwsw_internal_obj
+
         return cls
 
     return decorator
@@ -261,6 +280,7 @@ def api_method(cls):
     # Update constructor of the internal class
     def new_init(
         self,
+        api_object_reference: object,
         new_attributes: dict,
         new_attributes_annotations: dict,
         args: list,
@@ -275,6 +295,7 @@ def api_method(cls):
         # Update attributes type hints
         self.__class__.__annotations__ |= new_attributes_annotations
 
+        # Throw error if there are unknown arguments
         if args:
             fail_with_msg(
                 f"Unknown constructor arguments for class '{cls.__name__}': {args}"
@@ -284,9 +305,25 @@ def api_method(cls):
                 f"Unknown constructor arguments for class '{cls.__name__}': {kwargs}"
             )
 
+        # Store reference to API object
+        self.__api_obj = api_object_reference
+
         # Call original init
         original_init(self)
 
     cls.__init__ = new_init
+
+    # Create getter to obtain API object
+    def get_api_obj(self):
+        """
+        Method to convert internal Py2HWSW object to API object.
+        Py2HWSW should call this method for every internal object before passing it to the user.
+
+        Returns:
+            api_obj (object): API object. This object can be passed and freely modified by the user.
+        """
+        return self.__api_obj
+
+    cls.get_api_obj = get_api_obj
 
     return cls

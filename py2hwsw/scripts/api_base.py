@@ -88,14 +88,12 @@ def get_methods(cls):
 def has_body(func):
     """Check if a function has a body."""
     source = inspect.getsource(func)
-    # Remove leading and trailing whitespace
-    source = source.strip()
-    # Remove the function definition line
-    lines = source.split("\n")
-    if len(lines) < 2:
+    body = source.strip().split("\n")[1:]
+    if (len(body) == 1 or (len(body) > 1 and '"' in body[-2])) and body[
+        -1
+    ].strip() == "pass":
         return False
-    body = "\n".join(lines[1:])
-    return body.strip() != "pass"
+    return True
 
 
 def api_for(internal_reference):

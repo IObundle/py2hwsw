@@ -36,11 +36,6 @@
 #       understand the impact of updates and plan accordingly.
 
 
-# TODO: Remove these
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from pydantic import BaseModel
-
 from datetime import date
 import os
 import sys
@@ -48,6 +43,16 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')))
 from api_base import api_for, prevent_instantiation, empty_list, empty_dict
 import iob_conf as internal_conf
+import iob_signal as internal_signal
+import if_gen as internal_interface
+import iob_wire as internal_wire
+import iob_port as internal_port
+import iob_snippet as internal_snippet
+import iob_comb as internal_comb
+import iob_fsm as internal_fsm
+import iob_block as internal_block
+import iob_license as internal_license
+import iob_core as internal_core
 
 
 # NOTE: for developers:
@@ -118,6 +123,8 @@ class iob_conf():
     doc_only: bool = False
 
     def test_method(self, var1: str, var2: int) -> list:
+        """Example docstring
+        """
         pass
 
 
@@ -178,8 +185,8 @@ signal_short2python = [
 ]
 
 
-@dataclass
-class iob_signal(ABC):
+@api_for(internal_signal.iob_signal)
+class iob_signal():
     """
     Class that represents a wire/port signal.
 
@@ -230,8 +237,8 @@ interface_short2python = [
 
 
 # NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
-@dataclass
-class interface(ABC):
+@api_for(internal_interface.interface)
+class interface():
     """
     Class to represent an interface for generation.
 
@@ -276,8 +283,8 @@ wire_short2python = [
 ]
 
 
-@dataclass
-class iob_wire(ABC):
+@api_for(internal_wire.iob_wire)
+class iob_wire():
     """
     Class to represent a wire in an iob module.
 
@@ -298,7 +305,6 @@ class iob_wire(ABC):
     if_not_defined: str = ""
     signals: list[iob_signal] = empty_list()
 
-    @abstractmethod
     def get_signal(self, signal_name: str) -> iob_signal:
         """
         Find a signal by name and return it.
@@ -331,7 +337,8 @@ port_short2python = [
 ]
 
 
-@dataclass
+# FIXME: When decorator runs, iob_wire already has non-abstract getters/setters. The decorator throws an error because of these methods.
+@api_for(internal_port.iob_port)
 class iob_port(iob_wire):
     """
     Describes an IO port.
@@ -365,8 +372,8 @@ snippet_short2python = [
 ]
 
 
-@dataclass
-class iob_snippet(ABC):
+@api_for(internal_snippet.iob_snippet)
+class iob_snippet():
     """
     Class to represent a Verilog snippet in an iob module.
 
@@ -393,7 +400,7 @@ comb_short2python = [
 ]
 
 
-@dataclass
+@api_for(internal_comb.iob_comb)
 class iob_comb(iob_snippet):
     """
     Class to represent a Verilog combinatory circuit in an iob module.
@@ -424,7 +431,7 @@ fsm_short2python = [
 ]
 
 
-@dataclass
+@api_for(internal_fsm.iob_fsm)
 class iob_fsm(iob_comb):
     """
     Class to represent a Verilog finite state machine in an iob module.
@@ -443,7 +450,7 @@ class iob_fsm(iob_comb):
 #
 # Blocks
 #
-class iob_core(ABC):
+class iob_core():
     """Forward reference of iob_core class. Full declaration of iob_core class is available in below."""
 
     pass
@@ -464,8 +471,8 @@ block_group_short2python = [
 ]
 
 
-@dataclass
-class iob_block_group(ABC):
+@api_for(internal_block.iob_block_group)
+class iob_block_group():
     """
     Class to represent a group of blocks.
 
@@ -499,8 +506,8 @@ license_short2python = [
 ]
 
 
-@dataclass
-class iob_license(ABC):
+@api_for(internal_license.iob_license)
+class iob_license():
     """
     Class that represents a license attribute.
 
@@ -669,7 +676,7 @@ core_short2python = [
 ]
 
 
-@dataclass
+@api_for(internal_core.iob_core)
 class iob_core(iob_module, iob_instance):
     """
     Generic class to describe how to generate a base IOb IP core.
@@ -716,7 +723,6 @@ class iob_core(iob_module, iob_instance):
     doc_conf: str = ""
     title: str = ""
 
-    @abstractmethod
     def __init__(self, core_dictionary: dict = {}):
         """
         Constructor for cores.
@@ -726,7 +732,6 @@ class iob_core(iob_module, iob_instance):
         """
         pass
 
-    @abstractmethod
     def generate_build_dir(self):
         """
         Standard method to generate build directory.

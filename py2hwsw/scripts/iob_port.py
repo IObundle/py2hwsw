@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 import if_gen
 import iob_colors
-from iob_wire import iob_wire, replace_duplicate_signals_by_references
+from iob_wire import iob_wire, replace_duplicate_signals_by_references, dict2interface
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
@@ -219,7 +219,7 @@ def create_port(core, *args, signals=[], **kwargs):
         sig_obj_list = convert_dict2obj_list(signals, iob_signal)
     elif type(signals) is dict:
         # Convert user interface dictionary into an interface object
-        interface_obj = if_gen.dict2interface(signals)
+        interface_obj = dict2interface(signals)
         if interface_obj and not interface_obj.file_prefix:
             interface_obj.file_prefix = core.name + "_"
     else:

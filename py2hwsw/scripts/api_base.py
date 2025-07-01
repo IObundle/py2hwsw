@@ -85,6 +85,24 @@ def get_methods(cls):
     return methods
 
 
+def get_local_methods(cls):
+    """
+    Returns all non-default methods in a class (does NOT include ones inherited from superclasses)
+
+    Attributes:
+        cls (class): class
+    Returns:
+        dict: methods of the class and their type hints
+    """
+    methods = {}
+    for name in cls.__dict__:
+        attr = getattr(cls, name)
+        if inspect.isfunction(attr) and not name.startswith("__"):
+            signature = inspect.signature(attr)
+            methods[name] = signature
+    return methods
+
+
 def has_body(func):
     """Check if a function has a body."""
     source = inspect.getsource(func)
@@ -138,6 +156,7 @@ def api_class_for(internal_cls):
     def decorator(cls):
         # Get attributes and their default values
         attributes = {k: cls.__dict__[k] for k in cls.__annotations__}
+        local_methods = get_local_methods(cls)
         methods = get_methods(cls)
 
         # Update constructor of the API class
@@ -207,7 +226,7 @@ def api_class_for(internal_cls):
             setattr(cls, f"get_{name}", _generate_getter(name))
 
         # Replace API methods by calls to the internal methods
-        for name in methods:
+        for name in local_methods:
             # Ensure method is abstract (does not have body) in API class
             assert not has_body(
                 getattr(cls, name)
@@ -219,6 +238,7 @@ def api_class_for(internal_cls):
         # Remove class attributes from API class
         # This will make sure user cannot access them directly.
         for name in cls.__annotations__:
+            # Note: This only removes attribute from class, but not from __annotations__.
             delattr(cls, name)
 
         # Create getter to obtain internal object

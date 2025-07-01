@@ -2128,12 +2128,14 @@ def create_interface(
 
 if __name__ == "__main__":
     for if_name in if_names:
-        gen_all_vs_files(
-            interface(
-                type=if_name,
-                file_prefix="bla_",
-                prefix="di_",
-                portmap_port_prefix="da_",
-                widths={},
-            )
+        interface = create_interface(
+            type=if_name,
+            if_direction="",
+            mult=1,
+            widths={},
+            params=None,
+            prefix="di_",
+            portmap_port_prefix="da_",
+            file_prefix="bla_",
         )
+        interface.gen_all_vs_files()

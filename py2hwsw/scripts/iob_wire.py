@@ -202,23 +202,23 @@ def dict2interface(interface_dict):
 
     signals_dict = interface_dict.get("signals", {})
 
-    if "type" not in signals_dict:
-        raise ValueError("Interface dictionary must contain a 'type' key.")
+    type = interface_dict.get("type", "")
 
-    type = signals_dict["type"]
     if interface_dict.get("name").endswith("_m"):
         if_direction = "master"
     elif interface_dict.get("name").endswith("_s"):
         if_direction = "slave"
     else:
         if_direction = ""
+
     prefix = signals_dict.get("prefix", "")
     mult = signals_dict.get("mult", 1)
     params = signals_dict.get("params", None)
     params = params.split("_")
     file_prefix = signals_dict.get("file_prefix", "")
     portmap_port_prefix = signals_dict.get("portmap_port_prefix", "")
-    # Remaining entries in the interface_dict
+
+    # Remaining entries in the interface_dict (usually widths or other parameters)
     remaining_entries = {
         k: v
         for k, v in signals_dict.items()

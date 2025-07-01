@@ -283,7 +283,7 @@ if_types = [
 
 
 @dataclass
-class _Interface:
+class _interface:
     """Class to represent an interface for generation"""
 
     # Interface direction. Examples: '' (unspecified), 'manager', 'subordinate', ...
@@ -305,11 +305,11 @@ class _Interface:
 
     def __get_if_name(self):
         """Get the name of the interface."""
-        if isinstance(self, IobClkInterface):
+        if isinstance(self, iobClkInterface):
             return "iob_clk"
-        elif isinstance(self, IobInterface):
+        elif isinstance(self, iobInterface):
             return "iob"
-        elif isinstance(self, _MemInterface):
+        elif isinstance(self, _memInterface):
             return self.type
         elif isinstance(self, AXIStreamInterface):
             return "axis"
@@ -333,7 +333,7 @@ class _Interface:
             return "ahb"
         elif isinstance(self, RS232Interface):
             return "rs232"
-        elif isinstance(self, WishboneInterface):
+        elif isinstance(self, wishboneInterface):
             if self.is_full:
                 return "wb_full"
             else:
@@ -543,7 +543,7 @@ class _Interface:
 
 
 @dataclass
-class IobClkInterface(_Interface):
+class iobClkInterface(_interface):
     """Class to represent an IOb clock interface for generation"""
 
     has_cke: bool = True
@@ -582,7 +582,7 @@ class IobClkInterface(_Interface):
 
 
 @dataclass
-class IobInterface(_Interface):
+class iobInterface(_interface):
     """Class to represent an IOb interface for generation"""
 
     # Widths for the IOb interface
@@ -625,7 +625,7 @@ class IobInterface(_Interface):
 
 
 @dataclass
-class _MemInterface(_Interface):
+class _memInterface(_interface):
     """Class to represent a memory interface for generation"""
 
     # Width for the memory interface
@@ -670,7 +670,7 @@ class _MemInterface(_Interface):
 
 
 @dataclass
-class SymMemInterface(_MemInterface):
+class symMemInterface(_memInterface):
     """Class to represent a symmetric memory interface for generation"""
 
     # Data width for the memory interface
@@ -870,7 +870,7 @@ class SymMemInterface(_MemInterface):
 
 
 @dataclass
-class AsymMemInterface(_MemInterface):
+class asymMemInterface(_memInterface):
     """Class to represent an asymmetric memory interface for generation"""
 
     # Data widths for the memory interface
@@ -1058,7 +1058,7 @@ class AsymMemInterface(_MemInterface):
 
 
 @dataclass
-class AXIStreamInterface(_Interface):
+class AXIStreamInterface(_interface):
     """Class to represent an AXI-Stream interface for generation"""
 
     # Data width for the AXI-Stream interface
@@ -1098,7 +1098,7 @@ class AXIStreamInterface(_Interface):
 
 
 @dataclass
-class AXILiteInterface(_Interface):
+class AXILiteInterface(_interface):
     """Class to represent an AXI-Lite interface for generation"""
 
     # Data width for the AXI-Lite interface
@@ -1232,7 +1232,7 @@ class AXILiteInterface(_Interface):
 
 
 @dataclass
-class AXIInterface(_Interface):
+class AXIInterface(_interface):
     """Class to represent an AXI interface for generation"""
 
     # Data width for the AXI interface
@@ -1478,7 +1478,7 @@ class AXIInterface(_Interface):
 
 
 @dataclass
-class APBInterface(_Interface):
+class APBInterface(_interface):
     """Class to represent an APB interface for generation"""
 
     # Data width for the APB interface
@@ -1533,7 +1533,7 @@ class APBInterface(_Interface):
 
 
 @dataclass
-class AHBInterface(_Interface):
+class AHBInterface(_interface):
     """Class to represent an AHB interface for generation"""
 
     # Data width for the AHB interface
@@ -1622,7 +1622,7 @@ class AHBInterface(_Interface):
 
 
 @dataclass
-class RS232Interface(_Interface):
+class RS232Interface(_interface):
     """Class to represent an RS232 interface for generation"""
 
     # Number of pins for the RS232 interface
@@ -1705,7 +1705,7 @@ class RS232Interface(_Interface):
 
 
 @dataclass
-class WishboneInterface(_Interface):
+class wishboneInterface(_interface):
     """Class to represent a Wishbone interface for generation"""
 
     # Data width for the Wishbone interface
@@ -1906,7 +1906,7 @@ def create_interface(
                         f"Unknown parameter '{param}' for IOb clock interface."
                     )
 
-            interface = IobClkInterface(
+            interface = iobClkInterface(
                 if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
@@ -1918,7 +1918,7 @@ def create_interface(
                 has_en=has_en,
             )
         case "iob":
-            interface = IobInterface(
+            interface = iobInterface(
                 if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
@@ -1929,7 +1929,7 @@ def create_interface(
             )
         case mem if mem in mem_if_names:
             if "W_DATA_W" in widths and "R_DATA_W" in widths:
-                interface = AsymMemInterface(
+                interface = asymMemInterface(
                     if_direction=if_direction,
                     prefix=prefix,
                     mult=mult,
@@ -1942,7 +1942,7 @@ def create_interface(
                 )
             else:
                 # Symmetric memory interface
-                interface = SymMemInterface(
+                interface = symMemInterface(
                     if_direction=if_direction,
                     prefix=prefix,
                     mult=mult,
@@ -2095,7 +2095,7 @@ def create_interface(
                 n_pins=n_pins,
             )
         case "wb":
-            interface = WishboneInterface(
+            interface = wishboneInterface(
                 if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
@@ -2105,7 +2105,7 @@ def create_interface(
                 addr_w=addr_w,
             )
         case "wb_full":
-            interface = WishboneInterface(
+            interface = wishboneInterface(
                 if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,

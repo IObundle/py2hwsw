@@ -30,7 +30,7 @@ import ipxact_gen
 
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
-from if_gen import mem_if_names, _MemInterface
+from if_gen import mem_if_names, _memInterface
 from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
@@ -273,7 +273,7 @@ class iob_core(iob_module, iob_instance):
             for port in self.ports:
                 if (
                     port.interface
-                    and isinstance(port.interface, _MemInterface)
+                    and isinstance(port.interface, _memInterface)
                     and port.name.endswith("m")
                 ):
                     found_mem_if = True

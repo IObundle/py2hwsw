@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import copy
+
 from iob_base import iob_base, process_elements_from_list, fail_with_msg
 from iob_conf import create_conf_group
 from iob_port import create_port
@@ -191,21 +193,22 @@ class iob_module(iob_base):
         :param instantiator_obj: Instantiator object
         :param instance_dict: Dictionary describing verilog instance. Includes port connections and verilog parameter values.
         """
-        instantiator_obj.instantiate = True
+        new_instance = copy.deepcopy(instantiator_obj)
+        new_instance.instantiate = True
         # Set instance name
         if "instance_name" in instance_dict:
-            instantiator_obj.instance_name = instance_dict["instance_name"]
+            new_instance.instance_name = instance_dict["instance_name"]
         # Set instance description
         if "instance_description" in instance_dict:
-            instantiator_obj.instance_description = instance_dict[
+            new_instance.instance_description = instance_dict[
                 "instance_description"
             ]
         # Set values to pass via verilog parameters
-        instantiator_obj.parameters = instance_dict.get("parameters", {})
+        new_instance.parameters = instance_dict.get("parameters", {})
         # Connect ports of instantiator to external wires (wires of this superblock)
-        instantiator_obj.connect_instance_ports(instance_dict.get("connect", {}), self)
+        new_instance.connect_instance_ports(instance_dict.get("connect", {}), self)
         # Create a instantiator subblock, and add it to the 'subblocks' list of current superblock
-        self.subblocks.append(instantiator_obj)
+        self.subblocks.append(new_instance)
 
 
 def get_list_attr_handler(func):

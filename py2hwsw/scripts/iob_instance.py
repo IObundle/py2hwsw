@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import copy
 from typing import Dict
 
 from iob_base import iob_base
@@ -63,3 +64,35 @@ class iob_instance(iob_base):
             bool,
             descr="Select if should intantiate the module inside another Verilog module.",
         )
+
+    def __deepcopy__(self, memo):
+        """Create a deep copy of this instance:
+        - iob_instance attributes are copied by value
+        - super() attributes are copied by reference
+        """
+        # Create a new instance without calling __init__ to avoid side effects
+        cls = self.__class__
+        new_obj = cls.__new__(cls)
+
+        # Add to memo to handle circular references
+        memo[id(self)] = new_obj
+
+        # Copy class iob_instance attributes by value (deep copy)
+        instance_attributes = {
+            "instance_name",
+            "instance_description",
+            "parameters",
+            "if_defined",
+            "if_not_defined",
+            "instantiate",
+        }
+
+        for attr_name, attr_value in self.__dict__.items():
+            if attr_name in instance_attributes:
+                # Deep copy iob_instance attributes
+                setattr(new_obj, attr_name, copy.deepcopy(attr_value, memo))
+            else:
+                # Copy inherited attributes by reference (shallow copy)
+                setattr(new_obj, attr_name, attr_value)
+
+        return new_obj

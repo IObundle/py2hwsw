@@ -204,9 +204,9 @@ def dict2interface(interface_dict):
 
     type = interface_dict.get("type", "")
 
-    if interface_dict.get("name").endswith("_m"):
+    if interface_dict.get("name", "").endswith("_m"):
         if_direction = "master"
-    elif interface_dict.get("name").endswith("_s"):
+    elif interface_dict.get("name", "").endswith("_s"):
         if_direction = "slave"
     else:
         if_direction = ""
@@ -214,7 +214,8 @@ def dict2interface(interface_dict):
     prefix = signals_dict.get("prefix", "")
     mult = signals_dict.get("mult", 1)
     params = signals_dict.get("params", None)
-    params = params.split("_")
+    if params is not None:
+        params = params.split("_")
     file_prefix = signals_dict.get("file_prefix", "")
     portmap_port_prefix = signals_dict.get("portmap_port_prefix", "")
 

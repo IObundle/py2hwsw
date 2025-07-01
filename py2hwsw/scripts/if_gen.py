@@ -775,7 +775,7 @@ class symMemInterface(_memInterface):
             case _:
                 raise ValueError(f"Unknown memory interface type: {self.type}")
 
-        self._signals = self._remove_duplicate_signals(self._signals)
+        self._signals = self._remove_duplicate_signals()
 
     def __set_mem_read_signals(
         self,
@@ -1848,7 +1848,10 @@ def create_interface(
     resp_w = widths.get("RESP_W", 2)
     len_w = widths.get("LEN_W", 8)
     # AXIStream
-    has_tlast = "tlast" in params
+    if params is None:
+        has_tlast = False
+    else:
+        has_tlast = "tlast" in params
     # AHB
     ahb_prot_w = widths.get("AHB_PROT_W", 4)
     ahb_burst_w = widths.get("AHB_BURST_W", 3)
@@ -1892,6 +1895,8 @@ def create_interface(
             has_arst = False
             has_rst = False
             has_en = False
+            if params is None:
+                params = ["c", "a"]
             for param in params:
                 if param == "c":
                     has_cke = True

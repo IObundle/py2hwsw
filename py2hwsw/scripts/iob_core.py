@@ -87,14 +87,14 @@ class iob_core(iob_module, iob_instance):
                    dictionary will override the one from the constructor argument.
         :param dict connect: External wires to connect to ports of this instance
                        Key: Port name, Value: Wire name
-        :param iob_core instantiator: Module that is instantiating this instance
+        :param iob_core issuer: Module that is instantiating this instance
         :param bool is_parent: If this core is a parent core
         """
         # Arguments used by this class
         dest_dir = kwargs.get("dest_dir", "hardware/src")
         attributes = kwargs.get("attributes", {})
         connect = kwargs.get("connect", {})
-        self.instantiator = kwargs.get("instantiator", None)
+        self.issuer = kwargs.get("issuer", None)
         self.is_parent = kwargs.get("is_parent", False)
 
         # Store kwargs to allow access to python parameters after object has been created
@@ -258,8 +258,8 @@ class iob_core(iob_module, iob_instance):
         # Note: Parsing attributes (specifically the subblocks list) also initializes subblocks
         self.parse_attributes_dict(attributes)
 
-        # Connect ports of this instance to external wires (wires of the instantiator)
-        self.connect_instance_ports(connect, self.instantiator)
+        # Connect ports of this instance to external wires (wires of the issuer)
+        self.connect_instance_ports(connect, self.issuer)
 
         # iob_csrs specific code
         if self.is_system:
@@ -287,8 +287,8 @@ class iob_core(iob_module, iob_instance):
         if self.is_top_module or self.is_superblock:
             self.parse_attributes_dict({"superblocks": superblocks})
         if self.is_superblock:
-            # Generate verilog parameters of instantiator subblock
-            param_gen.generate_inst_params(self.instantiator)
+            # Generate verilog parameters of issuer subblock
+            param_gen.generate_inst_params(self.issuer)
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
@@ -388,7 +388,7 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("core_name", None)
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
-        filtered_parent_py_params.pop("instantiator", None)
+        filtered_parent_py_params.pop("issuer", None)
         filtered_parent_py_params.pop("py2hwsw_version", None)
         filtered_parent_py_params.pop("connect", None)
         filtered_parent_py_params.pop("parameters", None)
@@ -405,7 +405,7 @@ class iob_core(iob_module, iob_instance):
             **filtered_parent_py_params,
             is_parent=True,
             child_attributes=attributes,
-            instantiator=kwargs.get("instantiator", None),
+            issuer=kwargs.get("issuer", None),
             connect=kwargs.get("connect", {}),
             parameters=kwargs.get("parameters", {}),
             is_superblock=kwargs.get("is_superblock", False),
@@ -435,8 +435,8 @@ class iob_core(iob_module, iob_instance):
         # subblock setup process
         for subblock in self.subblocks:
             if self.is_superblock:
-                if subblock.original_name == self.instantiator.original_name:
-                    # skip build dir generation for instantiator subblocks
+                if subblock.original_name == self.issuer.original_name:
+                    # skip build dir generation for issuer subblocks
                     continue
             subblock.generate_build_dir()
 
@@ -593,35 +593,35 @@ class iob_core(iob_module, iob_instance):
                         f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
                     ]
 
-    def __connect_memory(self, port, instantiator):
+    def __connect_memory(self, port, issuer):
         """Create memory port in instantiatior and connect it to self"""
-        if not instantiator.generate_hw or not self.instantiate:
+        if not issuer.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
         _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
         _signals.update(port.interface.widths)
         if _signals["prefix"] == "":
             _signals.update({"prefix": f"{_name}_"})
-        instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
+        issuer.create_port(name=_name, signals=_signals, descr=port.descr)
         # Add port also to attributes_dict
-        instantiator.attributes_dict["ports"].append(
+        issuer.attributes_dict["ports"].append(
             {
                 "name": _name,
                 "signals": _signals,
                 "descr": port.descr,
             }
         )
-        _port = find_obj_in_list(instantiator.ports + instantiator.wires, _name)
+        _port = find_obj_in_list(issuer.ports + issuer.wires, _name)
         port.connect_external(_port, bit_slices=[])
 
-    def __connect_clk_interface(self, port, instantiator):
-        """Create, if needed, a clock interface port in instantiator and connect it to self"""
-        if not instantiator.generate_hw or not self.instantiate:
+    def __connect_clk_interface(self, port, issuer):
+        """Create, if needed, a clock interface port in issuer and connect it to self"""
+        if not issuer.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
         _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
         _signals.update(port.interface.widths)
-        for p in instantiator.ports:
+        for p in issuer.ports:
             if p.interface:
                 if (
                     p.interface.type == port.interface.type
@@ -638,24 +638,24 @@ class iob_core(iob_module, iob_instance):
                         p.__post_init__()
                     port.connect_external(p, bit_slices=[])
                     return
-        instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
-        _port = find_obj_in_list(instantiator.ports, _name)
+        issuer.create_port(name=_name, signals=_signals, descr=port.descr)
+        _port = find_obj_in_list(issuer.ports, _name)
         port.connect_external(_port, bit_slices=[])
 
-    def connect_instance_ports(self, connect, instantiator):
+    def connect_instance_ports(self, connect, issuer):
         """
         param connect: External wires to connect to ports of this instance
                        Key: Port name, Value: Wire name or tuple with wire name and signal bit slices
                        Tuple has format:
                        (wire_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
-        param instantiator: Module that is instantiating this instance
+        param issuer: Module that is instantiating this instance
         """
         # Connect instance ports to external wires
         for port_name, connection_value in connect.items():
             port = find_obj_in_list(self.ports, port_name)
             if not port:
                 fail_with_msg(
-                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!\n"
+                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{issuer.name}'!\n"
                     f"Available ports:\n- "
                     + "\n- ".join([port.name for port in self.ports])
                 )
@@ -677,56 +677,56 @@ class iob_core(iob_module, iob_instance):
                 wire = wire_name
             else:
                 wire = find_obj_in_list(
-                    instantiator.wires, wire_name
-                ) or find_obj_in_list(instantiator.ports, wire_name)
+                    issuer.wires, wire_name
+                ) or find_obj_in_list(issuer.ports, wire_name)
                 if not wire:
-                    debug(f"Creating implicit wire '{port.name}' in '{instantiator.name}'.", 1)
-                    # Add wire to instantiator
+                    debug(f"Creating implicit wire '{port.name}' in '{issuer.name}'.", 1)
+                    # Add wire to issuer
                     wire_signals = remove_signal_direction_suffixes(port.signals)
-                    instantiator.create_wire(name=wire_name, signals=wire_signals, descr=port.descr)
+                    issuer.create_wire(name=wire_name, signals=wire_signals, descr=port.descr)
                     # Add wire to attributes_dict as well
-                    instantiator.attributes_dict["wires"].append(
+                    issuer.attributes_dict["wires"].append(
                         {
                             "name": wire_name,
                             "signals": wire_signals,
                             "descr": port.descr,
                         }
                     )
-                    wire = instantiator.wires[-1]
+                    wire = issuer.wires[-1]
             port.connect_external(wire, bit_slices=bit_slices)
         for port in self.ports:
             if not port.e_connect and port.interface:
                 if (
                     port.interface.type in mem_if_names
-                    and instantiator
+                    and issuer
                     and not self.is_tester
                 ):
-                    # print(f"DEBUG: Creating port '{port.name}' in '{instantiator.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
-                    self.__connect_memory(port, instantiator)
+                    # print(f"DEBUG: Creating port '{port.name}' in '{issuer.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
+                    self.__connect_memory(port, issuer)
                 elif (
                     port.interface.type == "iob_clk"
-                    and instantiator
+                    and issuer
                     and not self.is_tester
                 ):
-                    self.__connect_clk_interface(port, instantiator)
+                    self.__connect_clk_interface(port, issuer)
 
         # iob_csrs specific code
-        if self.original_name == "iob_csrs" and instantiator:
-            self.__connect_cbus_port(instantiator)
+        if self.original_name == "iob_csrs" and issuer:
+            self.__connect_cbus_port(issuer)
 
-    def __connect_cbus_port(self, instantiator):
-        """Automatically adds "<prefix>_cbus_s" port to instantiators of iob_csrs (are usually iob_system peripherals).
+    def __connect_cbus_port(self, issuer):
+        """Automatically adds "<prefix>_cbus_s" port to issuers of iob_csrs (are usually iob_system peripherals).
         The '<prefix>' is replaced by instance name of iob_csrs subblock.
-        Also, connects the newly created instantiator port to the iob_csrs `control_if_s` port.
-        :param instantiator: Instantiator core object
+        Also, connects the newly created issuer port to the iob_csrs `control_if_s` port.
+        :param issuer: issuer core object
         """
         assert (
             self.original_name == "iob_csrs"
-        ), "Internal error: cbus can only be created for instantiator of 'iob_csrs' module."
-        # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of instantiator
+        ), "Internal error: cbus can only be created for issuer of 'iob_csrs' module."
+        # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of issuer
         csrs_port = find_obj_in_list(self.ports, "control_if_s")
 
-        instantiator.create_port(
+        issuer.create_port(
             name=f"{self.instance_name}_cbus_s",
             signals={
                 "type": csrs_port.interface.type,
@@ -736,10 +736,10 @@ class iob_core(iob_module, iob_instance):
             descr="Control and Status Registers interface (auto-generated)",
         )
         # Connect newly created port to self
-        csrs_port.connect_external(instantiator.ports[-1], bit_slices=[])
+        csrs_port.connect_external(issuer.ports[-1], bit_slices=[])
 
-        # Add port to instantiator's attributes_dict
-        instantiator.attributes_dict["ports"].append(
+        # Add port to issuer's attributes_dict
+        issuer.attributes_dict["ports"].append(
             {
                 "name": f"{self.instance_name}_cbus_s",
                 "signals": {
@@ -875,7 +875,7 @@ class iob_core(iob_module, iob_instance):
             return cls(attributes=core_dict, **kwargs)
         except Exception:
             add_traceback_msg(f"Failed to setup core '{core_dict['name']}'.")
-            if "instantiator" in kwargs and kwargs["instantiator"]:
+            if "issuer" in kwargs and kwargs["issuer"]:
                 raise
             exit(1)
 
@@ -1001,7 +1001,7 @@ class iob_core(iob_module, iob_instance):
                 os.path.join(core_dir, f"{core_name}.py"),
             )
             core_module = sys.modules[core_name]
-            instantiator = kwargs.pop("instantiator", None)
+            issuer = kwargs.pop("issuer", None)
             # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
             # obtain the core's py2hwsw dictionary.
             # Give it a dictionary with all arguments of this function, since the user
@@ -1011,8 +1011,8 @@ class iob_core(iob_module, iob_instance):
                     # "core_name": core_name,
                     "build_dir": __class__.global_build_dir,
                     "py2hwsw_target": __class__.global_special_target or "setup",
-                    "instantiator": (
-                        instantiator.attributes_dict if instantiator else ""
+                    "issuer": (
+                        issuer.attributes_dict if issuer else ""
                     ),
                     "py2hwsw_version": PY2HWSW_VERSION,
                     **kwargs,
@@ -1026,7 +1026,7 @@ class iob_core(iob_module, iob_instance):
             py2_core_dict.update(core_dict)
             instance = __class__.py2hw(
                 py2_core_dict,
-                instantiator=instantiator,
+                issuer=issuer,
                 # Note, any of the arguments below can have their values overridden by
                 # the py2_core_dict
                 **kwargs,

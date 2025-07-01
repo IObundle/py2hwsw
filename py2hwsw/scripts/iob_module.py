@@ -160,8 +160,8 @@ class iob_module(iob_base):
 
     def create_subblock(self, *args, **kwargs):
         if self.is_superblock:
-            # Remove instantiator subblock to ensure that it is not setup again
-            if self.handle_instantiator_subblock(*args, **kwargs):
+            # Remove issuer subblock to ensure that it is not setup again
+            if self.handle_issuer_subblock(*args, **kwargs):
                 return
         create_block(self, *args, **kwargs)
 
@@ -176,39 +176,39 @@ class iob_module(iob_base):
         if not __class__.global_top_module:
             __class__.global_top_module = self
 
-    def handle_instantiator_subblock(self, *args, **kwargs):
-        """If given kwargs describes the instantiator subblock, return True. Otherwise return False.
-        Also append instantiator object found to the core's 'subblocks' list.
+    def handle_issuer_subblock(self, *args, **kwargs):
+        """If given kwargs describes the issuer subblock, return True. Otherwise return False.
+        Also append issuer object found to the core's 'subblocks' list.
         """
-        instantiator = self.instantiator
-        if kwargs.get("core_name") == instantiator.original_name:
-            self.update_instantiator_obj(instantiator, kwargs)
+        issuer = self.issuer
+        if kwargs.get("core_name") == issuer.original_name:
+            self.update_issuer_obj(issuer, kwargs)
             return True
         else:
             return False
 
-    def update_instantiator_obj(self, instantiator_obj, instance_dict):
-        """Update given instantiator object with values for verilog parameters and external port connections.
-        Also, add instantiator object to the 'subblocks' list of this superblock.
-        :param instantiator_obj: Instantiator object
+    def update_issuer_obj(self, issuer_obj, instance_dict):
+        """Update given issuer object with values for verilog parameters and external port connections.
+        Also, add issuer object to the 'subblocks' list of this superblock.
+        :param issuer_obj: issuer object
         :param instance_dict: Dictionary describing verilog instance. Includes port connections and verilog parameter values.
         """
-        new_instance = copy.deepcopy(instantiator_obj)
-        new_instance.instantiate = True
+        new_issuer_instance = copy.deepcopy(issuer_obj)
+        new_issuer_instance.instantiate = True
         # Set instance name
         if "instance_name" in instance_dict:
-            new_instance.instance_name = instance_dict["instance_name"]
+            new_issuer_instance.instance_name = instance_dict["instance_name"]
         # Set instance description
         if "instance_description" in instance_dict:
-            new_instance.instance_description = instance_dict[
+            new_issuer_instance.instance_description = instance_dict[
                 "instance_description"
             ]
         # Set values to pass via verilog parameters
-        new_instance.parameters = instance_dict.get("parameters", {})
-        # Connect ports of instantiator to external wires (wires of this superblock)
-        new_instance.connect_instance_ports(instance_dict.get("connect", {}), self)
-        # Create a instantiator subblock, and add it to the 'subblocks' list of current superblock
-        self.subblocks.append(new_instance)
+        new_issuer_instance.parameters = instance_dict.get("parameters", {})
+        # Connect ports of issuer to external wires (wires of this superblock)
+        new_issuer_instance.connect_instance_ports(instance_dict.get("connect", {}), self)
+        # Create a issuer subblock, and add it to the 'subblocks' list of current superblock
+        self.subblocks.append(new_issuer_instance)
 
 
 def get_list_attr_handler(func):

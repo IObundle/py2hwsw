@@ -297,7 +297,7 @@ class _interface:
     # Prefix for "Verilog snippets" of portmaps of this interface:
     portmap_port_prefix: str = ""
     # List of signals for this interface (Internal, used for generation)
-    _signals: list = []
+    _signals: list = field(default_factory=list)
 
     def __post_init__(self):
         if not self.file_prefix:

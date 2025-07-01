@@ -282,11 +282,12 @@ if_types = [
 ]
 
 
-
 @dataclass
 class _Interface:
     """Class to represent an interface for generation"""
 
+    # Interface direction. Examples: '' (unspecified), 'manager', 'subordinate', ...
+    if_direction: str = ""
     # Prefix for signals of the interface
     prefix: str = ""
     # Width multiplier. Used when concatenating multiple instances of the interface.
@@ -298,33 +299,261 @@ class _Interface:
     # List of signals for this interface (Internal, used for generation)
     _signals: list = []
 
-
     def __post_init__(self):
         if not self.file_prefix:
             self.file_prefix = self.portmap_port_prefix + self.prefix
 
+    def __get_if_name(self):
+        """Get the name of the interface."""
+        if isinstance(self, IobClkInterface):
+            return "iob_clk"
+        elif isinstance(self, IobInterface):
+            return "iob"
+        elif isinstance(self, _MemInterface):
+            return self.type
+        elif isinstance(self, AXIStreamInterface):
+            return "axis"
+        elif isinstance(self, AXILiteInterface):
+            if self.has_read_if and self.has_write_if:
+                return "axil"
+            elif self.has_read_if:
+                return "axil_read"
+            elif self.has_write_if:
+                return "axil_write"
+        elif isinstance(self, AXIInterface):
+            if self.has_read_if and self.has_write_if:
+                return "axi"
+            elif self.has_read_if:
+                return "axi_read"
+            elif self.has_write_if:
+                return "axi_write"
+        elif isinstance(self, APBInterface):
+            return "apb"
+        elif isinstance(self, AHBInterface):
+            return "ahb"
+        elif isinstance(self, RS232Interface):
+            return "rs232"
+        elif isinstance(self, WishboneInterface):
+            if self.is_full:
+                return "wb_full"
+            else:
+                return "wb"
+        else:
+            print(f"ERROR: __get_if_name: unknown interface type {type(self)}.")
+            exit(1)
+
+    #
+    # Signal manipulation private methods
+    #
+    def __reverse_name_direction(name):
+        """Reverse the direction of a signal name."""
+        if name.endswith("_i"):
+            return name[:-2] + "_o"
+        elif name.endswith("_o"):
+            return name[:-2] + "_i"
+        elif name.endswith("_io"):
+            return name
+        else:
+            print(f"ERROR: __reverse_name_direction: invalid argument {name}.")
+            exit(1)
+
+    def __reverse_direction(direction):
+        """Reverse the direction of a signal."""
+        if direction == "input":
+            return "output"
+        elif direction == "output":
+            return "input"
+        else:
+            print(f"ERROR: __reverse_direction: invalid argument {direction}.")
+            exit(1)
+
+    def __reverse_signals_dir(self, signals):
+        """Reverse the direction of all signals in a list."""
+        new_signals = deepcopy(signals)
+        for signal in new_signals:
+            signal.direction = self.__reverse_direction(signal.direction)
+            signal.name = self.__reverse_name_direction(signal.name)
+        return new_signals
+
+    def __get_tbsignal_type(direction):
+        """Get the type of a signal for the testbench."""
+        if direction == "input":
+            return "wire"
+        elif direction == "output":
+            return "reg"
+        else:
+            print(f"ERROR: __get_tbsignal_type: invalid argument {direction}.")
+            exit(1)
+
+    def __get_suffix(direction):
+        """Get the suffix for a signal based on its direction."""
+        if direction == "input":
+            return "_i"
+        elif direction == "output":
+            return "_o"
+        elif direction == "inout":
+            return "_io"
+        else:
+            print(f"ERROR: __get_suffix: invalid argument {direction}.")
+            exit(1)
+
+    #
+    # Signal generation private methods
+    #
+    def __write_single_wire(self, fout, wire, for_tb):
+        """Write a single wire to the file."""
+        if isinstance(wire, iob_signal_reference):
+            return
+        wire_name = self.prefix + wire.name
+        # Remove suffix from wire name if it is already present
+        suffix = self.__get_suffix(wire.direction)
+        if wire_name.endswith(suffix):
+            wire_name = wire_name[: -len(suffix)]
+        wtype = "wire"
+        # If this is a testbench wire, add the suffix and change the type
+        if for_tb:
+            wire_name = wire_name + self.__get_suffix(
+                self.__reverse_direction(wire.direction)
+            )
+            wtype = self.__get_tbsignal_type(wire.direction)
+        # If this is a variable wire, change the type to reg
+        if wire.isvar:
+            wtype = "reg"
+        # Write the wire to the file
+        width_str = f" [{wire.width}-1:0] "
+        fout.write(wtype + width_str + wire_name + ";\n")
+
+    def __write_wires(self, fout):
+        """Write wires to the file."""
+        for wire in self.get_signals():
+            self.__write_single_wire(fout, wire, False)
+
+    def __write_tb_wires(self, fout):
+        """Write testbench wires to the file."""
+        for wire in self.get_signals():
+            self.__write_single_wire(fout, wire, True)
+
+    def __write_m_tb_wires(self, fout):
+        """Write master testbench wires to the file."""
+        self.__write_tb_wires(fout)
+
+    def __write_s_tb_wires(self, fout):
+        """Write slave testbench wires to the file."""
+        self.__write_m_tb_wires(fout)
+
+    #
+    # Port
+    #
+    def __write_single_port(self, fout, port):
+        """Write a single port to the file."""
+        direction = port.direction
+        name = self.prefix + port.name
+        width_str = f" [{port.width}-1:0] "
+        fout.write(direction + width_str + name + "," + "\n")
+
+    def __write_m_port(self, fout):
+        """Write master ports to the file."""
+        for port in self.get_signals():
+            self.__write_single_port(fout)
+
+    def __write_s_port(self, fout, port_list):
+        """Write slave ports to the file."""
+        self.__write_m_port(fout)
+
+    #
+    # Portmap
+    #
+    def __write_single_portmap(self, fout, port, connect_to_port):
+        """Write a single portmap to the file."""
+        port_name = self.portmap_port_prefix + port.name
+        wire_name = self.prefix + port.name
+        # Remove suffix from wire name if it is present
+        if not connect_to_port:
+            suffix = self.__get_suffix(port.direction)
+            if wire_name.endswith(suffix):
+                wire_name = wire_name[: -len(suffix)]
+
+        fout.write(f".{port_name}({wire_name}),\n")
+
+    def __write_m_portmap(self, fout):
+        for port in self.get_signals():
+            self.__write_single_portmap(fout, port, False)
+
+    def __write_s_portmap(self, fout):
+        self.__write_m_portmap(fout)
+
+    def __write_m_m_portmap(self, fout):
+        for port in self.get_signals():
+            self.__write_single_portmap(fout, port, True)
+
+    def __write_s_s_portmap(self, fout):
+        self.__write_m_m_portmap(fout)
 
     def get_signals(self):
-        return self._signals
+        """Get the signals of the interface."""
+        signals = deepcopy(self._signals)
+        # Set direction according to if_direction
+        if self.if_direction == "subordinate":
+            signals = self.__reverse_signals_dir(signals)
+
+        if self.mult != 1:
+            for signal in signals:
+                signal.width = f"({self.mult}*{signal.width})"
+
+        for signal in signals:
+            signal.name = self.prefix + signal.name
+
+        return signals
+
+    def gen_wires_vs_file(self):
+        """Generate wires snippet for given interface"""
+        file_name = self.__get_if_name()
+        file_prefix = self.file_prefix
+
+        fout = open(file_prefix + file_name + "_wire.vs", "w")
+        self.__write_wires(fout)
+        fout.close()
+
+    def gen_all_vs_files(self):
+        """Generate verilog snippets for all possible subtypes of a given interface"""
+        name = self.__get_if_name()
+        file_prefix = self.file_prefix
+
+        for if_type in if_types:
+            temp_interface = deepcopy(self)
+            fout = open(file_prefix + name + "_" + if_type + ".vs", "w")
+
+            # get ports
+            if if_type.startswith("s"):
+                temp_interface.if_direction = "subordinate"
+            else:
+                temp_interface.if_direction = "manager"
+
+            if "portmap" in if_type:
+                eval_str = f"self.__write_{if_type}(fout)"
+            else:
+                eval_str = f"self.__write_{if_type}(fout)"
+            eval(eval_str)
+            fout.close()
 
 
 #
 # IOb
 #
 
+
 @dataclass
 class IobClkInterface(_Interface):
     """Class to represent an IOb clock interface for generation"""
+
     has_cke: bool = True
     has_arst: bool = True
     has_rst: bool = False
     has_en: bool = False
 
-
     def __post_init__(self):
         super().__post_init__()
         self.__set_signals()
-
 
     def __set_signals(self):
         """Set signals for the IOb clock interface."""
@@ -337,11 +566,17 @@ class IobClkInterface(_Interface):
             self._signals.append(iob_signal(name="cke_o", descr="Clock enable"))
         if self.has_arst:
             if arst_polarity == "positive":
-                self._signals.append(iob_signal(name="arst_o", descr="Asynchronous active-high reset"))
+                self._signals.append(
+                    iob_signal(name="arst_o", descr="Asynchronous active-high reset")
+                )
             else:
-                self._signals.append(iob_signal(name="arst_n_o", descr="Asynchronous active-low reset"))
+                self._signals.append(
+                    iob_signal(name="arst_n_o", descr="Asynchronous active-low reset")
+                )
         if self.has_rst:
-            self._signals.append(iob_signal(name="rst_o", descr="Synchronous active-high reset"))
+            self._signals.append(
+                iob_signal(name="rst_o", descr="Synchronous active-high reset")
+            )
         if self.has_en:
             self._signals.append(iob_signal(name="en_o", descr="Enable"))
 
@@ -355,11 +590,9 @@ class IobInterface(_Interface):
     # Only address width is configurable, data width is fixed
     addr_w: str or int = 32
 
-
     def __post_init__(self):
         super.post__init__()
         self.__set_signals()
-
 
     def __set_signals(self):
         """Set signals for the IOb interface."""
@@ -390,6 +623,7 @@ class IobInterface(_Interface):
 # SE: Single enable for entire data word
 # Xil: Xilinx IP implementation
 
+
 @dataclass
 class _MemInterface(_Interface):
     """Class to represent a memory interface for generation"""
@@ -400,7 +634,6 @@ class _MemInterface(_Interface):
     _is_async: bool = False
     # Memory type
     type: str = "ram_sp"
-
 
     def _set_mem_signals(
         self, suffix: str, has_addr: bool = True, has_enable: bool = True
@@ -426,14 +659,13 @@ class _MemInterface(_Interface):
                 iob_signal(name="en" + suffix + "_o", descr=f"Enable port {suffix}")
             )
 
-
     def _remove_duplicate_signals(self):
         """Remove duplicate signals from the interface."""
         result = []
         for signal in self._signals:
             if signal not in result:
                 result.append(signal)
-        
+
         self._signals = result
 
 
@@ -444,11 +676,9 @@ class SymMemInterface(_MemInterface):
     # Data width for the memory interface
     data_w: int = 32
 
-
     def __post_init__(self):
         super().__post_init__()
         self.__set_signals()
-
 
     def __set_signals(self):
         """Set signals for the symmetric memory interface based on the memory type."""
@@ -457,15 +687,23 @@ class SymMemInterface(_MemInterface):
         match self.type:
             case "rom_2p":
                 self._set_mem_signals("", has_addr=False, has_enable=False)
-                self.__set_mem_read_signals("a", has_enable=True, has_ready=True, has_addr=True)
-                self.__set_mem_read_signals("b", has_enable=True, has_ready=True, has_addr=True)
+                self.__set_mem_read_signals(
+                    "a", has_enable=True, has_ready=True, has_addr=True
+                )
+                self.__set_mem_read_signals(
+                    "b", has_enable=True, has_ready=True, has_addr=True
+                )
             case "rom_sp":
                 self._set_mem_signals("")
                 self.__set_mem_read_signals("")
             case "rom_tdp":
                 self._set_mem_signals("", has_enable=False, has_addr=False)
-                self.__set_mem_read_signals("a", has_enable=True, has_addr=True, is_true_port=True)
-                self.__set_mem_read_signals("b", hasEnable=True, has_addr=True, is_true_port=True)
+                self.__set_mem_read_signals(
+                    "a", has_enable=True, has_addr=True, is_true_port=True
+                )
+                self.__set_mem_read_signals(
+                    "b", hasEnable=True, has_addr=True, is_true_port=True
+                )
             case "rom_atdp":
                 self._is_async = True
                 self._set_mem_signals("a")
@@ -474,7 +712,9 @@ class SymMemInterface(_MemInterface):
                 self.__set_mem_read_signals("b", is_true_port=True)
             case "ram_2p":
                 self._set_mem_signals("", has_addr=False, has_enable=False)
-                self.__set_mem_read_signals("", hasEnable=True, has_ready=True, has_addr=True)
+                self.__set_mem_read_signals(
+                    "", hasEnable=True, has_ready=True, has_addr=True
+                )
                 self.__set_mem_write_signals("", has_ready=True, has_addr=True)
             case "ram_at2p":
                 self._is_async = True
@@ -537,7 +777,6 @@ class SymMemInterface(_MemInterface):
 
         self._signals = self._remove_duplicate_signals(self._signals)
 
-
     def __set_mem_read_signals(
         self,
         suffix: str = "",
@@ -578,7 +817,6 @@ class SymMemInterface(_MemInterface):
                     name="r_ready" + suffix + "_i", descr=f"Read ready port {suffix}"
                 )
             )
-
 
     def __set_mem_write_signals(
         self,
@@ -643,10 +881,9 @@ class AsymMemInterface(_MemInterface):
     __block_addr_w: int = field(init=False, default=32)
     __data_ratio: int = field(init=False)
 
-
     def __post_init__(self):
         super().__post_init__()
-        
+
         max_data_w = max(self.w_data_w, self.r_data_w)
         min_data_w = min(self.w_data_w, self.r_data_w)
 
@@ -654,7 +891,9 @@ class AsymMemInterface(_MemInterface):
 
         # Check if data widths are a multiple of each other and the ratio is a power of two
         if max_data_w % min_data_w != 0 or ratio & (ratio - 1) != 0:
-            raise ValueError("Data widths must be a multiple of each other and the ratio must be a power of two.")
+            raise ValueError(
+                "Data widths must be a multiple of each other and the ratio must be a power of two."
+            )
 
         if ratio <= 1:
             raise ValueError("Data widths must be different.")
@@ -666,19 +905,26 @@ class AsymMemInterface(_MemInterface):
 
         self.__set_signals()
 
-
     def __set_signals(self):
         """Set signals for the asymmetric memory interface based on the memory type."""
 
         match self.type:
             case "rom_2p":
                 self._set_mem_signals("", has_addr=False, has_enable=False)
-                self.__set_mem_read_signals("a", has_enable=True, has_ready=True, has_addr=True)
-                self.__set_mem_read_signals("b", has_enable=True, has_ready=True, has_addr=True)
+                self.__set_mem_read_signals(
+                    "a", has_enable=True, has_ready=True, has_addr=True
+                )
+                self.__set_mem_read_signals(
+                    "b", has_enable=True, has_ready=True, has_addr=True
+                )
             case "rom_tdp":
                 self._set_mem_signals("", has_enable=False, has_addr=False)
-                self.__set_mem_read_signals("a", has_enable=True, has_addr=True, is_true_port=True)
-                self.__set_mem_read_signals("b", hasEnable=True, has_addr=True, is_true_port=True)
+                self.__set_mem_read_signals(
+                    "a", has_enable=True, has_addr=True, is_true_port=True
+                )
+                self.__set_mem_read_signals(
+                    "b", hasEnable=True, has_addr=True, is_true_port=True
+                )
             case "rom_atdp":
                 self._is_async = True
                 self._set_mem_signals("a")
@@ -687,7 +933,9 @@ class AsymMemInterface(_MemInterface):
                 self.__set_mem_read_signals("b", is_true_port=True)
             case "ram_2p":
                 self._set_mem_signals("", has_addr=False, has_enable=False)
-                self.__set_mem_read_signals("", hasEnable=True, has_ready=True, has_addr=True)
+                self.__set_mem_read_signals(
+                    "", hasEnable=True, has_ready=True, has_addr=True
+                )
                 self.__set_mem_write_signals("", has_ready=True, has_addr=True)
             case "ram_at2p":
                 self._is_async = True
@@ -719,7 +967,6 @@ class AsymMemInterface(_MemInterface):
 
         self._signals = self._remove_duplicate_signals(self._signals)
 
-
     def __set_mem_read_signals(
         self,
         suffix: str = "",
@@ -738,7 +985,7 @@ class AsymMemInterface(_MemInterface):
                 iob_signal(
                     name="r_en" + suffix + "_o",
                     width=self.__data_ratio,
-                    descr=f"Read enable port {suffix}"
+                    descr=f"Read enable port {suffix}",
                 )
             )
         if has_addr:
@@ -763,7 +1010,6 @@ class AsymMemInterface(_MemInterface):
                 )
             )
 
-
     def __set_mem_write_signals(
         self,
         suffix: str = "",
@@ -779,8 +1025,8 @@ class AsymMemInterface(_MemInterface):
         self._signals.append(
             iob_signal(
                 name="w_en" + suffix + "_o",
-                width=self.__data_ratio, 
-                descr=f"Write enable port {suffix}"
+                width=self.__data_ratio,
+                descr=f"Write enable port {suffix}",
             )
         )
         if has_addr:
@@ -805,9 +1051,11 @@ class AsymMemInterface(_MemInterface):
                 )
             )
 
+
 #
 # AXI interfaces
 #
+
 
 @dataclass
 class AXIStreamInterface(_Interface):
@@ -818,11 +1066,9 @@ class AXIStreamInterface(_Interface):
     # Signal to indicate if the interface has a last signal
     has_tlast: bool = False
 
-
     def __post_init__(self):
         super().__post_init__()
         self.__set_signals()
-
 
     def __set_signals(self):
         """Set signals for the AXI-Stream interface."""
@@ -867,11 +1113,9 @@ class AXILiteInterface(_Interface):
     has_write_if: bool = True
     has_prot: bool = True
 
-
     def __post_init__(self):
         super().__post_init__()
         self.__set_signals()
-
 
     def __set_signals(self):
         """Set signals for the AXI-Lite interface."""
@@ -880,7 +1124,6 @@ class AXILiteInterface(_Interface):
             self.__set_write_signals()
         if self.has_write_if:
             self.__set_read_signals()
-
 
     def __set_write_signals(self):
         """Set write signals for the AXI-Lite interface."""
@@ -940,7 +1183,6 @@ class AXILiteInterface(_Interface):
                 descr="AXI-Lite write response channel ready.",
             ),
         ]
-
 
     def __set_read_signals(self):
         """Set read signals for the AXI-Lite interface."""
@@ -1229,9 +1471,11 @@ class AXIInterface(_Interface):
             ),
         ]
 
+
 #
 # APB interfaces
 #
+
 
 @dataclass
 class APBInterface(_Interface):
@@ -1242,11 +1486,9 @@ class APBInterface(_Interface):
     # Address width for the APB interface
     addr_w: int = 32
 
-
     def __post_init__(self):
         super().__post_init__()
         self.__set_signals()
-
 
     def __set_signals(self):
         """Set signals for the APB interface."""
@@ -1288,6 +1530,7 @@ class APBInterface(_Interface):
                 descr="APB ready. Indicates the end of a transfer.",
             ),
         ]
+
 
 @dataclass
 class AHBInterface(_Interface):
@@ -1372,9 +1615,11 @@ class AHBInterface(_Interface):
             ),
         ]
 
+
 #
 # RS232
 #
+
 
 @dataclass
 class RS232Interface(_Interface):
@@ -1382,7 +1627,6 @@ class RS232Interface(_Interface):
 
     # Number of pins for the RS232 interface
     n_pins: int = 4
-
 
     def __post_init__(self):
         super().__post_init__()
@@ -1454,9 +1698,11 @@ class RS232Interface(_Interface):
                 ),
             ]
 
+
 #
 # Wishbone
 #
+
 
 @dataclass
 class WishboneInterface(_Interface):
@@ -1473,7 +1719,6 @@ class WishboneInterface(_Interface):
         super().__post_init__()
         self.__set_signals()
 
-        
     def __set_signals(self):
         """Set signals for the Wishbone interface."""
         self._signals += [
@@ -1556,266 +1801,324 @@ class WishboneInterface(_Interface):
             ]
 
 
-
-#
-# Handle signal direction
-#
-
-# reverse direction in name's suffix
-def reverse_name_direction(name):
-    if name.endswith("_i"):
-        return name[:-2] + "_o"
-    elif name.endswith("_o"):
-        return name[:-2] + "_i"
-    elif name.endswith("_io"):
-        return name
-    else:
-        print(f"ERROR: reverse_name_direction: invalid argument {name}.")
-        exit(1)
-
-
-# reverse module signal direction
-def reverse_direction(direction):
-    if direction == "input":
-        return "output"
-    elif direction == "output":
-        return "input"
-    else:
-        print(f"ERROR: reverse_direction: invalid argument {direction}.")
-        exit(1)
-
-
-def reverse_signals_dir(signals):
-    new_signals = deepcopy(signals)
-    for signal in new_signals:
-        signal.direction = reverse_direction(signal.direction)
-        signal.name = reverse_name_direction(signal.name)
-    return new_signals
-
-
-# testbench signal direction
-def get_tbsignal_type(direction):
-    if direction == "input":
-        return "wire"
-    elif direction == "output":
-        return "reg"
-    else:
-        print(f"ERROR: reverse_direction: invalid argument {direction}.")
-        exit(1)
-
-
-# get suffix from direction
-def get_suffix(direction):
-    if direction == "input":
-        return "_i"
-    elif direction == "output":
-        return "_o"
-    elif direction == "inout":
-        return "_io"
-    else:
-        print(f"ERROR: reverse_direction: invalid argument {direction}.")
-        exit(1)
-
-
-#
-# Port
-#
-
-
-# Write single port with given bus width, and name to file
-def write_port(fout, prefix, port):
-    direction = port.direction
-    name = prefix + port.name
-    width_str = f" [{port.width}-1:0] "
-    fout.write(direction + width_str + name + "," + "\n")
-
-
-def write_m_port(fout, prefix, port_list):
-    for port in port_list:
-        write_port(fout, prefix, port)
-
-
-def write_s_port(fout, prefix, port_list):
-    write_m_port(fout, prefix, port_list)
-
-
-#
-# Portmap
-#
-
-
-# Generate portmap string for a single port but width and name
-def get_portmap_string(port_prefix, wire_prefix, port, connect_to_port):
-    port_name = port_prefix + port.name
-    wire_name = wire_prefix + port.name
-    if not connect_to_port:
-        suffix = get_suffix(port.direction)
-        if wire_name.endswith(suffix):
-            wire_name = wire_name[: -len(suffix)]
-    return f".{port_name}({wire_name}),\n"
-
-
-# Write single port with to file
-def write_portmap(fout, port_prefix, wire_prefix, port, connect_to_port):
-    portmap_string = get_portmap_string(
-        port_prefix,
-        wire_prefix,
-        port,
-        connect_to_port,
-    )
-    fout.write(portmap_string)
-
-
-def write_m_portmap(fout, port_prefix, wire_prefix, port_list):
-    for port in port_list:
-        write_portmap(fout, port_prefix, wire_prefix, port, False)
-
-
-def write_s_portmap(fout, port_prefix, wire_prefix, port_list):
-    write_m_portmap(fout, port_prefix, wire_prefix, port_list)
-
-
-def write_m_m_portmap(fout, port_prefix, wire_prefix, port_list):
-    for port in port_list:
-        write_portmap(fout, port_prefix, wire_prefix, port, True)
-
-
-def write_s_s_portmap(fout, port_prefix, wire_prefix, port_list):
-    write_m_m_portmap(fout, port_prefix, wire_prefix, port_list)
-
-
-#
-# Wire
-#
-
-
-# Write wire with given name, bus size, width to file
-def write_single_wire(fout, prefix, wire, for_tb):
-    if isinstance(wire, iob_signal_reference):
-        return
-    wire_name = prefix + wire.name
-    suffix = get_suffix(wire.direction)
-    if wire_name.endswith(suffix):
-        wire_name = wire_name[: -len(suffix)]
-    wtype = "wire"
-    if for_tb:
-        wire_name = wire_name + get_suffix(reverse_direction(wire.direction))
-        wtype = get_tbsignal_type(wire.direction)
-    if wire.isvar:
-        wtype = "reg"
-    width_str = f" [{wire.width}-1:0] "
-    fout.write(wtype + width_str + wire_name + ";\n")
-
-
-def write_wire(fout, prefix, wires):
-    for wire in wires:
-        write_single_wire(fout, prefix, wire, False)
-
-
-def write_tb_wire(fout, prefix, wires):
-    for wire in wires:
-        write_single_wire(fout, prefix, wire, True)
-
-
-def write_m_tb_wire(fout, prefix, wires):
-    write_tb_wire(fout, prefix, wires)
-
-
-def write_s_tb_wire(fout, prefix, wires):
-    write_m_tb_wire(fout, prefix, wires)
-
-
 #
 # GENERATE INTERFACES
 #
 
 
-def get_signals(name, if_type="", mult=1, widths={}, params=None, signal_prefix=""):
-    """Get list of signals for given interface
-    param if_type: Type of interface.
-                   Examples: '' (unspecified), 'manager', 'subordinate', ...
+def create_interface(
+    type,
+    if_direction="",
+    mult=1,
+    widths={},
+    params=None,
+    prefix="",
+    portmap_port_prefix="",
+    file_prefix="",
+):
+    """Creates an interface with the given type and parameters.
+    param type: Name of the interface.
+    param if_direction: Direction of the interface.
+                Examples: '' (unspecified), 'manager', 'subordinate', ...
     param mult: Multiplication factor for all signal widths.
     param widths: Dictionary for configuration of specific signal widths.
+    param params: Dictionary for configuration of specific parameters.
+    param prefix: Prefix to add to all signal names.
+    param portmap_port_prefix: Prefix to add to all portmap ports.
+    param file_prefix: Prefix to add to the file name.
+    return: An instance of the interface class.
+    Raises ValueError if the type is not recognized or if the widths are not of the correct.
     """
-    eval_str = "get_" + name + "_ports(params=params,widths=widths)"
-    # print(eval_str)
-    signals = eval(eval_str)
 
-    # Set direction according to if_type
-    if if_type == "subordinate":
-        signals = reverse_signals_dir(signals)
-    # TODO: Code to support other if_types
-    # For example, the rs232 has not type.
+    # Retrieve widths and parameters even if not needed
+    # IOb
+    data_w = widths.get("DATA_W", 32)
+    addr_w = widths.get("ADDR_W", 32)
+    # Memory
+    w_data_w = widths.get("W_DATA_W", 32)
+    r_data_w = widths.get("R_DATA_W", 32)
+    # AXI
+    id_w = widths.get("ID_W", 1)
+    size_w = widths.get("SIZE_W", 3)
+    burst_w = widths.get("BURST_W", 2)
+    lock_w = widths.get("LOCK_W", 2)
+    cache_w = widths.get("CACHE_W", 4)
+    prot_w = widths.get("PROT_W", 3)
+    qos_w = widths.get("QOS_W", 4)
+    resp_w = widths.get("RESP_W", 2)
+    len_w = widths.get("LEN_W", 8)
+    # AXIStream
+    has_tlast = "tlast" in params
+    # AHB
+    ahb_prot_w = widths.get("AHB_PROT_W", 4)
+    ahb_burst_w = widths.get("AHB_BURST_W", 3)
+    ahb_trans_w = widths.get("AHB_TRANS_W", 2)
+    ahb_size_w = widths.get("AHB_SIZE_W", 3)
+    # rs232
+    n_pins = widths.get("N_PINS", 4)
 
-    if mult != 1:
-        for signal in signals:
-            signal.width = f"({mult}*{signal.width})"
+    # Check if widths are integers
+    if not isinstance(data_w, int):
+        raise ValueError("DATA_W must be an integer.")
+    if not isinstance(addr_w, int) and not isinstance(addr_w, str):
+        raise ValueError("ADDR_W must be an integer or a string.")
+    if not isinstance(w_data_w, int):
+        raise ValueError("W_DATA_W must be an integer.")
+    if not isinstance(r_data_w, int):
+        raise ValueError("R_DATA_W must be an integer.")
+    if not isinstance(id_w, int):
+        raise ValueError("ID_W must be an integer.")
+    if not isinstance(size_w, int):
+        raise ValueError("SIZE_W must be an integer.")
+    if not isinstance(burst_w, int):
+        raise ValueError("BURST_W must be an integer.")
+    if not isinstance(lock_w, int):
+        raise ValueError("LOCK_W must be an integer.")
+    if not isinstance(cache_w, int):
+        raise ValueError("CACHE_W must be an integer.")
+    if not isinstance(prot_w, int):
+        raise ValueError("PROT_W must be an integer.")
+    if not isinstance(qos_w, int):
+        raise ValueError("QOS_W must be an integer.")
+    if not isinstance(resp_w, int):
+        raise ValueError("RESP_W must be an integer.")
+    if not isinstance(len_w, int):
+        raise ValueError("LEN_W must be an integer.")
 
-    for signal in signals:
-        signal.name = signal_prefix + signal.name
+    match type:
+        case "iob_clk":
+            # Check the params for the IOb clock interface
+            has_cke = False
+            has_arst = False
+            has_rst = False
+            has_en = False
+            for param in params:
+                if param == "c":
+                    has_cke = True
+                elif param == "a":
+                    has_arst = True
+                elif param == "r":
+                    has_rst = True
+                elif param == "e":
+                    has_en = True
+                else:
+                    raise ValueError(
+                        f"Unknown parameter '{param}' for IOb clock interface."
+                    )
 
-    return signals
-
-
-def gen_if(interface):
-    """Generate verilog snippets for all possible subtypes of a given interface"""
-    name = interface.type
-    file_prefix = interface.file_prefix
-    portmap_port_prefix = interface.portmap_port_prefix
-    prefix = interface.prefix
-    mult = interface.mult
-    params = interface.params
-    widths = interface.widths
-
-    #
-    # GENERATE SNIPPETS FOR ALL TYPES OF PORTS AND WIRES
-    #
-    for if_type in if_types:
-        fout = open(file_prefix + name + "_" + if_type + ".vs", "w")
-
-        # get prefixes
-        prefix1 = prefix
-        prefix2_str = ""
-        if "portmap" in if_type:
-            prefix1 = portmap_port_prefix
-            prefix2_str = " prefix,"
-
-        # get ports
-        if if_type.startswith("s"):
-            ports = get_signals(
-                name=name,
-                if_type="subordinate",
+            interface = IobClkInterface(
+                if_direction=if_direction,
+                prefix=prefix,
                 mult=mult,
-                widths=widths,
-                params=params,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                has_cke=has_cke,
+                has_arst=has_arst,
+                has_rst=has_rst,
+                has_en=has_en,
             )
-        else:
-            ports = get_signals(
-                name=name, if_type="manager", mult=mult, widths=widths, params=params
+        case "iob":
+            interface = IobInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
             )
+        case mem if mem in mem_if_names:
+            if "W_DATA_W" in widths and "R_DATA_W" in widths:
+                interface = AsymMemInterface(
+                    if_direction=if_direction,
+                    prefix=prefix,
+                    mult=mult,
+                    file_prefix=file_prefix,
+                    portmap_port_prefix=portmap_port_prefix,
+                    addr_w=widths.get("ADDR_W", 32),
+                    type=type,
+                    w_data_w=w_data_w,
+                    r_data_w=r_data_w,
+                )
+            else:
+                # Symmetric memory interface
+                interface = SymMemInterface(
+                    if_direction=if_direction,
+                    prefix=prefix,
+                    mult=mult,
+                    file_prefix=file_prefix,
+                    portmap_port_prefix=portmap_port_prefix,
+                    addr_w=addr_w,
+                    type=type,
+                    data_w=data_w,
+                )
+        case "axis":
+            interface = AXIStreamInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                has_tlast=has_tlast,
+            )
+        case "axil_read":
+            interface = AXILiteInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                prot_w=prot_w,
+                resp_w=resp_w,
+                has_write_if=False,
+                has_prot="PROT_W" in widths,
+            )
+        case "axil_write":
+            interface = AXIInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                prot_w=prot_w,
+                resp_w=resp_w,
+                has_read_if=False,
+                has_prot="PROT_W" in widths,
+            )
+        case "axil":
+            interface = AXILiteInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                prot_w=prot_w,
+                resp_w=resp_w,
+            )
+        case "axi_read":
+            interface = AXIInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                id_w=id_w,
+                size_w=size_w,
+                burst_w=burst_w,
+                lock_w=lock_w,
+                cache_w=cache_w,
+                prot_w=prot_w,
+                qos_w=qos_w,
+                resp_w=resp_w,
+                len_w=len_w,
+                has_write_if=False,
+            )
+        case "axi_write":
+            interface = AXIInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                id_w=id_w,
+                size_w=size_w,
+                burst_w=burst_w,
+                lock_w=lock_w,
+                cache_w=cache_w,
+                prot_w=prot_w,
+                qos_w=qos_w,
+                resp_w=resp_w,
+                len_w=len_w,
+                has_read_if=False,
+            )
+        case "axi":
+            interface = AXIInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                id_w=id_w,
+                size_w=size_w,
+                burst_w=burst_w,
+                lock_w=lock_w,
+                cache_w=cache_w,
+                prot_w=prot_w,
+                qos_w=qos_w,
+                resp_w=resp_w,
+                len_w=len_w,
+            )
+        case "apb":
+            interface = APBInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+            )
+        case "ahb":
+            interface = AHBInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                prot_w=ahb_prot_w,
+                burst_w=ahb_burst_w,
+                trans_w=ahb_trans_w,
+                size_w=ahb_size_w,
+            )
+        case "rs232":
+            interface = RS232Interface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                n_pins=n_pins,
+            )
+        case "wb":
+            interface = WishboneInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+            )
+        case "wb_full":
+            interface = WishboneInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                data_w=data_w,
+                addr_w=addr_w,
+                is_full=True,
+            )
+        case _:
+            raise ValueError(f"Unknown interface type: {type}")
 
-        eval_str = f"write_{if_type}(fout, prefix1,{prefix2_str} ports)"
-        # print(eval_str, prefix1)
-        eval(eval_str)
-        fout.close()
-
-
-def gen_wires(interface):
-    """Generate wires snippet for given interface"""
-    name = interface.type
-    file_prefix = interface.file_prefix
-    prefix = interface.prefix
-    mult = interface.mult
-    params = interface.params
-    widths = interface.widths
-
-    signals = get_signals(
-        name=name, if_type="", mult=mult, widths=widths, params=params
-    )
-
-    fout = open(file_prefix + name + "_wire.vs", "w")
-    write_wire(fout, prefix, signals)
-    fout.close()
+    return interface
 
 
 #
@@ -1825,7 +2128,7 @@ def gen_wires(interface):
 
 if __name__ == "__main__":
     for if_name in if_names:
-        gen_if(
+        gen_all_vs_files(
             interface(
                 type=if_name,
                 file_prefix="bla_",

@@ -55,14 +55,7 @@ class iob_port(iob_wire):
             )
 
         if self.interface:
-            self.signals += if_gen.get_signals(
-                name=self.interface.type,
-                if_type=_direction,
-                mult=self.interface.mult,
-                widths=self.interface.widths,
-                params=self.interface.params,
-                signal_prefix=self.interface.prefix,
-            )
+            self.signals += self.interface.get_signals()
         elif _direction in ["subordinate", "manager"]:
             fail_with_msg(
                 f"Port '{self.name}' is a '{_direction}' port but no interface is defined",

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from encodings.punycode import T
 import sys
 import os
 import shutil
@@ -29,7 +30,7 @@ import ipxact_gen
 
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
-from if_gen import mem_if_names
+from if_gen import mem_if_names, _MemInterface
 from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
@@ -267,11 +268,18 @@ class iob_core(iob_module, iob_instance):
 
         # Create memory wrapper for top module if any memory interfaces are used
         if self.is_top_module or self.is_tester:
-            if any(
-                (port.interface.type in mem_if_names and port.name.endswith("m"))
-                for port in self.ports
-                if port.interface
-            ):
+            # Check if any memory interfaces are used and are a master
+            found_mem_if = False
+            for port in self.ports:
+                if (
+                    port.interface
+                    and isinstance(port.interface, _MemInterface)
+                    and port.name.endswith("m")
+                ):
+                    found_mem_if = True
+                    break
+
+            if found_mem_if:
                 superblocks = self.__create_memwrapper(superblocks=superblocks)
 
         # Add 'VERSION' macro
@@ -402,7 +410,7 @@ class iob_core(iob_module, iob_instance):
             f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
         )
         # Add SPDX license headers to every file in build dir
-        custom_header=f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
+        custom_header = f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
         generate_headers(
             root=self.build_dir,
             copyright_holder=self.license.author,
@@ -413,7 +421,6 @@ class iob_core(iob_module, iob_instance):
             skip_existing_headers=True,
             verbose=False,
         )
-
 
     def create_python_parameter_group(self, *args, **kwargs):
         create_python_parameter_group(self, *args, **kwargs)
@@ -667,10 +674,15 @@ class iob_core(iob_module, iob_instance):
                     instantiator.wires, wire_name
                 ) or find_obj_in_list(instantiator.ports, wire_name)
                 if not wire:
-                    debug(f"Creating implicit wire '{port.name}' in '{instantiator.name}'.", 1)
+                    debug(
+                        f"Creating implicit wire '{port.name}' in '{instantiator.name}'.",
+                        1,
+                    )
                     # Add wire to instantiator
                     wire_signals = remove_signal_direction_suffixes(port.signals)
-                    instantiator.create_wire(name=wire_name, signals=wire_signals, descr=port.descr)
+                    instantiator.create_wire(
+                        name=wire_name, signals=wire_signals, descr=port.descr
+                    )
                     # Add wire to attributes_dict as well
                     instantiator.attributes_dict["wires"].append(
                         {

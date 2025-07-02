@@ -454,7 +454,7 @@ class _interface:
     def _write_m_port(self, fout):
         """Write master ports to the file."""
         for port in self.get_signals():
-            self.__write_single_port(fout)
+            self.__write_single_port(fout, port)
 
     def _write_s_port(self, fout, port_list):
         """Write slave ports to the file."""

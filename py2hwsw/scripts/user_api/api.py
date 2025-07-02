@@ -128,6 +128,18 @@ class iob_conf():
         pass
 
 
+conf_dict2python = {
+    "name": iob_conf.set_name,
+    "type": iob_conf.set_kind,
+    "val": iob_conf.set_value,
+    "min": iob_conf.set_min_value,
+    "max": iob_conf.set_max_value,
+    "descr": iob_conf.set_descr,
+    "if_defined": iob_conf.set_if_defined,
+    "if_not_defined": iob_conf.set_if_not_defined,
+    "doc_only": iob_conf.set_doc_only,
+}
+
 # Convert dict keys to python attributes
 conf_group_dict2python = {
     "name": "name",
@@ -215,6 +227,19 @@ class iob_signal():
     # value: str or int = 0
 
 
+def parse_signals_list(signals_list):
+    """
+    Given a list of dictionaries, each describing a signal using the Py2HWSW dictionary interface, convert this list to a list of signal objects.
+
+    Attributes:
+        signals_list (list): List of dictionaries. Each dictionary is a signal description.
+
+    Returns:
+        list: List of iob_signal objects.
+    """
+    pass
+
+
 #
 # if_gen
 #
@@ -272,7 +297,7 @@ wire_dict2python = {
     "descr": "descr",
     "if_defined": "if_defined",
     "if_not_defined": "if_not_defined",
-    "signals": "signals",
+    "signals": parse_signals_list,
 }
 
 # Convert short notation to python attributes

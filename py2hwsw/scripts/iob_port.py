@@ -4,7 +4,6 @@
 
 from dataclasses import dataclass, field
 
-import if_gen
 import iob_colors
 from iob_wire import iob_wire, replace_duplicate_signals_by_references, dict2interface
 from iob_base import (
@@ -114,7 +113,7 @@ class iob_port(iob_wire):
                 validate_verilog_const(value=wire, direction=self.signals[0].direction)
         elif isinstance(wire, iob_wire):
             if self.interface and wire.interface:
-                if self.interface.type == wire.interface.type:
+                if type(self.interface) == type(wire.interface):
                     for signal in self.signals:
                         search_name = signal.name.replace(
                             self.interface.prefix, wire.interface.prefix, 1
@@ -198,8 +197,8 @@ attrs = [
 
 
 @str_to_kwargs(attrs)
-def create_port(core, *args, signals=[], **kwargs):
-    """Creates a new port object and adds it to the core's port list
+def create_port_from_dict(core, *args, signals=[], **kwargs):
+    """Creates a new port object using a dictionary and adds it to the core's port list
     Also creates a new internal module wire to connect to the new port
     param core: core object
     """
@@ -223,5 +222,49 @@ def create_port(core, *args, signals=[], **kwargs):
         error_msg=f"Invalid {kwargs.get('name', '')} port attribute '[arg]'!",
     )
     port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
+    replace_duplicate_signals_by_references(core.ports, port.signals)
+    core.ports.append(port)
+
+
+@str_to_kwargs(attrs)
+def add_signals_port(core, *args, signals=[], **kwargs):
+    """Creates a new port object and adds it to the core's port list
+    Also creates a new internal module wire to connect to the new port
+    param core: core object
+    """
+    # Ensure 'ports' list exists
+    core.set_default_attribute("ports", [])
+    # Check if the list of signals has only iob_signal types
+    if type(signals) is list:
+        for signal in signals:
+            if not isinstance(signal, iob_signal):
+                fail_with_msg(
+                    f"Signals must be a list of iob_signals! {signals}", TypeError
+                )
+    # Create the port with the signals
+    port = iob_port(*args, signals=signals, **kwargs)
+    replace_duplicate_signals_by_references(core.ports, port.signals)
+    core.ports.append(port)
+
+
+@str_to_kwargs(attrs)
+def add_interface_port(core, *args, name, interface, **kwargs):
+    """Creates a new port object and adds it to the core's port list
+    Also creates a new internal module wire to connect to the new port
+    param core: core object
+    """
+    # Ensure 'ports' list exists
+    core.set_default_attribute("ports", [])
+    # Check if the interface is a valid interface object
+    if not hasattr(interface, "get_signals"):
+        fail_with_msg(
+            f"Interface must be a valid interface object! {interface}", TypeError
+        )
+    if not interface.file_prefix:
+        interface.file_prefix = core.name + "_"
+    if interface.prefix == "":
+        interface.prefix = f"{name}_"
+    # Create the port with the interface
+    port = iob_port(*args, name=name, interface=interface, **kwargs)
     replace_duplicate_signals_by_references(core.ports, port.signals)
     core.ports.append(port)

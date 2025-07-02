@@ -592,16 +592,12 @@ class iob_core(iob_module, iob_instance):
         if not instantiator.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
-        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
-        _signals.update(port.interface.widths)
-        if _signals["prefix"] == "":
-            _signals.update({"prefix": f"{_name}_"})
-        instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
+        instantiator.add_interface_port(name=_name, interface=port.interface, descr=port.descr)
         # Add port also to attributes_dict
         instantiator.attributes_dict["ports"].append(
             {
                 "name": _name,
-                "signals": _signals,
+                "signals": port.interface.get_signals(),
                 "descr": port.descr,
             }
         )
@@ -613,26 +609,19 @@ class iob_core(iob_module, iob_instance):
         if not instantiator.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
-        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
-        _signals.update(port.interface.widths)
         for p in instantiator.ports:
-            if p.interface:
-                if (
-                    p.interface.type == port.interface.type
-                    and p.interface.prefix == port.interface.prefix
-                ):
-                    if p.interface.params != port.interface.params:
-                        p.interface.params = "_".join(
-                            filter(
-                                lambda x: x != "None",
-                                [p.interface.params, port.interface.params],
-                            )
-                        )
-                        p.signals = []
-                        p.__post_init__()
+            if isinstance(p.interface, iobClkInterface):
+                # If interface is the same, connect it and add parameters if needed
+                if p.interface.prefix == port.interface.prefix:
+                    p.interface.has_cke |= port.interface.has_cke
+                    p.interface.has_arst |= port.interface.has_arst
+                    p.interface.has_rst |= port.interface.has_rst
+                    p.interface.has_en |= port.interface.has_en
+                    p.signals = []
+                    p.__post_init__()
                     port.connect_external(p, bit_slices=[])
                     return
-        instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
+        instantiator.add_interface_port(name=_name, interface=port.interface, descr=port.descr)
         _port = find_obj_in_list(instantiator.ports, _name)
         port.connect_external(_port, bit_slices=[])
 
@@ -720,7 +709,7 @@ class iob_core(iob_module, iob_instance):
         # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of instantiator
         csrs_port = find_obj_in_list(self.ports, "control_if_s")
 
-        instantiator.create_port(
+        instantiator.create_port_from_dict(
             name=f"{self.instance_name}_cbus_s",
             signals={
                 "type": csrs_port.interface.type,

@@ -451,14 +451,14 @@ class _interface:
         width_str = f" [{port.width}-1:0] "
         fout.write(direction + width_str + name + "," + "\n")
 
-    def __write_m_port(self, fout):
+    def _write_m_port(self, fout):
         """Write master ports to the file."""
         for port in self.get_signals():
             self.__write_single_port(fout)
 
-    def __write_s_port(self, fout, port_list):
+    def _write_s_port(self, fout, port_list):
         """Write slave ports to the file."""
-        self.__write_m_port(fout)
+        self._write_m_port(fout)
 
     #
     # Portmap
@@ -475,19 +475,19 @@ class _interface:
 
         fout.write(f".{port_name}({wire_name}),\n")
 
-    def __write_m_portmap(self, fout):
+    def _write_m_portmap(self, fout):
         for port in self.get_signals():
             self.__write_single_portmap(fout, port, False)
 
-    def __write_s_portmap(self, fout):
-        self.__write_m_portmap(fout)
+    def _write_s_portmap(self, fout):
+        self._write_m_portmap(fout)
 
-    def __write_m_m_portmap(self, fout):
+    def _write_m_m_portmap(self, fout):
         for port in self.get_signals():
             self.__write_single_portmap(fout, port, True)
 
-    def __write_s_s_portmap(self, fout):
-        self.__write_m_m_portmap(fout)
+    def _write_s_s_portmap(self, fout):
+        self._write_m_m_portmap(fout)
 
     def get_signals(self):
         """Get the signals of the interface."""
@@ -530,9 +530,9 @@ class _interface:
                 temp_interface.if_direction = "manager"
 
             if "portmap" in if_type:
-                eval_str = f"self.__write_{if_type}(fout)"
+                eval_str = f"self._write_{if_type}(fout)"
             else:
-                eval_str = f"self.__write_{if_type}(fout)"
+                eval_str = f"self._write_{if_type}(fout)"
             eval(eval_str)
             fout.close()
 

@@ -102,7 +102,6 @@ class iob_comb(iob_snippet):
                     + self.verilog_code[insert_point:]
                 ) 
 
-
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""
 
@@ -194,7 +193,7 @@ class iob_comb(iob_snippet):
 
                     # Create the clock interface in the core, if it does not exist
                     if not any(port.name == "clk_en_rst_s" for port in core.ports):
-                        core.create_port(
+                        core.create_port_from_dict(
                             name="clk_en_rst_s",
                             signals={"type": "iob_clk", "params": self.clk_if},
                             descr="Clock interface signals",

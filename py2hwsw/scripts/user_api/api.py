@@ -40,7 +40,9 @@ from datetime import date
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')))
+sys.path.insert(
+    0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
+)
 from api_base import api_for, prevent_instantiation, empty_list, empty_dict
 import iob_conf as internal_conf
 import iob_signal as internal_signal
@@ -67,35 +69,12 @@ import iob_core as internal_core
 # - Classes have similar structure to python's '@dataclasses'
 # - Methods are abstract. They do not contain implementation in the API.
 
+
 #
 # Confs
 #
-
-# Convert dict keys to python attributes
-conf_dict2python = {
-    "name": "name",
-    "type": "kind",
-    "val": "value",
-    "min": "min_value",
-    "max": "max_value",
-    "descr": "descr",
-    "if_defined": "if_defined",
-    "if_not_defined": "if_not_defined",
-    "doc_only": "doc_only",
-}
-
-# Convert short notation to python attributes
-conf_short2python = [
-    "name",
-    ["-t", "kind"],
-    ["-v", "value"],
-    ["-m", "min_value"],
-    ["-M", "max_value"],
-]
-
-
 @api_for(internal_conf.iob_conf)
-class iob_conf():
+class iob_conf:
     """
     Class to represent a configuration option.
 
@@ -103,9 +82,9 @@ class iob_conf():
         name (str): Configuration identifier name.
         kind (str): Configuration type, either M (Verilog macro), P (Verilog parameter), C (Constant) or D (Derived Parameter).
                     False-parameters are the same as verilog parameters except that the its value must not be overriden.
-        value (str): Configuration value.
-        min_value (str): Minimum value supported by the configuration option (NA if not applicable).
-        max_value (str): Maximum value supported by the configuration option (NA if not applicable).
+        value (str | int | bool): Configuration value.
+        min_value (str | int): Minimum value supported by the configuration option (NA if not applicable).
+        max_value (str | int): Maximum value supported by the configuration option (NA if not applicable).
         descr (str): Description of the configuration option.
         if_defined (str): Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is defined.
         if_not_defined (str): Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is undefined.
@@ -123,41 +102,51 @@ class iob_conf():
     doc_only: bool = False
 
     def test_method(self, var1: str, var2: int) -> list:
-        """Example docstring
-        """
+        """Example docstring"""
         pass
 
 
-conf_dict2python = {
-    "name": iob_conf.set_name,
-    "type": iob_conf.set_kind,
-    "val": iob_conf.set_value,
-    "min": iob_conf.set_min_value,
-    "max": iob_conf.set_max_value,
-    "descr": iob_conf.set_descr,
-    "if_defined": iob_conf.set_if_defined,
-    "if_not_defined": iob_conf.set_if_not_defined,
-    "doc_only": iob_conf.set_doc_only,
-}
+@api_for(internal_conf.conf_from_dict)
+def create_conf_from_dict(conf_dict):
+    """
+    Function to create iob_conf object from dictionary attributes.
 
-# Convert dict keys to python attributes
-conf_group_dict2python = {
-    "name": "name",
-    "descr": "descr",
-    "confs": "confs",
-    "doc_only": "doc_only",
-    "doc_clearpage": "doc_clearpage",
-}
+    Attributes:
+        conf_dict (dict): dictionary with values to initialize attributes of iob_conf object.
+            This dictionary supports the following keys corresponding to the iob_conf attributes:
+            - name           -> iob_conf.name
+            - type           -> iob_conf.kind
+            - val            -> iob_conf.value
+            - min            -> iob_conf.min_value
+            - max            -> iob_conf.max_value
+            - descr          -> iob_conf.descr
+            - if_defined     -> iob_conf.if_defined
+            - if_not_defined -> iob_conf.if_not_defined
+            - doc_only       -> iob_conf.doc_only
 
-# Convert short notation to python attributes
-conf_group_short2python = [
-    "name",
-    ["-c", "confs", {"nargs": "+"}],
-]
+    Returns:
+        iob_conf: iob_conf object
+    """
+    pass
+
+
+@api_for(internal_conf.conf_from_text)
+def create_conf_from_text(conf_text):
+    """
+    Function to create iob_conf object from short notation text.
+
+    Attributes:
+        conf_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-t kind] [-v value] [-m min_value] [-M max_value]
+
+    Returns:
+        iob_conf: iob_conf object
+    """
+    pass
 
 
 @api_for(internal_conf.iob_conf_group)
-class iob_conf_group():
+class iob_conf_group:
     """
     Class to represent a group of configurations.
 
@@ -176,29 +165,65 @@ class iob_conf_group():
     doc_clearpage: bool = False
 
 
+# Convert dict keys to python attributes
+# conf_group_dict2python = {
+#     "name": "name",
+#     "descr": "descr",
+#     "confs": "confs",
+#     "doc_only": "doc_only",
+#     "doc_clearpage": "doc_clearpage",
+# }
+
+
+@api_for(internal_conf.conf_group_from_dict)
+def create_conf_group_from_dict(conf_group_dict):
+    """
+    Function to create iob_conf_group object from dictionary attributes.
+
+    Attributes:
+        conf_group_dict (dict): dictionary with values to initialize attributes of iob_conf_group object.
+            This dictionary supports the following keys corresponding to the iob_conf_group attributes:
+            - name          -> iob_conf_group.name
+            - descr         -> iob_conf_group.descr
+            - confs         -> iob_conf_group.confs
+            - doc_only      -> iob_conf_group.doc_only
+            - doc_clearpage -> iob_conf_group.doc_clearpage
+
+    Returns:
+        iob_conf_group: iob_conf_group object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# conf_group_short2python = [
+#     "name",
+#     ["-c", "confs", {"nargs": "+"}],
+# ]
+
+
+@api_for(internal_conf.conf_group_from_text)
+def create_conf_group_from_text(conf_group_text):
+    """
+    Function to create iob_conf_group object from short notation text.
+
+    Attributes:
+        conf_group_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-c confs]
+
+    Returns:
+        iob_conf_group: iob_conf_group object
+    """
+    pass
+
+
 #
 # Signals
 #
 
-# Convert dict keys to python attributes
-signal_dict2python = {
-    "name": "name",
-    "width": "width",
-    "descr": "descr",
-    "isvar": "isvar",
-    "isreg": "isreg",
-    "reg_signals": "reg_signals",
-    "val": "value",
-}
-
-# Convert short notation to python attributes
-signal_short2python = [
-    # TODO:
-]
-
 
 @api_for(internal_signal.iob_signal)
-class iob_signal():
+class iob_signal:
     """
     Class that represents a wire/port signal.
 
@@ -227,15 +252,57 @@ class iob_signal():
     # value: str or int = 0
 
 
-def parse_signals_list(signals_list):
+# Convert dict keys to python attributes
+# signal_dict2python = {
+#     "name": "name",
+#     "width": "width",
+#     "descr": "descr",
+#     "isvar": "isvar",
+#     "isreg": "isreg",
+#     "reg_signals": "reg_signals",
+#     "val": "value",
+# }
+
+
+@api_for(internal_signal.signal_from_dict)
+def create_signal_from_dict(signal_dict):
     """
-    Given a list of dictionaries, each describing a signal using the Py2HWSW dictionary interface, convert this list to a list of signal objects.
+    Function to create iob_signal object from dictionary attributes.
 
     Attributes:
-        signals_list (list): List of dictionaries. Each dictionary is a signal description.
+        signal_dict (dict): dictionary with values to initialize attributes of iob_signal object.
+            This dictionary supports the following keys corresponding to the iob_signal attributes:
+            - name          -> iob_signal.name
+            - width         -> iob_signal.width
+            - descr         -> iob_signal.descr
+            - isvar         -> iob_signal.isvar
+            - isreg         -> iob_signal.isreg
+            - reg_signals   -> iob_signal.reg_signals
+            - val           -> iob_signal.value
 
     Returns:
-        list: List of iob_signal objects.
+        iob_signal: iob_signal object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# signal_short2python = [
+#     # TODO:
+# ]
+
+
+@api_for(internal_signal.signal_from_text)
+def create_signal_from_text(signal_text):
+    """
+    Function to create iob_signal object from short notation text.
+
+    Attributes:
+        signal_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-w width] [-d descr] [-r (enables isreg)] [-v value]
+
+    Returns:
+        iob_signal: iob_signal object
     """
     pass
 
@@ -245,25 +312,25 @@ def parse_signals_list(signals_list):
 #
 
 # Convert dict keys to python attributes
-interface_dict2python = {
-    "type": "kind",
-    "prefix": "prefix",
-    "mult": "mult",
-    "params": "params",
-    "widths": "widths",
-    "file_prefix": "file_prefix",
-    "portmap_port_prefix": "portmap_port_prefix",
-}
+# interface_dict2python = {
+#     "type": "kind",
+#     "prefix": "prefix",
+#     "mult": "mult",
+#     "params": "params",
+#     "widths": "widths",
+#     "file_prefix": "file_prefix",
+#     "portmap_port_prefix": "portmap_port_prefix",
+# }
 
 # Convert short notation to python attributes
-interface_short2python = [
-    # TODO:
-]
+# interface_short2python = [
+#     # TODO:
+# ]
 
 
 # NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
 @api_for(internal_interface.interface)
-class interface():
+class interface:
     """
     Class to represent an interface for generation.
 
@@ -289,27 +356,8 @@ class interface():
 #
 # Wires
 #
-
-# Convert dict keys to python attributes
-wire_dict2python = {
-    "type": "kind",
-    "interface": "interface",
-    "descr": "descr",
-    "if_defined": "if_defined",
-    "if_not_defined": "if_not_defined",
-    "signals": parse_signals_list,
-}
-
-# Convert short notation to python attributes
-wire_short2python = [
-    "name",
-    ["-i", "signals&i", {"nargs": 1}, ("type",)],
-    ["-s", "signals&s", {"nargs": "+"}, ["name:width"]],
-]
-
-
 @api_for(internal_wire.iob_wire)
-class iob_wire():
+class iob_wire:
     """
     Class to represent a wire in an iob module.
 
@@ -343,26 +391,66 @@ class iob_wire():
         pass
 
 
+# Convert dict keys to python attributes
+# wire_dict2python = {
+#     "type": "kind",
+#     "interface": "interface",
+#     "descr": "descr",
+#     "if_defined": "if_defined",
+#     "if_not_defined": "if_not_defined",
+#     "signals": "signals",
+# }
+
+
+@api_for(internal_wire.wire_from_dict)
+def create_wire_from_dict(wire_dict):
+    """
+    Function to create iob_wire object from dictionary attributes.
+
+    Attributes:
+        wire_dict (dict): dictionary with values to initialize attributes of iob_wire object.
+            This dictionary supports the following keys corresponding to the iob_wire attributes:
+            - name           -> iob_wire.name
+            - interface      -> iob_wire.interface
+            - descr          -> iob_wire.descr
+            - if_defined     -> iob_wire.if_defined
+            - if_not_defined -> iob_wire.if_not_defined
+            - signals        -> iob_wire.signals
+
+    Returns:
+        iob_wire: iob_wire object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# wire_short2python = [
+#     "name",
+#     ["-i", "signals&i", {"nargs": 1}, ("type",)],
+#     ["-s", "signals&s", {"nargs": "+"}, ["name:width"]],
+# ]
+
+
+@api_for(internal_wire.wire_from_text)
+def create_wire_from_text(wire_text):
+    """
+    Function to create iob_wire object from short notation text.
+
+    Attributes:
+        wire_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-i interface] [-d descr] [-s signal_name:width]+
+
+    Returns:
+        iob_wire: iob_wire object
+    """
+    pass
+
+
 #
 # Ports
 #
 
-# Convert dict keys to python attributes
-port_dict2python = {
-    "e_connect": "e_connect",
-    "e_connect_bit_slices": "e_connect_bit_slices",
-    "doc_only": "doc_only",
-    "doc_clearpage": "doc_clearpage",
-    # And others inherited from iob_wire
-}
 
-# Convert short notation to python attributes
-port_short2python = [
-    # Inherited from iob_wire
-]
-
-
-# FIXME: When decorator runs, iob_wire already has non-abstract getters/setters. The decorator throws an error because of these methods.
 @api_for(internal_port.iob_port)
 class iob_port(iob_wire):
     """
@@ -382,23 +470,64 @@ class iob_port(iob_wire):
     doc_clearpage: bool = False
 
 
+# Convert dict keys to python attributes
+# port_dict2python = {
+#     "e_connect": "e_connect",
+#     "e_connect_bit_slices": "e_connect_bit_slices",
+#     "doc_only": "doc_only",
+#     "doc_clearpage": "doc_clearpage",
+#     # And others inherited from iob_wire
+# }
+
+
+@api_for(internal_port.port_from_dict)
+def create_port_from_dict(port_dict):
+    """
+    Function to create iob_port object from dictionary attributes.
+
+    Attributes:
+        port_dict (dict): dictionary with values to initialize attributes of iob_port object.
+            This dictionary supports the following keys corresponding to the iob_port attributes:
+            - e_connect      -> iob_port.e_connect
+            - e_connect_bit_slices -> iob_port.e_connect_bit_slices
+            - doc_only -> iob_port.doc_only
+            - doc_clearpage -> iob_port.doc_clearpage
+            (Also supports the keys inherited from iob_wire)
+
+    Returns:
+        iob_port: iob_port object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# port_short2python = [
+#     # Inherited from iob_wire
+# ]
+
+
+@api_for(internal_port.port_from_text)
+def create_port_from_text(port_text):
+    """
+    Function to create iob_port object from short notation text.
+
+    Attributes:
+        port_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-i interface] [-d descr] [-s signal_name:width]+
+
+    Returns:
+        iob_port: iob_port object
+    """
+    pass
+
+
 #
 # Snippets
 #
 
-# Convert dict keys to python attributes
-snippet_dict2python = {
-    "verilog_code": "verilog_code",
-}
-
-# Convert short notation to python attributes
-snippet_short2python = [
-    # TODO:
-]
-
 
 @api_for(internal_snippet.iob_snippet)
-class iob_snippet():
+class iob_snippet:
     """
     Class to represent a Verilog snippet in an iob module.
 
@@ -409,20 +538,52 @@ class iob_snippet():
     verilog_code: str = ""
 
 
+# Convert dict keys to python attributes
+# snippet_dict2python = {
+#     "verilog_code": "verilog_code",
+# }
+
+
+@api_for(internal_snippet.snippet_from_dict)
+def create_snippet_from_dict(snippet_dict):
+    """
+    Function to create iob_snippet object from dictionary attributes.
+
+    Attributes:
+        snippet_dict (dict): dictionary with values to initialize attributes of iob_snippet object.
+            This dictionary supports the following keys corresponding to the iob_snippet attributes:
+            - verilog_code -> iob_snippet.verilog_code
+
+    Returns:
+        iob_snippet: iob_snippet object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# snippet_short2python = [
+#     # TODO:
+# ]
+
+
+@api_for(internal_snippet.snippet_from_text)
+def create_snippet_from_text(snippet_text):
+    """
+    Function to create iob_snippet object from short notation text.
+
+    Attributes:
+        snippet_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_snippet: iob_snippet object
+    """
+    pass
+
+
 #
 # Comb
 #
-
-# Convert dict keys to python attributes
-comb_dict2python = {
-    "code": "code",
-    "clk_if": "clk_if",
-}
-
-# Convert short notation to python attributes
-comb_short2python = [
-    # TODO:
-]
 
 
 @api_for(internal_comb.iob_comb)
@@ -439,21 +600,54 @@ class iob_comb(iob_snippet):
     clk_if: str = "c_a"
 
 
+# Convert dict keys to python attributes
+# comb_dict2python = {
+#     "code": "code",
+#     "clk_if": "clk_if",
+# }
+
+
+@api_for(internal_comb.comb_from_dict)
+def create_comb_from_dict(comb_dict):
+    """
+    Function to create iob_comb object from dictionary attributes.
+
+    Attributes:
+        comb_dict (dict): dictionary with values to initialize attributes of iob_comb object.
+            This dictionary supports the following keys corresponding to the iob_comb attributes:
+            - code -> iob_comb.code
+            - clk_if -> iob_comb.clk_if
+
+    Returns:
+        iob_comb: iob_comb object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# comb_short2python = [
+#     # TODO:
+# ]
+
+
+@api_for(internal_comb.comb_from_text)
+def create_comb_from_text(comb_text):
+    """
+    Function to create iob_comb object from short notation text.
+
+    Attributes:
+        comb_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_comb: iob_comb object
+    """
+    pass
+
+
 #
 # FSM
 #
-
-# Convert dict keys to python attributes
-fsm_dict2python = {
-    "type": "kind",
-    "default_assignments": "default_assignments",
-    "state_descriptions": "state_descriptions",
-}
-
-# Convert short notation to python attributes
-fsm_short2python = [
-    # TODO:
-]
 
 
 @api_for(internal_fsm.iob_fsm)
@@ -472,32 +666,64 @@ class iob_fsm(iob_comb):
     state_descriptions: str = ""
 
 
+# Convert dict keys to python attributes
+# fsm_dict2python = {
+#     "type": "kind",
+#     "default_assignments": "default_assignments",
+#     "state_descriptions": "state_descriptions",
+# }
+
+
+@api_for(internal_fsm.fsm_from_dict)
+def create_fsm_from_dict(fsm_dict):
+    """
+    Function to create iob_fsm object from dictionary attributes.
+
+    Attributes:
+        fsm_dict (dict): dictionary with values to initialize attributes of iob_fsm object.
+            This dictionary supports the following keys corresponding to the iob_fsm attributes:
+            - type -> iob_fsm.kind
+            - default_assignments -> iob_fsm.default_assignments
+            - state_descriptions -> iob_fsm.state_descriptions
+
+    Returns:
+        iob_fsm: iob_fsm object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# fsm_short2python = [
+#     # TODO:
+# ]
+
+
+@api_for(internal_fsm.fsm_from_text)
+def create_fsm_from_text(fsm_text):
+    """
+    Function to create iob_fsm object from short notation text.
+
+    Attributes:
+        fsm_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_fsm: iob_fsm object
+    """
+    pass
+
+
 #
 # Blocks
 #
-class iob_core():
+class iob_core:
     """Forward reference of iob_core class. Full declaration of iob_core class is available in below."""
 
     pass
 
 
-# Convert dict keys to python attributes
-block_group_dict2python = {
-    "name": "name",
-    "descr": "descr",
-    "blocks": "blocks",
-    "doc_clearpage": "doc_clearpage",
-}
-
-# Convert short notation to python attributes
-block_group_short2python = [
-    "name",
-    ["-b", "blocks", {"nargs": "+"}],
-]
-
-
 @api_for(internal_block.iob_block_group)
-class iob_block_group():
+class iob_block_group:
     """
     Class to represent a group of blocks.
 
@@ -514,25 +740,63 @@ class iob_block_group():
     doc_clearpage: bool = False
 
 
+# Convert dict keys to python attributes
+# block_group_dict2python = {
+#     "name": "name",
+#     "descr": "descr",
+#     "blocks": "blocks",
+#     "doc_clearpage": "doc_clearpage",
+# }
+
+
+@api_for(internal_block.block_group_from_dict)
+def create_block_group_from_dict(block_group_dict):
+    """
+    Function to create iob_block_group object from dictionary attributes.
+
+    Attributes:
+        block_group_dict (dict): dictionary with values to initialize attributes of iob_block_group object.
+            This dictionary supports the following keys corresponding to the iob_block_group attributes:
+            - name -> iob_block_group.name
+            - descr -> iob_block_group.descr
+            - blocks -> iob_block_group.blocks
+            - doc_clearpage -> iob_block_group.doc_clearpage
+
+    Returns:
+        iob_block_group: iob_block_group object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# block_group_short2python = [
+#     "name",
+#     ["-b", "blocks", {"nargs": "+"}],
+# ]
+
+
+@api_for(internal_block.block_group_from_text)
+def create_block_group_from_text(block_group_text):
+    """
+    Function to create iob_block_group object from short notation text.
+
+    Attributes:
+        block_group_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-b block]+
+
+    Returns:
+        iob_block_group: iob_block_group object
+    """
+    pass
+
+
 #
 # License
 #
 
-# Convert dict keys to python attributes
-license_dict2python = {
-    "name": "name",
-    "year": "year",
-    "author": "author",
-}
-
-# Convert short notation to python attributes
-license_short2python = [
-    # TODO:
-]
-
 
 @api_for(internal_license.iob_license)
-class iob_license():
+class iob_license:
     """
     Class that represents a license attribute.
 
@@ -547,35 +811,60 @@ class iob_license():
     author: str = "IObundle, Lda"
 
 
+# Convert dict keys to python attributes
+# license_dict2python = {
+#     "name": "name",
+#     "year": "year",
+#     "author": "author",
+# }
+
+
+@api_for(internal_license.license_from_dict)
+def create_license_from_dict(license_dict):
+    """
+    Function to create iob_license object from dictionary attributes.
+
+    Attributes:
+        license_dict (dict): dictionary with values to initialize attributes of iob_license object.
+            This dictionary supports the following keys corresponding to the iob_license attributes:
+            - name -> iob_license.name
+            - year -> iob_license.year
+            - author -> iob_license.author
+
+    Returns:
+        iob_license: iob_license object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# license_short2python = [
+#     # TODO:
+# ]
+
+
+@api_for(internal_license.license_from_text)
+def create_license_from_text(license_text):
+    """
+    Function to create iob_license object from short notation text.
+
+    Attributes:
+        license_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_license: iob_license object
+    """
+    pass
+
+
 #
 # Core
 #
 
-# Convert dict keys to python attributes
-module_dict2python = {
-    "original_name": "original_name",
-    "name": "name",
-    "description": "description",
-    "reset_polarity": "reset_polarity",
-    "confs": "confs",
-    "ports": "ports",
-    "wires": "wires",
-    "snippets": "snippets",
-    "comb": "comb",
-    "fsm": "fsm",
-    "subblocks": "subblocks",
-    "superblocks": "superblocks",
-    "sw_modules": "sw_modules",
-}
-
-# Convert short notation to python attributes
-module_short2python = [
-    "original_name",
-]
-
 
 @prevent_instantiation
-class iob_module():
+class iob_module:
     """
     Class to describe a (Verilog) module.
 
@@ -611,27 +900,74 @@ class iob_module():
 
 
 # Convert dict keys to python attributes
-instance_dict2python = {
-    "instance_name": "instance_name",
-    "instance_description": "instance_description",
-    "parameters": "parameters",
-    "if_defined": "if_defined",
-    "if_not_defined": "if_not_defined",
-    "instantiate": "instantiate",
-    "connect": "connect",
-}
+# module_dict2python = {
+#     "original_name": "original_name",
+#     "name": "name",
+#     "description": "description",
+#     "reset_polarity": "reset_polarity",
+#     "confs": "confs",
+#     "ports": "ports",
+#     "wires": "wires",
+#     "snippets": "snippets",
+#     "comb": "comb",
+#     "fsm": "fsm",
+#     "subblocks": "subblocks",
+#     "superblocks": "superblocks",
+#     "sw_modules": "sw_modules",
+# }
+
+
+@api_for(internal_module.module_from_dict)
+def create_module_from_dict(module_dict):
+    """
+    Function to create iob_module object from dictionary attributes.
+
+    Attributes:
+        module_dict (dict): dictionary with values to initialize attributes of iob_module object.
+            This dictionary supports the following keys corresponding to the iob_module attributes:
+            - original_name -> iob_module.original_name
+            - name -> iob_module.name
+            - description -> iob_module.description
+            - reset_polarity -> iob_module.reset_polarity
+            - confs -> iob_module.confs
+            - ports -> iob_module.ports
+            - wires -> iob_module.wires
+            - snippets -> iob_module.snippets
+            - comb -> iob_module.comb
+            - fsm -> iob_module.fsm
+            - subblocks -> iob_module.subblocks
+            - superblocks -> iob_module.superblocks
+            - sw_modules -> iob_module.sw_modules
+
+    Returns:
+        iob_module: iob_module object
+    """
+    pass
+
 
 # Convert short notation to python attributes
-instance_short2python = [
-    "instance_name",
-    ["-p", "parameters", {"nargs": "+"}, "pairs"],
-    ["--no_instance", "instantiate", {"action": "store_false"}],
-    ["-c", "connect", {"nargs": "+"}, "pairs"],
-]
+# module_short2python = [
+#     "original_name",
+# ]
+
+
+@api_for(internal_module.module_from_text)
+def create_module_from_text(module_text):
+    """
+    Function to create iob_module object from short notation text.
+
+    Attributes:
+        module_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_module: iob_module object
+    """
+    pass
 
 
 @prevent_instantiation
-class iob_instance():
+class iob_instance:
     """
     Class to describe a module's (Verilog) instance.
 
@@ -655,50 +991,61 @@ class iob_instance():
 
 
 # Convert dict keys to python attributes
-core_dict2python = {
-    "version": "version",
-    "previous_version": "previous_version",
-    "setup_dir": "setup_dir",
-    "build_dir": "build_dir",
-    "use_netlist": "use_netlist",
-    "is_system": "is_system",
-    "board_list": "board_list",
-    "dest_dir": "dest_dir",
-    "ignore_snippets": "ignore_snippets",
-    "generate_hw": "generate_hw",
-    "parent": "parent",
-    "is_top_module": "is_top_module",
-    "is_superblock": "is_superblock",
-    "is_tester": "is_tester",
-    "python_parameters": "python_parameters",
-    "license": "license",
-    "doc_conf": "doc_conf",
-    "title": "title",
-}
+# instance_dict2python = {
+#     "instance_name": "instance_name",
+#     "instance_description": "instance_description",
+#     "parameters": "parameters",
+#     "if_defined": "if_defined",
+#     "if_not_defined": "if_not_defined",
+#     "instantiate": "instantiate",
+#     "connect": "connect",
+# }
+
+
+@api_for(internal_instance.instance_from_dict)
+def create_instance_from_dict(instance_dict):
+    """
+    Function to create iob_instance object from dictionary attributes.
+
+    Attributes:
+        instance_dict (dict): dictionary with values to initialize attributes of iob_instance object.
+            This dictionary supports the following keys corresponding to the iob_instance attributes:
+            - instance_name -> iob_instance.instance_name
+            - instance_description -> iob_instance.instance_description
+            - parameters -> iob_instance.parameters
+            - if_defined -> iob_instance.if_defined
+            - if_not_defined -> iob_instance.if_not_defined
+            - instantiate -> iob_instance.instantiate
+            - connect -> iob_instance.connect
+
+    Returns:
+        iob_instance: iob_instance object
+    """
+    pass
+
 
 # Convert short notation to python attributes
-core_short2python = [
-    ["--dest_dir", "dest_dir"],
-    # Should short notation for CSRs be here?
-    ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
-    ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
-    ["--csr_if", "csr_if"],
-    {
-        "--csr-group&csrs": [
-            "name",
-            {
-                "-r&regs": [
-                    "name:n_bits",
-                    ["-t", "type"],
-                    ["-m", "mode"],
-                    ["--rst_val", "rst_val"],
-                    ["--addr", "addr", {"type": int}],
-                    ["--log2n_items", "log2n_items"],
-                ],
-            },
-        ]
-    },
-]
+# instance_short2python = [
+#     "instance_name",
+#     ["-p", "parameters", {"nargs": "+"}, "pairs"],
+#     ["--no_instance", "instantiate", {"action": "store_false"}],
+#     ["-c", "connect", {"nargs": "+"}, "pairs"],
+# ]
+
+
+@api_for(internal_instance.instance_from_text)
+def create_instance_from_text(instance_text):
+    """
+    Function to create iob_instance object from short notation text.
+
+    Attributes:
+        instance_text (str): Short notation text. Object attributes are specified using the following format:
+            instance_name [-p parameter_name:parameter_value]+ [-c port_name:signal_name]+ [--no_instance]
+
+    Returns:
+        iob_instance: iob_instance object
+    """
+    pass
 
 
 @api_for(internal_core.iob_core)
@@ -765,9 +1112,103 @@ class iob_core(iob_module, iob_instance):
         pass
 
 
-#@api_for(internal_load_short_notation_file)
-#def load_short_notation_file(short_notation_file_path):
-#    """
-#    Reads a short notation file and returns a dictionary with parsed data.
-#    """
-#    pass
+# Convert dict keys to python attributes
+# core_dict2python = {
+#     "version": "version",
+#     "previous_version": "previous_version",
+#     "setup_dir": "setup_dir",
+#     "build_dir": "build_dir",
+#     "use_netlist": "use_netlist",
+#     "is_system": "is_system",
+#     "board_list": "board_list",
+#     "dest_dir": "dest_dir",
+#     "ignore_snippets": "ignore_snippets",
+#     "generate_hw": "generate_hw",
+#     "parent": "parent",
+#     "is_top_module": "is_top_module",
+#     "is_superblock": "is_superblock",
+#     "is_tester": "is_tester",
+#     "python_parameters": "python_parameters",
+#     "license": "license",
+#     "doc_conf": "doc_conf",
+#     "title": "title",
+# }
+
+
+@api_for(internal_core.core_from_dict)
+def create_core_from_dict(core_dict):
+    """
+    Function to create iob_core object from dictionary attributes.
+
+    Attributes:
+        core_dict (dict): dictionary with values to initialize attributes of iob_core object.
+            This dictionary supports the following keys corresponding to the iob_core attributes:
+            - version -> iob_core.version
+            - previous_version -> iob_core.previous_version
+            - setup_dir -> iob_core.setup_dir
+            - build_dir -> iob_core.build_dir
+            - use_netlist -> iob_core.use_netlist
+            - is_system -> iob_core.is_system
+            - board_list -> iob_core.board_list
+            - ignore_snippets -> iob_core.ignore_snippets
+            - generate_hw -> iob_core.generate_hw
+            - parent -> iob_core.parent
+            - is_top_module -> iob_core.is_top_module
+            - is_superblock -> iob_core.is_superblock
+            - is_tester -> iob_core.is_tester
+            - python_parameters -> iob_core.python_parameters
+            - license -> iob_core.license
+            - doc_conf -> iob_core.doc_conf
+            - title -> iob_core.title
+
+    Returns:
+        iob_core: iob_core object
+    """
+    pass
+
+
+# Convert short notation to python attributes
+# core_short2python = [
+#     ["--dest_dir", "dest_dir"],
+#     # Should short notation for CSRs be here?
+#     ["--no_autoaddr", "autoaddr", {"action": "store_false"}],
+#     ["--rw_overlap", "rw_overlap", {"action": "store_true"}],
+#     ["--csr_if", "csr_if"],
+#     {
+#         "--csr-group&csrs": [
+#             "name",
+#             {
+#                 "-r&regs": [
+#                     "name:n_bits",
+#                     ["-t", "type"],
+#                     ["-m", "mode"],
+#                     ["--rst_val", "rst_val"],
+#                     ["--addr", "addr", {"type": int}],
+#                     ["--log2n_items", "log2n_items"],
+#                 ],
+#             },
+#         ]
+#     },
+# ]
+
+
+@api_for(internal_core.core_from_text)
+def create_core_from_text(core_text):
+    """
+    Function to create iob_core object from short notation text.
+
+    Attributes:
+        core_text (str): Short notation text. Object attributes are specified using the following format:
+            [--dest_dir dest_dir]
+            # Below are parameters specific to the 'iob_csrs' module. They should probably not belong in the Py2HWSW API.
+            [--no_autoaddr]
+            [--rw_overlap]
+            [--csr_if csr_if]
+                [--csr-group csr_group_name]
+                    [-r reg_name:n_bits]
+                        [-t type] [-m mode] [--rst_val rst_val] [--addr addr] [--log2n_items log2n_items]
+
+    Returns:
+        iob_core: iob_core object
+    """
+    pass

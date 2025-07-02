@@ -775,7 +775,7 @@ class symMemInterface(_memInterface):
             case _:
                 raise ValueError(f"Unknown memory interface type: {self.type}")
 
-        self._signals = self._remove_duplicate_signals()
+        self._remove_duplicate_signals()
 
     def __set_mem_read_signals(
         self,

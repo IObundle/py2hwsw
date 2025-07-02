@@ -640,12 +640,18 @@ class _memInterface(_interface):
     ):
         """Get common signals for the memory interface."""
 
-        clk_prefix = f"{suffix}_" if self._is_async else ""
-        suffix = f"_{suffix}" if suffix else ""
+        if suffix:
+            clk_prefix = f"{suffix}_" if self._is_async else ""
+            suffix = f"_{suffix}"
+            self._signals.append(
+                iob_signal(name=clk_prefix + "clk_o", descr=f"Clock port {suffix}")
+            )
+        else:
+            suffix = ""
+            self._signals.append(
+                iob_signal(name="clk_o", descr="Clock")
+            )
 
-        self._signals.append(
-            iob_signal(name=clk_prefix + "clk" + "_o", descr=f"Clock port {suffix}")
-        )
         if has_addr:
             self._signals.append(
                 iob_signal(

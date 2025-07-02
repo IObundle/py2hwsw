@@ -30,7 +30,7 @@ import ipxact_gen
 
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
-from if_gen import mem_if_names, _memInterface
+from if_gen import mem_if_names, _memInterface, iobClkInterface
 from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
@@ -693,21 +693,16 @@ class iob_core(iob_module, iob_instance):
                     )
                     wire = instantiator.wires[-1]
             port.connect_external(wire, bit_slices=bit_slices)
-        for port in self.ports:
-            if not port.e_connect and port.interface:
-                if (
-                    port.interface.type in mem_if_names
-                    and instantiator
-                    and not self.is_tester
-                ):
-                    # print(f"DEBUG: Creating port '{port.name}' in '{instantiator.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
-                    self.__connect_memory(port, instantiator)
-                elif (
-                    port.interface.type == "iob_clk"
-                    and instantiator
-                    and not self.is_tester
-                ):
-                    self.__connect_clk_interface(port, instantiator)
+
+        # If this module has an instantiator and is not a tester
+        if instantiator and not self.is_tester:
+            for port in self.ports:
+                # If port is not connected externally, but is an interface, connect it if it is a memory or clock interface
+                if not port.e_connect and port.interface:
+                    if isinstance(port.interface, _memInterface):
+                        self.__connect_memory(port, instantiator)
+                    elif isinstance(port.interface, iobClkInterface):
+                        self.__connect_clk_interface(port, instantiator)
 
         # iob_csrs specific code
         if self.original_name == "iob_csrs" and instantiator:

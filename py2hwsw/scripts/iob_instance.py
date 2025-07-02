@@ -12,6 +12,7 @@ from iob_base import (
     fail_with_msg,
     debug,
 )
+from iob_portmap import iob_portmap, get_portmap_port
 from iob_signal import remove_signal_direction_suffixes
 
 
@@ -77,9 +78,6 @@ class iob_instance(iob_base):
             descr="Select if should intantiate the module inside another Verilog module.",
         )
 
-        issuer = kwargs.get("issuer", None)
-        if issuer and connect:
-            self.connect_instance_ports(connect, issuer)
 
     def __deepcopy__(self, memo):
         """Create a deep copy of this instance:
@@ -97,6 +95,7 @@ class iob_instance(iob_base):
         instance_attributes = {
             "instance_name",
             "instance_description",
+            "portmap_connections",
             "parameters",
             "if_defined",
             "if_not_defined",
@@ -121,7 +120,6 @@ class iob_instance(iob_base):
                        (wire_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
         param issuer: Module that is instantiating this instance
         """
-        # TODO: create portmap from port, connect external
         # Connect instance ports to external wires
         for port_name, connection_value in connect.items():
             port = find_obj_in_list(self.ports, port_name)
@@ -165,77 +163,79 @@ class iob_instance(iob_base):
                         }
                     )
                     wire = issuer.wires[-1]
-            # TODO: review this, probably keep in instance
-            port.connect_external(wire, bit_slices=bit_slices)
-        for port in self.ports:
-            if not port.e_connect and port.interface:
+
+            # create portmap and add to instance list
+            portmap = iob_portmap(port=port)
+            portmap.connect_external(wire, bit_slices=bit_slices)
+            self.portmap_connections.append(portmap)
+        for portmap in self.portmap_connections:
+            if not portmap.e_connect and portmap.port.interface:
                 if (
-                    port.interface.type in mem_if_names
+                    portmap.port.interface.type in mem_if_names
                     and issuer
                     and not self.is_tester
                 ):
                     # print(f"DEBUG: Creating port '{port.name}' in '{issuer.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
-                    self.__connect_memory(port, issuer)
+                    self.__connect_memory(portmap, issuer)
                 elif (
                     port.interface.type == "iob_clk"
                     and issuer
                     and not self.is_tester
                 ):
-                    self.__connect_clk_interface(port, issuer)
+                    self.__connect_clk_interface(portmap, issuer)
 
         # iob_csrs specific code
         if self.original_name == "iob_csrs" and issuer:
             self.__connect_cbus_port(issuer)
 
-    def __connect_memory(self, port, issuer):
+    def __connect_memory(self, portmap, issuer):
         """Create memory port in issuer and connect it to self"""
         if not issuer.generate_hw or not self.instantiate:
             return
-        _name = f"{port.name}"
-        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
-        _signals.update(port.interface.widths)
+        _name = f"{portmap.port.name}"
+        _signals = {k: v for k, v in portmap.port.interface.__dict__.items() if k != "widths"}
+        _signals.update(portmap.port.interface.widths)
         if _signals["prefix"] == "":
             _signals.update({"prefix": f"{_name}_"})
-        issuer.create_port(name=_name, signals=_signals, descr=port.descr)
+        issuer.create_port(name=_name, signals=_signals, descr=portmap.port.descr)
         # Add port also to attributes_dict
         issuer.attributes_dict["ports"].append(
             {
                 "name": _name,
                 "signals": _signals,
-                "descr": port.descr,
+                "descr": portmap.port.descr,
             }
         )
         _port = find_obj_in_list(issuer.ports + issuer.wires, _name)
-        port.connect_external(_port, bit_slices=[])
+        portmap.connect_external(_port, bit_slices=[])
 
-    def __connect_clk_interface(self, port, issuer):
+    def __connect_clk_interface(self, portmap, issuer):
         """Create, if needed, a clock interface port in issuer and connect it to self"""
         if not issuer.generate_hw or not self.instantiate:
             return
-        _name = f"{port.name}"
-        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
-        _signals.update(port.interface.widths)
+        _name = f"{portmap.port.name}"
+        _signals = {k: v for k, v in portmap.port.interface.__dict__.items() if k != "widths"}
+        _signals.update(portmap.port.interface.widths)
         for p in issuer.ports:
             if p.interface:
                 if (
-                    p.interface.type == port.interface.type
-                    and p.interface.prefix == port.interface.prefix
+                    p.interface.type == portmap.port.interface.type
+                    and p.interface.prefix == portmap.port.interface.prefix
                 ):
-                    if p.interface.params != port.interface.params:
+                    if p.interface.params != portmap.port.interface.params:
                         p.interface.params = "_".join(
                             filter(
                                 lambda x: x != "None",
-                                [p.interface.params, port.interface.params],
+                                [p.interface.params, portmap.port.interface.params],
                             )
                         )
                         p.signals = []
                         p.__post_init__()
-                    port.connect_external(p, bit_slices=[])
+                    portmap.connect_external(p, bit_slices=[])
                     return
-        issuer.create_port(name=_name, signals=_signals, descr=port.descr)
+        issuer.create_port(name=_name, signals=_signals, descr=portmap.port.descr)
         _port = find_obj_in_list(issuer.ports, _name)
-        port.connect_external(_port, bit_slices=[])
-
+        portmap.connect_external(_port, bit_slices=[])
 
     def __connect_cbus_port(self, issuer):
         """Automatically adds "<prefix>_cbus_s" port to issuers of iob_csrs (are usually iob_system peripherals).
@@ -247,28 +247,28 @@ class iob_instance(iob_base):
             self.original_name == "iob_csrs"
         ), "Internal error: cbus can only be created for issuer of 'iob_csrs' module."
         # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of issuer
-        csrs_port = find_obj_in_list(self.ports, "control_if_s")
+        csrs_portmap = find_obj_in_list(self.portmap_connections, "control_if_s", get_portmap_port)
 
         issuer.create_port(
             name=f"{self.instance_name}_cbus_s",
             signals={
-                "type": csrs_port.interface.type,
+                "type": csrs_portmap.port.interface.type,
                 "prefix": self.instance_name + "_",
-                **csrs_port.interface.widths,
+                **csrs_portmap.port.interface.widths,
             },
             descr="Control and Status Registers interface (auto-generated)",
         )
         # Connect newly created port to self
-        csrs_port.connect_external(issuer.ports[-1], bit_slices=[])
+        csrs_portmap.connect_external(issuer.ports[-1], bit_slices=[])
 
         # Add port to issuer's attributes_dict
         issuer.attributes_dict["ports"].append(
             {
                 "name": f"{self.instance_name}_cbus_s",
                 "signals": {
-                    "type": csrs_port.interface.type,
+                    "type": csrs_portmap.port.interface.type,
                     "prefix": self.instance_name + "_",
-                    **csrs_port.interface.widths,
+                    **csrs_portmap.port.interface.widths,
                 },
                 "descr": "Control and Status Registers interface (auto-generated)",
             }

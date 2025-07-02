@@ -16,19 +16,15 @@ from iob_wire import iob_wire
 
 
 @dataclass
-class iob_portmap(iob_port):
+class iob_portmap:
     """Describes an IO portmap connection."""
 
     # External wire that connects this port
     e_connect: iob_wire | None = None
     # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
     e_connect_bit_slices: list = field(default_factory=list)
-
-    # TODO: create constructor from port?
-    def __init__(self, port: iob_port):
-        # Iterate over the port attributes
-        for key, value in port.__dict__.items():
-            setattr(self, key, value)
+    # Port associated with portmap
+    port: iob_port = None
 
     def connect_external(self, wire, bit_slices={}):
         """Connects the port to an external wire
@@ -38,21 +34,21 @@ class iob_portmap(iob_port):
         """
         # wire must be iob_wire or str
         if isinstance(wire, str):
-            if len(self.signals) != 1:
+            if len(self.port.signals) != 1:
                 fail_with_msg(
-                    f"{iob_colors.FAIL}Port '{self.name}' has more than one signal but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
+                    f"{iob_colors.FAIL}Port '{self.port.name}' has more than one signal but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
                     ValueError,
                 )
             else:
-                validate_verilog_const(value=wire, direction=self.signals[0].direction)
+                validate_verilog_const(value=wire, direction=self.port.signals[0].direction)
         elif isinstance(wire, iob_wire):
-            if self.interface and wire.interface:
-                if self.interface.type == wire.interface.type:
-                    for signal in self.signals:
+            if self.port.interface and wire.interface:
+                if self.port.interface.type == wire.interface.type:
+                    for signal in self.port.signals:
                         search_name = signal.name.replace(
-                            self.interface.prefix, wire.interface.prefix, 1
+                            self.port.interface.prefix, wire.interface.prefix, 1
                         )
-                        if self.name[-2] != wire.name[-2]:
+                        if self.port.name[-2] != wire.name[-2]:
                             swap_suffix = {
                                 "_i": "_o",
                                 "_o": "_i",
@@ -75,33 +71,33 @@ class iob_portmap(iob_port):
                             ):
                                 newlinechar = "\n"
                                 fail_with_msg(
-                                    f"""Port '{self.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!
-Port '{self.name}' has the following signals:                                                                   
+                                    f"""Port '{self.port.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!
+Port '{self.port.name}' has the following signals:                                                                   
 
-{newlinechar.join("- " + signal.name for signal in self.signals)}                                               
+{newlinechar.join("- " + signal.name for signal in self.port.signals)}                                               
 External connection '{wire.name}' has the following signals:                                                    
 {newlinechar.join("- " + signal.name for signal in wire.signals)}                                               
 """,
                                     ValueError,
                                 )
-                elif len(self.signals) != len(wire.signals):
+                elif len(self.port.signals) != len(wire.signals):
                     newlinechar = "\n"
                     fail_with_msg(
-                        f"""Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
-Port '{self.name}' has the following signals:
-{newlinechar.join("- " + signal.name for signal in self.signals)}
+                        f"""Port '{self.port.name}' has different number of signals compared to external connection '{wire.name}'!
+Port '{self.port.name}' has the following signals:
+{newlinechar.join("- " + signal.name for signal in self.port.signals)}
 
 External connection '{wire.name}' has the following signals:
 {newlinechar.join("- " + signal.name for signal in wire.signals)}
 """,
                         ValueError,
                     )
-            elif len(self.signals) != len(wire.signals):
+            elif len(self.port.signals) != len(wire.signals):
                 newlinechar = "\n"
                 fail_with_msg(
-                    f"""Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
-Port '{self.name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(signal).name for signal in self.signals)}
+                    f"""Port '{self.port.name}' has different number of signals compared to external connection '{wire.name}'!
+Port '{self.port.name}' has the following signals:
+{newlinechar.join("- " + get_real_signal(signal).name for signal in self.port.signals)}
 
 External connection '{wire.name}' has the following signals:
 {newlinechar.join("- " + get_real_signal(signal).name for signal in wire.signals)}
@@ -109,7 +105,7 @@ External connection '{wire.name}' has the following signals:
                     ValueError,
                 )
             else:
-                for p, w in zip(self.signals, wire.signals):
+                for p, w in zip(self.port.signals, wire.signals):
                     w = get_real_signal(w)
                     if "'" in w.name or w.name.lower() == "z":
                         validate_verilog_const(value=w.name, direction=p.direction)
@@ -121,3 +117,13 @@ External connection '{wire.name}' has the following signals:
 
         self.e_connect = wire
         self.e_connect_bit_slices = bit_slices
+
+
+def get_portmap_port(portmap: iob_portmap):
+    """Given a iob_portmap reference, return port.
+    This function is used as process_func for find_obj_in_list().
+    """
+    port = None
+    if isinstance(portmap, iob_portmap):
+        port = portmap.port
+    return port

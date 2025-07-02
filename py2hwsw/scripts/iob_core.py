@@ -573,11 +573,11 @@ class iob_core(iob_module, iob_instance):
             self.is_system
         ), "Internal error: only iob_system type cores need fixing cbus width"
         for subblock in self.subblocks:
-            for port in subblock.ports:
+            for portmap in subblock.portmap_connections:
                 if (
-                    port.name == "iob_csrs_cbus_s"
-                    and port.interface.type == "iob"
-                    and port.e_connect
+                    portmap.port.name == "iob_csrs_cbus_s"
+                    and portmap.port.interface.type == "iob"
+                    and portmap.e_connect
                 ):
                     # print(
                     #     "DEBUG",
@@ -585,9 +585,9 @@ class iob_core(iob_module, iob_instance):
                     #     port,
                     #     file=sys.stderr,
                     # )
-                    port_width = port.interface.widths["ADDR_W"]
-                    external_wire_prefix = port.e_connect.interface.prefix
-                    port.e_connect_bit_slices = [
+                    port_width = portmap.port.interface.widths["ADDR_W"]
+                    external_wire_prefix = portmap.e_connect.interface.prefix
+                    portmap.e_connect_bit_slices = [
                         f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
                     ]
 

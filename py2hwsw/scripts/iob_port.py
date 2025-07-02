@@ -14,7 +14,7 @@ from iob_base import (
     find_obj_in_list,
     validate_verilog_const,
 )
-from iob_signal import iob_signal, get_real_signal
+from iob_signal import iob_signal, iob_signal_reference, get_real_signal
 
 
 @dataclass
@@ -112,26 +112,31 @@ class iob_port(iob_wire):
             else:
                 validate_verilog_const(value=wire, direction=self.signals[0].direction)
         elif isinstance(wire, iob_wire):
+            # If the port has an interface, check if the wire has the same interface
             if self.interface and wire.interface:
                 if type(self.interface) == type(wire.interface):
                     for signal in self.signals:
+                        # If it is a signal reference, get the real signal
+                        if isinstance(signal, iob_signal_reference):
+                            signal = get_real_signal(signal)
                         search_name = signal.name.replace(
                             self.interface.prefix, wire.interface.prefix, 1
                         )
+                        # If the wire name and port name have different suffixes
                         if self.name[-2] != wire.name[-2]:
-                            swap_suffix = {
-                                "_i": "_o",
-                                "_o": "_i",
-                            }
+                            # Swap the suffixes if the port is a master/slave port
                             if wire.name[-2:] in ["_s", "_m"]:
-                                search_name += (
-                                    search_name[:-2] + swap_suffix[search_name[-2:]]
-                                )
+                                if search_name[-2:] == "_i":
+                                    search_name += search_name[:-2] + "_o"
+                                else:
+                                    search_name += search_name[:-2] + "_i"
                             else:
                                 search_name = search_name[:-2]
+
                         e_signal = find_obj_in_list(
                             wire.signals, search_name, get_real_signal
                         )
+
                         if not e_signal:
                             if not any(
                                 [
@@ -141,37 +146,31 @@ class iob_port(iob_wire):
                             ):
                                 newlinechar = "\n"
                                 fail_with_msg(
-                                    f"""Port '{self.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!
-Port '{self.name}' has the following signals:                                                                   
-
-{newlinechar.join("- " + signal.name for signal in self.signals)}                                               
-External connection '{wire.name}' has the following signals:                                                    
-{newlinechar.join("- " + signal.name for signal in wire.signals)}                                               
-""",
+                                    f"Port '{self.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!\n"
+                                    f"Port '{self.name}' has the following signals:\n"
+                                    f"{newlinechar.join('- ' + signal.name for signal in self.signals)}\n"
+                                    f"External connection '{wire.name}' has the following signals:\n"
+                                    f"{newlinechar.join('- ' + signal.name for signal in wire.signals)}\n",
                                     ValueError,
                                 )
                 elif len(self.signals) != len(wire.signals):
                     newlinechar = "\n"
                     fail_with_msg(
-                        f"""Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
-Port '{self.name}' has the following signals:
-{newlinechar.join("- " + signal.name for signal in self.signals)}
-
-External connection '{wire.name}' has the following signals:
-{newlinechar.join("- " + signal.name for signal in wire.signals)}
-""",
+                        f"Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!\n"
+                        f"Port '{self.name}' has the following signals:\n"
+                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n\n"
+                        f"External connection '{wire.name}' has the following signals:\n"
+                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}\n",
                         ValueError,
                     )
             elif len(self.signals) != len(wire.signals):
                 newlinechar = "\n"
                 fail_with_msg(
-                    f"""Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!
-Port '{self.name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(signal).name for signal in self.signals)}
-
-External connection '{wire.name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(signal).name for signal in wire.signals)}
-""",
+                    f"Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!\n"
+                    f"Port '{self.name}' has the following signals:\n"
+                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n\n"
+                    f"External connection '{wire.name}' has the following signals:\n"
+                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}",
                     ValueError,
                 )
             else:

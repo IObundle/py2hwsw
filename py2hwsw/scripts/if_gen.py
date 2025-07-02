@@ -428,23 +428,23 @@ class _interface:
         width_str = f" [{wire.width}-1:0] "
         fout.write(wtype + width_str + wire_name + ";\n")
 
-    def __write_wire(self, fout):
+    def _write_wire(self, fout):
         """Write wires to the file."""
         for wire in self.get_signals():
             self.__write_single_wire(fout, wire, False)
 
-    def __write_tb_wires(self, fout):
+    def __write_tb_wire(self, fout):
         """Write testbench wires to the file."""
         for wire in self.get_signals():
             self.__write_single_wire(fout, wire, True)
 
-    def __write_m_tb_wires(self, fout):
+    def _write_m_tb_wire(self, fout):
         """Write master testbench wires to the file."""
-        self.__write_tb_wires(fout)
+        self.__write_tb_wire(fout)
 
-    def __write_s_tb_wires(self, fout):
+    def _write_s_tb_wire(self, fout):
         """Write slave testbench wires to the file."""
-        self.__write_m_tb_wires(fout)
+        self._write_m_tb_wire(fout)
 
     #
     # Port
@@ -516,7 +516,7 @@ class _interface:
         file_prefix = self.file_prefix
 
         fout = open(file_prefix + file_name + "_wire.vs", "w")
-        self.__write_wire(fout)
+        self.__write_wires(fout)
         fout.close()
 
     def gen_all_vs_files(self):

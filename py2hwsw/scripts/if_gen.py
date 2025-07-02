@@ -345,6 +345,7 @@ class _interface:
     #
     # Signal manipulation private methods
     #
+    @staticmethod
     def __reverse_name_direction(name):
         """Reverse the direction of a signal name."""
         if name.endswith("_i"):
@@ -357,6 +358,7 @@ class _interface:
             print(f"ERROR: __reverse_name_direction: invalid argument {name}.")
             exit(1)
 
+    @staticmethod
     def __reverse_direction(direction):
         """Reverse the direction of a signal."""
         if direction == "input":
@@ -367,14 +369,16 @@ class _interface:
             print(f"ERROR: __reverse_direction: invalid argument {direction}.")
             exit(1)
 
-    def __reverse_signals_dir(self, signals):
+    @staticmethod
+    def __reverse_signals_direction(signals):
         """Reverse the direction of all signals in a list."""
         new_signals = deepcopy(signals)
         for signal in new_signals:
-            signal.direction = self.__reverse_direction(signal.direction)
-            signal.name = self.__reverse_name_direction(signal.name)
+            signal.direction = _interface.__reverse_direction(signal.direction)
+            signal.name = _interface.__reverse_name_direction(signal.name)
         return new_signals
 
+    @staticmethod
     def __get_tbsignal_type(direction):
         """Get the type of a signal for the testbench."""
         if direction == "input":
@@ -385,6 +389,7 @@ class _interface:
             print(f"ERROR: __get_tbsignal_type: invalid argument {direction}.")
             exit(1)
 
+    @staticmethod
     def __get_suffix(direction):
         """Get the suffix for a signal based on its direction."""
         if direction == "input":
@@ -423,7 +428,7 @@ class _interface:
         width_str = f" [{wire.width}-1:0] "
         fout.write(wtype + width_str + wire_name + ";\n")
 
-    def __write_wires(self, fout):
+    def __write_wire(self, fout):
         """Write wires to the file."""
         for wire in self.get_signals():
             self.__write_single_wire(fout, wire, False)
@@ -494,7 +499,7 @@ class _interface:
         signals = deepcopy(self._signals)
         # Set direction according to if_direction
         if self.if_direction == "subordinate":
-            signals = self.__reverse_signals_dir(signals)
+            signals = self.__reverse_signals_direction(signals)
 
         if self.mult != 1:
             for signal in signals:
@@ -511,7 +516,7 @@ class _interface:
         file_prefix = self.file_prefix
 
         fout = open(file_prefix + file_name + "_wire.vs", "w")
-        self.__write_wires(fout)
+        self.__write_wire(fout)
         fout.close()
 
     def gen_all_vs_files(self):

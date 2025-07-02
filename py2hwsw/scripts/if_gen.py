@@ -591,7 +591,7 @@ class iobInterface(_interface):
     addr_w: str or int = 32
 
     def __post_init__(self):
-        super.post__init__()
+        super().__post_init__()
         self.__set_signals()
 
     def __set_signals(self):
@@ -708,7 +708,7 @@ class symMemInterface(_memInterface):
                     "a", has_enable=True, has_addr=True, is_true_port=True
                 )
                 self.__set_mem_read_signals(
-                    "b", hasEnable=True, has_addr=True, is_true_port=True
+                    "b", has_enable=True, has_addr=True, is_true_port=True
                 )
             case "rom_atdp":
                 self._is_async = True
@@ -719,15 +719,15 @@ class symMemInterface(_memInterface):
             case "ram_2p":
                 self._set_mem_signals("", has_addr=False, has_enable=False)
                 self.__set_mem_read_signals(
-                    "", hasEnable=True, has_ready=True, has_addr=True
+                    "", has_enable=True, has_ready=True, has_addr=True
                 )
                 self.__set_mem_write_signals("", has_ready=True, has_addr=True)
             case "ram_at2p":
                 self._is_async = True
-                self._set_mem_signals("r", hasAddr=False, hasEnable=False)
-                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
-                self._set_mem_signals("w", hasAddr=False, hasEnable=False)
-                self.__set_mem_write_signals("", hasAddr=True)
+                self._set_mem_signals("r", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("", has_enable=True, has_addr=True)
+                self._set_mem_signals("w", has_addr=False, has_enable=False)
+                self.__set_mem_write_signals("", has_addr=True)
             case "ram_atdp":
                 self._is_async = True
                 self._set_mem_signals("a")
@@ -740,10 +740,10 @@ class symMemInterface(_memInterface):
                 self._is_async = True
                 self._set_mem_signals("a")
                 self.__set_mem_read_signals("a", is_true_port=True)
-                self.__set_mem_write_signals("a", is_true_port=True, byte_enable=True)
+                self.__set_mem_write_signals("a", is_true_port=True, has_byte_enable=True)
                 self._set_mem_signals("b")
                 self.__set_mem_read_signals("b", is_true_port=True)
-                self.__set_mem_write_signals("b", is_true_port=True, byte_enable=True)
+                self.__set_mem_write_signals("b", is_true_port=True, has_byte_enable=True)
             case "ram_sp" | "ram_sp_se":
                 self._set_mem_signals("")
                 self.__set_mem_read_signals("")
@@ -751,18 +751,18 @@ class symMemInterface(_memInterface):
             case "ram_sp_be":
                 self._set_mem_signals("")
                 self.__set_mem_read_signals("")
-                self.__set_mem_write_signals("", byte_enable=True)
+                self.__set_mem_write_signals("", has_byte_enable=True)
             case "ram_t2p":
-                self._set_mem_signals("", hasAddr=False, hasEnable=False)
-                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
-                self.__set_mem_write_signals("", hasAddr=True)
+                self._set_mem_signals("", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("", has_enable=True, has_addr=True)
+                self.__set_mem_write_signals("", has_addr=True)
             case "ram_t2p_be":
-                self._set_mem_signals("", hasAddr=False, hasEnable=False)
-                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
-                self.__set_mem_write_signals("", hasAddr=True, byte_enable=True)
+                self._set_mem_signals("", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("", has_enable=True, has_addr=True)
+                self.__set_mem_write_signals("", has_addr=True, has_byte_enable=True)
             case "ram_t2p_tiled":
-                self._set_mem_signals("", hasEnable=False)
-                self.__set_mem_read_signals("", hasEnable=True)
+                self._set_mem_signals("", has_enable=False)
+                self.__set_mem_read_signals("", has_enable=True)
                 self.__set_mem_write_signals("")
             case "ram_tdp":
                 self._set_mem_signals("a")
@@ -774,10 +774,10 @@ class symMemInterface(_memInterface):
             case "ram_tdp_be" | "ram_tdp_be_xil":
                 self._set_mem_signals("a")
                 self.__set_mem_read_signals("a")
-                self.__set_mem_write_signals("a", byte_enable=True)
+                self.__set_mem_write_signals("a", has_byte_enable=True)
                 self._set_mem_signals("b")
                 self.__set_mem_read_signals("b")
-                self.__set_mem_write_signals("b", byte_enable=True)
+                self.__set_mem_write_signals("b", has_byte_enable=True)
             case _:
                 raise ValueError(f"Unknown memory interface type: {self.type}")
 
@@ -929,7 +929,7 @@ class asymMemInterface(_memInterface):
                     "a", has_enable=True, has_addr=True, is_true_port=True
                 )
                 self.__set_mem_read_signals(
-                    "b", hasEnable=True, has_addr=True, is_true_port=True
+                    "b", has_enable=True, has_addr=True, is_true_port=True
                 )
             case "rom_atdp":
                 self._is_async = True
@@ -940,15 +940,15 @@ class asymMemInterface(_memInterface):
             case "ram_2p":
                 self._set_mem_signals("", has_addr=False, has_enable=False)
                 self.__set_mem_read_signals(
-                    "", hasEnable=True, has_ready=True, has_addr=True
+                    "", has_enable=True, has_ready=True, has_addr=True
                 )
                 self.__set_mem_write_signals("", has_ready=True, has_addr=True)
             case "ram_at2p":
                 self._is_async = True
-                self._set_mem_signals("r", hasAddr=False, hasEnable=False)
-                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
-                self._set_mem_signals("w", hasAddr=False, hasEnable=False)
-                self.__set_mem_write_signals("", hasAddr=True)
+                self._set_mem_signals("r", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("", has_enable=True, has_addr=True)
+                self._set_mem_signals("w", has_addr=False, has_enable=False)
+                self.__set_mem_write_signals("", has_addr=True)
             case "ram_atdp":
                 self._is_async = True
                 self._set_mem_signals("a")
@@ -958,9 +958,9 @@ class asymMemInterface(_memInterface):
                 self.__set_mem_read_signals("b", is_true_port=True)
                 self.__set_mem_write_signals("b", is_true_port=True)
             case "ram_t2p":
-                self._set_mem_signals("", hasAddr=False, hasEnable=False)
-                self.__set_mem_read_signals("", hasEnable=True, hasAddr=True)
-                self.__set_mem_write_signals("", hasAddr=True)
+                self._set_mem_signals("", has_addr=False, has_enable=False)
+                self.__set_mem_read_signals("", has_enable=True, has_addr=True)
+                self.__set_mem_write_signals("", has_addr=True)
             case "ram_tdp":
                 self._set_mem_signals("a")
                 self.__set_mem_read_signals("a")

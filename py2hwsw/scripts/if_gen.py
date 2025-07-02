@@ -516,7 +516,7 @@ class _interface:
         file_prefix = self.file_prefix
 
         fout = open(file_prefix + file_name + "_wire.vs", "w")
-        self.__write_wires(fout)
+        self._write_wire(fout)
         fout.close()
 
     def gen_all_vs_files(self):

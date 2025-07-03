@@ -319,7 +319,7 @@ class _interface:
         elif isinstance(self, iobInterface):
             return "iob"
         elif isinstance(self, _memInterface):
-            return self.type
+            return self.genre
         elif isinstance(self, AXIStreamInterface):
             return "axis"
         elif isinstance(self, AXILiteInterface):
@@ -389,7 +389,7 @@ class _interface:
 
     @staticmethod
     def __get_tbsignal_type(direction):
-        """Get the type of a signal for the testbench."""
+        """Get the genre of a signal for the testbench."""
         if direction == "input":
             return "wire"
         elif direction == "output":
@@ -655,8 +655,8 @@ class _memInterface(_interface):
     addr_w: int or str = 32
     # Asynchronous memory interface
     _is_async: bool = False
-    # Memory type
-    type: str = "ram_sp"
+    # Memory genre
+    genre: str = "ram_sp"
 
     def _set_mem_signals(
         self, suffix: str, has_addr: bool = True, has_enable: bool = True
@@ -710,10 +710,10 @@ class symMemInterface(_memInterface):
         self.__set_signals()
 
     def __set_signals(self):
-        """Set signals for the symmetric memory interface based on the memory type."""
+        """Set signals for the symmetric memory interface based on the memory genre."""
 
         # Replace the long if-elif-else chain with a match-case statement (Python 3.10+)
-        match self.type:
+        match self.genre:
             case "rom_2p":
                 self._set_mem_signals("", has_addr=False, has_enable=False)
                 self.__set_mem_read_signals(
@@ -802,7 +802,7 @@ class symMemInterface(_memInterface):
                 self.__set_mem_read_signals("b")
                 self.__set_mem_write_signals("b", has_byte_enable=True)
             case _:
-                raise ValueError(f"Unknown memory interface type: {self.type}")
+                raise ValueError(f"Unknown memory interface genre: {self.genre}")
 
         self._remove_duplicate_signals()
 
@@ -935,9 +935,9 @@ class asymMemInterface(_memInterface):
         self.__set_signals()
 
     def __set_signals(self):
-        """Set signals for the asymmetric memory interface based on the memory type."""
+        """Set signals for the asymmetric memory interface based on the memory genre."""
 
-        match self.type:
+        match self.genre:
             case "rom_2p":
                 self._set_mem_signals("", has_addr=False, has_enable=False)
                 self.__set_mem_read_signals(
@@ -992,7 +992,7 @@ class asymMemInterface(_memInterface):
                 self.__set_mem_read_signals("b")
                 self.__set_mem_write_signals("b")
             case _:
-                raise ValueError(f"Unknown memory interface type: {self.type}")
+                raise ValueError(f"Unknown memory interface genre: {self.genre}")
 
         self._signals = self._remove_duplicate_signals(self._signals)
 
@@ -1836,7 +1836,7 @@ class wishboneInterface(_interface):
 
 
 def create_interface(
-    type,
+    genre,
     if_direction="",
     mult=1,
     widths={},
@@ -1845,8 +1845,8 @@ def create_interface(
     portmap_port_prefix="",
     file_prefix="",
 ):
-    """Creates an interface with the given type and parameters.
-    param type: Name of the interface.
+    """Creates an interface with the given genre and parameters.
+    param genre: Name of the interface.
     param if_direction: Direction of the interface.
                 Examples: '' (unspecified), 'manager', 'subordinate', ...
     param mult: Multiplication factor for all signal widths.
@@ -1856,7 +1856,7 @@ def create_interface(
     param portmap_port_prefix: Prefix to add to all portmap ports.
     param file_prefix: Prefix to add to the file name.
     return: An instance of the interface class.
-    Raises ValueError if the type is not recognized or if the widths are not of the correct.
+    Raises ValueError if the genre is not recognized or if the widths are not of the correct.
     """
 
     # Retrieve widths and parameters even if not needed
@@ -1889,36 +1889,32 @@ def create_interface(
     # rs232
     n_pins = widths.get("N_PINS", 4)
 
-    # Check if widths are integers
-    # NOTE: data_w should later be only an integer
-    if not isinstance(data_w, int) and not isinstance(data_w, str):
-        raise ValueError("DATA_W must be an integer or a string.")
-    if not isinstance(addr_w, int) and not isinstance(addr_w, str):
-        raise ValueError("ADDR_W must be an integer or a string.")
-    if not isinstance(w_data_w, int):
-        raise ValueError("W_DATA_W must be an integer or a string.")
-    if not isinstance(r_data_w, int):
-        raise ValueError("R_DATA_W must be an integer or a string.")
-    if not isinstance(id_w, int):
-        raise ValueError("ID_W must be an integer.")
-    if not isinstance(size_w, int):
-        raise ValueError("SIZE_W must be an integer.")
-    if not isinstance(burst_w, int):
-        raise ValueError("BURST_W must be an integer.")
-    if not isinstance(lock_w, int):
-        raise ValueError("LOCK_W must be an integer.")
-    if not isinstance(cache_w, int):
-        raise ValueError("CACHE_W must be an integer.")
-    if not isinstance(prot_w, int):
-        raise ValueError("PROT_W must be an integer.")
-    if not isinstance(qos_w, int):
-        raise ValueError("QOS_W must be an integer.")
-    if not isinstance(resp_w, int):
-        raise ValueError("RESP_W must be an integer.")
-    if not isinstance(len_w, int):
-        raise ValueError("LEN_W must be an integer.")
+    # Check if widths are integers or strings
+    # TODO: except for addr_w, all should later be only an integer
+    for width in [
+        data_w,
+        addr_w,
+        w_data_w,
+        r_data_w,
+        id_w,
+        size_w,
+        burst_w,
+        lock_w,
+        cache_w,
+        prot_w,
+        qos_w,
+        resp_w,
+        len_w,
+        ahb_prot_w,
+        ahb_burst_w,
+        ahb_trans_w,
+        ahb_size_w,
+        n_pins,
+    ]:
+        if not isinstance(width, int):
+            raise ValueError(f"Width '{width}' must be an integer, got {type(width)}.")
 
-    match type:
+    match genre:
         case "iob_clk":
             # Check the params for the IOb clock interface
             has_cke = False
@@ -1971,7 +1967,7 @@ def create_interface(
                     file_prefix=file_prefix,
                     portmap_port_prefix=portmap_port_prefix,
                     addr_w=widths.get("ADDR_W", 32),
-                    type=type,
+                    genre=genre,
                     w_data_w=w_data_w,
                     r_data_w=r_data_w,
                 )
@@ -1984,7 +1980,7 @@ def create_interface(
                     file_prefix=file_prefix,
                     portmap_port_prefix=portmap_port_prefix,
                     addr_w=addr_w,
-                    type=type,
+                    genre=genre,
                     data_w=data_w,
                 )
         case "axis":
@@ -2151,7 +2147,7 @@ def create_interface(
                 is_full=True,
             )
         case _:
-            raise ValueError(f"Unknown interface type: {type}")
+            raise ValueError(f"Unknown interface genre: {genre}")
 
     return interface
 
@@ -2164,7 +2160,7 @@ def create_interface(
 if __name__ == "__main__":
     for if_name in if_names:
         interface = create_interface(
-            type=if_name,
+            genre=if_name,
             if_direction="",
             mult=1,
             widths={},

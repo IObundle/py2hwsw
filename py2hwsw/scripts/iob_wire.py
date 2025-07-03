@@ -193,7 +193,7 @@ def dict2interface(name, interface_dict):
     if not interface_dict:
         return None
 
-    type = interface_dict.get("type", "")
+    genre = interface_dict.get("type", "")
 
     if name.endswith("_m"):
         if_direction = "manager"
@@ -201,7 +201,7 @@ def dict2interface(name, interface_dict):
         if_direction = "subordinate"
     else:
         if_direction = ""
-    
+
     prefix = interface_dict.get("prefix", "")
     mult = interface_dict.get("mult", 1)
     params = interface_dict.get("params", None)
@@ -226,14 +226,14 @@ def dict2interface(name, interface_dict):
     }
 
     interface = if_gen.create_interface(
-        type=type,
+        genre=genre,
         if_direction=if_direction,
         mult=mult,
         widths=remaining_entries,
         prefix=prefix,
         params=params,
         portmap_port_prefix=portmap_port_prefix,
-        file_prefix=file_prefix
+        file_prefix=file_prefix,
     )
 
     return interface

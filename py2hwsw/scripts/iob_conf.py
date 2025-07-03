@@ -128,9 +128,11 @@ def conf_from_text(conf_text):
 
 
 def conf_group_from_dict(conf_group_dict):
-    # Replace 'type' key with 'kind' key
-    if "type" in conf_group_dict:
-        conf_group_dict["kind"] = conf_group_dict.pop("type")
+    # Convert list of confs dictionaries into 'confs' objects
+    confs_objs = []
+    for conf in conf_group_dict.get("confs", []):
+        confs_objs.append(conf_from_dict(conf))
+    conf_group_dict["confs"] = confs_objs
     return iob_conf_group(**conf_group_dict)
 
 

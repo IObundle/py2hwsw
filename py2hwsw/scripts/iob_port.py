@@ -137,6 +137,7 @@ class iob_port(iob_wire):
                             wire.signals, search_name, get_real_signal
                         )
 
+                        # If the signal is not found, check if the bit slices contain the signal
                         if not e_signal:
                             if not any(
                                 [
@@ -210,7 +211,7 @@ def create_port_from_dict(core, *args, signals=[], **kwargs):
         sig_obj_list = convert_dict2obj_list(signals, iob_signal)
     elif type(signals) is dict:
         # Convert user interface dictionary into an interface object
-        interface_obj = dict2interface(signals)
+        interface_obj = dict2interface(kwargs.get("name", ""), signals)
         if interface_obj and not interface_obj.file_prefix:
             interface_obj.file_prefix = core.name + "_"
     else:

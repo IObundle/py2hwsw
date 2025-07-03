@@ -80,7 +80,7 @@ def create_wire(core, *args, signals=[], **kwargs):
             sig_obj_list = convert_dict2obj_list(signals, iob_signal)
         elif type(signals) is dict:
             # Convert user interface dictionary into '_interface' object
-            interface_obj = dict2interface(signals)
+            interface_obj = dict2interface(name=kwargs.get("name", ""), interface_dict=signals)
             if interface_obj and not interface_obj.file_prefix:
                 interface_obj.file_prefix = core.name + "_"
         else:
@@ -168,61 +168,53 @@ def find_signal_in_wires(wires, signal_name, process_func=get_real_signal):
 # Note: This function is to be deprecated in the future, since objects should be created directly for
 # each interface type.
 #
-def dict2interface(interface_dict):
+def dict2interface(name, interface_dict):
     """Convert dictionary to an interface.
     Example interface dict:
     {
-        "name": "cpu_m",
-        "descr": "cpu instruction bus",
-        "signals": {
-            "type": "iob",
-            # Generic string parameter
-            "params": "",
-            # Widths/Other parameters
-            "DATA_W": "DATA_W",
-            "ADDR_W": "ADDR_W",
-        },
-    },
+        "type": "iob",
+        # Generic string parameter
+        "params": "",
+        # Widths/Other parameters
+        "DATA_W": "DATA_W",
+        "ADDR_W": "ADDR_W",
+    }
     To use an assymmetric memory interface, the dictionary should look like this:
     {
-        "name": "mem_m",
-        "descr": "Memory interface",
-        "signals": {
-            "type": "ram_at2p",
-            # Generic string parameter
-            "params": "",
-            # Widths/Other parameters
-            "ADDR_W": "ADDR_W",
-            "W_DATA_W": "W_DATA_W",
-            "R_DATA_W": "R_DATA_W",
-        },
+        "type": "ram_at2p",
+        # Generic string parameter
+        "params": "",
+        # Widths/Other parameters
+        "ADDR_W": "ADDR_W",
+        "W_DATA_W": "W_DATA_W",
+        "R_DATA_W": "R_DATA_W",
+    }
     """
     if not interface_dict:
         return None
 
-    signals_dict = interface_dict.get("signals", {})
-
     type = interface_dict.get("type", "")
 
-    if interface_dict.get("name", "").endswith("_m"):
+    if name.endswith("_m"):
         if_direction = "master"
-    elif interface_dict.get("name", "").endswith("_s"):
+    elif name.endswith("_s"):
         if_direction = "slave"
     else:
         if_direction = ""
 
-    prefix = signals_dict.get("prefix", "")
-    mult = signals_dict.get("mult", 1)
-    params = signals_dict.get("params", None)
+
+    prefix = interface_dict.get("prefix", "")
+    mult = interface_dict.get("mult", 1)
+    params = interface_dict.get("params", None)
     if params is not None:
         params = params.split("_")
-    file_prefix = signals_dict.get("file_prefix", "")
-    portmap_port_prefix = signals_dict.get("portmap_port_prefix", "")
+    file_prefix = interface_dict.get("file_prefix", "")
+    portmap_port_prefix = interface_dict.get("portmap_port_prefix", "")
 
     # Remaining entries in the interface_dict (usually widths or other parameters)
     remaining_entries = {
         k: v
-        for k, v in signals_dict.items()
+        for k, v in interface_dict.items()
         if k
         not in [
             "type",
@@ -244,6 +236,5 @@ def dict2interface(interface_dict):
         portmap_port_prefix=portmap_port_prefix,
         file_prefix=file_prefix
     )
-
 
     return interface

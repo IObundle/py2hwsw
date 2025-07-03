@@ -286,10 +286,9 @@ def generate_headers(
     for file in files:
         write_independent_lic_file(file, header)
 
-    # # Download license using `reuse` tool
-    # breakpoint()
-    # if not os.path.isfile(os.path.join(root, f"LICENSES/{license_name}.txt")):
-    #     os.system(f"reuse --root {root} download {license_name}")
+    # Download license using `reuse` tool
+    if not os.path.isfile(os.path.join(root, f"LICENSES/{license_name}.txt")):
+        os.system(f"reuse --root {root} download {license_name}")
 
 
 def write_independent_lic_file(file, header):

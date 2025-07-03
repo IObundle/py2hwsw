@@ -33,7 +33,6 @@ from if_gen import mem_if_names
 from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
-    find_obj_in_list,
     fail_with_msg,
     find_file,
     import_python_module,
@@ -47,7 +46,6 @@ import sw_tools
 import verilog_format
 import verilog_lint
 from manage_headers import generate_headers
-from iob_signal import remove_signal_direction_suffixes
 
 
 class iob_core(iob_module, iob_instance):
@@ -87,15 +85,15 @@ class iob_core(iob_module, iob_instance):
                    dictionary will override the one from the constructor argument.
         :param dict connect: External wires to connect to ports of this instance
                        Key: Port name, Value: Wire name
-        :param iob_core instantiator: Module that is instantiating this instance
+        :param iob_core issuer: Module that is instantiating this instance
         :param bool is_parent: If this core is a parent core
         """
         # Arguments used by this class
         dest_dir = kwargs.get("dest_dir", "hardware/src")
         attributes = kwargs.get("attributes", {})
         connect = kwargs.get("connect", {})
-        self.instantiator = kwargs.get("instantiator", None)
-        is_parent = kwargs.get("is_parent", False)
+        self.issuer = kwargs.get("issuer", None)
+        self.is_parent = kwargs.get("is_parent", False)
 
         # Store kwargs to allow access to python parameters after object has been created
         self.received_python_parameters = kwargs
@@ -255,11 +253,11 @@ class iob_core(iob_module, iob_instance):
 
         # Read 'attributes' dictionary and set corresponding core attributes
         superblocks = attributes.pop("superblocks", [])
-        # Note: Parsing attributes (specifically the subblocks list) also causes the setup process for subblocks to run
+        # Note: Parsing attributes (specifically the subblocks list) also initializes subblocks
         self.parse_attributes_dict(attributes)
 
-        # Connect ports of this instance to external wires (wires of the instantiator)
-        self.connect_instance_ports(connect, self.instantiator)
+        # Connect ports of this instance to external wires (wires of the issuer)
+        self.connect_instance_ports(connect, self.issuer)
 
         # iob_csrs specific code
         if self.is_system:
@@ -282,13 +280,13 @@ class iob_core(iob_module, iob_instance):
             descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part.",
         )
 
-        # Ensure superblocks are set up last
+        # Ensure superblocks are instanciated last
         # and only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
             self.parse_attributes_dict({"superblocks": superblocks})
         if self.is_superblock:
-            # Generate verilog parameters of instantiator subblock
-            param_gen.generate_inst_params(self.instantiator)
+            # Generate verilog parameters of issuer subblock
+            param_gen.generate_inst_params(self.issuer)
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
@@ -304,7 +302,146 @@ class iob_core(iob_module, iob_instance):
         if self.abort_reason:
             return
 
+    def post_setup(self):
+        """Scripts to run at the end of the top module's setup"""
+        # Replace Verilog snippet includes
+        self._replace_snippet_includes()
+        # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
+        self._remove_duplicate_sources()
+        if self.is_tester:
+            # Add callback to: Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
+            __class__.global_post_setup_callbacks.append(
+                lambda: self._remove_duplicate_sources(
+                    main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
+                    subfolders=[
+                        "hardware/src",
+                        "hardware/simulation/src",
+                        "hardware/fpga/src",
+                        "hardware/common_src",
+                    ],
+                )
+            )
+        else:  # Not tester
+            # Run post setup callbacks
+            for callback in __class__.global_post_setup_callbacks:
+                callback()
+        # Generate docs
+        doc_gen.generate_docs(self)
+        # Generate ipxact file
+        ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
+        # Remove 'iob_v_tb.v' from build dir if 'iob_v_tb.vh' does not exist
+        sim_src_dir = "hardware/simulation/src"
+        if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
+            os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
+        # Lint and format sources
+        self.lint_and_format()
+        print(
+            f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
+        )
+        # Add SPDX license headers to every file in build dir
+        custom_header=f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
+        generate_headers(
+            root=self.build_dir,
+            copyright_holder=self.license.author,
+            copyright_year=self.license.year,
+            license_name=self.license.name,
+            header_template="spdx",
+            custom_header_suffix=custom_header,
+            skip_existing_headers=True,
+            verbose=False,
+        )
+
+    def create_python_parameter_group(self, *args, **kwargs):
+        create_python_parameter_group(self, *args, **kwargs)
+
+    def handle_parent(self, *args, **kwargs):
+        """Create a new core based on parent core.
+        returns: True if parent core was used. False otherwise.
+        """
+        attributes = kwargs.pop("attributes", {})
+        child_attributes = kwargs.pop("child_attributes", {})
+        if self.is_parent:
+            self.append_child_attributes(attributes, child_attributes)
+
+        # Don't setup parent core if this one does not have parent
+        parent = attributes.get("parent")
+        if not parent:
+            return False
+
+        assert parent["core_name"] != attributes["original_name"], fail_with_msg(
+            f"Parent and child cannot have the same name: '{parent['core_name']}'"
+        )
+
+        belongs_to_top_module = not __class__.global_top_module
+        # Check if this child module is the first one called (It is the leaf child of the top module. Does not have any other childs.)
+        is_first_module_called = belongs_to_top_module and not self.is_parent
+
+        name = attributes.get("name", attributes["original_name"])
+        # Update global build dir to match this module's name and version
+        if is_first_module_called and not __class__.global_build_dir:
+            version = attributes.get("version", PY2HWSW_VERSION)
+            __class__.global_build_dir = f"../{name}_V{version}"
+
+        filtered_parent_py_params = dict(parent)
+        filtered_parent_py_params.pop("core_name", None)
+        filtered_parent_py_params.pop("py2hwsw_target", None)
+        filtered_parent_py_params.pop("build_dir", None)
+        filtered_parent_py_params.pop("issuer", None)
+        filtered_parent_py_params.pop("py2hwsw_version", None)
+        filtered_parent_py_params.pop("connect", None)
+        filtered_parent_py_params.pop("parameters", None)
+        filtered_parent_py_params.pop("is_superblock", None)
+        if "name" not in filtered_parent_py_params:
+            filtered_parent_py_params["name"] = name
+
+        # print("DEBUG1", kwargs, file=sys.stderr)
+        # print("DEBUG2", filtered_parent_py_params, file=sys.stderr)
+
+        # Setup parent core
+        parent_module = self.get_core_obj(
+            parent["core_name"],
+            **filtered_parent_py_params,
+            is_parent=True,
+            child_attributes=attributes,
+            issuer=kwargs.get("issuer", None),
+            connect=kwargs.get("connect", {}),
+            parameters=kwargs.get("parameters", {}),
+            is_superblock=kwargs.get("is_superblock", False),
+        )
+
+        # Copy (some) parent attributes to child
+        self.__dict__.update(parent_module.__dict__)
+        self.original_name = attributes["original_name"]
+        self.setup_dir = attributes["setup_dir"]
+
+        if self.abort_reason:
+            return True
+
+        # Copy files from the module's setup dir
+        copy_srcs.copy_rename_setup_directory(self)
+
+        # Run post setup
+        if is_first_module_called:
+            self.post_setup()
+
+        return True
+
+    def generate_build_dir(self, **kwargs):
+
         self.__create_build_dir()
+
+        # subblock setup process
+        for subblock in self.subblocks:
+            if self.is_superblock:
+                if subblock.original_name == self.issuer.original_name:
+                    # skip build dir generation for issuer subblocks
+                    continue
+            subblock.generate_build_dir()
+
+        # Ensure superblocks are set up only for top module (or wrappers of it)
+        if self.is_top_module or self.is_superblock:
+            for superblock in self.superblocks:
+                superblock.generate_build_dir()
 
         if self.is_tester:
             self.relative_path_to_UUT = os.path.relpath(
@@ -362,134 +499,8 @@ class iob_core(iob_module, iob_instance):
         # TODO as well: Each module has a local `snippets` list.
         # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
-        if (self.is_top_module and not is_parent) or self.is_tester:
+        if (self.is_top_module and not self.is_parent) or self.is_tester:
             self.post_setup()
-
-    def post_setup(self):
-        """Scripts to run at the end of the top module's setup"""
-        # Replace Verilog snippet includes
-        self._replace_snippet_includes()
-        # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
-        self._remove_duplicate_sources()
-        if self.is_tester:
-            # Add callback to: Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
-            __class__.global_post_setup_callbacks.append(
-                lambda: self._remove_duplicate_sources(
-                    main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
-                    subfolders=[
-                        "hardware/src",
-                        "hardware/simulation/src",
-                        "hardware/fpga/src",
-                        "hardware/common_src",
-                    ],
-                )
-            )
-        else:  # Not tester
-            # Run post setup callbacks
-            for callback in __class__.global_post_setup_callbacks:
-                callback()
-        # Generate docs
-        doc_gen.generate_docs(self)
-        # Generate ipxact file
-        ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
-        # Remove 'iob_v_tb.v' from build dir if 'iob_v_tb.vh' does not exist
-        sim_src_dir = "hardware/simulation/src"
-        if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
-            os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
-        # Lint and format sources
-        self.lint_and_format()
-        print(
-            f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
-        )
-        # Add SPDX license headers to every file in build dir
-        custom_header=f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
-        generate_headers(
-            root=self.build_dir,
-            copyright_holder=self.license.author,
-            copyright_year=self.license.year,
-            license_name=self.license.name,
-            header_template="spdx",
-            custom_header_suffix=custom_header,
-            skip_existing_headers=True,
-            verbose=False,
-        )
-
-
-    def create_python_parameter_group(self, *args, **kwargs):
-        create_python_parameter_group(self, *args, **kwargs)
-
-    def handle_parent(self, *args, **kwargs):
-        """Create a new core based on parent core.
-        returns: True if parent core was used. False otherwise.
-        """
-        is_parent = kwargs.pop("is_parent", False)
-        attributes = kwargs.pop("attributes", {})
-        child_attributes = kwargs.pop("child_attributes", {})
-        if is_parent:
-            self.append_child_attributes(attributes, child_attributes)
-
-        # Don't setup parent core if this one does not have parent
-        parent = attributes.get("parent")
-        if not parent:
-            return False
-
-        assert parent["core_name"] != attributes["original_name"], fail_with_msg(
-            f"Parent and child cannot have the same name: '{parent['core_name']}'"
-        )
-
-        belongs_to_top_module = not __class__.global_top_module
-        # Check if this child module is the first one called (It is the leaf child of the top module. Does not have any other childs.)
-        is_first_module_called = belongs_to_top_module and not is_parent
-
-        name = attributes.get("name", attributes["original_name"])
-        # Update global build dir to match this module's name and version
-        if is_first_module_called and not __class__.global_build_dir:
-            version = attributes.get("version", PY2HWSW_VERSION)
-            __class__.global_build_dir = f"../{name}_V{version}"
-
-        filtered_parent_py_params = dict(parent)
-        filtered_parent_py_params.pop("core_name", None)
-        filtered_parent_py_params.pop("py2hwsw_target", None)
-        filtered_parent_py_params.pop("build_dir", None)
-        filtered_parent_py_params.pop("instantiator", None)
-        filtered_parent_py_params.pop("py2hwsw_version", None)
-        filtered_parent_py_params.pop("connect", None)
-        filtered_parent_py_params.pop("parameters", None)
-        filtered_parent_py_params.pop("is_superblock", None)
-        if "name" not in filtered_parent_py_params:
-            filtered_parent_py_params["name"] = name
-
-        # print("DEBUG1", kwargs, file=sys.stderr)
-        # print("DEBUG2", filtered_parent_py_params, file=sys.stderr)
-
-        # Setup parent core
-        parent_module = self.get_core_obj(
-            parent["core_name"],
-            **filtered_parent_py_params,
-            is_parent=True,
-            child_attributes=attributes,
-            instantiator=kwargs.get("instantiator", None),
-            connect=kwargs.get("connect", {}),
-            parameters=kwargs.get("parameters", {}),
-            is_superblock=kwargs.get("is_superblock", False),
-        )
-
-        # Copy (some) parent attributes to child
-        self.__dict__.update(parent_module.__dict__)
-        self.original_name = attributes["original_name"]
-        self.setup_dir = attributes["setup_dir"]
-
-        if self.abort_reason:
-            return True
-
-        # Copy files from the module's setup dir
-        copy_srcs.copy_rename_setup_directory(self)
-
-        # Run post setup
-        if is_first_module_called:
-            self.post_setup()
-
-        return True
 
     @staticmethod
     def append_child_attributes(parent_attributes, child_attributes):
@@ -562,11 +573,11 @@ class iob_core(iob_module, iob_instance):
             self.is_system
         ), "Internal error: only iob_system type cores need fixing cbus width"
         for subblock in self.subblocks:
-            for port in subblock.ports:
+            for portmap in subblock.portmap_connections:
                 if (
-                    port.name == "iob_csrs_cbus_s"
-                    and port.interface.type == "iob"
-                    and port.e_connect
+                    portmap.port.name == "iob_csrs_cbus_s"
+                    and portmap.port.interface.type == "iob"
+                    and portmap.e_connect
                 ):
                     # print(
                     #     "DEBUG",
@@ -574,169 +585,11 @@ class iob_core(iob_module, iob_instance):
                     #     port,
                     #     file=sys.stderr,
                     # )
-                    port_width = port.interface.widths["ADDR_W"]
-                    external_wire_prefix = port.e_connect.interface.prefix
-                    port.e_connect_bit_slices = [
+                    port_width = portmap.port.interface.widths["ADDR_W"]
+                    external_wire_prefix = portmap.e_connect.interface.prefix
+                    portmap.e_connect_bit_slices = [
                         f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
                     ]
-
-    def __connect_memory(self, port, instantiator):
-        """Create memory port in instantiatior and connect it to self"""
-        if not instantiator.generate_hw or not self.instantiate:
-            return
-        _name = f"{port.name}"
-        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
-        _signals.update(port.interface.widths)
-        if _signals["prefix"] == "":
-            _signals.update({"prefix": f"{_name}_"})
-        instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
-        # Add port also to attributes_dict
-        instantiator.attributes_dict["ports"].append(
-            {
-                "name": _name,
-                "signals": _signals,
-                "descr": port.descr,
-            }
-        )
-        _port = find_obj_in_list(instantiator.ports + instantiator.wires, _name)
-        port.connect_external(_port, bit_slices=[])
-
-    def __connect_clk_interface(self, port, instantiator):
-        """Create, if needed, a clock interface port in instantiator and connect it to self"""
-        if not instantiator.generate_hw or not self.instantiate:
-            return
-        _name = f"{port.name}"
-        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
-        _signals.update(port.interface.widths)
-        for p in instantiator.ports:
-            if p.interface:
-                if (
-                    p.interface.type == port.interface.type
-                    and p.interface.prefix == port.interface.prefix
-                ):
-                    if p.interface.params != port.interface.params:
-                        p.interface.params = "_".join(
-                            filter(
-                                lambda x: x != "None",
-                                [p.interface.params, port.interface.params],
-                            )
-                        )
-                        p.signals = []
-                        p.__post_init__()
-                    port.connect_external(p, bit_slices=[])
-                    return
-        instantiator.create_port(name=_name, signals=_signals, descr=port.descr)
-        _port = find_obj_in_list(instantiator.ports, _name)
-        port.connect_external(_port, bit_slices=[])
-
-    def connect_instance_ports(self, connect, instantiator):
-        """
-        param connect: External wires to connect to ports of this instance
-                       Key: Port name, Value: Wire name or tuple with wire name and signal bit slices
-                       Tuple has format:
-                       (wire_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
-        param instantiator: Module that is instantiating this instance
-        """
-        # Connect instance ports to external wires
-        for port_name, connection_value in connect.items():
-            port = find_obj_in_list(self.ports, port_name)
-            if not port:
-                fail_with_msg(
-                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!\n"
-                    f"Available ports:\n- "
-                    + "\n- ".join([port.name for port in self.ports])
-                )
-
-            bit_slices = []
-            if type(connection_value) is str:
-                wire_name = connection_value
-            elif type(connection_value) is tuple:
-                wire_name = connection_value[0]
-                bit_slices = connection_value[1]
-                if type(bit_slices) is not list:
-                    fail_with_msg(
-                        f"Second element of tuple must be a list of bit slices/connections: {connection_value}"
-                    )
-            else:
-                fail_with_msg(f"Invalid connection value: {connection_value}")
-
-            if "'" in wire_name or wire_name.lower() == "z":
-                wire = wire_name
-            else:
-                wire = find_obj_in_list(
-                    instantiator.wires, wire_name
-                ) or find_obj_in_list(instantiator.ports, wire_name)
-                if not wire:
-                    debug(f"Creating implicit wire '{port.name}' in '{instantiator.name}'.", 1)
-                    # Add wire to instantiator
-                    wire_signals = remove_signal_direction_suffixes(port.signals)
-                    instantiator.create_wire(name=wire_name, signals=wire_signals, descr=port.descr)
-                    # Add wire to attributes_dict as well
-                    instantiator.attributes_dict["wires"].append(
-                        {
-                            "name": wire_name,
-                            "signals": wire_signals,
-                            "descr": port.descr,
-                        }
-                    )
-                    wire = instantiator.wires[-1]
-            port.connect_external(wire, bit_slices=bit_slices)
-        for port in self.ports:
-            if not port.e_connect and port.interface:
-                if (
-                    port.interface.type in mem_if_names
-                    and instantiator
-                    and not self.is_tester
-                ):
-                    # print(f"DEBUG: Creating port '{port.name}' in '{instantiator.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
-                    self.__connect_memory(port, instantiator)
-                elif (
-                    port.interface.type == "iob_clk"
-                    and instantiator
-                    and not self.is_tester
-                ):
-                    self.__connect_clk_interface(port, instantiator)
-
-        # iob_csrs specific code
-        if self.original_name == "iob_csrs" and instantiator:
-            self.__connect_cbus_port(instantiator)
-
-    def __connect_cbus_port(self, instantiator):
-        """Automatically adds "<prefix>_cbus_s" port to instantiators of iob_csrs (are usually iob_system peripherals).
-        The '<prefix>' is replaced by instance name of iob_csrs subblock.
-        Also, connects the newly created instantiator port to the iob_csrs `control_if_s` port.
-        :param instantiator: Instantiator core object
-        """
-        assert (
-            self.original_name == "iob_csrs"
-        ), "Internal error: cbus can only be created for instantiator of 'iob_csrs' module."
-        # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of instantiator
-        csrs_port = find_obj_in_list(self.ports, "control_if_s")
-
-        instantiator.create_port(
-            name=f"{self.instance_name}_cbus_s",
-            signals={
-                "type": csrs_port.interface.type,
-                "prefix": self.instance_name + "_",
-                **csrs_port.interface.widths,
-            },
-            descr="Control and Status Registers interface (auto-generated)",
-        )
-        # Connect newly created port to self
-        csrs_port.connect_external(instantiator.ports[-1], bit_slices=[])
-
-        # Add port to instantiator's attributes_dict
-        instantiator.attributes_dict["ports"].append(
-            {
-                "name": f"{self.instance_name}_cbus_s",
-                "signals": {
-                    "type": csrs_port.interface.type,
-                    "prefix": self.instance_name + "_",
-                    **csrs_port.interface.widths,
-                },
-                "descr": "Control and Status Registers interface (auto-generated)",
-            }
-        )
 
     def __create_memwrapper(self, superblocks):
         """Create memory wrapper for top module"""
@@ -862,7 +715,7 @@ class iob_core(iob_module, iob_instance):
             return cls(attributes=core_dict, **kwargs)
         except Exception:
             add_traceback_msg(f"Failed to setup core '{core_dict['name']}'.")
-            if "instantiator" in kwargs and kwargs["instantiator"]:
+            if "issuer" in kwargs and kwargs["issuer"]:
                 raise
             exit(1)
 
@@ -988,7 +841,7 @@ class iob_core(iob_module, iob_instance):
                 os.path.join(core_dir, f"{core_name}.py"),
             )
             core_module = sys.modules[core_name]
-            instantiator = kwargs.pop("instantiator", None)
+            issuer = kwargs.pop("issuer", None)
             # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
             # obtain the core's py2hwsw dictionary.
             # Give it a dictionary with all arguments of this function, since the user
@@ -998,8 +851,8 @@ class iob_core(iob_module, iob_instance):
                     # "core_name": core_name,
                     "build_dir": __class__.global_build_dir,
                     "py2hwsw_target": __class__.global_special_target or "setup",
-                    "instantiator": (
-                        instantiator.attributes_dict if instantiator else ""
+                    "issuer": (
+                        issuer.attributes_dict if issuer else ""
                     ),
                     "py2hwsw_version": PY2HWSW_VERSION,
                     **kwargs,
@@ -1013,7 +866,7 @@ class iob_core(iob_module, iob_instance):
             py2_core_dict.update(core_dict)
             instance = __class__.py2hw(
                 py2_core_dict,
-                instantiator=instantiator,
+                issuer=issuer,
                 # Note, any of the arguments below can have their values overridden by
                 # the py2_core_dict
                 **kwargs,

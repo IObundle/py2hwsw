@@ -41,7 +41,7 @@ def setup(py_params_dict):
                 "subblocks": [
                     {
                         # Instantiate SUT (usually iob_system or a child of it)
-                        "core_name": py_params_dict["instantiator"]["original_name"],
+                        "core_name": py_params_dict["issuer"]["original_name"],
                         "instance_name": "pulse_gen_uut",
                         "instance_description": "Unit Under Test (UUT) to be verified by this tester.",
                         "parameters": {

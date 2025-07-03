@@ -9,7 +9,7 @@ The following list describes the cores don't rely solely on the standard interfa
 
 \begin{itemize}
 \item \textbf{iob\_system}: This core uses the `is\_system` attribute to enable an internal py2hwsw method that automatically fixes the address widths of the cbus interfaces of the system's peripherals.
-\item \textbf{iob\_csrs}: The py2hwsw tool contains an internal method to automatically search for the "iob\_csrs" subblock and insert a "\textless prefix\textgreater \_cbus\_s" port on the instantiator core of this subblock. It then connects this newly created "\textless prefix\textgreater \_cbus\_s" port of the instantiator core to the iob\_csrs "control\_if\_s" port. The '\textless prefix\textgreater ' is replaced by instance name of iob\_csrs subblock.
+\item \textbf{iob\_csrs}: The py2hwsw tool contains an internal method to automatically search for the "iob\_csrs" subblock and insert a "\textless prefix\textgreater \_cbus\_s" port on the issuer core of this subblock. It then connects this newly created "\textless prefix\textgreater \_cbus\_s" port of the issuer core to the iob\_csrs "control\_if\_s" port. The '\textless prefix\textgreater ' is replaced by instance name of iob\_csrs subblock.
 \end{itemize}
 
 

@@ -86,7 +86,7 @@ def create_block(
 
     try:
         instance = core.get_core_obj(
-            core_name, instance_name=instance_name, instantiator=core, **kwargs
+            core_name, instance_name=instance_name, issuer=core, **kwargs
         )
 
         getattr(core, blocks_attribute_name).append(instance)

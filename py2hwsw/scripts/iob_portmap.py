@@ -119,9 +119,8 @@ External connection '{wire.name}' has the following signals:
         self.e_connect_bit_slices = bit_slices
 
 
-def get_portmap_port(portmap: iob_portmap):
-    """Given a iob_portmap reference, return port.
-    This function is used as process_func for find_obj_in_list().
+def get_portmap_port(portmap):
+    """Given a portmap reference, return the associated port
     """
     port = None
     if isinstance(portmap, iob_portmap):

@@ -196,13 +196,12 @@ def dict2interface(name, interface_dict):
     type = interface_dict.get("type", "")
 
     if name.endswith("_m"):
-        if_direction = "master"
+        if_direction = "manager"
     elif name.endswith("_s"):
-        if_direction = "slave"
+        if_direction = "subordinate"
     else:
         if_direction = ""
-
-
+    
     prefix = interface_dict.get("prefix", "")
     mult = interface_dict.get("mult", 1)
     params = interface_dict.get("params", None)

@@ -300,6 +300,15 @@ class _interface:
     _signals: list = field(default_factory=list)
 
     def __post_init__(self):
+        """Post-initialization method to set up the interface."""
+        # Check if_direction is valid
+        if self.if_direction not in ["", "manager", "subordinate"]:
+            print(
+                f"ERROR: __post_init__: invalid if_direction '{self.if_direction}'. "
+                "Valid values are '', 'manager', 'subordinate'."
+            )
+            exit(1)
+
         if not self.file_prefix:
             self.file_prefix = self.portmap_port_prefix + self.prefix
 
@@ -1881,14 +1890,15 @@ def create_interface(
     n_pins = widths.get("N_PINS", 4)
 
     # Check if widths are integers
-    if not isinstance(data_w, int):
-        raise ValueError("DATA_W must be an integer.")
+    # NOTE: data_w should later be only an integer
+    if not isinstance(data_w, int) and not isinstance(data_w, str):
+        raise ValueError("DATA_W must be an integer or a string.")
     if not isinstance(addr_w, int) and not isinstance(addr_w, str):
         raise ValueError("ADDR_W must be an integer or a string.")
     if not isinstance(w_data_w, int):
-        raise ValueError("W_DATA_W must be an integer.")
+        raise ValueError("W_DATA_W must be an integer or a string.")
     if not isinstance(r_data_w, int):
-        raise ValueError("R_DATA_W must be an integer.")
+        raise ValueError("R_DATA_W must be an integer or a string.")
     if not isinstance(id_w, int):
         raise ValueError("ID_W must be an integer.")
     if not isinstance(size_w, int):

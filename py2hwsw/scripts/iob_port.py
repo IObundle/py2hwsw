@@ -140,7 +140,7 @@ class iob_port(iob_wire):
                         if not e_signal:
                             if not any(
                                 [
-                                    f"{signal.name}:" in bit_slice
+                                    f"{get_real_signal(signal).name}:" in bit_slice
                                     for bit_slice in bit_slices
                                 ]
                             ):
@@ -148,9 +148,9 @@ class iob_port(iob_wire):
                                 fail_with_msg(
                                     f"Port '{self.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!\n"
                                     f"Port '{self.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + signal.name for signal in self.signals)}\n"
+                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n"
                                     f"External connection '{wire.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + signal.name for signal in wire.signals)}\n",
+                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}\n",
                                     ValueError,
                                 )
                 elif len(self.signals) != len(wire.signals):

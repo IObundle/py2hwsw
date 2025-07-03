@@ -4,7 +4,7 @@
 
 from iob_base import iob_base, process_elements_from_list, fail_with_msg
 from iob_conf import create_conf_group
-from iob_port import create_port_from_dict
+from iob_port import create_port_from_dict, add_interface_port, add_signals_port
 from iob_wire import create_wire, get_wire_signal
 from iob_snippet import create_snippet
 from iob_globals import iob_globals, create_globals
@@ -129,6 +129,12 @@ class iob_module(iob_base):
 
     def create_port_from_dict(self, *args, **kwargs):
         create_port_from_dict(self, *args, **kwargs)
+
+    def add_interface_port(self, *args, **kwargs):
+        add_interface_port(self, *args, **kwargs)
+
+    def add_signals_port(self, *args, **kwargs):
+        add_signals_port(self, *args, **kwargs)
 
     def create_wire(self, *args, **kwargs):
         create_wire(self, *args, **kwargs)

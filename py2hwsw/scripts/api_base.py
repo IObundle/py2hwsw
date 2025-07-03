@@ -295,26 +295,28 @@ def api_class(cls):
             api_object_reference = args[0]  # object
             new_attributes = args[1]  # dict
             new_attributes_annotations = args[2]  # dict
-            args = args[3]  # list
-            kwargs = args[4]  # dict
+            user_args = args[3]  # list
+            user_kwargs = args[4]  # dict
 
         print("Internal class constructor called: ", cls.__name__)
         print("Received attributes: ", new_attributes)
 
         # Update internal class attributes
         for attribute_name, default_value in new_attributes.items():
-            setattr(self, attribute_name, kwargs.pop(attribute_name, default_value))
+            setattr(
+                self, attribute_name, user_kwargs.pop(attribute_name, default_value)
+            )
         # Update attributes type hints
         self.__class__.__annotations__ |= new_attributes_annotations
 
         # Throw error if there are unknown arguments
-        if args:
+        if user_args:
             fail_with_msg(
-                f"Unknown constructor arguments for class '{cls.__name__}': {args}"
+                f"Unknown constructor arguments for class '{cls.__name__}': {user_args}"
             )
-        if kwargs:
+        if user_kwargs:
             fail_with_msg(
-                f"Unknown constructor arguments for class '{cls.__name__}': {kwargs}"
+                f"Unknown constructor arguments for class '{cls.__name__}': {user_kwargs}"
             )
 
         # Store reference to API object

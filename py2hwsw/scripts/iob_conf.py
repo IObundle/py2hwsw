@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import importlib
 from dataclasses import dataclass
 from iob_base import (
     convert_dict2obj_list,
@@ -115,28 +116,34 @@ def create_conf_group(core, *args, **kwargs):
 
 
 def conf_from_dict(conf_dict):
+    # NOTE: Using a Lazy import here to avoid circular import.
+    #       Is there a better way to instantiate API class?
+    api_iob_conf = importlib.import_module("user_api.api").iob_conf
     # Replace 'type' key with 'kind' key
     if "type" in conf_dict:
         conf_dict["kind"] = conf_dict.pop("type")
-    return iob_conf(**conf_dict)
+    return api_iob_conf(**conf_dict)
 
 
 def conf_from_text(conf_text):
+    api_iob_conf = importlib.import_module("user_api.api").iob_conf
     conf_dict = {}
     # TODO: parse short notation text
-    return iob_conf(**conf_dict)
+    return api_iob_conf(**conf_dict)
 
 
 def conf_group_from_dict(conf_group_dict):
+    api_iob_conf_group = importlib.import_module("user_api.api").iob_conf_group
     # Convert list of confs dictionaries into 'confs' objects
     confs_objs = []
     for conf in conf_group_dict.get("confs", []):
         confs_objs.append(conf_from_dict(conf))
     conf_group_dict["confs"] = confs_objs
-    return iob_conf_group(**conf_group_dict)
+    return api_iob_conf_group(**conf_group_dict)
 
 
 def conf_group_from_text(conf_group_text):
+    api_iob_conf_group = importlib.import_module("user_api.api").iob_conf_group
     conf_group_dict = {}
     # TODO: parse short notation text
-    return iob_conf_group(**conf_group_dict)
+    return api_iob_conf_group(**conf_group_dict)

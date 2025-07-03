@@ -10,7 +10,6 @@ import re
 import os
 import sys
 from iob_signal import iob_signal
-from if_gen import if_details
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "../lib/hardware/iob_csrs")
@@ -421,7 +420,7 @@ def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
 """
 
         # Find interface details (including VLNV)
-        bus_details = next(i for i in if_details if i["name"] == bus_interface.type)
+        bus_details = bus_interface.get_interface_details()
         if_mode = "master" if port_name.endswith("_m") else "slave"
         bus_interfaces_xml += f"""\
 		<ipxact:busInterface>
@@ -452,7 +451,7 @@ def gen_bus_interface_xml_file(bus_interface, dest_dir):
     @param dest_dir: destination directory
     """
     # Find interface details (including VLNV)
-    bus_details = next(i for i in if_details if i["name"] == bus_interface.type)
+    bus_details = bus_interface.get_interface_details()
 
     # Create the destination directory if it doesn't exist
     if not os.path.exists(dest_dir):
@@ -460,7 +459,7 @@ def gen_bus_interface_xml_file(bus_interface, dest_dir):
 
     # Create the Bus Definition file for the interface
     with open(
-        f"{dest_dir}/interface_{bus_interface.type}.{bus_details['version']}.xml", "w"
+        f"{dest_dir}/interface_{bus_details['name']}.{bus_details['version']}.xml", "w"
     ) as f:
         f.write(
             f"""\

@@ -541,6 +541,15 @@ class _interface:
             eval(eval_str)
             fout.close()
 
+    def get_interface_details(self):
+        """Get the details of the interface."""
+        if_name = self.__get_if_name()
+        for item in if_details:
+            if item["name"] == if_name:
+                return item
+        print(f"ERROR: get_interface_details: unknown interface {if_name}.")
+        exit(1)
+
 
 #
 # IOb

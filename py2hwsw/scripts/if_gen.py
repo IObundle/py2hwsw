@@ -609,7 +609,7 @@ class iobInterface(_interface):
     """Class to represent an IOb interface for generation"""
 
     # Widths for the IOb interface
-    data_w: int = 32
+    data_w: str or int = 32
     # Only address width is configurable, data width is fixed
     addr_w: str or int = 32
 
@@ -619,13 +619,14 @@ class iobInterface(_interface):
 
     def __set_signals(self):
         """Set signals for the IOb interface."""
-        wstrb_w = self.data_w // 8
 
         self._signals = self._signals + [
             iob_signal(name="iob_valid_o", descr="Request address is valid."),
             iob_signal(name="iob_addr_o", width=self.addr_w, descr="Byte address."),
             iob_signal(name="iob_wdata_o", width=self.data_w, descr="Write data."),
-            iob_signal(name="iob_wstrb_o", width=wstrb_w, descr="Write strobe."),
+            iob_signal(
+                name="iob_wstrb_o", width=f"{self.data_w}/8", descr="Write strobe."
+            ),
             iob_signal(name="iob_rvalid_i", descr="Read data valid."),
             iob_signal(name="iob_rdata_i", width=self.data_w, descr="Read data."),
             iob_signal(name="iob_ready_i", descr="Interface ready."),
@@ -703,7 +704,7 @@ class symMemInterface(_memInterface):
     """Class to represent a symmetric memory interface for generation"""
 
     # Data width for the memory interface
-    data_w: int = 32
+    data_w: int or str = 32
 
     def __post_init__(self):
         super().__post_init__()
@@ -861,11 +862,10 @@ class symMemInterface(_memInterface):
         wr_suffix = suffix if is_true_port else ""
 
         if has_byte_enable:
-            wstrb_w = self.data_w // 8
             self._signals.append(
                 iob_signal(
                     name="w_strb" + suffix + "_o",
-                    width=wstrb_w,
+                    width=f"{self.data_w}/8",
                     descr=f"Write strobe port {suffix}",
                 )
             )
@@ -903,8 +903,8 @@ class asymMemInterface(_memInterface):
     """Class to represent an asymmetric memory interface for generation"""
 
     # Data widths for the memory interface
-    w_data_w: int = 32
-    r_data_w: int = 32
+    w_data_w: int or str = 32
+    r_data_w: int or str = 32
 
     __block_data_w: int = field(init=False, default=32)
     __block_addr_w: int = field(init=False, default=32)
@@ -1131,12 +1131,12 @@ class AXILiteInterface(_interface):
     """Class to represent an AXI-Lite interface for generation"""
 
     # Data width for the AXI-Lite interface
-    data_w: int = 32
+    data_w: int or str = 32
     # Address width for the AXI-Lite interface
-    addr_w: int = 32
+    addr_w: int or str = 32
     # AXI-Lite parameters
-    resp_w: int = 2
-    prot_w: int = 3
+    resp_w: int or str = 2
+    prot_w: int or str = 3
     # Interfaces/Ports to include in the AXI-Lite interface
     has_read_if: bool = True
     has_write_if: bool = True
@@ -1187,7 +1187,7 @@ class AXILiteInterface(_interface):
             ),
             iob_signal(
                 name="axil_wstrb_o",
-                width=self.data_w // 8,
+                width=f"{self.data_w}/8",
                 descr="AXI-Lite write channel write strobe.",
             ),
             iob_signal(
@@ -1265,19 +1265,19 @@ class AXIInterface(_interface):
     """Class to represent an AXI interface for generation"""
 
     # Data width for the AXI interface
-    data_w: int = 32
+    data_w: int or str = 32
     # Address width for the AXI interface
-    addr_w: int = 32
+    addr_w: int or str = 32
     # AXI parameters
-    id_w: int = 1
-    size_w: int = 3
-    burst_w: int = 2
-    lock_w: int = 2
-    cache_w: int = 4
-    prot_w: int = 3
-    qos_w: int = 4
-    resp_w: int = 2
-    len_w: int = 8
+    id_w: int or str = 1
+    size_w: int or str = 3
+    burst_w: int or str = 2
+    lock_w: int or str = 2
+    cache_w: int or str = 4
+    prot_w: int or str = 3
+    qos_w: int or str = 4
+    resp_w: int or str = 2
+    len_w: int or str = 8
     # Interfaces/Ports to include in the AXI-Lite interface
     has_read_if: bool = True
     has_write_if: bool = True
@@ -1330,7 +1330,7 @@ class AXIInterface(_interface):
             ),
             iob_signal(
                 name="axi_wstrb_o",
-                width=self.data_w // 8,
+                width=f"{self.data_w}/8",
                 descr="AXI write channel write strobe.",
             ),
             iob_signal(
@@ -1511,9 +1511,9 @@ class APBInterface(_interface):
     """Class to represent an APB interface for generation"""
 
     # Data width for the APB interface
-    data_w: int = 32
+    data_w: int or str = 32
     # Address width for the APB interface
-    addr_w: int = 32
+    addr_w: int or str = 32
 
     def __post_init__(self):
         super().__post_init__()
@@ -1546,7 +1546,7 @@ class APBInterface(_interface):
             ),
             iob_signal(
                 name="apb_wstrb_o",
-                width=self.data_w // 8,
+                width=f"{self.data_w}/8",
                 descr="APB write strobe.",
             ),
             iob_signal(
@@ -1566,14 +1566,14 @@ class AHBInterface(_interface):
     """Class to represent an AHB interface for generation"""
 
     # Data width for the AHB interface
-    data_w: int = 32
+    data_w: int or str = 32
     # Address width for the AHB interface
-    addr_w: int = 32
+    addr_w: int or str = 32
     # AHB parameters
-    prot_w: int = 4
-    burst_w: int = 3
-    trans_w: int = 2
-    size_w: int = 3
+    prot_w: int or str = 4
+    burst_w: int or str = 3
+    trans_w: int or str = 2
+    size_w: int or str = 3
 
     def __post_init__(self):
         super().__post_init__()
@@ -1618,7 +1618,7 @@ class AHBInterface(_interface):
             ),
             iob_signal(
                 name="ahb_wstrb_o",
-                width=self.data_w // 8,
+                width=f"{self.data_w}/8",
                 descr="AHB write strobe.",
             ),
             iob_signal(
@@ -1655,7 +1655,7 @@ class RS232Interface(_interface):
     """Class to represent an RS232 interface for generation"""
 
     # Number of pins for the RS232 interface
-    n_pins: int = 4
+    n_pins: int or str = 4
 
     def __post_init__(self):
         super().__post_init__()
@@ -1738,9 +1738,9 @@ class wishboneInterface(_interface):
     """Class to represent a Wishbone interface for generation"""
 
     # Data width for the Wishbone interface
-    data_w: int = 32
+    data_w: int or str = 32
     # Address width for the Wishbone interface
-    addr_w: int = 32
+    addr_w: int or str = 32
     # Sets if it is a full Wishbone interface
     is_full: bool = False
 
@@ -1776,7 +1776,7 @@ class wishboneInterface(_interface):
             ),
             iob_signal(
                 name="wb_sel_o",
-                width=self.data_w // 8,
+                width=f"{self.data_w}/8",
                 descr="Select output. Indicates where valid data is expected on the data bus.",
             ),
             iob_signal(
@@ -1891,28 +1891,28 @@ def create_interface(
 
     # Check if widths are integers or strings
     # TODO: except for addr_w, all should later be only an integer
-    for width in [
-        data_w,
-        addr_w,
-        w_data_w,
-        r_data_w,
-        id_w,
-        size_w,
-        burst_w,
-        lock_w,
-        cache_w,
-        prot_w,
-        qos_w,
-        resp_w,
-        len_w,
-        ahb_prot_w,
-        ahb_burst_w,
-        ahb_trans_w,
-        ahb_size_w,
-        n_pins,
+    for name, width in [
+        ("DATA_W", data_w),
+        ("ADDR_W", addr_w),
+        ("W_DATA_W", w_data_w),
+        ("R_DATA_W", r_data_w),
+        ("ID_W", id_w),
+        ("SIZE_W", size_w),
+        ("BURST_W", burst_w),
+        ("LOCK_W", lock_w),
+        ("CACHE_W", cache_w),
+        ("PROT_W", prot_w),
+        ("QOS_W", qos_w),
+        ("RESP_W", resp_w),
+        ("LEN_W", len_w),
+        ("AHB_PROT_W", ahb_prot_w),
+        ("AHB_BURST_W", ahb_burst_w),
+        ("AHB_TRANS_W", ahb_trans_w),
+        ("AHB_SIZE_W", ahb_size_w),
+        ("N_PINS", n_pins)
     ]:
-        if not isinstance(width, int):
-            raise ValueError(f"Width '{width}' must be an integer, got {type(width)}.")
+        if not isinstance(width, (int, str)):
+            raise ValueError(f"Width '{name}' must be an integer or string, got '{width}' of type {type(width)}.")
 
     match genre:
         case "iob_clk":

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from encodings.punycode import T
+from hmac import new
 import sys
 import os
 import shutil
@@ -30,7 +31,7 @@ import ipxact_gen
 
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
-from if_gen import mem_if_names, _memInterface, iobClkInterface
+import if_gen
 from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
@@ -273,7 +274,10 @@ class iob_core(iob_module, iob_instance):
             for port in self.ports:
                 if (
                     port.interface
-                    and isinstance(port.interface, _memInterface)
+                    and isinstance(
+                        port.interface,
+                        (if_gen.asymMemInterface, if_gen.symMemInterface),
+                    )
                     and port.name.endswith("m")
                 ):
                     found_mem_if = True
@@ -572,16 +576,10 @@ class iob_core(iob_module, iob_instance):
             for port in subblock.ports:
                 if (
                     port.name == "iob_csrs_cbus_s"
-                    and port.interface.type == "iob"
+                    and isinstance(port.interface, if_gen.iobInterface)
                     and port.e_connect
                 ):
-                    # print(
-                    #     "DEBUG",
-                    #     self.name,
-                    #     port,
-                    #     file=sys.stderr,
-                    # )
-                    port_width = port.interface.widths["ADDR_W"]
+                    port_width = port.interface.addr_w
                     external_wire_prefix = port.e_connect.interface.prefix
                     port.e_connect_bit_slices = [
                         f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
@@ -610,7 +608,7 @@ class iob_core(iob_module, iob_instance):
             return
         _name = f"{port.name}"
         for p in instantiator.ports:
-            if isinstance(p.interface, iobClkInterface):
+            if isinstance(p.interface, if_gen.iobClkInterface):
                 # If interface is the same, connect it and add parameters if needed
                 if p.interface.prefix == port.interface.prefix:
                     p.interface.has_cke |= port.interface.has_cke
@@ -688,9 +686,9 @@ class iob_core(iob_module, iob_instance):
             for port in self.ports:
                 # If port is not connected externally, but is an interface, connect it if it is a memory or clock interface
                 if not port.e_connect and port.interface:
-                    if isinstance(port.interface, _memInterface):
+                    if isinstance(port.interface, if_gen._memInterface):
                         self.__connect_memory(port, instantiator)
-                    elif isinstance(port.interface, iobClkInterface):
+                    elif isinstance(port.interface, if_gen.iobClkInterface):
                         self.__connect_clk_interface(port, instantiator)
 
         # iob_csrs specific code
@@ -709,26 +707,31 @@ class iob_core(iob_module, iob_instance):
         # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of instantiator
         csrs_port = find_obj_in_list(self.ports, "control_if_s")
 
-        instantiator.create_port_from_dict(
-            name=f"{self.instance_name}_cbus_s",
-            signals={
-                "type": csrs_port.interface.type,
-                "prefix": self.instance_name + "_",
-                **csrs_port.interface.widths,
-            },
-            descr="Control and Status Registers interface (auto-generated)",
-        )
+        # Copy interface from csrs_port to create a new interface and set its prefix
+        new_interface = copy.deepcopy(csrs_port.interface)
+        new_interface.prefix = self.instance_name + "_"
+
+        instantiator.add_interface_port(name=f"{self.instance_name}_cbus_s", 
+                                        interface=new_interface,
+                                        descr="Control and Status Registers interface (auto-generated)")
         # Connect newly created port to self
         csrs_port.connect_external(instantiator.ports[-1], bit_slices=[])
 
+        # TODO: Remove attributes_dict from the system
         # Add port to instantiator's attributes_dict
+        csr_if_genre = "iob_clk"
+        if isinstance(csrs_port.interface, if_gen.AXILiteInterface):
+            csr_if_genre = "axil"
+        if isinstance(csrs_port.interface, if_gen.APBInterface):
+            csr_if_genre = "apb"
         instantiator.attributes_dict["ports"].append(
             {
                 "name": f"{self.instance_name}_cbus_s",
                 "signals": {
-                    "type": csrs_port.interface.type,
+                    "type": csr_if_genre,
                     "prefix": self.instance_name + "_",
-                    **csrs_port.interface.widths,
+                    "DATA_W": csrs_port.interface.data_w,
+                    "ADDR_W": csrs_port.interface.addr_w,
                 },
                 "descr": "Control and Status Registers interface (auto-generated)",
             }
@@ -740,7 +743,7 @@ class iob_core(iob_module, iob_instance):
             {
                 "core_name": "iob_memwrapper",
                 "instance_name": f"{self.name}_memwrapper",
-                "mem_if_names": mem_if_names,
+                "mem_if_names": if_gen.mem_if_names,
                 "superblocks": superblocks,
             },
         ]

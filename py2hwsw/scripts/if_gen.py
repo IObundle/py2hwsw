@@ -9,15 +9,7 @@
 # interface dictionary as below. Run this script with the -h option for help
 from copy import deepcopy
 from dataclasses import dataclass, field
-from encodings.punycode import T
-from pydoc import describe
-import re
-from sys import prefix
-from turtle import reset
-from typing import Dict
-from unittest import result, signals
 
-from numpy import add, size
 from iob_signal import iob_signal, iob_signal_reference
 from iob_globals import iob_globals
 

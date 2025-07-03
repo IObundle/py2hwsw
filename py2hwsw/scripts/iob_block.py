@@ -170,3 +170,18 @@ def create_block(core, core_name: str = "", instance_name: str = "", **kwargs):
     except ModuleNotFoundError:
         add_traceback_msg(f"Failed to create instance '{instance_name}'.")
         raise
+
+
+#
+# API methods
+#
+
+
+def block_group_from_dict(block_group_dict):
+    return iob_block_group(**block_group_dict)
+
+
+def block_group_from_text(block_group_text):
+    block_group_dict = {}
+    # TODO: parse short notation text
+    return iob_block_group(**block_group_dict)

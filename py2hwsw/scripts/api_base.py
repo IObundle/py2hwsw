@@ -55,18 +55,6 @@ def convert2internal(api_obj):
 #
 
 
-def prevent_instantiation(cls):
-    """
-    Decorator to prevent class instantiation
-    """
-
-    def new_init(*args, **kwargs):
-        raise TypeError(f"Class {cls.__name__} cannot be instantiated")
-
-    cls.__init__ = new_init
-    return cls
-
-
 def get_methods(cls):
     """
     Returns all non-default methods in a class (includes ones inherited from superclasses)
@@ -284,7 +272,7 @@ def api_method_for(internal_method):
 #
 
 
-def api_method(cls):
+def api_class(cls):
     """
     Decorator for internal methods that extend functionality of API methods.
 
@@ -298,14 +286,18 @@ def api_method(cls):
     original_init = cls.__init__
 
     # Update constructor of the internal class
-    def new_init(
-        self,
-        api_object_reference: object,
-        new_attributes: dict,
-        new_attributes_annotations: dict,
-        args: list,
-        kwargs: dict,
-    ):
+    def new_init(self, *args, **kwargs):
+        if len(args) != 5:
+            fail_with_msg(
+                f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
+            )
+        else:
+            api_object_reference = args[0]  # object
+            new_attributes = args[1]  # dict
+            new_attributes_annotations = args[2]  # dict
+            args = args[3]  # list
+            kwargs = args[4]  # dict
+
         print("Internal class constructor called: ", cls.__name__)
         print("Received attributes: ", new_attributes)
 

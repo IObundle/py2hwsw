@@ -25,3 +25,18 @@ def create_snippet(core, *args, **kwargs):
     )
     snippet = iob_snippet(*args, **kwargs)
     core.snippets.append(snippet)
+
+
+#
+# API methods
+#
+
+
+def snippet_from_dict(snippet_dict):
+    return iob_snippet(**snippet_dict)
+
+
+def snippet_from_text(snippet_text):
+    snippet_dict = {}
+    # TODO: parse short notation text
+    return iob_snippet(**snippet_dict)

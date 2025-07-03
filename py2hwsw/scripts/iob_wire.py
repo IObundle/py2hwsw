@@ -165,3 +165,18 @@ def find_signal_in_wires(wires, signal_name, process_func=get_real_signal):
         if signal:
             return signal
     return None
+
+
+#
+# API methods
+#
+
+
+def wire_from_dict(wire_dict):
+    return iob_wire(**wire_dict)
+
+
+def wire_from_text(wire_text):
+    wire_dict = {}
+    # TODO: parse short notation text
+    return iob_wire(**wire_dict)

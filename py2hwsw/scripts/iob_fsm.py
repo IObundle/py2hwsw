@@ -119,3 +119,18 @@ def create_fsm(core, *args, **kwargs):
     fsm.infer_registers(core)
 
     core.fsm = fsm
+
+
+#
+# API methods
+#
+
+
+def fsm_from_dict(fsm_dict):
+    return iob_fsm(**fsm_dict)
+
+
+def fsm_from_text(fsm_text):
+    fsm_dict = {}
+    # TODO: parse short notation text
+    return iob_fsm(**fsm_dict)

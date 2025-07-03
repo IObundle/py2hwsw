@@ -1675,3 +1675,18 @@ if __name__ == "__main__":
                 widths={},
             )
         )
+
+
+#
+# API methods
+#
+
+
+def interface_from_dict(interface_dict):
+    return interface(**interface_dict)
+
+
+def interface_from_text(interface_text):
+    interface_dict = {}
+    # TODO: parse short notation text
+    return interface(**interface_dict)

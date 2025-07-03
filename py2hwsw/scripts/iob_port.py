@@ -232,3 +232,18 @@ def create_port(core, *args, signals=[], **kwargs):
     port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
     replace_duplicate_signals_by_references(core.ports, port.signals)
     core.ports.append(port)
+
+
+#
+# API methods
+#
+
+
+def port_from_dict(port_dict):
+    return iob_port(**port_dict)
+
+
+def port_from_text(port_text):
+    port_dict = {}
+    # TODO: parse short notation text
+    return iob_port(**port_dict)

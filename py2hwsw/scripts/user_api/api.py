@@ -43,7 +43,7 @@ import sys
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 )
-from api_base import api_for, prevent_instantiation, empty_list, empty_dict
+from api_base import api_for, empty_list, empty_dict
 import iob_conf as internal_conf
 import iob_signal as internal_signal
 import if_gen as internal_interface
@@ -738,12 +738,13 @@ def create_license_from_text(license_text):
 #
 
 
-@prevent_instantiation
-class iob_module:
+@api_for(internal_core.iob_core)
+class iob_core:
     """
-    Class to describe a (Verilog) module.
+    Generic class to describe how to generate a base IOb IP core.
 
     Attributes:
+        # Module attributes
         original_name (str): Original name of the module. (The module name commonly used in the files of the setup dir.)
         name (str): Name of the generated module.
         description (str): Description of the module.
@@ -757,29 +758,8 @@ class iob_module:
         subblocks (list): List of instances of other cores inside this core.
         superblocks (list): List of wrappers for this core. Will only be setup if this core is a top module, or a wrapper of the top module.
         sw_modules (list): List of software modules required by this core.
-    """
 
-    original_name: str = None
-    name: str = ""
-    description: str = "Default description"
-    reset_polarity: str = None
-    confs: list[iob_conf_group] = empty_list()
-    ports: list[iob_port] = empty_list()
-    wires: list[iob_wire] = empty_list()
-    snippets: list[iob_snippet] = empty_list()
-    comb: iob_comb = None
-    fsm: iob_fsm = None
-    subblocks: list[iob_block_group] = empty_list()
-    superblocks: list[iob_block_group] = empty_list()
-    sw_modules: list[iob_block_group] = empty_list()
-
-
-@prevent_instantiation
-class iob_instance:
-    """
-    Class to describe a module's (Verilog) instance.
-
-    Attributes:
+        # Instance attributes
         instance_name (str): Name of the instance. (Will be used as the instance's name in the Verilog module).
         instance_description (str): Description of the instance.
         parameters (dict): Verilog parameter values for this instance.
@@ -787,23 +767,8 @@ class iob_instance:
         if_not_defined (str): Only use this instance in Verilog if given Verilog macro is not defined.
         instantiate (bool): Select if should intantiate the module inside another Verilog module.
         connect (dict): Connections for ports of the instance.
-    """
 
-    instance_name: str = None
-    instance_description: str = ""
-    parameters: dict[str, int | str] = empty_dict()
-    if_defined: str = ""
-    if_not_defined: str = ""
-    instantiate: bool = ""
-    connect: dict[str, str] = empty_dict()
-
-
-@api_for(internal_core.iob_core)
-class iob_core(iob_module, iob_instance):
-    """
-    Generic class to describe how to generate a base IOb IP core.
-
-    Attributes:
+        # Core attributes
         version (str): Core version. By default is the same as Py2HWSW version.",
         previous_version (str): Core previous version.",
         setup_dir (str): Path to root setup folder of the core.",
@@ -825,6 +790,31 @@ class iob_core(iob_module, iob_instance):
         title (str): Title of this core. Used for documentation.",
     """
 
+    # Module attributes
+    original_name: str = None
+    name: str = ""
+    description: str = "Default description"
+    reset_polarity: str = None
+    confs: list[iob_conf_group] = empty_list()
+    ports: list[iob_port] = empty_list()
+    wires: list[iob_wire] = empty_list()
+    snippets: list[iob_snippet] = empty_list()
+    comb: iob_comb = None
+    fsm: iob_fsm = None
+    subblocks: list[iob_block_group] = empty_list()
+    superblocks: list[iob_block_group] = empty_list()
+    sw_modules: list[iob_block_group] = empty_list()
+
+    # Instance attributes
+    instance_name: str = None
+    instance_description: str = ""
+    parameters: dict[str, int | str] = empty_dict()
+    if_defined: str = ""
+    if_not_defined: str = ""
+    instantiate: bool = ""
+    connect: dict[str, str] = empty_dict()
+
+    # Core attributes
     version: str = None
     previous_version: str = None
     setup_dir: str = None

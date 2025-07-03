@@ -12,10 +12,10 @@ from iob_base import (
     find_obj_in_list,
 )
 
-from api_base import api_method
+from api_base import api_class
 
 
-@api_method
+@api_class
 @dataclass
 class iob_conf:
     """Class to represent a configuration option."""
@@ -40,6 +40,7 @@ class iob_conf:
             pass
 
 
+@api_class
 @dataclass
 class iob_conf_group:
     """Class to represent a group of configurations."""
@@ -106,3 +107,34 @@ def create_conf_group(core, *args, **kwargs):
     except Exception:
         add_traceback_msg(f"Failed to create conf/group '{kwargs['name']}'.")
         raise
+
+
+#
+# API methods
+#
+
+
+def conf_from_dict(conf_dict):
+    # Replace 'type' key with 'kind' key
+    if "type" in conf_dict:
+        conf_dict["kind"] = conf_dict.pop("type")
+    return iob_conf(**conf_dict)
+
+
+def conf_from_text(conf_text):
+    conf_dict = {}
+    # TODO: parse short notation text
+    return iob_conf(**conf_dict)
+
+
+def conf_group_from_dict(conf_group_dict):
+    # Replace 'type' key with 'kind' key
+    if "type" in conf_group_dict:
+        conf_group_dict["kind"] = conf_group_dict.pop("type")
+    return iob_conf_group(**conf_group_dict)
+
+
+def conf_group_from_text(conf_group_text):
+    conf_group_dict = {}
+    # TODO: parse short notation text
+    return iob_conf_group(**conf_group_dict)

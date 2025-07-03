@@ -229,3 +229,18 @@ def create_comb(core, *args, **kwargs):
     comb.set_needed_reg(core)
     comb.infer_registers(core)
     core.comb = comb
+
+
+#
+# API methods
+#
+
+
+def comb_from_dict(comb_dict):
+    return iob_comb(**comb_dict)
+
+
+def comb_from_text(comb_text):
+    comb_dict = {}
+    # TODO: parse short notation text
+    return iob_comb(**comb_dict)

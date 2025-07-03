@@ -85,3 +85,18 @@ def get_real_signal(signal):
     while isinstance(signal, iob_signal_reference):
         signal = signal.signal
     return signal
+
+
+#
+# API methods
+#
+
+
+def signal_from_dict(signal_dict):
+    return iob_signal(**signal_dict)
+
+
+def signal_from_text(signal_text):
+    signal_dict = {}
+    # TODO: parse short notation text
+    return iob_signal(**signal_dict)

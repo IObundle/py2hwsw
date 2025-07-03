@@ -1121,3 +1121,18 @@ def find_module_setup_dir(core_name):
     # print("Found setup dir based on location of: " + file_path, file=sys.stderr)
     if file_ext == ".py" or file_ext == ".json":
         return os.path.dirname(file_path), file_ext
+
+
+#
+# API methods
+#
+
+
+def core_from_dict(core_dict):
+    return iob_core(**core_dict)
+
+
+def core_from_text(core_text):
+    core_dict = {}
+    # TODO: parse short notation text
+    return iob_core(**core_dict)

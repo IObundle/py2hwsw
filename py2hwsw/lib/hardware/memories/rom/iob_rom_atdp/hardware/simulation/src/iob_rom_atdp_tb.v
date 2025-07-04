@@ -95,13 +95,13 @@ module iob_rom_atdp_tb;
       .DATA_W(`DATA_W),
       .ADDR_W(`ADDR_W)
    ) uut (
-      .clk_a_i   (clk_a),
-      .en_a_i  (r_en_a),
+      .a_clk_i   (clk_a),
+      .en_a_i    (r_en_a),
       .addr_a_i  (addr_a),
       .r_data_a_o(r_data_a),
 
-      .clk_b_i   (clk_b),
-      .en_b_i  (r_en_b),
+      .b_clk_i   (clk_b),
+      .en_b_i    (r_en_b),
       .addr_b_i  (addr_b),
       .r_data_b_o(r_data_b)
    );

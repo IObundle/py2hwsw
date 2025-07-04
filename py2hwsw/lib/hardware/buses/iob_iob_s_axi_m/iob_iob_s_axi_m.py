@@ -218,9 +218,9 @@ def setup(py_params_dict):
             "name": "read_data_axis",
             "descr": "Read data AXI-Stream signals",
             "signals": [
+                {"name": "iob_rdata_o", "width": "DATA_W"},
                 {"name": "iob_rvalid_o"},
                 {"name": "read_data_ready"},
-                {"name": "iob_rdata_o", "width": "DATA_W"},
             ],
         },
         {

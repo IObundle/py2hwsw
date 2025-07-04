@@ -73,9 +73,9 @@ def setup(py_params_dict):
                 "name": "read_data_axis_io",
                 "descr": "Read data AXI-Stream signals",
                 "signals": [
+                    {"name": "read_data_o", "width": "AXI_DATA_W"},
                     {"name": "read_data_valid_o"},
                     {"name": "read_data_ready_i"},
-                    {"name": "read_data_o", "width": "AXI_DATA_W"},
                 ],
             },
             {

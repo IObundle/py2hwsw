@@ -67,11 +67,11 @@ def setup(py_params_dict):
        end
    endgenerate
 
-   always @(posedge clk_a_i)  // Port A
+   always @(posedge a_clk_i)  // Port A
       if (en_a_i)
          r_data_a_int <= rom[addr_a_i];
 
-   always @(posedge clk_b_i)  // Port B
+   always @(posedge b_clk_i)  // Port B
       if (en_b_i)
          r_data_b_int <= rom[addr_b_i];
 

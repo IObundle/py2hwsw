@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass, field
+import importlib
 
 import if_gen
 import iob_colors
@@ -240,10 +241,12 @@ def create_port(core, *args, signals=[], **kwargs):
 
 
 def port_from_dict(port_dict):
-    return iob_port(**port_dict)
+    api_iob_port = importlib.import_module("user_api.api").iob_port
+    return api_iob_port(**port_dict)
 
 
 def port_from_text(port_text):
+    api_iob_port = importlib.import_module("user_api.api").iob_port
     port_dict = {}
     # TODO: parse short notation text
-    return iob_port(**port_dict)
+    return api_iob_port(**port_dict)

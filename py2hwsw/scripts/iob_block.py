@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import importlib
 from dataclasses import dataclass, field
 from iob_base import (
     str_to_kwargs,
@@ -178,10 +179,12 @@ def create_block(core, core_name: str = "", instance_name: str = "", **kwargs):
 
 
 def block_group_from_dict(block_group_dict):
-    return iob_block_group(**block_group_dict)
+    api_iob_block_group = importlib.import_module("user_api.api").iob_block_group
+    return api_iob_block_group(**block_group_dict)
 
 
 def block_group_from_text(block_group_text):
+    api_iob_block_group = importlib.import_module("user_api.api").iob_block_group
     block_group_dict = {}
     # TODO: parse short notation text
-    return iob_block_group(**block_group_dict)
+    return api_iob_block_group(**block_group_dict)

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import re
+import importlib
 
 from dataclasses import dataclass
 from iob_comb import iob_comb
@@ -127,10 +128,12 @@ def create_fsm(core, *args, **kwargs):
 
 
 def fsm_from_dict(fsm_dict):
-    return iob_fsm(**fsm_dict)
+    api_iob_fsm = importlib.import_module("user_api.api").iob_fsm
+    return api_iob_fsm(**fsm_dict)
 
 
 def fsm_from_text(fsm_text):
+    api_iob_fsm = importlib.import_module("user_api.api").iob_fsm
     fsm_dict = {}
     # TODO: parse short notation text
-    return iob_fsm(**fsm_dict)
+    return api_iob_fsm(**fsm_dict)

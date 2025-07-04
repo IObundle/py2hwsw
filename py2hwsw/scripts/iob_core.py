@@ -10,6 +10,7 @@ from pathlib import Path
 import copy
 from types import SimpleNamespace
 import pathlib
+import importlib
 
 import iob_colors
 
@@ -1129,10 +1130,12 @@ def find_module_setup_dir(core_name):
 
 
 def core_from_dict(core_dict):
-    return iob_core(**core_dict)
+    api_iob_core = importlib.import_module("user_api.api").iob_core
+    return api_iob_core(**core_dict)
 
 
 def core_from_text(core_text):
+    api_iob_core = importlib.import_module("user_api.api").iob_core
     core_dict = {}
     # TODO: parse short notation text
-    return iob_core(**core_dict)
+    return api_iob_core(**core_dict)

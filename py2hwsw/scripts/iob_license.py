@@ -4,6 +4,7 @@
 
 from dataclasses import dataclass
 from datetime import date
+import importlib
 
 from iob_base import fail_with_msg
 
@@ -37,10 +38,12 @@ def update_license(core, *args, **kwargs):
 
 
 def license_from_dict(license_dict):
-    return iob_license(**license_dict)
+    api_iob_license = importlib.import_module("user_api.api").iob_license
+    return api_iob_license(**license_dict)
 
 
 def license_from_text(license_text):
+    api_iob_license = importlib.import_module("user_api.api").iob_license
     license_dict = {}
     # TODO: parse short notation text
-    return iob_license(**license_dict)
+    return api_iob_license(**license_dict)

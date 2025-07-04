@@ -10,6 +10,8 @@
 from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Dict
+import importlib
+
 from iob_signal import iob_signal, iob_signal_reference
 from iob_globals import iob_globals
 
@@ -1683,10 +1685,12 @@ if __name__ == "__main__":
 
 
 def interface_from_dict(interface_dict):
-    return interface(**interface_dict)
+    api_interface = importlib.import_module("user_api.api").interface
+    return api_interface(**interface_dict)
 
 
 def interface_from_text(interface_text):
+    api_interface = importlib.import_module("user_api.api").interface
     interface_dict = {}
     # TODO: parse short notation text
-    return interface(**interface_dict)
+    return api_interface(**interface_dict)

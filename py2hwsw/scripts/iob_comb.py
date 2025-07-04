@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import re
+import importlib
 
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
@@ -237,10 +238,12 @@ def create_comb(core, *args, **kwargs):
 
 
 def comb_from_dict(comb_dict):
-    return iob_comb(**comb_dict)
+    api_iob_comb = importlib.import_module("user_api.api").iob_comb
+    return api_iob_comb(**comb_dict)
 
 
 def comb_from_text(comb_text):
+    api_iob_comb = importlib.import_module("user_api.api").iob_comb
     comb_dict = {}
     # TODO: parse short notation text
-    return iob_comb(**comb_dict)
+    return api_iob_comb(**comb_dict)

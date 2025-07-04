@@ -4,6 +4,7 @@
 
 from dataclasses import dataclass, field
 from typing import List
+import importlib
 
 import if_gen
 from iob_base import (
@@ -173,10 +174,12 @@ def find_signal_in_wires(wires, signal_name, process_func=get_real_signal):
 
 
 def wire_from_dict(wire_dict):
-    return iob_wire(**wire_dict)
+    api_iob_wire = importlib.import_module("user_api.api").iob_wire
+    return api_iob_wire(**wire_dict)
 
 
 def wire_from_text(wire_text):
+    api_iob_wire = importlib.import_module("user_api.api").iob_wire
     wire_dict = {}
     # TODO: parse short notation text
-    return iob_wire(**wire_dict)
+    return api_iob_wire(**wire_dict)

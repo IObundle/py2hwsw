@@ -2,18 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
-import iob_colors
 from iob_wire import iob_wire, replace_duplicate_signals_by_references, dict2interface
-import if_gen
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
     str_to_kwargs,
     assert_attributes,
 )
-from iob_signal import iob_signal, iob_signal_reference, get_real_signal
+from iob_signal import iob_signal
 
 
 @dataclass
@@ -89,98 +87,6 @@ class iob_port(iob_wire):
                 f"Port '{self.name}' has 'inout' direction but no outputs defined",
                 ValueError,
             )
-
-    def connect_external(self, wire, bit_slices={}):
-        """Connects the port to an external wire
-        Verifies that the wire is compatible with the port
-        :param iob_wire wire: external wire
-        :param list bit_slices: bit slices of signals in wire
-        """
-        # wire must be iob_wire or str
-        if isinstance(wire, str):
-            if len(self.signals) != 1:
-                fail_with_msg(
-                    f"{iob_colors.FAIL}Port '{self.name}' has more than one signal but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
-                    ValueError,
-                )
-            else:
-                validate_verilog_const(value=wire, direction=self.signals[0].direction)
-        elif isinstance(wire, iob_wire):
-            # If the port has an interface, check if the wire has the same interface
-            if self.interface and wire.interface:
-                if type(self.interface) == type(wire.interface):
-                    for signal in self.signals:
-                        # If it is a signal reference, get the real signal
-                        if isinstance(signal, iob_signal_reference):
-                            signal = get_real_signal(signal)
-                        search_name = signal.name.replace(
-                            self.interface.prefix, wire.interface.prefix, 1
-                        )
-                        # If the wire name and port name have different suffixes
-                        if self.name[-2] != wire.name[-2]:
-                            # Swap the suffixes if the port is a master/slave port
-                            if wire.name[-2:] in ["_s", "_m"]:
-                                if search_name[-2:] == "_i":
-                                    search_name += search_name[:-2] + "_o"
-                                else:
-                                    search_name += search_name[:-2] + "_i"
-                            else:
-                                search_name = search_name[:-2]
-
-                        e_signal = find_obj_in_list(
-                            wire.signals, search_name, get_real_signal
-                        )
-
-                        # If the signal is not found, check if the bit slices contain the signal
-                        if not e_signal:
-                            if not any(
-                                [
-                                    f"{get_real_signal(signal).name}:" in bit_slice
-                                    for bit_slice in bit_slices
-                                ]
-                            ):
-                                newlinechar = "\n"
-                                fail_with_msg(
-                                    f"Port '{self.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!\n"
-                                    f"Port '{self.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n"
-                                    f"External connection '{wire.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}\n",
-                                    ValueError,
-                                )
-                elif len(self.signals) != len(wire.signals):
-                    newlinechar = "\n"
-                    fail_with_msg(
-                        f"Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!\n"
-                        f"Port '{self.name}' has the following signals:\n"
-                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n\n"
-                        f"External connection '{wire.name}' has the following signals:\n"
-                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}\n",
-                        ValueError,
-                    )
-            elif len(self.signals) != len(wire.signals):
-                newlinechar = "\n"
-                fail_with_msg(
-                    f"Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!\n"
-                    f"Port '{self.name}' has the following signals:\n"
-                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n\n"
-                    f"External connection '{wire.name}' has the following signals:\n"
-                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}",
-                    ValueError,
-                )
-            else:
-                for p, w in zip(self.signals, wire.signals):
-                    w = get_real_signal(w)
-                    if "'" in w.name or w.name.lower() == "z":
-                        validate_verilog_const(value=w.name, direction=p.direction)
-        else:
-            fail_with_msg(
-                f"Invalid wire type! {wire}. Must be iob_wire or str",
-                TypeError,
-            )
-
-        self.e_connect = wire
-        self.e_connect_bit_slices = bit_slices
 
 
 attrs = [

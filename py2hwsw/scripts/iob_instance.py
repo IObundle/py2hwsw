@@ -5,7 +5,7 @@
 import copy
 from typing import Dict
 
-from if_gen import mem_if_names
+import if_gen
 from iob_base import (
     iob_base,
     find_obj_in_list,
@@ -197,18 +197,28 @@ class iob_instance(iob_base):
         if not issuer.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
-        _signals = {
-            k: v for k, v in port.interface.__dict__.items() if k != "widths"
+        issuer.add_interface_port(name=_name, interface=port.interface, descr=port.descr)
+        # Translate interface to a dictionary (TODO: remove along with attributes_dict)
+        interface_dict = {
+            "type": port.interface.genre,
+            "prefix": port.interface.prefix,
+            "mult": port.interface.mult,
+            "file_prefix": port.interface.file_prefix,
+            "portmap_port_prefix": port.interface.portmap_port_prefix,
+            "ADDR_W": port.interface.addr_w,
         }
-        _signals.update(port.interface.widths)
-        if _signals["prefix"] == "":
-            _signals.update({"prefix": f"{_name}_"})
-        issuer.create_port(name=_name, signals=_signals, descr=port.descr)
+        if isinstance(port.interface, if_gen.symMemInterface):
+            # If symmetric memory, add 'DATA_W'
+            interface_dict["DATA_W"] = port.interface.data_w
+        elif isinstance(port.interface, if_gen.asymMemInterface):
+            # If asymmetric memory, add 'W_DATA_W' and 'R_DATA_W'
+            interface_dict["W_DATA_W"] = port.interface.w_data_w
+            interface_dict["R_DATA_W"] = port.interface.r_data_w
         # Add port also to attributes_dict
         issuer.attributes_dict["ports"].append(
             {
                 "name": _name,
-                "signals": _signals,
+                "signals": interface_dict,
                 "descr": port.descr,
             }
         )
@@ -233,21 +243,16 @@ class iob_instance(iob_base):
         self.portmap_connections.append(clk_portmap)
 
         for p in issuer.ports:
-            if p.interface:
-                if (
-                    p.interface.type == port.interface.type
-                    and p.interface.prefix == port.interface.prefix
-                ):
-                    if p.interface.params != port.interface.params:
-                        p.interface.params = "_".join(
-                            filter(
-                                lambda x: x != "None",
-                                [p.interface.params, port.interface.params],
-                            )
-                        )
-                        p.signals = []
-                        p.__post_init__()
-                    clk_portmap.connect_external(p, bit_slices=[])
+            if isinstance(p.interface, if_gen.iobClkInterface):
+                # If interface is the same, connect it and add parameters if needed
+                if p.interface.prefix == port.interface.prefix:
+                    p.interface.has_cke |= port.interface.has_cke
+                    p.interface.has_arst |= port.interface.has_arst
+                    p.interface.has_rst |= port.interface.has_rst
+                    p.interface.has_en |= port.interface.has_en
+                    p.signals = []
+                    p.__post_init__()
+                    port.connect_external(p, bit_slices=[])
                     return
         issuer.create_port(name=_name, signals=_signals, descr=port.descr)
         _port = find_obj_in_list(issuer.ports, _name)
@@ -265,19 +270,27 @@ class iob_instance(iob_base):
         # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of issuer
         csrs_port = find_obj_in_list(self.ports, "control_if_s")
 
-        issuer.create_port(
+        # Copy interface from csrs_port to create a new interface and set its prefix
+        new_interface = copy.deepcopy(csrs_port.interface)
+        new_interface.prefix = self.instance_name + "_"
+
+        issuer.add_interface_port(
             name=f"{self.instance_name}_cbus_s",
-            signals={
-                "type": csrs_port.interface.type,
-                "prefix": self.instance_name + "_",
-                **csrs_port.interface.widths,
-            },
+            interface=new_interface,
             descr="Control and Status Registers interface (auto-generated)",
         )
         # Connect newly created port to self
         csrs_portmap = iob_portmap(port=csrs_port)
         csrs_portmap.connect_external(issuer.ports[-1], bit_slices=[])
         self.portmap_connections.append(csrs_portmap)
+
+        # TODO: Remove attributes_dict from the system
+        # Add port to instantiator's attributes_dict
+        csr_if_genre = "iob_clk"
+        if isinstance(csrs_port.interface, if_gen.AXILiteInterface):
+            csr_if_genre = "axil"
+        if isinstance(csrs_port.interface, if_gen.APBInterface):
+            csr_if_genre = "apb"
 
         # Add port to issuer's attributes_dict
         issuer.attributes_dict["ports"].append(

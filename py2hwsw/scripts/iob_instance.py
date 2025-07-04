@@ -171,22 +171,21 @@ class iob_instance(iob_base):
             portmap = iob_portmap(port=port)
             portmap.connect_external(wire, bit_slices=bit_slices)
             self.portmap_connections.append(portmap)
-        for port in self.ports:
-            if (
-                not find_obj_in_list(
-                    self.portmap_connections, port.name, get_portmap_port
-                )
-                and port.interface
-            ):
+        # If this module has an issuer and is not a tester
+        if issuer and not self.is_tester:
+            for port in self.ports:
                 if (
-                    port.interface.type in mem_if_names
-                    and issuer
-                    and not self.is_tester
+                    not find_obj_in_list(
+                        self.portmap_connections, port.name, get_portmap_port
+                    )
+                    and port.interface
                 ):
-                    # print(f"DEBUG: Creating port '{port.name}' in '{issuer.name}' and connecting it to port of subblock '{self.name}'.", file=sys.stderr)
-                    self.__connect_memory(port, issuer)
-                elif port.interface.type == "iob_clk" and issuer and not self.is_tester:
-                    self.__connect_clk_interface(port, issuer)
+                    if isinstance(port.interface, if_gen.symMemInterface) or isinstance(
+                        port.interface, if_gen.asymMemInterface
+                    ):
+                        self.__connect_memory(port, issuer)
+                    elif isinstance(port.interface, if_gen.iobClkInterface):
+                        self.__connect_clk_interface(port, issuer)
 
         # iob_csrs specific code
         if self.original_name == "iob_csrs" and issuer:
@@ -197,7 +196,9 @@ class iob_instance(iob_base):
         if not issuer.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
-        issuer.add_interface_port(name=_name, interface=port.interface, descr=port.descr)
+        issuer.add_interface_port(
+            name=_name, interface=port.interface, descr=port.descr
+        )
         # Translate interface to a dictionary (TODO: remove along with attributes_dict)
         interface_dict = {
             "type": port.interface.genre,
@@ -233,9 +234,7 @@ class iob_instance(iob_base):
         if not issuer.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
-        _signals = {
-            k: v for k, v in port.interface.__dict__.items() if k != "widths"
-        }
+        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
         _signals.update(port.interface.widths)
 
         # create new clk portmap
@@ -254,6 +253,7 @@ class iob_instance(iob_base):
                     p.__post_init__()
                     port.connect_external(p, bit_slices=[])
                     return
+
         issuer.create_port(name=_name, signals=_signals, descr=port.descr)
         _port = find_obj_in_list(issuer.ports, _name)
         clk_portmap.connect_external(_port, bit_slices=[])
@@ -297,7 +297,7 @@ class iob_instance(iob_base):
             {
                 "name": f"{self.instance_name}_cbus_s",
                 "signals": {
-                    "type": csrs_port.interface.type,
+                    "type": csr_if_genre,
                     "prefix": self.instance_name + "_",
                     **csrs_port.interface.widths,
                 },

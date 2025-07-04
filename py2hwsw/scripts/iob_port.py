@@ -206,6 +206,7 @@ def create_port_from_dict(core, *args, signals=[], **kwargs):
     core.set_default_attribute("ports", [])
     sig_obj_list = []
     interface_obj = None
+
     if type(signals) is list:
         # Convert user signal dictionaries into 'iob_signal' objects
         sig_obj_list = convert_dict2obj_list(signals, iob_signal)

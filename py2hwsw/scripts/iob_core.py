@@ -591,11 +591,27 @@ class iob_core(iob_module, iob_instance):
             return
         _name = f"{port.name}"
         instantiator.add_interface_port(name=_name, interface=port.interface, descr=port.descr)
+        # Translate interface to a dictionary (TODO: remove along with attributes_dict)
+        interface_dict = {
+            "type": port.interface.genre,
+            "prefix": port.interface.prefix,
+            "mult": port.interface.mult,
+            "file_prefix": port.interface.file_prefix,
+            "portmap_port_prefix": port.interface.portmap_port_prefix,
+            "ADDR_W": port.interface.addr_w,
+        }
+        if isinstance(port.interface, if_gen.symMemInterface):
+            # If symmetric memory, add 'DATA_W'
+            interface_dict["DATA_W"] = port.interface.data_w
+        elif isinstance(port.interface, if_gen.asymMemInterface):
+            # If asymmetric memory, add 'W_DATA_W' and 'R_DATA_W'
+            interface_dict["W_DATA_W"] = port.interface.w_data_w
+            interface_dict["R_DATA_W"] = port.interface.r_data_w
         # Add port also to attributes_dict
         instantiator.attributes_dict["ports"].append(
             {
                 "name": _name,
-                "signals": port.interface.get_signals(),
+                "signals": interface_dict,
                 "descr": port.descr,
             }
         )

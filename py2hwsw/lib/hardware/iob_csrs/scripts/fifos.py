@@ -606,7 +606,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                             f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
                         ],
                     ),
-                    "extmem_io": f"{fifo_name}_extmem_io",
+                    "extmem_m": f"{fifo_name}_extmem_io",
                 },
             }
         )

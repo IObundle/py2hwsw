@@ -9,6 +9,7 @@ from iob_snippet import iob_snippet
 from iob_base import fail_with_msg, assert_attributes
 from iob_wire import find_signal_in_wires
 from iob_signal import get_real_signal
+from if_gen import iobClkInterface
 
 
 @dataclass
@@ -114,12 +115,18 @@ class iob_comb(iob_snippet):
                     # and overwrite the default one
                     for port in core.ports:
                         if port.interface:
-                            if port.interface.type == "iob_clk" and port.interface.prefix == self.clk_prefix:
+                            if isinstance(port.interface, iobClkInterface) and port.interface.prefix == self.clk_prefix:
                                 clk_if_name = port.name
-                                if port.interface.params:
-                                    port_params = port.interface.params
-                                else:
-                                    port_params = "c_a"
+                                # If it does not cke or arst, set them
+                                port.interface.has_cke = True
+                                port.interface.has_arst = True
+
+                                port_params = "c_a"
+                                # Add the remaining parameters
+                                if port.interface.has_rst:
+                                    port_params += "_r"
+                                if port.interface.has_en:
+                                    port_params += "_e"
 
                     # Connect the register
                     connect = {

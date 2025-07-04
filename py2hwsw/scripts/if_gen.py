@@ -1132,7 +1132,7 @@ class AXILiteInterface(_interface):
     # Interfaces/Ports to include in the AXI-Lite interface
     has_read_if: bool = True
     has_write_if: bool = True
-    has_prot: bool = True
+    has_prot: bool = False
 
     def __post_init__(self):
         super().__post_init__()
@@ -1273,7 +1273,7 @@ class AXIInterface(_interface):
     # Interfaces/Ports to include in the AXI-Lite interface
     has_read_if: bool = True
     has_write_if: bool = True
-    has_prot: bool = True
+    has_prot: bool = False
 
     def __post_init__(self):
         super().__post_init__()
@@ -1312,7 +1312,7 @@ class AXIInterface(_interface):
                 descr="AXI address write channel valid.",
             ),
             iob_signal(
-                name="axil_awready_i",
+                name="axi_awready_i",
                 descr="AXI address write channel ready.",
             ),
             iob_signal(
@@ -2044,6 +2044,7 @@ def create_interface(
                 resp_w=resp_w,
                 len_w=len_w,
                 has_write_if=False,
+                has_prot="PROT_W" in widths,
             )
         case "axi_write":
             interface = AXIInterface(
@@ -2064,6 +2065,7 @@ def create_interface(
                 resp_w=resp_w,
                 len_w=len_w,
                 has_read_if=False,
+                has_prot="PROT_W" in widths,
             )
         case "axi":
             interface = AXIInterface(
@@ -2083,6 +2085,7 @@ def create_interface(
                 qos_w=qos_w,
                 resp_w=resp_w,
                 len_w=len_w,
+                has_prot="PROT_W" in widths,
             )
         case "apb":
             interface = APBInterface(

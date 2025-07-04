@@ -35,7 +35,6 @@ import if_gen
 from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
-    find_obj_in_list,
     fail_with_msg,
     find_file,
     import_python_module,
@@ -49,7 +48,6 @@ import sw_tools
 import verilog_format
 import verilog_lint
 from manage_headers import generate_headers
-from iob_signal import remove_signal_direction_suffixes
 
 
 class iob_core(iob_module, iob_instance):
@@ -89,15 +87,15 @@ class iob_core(iob_module, iob_instance):
                    dictionary will override the one from the constructor argument.
         :param dict connect: External wires to connect to ports of this instance
                        Key: Port name, Value: Wire name
-        :param iob_core instantiator: Module that is instantiating this instance
+        :param iob_core issuer: Module that is instantiating this instance
         :param bool is_parent: If this core is a parent core
         """
         # Arguments used by this class
         dest_dir = kwargs.get("dest_dir", "hardware/src")
         attributes = kwargs.get("attributes", {})
         connect = kwargs.get("connect", {})
-        self.instantiator = kwargs.get("instantiator", None)
-        is_parent = kwargs.get("is_parent", False)
+        self.issuer = kwargs.get("issuer", None)
+        self.is_parent = kwargs.get("is_parent", False)
 
         # Store kwargs to allow access to python parameters after object has been created
         self.received_python_parameters = kwargs
@@ -257,11 +255,11 @@ class iob_core(iob_module, iob_instance):
 
         # Read 'attributes' dictionary and set corresponding core attributes
         superblocks = attributes.pop("superblocks", [])
-        # Note: Parsing attributes (specifically the subblocks list) also causes the setup process for subblocks to run
+        # Note: Parsing attributes (specifically the subblocks list) also initializes subblocks
         self.parse_attributes_dict(attributes)
 
-        # Connect ports of this instance to external wires (wires of the instantiator)
-        self.connect_instance_ports(connect, self.instantiator)
+        # Connect ports of this instance to external wires (wires of the issuer)
+        self.connect_instance_ports(connect, self.issuer)
 
         # iob_csrs specific code
         if self.is_system:
@@ -294,13 +292,13 @@ class iob_core(iob_module, iob_instance):
             descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part.",
         )
 
-        # Ensure superblocks are set up last
+        # Ensure superblocks are instanciated last
         # and only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
             self.parse_attributes_dict({"superblocks": superblocks})
         if self.is_superblock:
-            # Generate verilog parameters of instantiator subblock
-            param_gen.generate_inst_params(self.instantiator)
+            # Generate verilog parameters of issuer subblock
+            param_gen.generate_inst_params(self.issuer)
 
         if not self.is_top_module:
             self.build_dir = __class__.global_build_dir
@@ -315,67 +313,6 @@ class iob_core(iob_module, iob_instance):
 
         if self.abort_reason:
             return
-
-        self.__create_build_dir()
-
-        if self.is_tester:
-            self.relative_path_to_UUT = os.path.relpath(
-                __class__.global_build_dir, self.build_dir
-            )
-
-        # Copy files from LIB to setup various flows
-        # (should run before copy of files from module's setup dir)
-        if self.is_top_module or self.is_tester:
-            copy_srcs.flows_setup(self)
-
-        # Copy files from the module's setup dir
-        copy_srcs.copy_rename_setup_directory(self)
-
-        # Generate config_build.mk
-        if self.is_top_module or self.is_tester:
-            config_gen.config_build_mk(self, __class__.global_top_module)
-
-        # Generate configuration files
-        config_gen.generate_confs(self)
-
-        # Generate parameters
-        param_gen.generate_params_snippets(self)
-
-        # Generate ios
-        io_gen.generate_ports_snippet(self)
-
-        # Generate wires
-        wire_gen.generate_wires_snippet(self)
-
-        # Generate instances
-        if self.generate_hw:
-            block_gen.generate_subblocks_snippet(self)
-
-        # Generate comb
-        comb_gen.generate_comb_snippet(self)
-
-        # Generate fsm
-        fsm_gen.generate_fsm_snippet(self)
-
-        # Generate snippets
-        snippet_gen.generate_snippets_snippet(self)
-
-        # Generate main Verilog module
-        if self.generate_hw:
-            verilog_gen.generate_verilog(self)
-
-        # TODO: Generate a global list of signals
-        # This list is useful for a python based simulator
-        # 1) Each input of the top generates a global signal
-        # 2) Each output of a leaf generates a global signal
-        # 3) Each output of a snippet generates a global signal
-        #    A snippet is a piece of verilog code manually written (should also receive a list of outputs by the user).
-        #    A snippet can also be any method that generates a new signal, like the `concat_bits`, or any other that performs logic in from other signals into a new one.
-        # TODO as well: Each module has a local `snippets` list.
-        # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
-
-        if (self.is_top_module and not is_parent) or self.is_tester:
-            self.post_setup()
 
     def post_setup(self):
         """Scripts to run at the end of the top module's setup"""
@@ -433,10 +370,9 @@ class iob_core(iob_module, iob_instance):
         """Create a new core based on parent core.
         returns: True if parent core was used. False otherwise.
         """
-        is_parent = kwargs.pop("is_parent", False)
         attributes = kwargs.pop("attributes", {})
         child_attributes = kwargs.pop("child_attributes", {})
-        if is_parent:
+        if self.is_parent:
             self.append_child_attributes(attributes, child_attributes)
 
         # Don't setup parent core if this one does not have parent
@@ -450,7 +386,7 @@ class iob_core(iob_module, iob_instance):
 
         belongs_to_top_module = not __class__.global_top_module
         # Check if this child module is the first one called (It is the leaf child of the top module. Does not have any other childs.)
-        is_first_module_called = belongs_to_top_module and not is_parent
+        is_first_module_called = belongs_to_top_module and not self.is_parent
 
         name = attributes.get("name", attributes["original_name"])
         # Update global build dir to match this module's name and version
@@ -462,7 +398,7 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("core_name", None)
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
-        filtered_parent_py_params.pop("instantiator", None)
+        filtered_parent_py_params.pop("issuer", None)
         filtered_parent_py_params.pop("py2hwsw_version", None)
         filtered_parent_py_params.pop("connect", None)
         filtered_parent_py_params.pop("parameters", None)
@@ -479,7 +415,7 @@ class iob_core(iob_module, iob_instance):
             **filtered_parent_py_params,
             is_parent=True,
             child_attributes=attributes,
-            instantiator=kwargs.get("instantiator", None),
+            issuer=kwargs.get("issuer", None),
             connect=kwargs.get("connect", {}),
             parameters=kwargs.get("parameters", {}),
             is_superblock=kwargs.get("is_superblock", False),
@@ -501,6 +437,82 @@ class iob_core(iob_module, iob_instance):
             self.post_setup()
 
         return True
+
+    def generate_build_dir(self, **kwargs):
+
+        self.__create_build_dir()
+
+        # subblock setup process
+        for subblock in self.subblocks:
+            if self.is_superblock:
+                if subblock.original_name == self.issuer.original_name:
+                    # skip build dir generation for issuer subblocks
+                    continue
+            subblock.generate_build_dir()
+
+        # Ensure superblocks are set up only for top module (or wrappers of it)
+        if self.is_top_module or self.is_superblock:
+            for superblock in self.superblocks:
+                superblock.generate_build_dir()
+
+        if self.is_tester:
+            self.relative_path_to_UUT = os.path.relpath(
+                __class__.global_build_dir, self.build_dir
+            )
+
+        # Copy files from LIB to setup various flows
+        # (should run before copy of files from module's setup dir)
+        if self.is_top_module or self.is_tester:
+            copy_srcs.flows_setup(self)
+
+        # Copy files from the module's setup dir
+        copy_srcs.copy_rename_setup_directory(self)
+
+        # Generate config_build.mk
+        if self.is_top_module or self.is_tester:
+            config_gen.config_build_mk(self, __class__.global_top_module)
+
+        # Generate configuration files
+        config_gen.generate_confs(self)
+
+        # Generate parameters
+        param_gen.generate_params_snippets(self)
+
+        # Generate ios
+        io_gen.generate_ports_snippet(self)
+
+        # Generate wires
+        wire_gen.generate_wires_snippet(self)
+
+        # Generate instances
+        if self.generate_hw:
+            block_gen.generate_subblocks_snippet(self)
+
+        # Generate comb
+        comb_gen.generate_comb_snippet(self)
+
+        # Generate fsm
+        fsm_gen.generate_fsm_snippet(self)
+
+        # Generate snippets
+        snippet_gen.generate_snippets_snippet(self)
+
+        # Generate main Verilog module
+        if self.generate_hw:
+            verilog_gen.generate_verilog(self)
+
+        # TODO: Generate a global list of signals
+        # This list is useful for a python based simulator
+        # 1) Each input of the top generates a global signal
+        # 2) Each output of a leaf generates a global signal
+        # 3) Each output of a snippet generates a global signal
+        #    A snippet is a piece of verilog code manually written (should also receive a list of outputs by the user).
+        #    A snippet can also be any method that generates a new signal, like the `concat_bits`, or any other that performs logic in from other signals into a new one.
+        # TODO as well: Each module has a local `snippets` list.
+        # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
+
+        if (self.is_top_module and not self.is_parent) or self.is_tester:
+            self.post_setup()
 
     @staticmethod
     def append_child_attributes(parent_attributes, child_attributes):
@@ -573,185 +585,17 @@ class iob_core(iob_module, iob_instance):
             self.is_system
         ), "Internal error: only iob_system type cores need fixing cbus width"
         for subblock in self.subblocks:
-            for port in subblock.ports:
+            for portmap in subblock.portmap_connections:
                 if (
-                    port.name == "iob_csrs_cbus_s"
-                    and isinstance(port.interface, if_gen.iobInterface)
-                    and port.e_connect
+                    portmap.port.name == "iob_csrs_cbus_s"
+                    and isinstance(portmap.port.interface, if_gen.iobInterface)
+                    and portmap.e_connect
                 ):
-                    port_width = port.interface.addr_w
-                    external_wire_prefix = port.e_connect.interface.prefix
-                    port.e_connect_bit_slices = [
+                    port_width = portmap.port.interface.addr_w
+                    external_wire_prefix = portmap.e_connect.interface.prefix
+                    portmap.e_connect_bit_slices = [
                         f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
                     ]
-
-    def __connect_memory(self, port, instantiator):
-        """Create memory port in instantiatior and connect it to self"""
-        if not instantiator.generate_hw or not self.instantiate:
-            return
-        _name = f"{port.name}"
-        instantiator.add_interface_port(name=_name, interface=port.interface, descr=port.descr)
-        # Translate interface to a dictionary (TODO: remove along with attributes_dict)
-        interface_dict = {
-            "type": port.interface.genre,
-            "prefix": port.interface.prefix,
-            "mult": port.interface.mult,
-            "file_prefix": port.interface.file_prefix,
-            "portmap_port_prefix": port.interface.portmap_port_prefix,
-            "ADDR_W": port.interface.addr_w,
-        }
-        if isinstance(port.interface, if_gen.symMemInterface):
-            # If symmetric memory, add 'DATA_W'
-            interface_dict["DATA_W"] = port.interface.data_w
-        elif isinstance(port.interface, if_gen.asymMemInterface):
-            # If asymmetric memory, add 'W_DATA_W' and 'R_DATA_W'
-            interface_dict["W_DATA_W"] = port.interface.w_data_w
-            interface_dict["R_DATA_W"] = port.interface.r_data_w
-        # Add port also to attributes_dict
-        instantiator.attributes_dict["ports"].append(
-            {
-                "name": _name,
-                "signals": interface_dict,
-                "descr": port.descr,
-            }
-        )
-        _port = find_obj_in_list(instantiator.ports + instantiator.wires, _name)
-        port.connect_external(_port, bit_slices=[])
-
-    def __connect_clk_interface(self, port, instantiator):
-        """Create, if needed, a clock interface port in instantiator and connect it to self"""
-        if not instantiator.generate_hw or not self.instantiate:
-            return
-        _name = f"{port.name}"
-        for p in instantiator.ports:
-            if isinstance(p.interface, if_gen.iobClkInterface):
-                # If interface is the same, connect it and add parameters if needed
-                if p.interface.prefix == port.interface.prefix:
-                    p.interface.has_cke |= port.interface.has_cke
-                    p.interface.has_arst |= port.interface.has_arst
-                    p.interface.has_rst |= port.interface.has_rst
-                    p.interface.has_en |= port.interface.has_en
-                    p.signals = []
-                    p.__post_init__()
-                    port.connect_external(p, bit_slices=[])
-                    return
-        instantiator.add_interface_port(name=_name, interface=port.interface, descr=port.descr)
-        _port = find_obj_in_list(instantiator.ports, _name)
-        port.connect_external(_port, bit_slices=[])
-
-    def connect_instance_ports(self, connect, instantiator):
-        """
-        param connect: External wires to connect to ports of this instance
-                       Key: Port name, Value: Wire name or tuple with wire name and signal bit slices
-                       Tuple has format:
-                       (wire_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
-        param instantiator: Module that is instantiating this instance
-        """
-        # Connect instance ports to external wires
-        for port_name, connection_value in connect.items():
-            port = find_obj_in_list(self.ports, port_name)
-            if not port:
-                fail_with_msg(
-                    f"Port '{port_name}' not found in instance '{self.instance_name}' of module '{instantiator.name}'!\n"
-                    f"Available ports:\n- "
-                    + "\n- ".join([port.name for port in self.ports])
-                )
-
-            bit_slices = []
-            if type(connection_value) is str:
-                wire_name = connection_value
-            elif type(connection_value) is tuple:
-                wire_name = connection_value[0]
-                bit_slices = connection_value[1]
-                if type(bit_slices) is not list:
-                    fail_with_msg(
-                        f"Second element of tuple must be a list of bit slices/connections: {connection_value}"
-                    )
-            else:
-                fail_with_msg(f"Invalid connection value: {connection_value}")
-
-            if "'" in wire_name or wire_name.lower() == "z":
-                wire = wire_name
-            else:
-                wire = find_obj_in_list(
-                    instantiator.wires, wire_name
-                ) or find_obj_in_list(instantiator.ports, wire_name)
-                if not wire:
-                    debug(
-                        f"Creating implicit wire '{port.name}' in '{instantiator.name}'.",
-                        1,
-                    )
-                    # Add wire to instantiator
-                    wire_signals = remove_signal_direction_suffixes(port.signals)
-                    instantiator.create_wire(
-                        name=wire_name, signals=wire_signals, descr=port.descr
-                    )
-                    # Add wire to attributes_dict as well
-                    instantiator.attributes_dict["wires"].append(
-                        {
-                            "name": wire_name,
-                            "signals": wire_signals,
-                            "descr": port.descr,
-                        }
-                    )
-                    wire = instantiator.wires[-1]
-            port.connect_external(wire, bit_slices=bit_slices)
-
-        # If this module has an instantiator and is not a tester
-        if instantiator and not self.is_tester:
-            for port in self.ports:
-                # If port is not connected externally, but is an interface, connect it if it is a memory or clock interface
-                if not port.e_connect and port.interface:
-                    if isinstance(port.interface, if_gen._memInterface):
-                        self.__connect_memory(port, instantiator)
-                    elif isinstance(port.interface, if_gen.iobClkInterface):
-                        self.__connect_clk_interface(port, instantiator)
-
-        # iob_csrs specific code
-        if self.original_name == "iob_csrs" and instantiator:
-            self.__connect_cbus_port(instantiator)
-
-    def __connect_cbus_port(self, instantiator):
-        """Automatically adds "<prefix>_cbus_s" port to instantiators of iob_csrs (are usually iob_system peripherals).
-        The '<prefix>' is replaced by instance name of iob_csrs subblock.
-        Also, connects the newly created instantiator port to the iob_csrs `control_if_s` port.
-        :param instantiator: Instantiator core object
-        """
-        assert (
-            self.original_name == "iob_csrs"
-        ), "Internal error: cbus can only be created for instantiator of 'iob_csrs' module."
-        # Find CSR control port in iob_csrs, and copy its properites to a newly generated "<prefix>_cbus_s" port of instantiator
-        csrs_port = find_obj_in_list(self.ports, "control_if_s")
-
-        # Copy interface from csrs_port to create a new interface and set its prefix
-        new_interface = copy.deepcopy(csrs_port.interface)
-        new_interface.prefix = self.instance_name + "_"
-
-        instantiator.add_interface_port(name=f"{self.instance_name}_cbus_s", 
-                                        interface=new_interface,
-                                        descr="Control and Status Registers interface (auto-generated)")
-        # Connect newly created port to self
-        csrs_port.connect_external(instantiator.ports[-1], bit_slices=[])
-
-        # TODO: Remove attributes_dict from the system
-        # Add port to instantiator's attributes_dict
-        csr_if_genre = "iob_clk"
-        if isinstance(csrs_port.interface, if_gen.AXILiteInterface):
-            csr_if_genre = "axil"
-        if isinstance(csrs_port.interface, if_gen.APBInterface):
-            csr_if_genre = "apb"
-        instantiator.attributes_dict["ports"].append(
-            {
-                "name": f"{self.instance_name}_cbus_s",
-                "signals": {
-                    "type": csr_if_genre,
-                    "prefix": self.instance_name + "_",
-                    "DATA_W": csrs_port.interface.data_w,
-                    "ADDR_W": csrs_port.interface.addr_w,
-                },
-                "descr": "Control and Status Registers interface (auto-generated)",
-            }
-        )
 
     def __create_memwrapper(self, superblocks):
         """Create memory wrapper for top module"""
@@ -877,7 +721,7 @@ class iob_core(iob_module, iob_instance):
             return cls(attributes=core_dict, **kwargs)
         except Exception:
             add_traceback_msg(f"Failed to setup core '{core_dict['name']}'.")
-            if "instantiator" in kwargs and kwargs["instantiator"]:
+            if "issuer" in kwargs and kwargs["issuer"]:
                 raise
             exit(1)
 
@@ -1003,7 +847,7 @@ class iob_core(iob_module, iob_instance):
                 os.path.join(core_dir, f"{core_name}.py"),
             )
             core_module = sys.modules[core_name]
-            instantiator = kwargs.pop("instantiator", None)
+            issuer = kwargs.pop("issuer", None)
             # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
             # obtain the core's py2hwsw dictionary.
             # Give it a dictionary with all arguments of this function, since the user
@@ -1013,8 +857,8 @@ class iob_core(iob_module, iob_instance):
                     # "core_name": core_name,
                     "build_dir": __class__.global_build_dir,
                     "py2hwsw_target": __class__.global_special_target or "setup",
-                    "instantiator": (
-                        instantiator.attributes_dict if instantiator else ""
+                    "issuer": (
+                        issuer.attributes_dict if issuer else ""
                     ),
                     "py2hwsw_version": PY2HWSW_VERSION,
                     **kwargs,
@@ -1028,7 +872,7 @@ class iob_core(iob_module, iob_instance):
             py2_core_dict.update(core_dict)
             instance = __class__.py2hw(
                 py2_core_dict,
-                instantiator=instantiator,
+                issuer=issuer,
                 # Note, any of the arguments below can have their values overridden by
                 # the py2_core_dict
                 **kwargs,

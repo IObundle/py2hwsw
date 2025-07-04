@@ -5,7 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "name": py_params_dict["instantiator"]["name"] + "_sim",
+        "name": py_params_dict["issuer"]["name"] + "_sim",
         "generate_hw": False,
         "confs": [
             {

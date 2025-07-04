@@ -1142,9 +1142,9 @@ class AXILiteInterface(_interface):
         """Set signals for the AXI-Lite interface."""
 
         if self.has_read_if:
-            self.__set_write_signals()
-        if self.has_write_if:
             self.__set_read_signals()
+        if self.has_write_if:
+            self.__set_write_signals()
 
     def __set_write_signals(self):
         """Set write signals for the AXI-Lite interface."""
@@ -1283,9 +1283,9 @@ class AXIInterface(_interface):
         """Set signals for the AXI interface."""
 
         if self.has_read_if:
-            self.__set_write_signals()
-        if self.has_write_if:
             self.__set_read_signals()
+        if self.has_write_if:
+            self.__set_write_signals()
 
     def __set_write_signals(self):
         """Set write signals for the AXI interface."""

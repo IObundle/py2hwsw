@@ -115,6 +115,29 @@ def create_conf_group(core, *args, **kwargs):
 #
 
 
+def rename_dictionary_keys(dictionary, key_mapping):
+    """
+    Rename keys in dictionary using a mapping.
+    Mapping format:
+    {
+        "old_key": "new_key",
+        ...
+    }
+
+    Attributes:
+        dictionary (dict): Dictionary to rename keys in.
+        key_mapping (dict): Mapping of keys to rename.
+
+    Returns:
+        dict: Dictionary with renamed keys.
+    """
+    # Replace key with corresponding attribute name
+    for old_key, new_key in key_mapping.items():
+        if old_key in key_mapping:
+            dictionary[new_key] = dictionary.pop(old_key)
+    return dictionary
+
+
 def conf_from_dict(conf_dict):
     # NOTE: Using a Lazy import here to avoid circular import.
     #       Is there a better way to instantiate API class?

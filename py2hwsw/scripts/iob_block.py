@@ -14,14 +14,13 @@ from iob_base import (
 )
 
 
+from api_base import api_class
+
+
+@api_class
 @dataclass
 class iob_block_group:
     """Class to represent a group of blocks."""
-
-    name: str = ""
-    descr: str = "Default description"
-    blocks: list = field(default_factory=list)
-    doc_clearpage: bool = False
 
     def __post_init__(self):
         if not self.name:
@@ -180,6 +179,12 @@ def create_block(core, core_name: str = "", instance_name: str = "", **kwargs):
 
 def block_group_from_dict(block_group_dict):
     api_iob_block_group = importlib.import_module("user_api.api").iob_block_group
+    core_from_dict = importlib.import_module("iob_core").core_from_dict
+    # Convert list of blocks dictionaries into 'blocks' objects
+    blocks_objs = []
+    for block in block_group_dict.get("blocks", []):
+        blocks_objs.append(core_from_dict(block))
+    block_group_dict["blocks"] = blocks_objs
     return api_iob_block_group(**block_group_dict)
 
 

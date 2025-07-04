@@ -9,16 +9,13 @@ import importlib
 from iob_base import fail_with_msg
 
 
+from api_base import api_class
+
+
+@api_class
 @dataclass
 class iob_license:
     """Class that represents a license attribute"""
-
-    # Identifier name for the license.
-    name: str = "MIT"
-    # Year of the license.
-    year: int = date.today().year
-    # Author of the license.
-    author: str = "IObundle, Lda"
 
 
 def update_license(core, *args, **kwargs):

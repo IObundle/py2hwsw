@@ -4,6 +4,8 @@
 
 from typing import Any
 from dataclasses import dataclass, field
+import importlib
+
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
@@ -13,35 +15,23 @@ from iob_base import (
     find_obj_in_list,
 )
 
+from api_base import api_class
 
+
+@api_class
 @dataclass
 class iob_python_parameter:
     """Class to represent a Python Parameter option."""
-
-    # Identifier name for the Python Parameter option.
-    name: str = ""
-    # Value of the Python Parameter option.
-    val: Any = ""
-    # Description of the Python Parameter option.
-    descr: str = "Default description"
 
     def __post_init__(self):
         if not self.name:
             fail_with_msg("Every Python Parameter must have a name!")
 
 
+@api_class
 @dataclass
 class iob_python_parameter_group:
-    """Class to represent a group of Python Parameters."""
-
-    # Identifier name for the group of Python Parameters.
-    name: str = ""
-    # Description of the Python Parameter group.
-    descr: str = "Default description"
-    # List of Python Parameter objects.
-    python_parameters: list = field(default_factory=list)
-    # If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
-    doc_clearpage: bool = False
+    """Class to represent a Group of Python Parameters."""
 
     def __post_init__(self):
         if not self.name:
@@ -110,3 +100,40 @@ def create_python_parameter_group(core, *args, **kwargs):
             f"Failed to create python_parameter/group '{kwargs['name']}'."
         )
         raise
+
+
+def python_parameter_from_dict(python_parameter_dict):
+    api_iob_python_parameter = importlib.import_module(
+        "user_api.api"
+    ).api_iob_python_parameter
+    return api_iob_python_parameter(**python_parameter_dict)
+
+
+def python_parameter_from_text(python_parameter_text):
+    api_iob_python_parameter = importlib.import_module(
+        "user_api.api"
+    ).api_iob_python_parameter
+    python_parameter_dict = {}
+    # TODO: parse short notation text
+    return api_iob_python_parameter(**python_parameter_dict)
+
+
+def python_parameter_group_from_dict(python_parameter_group_dict):
+    api_iob_python_parameter_group = importlib.import_module(
+        "user_api.api"
+    ).api_iob_python_parameter_group
+    # Convert list of python_parameters dictionaries into 'python_parameters' objects
+    python_parameters_objs = []
+    for python_parameter in python_parameter_group_dict.get("python_parameters", []):
+        python_parameters_objs.append(python_parameter_from_dict(python_parameter))
+    python_parameter_group_dict["python_parameters"] = python_parameters_objs
+    return api_iob_python_parameter_group(**python_parameter_group_dict)
+
+
+def python_parameter_group_from_text(python_parameter_group_text):
+    api_iob_python_parameter_group = importlib.import_module(
+        "user_api.api"
+    ).api_iob_python_parameter_group
+    python_parameter_group_dict = {}
+    # TODO: parse short notation text
+    return api_iob_python_parameter_group(**python_parameter_group_dict)

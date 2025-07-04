@@ -7,7 +7,11 @@ import importlib
 
 import if_gen
 import iob_colors
-from iob_wire import iob_wire, replace_duplicate_signals_by_references
+from iob_wire import (
+    iob_wire,
+    replace_duplicate_signals_by_references,
+    process_wire_attributes,
+)
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
@@ -19,18 +23,13 @@ from iob_base import (
 from iob_signal import iob_signal, get_real_signal
 
 
+from api_base import api_class
+
+
+@api_class
 @dataclass
 class iob_port(iob_wire):
     """Describes an IO port."""
-
-    # External wire that connects this port
-    e_connect: iob_wire | None = None
-    # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
-    e_connect_bit_slices: list = field(default_factory=list)
-    # If enabled, port will only appear in documentation. Not in the verilog code.
-    doc_only: bool = False
-    # If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
-    doc_clearpage: bool = False
 
     def __post_init__(self):
         if not self.name:
@@ -242,6 +241,7 @@ def create_port(core, *args, signals=[], **kwargs):
 
 def port_from_dict(port_dict):
     api_iob_port = importlib.import_module("user_api.api").iob_port
+    port_dict = process_wire_attributes(port_dict)
     return api_iob_port(**port_dict)
 
 

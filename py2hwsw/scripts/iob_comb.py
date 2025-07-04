@@ -12,12 +12,13 @@ from iob_wire import find_signal_in_wires
 from iob_signal import get_real_signal
 
 
+from api_base import api_class
+
+
+@api_class
 @dataclass
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
-
-    code: str = ""
-    clk_if: str = "c_a"
 
     def __post_init__(self):
         """Wrap verilog code with the always block"""

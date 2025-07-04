@@ -291,6 +291,7 @@ def api_class(cls):
             fail_with_msg(
                 f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
             )
+            # NOTE: Possible improvement: Make this constructor lazy import the corresponding API class and automatically instantiate it, instead of throwing this error.
         else:
             api_object_reference = args[0]  # object
             new_attributes = args[1]  # dict

@@ -7,12 +7,13 @@ from iob_base import assert_attributes
 import importlib
 
 
+from api_base import api_class
+
+
+@api_class
 @dataclass
 class iob_snippet:
     """Class to represent a Verilog snippet in an iob module"""
-
-    # List of outputs of this snippet (use to generate global wires)
-    verilog_code: str = ""
 
 
 def create_snippet(core, *args, **kwargs):

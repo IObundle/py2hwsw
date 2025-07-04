@@ -54,6 +54,7 @@ import iob_comb as internal_comb
 import iob_fsm as internal_fsm
 import iob_block as internal_block
 import iob_license as internal_license
+import iob_python_parameter as internal_python_parameter
 import iob_core as internal_core
 
 
@@ -729,6 +730,112 @@ def create_license_from_text(license_text):
 
     Returns:
         iob_license: iob_license object
+    """
+    pass
+
+
+#
+# Python Parameter
+#
+
+
+@api_for(internal_python_parameter.iob_python_parameter)
+class iob_python_parameter:
+    """
+    Class that represents a python parameter attribute.
+
+    Attributes:
+        name (str): Identifier name for the Python Parameter option.
+        val (Any): Value of the Python Parameter option.
+        descr (str): Description of the Python Parameter option.
+    """
+
+    name: str = ""
+    val: object = ""
+    descr: str = "Default description"
+
+
+@api_for(internal_python_parameter.python_parameter_from_dict)
+def create_python_parameter_from_dict(python_parameter_dict):
+    """
+    Function to create iob_python_parameter object from dictionary attributes.
+
+    Attributes:
+        python_parameter_dict (dict): dictionary with values to initialize attributes of iob_python_parameter object.
+            This dictionary supports the following keys corresponding to the iob_python_parameter attributes:
+            - name -> iob_python_parameter.name
+            - val -> iob_python_parameter.val
+            - descr -> iob_python_parameter.descr
+
+    Returns:
+        iob_python_parameter: iob_python_parameter object
+    """
+    pass
+
+
+@api_for(internal_python_parameter.python_parameter_from_text)
+def create_python_parameter_from_text(python_parameter_text):
+    """
+    Function to create iob_python_parameter object from short notation text.
+
+    Attributes:
+        python_parameter_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_python_parameter: iob_python_parameter object
+    """
+    pass
+
+
+@api_for(internal_python_parameter.iob_python_parameter_group)
+class iob_python_parameter_group:
+    """
+    Class that represents a group of Python Parameters.
+
+    Attributes:
+        name (str): Identifier name for the group of Python Parameters.
+        descr (str): Description of the Python Parameter group.
+        python_parameters (list): List of Python Parameter objects.
+        doc_clearpage (bool): If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
+    """
+
+    name: str = ""
+    descr: str = "Default description"
+    python_parameters: list = empty_list()
+    doc_clearpage: bool = False
+
+
+@api_for(internal_python_parameter.python_parameter_group_from_dict)
+def create_python_parameter_group_from_dict(python_parameter_group_dict):
+    """
+    Function to create iob_python_parameter_group object from dictionary attributes.
+
+    Attributes:
+        python_parameter_group_dict (dict): dictionary with values to initialize attributes of iob_python_parameter_group object.
+            This dictionary supports the following keys corresponding to the iob_python_parameter_group attributes:
+            - name -> iob_python_parameter_group.name
+            - descr -> iob_python_parameter_group.descr
+            - python_parameters -> iob_python_parameter_group.python_parameters
+            - doc_clearpage -> iob_python_parameter_group.doc_clearpage
+
+    Returns:
+        iob_python_parameter_group: iob_python_parameter_group object
+    """
+    pass
+
+
+@api_for(internal_python_parameter.python_parameter_group_from_text)
+def create_python_parameter_group_from_text(python_parameter_group_text):
+    """
+    Function to create iob_python_parameter_group object from short notation text.
+
+    Attributes:
+        python_parameter_group_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_python_parameter_group: iob_python_parameter_group object
     """
     pass
 

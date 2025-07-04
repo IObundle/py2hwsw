@@ -15,25 +15,22 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
 )
-from iob_signal import iob_signal, iob_signal_reference, get_real_signal
+from iob_signal import (
+    iob_signal,
+    iob_signal_reference,
+    get_real_signal,
+    signal_from_dict,
+    signal_from_text,
+)
 
 
+from api_base import api_class
+
+
+@api_class
 @dataclass
 class iob_wire:
     """Class to represent a wire in an iob module"""
-
-    # Identifier name for the wire.
-    name: str = ""
-    # Name of the standard interface to auto-generate with `if_gen.py` script.
-    interface: if_gen.interface = None
-    # Description of the wire.
-    descr: str = "Default description"
-    # Conditionally define this wire if the specified Verilog macro is defined/undefined.
-    if_defined: str = ""
-    if_not_defined: str = ""
-    # List of signals belonging to this wire
-    # (each signal represents a hardware Verilog wire).
-    signals: List = field(default_factory=list)
 
     def __post_init__(self):
         if not self.name:
@@ -173,8 +170,18 @@ def find_signal_in_wires(wires, signal_name, process_func=get_real_signal):
 #
 
 
+def process_wire_attributes(wire_dict):
+    # Convert list of signals dictionaries into 'signals' objects
+    signals_objs = []
+    for signal in wire_dict.get("signals", []):
+        signals_objs.append(signal_from_dict(signal))
+    wire_dict["signals"] = signals_objs
+    return wire_dict
+
+
 def wire_from_dict(wire_dict):
     api_iob_wire = importlib.import_module("user_api.api").iob_wire
+    wire_dict = process_wire_attributes(wire_dict)
     return api_iob_wire(**wire_dict)
 
 

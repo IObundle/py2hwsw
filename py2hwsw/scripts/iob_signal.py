@@ -8,18 +8,13 @@ import importlib
 from iob_base import fail_with_msg
 
 
+from api_base import api_class
+
+
+@api_class
 @dataclass
 class iob_signal:
     """Class that represents a wire/port signal"""
-
-    # Identifier name for the signal.
-    name: str = ""
-    # Number of bits in the signal.
-    width: str or int = 1
-    # Description of the signal.
-    descr: str = "Default description"
-    # If enabled, signal will be generated with type `reg` in Verilog.
-    isvar: bool = False
 
     # Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
     isreg: bool = False

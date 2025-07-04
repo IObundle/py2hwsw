@@ -10,13 +10,13 @@ from iob_comb import iob_comb
 from iob_base import assert_attributes
 
 
+from api_base import api_class
+
+
+@api_class
 @dataclass
 class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
-
-    kind: str = "prog"
-    default_assignments: str = ""
-    state_descriptions: str = ""
 
     def __post_init__(self):
         if self.kind not in ["prog", "fsm"]:

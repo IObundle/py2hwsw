@@ -48,7 +48,18 @@ import sw_tools
 import verilog_format
 import verilog_lint
 
+from iob_conf import conf_from_dict
+from iob_port import port_from_dict
+from iob_wire import wire_from_dict
+from iob_snippet import snippet_from_dict
+from iob_block import block_group_from_dict
+from iob_python_parameter import python_parameter_group_from_dict
 
+
+from api_base import api_class
+
+
+@api_class
 class iob_core(iob_module, iob_instance):
     """Generic class to describe how to generate a base IOb IP core"""
 
@@ -1131,6 +1142,22 @@ def find_module_setup_dir(core_name):
 
 def core_from_dict(core_dict):
     api_iob_core = importlib.import_module("user_api.api").iob_core
+    # Convert lists of dictionaries into objects
+    converter_functions = {
+        "confs": conf_from_dict,
+        "ports": port_from_dict,
+        "wires": wire_from_dict,
+        "snippets": snippet_from_dict,
+        "subblocks": block_group_from_dict,
+        "superblocks": block_group_from_dict,
+        "sw_modules": block_group_from_dict,
+        "python_parameters": python_parameter_group_from_dict,
+    }
+    for list_name, converter_function in converter_functions.items():
+        objs_list = []
+        for dictionary in core_dict.get(list_name, []):
+            objs_list.append(converter_function(dictionary))
+        core_dict[list_name] = objs_list
     return api_iob_core(**core_dict)
 
 

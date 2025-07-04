@@ -14,6 +14,7 @@ import importlib
 
 from iob_signal import iob_signal, iob_signal_reference
 from iob_globals import iob_globals
+from api_base import api_class
 
 mem_if_details = [
     {
@@ -276,7 +277,10 @@ if_types = [
 ]
 
 
+
+
 # NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
+@api_class
 @dataclass
 class interface:
     """Class to represent an interface for generation"""

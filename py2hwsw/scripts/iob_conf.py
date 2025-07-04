@@ -119,9 +119,16 @@ def conf_from_dict(conf_dict):
     # NOTE: Using a Lazy import here to avoid circular import.
     #       Is there a better way to instantiate API class?
     api_iob_conf = importlib.import_module("user_api.api").iob_conf
-    # Replace 'type' key with 'kind' key
-    if "type" in conf_dict:
-        conf_dict["kind"] = conf_dict.pop("type")
+    key_attribute_mapping = {
+        "type": "kind",
+        "val": "value",
+        "min": "min_value",
+        "max": "max_value",
+    }
+    # Replace key with corresponding attribute name
+    for key, attr in key_attribute_mapping.items():
+        if key in conf_dict:
+            conf_dict[attr] = conf_dict.pop(key)
     return api_iob_conf(**conf_dict)
 
 

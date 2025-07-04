@@ -58,8 +58,24 @@ class iob_and(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     # conf_obj = py2hwsw.iob_conf(name="a")
-    conf_obj = py2hwsw.create_conf_from_dict({"name": "a"})
-    print("Name of conf_obj: ", conf_obj.get_name())
+    conf_group_obj = py2hwsw.create_conf_group_from_dict(
+        {
+            "name": "general",
+            "descr": "General group of confs",
+            "confs": [
+                {
+                    "name": "W",
+                    "type": "P",
+                    "val": "21",
+                    "min": "1",
+                    "max": "32",
+                    "descr": "IO width",
+                },
+            ],
+        },
+    )
+    print("Name of conf_group_obj: ", conf_group_obj.get_name())
+    print("Name of conf_obj: ", conf_group_obj.get_confs()[0].get_name())
     # conf_obj.test_method()
     # iob_and_obj = iob_and()
     # print(iob_and_obj)

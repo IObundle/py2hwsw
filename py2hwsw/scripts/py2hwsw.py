@@ -203,7 +203,8 @@ if __name__ == "__main__":
             py_params[k] = v
 
     if args.target == "setup":
-        iob_core.get_core_obj(args.core_name, **py_params)
+        instance = iob_core.get_core_obj(args.core_name, **py_params)
+        instance.generate_build_dir()
     elif args.target == "clean":
         iob_core.clean_build_dir(args.core_name)
     elif args.target == "print_build_dir":

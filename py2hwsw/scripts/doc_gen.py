@@ -80,7 +80,7 @@ def generate_tex_py2hwsw_standard_py_params(out_dir):
         [
             "build_dir",
             str,
-            "Build directory of this core. Usually defined by `--build-dir` flag or instantiator.",
+            "Build directory of this core. Usually defined by `--build-dir` flag or issuer.",
         ],
         [
             "py2hwsw_target",
@@ -88,9 +88,9 @@ def generate_tex_py2hwsw_standard_py_params(out_dir):
             "The reason why py2hwsw is invoked. Usually `setup` meaning the Py2HWSW is calling the core's script to obtain information on how to generate the core. May also be other targets like `clean`, `print_attributes`, or `deliver`. These are usually to obtain information about the core for various purposes, but not to generate the build directory.",
         ],
         [
-            "instantiator",
+            "issuer",
             dict,
-            "Core dictionary with attributes of the instantiator core (if any). Allows subblocks to obtain information about their instantiator core.",
+            "Core dictionary with attributes of the issuer core (if any). Allows subblocks to obtain information about their issuer core.",
         ],
         [
             "py2hwsw_version",

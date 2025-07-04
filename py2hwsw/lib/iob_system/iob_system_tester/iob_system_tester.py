@@ -45,7 +45,7 @@ def setup(py_params_dict):
                 "subblocks": [
                     {
                         # Instantiate SUT (usually iob_system or a child of it)
-                        "core_name": py_params_dict["instantiator"]["original_name"],
+                        "core_name": py_params_dict["issuer"]["original_name"],
                         "instance_name": "SUT",
                         "instance_description": "System Under Test (SUT) to be verified by this tester.",
                         # "is_peripheral": True,  # Only applies if SUT has CSRs (via regfileif).

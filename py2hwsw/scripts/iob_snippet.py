@@ -35,12 +35,12 @@ def create_snippet(core, *args, **kwargs):
 
 
 def snippet_from_dict(snippet_dict):
-    api_iob_snippet = importlib.import_module("user_api.api").api_iob_snippet
+    api_iob_snippet = importlib.import_module("user_api.api").iob_snippet
     return api_iob_snippet(**snippet_dict)
 
 
 def snippet_from_text(snippet_text):
-    api_iob_snippet = importlib.import_module("user_api.api").api_iob_snippet
+    api_iob_snippet = importlib.import_module("user_api.api").iob_snippet
     snippet_dict = {}
     # TODO: parse short notation text
     return api_iob_snippet(**snippet_dict)

@@ -142,8 +142,22 @@ def api_class_for(internal_cls):
 
     # Create decorator dynamically for the API class
     def decorator(cls):
+        # Store annotations for access in subclasses if needed
+        if not hasattr(cls, "__parent_annotations"):
+            cls.__parent_annotations = {}
+        # Append currrent class annotations to ones inherited from parent
+        all_annotations = cls.__parent_annotations | cls.__annotations__
+        cls.__parent_annotations = all_annotations
+
+        # Store class dict for access in subclasses if needed
+        if not hasattr(cls, "__parent_dict"):
+            cls.__parent_dict = {}
+        # Append current class dict to ones inherited from parent
+        all_dict = cls.__parent_dict | cls.__dict__
+        cls.__parent_dict = all_dict
+
         # Get attributes and their default values
-        attributes = {k: cls.__dict__[k] for k in cls.__annotations__}
+        attributes = {k: all_dict[k] for k in all_annotations}
         local_methods = get_local_methods(cls)
         methods = get_methods(cls)
 
@@ -154,14 +168,12 @@ def api_class_for(internal_cls):
                 "Attributes: ", attributes
             )  # Dictionary with attributes and their types
             print(
-                "Annotations: ", cls.__annotations__
+                "Annotations: ", all_annotations
             )  # Dictionary with attributes and their types
             print("Methods: ", methods)  # Dictionary with methods and their types
 
             # Instantiate internal class with API attributes
-            internal_obj = internal_cls(
-                self, attributes, cls.__annotations__, args, kwargs
-            )
+            internal_obj = internal_cls(self, attributes, all_annotations, args, kwargs)
 
             # Store reference to internal object
             self.__internal_obj = internal_obj

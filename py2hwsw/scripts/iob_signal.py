@@ -16,6 +16,9 @@ from api_base import api_class
 class iob_signal:
     """Class that represents a wire/port signal"""
 
+    # Undefined by default. Will be set based on suffix of name (_i, _o, _io)
+    direction: str = ""
+
     # Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
     isreg: bool = False
     # Used for `iob_comb`: List of signals associated to the infered register.

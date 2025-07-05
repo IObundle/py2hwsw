@@ -72,6 +72,8 @@ class iob_port(iob_wire):
         port_has_inputs = False
         port_has_outputs = False
         for signal in self.signals:
+            # Get internal representation of signal, because 'direction' is a internal attribute
+            signal = signal._get_py2hwsw_internal_obj()
             if not signal.direction:
                 raise Exception("Port direction is required")
             elif signal.direction not in ["input", "output", "inout"]:

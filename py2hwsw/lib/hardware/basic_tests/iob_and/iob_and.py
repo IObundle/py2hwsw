@@ -74,8 +74,26 @@ if __name__ == "__main__":
             ],
         },
     )
-    print("Name of conf_group_obj: ", conf_group_obj.get_name())
-    print("Name of conf_obj: ", conf_group_obj.get_confs()[0].get_name())
+    print(">>> Name of conf_group_obj: ", conf_group_obj.get_name())
+    print(">>> Name of conf_obj: ", conf_group_obj.get_confs()[0].get_name())
+
+    port_obj = py2hwsw.create_port_from_dict(
+        {
+            "name": "a_i",
+            "descr": "Input port",
+            "signals": [
+                {"name": "a_i", "width": "W"},
+            ],
+        },
+    )
+    print(">>> Name of port_obj: ", port_obj.get_name())
+    print(">>> Name of port signal: ", port_obj.get_signals()[0].get_name())
+
+    snippet_obj = py2hwsw.create_snippet_from_dict(
+        {"verilog_code": "   assign y_o = a_i & b_i;"}
+    )
+    print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
+
     # conf_obj.test_method()
     # iob_and_obj = iob_and()
     # print(iob_and_obj)

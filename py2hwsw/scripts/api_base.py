@@ -313,9 +313,11 @@ def internal_api_class(cls):
 
         print("Internal class constructor called: ", cls.__name__)
         print("Received attributes: ", new_attributes)
+        print("kwargs attributes: ", user_args)
 
         # Update internal class attributes
         for attribute_name, default_value in new_attributes.items():
+            # TODO: Maybe add some data type validation here before setting value.
             setattr(
                 self, attribute_name, user_kwargs.pop(attribute_name, default_value)
             )
@@ -323,6 +325,10 @@ def internal_api_class(cls):
         self.__class__.__annotations__ |= new_attributes_annotations
 
         # Throw error if there are unknown arguments
+        # TODO: This is the same behaviour as a data class (any unknown args will raise error).
+        # However, I would probably like to pass new arguments to the original constructor in some cases.
+        # For example, calling the iob_core constructor with a single dictionary of attributes, to be processed by the original iob_core constructor.
+        # Maybe I could add an argument to this decorator that chooses if it should pass unknown arguments to the original constructor.
         if user_args:
             fail_with_msg(
                 f"Unknown constructor arguments for class '{cls.__name__}': {user_args}"
@@ -336,7 +342,7 @@ def internal_api_class(cls):
         self.__api_obj = api_object_reference
 
         # Call original init
-        original_init(self)
+        original_init(self, *user_args, **user_kwargs)
 
     cls.__init__ = new_init
 

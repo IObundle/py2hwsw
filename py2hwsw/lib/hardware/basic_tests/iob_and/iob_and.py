@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+import copy
+
 import py2hwsw_api as py2hwsw
 
 core_dictionary = {
@@ -54,7 +56,7 @@ core_dictionary = {
 class iob_and(py2hwsw.iob_core):
     def __init__(self):
         print("iob_and constructor called.")
-        super().__init__(**core_dictionary)
+        super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
@@ -95,12 +97,15 @@ if __name__ == "__main__":
     )
     print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
 
-    core_obj = py2hwsw.create_core_from_dict(core_dictionary)
+    # NOTE: Be careful that calling create_core_from_dict() will modify the dictionary given to it
+    core_obj = py2hwsw.create_core_from_dict(copy.deepcopy(core_dictionary))
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])
 
     # conf_obj.test_method()
-    iob_and_obj = iob_and()
-    print(">>> Generate_hw of iob_and_obj: ", iob_and_obj.get_generate_hw())
-    print(">>> Ports of iob_and_obj: ", [i.get_name() for i in iob_and_obj.get_ports()])
+
+    # iob_and_obj = iob_and()
+    # print(">>> Generate_hw of iob_and_obj: ", iob_and_obj.get_generate_hw())
+    # print(">>> Ports of iob_and_obj: ", [i.get_name() for i in iob_and_obj.get_ports()])
+
     # iob_and.generate_build_dir()

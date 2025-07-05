@@ -102,6 +102,7 @@ class iob_conf:
     if_not_defined: str = ""
     doc_only: bool = False
 
+    # TODO: Remove this method
     def test_method(self, var1: str, var2: int) -> list:
         """Example docstring"""
         pass
@@ -901,13 +902,13 @@ class iob_core:
     original_name: str = None
     name: str = ""
     description: str = "Default description"
-    reset_polarity: str = None
+    reset_polarity: str = "positive"
     confs: list[iob_conf_group] = empty_list()
     ports: list[iob_port] = empty_list()
     wires: list[iob_wire] = empty_list()
     snippets: list[iob_snippet] = empty_list()
-    comb: iob_comb = None
-    fsm: iob_fsm = None
+    comb: iob_comb | None = None
+    fsm: iob_fsm | None = None
     subblocks: list[iob_block_group] = empty_list()
     superblocks: list[iob_block_group] = empty_list()
     sw_modules: list[iob_block_group] = empty_list()

@@ -48,7 +48,7 @@ import sw_tools
 import verilog_format
 import verilog_lint
 
-from iob_conf import conf_from_dict
+from iob_conf import conf_group_from_dict
 from iob_port import port_from_dict
 from iob_wire import wire_from_dict
 from iob_snippet import snippet_from_dict
@@ -100,6 +100,10 @@ class iob_core(iob_module, iob_instance):
         :param iob_core instantiator: Module that is instantiating this instance
         :param bool is_parent: If this core is a parent core
         """
+
+        # FIXME:
+        return
+
         # Arguments used by this class
         dest_dir = kwargs.get("dest_dir", "hardware/src")
         attributes = kwargs.get("attributes", {})
@@ -119,118 +123,8 @@ class iob_core(iob_module, iob_instance):
         iob_instance.__init__(self, *args, **kwargs)
         # Ensure global top module is set
         self.update_global_top_module(attributes)
-        self.set_default_attribute(
-            "version",
-            PY2HWSW_VERSION,
-            str,
-            descr="Core version. By default is the same as Py2HWSW version.",
-        )
-        self.set_default_attribute(
-            "previous_version",
-            self.version,
-            str,
-            descr="Core previous version.",
-        )
-        self.set_default_attribute(
-            "setup_dir",
-            kwargs.get("setup_dir", ""),
-            str,
-            descr="Path to root setup folder of the core.",
-        )
-        self.set_default_attribute(
-            "build_dir",
-            "",
-            str,
-            descr="Path to folder of build directory to be generated for this project.",
-        )
-        # Duplicate from iob_instance?
-        #self.set_default_attribute(
-        #    "instance_name",
-        #    "",
-        #    str,
-        #    descr="Name of an instance of this class.",
-        #)
-        self.set_default_attribute(
-            "use_netlist",
-            False,
-            bool,
-            descr="Copy `<SETUP_DIR>/CORE.v` netlist instead of `<SETUP_DIR>/hardware/src/*`",
-        )
-        self.set_default_attribute(
-            "is_system",
-            False,
-            bool,
-            descr="Sets `IS_FPGA=1` in config_build.mk",
-        )
-        self.set_default_attribute(
-            "board_list",
-            [],
-            list,
-            descr="List of FPGAs supported by this core. A standard folder will be created for each board in this list.",
-        )
-        self.set_default_attribute(
-            "dest_dir",
-            dest_dir,
-            str,
-            descr="Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`",
-        )
-        self.set_default_attribute(
-            "ignore_snippets",
-            [],
-            list,
-            descr="List of `.vs` file includes in verilog to ignore.",
-        )
-        self.set_default_attribute(
-            "generate_hw",
-            False,
-            bool,
-            descr="Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.",
-        )
-        self.set_default_attribute(
-            "parent",
-            {},
-            dict,
-            descr="Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
-        )
-        self.set_default_attribute(
-            "is_top_module",
-            __class__.global_top_module == self,
-            bool,
-            descr="Selects if core is top module. Auto-filled. DO NOT CHANGE.",
-        )
-        self.set_default_attribute(
-            "is_superblock",
-            kwargs.get("is_superblock", False),
-            bool,
-            descr="Selects if core is superblock of another. Auto-filled. DO NOT CHANGE.",
-        )
-        self.set_default_attribute(
-            "is_tester",
-            False,
-            bool,
-            descr="Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).",
-        )
-        # List of core Python Parameters (for documentation)
-        self.set_default_attribute(
-            "python_parameters",
-            [],
-            list,
-            get_list_attr_handler(self.create_python_parameter_group),
-            descr="List of core Python Parameters. Used for documentation.",
-        )
-        self.set_default_attribute(
-            "license",
-            iob_license(),  # Create a default license
-            iob_license,
-            lambda y: update_license(self, **y),
-            descr="License for the core.",
-        )
-        self.set_default_attribute(
-            "doc_conf",
-            "",
-            str,
-            descr="CSR Configuration to use",
-        )
+
+        # REMOVED set_default_attributes from here
 
         if self.is_top_module and "reset_polarity" not in attributes:
             # Set default reset polarity to 'positive'
@@ -1144,7 +1038,7 @@ def core_from_dict(core_dict):
     api_iob_core = importlib.import_module("user_api.api").iob_core
     # Convert lists of dictionaries into objects
     converter_functions = {
-        "confs": conf_from_dict,
+        "confs": conf_group_from_dict,
         "ports": port_from_dict,
         "wires": wire_from_dict,
         "snippets": snippet_from_dict,

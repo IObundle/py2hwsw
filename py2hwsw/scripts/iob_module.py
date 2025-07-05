@@ -18,103 +18,6 @@ class iob_module(iob_base):
 
     global_top_module = None  # Datatype is 'iob_module'
 
-    def __init__(self, *args, **kwargs):
-        # Original name of the module.
-        # (The module name commonly used in the files of the setup dir.)
-        self.set_default_attribute(
-            "original_name",
-            "",
-            str,
-            descr="Original name of the module. (The module name commonly used in the files of the setup dir.)",
-        )
-        # Name of the generated module
-        self.set_default_attribute(
-            "name", "", str, descr="Name of the generated module."
-        )
-        self.set_default_attribute(
-            "description",
-            "Default description",
-            str,
-            descr="Description of the module",
-        )
-        self.set_default_attribute(
-            "reset_polarity",
-            None,
-            str,
-            self.set_rst_polarity,
-            "Global reset polarity of the module. Can be 'positive' or 'negative'. (Will override all subblocks' reset polarities).",
-        )
-        # List of module macros and Verilog (false-)parameters
-        self.set_default_attribute(
-            "confs",
-            [],
-            list,
-            get_list_attr_handler(self.create_conf_group),
-            "List of module macros and Verilog (false-)parameters.",
-        )
-        self.set_default_attribute(
-            "ports",
-            [],
-            list,
-            get_list_attr_handler(self.create_port),
-            "List of module ports.",
-        )
-        self.set_default_attribute(
-            "wires",
-            [],
-            list,
-            get_list_attr_handler(self.create_wire),
-            "List of module wires.",
-        )
-        # List of core Verilog snippets
-        self.set_default_attribute(
-            "snippets",
-            [],
-            list,
-            get_list_attr_handler(self.create_snippet),
-            "List of core Verilog snippets.",
-        )
-        # List of core Verilog combinatory circuits
-        self.set_default_attribute(
-            "comb",
-            None,
-            iob_comb,
-            lambda y: self.create_comb(**y),
-            "Verilog combinatory circuit.",
-        )
-        # List of core Verilog finite state machines
-        self.set_default_attribute(
-            "fsm",
-            None,
-            iob_fsm,
-            lambda y: self.create_fsm(**y),
-            "Verilog finite state machine.",
-        )
-        # List of instances of other cores inside this core
-        self.set_default_attribute(
-            "subblocks",
-            [],
-            list,
-            get_list_attr_handler(self.create_subblock_group),
-            "List of instances of other cores inside this core.",
-        )
-        # List of wrappers for this core
-        self.set_default_attribute(
-            "superblocks",
-            [],
-            list,
-            get_list_attr_handler(self.create_superblock_group),
-            "List of wrappers for this core. Will only be setup if this core is a top module, or a wrapper of the top module.",
-        )
-        # List of software modules required by this core
-        self.set_default_attribute(
-            "sw_modules",
-            [],
-            list,
-            get_list_attr_handler(self.create_sw_instance_group),
-            "List of software modules required by this core.",
-        )
-
     def set_rst_polarity(self, polarity):
         if self.is_top_module:
             create_globals(self, "reset_polarity", polarity)
@@ -153,7 +56,7 @@ class iob_module(iob_base):
             instantiate=False,
             is_superblock=True,
             blocks_attribute_name="superblocks",
-            **kwargs
+            **kwargs,
         )
 
     def create_subblock_group(self, *args, **kwargs):

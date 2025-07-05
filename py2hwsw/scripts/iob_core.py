@@ -56,10 +56,10 @@ from iob_block import block_group_from_dict
 from iob_python_parameter import python_parameter_group_from_dict
 
 
-from api_base import api_class
+from api_base import internal_api_class
 
 
-@api_class
+@internal_api_class
 class iob_core(iob_module, iob_instance):
     """Generic class to describe how to generate a base IOb IP core"""
 

@@ -15,10 +15,10 @@ from iob_base import (
     find_obj_in_list,
 )
 
-from api_base import api_class
+from api_base import internal_api_class
 
 
-@api_class
+@internal_api_class
 @dataclass
 class iob_python_parameter:
     """Class to represent a Python Parameter option."""
@@ -28,7 +28,7 @@ class iob_python_parameter:
             fail_with_msg("Every Python Parameter must have a name!")
 
 
-@api_class
+@internal_api_class
 @dataclass
 class iob_python_parameter_group:
     """Class to represent a Group of Python Parameters."""

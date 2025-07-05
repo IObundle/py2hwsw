@@ -10,10 +10,10 @@ from iob_comb import iob_comb
 from iob_base import assert_attributes
 
 
-from api_base import api_class
+from api_base import internal_api_class
 
 
-@api_class
+@internal_api_class
 @dataclass
 class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""

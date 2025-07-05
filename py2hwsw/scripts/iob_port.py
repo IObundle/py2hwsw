@@ -23,10 +23,10 @@ from iob_base import (
 from iob_signal import iob_signal, get_real_signal
 
 
-from api_base import api_class
+from api_base import internal_api_class
 
 
-@api_class
+@internal_api_class
 @dataclass
 class iob_port(iob_wire):
     """Describes an IO port."""

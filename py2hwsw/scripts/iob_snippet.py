@@ -7,10 +7,10 @@ from iob_base import assert_attributes
 import importlib
 
 
-from api_base import api_class
+from api_base import internal_api_class
 
 
-@api_class
+@internal_api_class
 @dataclass
 class iob_snippet:
     """Class to represent a Verilog snippet in an iob module"""

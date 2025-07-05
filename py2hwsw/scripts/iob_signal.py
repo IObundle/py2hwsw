@@ -8,10 +8,10 @@ import importlib
 from iob_base import fail_with_msg
 
 
-from api_base import api_class
+from api_base import internal_api_class
 
 
-@api_class
+@internal_api_class
 @dataclass
 class iob_signal:
     """Class that represents a wire/port signal"""

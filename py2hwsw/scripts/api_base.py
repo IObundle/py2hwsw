@@ -35,7 +35,7 @@ def convert2api(internal_obj):
     Returns:
         object: api object
     """
-    pass
+    return internal_obj.get_api_obj()
 
 
 def convert2internal(api_obj):
@@ -47,7 +47,7 @@ def convert2internal(api_obj):
     Returns:
         object: internal object
     """
-    pass
+    return api_obj._get_py2hwsw_internal_obj()
 
 
 #
@@ -284,7 +284,7 @@ def api_method_for(internal_method):
 #
 
 
-def api_class(cls):
+def internal_api_class(cls):
     """
     Decorator for internal methods that extend functionality of API methods.
 

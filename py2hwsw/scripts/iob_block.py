@@ -14,10 +14,10 @@ from iob_base import (
 )
 
 
-from api_base import api_class
+from api_base import internal_api_class
 
 
-@api_class
+@internal_api_class
 @dataclass
 class iob_block_group:
     """Class to represent a group of blocks."""

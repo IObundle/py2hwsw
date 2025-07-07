@@ -298,8 +298,7 @@ def internal_api_class(cls):
 
     original_init = cls.__init__
 
-    # Update constructor of the internal class
-    def new_init(self, *args, **kwargs):
+    def replacement_new(cls, *args, **kwargs):
         if len(args) != 5:
             fail_with_msg(
                 f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
@@ -309,12 +308,27 @@ def internal_api_class(cls):
             # api_class = getattr(importlib.import_module("user_api.api"), class_name)
             # Constructors cannot return values. Need to find out another way of doing this.
             # return api_class(*args, **kwargs)
-        else:
-            api_object_reference = args[0]  # object
-            new_attributes = args[1]  # dict
-            new_attributes_annotations = args[2]  # dict
-            user_args = args[3]  # list
-            user_kwargs = args[4]  # dict
+        return object.__new__(cls)
+
+    # Update constructor of the internal class
+    def replacement_init(
+        self,
+        api_object_reference,
+        new_attributes,
+        new_attributes_annotations,
+        user_args,
+        user_kwargs,
+    ):
+        # if len(args) != 5:
+        #     fail_with_msg(
+        #         f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
+        #     )
+        # else:
+        #     api_object_reference = args[0]  # object
+        #     new_attributes = args[1]  # dict
+        #     new_attributes_annotations = args[2]  # dict
+        #     user_args = args[3]  # list
+        #     user_kwargs = args[4]  # dict
 
         print("Internal class constructor called: ", cls.__name__)
         print("Received attributes: ", new_attributes)
@@ -349,7 +363,8 @@ def internal_api_class(cls):
         # Call original init
         original_init(self, *user_args, **user_kwargs)
 
-    cls.__init__ = new_init
+    cls.__new__ = replacement_new
+    cls.__init__ = replacement_init
 
     # Create getter to obtain API object
     def get_api_obj(self):

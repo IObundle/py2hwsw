@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import inspect
+import importlib
 
 from dataclasses import field
 
@@ -304,6 +305,10 @@ def internal_api_class(cls):
                 f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
             )
             # NOTE: Possible improvement: Make this constructor lazy import the corresponding API class and automatically instantiate it, instead of throwing this error.
+            # class_name = cls.__name__
+            # api_class = getattr(importlib.import_module("user_api.api"), class_name)
+            # Constructors cannot return values. Need to find out another way of doing this.
+            # return api_class(*args, **kwargs)
         else:
             api_object_reference = args[0]  # object
             new_attributes = args[1]  # dict

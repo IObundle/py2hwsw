@@ -9,7 +9,7 @@ from iob_snippet import iob_snippet
 from iob_base import fail_with_msg, assert_attributes
 from iob_wire import find_signal_in_wires
 from iob_signal import get_real_signal
-from if_gen import iobClkInterface
+from interfaces import iobClkInterface
 
 
 @dataclass

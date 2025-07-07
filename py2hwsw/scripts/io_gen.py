@@ -10,7 +10,7 @@
 from latex import write_table
 import os
 
-import if_gen
+import interfaces
 from iob_signal import iob_signal
 
 

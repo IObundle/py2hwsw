@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 import re
 from typing import List
 
-import if_gen
+import interfaces
 from iob_base import (
     find_obj_in_list,
     convert_dict2obj_list,
@@ -24,8 +24,8 @@ class iob_wire:
 
     # Identifier name for the wire.
     name: str = ""
-    # Name of the standard interface to auto-generate with `if_gen.py` script.
-    interface: if_gen._interface = None
+    # Name of the standard interface to auto-generate with `interfaces.py` script.
+    interface: interfaces._interface = None
     # Description of the wire.
     descr: str = "Default description"
     # Conditionally define this wire if the specified Verilog macro is defined/undefined.
@@ -225,7 +225,7 @@ def dict2interface(name, interface_dict):
         ]
     }
 
-    interface = if_gen.create_interface(
+    interface = interfaces.create_interface(
         genre=genre,
         if_direction=if_direction,
         mult=mult,

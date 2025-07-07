@@ -7,7 +7,7 @@
 #
 #    wire_gen.py: build Verilog module wires
 #
-import if_gen
+import interfaces
 import os
 from iob_signal import iob_signal
 

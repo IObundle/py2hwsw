@@ -447,7 +447,7 @@ def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
 def gen_bus_interface_xml_file(bus_interface, dest_dir):
     """
     Generate the IPXACT XML file for given bus interface.
-    @param bus_interface: bus interface object (if_gen.py 'interface' object)
+    @param bus_interface: bus interface object (interfaces.py 'interface' object)
     @param dest_dir: destination directory
     """
     # Find interface details (including VLNV)

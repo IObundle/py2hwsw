@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from encodings.punycode import T
-from hmac import new
 import sys
 import os
 import shutil
@@ -31,7 +29,7 @@ import ipxact_gen
 
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
-import if_gen
+import interfaces
 from iob_module import iob_module, get_list_attr_handler
 from iob_instance import iob_instance
 from iob_base import (
@@ -274,7 +272,7 @@ class iob_core(iob_module, iob_instance):
                     port.interface
                     and isinstance(
                         port.interface,
-                        (if_gen.asymMemInterface, if_gen.symMemInterface),
+                        (interfaces.asymMemInterface, interfaces.symMemInterface),
                     )
                     and port.name.endswith("m")
                 ):
@@ -588,7 +586,7 @@ class iob_core(iob_module, iob_instance):
             for portmap in subblock.portmap_connections:
                 if (
                     portmap.port.name == "iob_csrs_cbus_s"
-                    and isinstance(portmap.port.interface, if_gen.iobInterface)
+                    and isinstance(portmap.port.interface, interfaces.iobInterface)
                     and portmap.e_connect
                 ):
                     port_width = portmap.port.interface.addr_w
@@ -603,7 +601,7 @@ class iob_core(iob_module, iob_instance):
             {
                 "core_name": "iob_memwrapper",
                 "instance_name": f"{self.name}_memwrapper",
-                "mem_if_names": if_gen.mem_if_names,
+                "mem_if_names": interfaces.mem_if_names,
                 "superblocks": superblocks,
             },
         ]

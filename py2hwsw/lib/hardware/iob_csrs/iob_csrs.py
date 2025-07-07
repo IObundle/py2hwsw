@@ -126,7 +126,7 @@ def setup(py_params_dict):
         )
 
     # Append parameters for csr interface
-    if_gen_params = {}
+    interface_params = {}
     for param_name, param_value in csr_if_params.items():
         confs.append(
             {
@@ -140,7 +140,7 @@ def setup(py_params_dict):
         )
         # Remove csr_if suffix from parameter name (remove "AXI_" prefix)
         name_without_suffix = param_name[len(params["csr_if"]) + 1 :]
-        if_gen_params[name_without_suffix] = param_name
+        interface_params[name_without_suffix] = param_name
 
     attributes_dict = {
         "name": params["name"],
@@ -162,7 +162,7 @@ def setup(py_params_dict):
                     "type": params["csr_if"],
                     # ADDR_W set automatically
                     "DATA_W": "DATA_W",
-                    **if_gen_params,
+                    **interface_params,
                 },
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",
             },

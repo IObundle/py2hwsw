@@ -3,9 +3,10 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass, field
+import re
 from typing import List
 
-import if_gen
+import interfaces
 from iob_base import (
     find_obj_in_list,
     convert_dict2obj_list,
@@ -23,8 +24,8 @@ class iob_wire:
 
     # Identifier name for the wire.
     name: str = ""
-    # Name of the standard interface to auto-generate with `if_gen.py` script.
-    interface: if_gen.interface = None
+    # Name of the standard interface to auto-generate with `interfaces.py` script.
+    interface: interfaces._interface = None
     # Description of the wire.
     descr: str = "Default description"
     # Conditionally define this wire if the specified Verilog macro is defined/undefined.
@@ -39,14 +40,7 @@ class iob_wire:
             fail_with_msg("All wires must have a name!", ValueError)
 
         if self.interface:
-            self.signals += if_gen.get_signals(
-                name=self.interface.type,
-                if_type="",
-                mult=self.interface.mult,
-                params=self.interface.params,
-                widths=self.interface.widths,
-                signal_prefix=self.interface.prefix,
-            )
+            self.signals += self.interface.get_signals()
 
             # Remove signal direction information
             for signal in self.signals:
@@ -54,9 +48,11 @@ class iob_wire:
                 if isinstance(signal, iob_signal_reference):
                     continue
                 if hasattr(signal, "direction"):
-                    suffix = if_gen.get_suffix(signal.direction)
-                    if signal.name.endswith(suffix):
-                        signal.name = signal.name[: -len(suffix)]
+                    # Remove direction suffix from signal name
+                    if signal.name.endswith("_i") or signal.name.endswith("_o"):
+                        signal.name = signal.name[:-2]
+                    elif signal.name.endswith("_io"):
+                        signal.name = signal.name[:-3]
                     signal.direction = ""
 
 
@@ -83,8 +79,8 @@ def create_wire(core, *args, signals=[], **kwargs):
             replace_duplicate_signals_by_references(core.wires + core.ports, signals)
             sig_obj_list = convert_dict2obj_list(signals, iob_signal)
         elif type(signals) is dict:
-            # Convert user interface dictionary into 'if_gen.interface' object
-            interface_obj = if_gen.dict2interface(signals)
+            # Convert user interface dictionary into '_interface' object
+            interface_obj = dict2interface(name=kwargs.get("name", ""), interface_dict=signals)
             if interface_obj and not interface_obj.file_prefix:
                 interface_obj.file_prefix = core.name + "_"
         else:
@@ -165,3 +161,79 @@ def find_signal_in_wires(wires, signal_name, process_func=get_real_signal):
         if signal:
             return signal
     return None
+
+
+#
+# Convert interface dictionary to an interface object
+# Note: This function is to be deprecated in the future, since objects should be created directly for
+# each interface type.
+#
+def dict2interface(name, interface_dict):
+    """Convert dictionary to an interface.
+    Example interface dict:
+    {
+        "type": "iob",
+        # Generic string parameter
+        "params": "",
+        # Widths/Other parameters
+        "DATA_W": "DATA_W",
+        "ADDR_W": "ADDR_W",
+    }
+    To use an assymmetric memory interface, the dictionary should look like this:
+    {
+        "type": "ram_at2p",
+        # Generic string parameter
+        "params": "",
+        # Widths/Other parameters
+        "ADDR_W": "ADDR_W",
+        "W_DATA_W": "W_DATA_W",
+        "R_DATA_W": "R_DATA_W",
+    }
+    """
+    if not interface_dict:
+        return None
+
+    genre = interface_dict.get("type", "")
+
+    if name.endswith("_m"):
+        if_direction = "manager"
+    elif name.endswith("_s"):
+        if_direction = "subordinate"
+    else:
+        if_direction = ""
+
+    prefix = interface_dict.get("prefix", "")
+    mult = interface_dict.get("mult", 1)
+    params = interface_dict.get("params", None)
+    if params is not None:
+        params = params.split("_")
+    file_prefix = interface_dict.get("file_prefix", "")
+    portmap_port_prefix = interface_dict.get("portmap_port_prefix", "")
+
+    # Remaining entries in the interface_dict (usually widths or other parameters)
+    remaining_entries = {
+        k: v
+        for k, v in interface_dict.items()
+        if k
+        not in [
+            "type",
+            "prefix",
+            "mult",
+            "params",
+            "file_prefix",
+            "portmap_port_prefix",
+        ]
+    }
+
+    interface = interfaces.create_interface(
+        genre=genre,
+        if_direction=if_direction,
+        mult=mult,
+        widths=remaining_entries,
+        prefix=prefix,
+        params=params,
+        portmap_port_prefix=portmap_port_prefix,
+        file_prefix=file_prefix,
+    )
+
+    return interface

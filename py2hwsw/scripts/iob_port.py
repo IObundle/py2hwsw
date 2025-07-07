@@ -2,10 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
-import if_gen
-from iob_wire import iob_wire, replace_duplicate_signals_by_references
+from iob_wire import iob_wire, replace_duplicate_signals_by_references, dict2interface
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
@@ -47,14 +46,7 @@ class iob_port(iob_wire):
             )
 
         if self.interface:
-            self.signals += if_gen.get_signals(
-                name=self.interface.type,
-                if_type=_direction,
-                mult=self.interface.mult,
-                widths=self.interface.widths,
-                params=self.interface.params,
-                signal_prefix=self.interface.prefix,
-            )
+            self.signals += self.interface.get_signals()
         elif _direction in ["subordinate", "manager"]:
             fail_with_msg(
                 f"Port '{self.name}' is a '{_direction}' port but no interface is defined",
@@ -105,8 +97,8 @@ attrs = [
 
 
 @str_to_kwargs(attrs)
-def create_port(core, *args, signals=[], **kwargs):
-    """Creates a new port object and adds it to the core's port list
+def create_port_from_dict(core, *args, signals=[], **kwargs):
+    """Creates a new port object using a dictionary and adds it to the core's port list
     Also creates a new internal module wire to connect to the new port
     param core: core object
     """
@@ -114,12 +106,13 @@ def create_port(core, *args, signals=[], **kwargs):
     core.set_default_attribute("ports", [])
     sig_obj_list = []
     interface_obj = None
+
     if type(signals) is list:
         # Convert user signal dictionaries into 'iob_signal' objects
         sig_obj_list = convert_dict2obj_list(signals, iob_signal)
     elif type(signals) is dict:
-        # Convert user interface dictionary into 'if_gen.interface' object
-        interface_obj = if_gen.dict2interface(signals)
+        # Convert user interface dictionary into an interface object
+        interface_obj = dict2interface(kwargs.get("name", ""), signals)
         if interface_obj and not interface_obj.file_prefix:
             interface_obj.file_prefix = core.name + "_"
     else:
@@ -130,5 +123,49 @@ def create_port(core, *args, signals=[], **kwargs):
         error_msg=f"Invalid {kwargs.get('name', '')} port attribute '[arg]'!",
     )
     port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
+    replace_duplicate_signals_by_references(core.ports, port.signals)
+    core.ports.append(port)
+
+
+@str_to_kwargs(attrs)
+def add_signals_port(core, *args, signals=[], **kwargs):
+    """Creates a new port object and adds it to the core's port list
+    Also creates a new internal module wire to connect to the new port
+    param core: core object
+    """
+    # Ensure 'ports' list exists
+    core.set_default_attribute("ports", [])
+    # Check if the list of signals has only iob_signal types
+    if type(signals) is list:
+        for signal in signals:
+            if not isinstance(signal, iob_signal):
+                fail_with_msg(
+                    f"Signals must be a list of iob_signals! {signals}", TypeError
+                )
+    # Create the port with the signals
+    port = iob_port(*args, signals=signals, **kwargs)
+    replace_duplicate_signals_by_references(core.ports, port.signals)
+    core.ports.append(port)
+
+
+@str_to_kwargs(attrs)
+def add_interface_port(core, *args, name, interface, **kwargs):
+    """Creates a new port object and adds it to the core's port list
+    Also creates a new internal module wire to connect to the new port
+    param core: core object
+    """
+    # Ensure 'ports' list exists
+    core.set_default_attribute("ports", [])
+    # Check if the interface is a valid interface object
+    if not hasattr(interface, "get_signals"):
+        fail_with_msg(
+            f"Interface must be a valid interface object! {interface}", TypeError
+        )
+    if not interface.file_prefix:
+        interface.file_prefix = core.name + "_"
+    if interface.prefix == "":
+        interface.prefix = f"{name}_"
+    # Create the port with the interface
+    port = iob_port(*args, name=name, interface=interface, **kwargs)
     replace_duplicate_signals_by_references(core.ports, port.signals)
     core.ports.append(port)

@@ -24,7 +24,7 @@ def setup(py_params_dict):
             "ports": [],
         }
 
-    # List of supported memory interfaces (usually taken from if_gen.py)
+    # List of supported memory interfaces (usually taken from interfaces.py)
     mem_if_names = py_params_dict["mem_if_names"]
     attrs = py_params_dict["issuer"]
 

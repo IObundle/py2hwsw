@@ -75,7 +75,7 @@ def setup(py_params_dict):
             {
                 "name": "port_params",
                 "val": port_params,
-                "descr": "Port parameters are passed to if_gen interfaces to generate different interfaces based on the parameters.",
+                "descr": "Port parameters are passed to interfaces to generate different interfaces.",
             },
         ],
         "version": "0.1",

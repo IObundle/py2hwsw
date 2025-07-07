@@ -10,7 +10,7 @@
 from latex import write_table
 import os
 
-import if_gen
+import interfaces
 from iob_signal import iob_signal
 
 
@@ -75,7 +75,7 @@ def generate_ports_snippet(core):
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.
         if port.interface:
-            if_gen.gen_if(port.interface)
+            port.interface.gen_all_vs_files()
 
             # move all .vs files from current directory to out_dir
             for file in os.listdir("."):

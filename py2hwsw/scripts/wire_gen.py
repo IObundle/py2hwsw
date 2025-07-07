@@ -7,7 +7,7 @@
 #
 #    wire_gen.py: build Verilog module wires
 #
-import if_gen
+import interfaces
 import os
 from iob_signal import iob_signal
 
@@ -56,7 +56,7 @@ def generate_wires_snippet(core):
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.
         if wire.interface:
-            if_gen.gen_wires(wire.interface)
+            wire.interface.gen_wires_vs_file()
 
             # move all .vs files from current directory to out_dir
             for file in os.listdir("."):

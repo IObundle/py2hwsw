@@ -1036,6 +1036,13 @@ def find_module_setup_dir(core_name):
 
 def core_from_dict(core_dict):
     api_iob_core = importlib.import_module("user_api.api").iob_core
+    # Replace key with corresponding attribute name
+    key_attribute_mapping = {
+        "descr": "description",
+    }
+    for key, attr in key_attribute_mapping.items():
+        if key in core_dict:
+            core_dict[attr] = core_dict.pop(key)
     # Convert lists of dictionaries into objects
     converter_functions = {
         "confs": conf_group_from_dict,

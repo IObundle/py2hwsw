@@ -972,7 +972,7 @@ def create_core_from_dict(core_dict):
             # Keys inherited from iob_module
             - original_name -> iob_module.original_name
             - name -> iob_module.name
-            - description -> iob_module.description
+            - descr -> iob_module.description
             - reset_polarity -> iob_module.reset_polarity
             - confs -> iob_module.confs
             - ports -> iob_module.ports

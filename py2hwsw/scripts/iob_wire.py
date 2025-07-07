@@ -27,9 +27,6 @@ class iob_wire:
     interface: if_gen.interface = None
     # Description of the wire.
     descr: str = "Default description"
-    # Conditionally define this wire if the specified Verilog macro is defined/undefined.
-    if_defined: str = ""
-    if_not_defined: str = ""
     # List of signals belonging to this wire
     # (each signal represents a hardware Verilog wire).
     signals: List = field(default_factory=list)

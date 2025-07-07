@@ -31,22 +31,12 @@ def generate_ports(core):
         if port.doc_only:
             continue
 
-        # Open ifdef if conditional interface
-        if port.if_defined:
-            lines.append(f"`ifdef {port.if_defined}\n")
-        if port.if_not_defined:
-            lines.append(f"`ifndef {port.if_not_defined}\n")
-
         lines.append(f"    // {port.name}: {port.descr}\n")
 
         for signal_idx, signal in enumerate(port.signals):
             if isinstance(signal, iob_signal):
                 if signal.get_verilog_port():
                     lines.append("    " + signal.get_verilog_port())
-
-        # Close ifdef if conditional interface
-        if port.if_defined or port.if_not_defined:
-            lines.append("`endif\n")
 
     # Remove comma from last port line
     if lines:

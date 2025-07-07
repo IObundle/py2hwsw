@@ -30,9 +30,6 @@ class iob_conf:
     max: str | int = "NA"
     # Description of the configuration option.
     descr: str = "Default description"
-    # Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is defined/undefined.
-    if_defined: str = ""
-    if_not_defined: str = ""
     # If enabled, configuration option will only appear in documentation. Not in the verilog code.
     doc_only: bool = False
 

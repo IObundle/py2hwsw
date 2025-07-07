@@ -18,11 +18,6 @@ def generate_wires(core):
     """
     code = ""
     for wire in core.wires:
-        # Open ifdef if conditional interface
-        if wire.if_defined:
-            code += f"`ifdef {wire.if_defined}\n"
-        if wire.if_not_defined:
-            code += f"`ifndef {wire.if_not_defined}\n"
 
         signals_code = ""
         for signal in wire.signals:
@@ -34,10 +29,6 @@ def generate_wires(core):
             if wire.descr != "" and wire.descr != "Default description":
                 code += f"// {wire.descr}\n"
             code += signals_code
-
-        # Close ifdef if conditional interface
-        if wire.if_defined or wire.if_not_defined:
-            code += "`endif\n"
 
     return code
 

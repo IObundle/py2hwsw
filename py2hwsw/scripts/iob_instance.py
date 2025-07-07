@@ -234,8 +234,6 @@ class iob_instance(iob_base):
         if not issuer.generate_hw or not self.instantiate:
             return
         _name = f"{port.name}"
-        _signals = {k: v for k, v in port.interface.__dict__.items() if k != "widths"}
-        _signals.update(port.interface.widths)
 
         # create new clk portmap
         clk_portmap = iob_portmap(port=port)
@@ -251,10 +249,12 @@ class iob_instance(iob_base):
                     p.interface.has_en |= port.interface.has_en
                     p.signals = []
                     p.__post_init__()
-                    port.connect_external(p, bit_slices=[])
+                    clk_portmap.connect_external(p, bit_slices=[])
                     return
 
-        issuer.create_port(name=_name, signals=_signals, descr=port.descr)
+        issuer.add_interface_port(
+            name=_name, interface=port.interface, descr=port.descr
+        )
         _port = find_obj_in_list(issuer.ports, _name)
         clk_portmap.connect_external(_port, bit_slices=[])
 
@@ -299,7 +299,8 @@ class iob_instance(iob_base):
                 "signals": {
                     "type": csr_if_genre,
                     "prefix": self.instance_name + "_",
-                    **csrs_port.interface.widths,
+                    "DATA_W": csrs_port.interface.data_w,
+                    "ADDR_W": csrs_port.interface.addr_w,
                 },
                 "descr": "Control and Status Registers interface (auto-generated)",
             }

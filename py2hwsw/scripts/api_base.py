@@ -115,6 +115,11 @@ def api_for(internal_reference):
         return api_method_for(internal_reference)
 
 
+# A constant random value that is very unlikely to be used by user/developer code.
+# This value is used to distinguish between automated API calls and user/developer code calls.
+SPECIAL_ARGUMENT_VALUE = "special_argument_value"
+
+
 def api_class_for(internal_cls):
     """
     Decorator for creating class API interface. Apply this decorator to every class in the API.
@@ -175,7 +180,7 @@ def api_class_for(internal_cls):
 
             # Instantiate internal class with API attributes
             internal_obj = internal_cls(
-                "special_argument_value",  # Special internal argument to identify API calls
+                SPECIAL_ARGUMENT_VALUE,  # Special internal argument to identify API calls
                 self,
                 attributes,
                 all_annotations,
@@ -311,7 +316,7 @@ def internal_api_class(api_module, api_class_name, allow_unknown_args=False):
         original_init = cls.__init__
 
         def replacement_new(cls, *args, **kwargs):
-            if len(args) != 6 or args[0] != "special_argument_value":
+            if len(args) != 6 or args[0] != SPECIAL_ARGUMENT_VALUE:
                 # Someone tried to instantiate this class directly, instead of the API class.
 
                 # fail_with_msg(

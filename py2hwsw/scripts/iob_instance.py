@@ -26,8 +26,6 @@ class iob_instance(iob_base):
         instance_description: str = None,
         connect: Dict = {},
         parameters: Dict = {},
-        if_defined: str = None,
-        if_not_defined: str = None,
         instantiate: bool = True,
         **kwargs,
     ):
@@ -54,20 +52,6 @@ class iob_instance(iob_base):
         # Verilog parameter values
         self.set_default_attribute(
             "parameters", parameters, Dict, descr="Verilog parameter values"
-        )
-        # Only use this instance in Verilog if this Verilog macro is defined
-        self.set_default_attribute(
-            "if_defined",
-            if_defined,
-            str,
-            descr="Only use this instance in Verilog if this Verilog macro is defined",
-        )
-        # Only use this instance in Verilog if this Verilog macro is not defined
-        self.set_default_attribute(
-            "if_not_defined",
-            if_not_defined,
-            str,
-            descr="Only use this instance in Verilog if this Verilog macro is not defined",
         )
         # Select if should intantiate inside another Verilog module.
         # May be False if this is a software only module.
@@ -96,8 +80,6 @@ class iob_instance(iob_base):
             "instance_description",
             "portmap_connections",
             "parameters",
-            "if_defined",
-            "if_not_defined",
             "instantiate",
         }
 

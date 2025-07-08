@@ -72,11 +72,6 @@ def generate_subblocks(core):
     for instance in core.subblocks:
         if not instance.instantiate:
             continue
-        # Open ifdef if conditional interface
-        if instance.if_defined:
-            code += f"`ifdef {instance.if_defined}\n"
-        if instance.if_not_defined:
-            code += f"`ifndef {instance.if_not_defined}\n"
 
         params_str = ""
         if instance.parameters:
@@ -91,9 +86,6 @@ def generate_subblocks(core):
         );
 
     """
-        # Close ifdef if conditional interface
-        if instance.if_defined or instance.if_not_defined:
-            code += "`endif\n"
 
     return code
 

@@ -69,10 +69,6 @@ def conf_vh(macros, top_module, out_dir):
             # If macro has 'doc_only' attribute set to True, skip it
             if macro.doc_only:
                 continue
-            if macro.if_defined:
-                file2create.write(f"`ifdef {macro.if_defined}\n")
-            if macro.if_not_defined:
-                file2create.write(f"`ifndef {macro.if_not_defined}\n")
 
             # Only insert macro if its is not a bool define, and if so only insert it if it is true
             if type(macro.val) is not bool:
@@ -82,8 +78,6 @@ def conf_vh(macros, top_module, out_dir):
             elif macro.val:
                 m_name = macro.name.upper()
                 file2create.write(f"`define {core_prefix}{m_name} 1\n")
-            if macro.if_defined or macro.if_not_defined:
-                file2create.write("`endif\n")
 
 
 def conf_h(macros, top_module, out_dir):

@@ -26,6 +26,7 @@ class iob_base:
         datatype=None,
         set_attribute_handler=None,
         descr: str = "",
+        copy_by_reference: bool = True,
     ):
         """Set an attribute if it has not been set before (likely by a subclass)
         Also optionally verifies if the datatype of the attribute set
@@ -36,16 +37,41 @@ class iob_base:
         param set_attribute_handler: function to call to set the attribute
                                      Related to `parse_attributes_dict()` of iob_core.py
         param descr: description of the attribute
+        param copy_by_reference: if True (default), the attribute is copied by reference
         """
-        if not hasattr(self, name):
-            setattr(self, name, value)
-        elif datatype is not None:
-            if type(getattr(self, name)) != datatype:
-                raise TypeError(
-                    iob_colors.FAIL
-                    + f"Attribute '{name}' must be of type {datatype}"
-                    + iob_colors.ENDC
-                )
+
+        # Coditions to add to _attr_refs:
+        # 1. copy_by_reference is True
+        # 2. datatype is immutable
+        add_attr_refs = False
+        if copy_by_reference and is_immutable_type(value, datatype):
+            add_attr_refs = True
+
+        # Ensure that `_attr_refs` dictionary exists
+        if add_attr_refs and "_attr_refs" not in self.__dict__:
+            self._attr_refs = {}
+
+        if add_attr_refs:
+            if name not in self._attr_refs:
+                self._attr_refs[name] = value
+                self.__create_attr_ref_property(name)
+            elif datatype:
+                if not isinstance(self._attr_refs[name], datatype):
+                    raise TypeError(
+                        iob_colors.FAIL
+                        + f"Shared attribute '{name}' must be of type {datatype}"
+                        + iob_colors.ENDC
+                    )
+        else:
+            if not hasattr(self, name):
+                setattr(self, name, value)
+            elif datatype is not None:
+                if type(getattr(self, name)) != datatype:
+                    raise TypeError(
+                        iob_colors.FAIL
+                        + f"Attribute '{name}' must be of type {datatype}"
+                        + iob_colors.ENDC
+                    )
         # Ensure that `ATTRIBUTE_PROPERTIES` dictionary exists
         # The 'ATTRIBUTE_PROPERTIES' is a dictionary that stores information about the
         # attributes, including the handlers used to set their values.
@@ -68,12 +94,32 @@ class iob_base:
             properties.set_handler = set_attribute_handler
         elif not properties.set_handler:
             # Set default set_handler
-            properties.set_handler = lambda v: setattr(self, name, v)
+            if add_attr_refs:
+                properties.set_handler = lambda v: self._attr_refs.update({name: v})
+            else:
+                properties.set_handler = lambda v: setattr(self, name, v)
         if descr:
             properties.descr = descr
 
         self.ATTRIBUTE_PROPERTIES[name] = properties
 
+    def __create_attr_ref_property(self, name: str):
+        """Create a property to access `name` as a regular attribute.
+        This allows access to `name` attribute as a regular attribute,
+        while copying by reference with copy(obj) for immutable types.
+        params: name: name of the attribute to create a property for
+        """
+
+        def getter(self):
+            return self._attr_refs.get(name, None)
+
+        def setter(self, value):
+            if "_attr_refs" not in self.__dict__:
+                self._attr_refs = {}
+            self._attr_refs[name] = value
+
+        # Create property of the classe
+        setattr(self.__class__, name, property(getter, setter))
 
 @dataclass
 class iob_attribute_properties:
@@ -85,6 +131,36 @@ class iob_attribute_properties:
     set_handler: object = None
     descr: str = "Default attribute description"
 
+
+#
+# Type check method
+#
+
+
+def is_immutable_type(value, datatype=None):
+    """Check if a built-in datatype is immutable
+    params value: value to check datatype
+    params datatype: optional datatype to check against
+    returns: True if the value is of immutable datatype, False otherwise
+    """
+    if datatype:
+        immutable_type_values = (
+            int(),
+            float(),
+            complex(),
+            bool(),
+            str(),
+            tuple(),
+            bytes(),
+            frozenset(),
+        )
+        for t in immutable_type_values:
+            if datatype == type(t):
+                return True
+        return False
+    else:
+        immutable_types = (int, float, complex, bool, str, tuple, bytes, frozenset)
+        return isinstance(value, immutable_types)
 
 #
 # List manipulation methods

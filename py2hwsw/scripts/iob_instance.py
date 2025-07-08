@@ -38,20 +38,24 @@ class iob_instance(iob_base):
             instance_name or self.__class__.__name__ + "_inst",
             str,
             descr="Name of the instance",
+            copy_by_reference=False,
         )
         self.set_default_attribute(
             "instance_description",
             instance_description or "Default description",
             str,
             descr="Description of the instance",
+            copy_by_reference=False,
         )
         # Instance portmap connections
         self.set_default_attribute(
-            "portmap_connections", [], list, descr="Instance portmap connections"
+            "portmap_connections", [], list, descr="Instance portmap connections",
+            copy_by_reference=False,
         )
         # Verilog parameter values
         self.set_default_attribute(
-            "parameters", parameters, Dict, descr="Verilog parameter values"
+            "parameters", parameters, Dict, descr="Verilog parameter values",
+            copy_by_reference=False,
         )
         # Select if should intantiate inside another Verilog module.
         # May be False if this is a software only module.
@@ -60,6 +64,7 @@ class iob_instance(iob_base):
             instantiate,
             bool,
             descr="Select if should intantiate the module inside another Verilog module.",
+            copy_by_reference=False,
         )
 
     def __deepcopy__(self, memo):

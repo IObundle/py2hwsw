@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import re
-import importlib
 
 from dataclasses import dataclass
 from iob_comb import iob_comb
@@ -13,7 +12,7 @@ from iob_base import assert_attributes
 from api_base import internal_api_class
 
 
-@internal_api_class
+@internal_api_class("user_api.api", "iob_fsm")
 @dataclass
 class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
@@ -128,12 +127,12 @@ def create_fsm(core, *args, **kwargs):
 
 
 def fsm_from_dict(fsm_dict):
-    api_iob_fsm = importlib.import_module("user_api.api").iob_fsm
-    return api_iob_fsm(**fsm_dict)
+    iob_fsm = importlib.import_module("user_api.api").iob_fsm
+    return iob_fsm(**fsm_dict)
 
 
 def fsm_from_text(fsm_text):
-    api_iob_fsm = importlib.import_module("user_api.api").iob_fsm
+    iob_fsm = importlib.import_module("user_api.api").iob_fsm
     fsm_dict = {}
     # TODO: parse short notation text
-    return api_iob_fsm(**fsm_dict)
+    return iob_fsm(**fsm_dict)

@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-import importlib
 
 from iob_wire import (
     iob_wire,
@@ -21,7 +20,7 @@ from iob_signal import iob_signal
 from api_base import internal_api_class
 
 
-@internal_api_class
+@internal_api_class("user_api.api", "iob_port")
 @dataclass
 class iob_port(iob_wire):
     """Describes an IO port."""
@@ -183,13 +182,11 @@ def add_interface_port(core, *args, name, interface, **kwargs):
 
 
 def port_from_dict(port_dict):
-    api_iob_port = importlib.import_module("user_api.api").iob_port
     port_dict = process_wire_attributes(port_dict)
-    return api_iob_port(**port_dict)
+    return iob_port(**port_dict)
 
 
 def port_from_text(port_text):
-    api_iob_port = importlib.import_module("user_api.api").iob_port
     port_dict = {}
     # TODO: parse short notation text
-    return api_iob_port(**port_dict)
+    return iob_port(**port_dict)

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 import inspect
+import importlib
 
 from dataclasses import field
 
@@ -173,7 +174,14 @@ def api_class_for(internal_cls):
             print("Methods: ", methods)  # Dictionary with methods and their types
 
             # Instantiate internal class with API attributes
-            internal_obj = internal_cls(self, attributes, all_annotations, args, kwargs)
+            internal_obj = internal_cls(
+                "special_argument_value",  # Special internal argument to identify API calls
+                self,
+                attributes,
+                all_annotations,
+                args,
+                kwargs,
+            )
 
             # Store reference to internal object
             self.__internal_obj = internal_obj
@@ -284,79 +292,108 @@ def api_method_for(internal_method):
 #
 
 
-def internal_api_class(cls):
+def internal_api_class(api_module, api_class_name):
     """
-    Decorator for internal methods that extend functionality of API methods.
+    Decorator for internal classes that extend functionality of API classes.
 
     This decorator:
     1) Adds constructor that accepts new attributes via arguments (the ones defined in the API class).
 
     Attributes received by constructor will be added to this internal class.
 
+    Attributes:
+        api_module (str): module in which the API class is defined. Example: "user_api.api"
+        api_class_name (str): name of the API class. Example: "iob_conf"
     """
 
-    original_init = cls.__init__
+    def decorator(cls):
+        original_init = cls.__init__
 
-    # Update constructor of the internal class
-    def new_init(self, *args, **kwargs):
-        if len(args) != 5:
-            fail_with_msg(
-                f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
-            )
-            # NOTE: Possible improvement: Make this constructor lazy import the corresponding API class and automatically instantiate it, instead of throwing this error.
-        else:
-            api_object_reference = args[0]  # object
-            new_attributes = args[1]  # dict
-            new_attributes_annotations = args[2]  # dict
-            user_args = args[3]  # list
-            user_kwargs = args[4]  # dict
+        def replacement_new(cls, *args, **kwargs):
+            if len(args) != 6 or args[0] != "special_argument_value":
+                # Someone tried to instantiate this class directly, instead of the API class.
 
-        print("Internal class constructor called: ", cls.__name__)
-        print("Received attributes: ", new_attributes)
-        print("kwargs attributes: ", user_args)
+                # fail_with_msg(
+                #     f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
+                # )
 
-        # Update internal class attributes
-        for attribute_name, default_value in new_attributes.items():
-            # TODO: Maybe add some data type validation here before setting value.
-            setattr(
-                self, attribute_name, user_kwargs.pop(attribute_name, default_value)
-            )
-        # Update attributes type hints
-        self.__class__.__annotations__ |= new_attributes_annotations
+                # Lazy import the corresponding API class and automatically instantiate it
+                api_class = getattr(importlib.import_module(api_module), api_class_name)
+                return api_class(*args, **kwargs)
 
-        # Throw error if there are unknown arguments
-        # TODO: This is the same behaviour as a data class (any unknown args will raise error).
-        # However, I would probably like to pass new arguments to the original constructor in some cases.
-        # For example, calling the iob_core constructor with a single dictionary of attributes, to be processed by the original iob_core constructor.
-        # Maybe I could add an argument to this decorator that chooses if it should pass unknown arguments to the original constructor.
-        if user_args:
-            fail_with_msg(
-                f"Unknown constructor arguments for class '{cls.__name__}': {user_args}"
-            )
-        if user_kwargs:
-            fail_with_msg(
-                f"Unknown constructor arguments for class '{cls.__name__}': {user_kwargs}"
-            )
+            # Return the normal __new__ method
+            return object.__new__(cls)
 
-        # Store reference to API object
-        self.__api_obj = api_object_reference
+        # Update constructor of the internal class
+        def replacement_init(
+            self,
+            special_argument,  # Special internal argument to identify api calls
+            api_object_reference,
+            new_attributes,
+            new_attributes_annotations,
+            user_args,
+            user_kwargs,
+        ):
+            # if len(args) != 5:
+            #     fail_with_msg(
+            #         f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
+            #     )
+            # else:
+            #     api_object_reference = args[0]  # object
+            #     new_attributes = args[1]  # dict
+            #     new_attributes_annotations = args[2]  # dict
+            #     user_args = args[3]  # list
+            #     user_kwargs = args[4]  # dict
 
-        # Call original init
-        original_init(self, *user_args, **user_kwargs)
+            print("Internal class constructor called: ", cls.__name__)
+            print("Received attributes: ", new_attributes)
+            print("kwargs attributes: ", user_args)
 
-    cls.__init__ = new_init
+            # Update internal class attributes
+            for attribute_name, default_value in new_attributes.items():
+                # TODO: Maybe add some data type validation here before setting value.
+                setattr(
+                    self, attribute_name, user_kwargs.pop(attribute_name, default_value)
+                )
+            # Update attributes type hints
+            self.__class__.__annotations__ |= new_attributes_annotations
 
-    # Create getter to obtain API object
-    def get_api_obj(self):
-        """
-        Method to convert internal Py2HWSW object to API object.
-        Py2HWSW should call this method for every internal object before passing it to the user.
+            # Throw error if there are unknown arguments
+            # TODO: This is the same behaviour as a data class (any unknown args will raise error).
+            # However, I would probably like to pass new arguments to the original constructor in some cases.
+            # For example, calling the iob_core constructor with a single dictionary of attributes, to be processed by the original iob_core constructor.
+            # Maybe I could add an argument to this decorator that chooses if it should pass unknown arguments to the original constructor.
+            if user_args:
+                fail_with_msg(
+                    f"Unknown constructor arguments for class '{cls.__name__}': {user_args}"
+                )
+            if user_kwargs:
+                fail_with_msg(
+                    f"Unknown constructor arguments for class '{cls.__name__}': {user_kwargs}"
+                )
 
-        Returns:
-            api_obj (object): API object. This object can be passed and freely modified by the user.
-        """
-        return self.__api_obj
+            # Store reference to API object
+            self.__api_obj = api_object_reference
 
-    cls.get_api_obj = get_api_obj
+            # Call original init
+            original_init(self, *user_args, **user_kwargs)
 
-    return cls
+        cls.__new__ = replacement_new
+        cls.__init__ = replacement_init
+
+        # Create getter to obtain API object
+        def get_api_obj(self):
+            """
+            Method to convert internal Py2HWSW object to API object.
+            Py2HWSW should call this method for every internal object before passing it to the user.
+
+            Returns:
+                api_obj (object): API object. This object can be passed and freely modified by the user.
+            """
+            return self.__api_obj
+
+        cls.get_api_obj = get_api_obj
+
+        return cls
+
+    return decorator

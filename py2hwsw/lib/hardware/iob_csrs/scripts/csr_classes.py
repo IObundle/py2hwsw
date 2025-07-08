@@ -228,7 +228,7 @@ def create_csr_group(*args, **kwargs):
         regs = [kwargs]
         group_kwargs = {
             "name": "general_operation",
-            "descr": "General operation group",
+            "descr": "Core configuration.",
         }
 
     # Convert user reg dictionaries into 'iob_csr' objects

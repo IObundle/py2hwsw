@@ -78,7 +78,7 @@ def create_conf_group(core, *args, **kwargs):
             confs = [kwargs]
             group_kwargs = {
                 "name": "general_operation",
-                "descr": "General operation group",
+                "descr": "Core configuration.",
             }
             # Try to use existing "general_operation" group if was previously created
             general_group_ref = find_obj_in_list(core.confs, "general_operation")

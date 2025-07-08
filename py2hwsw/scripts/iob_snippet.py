@@ -4,13 +4,12 @@
 
 from dataclasses import dataclass
 from iob_base import assert_attributes
-import importlib
 
 
 from api_base import internal_api_class
 
 
-@internal_api_class
+@internal_api_class("user_api.api", "iob_snippet")
 @dataclass
 class iob_snippet:
     """Class to represent a Verilog snippet in an iob module"""
@@ -35,12 +34,10 @@ def create_snippet(core, *args, **kwargs):
 
 
 def snippet_from_dict(snippet_dict):
-    api_iob_snippet = importlib.import_module("user_api.api").iob_snippet
-    return api_iob_snippet(**snippet_dict)
+    return iob_snippet(**snippet_dict)
 
 
 def snippet_from_text(snippet_text):
-    api_iob_snippet = importlib.import_module("user_api.api").iob_snippet
     snippet_dict = {}
     # TODO: parse short notation text
-    return api_iob_snippet(**snippet_dict)
+    return iob_snippet(**snippet_dict)

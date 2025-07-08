@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass, field
-import importlib
 
 from iob_base import fail_with_msg
 
@@ -11,7 +10,7 @@ from iob_base import fail_with_msg
 from api_base import internal_api_class
 
 
-@internal_api_class
+@internal_api_class("user_api.api", "iob_signal")
 @dataclass
 class iob_signal:
     """Class that represents a wire/port signal"""
@@ -92,12 +91,10 @@ def get_real_signal(signal):
 
 
 def signal_from_dict(signal_dict):
-    api_iob_signal = importlib.import_module("user_api.api").iob_signal
-    return api_iob_signal(**signal_dict)
+    return iob_signal(**signal_dict)
 
 
 def signal_from_text(signal_text):
-    api_iob_signal = importlib.import_module("user_api.api").iob_signal
     signal_dict = {}
     # TODO: parse short notation text
-    return api_iob_signal(**signal_dict)
+    return iob_signal(**signal_dict)

@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import re
-import importlib
 
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
@@ -15,7 +14,7 @@ from iob_signal import get_real_signal
 from api_base import internal_api_class
 
 
-@internal_api_class
+@internal_api_class("user_api.api", "iob_comb")
 @dataclass
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
@@ -239,12 +238,10 @@ def create_comb(core, *args, **kwargs):
 
 
 def comb_from_dict(comb_dict):
-    api_iob_comb = importlib.import_module("user_api.api").iob_comb
-    return api_iob_comb(**comb_dict)
+    return iob_comb(**comb_dict)
 
 
 def comb_from_text(comb_text):
-    api_iob_comb = importlib.import_module("user_api.api").iob_comb
     comb_dict = {}
     # TODO: parse short notation text
-    return api_iob_comb(**comb_dict)
+    return iob_comb(**comb_dict)

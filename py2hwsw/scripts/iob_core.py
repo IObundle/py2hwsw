@@ -10,7 +10,6 @@ from pathlib import Path
 import copy
 from types import SimpleNamespace
 import pathlib
-import importlib
 
 import iob_colors
 
@@ -59,7 +58,7 @@ from iob_python_parameter import python_parameter_group_from_dict
 from api_base import internal_api_class
 
 
-@internal_api_class
+@internal_api_class("user_api.api", "iob_core")
 class iob_core(iob_module, iob_instance):
     """Generic class to describe how to generate a base IOb IP core"""
 
@@ -1035,7 +1034,6 @@ def find_module_setup_dir(core_name):
 
 
 def core_from_dict(core_dict):
-    api_iob_core = importlib.import_module("user_api.api").iob_core
     # Replace key with corresponding attribute name
     key_attribute_mapping = {
         "descr": "description",
@@ -1059,11 +1057,10 @@ def core_from_dict(core_dict):
         for dictionary in core_dict.get(list_name, []):
             objs_list.append(converter_function(dictionary))
         core_dict[list_name] = objs_list
-    return api_iob_core(**core_dict)
+    return iob_core(**core_dict)
 
 
 def core_from_text(core_text):
-    api_iob_core = importlib.import_module("user_api.api").iob_core
     core_dict = {}
     # TODO: parse short notation text
-    return api_iob_core(**core_dict)
+    return iob_core(**core_dict)

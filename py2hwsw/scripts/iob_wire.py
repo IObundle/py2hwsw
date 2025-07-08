@@ -4,7 +4,6 @@
 
 from dataclasses import dataclass, field
 from typing import List
-import importlib
 
 import if_gen
 from iob_base import (
@@ -27,7 +26,7 @@ from iob_signal import (
 from api_base import internal_api_class
 
 
-@internal_api_class
+@internal_api_class("user_api.api", "iob_wire")
 @dataclass
 class iob_wire:
     """Class to represent a wire in an iob module"""
@@ -180,13 +179,11 @@ def process_wire_attributes(wire_dict):
 
 
 def wire_from_dict(wire_dict):
-    api_iob_wire = importlib.import_module("user_api.api").iob_wire
     wire_dict = process_wire_attributes(wire_dict)
-    return api_iob_wire(**wire_dict)
+    return iob_wire(**wire_dict)
 
 
 def wire_from_text(wire_text):
-    api_iob_wire = importlib.import_module("user_api.api").iob_wire
     wire_dict = {}
     # TODO: parse short notation text
-    return api_iob_wire(**wire_dict)
+    return iob_wire(**wire_dict)

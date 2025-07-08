@@ -594,69 +594,6 @@ def create_fsm_from_text(fsm_text):
 
 
 #
-# Blocks
-#
-
-
-class iob_core:
-    """Forward reference of iob_core class. Full declaration of iob_core class is available in below."""
-
-    pass
-
-
-@api_for(internal_block.iob_block_group)
-class iob_block_group:
-    """
-    Class to represent a group of blocks.
-
-    Attributes:
-        name (str): Name of the block group.
-        descr (str): Description of the block group.
-        blocks (list): List of blocks in the block group.
-        doc_clearpage (bool): If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
-    """
-
-    name: str = ""
-    descr: str = "Default description"
-    blocks: list[iob_core] = empty_list()
-    doc_clearpage: bool = False
-
-
-@api_for(internal_block.block_group_from_dict)
-def create_block_group_from_dict(block_group_dict):
-    """
-    Function to create iob_block_group object from dictionary attributes.
-
-    Attributes:
-        block_group_dict (dict): dictionary with values to initialize attributes of iob_block_group object.
-            This dictionary supports the following keys corresponding to the iob_block_group attributes:
-            - name -> iob_block_group.name
-            - descr -> iob_block_group.descr
-            - blocks -> iob_block_group.blocks
-            - doc_clearpage -> iob_block_group.doc_clearpage
-
-    Returns:
-        iob_block_group: iob_block_group object
-    """
-    pass
-
-
-@api_for(internal_block.block_group_from_text)
-def create_block_group_from_text(block_group_text):
-    """
-    Function to create iob_block_group object from short notation text.
-
-    Attributes:
-        block_group_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-b block]+
-
-    Returns:
-        iob_block_group: iob_block_group object
-    """
-    pass
-
-
-#
 # License
 #
 
@@ -817,8 +754,14 @@ def create_python_parameter_group_from_text(python_parameter_group_text):
 
 
 #
-# Core
+# Core (Subblocks, Superblocks, SwModules)
 #
+
+
+class iob_core:
+    """Forward reference of iob_core class. Full declaration of iob_core class is available in below."""
+
+    pass
 
 
 @api_for(internal_core.iob_core)
@@ -882,9 +825,9 @@ class iob_core:
     snippets: list[iob_snippet] = empty_list()
     comb: iob_comb | None = None
     fsm: iob_fsm | None = None
-    subblocks: list[iob_block_group] = empty_list()
-    superblocks: list[iob_block_group] = empty_list()
-    sw_modules: list[iob_block_group] = empty_list()
+    subblocks: list[iob_core] = empty_list()
+    superblocks: list[iob_core] = empty_list()
+    sw_modules: list[iob_core] = empty_list()
 
     # Instance attributes
     instance_name: str = None

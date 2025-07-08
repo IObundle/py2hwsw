@@ -52,7 +52,6 @@ from iob_conf import conf_group_from_dict
 from iob_port import port_from_dict
 from iob_wire import wire_from_dict
 from iob_snippet import snippet_from_dict
-from iob_block import block_group_from_dict
 from iob_python_parameter import python_parameter_group_from_dict
 
 from api_base import internal_api_class
@@ -1044,9 +1043,9 @@ def core_from_dict(core_dict):
         "ports": port_from_dict,
         "wires": wire_from_dict,
         "snippets": snippet_from_dict,
-        "subblocks": block_group_from_dict,
-        "superblocks": block_group_from_dict,
-        "sw_modules": block_group_from_dict,
+        "subblocks": core_from_dict,
+        "superblocks": core_from_dict,
+        "sw_modules": core_from_dict,
         "python_parameters": python_parameter_group_from_dict,
     }
     for list_name, converter_function in converter_functions.items():

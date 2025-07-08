@@ -161,77 +161,66 @@ core_dictionary = {
         },
     ],
     # TODO: Replace "name" by "core" (old core_name)
+    # TODO: Replace "portmap_connections" by "connect"
     "subblocks": [
         {
-            "name": "general_block_group",
-            "descr": "General group of subblocks",
-            "blocks": [
-                {
-                    "name": "iob_and",
-                    "descr": "First and gate",
-                    "instance_name": "iob_and_ab",
-                    "parameters": {
-                        "W": "W",
-                    },
-                    "connect": {
-                        "a_i": "a_i",
-                        "b_i": "b_i",
-                        "y_o": "and_ab_out",
-                    },
-                },
-                {
-                    "name": "iob_and",
-                    "descr": "Second and gate",
-                    "instance_name": "io_and_cd",
-                    "parameters": {
-                        "W": "W",
-                    },
-                    "connect": {
-                        "a_i": "c_i",
-                        "b_i": "d_i",
-                        "y_o": "and_cd_out",
-                    },
-                },
-                {
-                    "name": "iob_or",
-                    "descr": "Or gate",
-                    "instance_name": "iob_or_abcd",
-                    "parameters": {
-                        "W": "W",
-                    },
-                    "connect": {
-                        "a_i": "and_ab_out",
-                        "b_i": "and_cd_out",
-                        "y_o": "or_out",
-                    },
-                },
-                {
-                    "name": "iob_inv",
-                    "descr": "Inverter",
-                    "instance_name": "iob_inv_out",
-                    "parameters": {
-                        "W": "W",
-                    },
-                    "connect": {
-                        "a_i": "or_out",
-                        "y_o": "y_o",
-                    },
-                },
-            ],
+            "name": "iob_and",
+            "descr": "First and gate",
+            "instance_name": "iob_and_ab",
+            "parameters": {
+                "W": "W",
+            },
+            "portmap_connections": {
+                "a_i": "a_i",
+                "b_i": "b_i",
+                "y_o": "and_ab_out",
+            },
+        },
+        {
+            "name": "iob_and",
+            "descr": "Second and gate",
+            "instance_name": "io_and_cd",
+            "parameters": {
+                "W": "W",
+            },
+            "portmap_connections": {
+                "a_i": "c_i",
+                "b_i": "d_i",
+                "y_o": "and_cd_out",
+            },
+        },
+        {
+            "name": "iob_or",
+            "descr": "Or gate",
+            "instance_name": "iob_or_abcd",
+            "parameters": {
+                "W": "W",
+            },
+            "portmap_connections": {
+                "a_i": "and_ab_out",
+                "b_i": "and_cd_out",
+                "y_o": "or_out",
+            },
+        },
+        {
+            "name": "iob_inv",
+            "descr": "Inverter",
+            "instance_name": "iob_inv_out",
+            "parameters": {
+                "W": "W",
+            },
+            "portmap_connections": {
+                "a_i": "or_out",
+                "y_o": "y_o",
+            },
         },
     ],
     "superblocks": [
+        # Tester
         {
-            "name": "general_block_group",
-            "descr": "General group of superblocks",
-            "blocks": [
-                # Tester
-                {
-                    "name": "iob_aoi_tester",
-                    "instance_name": "iob_tester",
-                    # "dest_dir": "tester",
-                },
-            ],
+            "name": "iob_aoi_tester",
+            "instance_name": "iob_tester",
+            # "dest_dir": "tester",
         },
     ],
 }
@@ -250,11 +239,11 @@ if __name__ == "__main__":
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])
     print(
         ">>> Subblocks of core_obj: ",
-        [i.get_name() for i in core_obj.get_subblocks()[0].get_blocks()],
+        [i.get_name() for i in core_obj.get_subblocks()],
     )
     print(
         ">>> Ports of iob_and subblock: ",
-        core_obj.get_subblocks()[0].get_blocks()[0].get_ports(),
+        core_obj.get_subblocks()[0].get_ports(),
     )
 
     # iob_aoi_obj = iob_aoi()

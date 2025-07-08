@@ -111,9 +111,10 @@ class iob_core(iob_module, iob_instance):
         # Store kwargs to allow access to python parameters after object has been created
         self.received_python_parameters = kwargs
 
+        # FIXME: Use subclasses instead of parent
         # Create core based on 'parent' core (if applicable)
-        if self.handle_parent(*args, **kwargs):
-            return
+        #if self.handle_parent(*args, **kwargs):
+        #    return
 
         # Inherit attributes from superclasses
         iob_module.__init__(self, *args, **kwargs)
@@ -585,7 +586,8 @@ class iob_core(iob_module, iob_instance):
                 self.version = version
             if not __class__.global_build_dir:
                 __class__.global_build_dir = f"../{self.name}_V{self.version}"
-            self.set_default_attribute("build_dir", __class__.global_build_dir)
+            if not hasattr(self, "build_dir") or not self.build_dir:
+                self.build_dir = __class__.global_build_dir
 
     def __fix_subblock_cbus_widths(self):
         """Used specifically for iob_system type cores

@@ -292,7 +292,7 @@ def api_method_for(internal_method):
 #
 
 
-def internal_api_class(api_module, api_class_name):
+def internal_api_class(api_module, api_class_name, allow_unknown_args=False):
     """
     Decorator for internal classes that extend functionality of API classes.
 
@@ -304,6 +304,7 @@ def internal_api_class(api_module, api_class_name):
     Attributes:
         api_module (str): module in which the API class is defined. Example: "user_api.api"
         api_class_name (str): name of the API class. Example: "iob_conf"
+        allow_unknown_args (bool): if True, allow extra (unknown) arguments in 'args' and 'kwargs'. These will be passed to the internal class constructor. If false, fail with error (same as dataclass behaviour).
     """
 
     def decorator(cls):
@@ -349,28 +350,26 @@ def internal_api_class(api_module, api_class_name):
             print("Received attributes: ", new_attributes)
             print("kwargs attributes: ", user_args)
 
-            # Update internal class attributes
+            # Update internal class attributes. Use user values if present, else use default values.
             for attribute_name, default_value in new_attributes.items():
+                user_value = user_kwargs.pop(attribute_name, None)
                 # TODO: Maybe add some data type validation here before setting value.
-                setattr(
-                    self, attribute_name, user_kwargs.pop(attribute_name, default_value)
-                )
+                setattr(self, attribute_name, user_value or default_value)
             # Update attributes type hints
             self.__class__.__annotations__ |= new_attributes_annotations
 
-            # Throw error if there are unknown arguments
-            # TODO: This is the same behaviour as a data class (any unknown args will raise error).
-            # However, I would probably like to pass new arguments to the original constructor in some cases.
-            # For example, calling the iob_core constructor with a single dictionary of attributes, to be processed by the original iob_core constructor.
-            # Maybe I could add an argument to this decorator that chooses if it should pass unknown arguments to the original constructor.
-            if user_args:
-                fail_with_msg(
-                    f"Unknown constructor arguments for class '{cls.__name__}': {user_args}"
-                )
-            if user_kwargs:
-                fail_with_msg(
-                    f"Unknown constructor arguments for class '{cls.__name__}': {user_kwargs}"
-                )
+            # If allow_unknown_arguments is False:
+            #     Behave similar to dataclass: Throw error if there are unknown arguments (args/kwargs that do not match attributes).
+            if not allow_unknown_args:
+                # Known user_args/kwargs have been popped out. Any remaining ones are unknown.
+                if user_args:
+                    fail_with_msg(
+                        f"Unknown constructor arguments for class '{cls.__name__}': {user_args}"
+                    )
+                if user_kwargs:
+                    fail_with_msg(
+                        f"Unknown constructor arguments for class '{cls.__name__}': {user_kwargs}"
+                    )
 
             # Store reference to API object
             self.__api_obj = api_object_reference

@@ -24,4 +24,3 @@ int iob_core_tb();
 
 #define csrs_iob_rdata_o iob_uart_csrs_iob_rdata_o
 #define csrs_iob_rvalid_o iob_uart_csrs_iob_rvalid_o
-#define csrs_iob_rready_i iob_uart_csrs_iob_rready_i

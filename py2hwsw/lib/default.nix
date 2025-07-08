@@ -92,6 +92,7 @@ let
     python3Packages.scipy
     python3Packages.pyserial
     python3Packages.pydantic
+    python3Packages.jinja2
     (texlive.combine { inherit (texlive) scheme-medium multirow lipsum catchfile nowidow enumitem placeins xltabular ltablex titlesec makecell datetime fmtcount comment textpos csquotes amsmath cancel listings hyperref biblatex pmboxdraw varwidth hanging adjustbox stackengine alphalph; })
     (callPackage ./scripts/riscv-gnu-toolchain.nix { })
     verible

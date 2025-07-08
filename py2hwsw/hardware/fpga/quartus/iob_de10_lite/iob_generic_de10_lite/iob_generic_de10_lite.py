@@ -5,7 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "name": py_params_dict["instantiator"]["name"] + "_iob_de10_lite",
+        "name": py_params_dict["issuer"]["name"] + "_iob_de10_lite",
         "generate_hw": False,
         "confs": [
             {

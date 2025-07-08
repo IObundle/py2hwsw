@@ -266,8 +266,8 @@ def setup(py_params_dict):
     #
     attributes_dict["subblocks"] = [
         {
-            "core_name": py_params_dict["instantiator"]["original_name"],
-            "instance_name": py_params_dict["instantiator"]["original_name"],
+            "core_name": py_params_dict["issuer"]["original_name"],
+            "instance_name": py_params_dict["issuer"]["original_name"],
             "instance_description": "IOb-SoC memory wrapper",
             "parameters": {
                 "AXI_ID_W": "AXI_ID_W",

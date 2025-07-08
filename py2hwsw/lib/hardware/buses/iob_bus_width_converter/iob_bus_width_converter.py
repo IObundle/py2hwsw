@@ -132,7 +132,7 @@ def setup(py_params_dict):
                 "descr": f"Manager {width[:-2]} bus width",
             },
         ]
-        # Set parameters for if_gen generation of each interface
+        # Set parameters for generation of each interface
         subordinate_interface_parameters[width] = f"SUBORDINATE_{width}"
         manager_interface_parameters[width] = f"MANAGER_{width}"
 

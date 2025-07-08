@@ -65,6 +65,8 @@ def setup(py_params_dict):
         "is_system": True,
         "board_list": ["iob_aes_ku040_db_g", "iob_zybo_z7", "iob_cyclonev_gt_dk"],
         "python_parameters": python_parameters_attribute,
+        "title": "IOb-System",
+        "description": "System-on-Chip (SoC) template",
         "confs": [
             # macros
             {  # Needed for testbench

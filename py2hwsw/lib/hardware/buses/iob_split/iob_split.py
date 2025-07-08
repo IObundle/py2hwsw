@@ -168,20 +168,6 @@ def setup(py_params_dict):
                 {"name": "demux_wstrb_output", "width": NUM_OUTPUTS * int(DATA_W / 8)},
             ],
         },
-        {
-            "name": "demux_rready_data_i",
-            "descr": "Input of rready demux",
-            "signals": [
-                {"name": "input_iob_rready_i"},
-            ],
-        },
-        {
-            "name": "demux_rready_data_o",
-            "descr": "Output of rready demux",
-            "signals": [
-                {"name": "demux_rready_output", "width": NUM_OUTPUTS},
-            ],
-        },
         # Mux signals
         {
             "name": "mux_rdata_data_i",
@@ -302,19 +288,6 @@ def setup(py_params_dict):
                 "data_o": "demux_wstrb_data_o",
             },
         },
-        {
-            "core_name": "iob_demux",
-            "instance_name": "iob_demux_rready",
-            "parameters": {
-                "DATA_W": 1,
-                "N": NUM_OUTPUTS,
-            },
-            "connect": {
-                "sel_i": "output_sel_reg",
-                "data_i": "demux_rready_data_i",
-                "data_o": "demux_rready_data_o",
-            },
-        },
         # Muxers
         {
             "core_name": "iob_mux",
@@ -372,7 +345,6 @@ def setup(py_params_dict):
     assign output{port_idx}_iob_addr_o = demux_addr_output[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
     assign output{port_idx}_iob_wdata_o = demux_wdata_output[{port_idx*DATA_W}+:{DATA_W}];
     assign output{port_idx}_iob_wstrb_o = demux_wstrb_output[{port_idx*int(DATA_W/8)}+:{int(DATA_W/8)}];
-    assign output{port_idx}_iob_rready_o = demux_rready_output[{port_idx}+:1];
 """
     verilog_code += "\n"
     # Connect muxer inputs

@@ -12,21 +12,21 @@ from iob_core import find_module_setup_dir
 
 def setup(py_params_dict):
     """Memory wrapper core. Inteended to be used as a superblock of other cores.
-    Required memories are automatically generated based on the ports of the instantiator (subblock).
+    Required memories are automatically generated based on the ports of the issuer (subblock).
     """
     # Check if should create a demonstation of this core
     if py_params_dict.get("demo", False):
         py_params_dict["mem_if_names"] = []
-        py_params_dict["instantiator"] = {
+        py_params_dict["issuer"] = {
             "original_name": "iob_core",
             "name": "iob",
             "confs": [],
             "ports": [],
         }
 
-    # List of supported memory interfaces (usually taken from if_gen.py)
+    # List of supported memory interfaces (usually taken from interfaces.py)
     mem_if_names = py_params_dict["mem_if_names"]
-    attrs = py_params_dict["instantiator"]
+    attrs = py_params_dict["issuer"]
 
     attributes_dict = {
         "name": f"{attrs['name']}_mwrap",
@@ -58,13 +58,24 @@ def setup(py_params_dict):
         for p, w in zip(memory_ports + mwrap_ports, mwrap_wires + mwrap_ports)
     }
 
+    confs_without_groups = []
+    for item in attrs["confs"]:
+        if "confs" in item:
+            # item is a group of confs
+            confs_without_groups += item["confs"]
+        else:
+            # item is a single conf
+            confs_without_groups.append(item)
+
     attributes_dict["subblocks"] = [
         {
             "core_name": attrs["original_name"],
             "instance_name": f"{attrs['name']}_inst",
             "instance_description": "Wrapped module",
             "parameters": {
-                i["name"]: i["name"] for i in attrs["confs"] if i["type"] in ["P", "D"]
+                i["name"]: i["name"]
+                for i in confs_without_groups
+                if i["type"] in ["P", "D"]
             },
             "connect": connect_dict,
         }
@@ -89,7 +100,7 @@ def setup(py_params_dict):
         word_addr_w = wire["signals"].get("ADDR_W", 32)
         # Memory init hexfile name
         hexfile_param = f"{prefix_str.upper()}HEXFILE"
-        hexfile_obj = find_obj_in_list(attrs["confs"], hexfile_param)
+        hexfile_obj = find_obj_in_list(confs_without_groups, hexfile_param)
         if hexfile_obj is None:
             hexfile = "none"
             hexfile_param = '"none"'
@@ -141,7 +152,7 @@ def setup(py_params_dict):
     # Add MEM_NO_READ_ON_WRITE to the attributes dictionary
     # if the user has not set it
     has_mem_no_read_on_write_in_attrs = False
-    for conf in attrs["confs"]:
+    for conf in confs_without_groups:
         if conf["name"] == "MEM_NO_READ_ON_WRITE":
             has_mem_no_read_on_write_in_attrs = True
             break

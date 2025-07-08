@@ -7,10 +7,8 @@
 #
 
 from latex import write_table
-import sys
 
 import iob_colors
-from iob_base import fail_with_msg
 from iob_signal import get_real_signal, iob_signal
 import param_gen
 
@@ -25,30 +23,21 @@ def generate_subblocks_table_tex(subblocks, out_dir):
         the subblocks in the Block Diagram.\n"
     )
 
-    for group in subblocks:
-        subblocks_file.write(
-            """
+    subblocks_file.write(
+        """
 \\begin{xltabular}{\\textwidth}{|l|l|X|}
 
   \\hline
   \\rowcolor{iob-green}
   {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
 
-  \\input """
-            + group.name
-            + """_subblocks_tab
+  \\input subblocks_tab
 
-  \\caption{"""
-            + group.descr.replace("_", "\\_")
-            + """}
+  \\caption{Table of subblocks in the core.}
 \\end{xltabular}
-\\label{"""
-            + group.name
-            + """_subblocks_tab:is}
+\\label{subblocks_tab:is}
 """
-        )
-        if group.doc_clearpage:
-            subblocks_file.write("\\clearpage")
+    )
 
     subblocks_file.write("\\clearpage")
     subblocks_file.close()
@@ -59,21 +48,20 @@ def generate_subblocks_tex(subblocks, out_dir):
     # Create subblocks.tex file
     generate_subblocks_table_tex(subblocks, out_dir)
 
-    # Create table for each group
-    for group in subblocks:
-        tex_table = []
-        for block in group.blocks:
-            if not block.instantiate:
-                continue
-            tex_table.append(
-                [
-                    block.name,
-                    block.instance_name,
-                    block.instance_description,
-                ]
-            )
+    # Create table for subblocks
+    tex_table = []
+    for block in subblocks:
+        if not block.instantiate:
+            continue
+        tex_table.append(
+            [
+                block.name,
+                block.instance_name,
+                block.instance_description,
+            ]
+        )
 
-        write_table(f"{out_dir}/{group.name}_subblocks", tex_table)
+    write_table(f"{out_dir}/subblocks", tex_table)
 
 
 def generate_subblocks(core):
@@ -81,32 +69,23 @@ def generate_subblocks(core):
     returns: Generated verilog code
     """
     code = ""
-    for group in core.subblocks:
-        for instance in group.blocks:
-            if not instance.instantiate:
-                continue
-            # Open ifdef if conditional interface
-            if instance.if_defined:
-                code += f"`ifdef {instance.if_defined}\n"
-            if instance.if_not_defined:
-                code += f"`ifndef {instance.if_not_defined}\n"
+    for instance in core.subblocks:
+        if not instance.instantiate:
+            continue
 
-            params_str = ""
-            if instance.parameters:
-                params_str = f"""#(
+        params_str = ""
+        if instance.parameters:
+            params_str = f"""#(
 {param_gen.generate_inst_params(instance)}\
     ) """
 
-            code += f"""\
+        code += f"""\
         // {instance.instance_description}
         {instance.name} {params_str}{instance.instance_name} (
     {get_instance_port_connections(instance)}\
         );
 
     """
-            # Close ifdef if conditional interface
-            if instance.if_defined or instance.if_not_defined:
-                code += "`endif\n"
 
     return code
 
@@ -128,27 +107,28 @@ def get_instance_port_connections(instance):
     instance_portmap = ""
 
     # Iterade over all ports of the instance
-    for port_idx, port in enumerate(instance.ports):
+    for portmap in instance.portmap_connections:
+        port = portmap.port
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
 
         # Check if there are connections for this instance
         assert (
-            port.e_connect
+            portmap.e_connect
         ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
 
         # If one of the ports is not a standard inferface, check if the number of signals is the same
-        if not port.interface or not port.e_connect.interface:
+        if not port.interface or not portmap.e_connect.interface:
             newlinechar = "\n"
             assert len(port.signals) == len(
-                port.e_connect.signals
+                portmap.e_connect.signals
             ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
 Port '{port.name}' has the following signals:
 {newlinechar.join("- " + get_real_signal(port).name for port in port.signals)}
 
-External connection '{get_real_signal(port.e_connect).name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(port).name for port in port.e_connect.signals)}
+External connection '{get_real_signal(portmap.e_connect).name}' has the following signals:
+{newlinechar.join("- " + get_real_signal(port).name for port in portmap.e_connect.signals)}
 {iob_colors.ENDC}
 """
 
@@ -160,12 +140,12 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
         if port.descr and not port.doc_only:
             instance_portmap += f"        // {port.name} port: {port.descr}\n"
 
-        if isinstance(port.e_connect, str):
-            if "z" in port.e_connect.lower():
+        if isinstance(portmap.e_connect, str):
+            if "z" in portmap.e_connect.lower():
                 instance_portmap += f"        .{port.signals[0].name}(),\n"
             else:
                 instance_portmap += (
-                    f"        .{port.signals[0].name}({port.e_connect}),\n"
+                    f"        .{port.signals[0].name}({portmap.e_connect}),\n"
                 )
             continue
         # Connect individual signals
@@ -176,17 +156,17 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
             port_name = port_signal.name
 
             # If both ports are standard interfaces, connect by name
-            if port.interface and port.e_connect.interface:
+            if port.interface and portmap.e_connect.interface:
                 # Remove prefix and suffix from port name
                 port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
-                for e_signal in port.e_connect.signals:
+                for e_signal in portmap.e_connect.signals:
                     real_e_signal = get_real_signal(e_signal)
                     e_signal_name = real_e_signal.name
                     # Remove prefix and suffix from external signal name
                     if e_signal_name[-2:] in ["_o", "_i"]:
                         e_signal_name = e_signal_name[:-2]
                     e_signal_name = e_signal_name.replace(
-                        port.e_connect.interface.prefix, "", 1
+                        portmap.e_connect.interface.prefix, "", 1
                     )
                     if e_signal_name == port_name:
                         e_signal_name = real_e_signal.name
@@ -195,12 +175,12 @@ External connection '{get_real_signal(port.e_connect).name}' has the following s
                 port_name = port_signal.name
             else:
                 # If both ports are not standard interfaces, connect by index
-                real_e_signal = get_real_signal(port.e_connect.signals[idx])
+                real_e_signal = get_real_signal(portmap.e_connect.signals[idx])
                 e_signal_name = real_e_signal.name
 
             # If the signal is a bit slice, get the name of the bit slice
             # and the name of the port (this overwrites the previous connection)
-            for bit_slice in port.e_connect_bit_slices:
+            for bit_slice in portmap.e_connect_bit_slices:
                 if e_signal_name in bit_slice:
                     # Connection is not a bit_slice
                     if f"{port_signal.name}:" in bit_slice:

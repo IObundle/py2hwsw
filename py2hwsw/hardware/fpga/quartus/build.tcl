@@ -13,7 +13,6 @@ set USE_EXTMEM [lindex $argv 6]
 set USE_ETHERNET [lindex $argv 7]
 set SEED [lindex $argv 8]
 set USE_QUARTUS_PRO [lindex $argv 9]
-set SDC_PREFIX [lindex $argv 10]
 
 load_package flow
 
@@ -63,10 +62,10 @@ if {$IS_FPGA != "1"} {
 
 
 #read synthesis design constraints
-set_global_assignment -name SDC_FILE ./quartus/$BOARD/$SDC_PREFIX\_dev.sdc
-set_global_assignment -name SDC_FILE ../src/$SDC_PREFIX.sdc
-set_global_assignment -name SDC_FILE ../src/$SDC_PREFIX\_$CSR_IF.sdc
-set_global_assignment -name SDC_FILE ./src/$SDC_PREFIX.sdc
+set_global_assignment -name SDC_FILE ./quartus/$BOARD/$NAME\_dev.sdc
+set_global_assignment -name SDC_FILE ../src/$NAME.sdc
+set_global_assignment -name SDC_FILE ../src/$NAME\_$CSR_IF.sdc
+set_global_assignment -name SDC_FILE ./src/$NAME.sdc
 
 set_global_assignment -name SYNCHRONIZER_IDENTIFICATION "Forced if Asynchronous"
 
@@ -124,10 +123,10 @@ if {[file exists "quartus/postmap.tcl"]} {
 }
 
 #read implementation design constraints
-if {[file exists "quartus/$SDC_PREFIX\_tool.sdc"] == 0} {
-    puts [open "quartus/$SDC_PREFIX\_tool.sdc" w] "derive_clock_uncertainty"
+if {[file exists "quartus/$NAME\_tool.sdc"] == 0} {
+    puts [open "quartus/$NAME\_tool.sdc" w] "derive_clock_uncertainty"
 }
-set_global_assignment -name SDC_FILE ./quartus/$SDC_PREFIX\_tool.sdc
+set_global_assignment -name SDC_FILE ./quartus/$NAME\_tool.sdc
 
 #run quartus fit
 if {[catch {execute_module -tool fit} result]} {

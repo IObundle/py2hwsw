@@ -46,7 +46,7 @@ sys.path.insert(
 from api_base import api_for, empty_list, empty_dict
 import iob_conf as internal_conf
 import iob_signal as internal_signal
-import if_gen as internal_interface
+import interfaces as internal_interface
 import iob_wire as internal_wire
 import iob_port as internal_port
 import iob_snippet as internal_snippet
@@ -87,8 +87,6 @@ class iob_conf:
         min_value (str | int): Minimum value supported by the configuration option (NA if not applicable).
         max_value (str | int): Maximum value supported by the configuration option (NA if not applicable).
         descr (str): Description of the configuration option.
-        if_defined (str): Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is defined.
-        if_not_defined (str): Only applicable to Verilog macros: Conditionally enable this configuration if the specified Verilog macro is undefined.
         doc_only (bool): If enabled, configuration option will only appear in documentation. Not in the verilog code.
     """
 
@@ -98,8 +96,6 @@ class iob_conf:
     min_value: str | int = "NA"
     max_value: str | int = "NA"
     descr: str = "Default description"
-    if_defined: str = ""
-    if_not_defined: str = ""
     doc_only: bool = False
 
     # TODO: Remove this method
@@ -122,8 +118,6 @@ def create_conf_from_dict(conf_dict):
             - min            -> iob_conf.min_value
             - max            -> iob_conf.max_value
             - descr          -> iob_conf.descr
-            - if_defined     -> iob_conf.if_defined
-            - if_not_defined -> iob_conf.if_not_defined
             - doc_only       -> iob_conf.doc_only
 
     Returns:
@@ -270,27 +264,22 @@ def create_signal_from_text(signal_text):
 #
 
 
-# NOTE: artur: I believe the 'params' attribute could be merged with 'widths' attibute.
 @api_for(internal_interface.interface)
 class interface:
     """
     Class to represent an interface for generation.
 
     Attributes:
-        kind (str): Type/Name of interface to generate.
+        if_direction (str): Interface direction. Examples: '' (unspecified), 'manager', 'subordinate', ...
         prefix (str): Prefix for signals of the interface.
         mult (str or int): Width multiplier. Used when concatenating multiple instances of the interface.
-        params (str): Generic string parameter that is passed to "get_<interface>_ports" function
-        widths (dict[str, str]): Dictionary of width properties of interface.
         file_prefix (str): Prefix for generated "Verilog Snippets" of this interface.
         portmap_port_prefix (str): Prefix for "Verilog snippets" of portmaps of this interface:
     """
 
-    kind: str = ""
+    if_direction: str = ""
     prefix: str = ""
     mult: str | int = 1
-    params: str = None
-    widths: dict[str, str] = empty_dict()
     file_prefix: str = ""
     portmap_port_prefix: str = ""
 
@@ -303,12 +292,10 @@ def create_interface_from_dict(interface_dict):
     Attributes:
         interface_dict (dict): dictionary with values to initialize attributes of interface object.
             This dictionary supports the following keys corresponding to the interface attributes:
-            - kind          -> interface.kind
-            - prefix        -> interface.prefix
-            - mult          -> interface.mult
-            - params        -> interface.params
-            - widths        -> interface.widths
-            - file_prefix   -> interface.file_prefix
+            - if_direction        -> interface.if_direction
+            - prefix              -> interface.prefix
+            - mult                -> interface.mult
+            - file_prefix         -> interface.file_prefix
             - portmap_port_prefix -> interface.portmap_port_prefix
 
     Returns:
@@ -324,7 +311,7 @@ def create_interface_from_text(interface_text):
 
     Attributes:
         interface_text (str): Short notation text. Object attributes are specified using the following format:
-            type [-p prefix] [-m mult] [-w width] [-p params]
+            type [-p prefix] [-m mult] [-w width]
 
     Returns:
         interface: interface object
@@ -344,8 +331,6 @@ class iob_wire:
         name (str): Identifier name for the wire.
         interface (interface): Name of the standard interface to auto-generate with `if_gen.py` script.
         descr (str): Description of the wire.
-        if_defined (str): Conditionally define this wire if the specified Verilog macro is defined/undefined.
-        if_not_defined (str): Conditionally define this wire if the specified Verilog macro is defined/undefined.
         signals (list): List of signals belonging to this wire
                         (each signal represents a hardware Verilog wire).
     """
@@ -353,8 +338,6 @@ class iob_wire:
     name: str = ""
     interface: interface = None
     descr: str = "Default description"
-    if_defined: str = ""
-    if_not_defined: str = ""
     signals: list[iob_signal] = empty_list()
 
     def get_signal(self, signal_name: str) -> iob_signal:
@@ -381,8 +364,6 @@ def create_wire_from_dict(wire_dict):
             - name           -> iob_wire.name
             - interface      -> iob_wire.interface
             - descr          -> iob_wire.descr
-            - if_defined     -> iob_wire.if_defined
-            - if_not_defined -> iob_wire.if_not_defined
             - signals        -> iob_wire.signals
 
     Returns:
@@ -417,15 +398,10 @@ class iob_port(iob_wire):
     Describes an IO port.
 
     Attributes:
-        e_connect (iob_wire): External wire to connect to.
-        e_connect_bit_slices (list): List of bit slices of signals in e_connect
         doc_only (bool): Only add to documentation
         doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     """
 
-    e_connect: iob_wire = None
-    # FIXME: Constrain values received by bit slices
-    e_connect_bit_slices: list[object] = empty_list()
     doc_only: bool = False
     doc_clearpage: bool = False
 
@@ -438,8 +414,6 @@ def create_port_from_dict(port_dict):
     Attributes:
         port_dict (dict): dictionary with values to initialize attributes of iob_port object.
             This dictionary supports the following keys corresponding to the iob_port attributes:
-            - e_connect      -> iob_port.e_connect
-            - e_connect_bit_slices -> iob_port.e_connect_bit_slices
             - doc_only -> iob_port.doc_only
             - doc_clearpage -> iob_port.doc_clearpage
             (Also supports the keys inherited from iob_wire)
@@ -530,6 +504,7 @@ class iob_comb(iob_snippet):
 
     code: str = ""
     clk_if: str = "c_a"
+    clk_prefix: str = ""
 
 
 @api_for(internal_comb.comb_from_dict)
@@ -870,11 +845,9 @@ class iob_core:
         # Instance attributes
         instance_name (str): Name of the instance. (Will be used as the instance's name in the Verilog module).
         instance_description (str): Description of the instance.
+        portmap_connections (list): Instance portmap connections.
         parameters (dict): Verilog parameter values for this instance.
-        if_defined (str): Only use this instance in Verilog if given Verilog macro is defined.
-        if_not_defined (str): Only use this instance in Verilog if given Verilog macro is not defined.
         instantiate (bool): Select if should intantiate the module inside another Verilog module.
-        connect (dict): Connections for ports of the instance.
 
         # Core attributes
         version (str): Core version. By default is the same as Py2HWSW version.",
@@ -916,11 +889,9 @@ class iob_core:
     # Instance attributes
     instance_name: str = None
     instance_description: str = ""
+    portmap_connections: list[str] = empty_list()
     parameters: dict[str, int | str] = empty_dict()
-    if_defined: str = ""
-    if_not_defined: str = ""
     instantiate: bool = ""
-    connect: dict[str, str] = empty_dict()
 
     # Core attributes
     version: str = None
@@ -987,11 +958,9 @@ def create_core_from_dict(core_dict):
             # Keys inherited from iob_instance
             - instance_name -> iob_instance.instance_name
             - instance_description -> iob_instance.instance_description
+            - portmap_connections -> iob_instance.portmap_connections
             - parameters -> iob_instance.parameters
-            - if_defined -> iob_instance.if_defined
-            - if_not_defined -> iob_instance.if_not_defined
             - instantiate -> iob_instance.instantiate
-            - connect -> iob_instance.connect
 
             # Iob_core specific keys
             - version -> iob_core.version

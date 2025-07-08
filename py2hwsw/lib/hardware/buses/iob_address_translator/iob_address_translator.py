@@ -138,7 +138,7 @@ Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), 
                 "descr": f"{width[:-2]} bus width",
             },
         ]
-        # Set parameters for if_gen generation of the interface
+        # Set parameters for generation of the interface
         interface_parameters[width] = width
 
     #

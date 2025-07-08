@@ -47,7 +47,7 @@ def create_rom_instance(attributes_dict, csr_ref):
     # ROM Ports
     #
     attributes_dict["ports"].append(
-        # Create standard external memory port for ROM with if_gen.py
+        # Create standard external memory port for ROM with interfaces.py
         {
             "name": f"{rom_name}_bus_m",
             "descr": f"External {rom_name} ROM signals.",

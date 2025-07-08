@@ -7,7 +7,7 @@
 #
 #    wire_gen.py: build Verilog module wires
 #
-import if_gen
+import interfaces
 import os
 from iob_signal import iob_signal
 
@@ -18,11 +18,6 @@ def generate_wires(core):
     """
     code = ""
     for wire in core.wires:
-        # Open ifdef if conditional interface
-        if wire.if_defined:
-            code += f"`ifdef {wire.if_defined}\n"
-        if wire.if_not_defined:
-            code += f"`ifndef {wire.if_not_defined}\n"
 
         signals_code = ""
         for signal in wire.signals:
@@ -34,10 +29,6 @@ def generate_wires(core):
             if wire.descr != "" and wire.descr != "Default description":
                 code += f"// {wire.descr}\n"
             code += signals_code
-
-        # Close ifdef if conditional interface
-        if wire.if_defined or wire.if_not_defined:
-            code += "`endif\n"
 
     return code
 
@@ -56,7 +47,7 @@ def generate_wires_snippet(core):
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.
         if wire.interface:
-            if_gen.gen_wires(wire.interface)
+            wire.interface.gen_wires_vs_file()
 
             # move all .vs files from current directory to out_dir
             for file in os.listdir("."):

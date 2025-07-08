@@ -10,8 +10,7 @@ from iob_snippet import iob_snippet
 from iob_base import fail_with_msg, assert_attributes
 from iob_wire import find_signal_in_wires
 from iob_signal import get_real_signal
-
-
+from interfaces import iobClkInterface
 from api_base import internal_api_class
 
 
@@ -28,14 +27,18 @@ class iob_comb(iob_snippet):
             + self.code
             + """\n\t\tend"""
         )
+        if "clk_i:" in self.clk_if:
+            self.clk_prefix, self.clk_if = self.clk_if.split("clk_i:")
 
     def set_needed_reg(self, core):
         blocking_regex = re.compile(r"^\s*(\w+)\s*(?:\[[^\]]*\])?\s*=", re.MULTILINE)
         non_blocking_regex = re.compile(
             r"^\s*(\w+)\s*(?:\[[^\]]*\])?\s*<=", re.MULTILINE
         )
+        nxt_regex = re.compile(r"[a-zA-Z0-9_$]+_nxt", re.MULTILINE)
 
         outputs = set()
+        nxt_vars = set()
 
         for match in blocking_regex.findall(self.verilog_code):
             outputs.add(match)
@@ -43,7 +46,10 @@ class iob_comb(iob_snippet):
         for match in non_blocking_regex.findall(self.verilog_code):
             outputs.add(match)
 
-        for signal_name in outputs:
+        for match in nxt_regex.findall(self.verilog_code):
+            nxt_vars.add(match)
+
+        for signal_name in outputs | nxt_vars:
             if signal_name.endswith("_o"):
                 signal = find_signal_in_wires(
                     core.ports,
@@ -87,6 +93,15 @@ class iob_comb(iob_snippet):
             if signal is None:
                 fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
 
+        for signal_name in nxt_vars - outputs:
+            insert_point = self.verilog_code.find("\t\t\t")
+            if insert_point != -1:
+                self.verilog_code = (
+                    self.verilog_code[:insert_point]
+                    + f"\t\t\t{signal_name} = {signal_name[:-4]};\n"
+                    + self.verilog_code[insert_point:]
+                )
+
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""
 
@@ -99,8 +114,21 @@ class iob_comb(iob_snippet):
                     # and overwrite the default one
                     for port in core.ports:
                         if port.interface:
-                            if port.interface.kind == "iob_clk":
+                            if (
+                                isinstance(port.interface, iobClkInterface)
+                                and port.interface.prefix == self.clk_prefix
+                            ):
                                 clk_if_name = port.name
+                                # If it does not cke or arst, set them
+                                port.interface.has_cke = True
+                                port.interface.has_arst = True
+
+                                port_params = "c_a"
+                                # Add the remaining parameters
+                                if port.interface.has_rst:
+                                    port_params += "_r"
+                                if port.interface.has_en:
+                                    port_params += "_e"
 
                     # Connect the register
                     connect = {
@@ -134,7 +162,9 @@ class iob_comb(iob_snippet):
 
                     _reg_signals = []
                     bit_slices = []
-                    port_params = self.clk_if
+
+                    if self.clk_if:
+                        port_params = self.clk_if
 
                     # Find, create and connect the enable and reset signals (if they exist)
                     if any(reg_signal == "_en" for reg_signal in signal.reg_signals):
@@ -172,7 +202,7 @@ class iob_comb(iob_snippet):
 
                     # Create the clock interface in the core, if it does not exist
                     if not any(port.name == "clk_en_rst_s" for port in core.ports):
-                        core.create_port(
+                        core.create_port_from_dict(
                             name="clk_en_rst_s",
                             signals={"type": "iob_clk", "params": self.clk_if},
                             descr="Clock interface signals",
@@ -182,14 +212,13 @@ class iob_comb(iob_snippet):
                     if bit_slices:
                         connect["clk_en_rst_s"] = (clk_if_name, bit_slices)
 
-                    # Create the subblock group for the register
+                    # Create the subblock for the register
                     # if it does not already exist
                     if not any(
                         block.instance_name == f"{signal.name}_reg"
-                        for group in core.subblocks
-                        for block in group.blocks
+                        for block in core.subblocks
                     ):
-                        core.create_subblock_group(
+                        core.create_subblock(
                             core_name="iob_reg",
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": 0},

@@ -16,7 +16,6 @@ interface iob_if;
    logic [                31:0] iob_wdata_i;
    logic [`IOB_CSRS_ADDR_W-1:0] iob_addr_i;
    logic [                 3:0] iob_wstrb_i;
-   logic                        iob_rready_i;
    logic                        iob_rvalid_o;
    logic [                31:0] iob_rdata_o;
    logic                        iob_ready_o;
@@ -42,7 +41,6 @@ module iob_uvm_tb;
       .iob_addr_i  (vif.iob_addr_i),
       .iob_wdata_i (vif.iob_wdata_i),
       .iob_wstrb_i (vif.iob_wstrb_i),
-      .iob_rready_i(vif.iob_rready_i),
       .iob_rvalid_o(vif.iob_rvalid_o),
       .iob_rdata_o (vif.iob_rdata_o),
       .iob_ready_o (vif.iob_ready_o)
@@ -73,7 +71,6 @@ module iob_uvm_tb;
       vif.iob_addr_i   = 0;
       vif.iob_wdata_i  = 0;
       vif.iob_wstrb_i  = 0;
-      vif.iob_rready_i = 0;
    end
 
    //toggle clock

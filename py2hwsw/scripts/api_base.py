@@ -175,8 +175,8 @@ def api_class_for(internal_cls):
 
             # Instantiate internal class with API attributes
             internal_obj = internal_cls(
-                self,
                 "special_argument_value",  # Special internal argument to identify API calls
+                self,
                 attributes,
                 all_annotations,
                 args,
@@ -319,7 +319,7 @@ def internal_api_class(api_module, api_class_name):
 
                 # Lazy import the corresponding API class and automatically instantiate it
                 api_class = getattr(importlib.import_module(api_module), api_class_name)
-                return api_class
+                return api_class(*args, **kwargs)
 
             # Return the normal __new__ method
             return object.__new__(cls)

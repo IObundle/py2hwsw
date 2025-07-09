@@ -76,6 +76,19 @@ let
 
   yosys = import ./scripts/yosys.nix { inherit pkgs; };
 
+  pythonEnv = pkgs.python3.withPackages (ps: with ps; [
+    black
+    mypy
+    parse
+    numpy
+    wavedrom
+    matplotlib
+    scipy
+    pyserial
+    pydantic
+    jinja2
+  ]);
+
   py2hwsw_dependencies = with pkgs; [
     bash
     gnumake
@@ -83,15 +96,7 @@ let
     verilator
     gtkwave
     python3
-    python3Packages.black
-    python3Packages.mypy
-    python3Packages.parse
-    python3Packages.numpy
-    python3Packages.wavedrom
-    python3Packages.matplotlib
-    python3Packages.scipy
-    python3Packages.pyserial
-    python3Packages.jinja2
+    pythonEnv
     (texlive.combine { inherit (texlive) scheme-medium multirow lipsum catchfile nowidow enumitem placeins xltabular ltablex titlesec makecell datetime fmtcount comment textpos csquotes amsmath cancel listings hyperref biblatex pmboxdraw varwidth hanging adjustbox stackengine alphalph; })
     (callPackage ./scripts/riscv-gnu-toolchain.nix { })
     verible
@@ -141,5 +146,6 @@ pkgs.mkShell {
   buildInputs = py2hwsw_dependencies;
   shellHook = ''
     export PATH="$PATH:${bin_path}"
+    export PYTHONPATH=${pythonEnv}/${pythonEnv.sitePackages}
   '';
 }

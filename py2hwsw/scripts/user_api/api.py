@@ -883,7 +883,7 @@ def create_core_from_dict(core_dict):
         core_dict (dict): dictionary with values to initialize attributes of iob_core object.
             This dictionary supports the following keys corresponding to the iob_core attributes:
 
-            # Keys inherited from iob_module
+            # Module keys
             - original_name -> iob_module.original_name
             - name -> iob_module.name
             - descr -> iob_module.description
@@ -894,18 +894,18 @@ def create_core_from_dict(core_dict):
             - snippets -> iob_module.snippets
             - comb -> iob_module.comb
             - fsm -> iob_module.fsm
-            - subblocks -> iob_module.subblocks
-            - superblocks -> iob_module.superblocks
-            - sw_modules -> iob_module.sw_modules
+            - subblocks -> create_core_instance_from_dict
+            - superblocks -> create_core_instance_from_dict
+            - sw_modules -> create_core_instance_from_dict
 
-            # Keys inherited from iob_instance
+            # Instance keys
             - instance_name -> iob_instance.instance_name
             - instance_description -> iob_instance.instance_description
             - portmap_connections -> iob_instance.portmap_connections
             - parameters -> iob_instance.parameters
             - instantiate -> iob_instance.instantiate
 
-            # Iob_core specific keys
+            # Core keys
             - version -> iob_core.version
             - previous_version -> iob_core.previous_version
             - setup_dir -> iob_core.setup_dir
@@ -933,6 +933,7 @@ def create_core_from_dict(core_dict):
 @api_for(internal_core.core_from_text)
 def create_core_from_text(core_text):
     """
+    Function to create iob_core object from dictionary attributes.
     Function to create iob_core object from short notation text.
 
     Attributes:
@@ -955,5 +956,22 @@ def create_core_from_text(core_text):
 
     Returns:
         iob_core: iob_core object
+    """
+    pass
+
+
+@api_for(internal_core.core_instance_from_dict)
+def create_core_instance_from_dict(core_dict):
+    """
+    Parse instance dictionary (passed in subblocks/superblocks/swmodules lists) and instantiate the corresponding core.
+
+    Attributes:
+        instance_dict (dict): The dictionary of the instance. Supports following keys:
+            - core (str): The name of the core to instantiate (will search for <core>.py or <core>.json file)
+            - python_parameters (dict): Dictionary of python parameters to pass to the core (will be passed as **kwargs to the core's constructor).
+            Other supported dictionary keys are the instance attributes from iob_core.
+
+    Returns:
+        iob_core: The instantiated core object
     """
     pass

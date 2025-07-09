@@ -56,7 +56,7 @@ from iob_python_parameter import python_parameter_group_from_dict
 from api_base import internal_api_class
 
 
-@internal_api_class("user_api.api", "iob_core")
+@internal_api_class("user_api.api", "iob_core", allow_unknown_args=True)
 class iob_core(iob_module, iob_instance):
     """Generic class to describe how to generate a base IOb IP core"""
 
@@ -98,8 +98,27 @@ class iob_core(iob_module, iob_instance):
         :param bool is_parent: If this core is a parent core
         """
 
+        print("Iob-core: called")
+        # Parse core dict given to constructor
+        if len(args) > 0:
+            if type(args[0]) is dict:
+                print("Iob-core: Receiving core dict")
+                core_dict = args[0]
+                # TODO: Initialize core with code similar to 'core_from_dict()' and decorator.
+                # Should this code be merged in the decorator? Merging in decorator would allow every object (confs, ports, etc) to be initialized from dict.
+            else:
+                fail_with_msg("[Py2HWSW bug] Iob-core: First argument should be core dict")
+
+
+        # Create subblocks
+
         # FIXME:
         return
+
+    """
+        #
+        # Old constructor code
+        #
 
         # Arguments used by this class
         dest_dir = kwargs.get("dest_dir", "hardware/src")
@@ -325,6 +344,7 @@ class iob_core(iob_module, iob_instance):
 
         if self.abort_reason:
             return
+    """
 
     def post_setup(self):
         """Scripts to run at the end of the top module's setup"""
@@ -1024,6 +1044,47 @@ def find_module_setup_dir(core_name):
         return os.path.dirname(file_path), file_ext
 
 
+
+
+def get_instance_obj_from_dict(instance_dict):
+    """
+    Parse instance dictionary (passed in subblocks/superblocks/swmodules lists) and instantiate the corresponding core.
+
+    Attributes:
+        instance_dict (dict): The dictionary of the instance. Supports following keys:
+            - core (str): The name of the core to instantiate (will search for <core>.py or <core>.json file)
+            - python_parameters (dict): Dictionary of python parameters to pass to the core (will be passed as **kwargs to the core's constructor).
+
+    """
+    core_name = instance_dict.get("core", None)
+    if not core_name:
+        fail_with_msg("No core name specified in instance core dictionary!")
+
+    core_dir, file_ext = find_module_setup_dir(core_name)
+
+    print("FOUND MODULE", core_dir, file_ext)
+    if file_ext == ".py":
+        import_python_module(
+            os.path.join(core_dir, f"{core_name}.py"),
+        )
+        core_module = sys.modules[core_name]
+
+        # 
+        python_parameters = instance_dict.get("python_parameters", {})
+
+        # Instantiate core (call constructor from class defined inside the .py file)
+        core_obj = getattr(core_module, core_name)(**python_parameters)
+
+    # TODO:
+    # elif file_ext == ".json":
+    #     core_obj = __class__.read_py2hw_json(
+    #         os.path.join(core_dir, f"{core_name}.json"),
+    #         # Note, any of the arguments below can have their values overridden by
+    #         # the json data
+    #         **kwargs,
+    #     )
+    return core_obj
+
 #
 # API methods
 #
@@ -1043,9 +1104,9 @@ def core_from_dict(core_dict):
         "ports": port_from_dict,
         "wires": wire_from_dict,
         "snippets": snippet_from_dict,
-        "subblocks": core_from_dict,
-        "superblocks": core_from_dict,
-        "sw_modules": core_from_dict,
+        "subblocks": get_instance_obj_from_dict,
+        "superblocks": get_instance_obj_from_dict,
+        "sw_modules": get_instance_obj_from_dict,
         "python_parameters": python_parameter_group_from_dict,
     }
     for list_name, converter_function in converter_functions.items():

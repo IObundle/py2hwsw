@@ -1044,6 +1044,36 @@ def find_module_setup_dir(core_name):
         return os.path.dirname(file_path), file_ext
 
 
+def core_instance_from_dict(core_name, python_parameters={}):
+    """
+    Find a core based on given core_name and instatiate it.
+
+    Attributes:
+        core (str): The name of the core to instantiate. Will search for <core>.py or <core>.json files.
+                    If <core>.py is found, it must contain a class called <core> that extends iob_core. This class will be used to instantiate the core.
+                    If <core>.json is found, its contents will be read and parsed by the core_from_dict(<json_contents>) function.
+        python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated core.
+                                  Elements from this dictionary will be passed as **kwargs to the instantiated core's constructor.
+                                  Only applicable if instantiated core has a constructor that accepts python parameters (excludes cores defined in JSON or purely by dictionary).
+    Returns:
+        iob_core: The instantiated core object
+    """
+    core_dir, file_ext = find_module_setup_dir(core_name)
+
+    if file_ext == ".py":
+        debug(f"Importing {core_name}.py", 1)
+        import_python_module(
+            os.path.join(core_dir, f"{core_name}.py"),
+        )
+        core_module = sys.modules[core_name]
+
+        # Instantiate core (call constructor from class defined inside the .py file)
+        core_obj = getattr(core_module, core_name)(**python_parameters)
+
+    elif file_ext == ".json":
+        debug(f"Loading {core_name}.json", 1)
+        core_obj = core_from_dict(json.load(open(os.path.join(core_dir, f"{core_name}.json"))))
+    return core_obj
 
 #
 # API methods
@@ -1051,6 +1081,10 @@ def find_module_setup_dir(core_name):
 
 
 def core_from_dict(core_dict):
+    # If 'core' key is given, find corresponding core and instantiate it. Ignore other attributes.
+    if core_dict.get("core", None):
+        return core_instance_from_dict(core_dict["core"], core_dict.get("python_parameters", {}))
+
     # Replace key with corresponding attribute name
     key_attribute_mapping = {
         "descr": "description",
@@ -1064,9 +1098,9 @@ def core_from_dict(core_dict):
         "ports": port_from_dict,
         "wires": wire_from_dict,
         "snippets": snippet_from_dict,
-        "subblocks": core_instance_from_dict,
-        "superblocks": core_instance_from_dict,
-        "sw_modules": core_instance_from_dict,
+        "subblocks": core_from_dict,
+        "superblocks": core_from_dict,
+        "sw_modules": core_from_dict,
         "python_parameters": python_parameter_group_from_dict,
     }
     for list_name, converter_function in converter_functions.items():
@@ -1081,29 +1115,3 @@ def core_from_text(core_text):
     core_dict = {}
     # TODO: parse short notation text
     return iob_core(**core_dict)
-
-
-def core_instance_from_dict(instance_dict):
-    core_name = instance_dict.get("core", None)
-    if not core_name:
-        fail_with_msg("No core name specified in instance core dictionary!")
-
-    core_dir, file_ext = find_module_setup_dir(core_name)
-
-    if file_ext == ".py":
-        debug(f"Importing {core_name}.py", 1)
-        import_python_module(
-            os.path.join(core_dir, f"{core_name}.py"),
-        )
-        core_module = sys.modules[core_name]
-
-        # Get dictionary of python parameters to pass to the core
-        python_parameters = instance_dict.get("python_parameters", {})
-
-        # Instantiate core (call constructor from class defined inside the .py file)
-        core_obj = getattr(core_module, core_name)(**python_parameters)
-
-    elif file_ext == ".json":
-        debug(f"Loading {core_name}.json", 1)
-        core_obj = core_from_dict(json.load(open(os.path.join(core_dir, f"{core_name}.json"))))
-    return core_obj

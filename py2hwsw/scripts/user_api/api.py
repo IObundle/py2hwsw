@@ -894,9 +894,9 @@ def create_core_from_dict(core_dict):
             - snippets -> iob_module.snippets
             - comb -> iob_module.comb
             - fsm -> iob_module.fsm
-            - subblocks -> create_core_instance_from_dict
-            - superblocks -> create_core_instance_from_dict
-            - sw_modules -> create_core_instance_from_dict
+            - subblocks -> iob_module.subblocks = [create_core_from_dict(i) for i in subblocks]
+            - superblocks -> iob_module.superblocks = [create_core_from_dict(i) for i in superblocks]
+            - sw_modules -> iob_module.sw_modules = [create_core_from_dict(i) for i in sw_modules]
 
             # Instance keys
             - instance_name -> iob_instance.instance_name
@@ -904,6 +904,15 @@ def create_core_from_dict(core_dict):
             - portmap_connections -> iob_instance.portmap_connections
             - parameters -> iob_instance.parameters
             - instantiate -> iob_instance.instantiate
+            # Non-attribute instance keys
+            - core (str): Optional. The name of the core to instantiate. Will search for <core>.py or <core>.json files.
+                          If this key is set, all other keys will be ignored! (Except 'python_parameters' key).
+                          If <core>.py is found, it must contain a class called <core> that extends iob_core. This class will be used to instantiate the core.
+                          If <core>.json is found, its contents will be read and parsed by the create_core_from_dict(<json_contents>) function.
+            - python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated core.
+                                        This key should be used in conjunction with the 'core' key.
+                                        Elements from this dictionary will be passed as **kwargs to the instantiated core's constructor.
+                                        Only applicable if instantiated core has a constructor that accepts python parameters (excludes cores defined in JSON or purely by dictionary).
 
             # Core keys
             - version -> iob_core.version
@@ -956,22 +965,5 @@ def create_core_from_text(core_text):
 
     Returns:
         iob_core: iob_core object
-    """
-    pass
-
-
-@api_for(internal_core.core_instance_from_dict)
-def create_core_instance_from_dict(core_dict):
-    """
-    Parse instance dictionary (passed in subblocks/superblocks/swmodules lists) and instantiate the corresponding core.
-
-    Attributes:
-        instance_dict (dict): The dictionary of the instance. Supports following keys:
-            - core (str): The name of the core to instantiate (will search for <core>.py or <core>.json file)
-            - python_parameters (dict): Dictionary of python parameters to pass to the core (will be passed as **kwargs to the core's constructor).
-            Other supported dictionary keys are the instance attributes from iob_core.
-
-    Returns:
-        iob_core: The instantiated core object
     """
     pass

@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "confs": [
             {
                 "name": "W_DATA_W",
-                "descr": "",
+                "descr": "Write data width",
                 "type": "P",
                 "val": "21",
                 "min": "NA",
@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "R_DATA_W",
-                "descr": "",
+                "descr": "Read data width",
                 "type": "P",
                 "val": "21",
                 "min": "NA",
@@ -25,15 +25,23 @@ def setup(py_params_dict):
             },
             {
                 "name": "ADDR_W",
-                "descr": "Higher ADDR_W lower DATA_W",
+                "descr": "Higher ADDR_W (lower DATA_W)",
                 "type": "P",
                 "val": "3",
                 "min": "NA",
                 "max": "NA",
             },
             {
+                "name": "BIG_ENDIAN",
+                "descr": "Big-endian mode: 1 for big-endian, 0 for little-endian",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "1",
+            },
+            {
                 "name": "MAXDATA_W",
-                "descr": "",
+                "descr": "Computed maximum data width",
                 "type": "D",
                 "val": "iob_max(W_DATA_W, R_DATA_W)",
                 "min": "NA",
@@ -41,7 +49,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "MINDATA_W",
-                "descr": "",
+                "descr": "Computed minimum data width",
                 "type": "D",
                 "val": "iob_min(W_DATA_W, R_DATA_W)",
                 "min": "NA",
@@ -49,7 +57,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "R",
-                "descr": "",
+                "descr": "Computed ratio between maximum and minimum data widths",
                 "type": "D",
                 "val": "MAXDATA_W / MINDATA_W",
                 "min": "NA",
@@ -65,7 +73,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "W_ADDR_W",
-                "descr": "",
+                "descr": "Computed write address width",
                 "type": "D",
                 "val": "(W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W",
                 "min": "NA",
@@ -73,7 +81,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "R_ADDR_W",
-                "descr": "",
+                "descr": "Computed read address width",
                 "type": "D",
                 "val": "(R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W",
                 "min": "NA",

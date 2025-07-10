@@ -4,25 +4,17 @@
 
 `timescale 1ns / 1ps
 
+`include "iob_fifo_async_conf.vh"
+
 module iob_fifo_async #(
-   parameter W_DATA_W = 21,
-   parameter R_DATA_W = 21,
-   parameter ADDR_W = 3,  //higher ADDR_W lower DATA_W
-   parameter BIG_ENDIAN = 0,  //0: little endian, 1: big endian
-   //determine W_ADDR_W and R_ADDR_W
-   parameter MAXDATA_W = iob_max(W_DATA_W, R_DATA_W),
-   parameter MINDATA_W = iob_min(W_DATA_W, R_DATA_W),
-   parameter R = MAXDATA_W / MINDATA_W,
-   parameter ADDR_W_DIFF = $clog2(R),
-   parameter MINADDR_W = ADDR_W - $clog2(R),  //lower ADDR_W (higher DATA_W)
-   parameter W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
-   parameter R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
+   `include "iob_fifo_async_params.vs"
 ) (
    `include "iob_fifo_async_io.vs"
 );
 
    `include "iob_functions.vs"
 
+   localparam ADDR_W_DIFF = $clog2(R);  //difference between read and write address widths
    localparam [ADDR_W:0] FIFO_SIZE = {1'b1, {ADDR_W{1'b0}}};  //in bytes
 
    //binary read addresses on both domains

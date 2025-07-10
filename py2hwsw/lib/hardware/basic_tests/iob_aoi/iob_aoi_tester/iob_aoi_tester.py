@@ -1,80 +1,82 @@
+#!/usr/bin/env python3
+
 # SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 
+import py2hwsw_api as py2hwsw
 
-def setup(py_params_dict):
-    attributes_dict = {
-        # Set "is_tester" attribute to generate Makefile and flows allowing to run this core as top module
-        "generate_hw": True,
-        "is_tester": True,
-        "confs": [
-            {
-                "name": "W",
-                "type": "P",
-                "val": "21",
-                "min": "1",
-                "max": "32",
-                "descr": "IO width",
+core_dictionary = {
+    # Set "is_tester" attribute to generate Makefile and flows allowing to run this core as top module
+    "generate_hw": True,
+    "is_tester": True,
+    "confs": [
+        {
+            "name": "W",
+            "type": "P",
+            "val": "21",
+            "min": "1",
+            "max": "32",
+            "descr": "IO width",
+        },
+    ],
+    "wires": [
+        {
+            "name": "a",
+            "descr": "AOI input port 1",
+            "signals": [
+                {"name": "a", "width": "W"},
+            ],
+        },
+        {
+            "name": "b",
+            "descr": "AOI input port 2",
+            "signals": [
+                {"name": "b", "width": "W"},
+            ],
+        },
+        {
+            "name": "c",
+            "descr": "AOI input port 3",
+            "signals": [
+                {"name": "c", "width": "W"},
+            ],
+        },
+        {
+            "name": "d",
+            "descr": "AOI input port 4",
+            "signals": [
+                {"name": "d", "width": "W"},
+            ],
+        },
+        {
+            "name": "y",
+            "descr": "AOI output port",
+            "signals": [
+                {"name": "y", "width": "W"},
+            ],
+        },
+    ],
+    "subblocks": [
+        {
+            "core_name": "iob_aoi",
+            "instance_name": "uut_aoi",
+            "instance_description": "Unit Under Test",
+            "parameters": {
+                "W": "W",
             },
-        ],
-        "wires": [
-            {
-                "name": "a",
-                "descr": "AOI input port 1",
-                "signals": [
-                    {"name": "a", "width": "W"},
-                ],
+            "connect": {
+                "a_i": "a",
+                "b_i": "b",
+                "c_i": "c",
+                "d_i": "d",
+                "y_o": "y",
             },
-            {
-                "name": "b",
-                "descr": "AOI input port 2",
-                "signals": [
-                    {"name": "b", "width": "W"},
-                ],
-            },
-            {
-                "name": "c",
-                "descr": "AOI input port 3",
-                "signals": [
-                    {"name": "c", "width": "W"},
-                ],
-            },
-            {
-                "name": "d",
-                "descr": "AOI input port 4",
-                "signals": [
-                    {"name": "d", "width": "W"},
-                ],
-            },
-            {
-                "name": "y",
-                "descr": "AOI output port",
-                "signals": [
-                    {"name": "y", "width": "W"},
-                ],
-            },
-        ],
-        "subblocks": [
-            {
-                "core_name": "iob_aoi",
-                "instance_name": "uut_aoi",
-                "instance_description": "Unit Under Test",
-                "parameters": {
-                    "W": "W",
-                },
-                "connect": {
-                    "a_i": "a",
-                    "b_i": "b",
-                    "c_i": "c",
-                    "d_i": "d",
-                    "y_o": "y",
-                },
-            }
-        ],
-        "snippets": [
-            {
-                "verilog_code": """\
+        }
+    ],
+    "snippets": [
+        {
+            "verilog_code": """\
    // Tester body / verification code
    // Currently using non-synthesizable code
 
@@ -106,8 +108,16 @@ def setup(py_params_dict):
       $finish();
    end
 """
-            }
-        ],
-    }
+        }
+    ],
+}
 
-    return attributes_dict
+
+class iob_aoi_tester(py2hwsw.iob_core):
+    def __init__(self):
+        super().__init__(core_dictionary)
+
+
+if __name__ == "__main__":
+    iob_aoi_tester_obj = iob_aoi_tester()
+    iob_aoi_tester.generate_build_dir()

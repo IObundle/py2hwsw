@@ -40,7 +40,7 @@ core_dictionary = {
 
 class iob_inv(py2hwsw.iob_core):
     def __init__(self):
-        super().__init__(**core_dictionary)
+        super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":

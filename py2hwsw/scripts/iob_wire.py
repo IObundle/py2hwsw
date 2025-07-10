@@ -237,18 +237,24 @@ def dict2interface(name, interface_dict):
     return interface
 
 
-#
-# API methods
-#
-
-
 def process_wire_attributes(wire_dict):
+    """
+    Attributes:
+        wire_dict (dict): The wire dictionary in dictionary format according to the API.
+    Returns:
+        dict: The wire dictionary but without any sub-dictionaries (all of them converted to lists of objects)
+    """
     # Convert list of signals dictionaries into 'signals' objects
     signals_objs = []
     for signal in wire_dict.get("signals", []):
         signals_objs.append(signal_from_dict(signal))
     wire_dict["signals"] = signals_objs
     return wire_dict
+
+
+#
+# API methods
+#
 
 
 def wire_from_dict(wire_dict):

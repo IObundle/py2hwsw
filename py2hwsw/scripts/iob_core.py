@@ -26,6 +26,7 @@ import snippet_gen
 import doc_gen
 import verilog_gen
 import ipxact_gen
+import importlib
 
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
@@ -75,7 +76,7 @@ class iob_core(iob_module, iob_instance):
     # List of callbacks to run at post setup stage
     global_post_setup_callbacks: list = []
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, core_dictionary: dict = {}):
         """Build a core (includes module and instance attributes)
         :param str dest_dir: Destination directory, within the build directory, for the core
         :param dict attributes: py2hwsw dictionary describing the core
@@ -99,16 +100,20 @@ class iob_core(iob_module, iob_instance):
         """
 
         print("Iob-core: called")
-        # Parse core dict given to constructor
-        if len(args) > 0:
-            if type(args[0]) is dict:
-                print("Iob-core: Receiving core dict")
-                core_dict = args[0]
-                # TODO: Initialize core with code similar to 'core_from_dict()' and decorator.
-                # Should this code be merged in the decorator? Merging in decorator would allow every object (confs, ports, etc) to be initialized from dict.
-            else:
-                fail_with_msg("[Py2HWSW bug] Iob-core: First argument should be core dict")
+        print("Iob-core attributes:", self.__class__.__annotations__)
 
+        # Lazy import iob_core API class to get its public attributes
+        api_class = getattr(importlib.import_module("user_api.api"), "iob_core")
+        print("API iob-core attributes:", api_class.__annotations__)
+
+        core_dictionary = process_core_attributes(core_dictionary)
+        # Update attributes with values from core dictionary
+        for attribute_name, new_value in core_dictionary.items():
+            if attribute_name not in api_class.__annotations__:
+                fail_with_msg(
+                    f"Invalid attribute '{attribute_name}' in core dictionary."
+                )
+            setattr(self, attribute_name, new_value)
 
         # Create subblocks
 
@@ -1075,16 +1080,14 @@ def core_instance_from_dict(core_name, python_parameters={}):
         core_obj = core_from_dict(json.load(open(os.path.join(core_dir, f"{core_name}.json"))))
     return core_obj
 
-#
-# API methods
-#
 
-
-def core_from_dict(core_dict):
-    # If 'core' key is given, find corresponding core and instantiate it. Ignore other attributes.
-    if core_dict.get("core", None):
-        return core_instance_from_dict(core_dict["core"], core_dict.get("python_parameters", {}))
-
+def process_core_attributes(core_dict):
+    """
+    Attributes:
+        core_dict (dict): The core dictionary in dictionary format according to the API.
+    Returns:
+        dict: The core dictionary but: with keys renamed to match corresponding attribute names, and without any sub-dictionaries (all of them converted to lists of objects)
+    """
     # Replace key with corresponding attribute name
     key_attribute_mapping = {
         "descr": "description",
@@ -1108,6 +1111,18 @@ def core_from_dict(core_dict):
         for dictionary in core_dict.get(list_name, []):
             objs_list.append(converter_function(dictionary))
         core_dict[list_name] = objs_list
+    return core_dict
+
+#
+# API methods
+#
+
+
+def core_from_dict(core_dict):
+    # If 'core' key is given, find corresponding core and instantiate it. Ignore other attributes.
+    if core_dict.get("core", None):
+        return core_instance_from_dict(core_dict["core"], core_dict.get("python_parameters", {}))
+    core_dict = process_core_attributes(core_dict)
     return iob_core(**core_dict)
 
 

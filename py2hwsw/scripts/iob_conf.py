@@ -153,9 +153,55 @@ def conf_from_dict(conf_dict):
     return iob_conf(**conf_dict)
 
 
-def conf_from_text(conf_text):
-    conf_dict = {}
-    # TODO: parse short notation text
+import argparse
+import shlex
+
+
+def short_notation_create_parser(flags: list) -> argparse.ArgumentParser:
+    """
+    TODO:
+    - import argparse
+    - or add this to iob_base.py or short_notation.py
+    """
+    breakpoint()
+    parser = argparse.ArgumentParser()
+    for flag in flags:
+        if isinstance(flag, str):
+            parser.add_argument(flag)
+        elif isinstance(flag, list):
+            parser.add_argument(flag[0], **flag[1])
+        else:
+            raise ValueError(f"ERROR: unsupported flag format: {flag}")
+    breakpoint()
+    return parser
+
+
+def _conf_parse_text(conf_text: str) -> dict:
+    # parse conf text into a dictionary
+    conf_text_flags = [
+        "name",
+        ["-t", {"dest": "kind"}],
+        ["-v", {"dest": "value"}],
+        ["-m", {"dest": "min_value"}],
+        ["-M", {"dest": "max_value"}],
+        ["-d", {"dest": "descr", "nargs": "?"}],
+        ["-doc", {"dest": "doc_only", "action": "store_true"}],
+    ]
+
+    # preprocess short notation text
+    pre_process_conf_text = shlex.split(conf_text.strip('\n'))
+    # create argument parser
+    parser = short_notation_create_parser(conf_text_flags)
+    print(f"DEBUG: pre_process_conf_text = {pre_process_conf_text}")
+    breakpoint()
+    # parse and return conf_text as dict
+    return parser.parse_args(pre_process_conf_text).__dict__
+
+
+def conf_from_text(conf_text: str) -> iob_conf:
+    conf_dict = _conf_parse_text(conf_text)
+    print(f"DEBUG: {conf_dict}")
+    breakpoint()
     return iob_conf(**conf_dict)
 
 

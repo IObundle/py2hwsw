@@ -77,6 +77,41 @@ if __name__ == "__main__":
             ],
         },
     )
+
+    conf_obj = py2hwsw.create_conf_from_text(
+        """
+        W -t P -v 21 -m 1 -M 32 
+        -d 'IO width'
+        """
+    )
+
+    # conf_groups_obj = py2hwsw.create_conf_group_from_text(
+    #     """
+    #     'Default group'
+    #     -d 'Default group of confs'
+    #     -doc
+    #     -doc_clearpage
+    #     --confs
+    #         DATA_W -t P -v 32 -m NA -M NA
+    #         -d 'Data bus width'
+    #
+    #         FRACTIONAL_W -t P -v 0 -m NA -M NA
+    #         -d 'Fractional part width'
+    #
+    #         REAL_W -t P -v 'DATA_W - FRACTIONAL_W' -m NA -M NA
+    #         -d 'Real part width'
+    #
+    #         SIZE_W -t P -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
+    #         -d 'Size width'
+    #
+    #         END_COUNT -t D -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA
+    #         -d 'End count'
+    #
+    #         COUNT_W -t D -v $clog2(END_COUNT) -m NA -M NA
+    #         -d 'Count width'
+    #     """
+    # )
+    breakpoint()
     print(">>> Name of conf_group_obj: ", conf_group_obj.get_name())
     print(">>> Name of conf_obj: ", conf_group_obj.get_confs()[0].get_name())
 

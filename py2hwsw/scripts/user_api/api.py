@@ -771,8 +771,13 @@ class iob_core:
 
     Attributes:
         # Module attributes
-        original_name (str): Original name of the module. (The module name commonly used in the files of the setup dir.)
-        name (str): Name of the generated module.
+        original_name (str): Original name of the module. Usually auto-filled by Py2HWSW.
+                             Must match name of the core's .py file and its class (if any);
+                             Must match name of the core's .json file (if any).
+                             Only manually needed if core is built directly from iob_core (like `my_core = iob_core(<core_attributes>)`).
+        name (str): Name of the generated module. Usually the same as 'original_name' attribute.
+                    The core's generated verilog module, sources, and files will have this name.
+                    If the core has files in its setup directory, containing strings matching the 'original_name', they will all be renamed to this 'name' when copied to the build directory.
         description (str): Description of the module.
         reset_polarity (str): Global reset polarity of the module. Can be 'positive' or 'negative'. (Will override all subblocks' reset polarities).
         confs (list): List of module macros and Verilog (false-)parameters
@@ -793,25 +798,25 @@ class iob_core:
         instantiate (bool): Select if should intantiate the module inside another Verilog module.
 
         # Core attributes
-        version (str): Core version. By default is the same as Py2HWSW version.",
-        previous_version (str): Core previous version.",
-        setup_dir (str): Path to root setup folder of the core.",
-        build_dir (str): Path to folder of build directory to be generated for this project.",
-        # instance_name (str): Name of an instance of this class.",
-        use_netlist (bool): Copy `<SETUP_DIR>/CORE.v` netlist instead of `<SETUP_DIR>/hardware/src/*`",
-        is_system (bool): Sets `IS_FPGA=1` in config_build.mk",
-        board_list (list): List of FPGAs supported by this core. A standard folder will be created for each board in this list.",
-        dest_dir (str): Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`",
-        ignore_snippets (list): List of `.vs` file includes in verilog to ignore.",
-        generate_hw (bool): Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.",
-        parent (dict): Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.",
-        is_top_module (bool): Selects if core is top module. Auto-filled. DO NOT CHANGE.",
-        is_superblock (bool): Selects if core is superblock of another. Auto-filled. DO NOT CHANGE.",
-        is_tester (bool): Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).",
-        python_parameters (list): List of core Python Parameters. Used for documentation.",
-        license (iob_license): License for the core.",
-        doc_conf (str): CSR Configuration to use.",
-        title (str): Title of this core. Used for documentation.",
+        version (str): Core version. By default is the same as Py2HWSW version.
+        previous_version (str): Core previous version.
+        setup_dir (str): Path to root folder (setup directory) of the core. Usually auto-filled by Py2HWSW.
+                         By default this directory matches the directory of the core's .py/.json file.
+        build_dir (str): Path to folder of build directory to be generated for this project.
+        use_netlist (bool): Copy `<SETUP_DIR>/CORE.v` netlist instead of `<SETUP_DIR>/hardware/src/*`
+        is_system (bool): Sets `IS_FPGA=1` in config_build.mk
+        board_list (list): List of FPGAs supported by this core. A standard folder will be created for each board in this list.
+        dest_dir (str): Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`
+        ignore_snippets (list): List of `.vs` file includes in verilog to ignore.
+        generate_hw (bool): Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.
+        parent (dict): Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.
+        is_top_module (bool): Selects if core is top module. Auto-filled. DO NOT CHANGE.
+        is_superblock (bool): Selects if core is superblock of another. Auto-filled. DO NOT CHANGE.
+        is_tester (bool): Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).
+        python_parameters (list): List of core Python Parameters. Used for documentation.
+        license (iob_license): License for the core.
+        doc_conf (str): CSR Configuration to use.
+        title (str): Title of this core. Used for documentation.
     """
 
     # Module attributes
@@ -852,6 +857,7 @@ class iob_core:
     is_top_module: bool = False
     is_superblock: bool = False
     is_tester: bool = False
+    # FIXME: Should this be an instance attribute? Should it store received values as well?
     python_parameters: list[object] = empty_list()
     license: iob_license = None
     doc_conf: str = ""
@@ -928,7 +934,7 @@ def create_core_from_dict(core_dict):
             - is_top_module -> iob_core.is_top_module
             - is_superblock -> iob_core.is_superblock
             - is_tester -> iob_core.is_tester
-            - python_parameters -> iob_core.python_parameters
+            - python_parameters -> iob_core.python_parameters  # FIXME: Cant have two keys with the same name
             - license -> iob_core.license
             - doc_conf -> iob_core.doc_conf
             - title -> iob_core.title

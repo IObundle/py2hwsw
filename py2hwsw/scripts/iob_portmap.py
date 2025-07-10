@@ -72,11 +72,10 @@ class iob_portmap:
                                 ]
                             ):
                                 newlinechar = "\n"
-                                newlinechar = "\n"
                                 fail_with_msg(
-                                    f"Port '{self.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!\n"
-                                    f"Port '{self.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n"
+                                    f"Port '{self.port.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!\n"
+                                    f"Port '{self.port.name}' has the following signals:\n"
+                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n"
                                     f"External connection '{wire.name}' has the following signals:\n"
                                     f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}\n",
                                     ValueError,
@@ -84,18 +83,19 @@ class iob_portmap:
                 elif len(self.port.signals) != len(wire.signals):
                     newlinechar = "\n"
                     fail_with_msg(
-                        f"Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!\n"
-                        f"Port '{self.name}' has the following signals:\n"
-                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n\n"
+                        f"Port '{self.port.name}' has different number of signals compared to external connection '{wire.name}'!\n"
+                        f"Port '{self.port.name}' has the following signals:\n"
+                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n\n"
                         f"External connection '{wire.name}' has the following signals:\n"
                         f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}\n",
                         ValueError,
                     )
             elif len(self.port.signals) != len(wire.signals):
+                newlinechar = "\n"
                 fail_with_msg(
-                    f"Port '{self.name}' has different number of signals compared to external connection '{wire.name}'!\n"
-                    f"Port '{self.name}' has the following signals:\n"
-                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.signals)}\n\n"
+                    f"Port '{self.port.name}' has different number of signals compared to external connection '{wire.name}'!\n"
+                    f"Port '{self.port.name}' has the following signals:\n"
+                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n\n"
                     f"External connection '{wire.name}' has the following signals:\n"
                     f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}",
                     ValueError,

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 # User API for interfacing with Py2HWSW
 #
 # Py2HWSW has 3 user interfaces in total:

@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
+# This module contains utility functions and decorators for the API interface.
+# These functions should only be used by Py2HWSW developers.
+
 import inspect
 import importlib
 

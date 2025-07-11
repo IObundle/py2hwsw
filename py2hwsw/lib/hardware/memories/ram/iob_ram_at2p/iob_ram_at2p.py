@@ -60,7 +60,7 @@ def setup(py_params_dict):
 
     # Add initialization code if init_mem is True
     if init_mem:
-        code_snippet +="""
+        code_snippet += """
    // Initialize the RAM
    initial $readmemh(HEXFILE, ram, 0, (2 ** ADDR_W) - 1);
             """
@@ -80,7 +80,7 @@ def setup(py_params_dict):
        end
    end
             """
-    
+
     if init_mem:
         name = "iob_ram_at2p_w_init"
     else:

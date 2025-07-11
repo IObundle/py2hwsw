@@ -228,9 +228,6 @@ class iob_signal:
         width (str or int): Number of bits in the signal.
         descr (str): Description of the signal.
         isvar (bool): If enabled, signal will be generated with type `reg` in Verilog.
-        # isreg (bool): Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
-        # reg_signals (list): Used for `iob_comb`: List of signals associated to the infered register.
-        # value (str or int): Logic value for future simulation effort using global signals list.
     """
 
     name: str = ""
@@ -251,9 +248,6 @@ def create_signal_from_dict(signal_dict):
             - width         -> iob_signal.width
             - descr         -> iob_signal.descr
             - isvar         -> iob_signal.isvar
-            - isreg         -> iob_signal.isreg
-            - reg_signals   -> iob_signal.reg_signals
-            - val           -> iob_signal.value
 
     Returns:
         iob_signal: iob_signal object
@@ -268,7 +262,9 @@ def create_signal_from_text(signal_text):
 
     Attributes:
         signal_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-w width] [-d descr] [-r (enables isreg)] [-v value]
+            name [-w width] [-d descr] [-v (enables isvar)]
+            Example:
+                en -w 1 -d 'Enable signal' -v
 
     Returns:
         iob_signal: iob_signal object

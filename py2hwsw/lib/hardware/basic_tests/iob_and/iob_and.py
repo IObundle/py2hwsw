@@ -124,8 +124,13 @@ if __name__ == "__main__":
         print(">>> Conf min: ", conf.get_min_value())
         print(">>> Conf max: ", conf.get_max_value())
         print(">>> Conf description: ", conf.get_descr())
-    print(">>> Name of conf_group_obj: ", conf_group_obj.get_name())
-    print(">>> Name of conf_obj: ", conf_group_obj.get_confs()[0].get_name())
+
+    print("\n\n")
+    signal_obj = py2hwsw.create_signal_from_text("en -w 1 -d 'Enable signal' -v")
+    print("signal_obj: ", signal_obj.get_name(), end=" ")
+    print("width: ", signal_obj.get_width(), end=" ")
+    print("isvar: ", signal_obj.get_isvar(), end=" ")
+    print("descr: ", signal_obj.get_descr())
 
     port_obj = py2hwsw.create_port_from_dict(
         {

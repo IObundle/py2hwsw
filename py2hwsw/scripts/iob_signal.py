@@ -8,7 +8,7 @@ import copy
 from iob_base import fail_with_msg
 
 
-from api_base import internal_api_class
+from api_base import internal_api_class, parse_short_notation_text
 
 
 @internal_api_class("user_api.api", "iob_signal")
@@ -105,6 +105,11 @@ def signal_from_dict(signal_dict):
 
 
 def signal_from_text(signal_text):
-    signal_dict = {}
-    # TODO: parse short notation text
+    signal_flags = [
+        "name",
+        ["-w", {"dest": "width"}],
+        ["-v", {"dest": "isvar", "action": "store_true"}],
+        ["-d", {"dest": "descr", "nargs": "?"}],
+    ]
+    signal_dict = parse_short_notation_text(signal_text, signal_flags)
     return iob_signal(**signal_dict)

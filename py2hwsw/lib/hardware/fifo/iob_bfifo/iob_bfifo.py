@@ -15,59 +15,15 @@ def setup(py_params_dict):
                 "min": "NA",
                 "max": "NA",
             },
-            {
-                "name": "BUFFER_SIZE",
-                "descr": "Buffer size",
-                "type": "D",
-                "val": "2 * DATA_W",
-                "min": "NA",
-                "max": "NA",
-            },
         ],
         "ports": [
             {
-                "name": "clk_i",
-                "descr": "Clock",
-                "signals": [
-                    {
-                        "name": "clk_i",
-                        "width": 1,
-                        "descr": "Clock signal",
-                    },
-                ],
-            },
-            {
-                "name": "cke_i",
-                "descr": "Clock Enable",
-                "signals": [
-                    {
-                        "name": "cke_i",
-                        "width": 1,
-                        "descr": "Clock enable signal",
-                    },
-                ],
-            },
-            {
-                "name": "arst_i",
-                "descr": "Asynchronous Reset",
-                "signals": [
-                    {
-                        "name": "arst_i",
-                        "width": 1,
-                        "descr": "Asynchronous Reset signal",
-                    },
-                ],
-            },
-            {
-                "name": "rst_i",
-                "descr": "Reset",
-                "signals": [
-                    {
-                        "name": "rst_i",
-                        "width": 1,
-                        "descr": "Reset signal",
-                    },
-                ],
+                "name": "clk_en_rst_s",
+                "signals": {
+                    "type": "iob_clk",
+                    "params": "c_a_r",
+                },
+                "descr": "Clock, clock enable, async and sync reset",
             },
             {
                 "name": "write_io",
@@ -225,7 +181,6 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": """
-                //abc
                 `include "iob_functions.vs"
                 reg  [      (2*DATA_W)-1:0] data_nxt;
                 reg  [$clog2(2*DATA_W)-1:0] rptr_nxt;
@@ -234,7 +189,7 @@ def setup(py_params_dict):
                 reg  [          DATA_W-1:0] wdata_int;
                 reg  [      (2*DATA_W)-1:0] wdata;
 
-
+                localparam BUFFER_SIZE = 2 * DATA_W;
                 //assign outputs
                 assign wlevel_o = (1'b1 << $clog2(BUFFER_SIZE)) - level;
                 assign rlevel_o = level;

@@ -200,7 +200,11 @@ External connection '{get_real_signal(portmap.e_connect).name}' has the followin
                         e_signal_name = bit_slice
                     break
 
-            instance_portmap += f"        .{port_name}({e_signal_name}),\n"
+            if e_signal_name.lower() == "z":
+                # If the external signal is 'z', do not connect it
+                instance_portmap += f"        .{port_name}(),\n"
+            else:
+                instance_portmap += f"        .{port_name}({e_signal_name}),\n"
 
     instance_portmap = instance_portmap[:-2] + "\n"  # Remove last comma
 

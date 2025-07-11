@@ -245,8 +245,8 @@ if __name__ == "__main__":
         core_obj.get_subblocks()[0].get_ports(),
     )
 
-    iob_aoi_obj = iob_aoi()
-    print(">>> Ports of iob_aoi: ", iob_aoi_obj.get_ports())
-    print(">>> Ports of iob_aoi: ", [i.get_name() for i in iob_aoi_obj.get_ports()])
+    # iob_aoi_obj = iob_aoi()
+    # print(">>> Ports of iob_aoi: ", iob_aoi_obj.get_ports())
+    # print(">>> Ports of iob_aoi: ", [i.get_name() for i in iob_aoi_obj.get_ports()])
 
     # iob_aoi.generate_build_dir()

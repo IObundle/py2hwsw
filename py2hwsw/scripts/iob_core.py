@@ -41,6 +41,8 @@ from iob_base import (
     add_traceback_msg,
     debug,
     get_lib_cores,
+    update_obj_from_dict,
+    process_elements_from_list
 )
 from iob_license import iob_license, update_license
 import sw_tools
@@ -102,22 +104,27 @@ class iob_core(iob_module, iob_instance):
         print("Iob-core: called")
         print("Iob-core attributes:", self.__class__.__annotations__)
 
-        # Lazy import iob_core API class to get its public attributes
-        api_class = getattr(importlib.import_module("user_api.api"), "iob_core")
-        print("API iob-core attributes:", api_class.__annotations__)
-
-        core_dictionary = process_core_attributes(core_dictionary)
-        # Update attributes with values from core dictionary
-        for attribute_name, new_value in core_dictionary.items():
-            if attribute_name not in api_class.__annotations__:
-                fail_with_msg(
-                    f"Invalid attribute '{attribute_name}' in core dictionary."
-                )
-            setattr(self, attribute_name, new_value)
+        # Update current core's attributes with values from given core_dictionary
+        if core_dictionary:
+            # Lazy import iob_core API class to get its public attributes
+            api_class = getattr(importlib.import_module("user_api.api"), "iob_core")
+            key_attribute_mapping = {
+                "descr": "description",
+            }
+            preprocessor_functions = {
+                "confs": lambda lst: process_elements_from_list(lst, conf_group_from_dict),
+                "ports": lambda lst: process_elements_from_list(lst, port_from_dict),
+                "wires": lambda lst: process_elements_from_list(lst, wire_from_dict),
+                "snippets": lambda lst: process_elements_from_list(lst, snippet_from_dict),
+                "subblocks": lambda lst: process_elements_from_list(lst, core_from_dict),
+                "superblocks": lambda lst: process_elements_from_list(lst, core_from_dict),
+                "sw_modules": lambda lst: process_elements_from_list(lst, core_from_dict),
+                "python_parameters": lambda lst: process_elements_from_list(lst, python_parameter_group_from_dict),
+            }
+            update_obj_from_dict(self, core_dictionary, key_attribute_mapping, preprocessor_functions, api_class.__annotations__.keys())
 
         # Create subblocks
 
-        # FIXME:
         return
 
     """
@@ -1049,7 +1056,7 @@ def find_module_setup_dir(core_name):
         return os.path.dirname(file_path), file_ext
 
 
-def core_instance_from_dict(core_name, python_parameters={}):
+def instantiate_core(core_name, python_parameters={}):
     """
     Find a core based on given core_name and instatiate it.
 
@@ -1081,49 +1088,17 @@ def core_instance_from_dict(core_name, python_parameters={}):
     return core_obj
 
 
-def process_core_attributes(core_dict):
-    """
-    Attributes:
-        core_dict (dict): The core dictionary in dictionary format according to the API.
-    Returns:
-        dict: The core dictionary but: with keys renamed to match corresponding attribute names, and without any sub-dictionaries (all of them converted to lists of objects)
-    """
-    # Replace key with corresponding attribute name
-    key_attribute_mapping = {
-        "descr": "description",
-    }
-    for key, attr in key_attribute_mapping.items():
-        if key in core_dict:
-            core_dict[attr] = core_dict.pop(key)
-    # Convert lists of dictionaries into objects
-    converter_functions = {
-        "confs": conf_group_from_dict,
-        "ports": port_from_dict,
-        "wires": wire_from_dict,
-        "snippets": snippet_from_dict,
-        "subblocks": core_from_dict,
-        "superblocks": core_from_dict,
-        "sw_modules": core_from_dict,
-        "python_parameters": python_parameter_group_from_dict,
-    }
-    for list_name, converter_function in converter_functions.items():
-        objs_list = []
-        for dictionary in core_dict.get(list_name, []):
-            objs_list.append(converter_function(dictionary))
-        core_dict[list_name] = objs_list
-    return core_dict
-
 #
 # API methods
 #
 
 
+# FIXME: Rename to create_from_dict
 def core_from_dict(core_dict):
     # If 'core' key is given, find corresponding core and instantiate it. Ignore other attributes.
     if core_dict.get("core", None):
-        return core_instance_from_dict(core_dict["core"], core_dict.get("python_parameters", {}))
-    core_dict = process_core_attributes(core_dict)
-    return iob_core(**core_dict)
+        return instantiate_core(core_dict["core"], core_dict.get("python_parameters", {}))
+    return iob_core(core_dict)
 
 
 def core_from_text(core_text):

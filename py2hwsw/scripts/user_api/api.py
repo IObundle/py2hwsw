@@ -824,6 +824,9 @@ class iob_core:
     """
 
     # Module attributes
+    # FIXME: Remove original_name attribute. Create internal `get_original_name()` method that obtains class name dynamically.
+    # The lack of this attribute may cause some issues for .json cores, or cores created with iob_core(core_dict).
+    # But we can probably work around this by creating dynamic subclasses of iob_core with the correct name.
     original_name: str = None
     name: str = ""
     description: str = "Default description"

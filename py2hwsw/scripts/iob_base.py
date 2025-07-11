@@ -203,7 +203,7 @@ def convert_dict2obj_list(dict_list: dict, obj_class):
     return obj_list
 
 
-def process_elements_from_list(list2process: list, process_func):
+def process_elements_from_list(list2process: list, process_func: callable):
     """Run processing function on each element of a list"""
     for e in list2process:
         process_func(e)
@@ -663,3 +663,48 @@ def validate_verilog_const(value: str, direction: str):
         fail_with_msg(
             f"Invalid direction '{direction}' for wire '{value}'! Expected input or output."
         )
+
+
+def update_obj_from_dict(obj, attributes_dict, key_attribute_mapping={}, preprocessor_functions={}, valid_attributes_list=[]):
+    """
+    Update a given object's attributes with values from a dictionary.
+    Supports mapping keys to different attribute names.
+    Supports preprocessor functions for attribute's values.
+
+    Attributes:
+        obj (object): The object to update with new attribute values.
+        attributes_dict (dict): The attributes and their values, in dictionary format.
+        key_attribute_mapping (dict): Dictionary of key to attribute name mappings. Given dictionary keys will be replaced with corresponding attribute names.
+            Example mapping:
+                key_attribute_mapping = {
+                    "key_name": "attribute_name",
+                    "descr": "description",
+                    "min": "min_value",
+                    "max": "max_value",
+                }
+        preprocessor_functions (dict): Dictionary of attribute preprocessor functions. Each attribute's value will be preprocessed by the corresponding function before being set. Normally used to convert subdictionaries into objects.
+            Example mapping:
+                preprocessor_functions = {
+                    "attribute_name": preprocessor_function_name,
+                    "ports": port_from_dict,
+                    "wires": wire_from_dict,
+                    "snippets": snippet_from_dict,
+                }
+        valid_attributes_list (list): List of valid attributes for the given object. All valid if empty. Normally used to specify public (API) attributes, preventing access to private ones.
+    """
+    # Fill attributes
+    for key, value in attributes_dict.items():
+        # Find attribute name based on key-attribute mapping
+        attribute_name = key_attribute_mapping.get(key, key)
+        # Only allow valid attributes (if any specified)
+        if valid_attributes_list:
+            if attribute_name not in valid_attributes_list:
+                fail_with_msg(f"Attribute '{attribute_name}' is not valid for object '{obj.__dict__.get('name', 'Unknown')}'.")
+        # Sanity check
+        if not hasattr(obj, attribute_name):
+            fail_with_msg(f"Attribute '{attribute_name}' does not exist for object '{obj.__dict__.get('name', 'Unknown')}'.")
+        # Check if should preprocess value
+        if attribute_name in preprocessor_functions:
+            value = preprocessor_functions[attribute_name](value)
+        # Set attribute
+        setattr(obj, attribute_name, value)

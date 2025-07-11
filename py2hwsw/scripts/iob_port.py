@@ -3,18 +3,20 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
+import importlib
 
 from iob_wire import (
     iob_wire,
     replace_duplicate_signals_by_references,
-    process_wire_attributes,
     dict2interface,
+    WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS,
 )
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
     str_to_kwargs,
     assert_attributes,
+    update_obj_from_dict,
 )
 from iob_signal import iob_signal
 from api_base import internal_api_class
@@ -182,8 +184,22 @@ def add_interface_port(core, *args, name, interface, **kwargs):
 
 
 def port_from_dict(port_dict):
-    port_dict = process_wire_attributes(port_dict)
-    return iob_port(**port_dict)
+    port_obj = iob_port()
+
+    # Lazy import iob_port API class to get its public attributes
+    api_class = getattr(importlib.import_module("user_api.api"), "iob_port")
+    key_attribute_mapping = {}
+    preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
+    # Update port_obj attributes with values from given dictionary
+    update_obj_from_dict(
+        port_obj,
+        port_dict,
+        key_attribute_mapping,
+        preprocessor_functions,
+        api_class.__annotations__.keys(),
+    )
+
+    return port_obj
 
 
 def port_from_text(port_text):

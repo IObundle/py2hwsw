@@ -5,7 +5,7 @@
 from dataclasses import dataclass, field
 import copy
 
-from iob_base import fail_with_msg
+from iob_base import fail_with_msg, update_obj_from_dict
 
 
 from api_base import internal_api_class

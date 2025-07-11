@@ -5,6 +5,7 @@
 from dataclasses import dataclass, field
 import re
 from typing import List
+import importlib
 
 import interfaces
 from iob_base import (
@@ -14,6 +15,8 @@ from iob_base import (
     add_traceback_msg,
     str_to_kwargs,
     assert_attributes,
+    update_obj_from_dict,
+    process_elements_from_list,
 )
 from iob_signal import (
     iob_signal,
@@ -237,20 +240,10 @@ def dict2interface(name, interface_dict):
     return interface
 
 
-def process_wire_attributes(wire_dict):
-    """
-    Attributes:
-        wire_dict (dict): The wire dictionary in dictionary format according to the API.
-    Returns:
-        dict: The wire dictionary but without any sub-dictionaries (all of them converted to lists of objects)
-    """
-    # Convert list of signals dictionaries into 'signals' objects
-    signals_objs = []
-    for signal in wire_dict.get("signals", []):
-        signals_objs.append(signal_from_dict(signal))
-    wire_dict["signals"] = signals_objs
-    return wire_dict
-
+# Dictionary of attributes that need to be preprocessed when set from a wire_dictionary, and their corresponding preprocessor functions
+WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS = {
+    "signals": lambda lst: process_elements_from_list(lst, signal_from_dict),
+}
 
 #
 # API methods
@@ -258,8 +251,22 @@ def process_wire_attributes(wire_dict):
 
 
 def wire_from_dict(wire_dict):
-    wire_dict = process_wire_attributes(wire_dict)
-    return iob_wire(**wire_dict)
+    wire_obj = iob_wire()
+
+    # Lazy import iob_wire API class to get its public attributes
+    api_class = getattr(importlib.import_module("user_api.api"), "iob_wire")
+    key_attribute_mapping = {}
+    preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
+    # Update wire_obj attributes with values from given dictionary
+    update_obj_from_dict(
+        wire_obj,
+        wire_dict,
+        key_attribute_mapping,
+        preprocessor_functions,
+        api_class.__annotations__.keys(),
+    )
+
+    return wire_obj
 
 
 def wire_from_text(wire_text):

@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
+import importlib
+
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
@@ -10,6 +12,8 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     find_obj_in_list,
+    update_obj_from_dict,
+    process_elements_from_list,
 )
 
 from api_base import internal_api_class
@@ -138,19 +142,27 @@ def rename_dictionary_keys(dictionary, key_mapping):
 
 
 def conf_from_dict(conf_dict):
-    # NOTE: Using a Lazy import here to avoid circular import.
-    #       Is there a better way to instantiate API class?
+    conf_obj = iob_conf()
+
+    # Lazy import iob_conf API class to get its public attributes
+    api_class = getattr(importlib.import_module("user_api.api"), "iob_conf")
     key_attribute_mapping = {
         "type": "kind",
         "val": "value",
         "min": "min_value",
         "max": "max_value",
     }
-    # Replace key with corresponding attribute name
-    for key, attr in key_attribute_mapping.items():
-        if key in conf_dict:
-            conf_dict[attr] = conf_dict.pop(key)
-    return iob_conf(**conf_dict)
+    preprocessor_functions = {}
+    # Update conf_obj attributes with values from given dictionary
+    update_obj_from_dict(
+        conf_obj,
+        conf_dict,
+        key_attribute_mapping,
+        preprocessor_functions,
+        api_class.__annotations__.keys(),
+    )
+
+    return conf_obj
 
 
 def conf_from_text(conf_text):
@@ -160,12 +172,24 @@ def conf_from_text(conf_text):
 
 
 def conf_group_from_dict(conf_group_dict):
-    # Convert list of confs dictionaries into 'confs' objects
-    confs_objs = []
-    for conf in conf_group_dict.get("confs", []):
-        confs_objs.append(conf_from_dict(conf))
-    conf_group_dict["confs"] = confs_objs
-    return iob_conf_group(**conf_group_dict)
+    conf_group_obj = iob_conf_group()
+
+    # Lazy import iob_conf_group API class to get its public attributes
+    api_class = getattr(importlib.import_module("user_api.api"), "iob_conf_group")
+    key_attribute_mapping = {}
+    preprocessor_functions = {
+        "confs": lambda lst: process_elements_from_list(lst, conf_from_dict),
+    }
+    # Update conf_group_obj attributes with values from given dictionary
+    update_obj_from_dict(
+        conf_group_obj,
+        conf_group_dict,
+        key_attribute_mapping,
+        preprocessor_functions,
+        api_class.__annotations__.keys(),
+    )
+
+    return conf_group_obj
 
 
 def conf_group_from_text(conf_group_text):

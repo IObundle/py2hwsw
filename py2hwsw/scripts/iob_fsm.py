@@ -127,12 +127,10 @@ def create_fsm(core, *args, **kwargs):
 
 
 def fsm_from_dict(fsm_dict):
-    iob_fsm = importlib.import_module("user_api.api").iob_fsm
     return iob_fsm(**fsm_dict)
 
 
 def fsm_from_text(fsm_text):
-    iob_fsm = importlib.import_module("user_api.api").iob_fsm
     fsm_dict = {}
     # TODO: parse short notation text
     return iob_fsm(**fsm_dict)

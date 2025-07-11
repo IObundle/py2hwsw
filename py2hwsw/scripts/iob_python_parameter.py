@@ -4,6 +4,7 @@
 
 from typing import Any
 from dataclasses import dataclass, field
+import importlib
 
 from iob_base import (
     convert_dict2obj_list,
@@ -12,6 +13,8 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     find_obj_in_list,
+    update_obj_from_dict,
+    process_elements_from_list,
 )
 
 from api_base import internal_api_class
@@ -112,12 +115,28 @@ def python_parameter_from_text(python_parameter_text):
 
 
 def python_parameter_group_from_dict(python_parameter_group_dict):
-    # Convert list of python_parameters dictionaries into 'python_parameters' objects
-    python_parameters_objs = []
-    for python_parameter in python_parameter_group_dict.get("python_parameters", []):
-        python_parameters_objs.append(python_parameter_from_dict(python_parameter))
-    python_parameter_group_dict["python_parameters"] = python_parameters_objs
-    return iob_python_parameter_group(**python_parameter_group_dict)
+    python_parameter_group_obj = iob_python_parameter_group()
+
+    # Lazy import iob_python_parameter_group API class to get its public attributes
+    api_class = getattr(
+        importlib.import_module("user_api.api"), "iob_python_parameter_group"
+    )
+    key_attribute_mapping = {}
+    preprocessor_functions = {
+        "python_parameters": lambda lst: process_elements_from_list(
+            lst, python_parameter_from_dict
+        ),
+    }
+    # Update python_parameter_group_obj attributes with values from given dictionary
+    update_obj_from_dict(
+        python_parameter_group_obj,
+        python_parameter_group_dict,
+        key_attribute_mapping,
+        preprocessor_functions,
+        api_class.__annotations__.keys(),
+    )
+
+    return python_parameter_group_obj
 
 
 def python_parameter_group_from_text(python_parameter_group_text):

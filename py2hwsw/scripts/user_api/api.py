@@ -392,7 +392,9 @@ def create_wire_from_text(wire_text):
 
     Attributes:
         wire_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-i interface] [-d descr] [-s signal_name:width]+
+            name [-i interface] [-d descr] [-s signal_name1:width1] [-s signal_name2:width2]+
+            Examples:
+                dbus -d 'data bus' -s wdata:32 -s wstrb:4
 
     Returns:
         iob_wire: iob_wire object

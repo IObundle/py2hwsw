@@ -132,6 +132,19 @@ if __name__ == "__main__":
     print("isvar: ", signal_obj.get_isvar(), end=" ")
     print("descr: ", signal_obj.get_descr())
 
+    print("\n\n")
+    wire_obj = py2hwsw.create_wire_from_text(
+        """
+            aoi_outs -s aab:W -s cad:W -s oab:1
+            -d 'AOI outputs'
+        """
+    )
+    print("wire_obj: ", wire_obj.get_name(), end=" ")
+    print("width: ", wire_obj.get_interface())
+    for signal in wire_obj.get_signals():
+        print("\tsignal: ", signal.get_name(), "width:", signal.get_width())
+    print("descr: ", wire_obj.get_descr())
+
     port_obj = py2hwsw.create_port_from_dict(
         {
             "name": "a_i",

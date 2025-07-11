@@ -126,28 +126,6 @@ def create_conf_from_dict(conf_dict):
     pass
 
 
-# Example confs:
-# "confs": [
-#     """
-#     DATA_W -t P -v 32 -m NA -M NA
-#     -d 'Data bus width'
-#
-#     FRACTIONAL_W -t P -v 0 -m NA -M NA
-#     -d 'Fractional part width'
-#
-#     REAL_W -t P -v 'DATA_W - FRACTIONAL_W' -m NA -M NA
-#     -d 'Real part width'
-#
-#     SIZE_W -t P -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
-#     -d 'Size width'
-#
-#     END_COUNT -t D -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA
-#     -d 'End count'
-#
-#     COUNT_W -t D -v $clog2(END_COUNT) -m NA -M NA
-#     -d 'Count width'
-#     """,
-# ],
 @api_for(internal_conf.conf_from_text)
 def create_conf_from_text(conf_text):
     """
@@ -157,9 +135,9 @@ def create_conf_from_text(conf_text):
         conf_text (str): Short notation text. Object attributes are specified using the following format:
             name [-t kind] [-v value] [-m min_value] [-M max_value] [-doc]
             [-d descr]
-        Example:
-            DATA_W -t P -v 32 -m NA -M NA
-            -d 'Data bus width'
+            Example:
+                DATA_W -t P -v 32 -m NA -M NA
+                -d 'Data bus width'
 
     Returns:
         iob_conf: iob_conf object
@@ -214,7 +192,20 @@ def create_conf_group_from_text(conf_group_text):
 
     Attributes:
         conf_group_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-c confs]
+            name [-d descr] [--confs] [-doc] [-doc_clearpage]
+            Example:
+                'Default group'
+                -d 'Default group of confs'
+                -doc
+                -doc_clearpage
+                --confs
+                    "
+                    DATA_W -t P -v 32 -m NA -M NA
+                    -d 'Data bus width'
+
+                    ADDR_W -t P -v 4 -m NA -M NA
+                    -d 'Address width'
+                    "
 
     Returns:
         iob_conf_group: iob_conf_group object

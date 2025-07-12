@@ -96,7 +96,6 @@ if __name__ == "__main__":
     )
     print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
 
-    # NOTE: Be careful that calling create_core_from_dict() will modify the dictionary given to it
     core_obj = py2hwsw.create_core_from_dict(core_dictionary)
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])

@@ -99,8 +99,13 @@ class iob_core(iob_module, iob_instance):
         :param bool is_parent: If this core is a parent core
         """
 
-        print("Iob-core: called")
-        print("Iob-core attributes:", self.__class__.__annotations__)
+        # For debug:
+        # print("Iob-core: called")
+        # print("Iob-core attributes:", self.__class__.__annotations__)
+
+        # Set internal attributes
+        "Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`"
+        self.dest_dir = ""
 
         # Update current core's attributes with values from given core_dictionary
         if core_dictionary:
@@ -119,7 +124,8 @@ class iob_core(iob_module, iob_instance):
             }
             update_obj_from_dict(self, core_dictionary, key_attribute_mapping, preprocessor_functions, self.get_api_obj().get_supported_attributes().keys())
 
-        # Create subblocks
+        # Auto fill some attributes (like setup_dir)
+
 
         return
 
@@ -354,6 +360,97 @@ class iob_core(iob_module, iob_instance):
             return
     """
 
+    def generate_build_dir(self, **kwargs):
+        # FIXME: Many of these methods need to use internal objects (because they access attributes directly).
+        # Maybe update '_get_py2hwsw_internal_obj()' to convert all objects to internal recursively? This does not seem very efficient since it would have to convert everything, including subblocks recursively.
+        # Or should each of these scripts handle the conversion to internal object indiviually when needed?
+        # Or should we use the API's getters/setters internally as well?
+
+        self.__create_build_dir()
+
+        # subblock setup process
+        for subblock in self.subblocks:
+            if self.is_superblock:
+                if subblock.original_name == self.issuer.original_name:
+                    # skip build dir generation for issuer subblocks
+                    continue
+            subblock.generate_build_dir()
+
+        # Ensure superblocks are set up only for top module (or wrappers of it)
+        if self.is_top_module or self.is_superblock:
+            for superblock in self.superblocks:
+                superblock.generate_build_dir()
+
+        if self.is_tester:
+            self.relative_path_to_UUT = os.path.relpath(
+                __class__.global_build_dir, self.build_dir
+            )
+
+        # Copy files from LIB to setup various flows
+        # (should run before copy of files from module's setup dir)
+        if self.is_top_module or self.is_tester:
+            copy_srcs.flows_setup(self)
+
+        # Copy files from the module's setup dir
+        copy_srcs.copy_rename_setup_directory(self)
+
+        # Generate config_build.mk
+        if self.is_top_module or self.is_tester:
+            config_gen.config_build_mk(self, __class__.global_top_module)
+
+        # Generate configuration files
+        config_gen.generate_confs(self)
+
+        # Generate parameters
+        param_gen.generate_params_snippets(self)
+
+        # Generate ios
+        io_gen.generate_ports_snippet(self)
+
+        # Generate wires
+        wire_gen.generate_wires_snippet(self)
+
+        # Generate instances
+        if self.generate_hw:
+            block_gen.generate_subblocks_snippet(self)
+
+        # Generate comb
+        comb_gen.generate_comb_snippet(self)
+
+        # Generate fsm
+        fsm_gen.generate_fsm_snippet(self)
+
+        # Generate snippets
+        snippet_gen.generate_snippets_snippet(self)
+
+        # Generate main Verilog module
+        if self.generate_hw:
+            verilog_gen.generate_verilog(self)
+
+        # TODO: Generate a global list of signals
+        # This list is useful for a python based simulator
+        # 1) Each input of the top generates a global signal
+        # 2) Each output of a leaf generates a global signal
+        # 3) Each output of a snippet generates a global signal
+        #    A snippet is a piece of verilog code manually written (should also receive a list of outputs by the user).
+        #    A snippet can also be any method that generates a new signal, like the `concat_bits`, or any other that performs logic in from other signals into a new one.
+        # TODO as well: Each module has a local `snippets` list.
+        # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
+
+        if (self.is_top_module and not self.is_parent) or self.is_tester:
+            self.post_setup()
+
+    ##############################################################################
+    #
+    # Other non-API methods
+    #
+    ##############################################################################
+
+    def validate_attributes(self):
+        if not self.setup_dir:
+            fail_with_msg(f"Setup directory is not defined for core {self.original_name}", ValueError)
+        pass
+
     def post_setup(self):
         """Scripts to run at the end of the top module's setup"""
         # Replace Verilog snippet includes
@@ -478,81 +575,6 @@ class iob_core(iob_module, iob_instance):
 
         return True
 
-    def generate_build_dir(self, **kwargs):
-
-        self.__create_build_dir()
-
-        # subblock setup process
-        for subblock in self.subblocks:
-            if self.is_superblock:
-                if subblock.original_name == self.issuer.original_name:
-                    # skip build dir generation for issuer subblocks
-                    continue
-            subblock.generate_build_dir()
-
-        # Ensure superblocks are set up only for top module (or wrappers of it)
-        if self.is_top_module or self.is_superblock:
-            for superblock in self.superblocks:
-                superblock.generate_build_dir()
-
-        if self.is_tester:
-            self.relative_path_to_UUT = os.path.relpath(
-                __class__.global_build_dir, self.build_dir
-            )
-
-        # Copy files from LIB to setup various flows
-        # (should run before copy of files from module's setup dir)
-        if self.is_top_module or self.is_tester:
-            copy_srcs.flows_setup(self)
-
-        # Copy files from the module's setup dir
-        copy_srcs.copy_rename_setup_directory(self)
-
-        # Generate config_build.mk
-        if self.is_top_module or self.is_tester:
-            config_gen.config_build_mk(self, __class__.global_top_module)
-
-        # Generate configuration files
-        config_gen.generate_confs(self)
-
-        # Generate parameters
-        param_gen.generate_params_snippets(self)
-
-        # Generate ios
-        io_gen.generate_ports_snippet(self)
-
-        # Generate wires
-        wire_gen.generate_wires_snippet(self)
-
-        # Generate instances
-        if self.generate_hw:
-            block_gen.generate_subblocks_snippet(self)
-
-        # Generate comb
-        comb_gen.generate_comb_snippet(self)
-
-        # Generate fsm
-        fsm_gen.generate_fsm_snippet(self)
-
-        # Generate snippets
-        snippet_gen.generate_snippets_snippet(self)
-
-        # Generate main Verilog module
-        if self.generate_hw:
-            verilog_gen.generate_verilog(self)
-
-        # TODO: Generate a global list of signals
-        # This list is useful for a python based simulator
-        # 1) Each input of the top generates a global signal
-        # 2) Each output of a leaf generates a global signal
-        # 3) Each output of a snippet generates a global signal
-        #    A snippet is a piece of verilog code manually written (should also receive a list of outputs by the user).
-        #    A snippet can also be any method that generates a new signal, like the `concat_bits`, or any other that performs logic in from other signals into a new one.
-        # TODO as well: Each module has a local `snippets` list.
-        # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
-
-        if (self.is_top_module and not self.is_parent) or self.is_tester:
-            self.post_setup()
 
     @staticmethod
     def append_child_attributes(parent_attributes, child_attributes):
@@ -1081,6 +1103,14 @@ def instantiate_core(core_name, python_parameters={}):
     elif file_ext == ".json":
         debug(f"Loading {core_name}.json", 1)
         core_obj = core_from_dict(json.load(open(os.path.join(core_dir, f"{core_name}.json"))))
+
+    # Auto-set core attributes
+    internal_core_obj = core_obj._get_py2hwsw_internal_obj()
+    if not internal_core_obj.original_name:
+        internal_core_obj.original_name = core_name
+    if not internal_core_obj.setup_dir:
+        internal_core_obj.setup_dir = core_dir
+
     return core_obj
 
 

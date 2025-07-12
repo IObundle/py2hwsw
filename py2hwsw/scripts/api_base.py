@@ -8,7 +8,7 @@
 import inspect
 import importlib
 
-from dataclasses import field
+from dataclasses import field, Field
 
 from iob_base import fail_with_msg
 
@@ -23,6 +23,13 @@ def empty_list():
 
 def empty_dict():
     return field(default_factory=dict)
+
+
+def get_field_default_value(field_obj):
+    """Parse a given dataclass field to get the default value."""
+    if field_obj.default_factory is not None:
+        return field_obj.default_factory()
+    return field_obj.default
 
 
 #
@@ -168,18 +175,14 @@ def api_class_for(internal_cls):
         # Get attributes and their default values
         attributes = {k: all_dict[k] for k in all_annotations}
         local_methods = get_local_methods(cls)
-        methods = get_methods(cls)
 
         # Update constructor of the API class
         def new_init(self, *args, **kwargs):
-            print("API class constructor called: ", cls.__name__)
-            print(
-                "Attributes: ", attributes
-            )  # Dictionary with attributes and their types
-            print(
-                "Annotations: ", all_annotations
-            )  # Dictionary with attributes and their types
-            print("Methods: ", methods)  # Dictionary with methods and their types
+            # For debug:
+            # print("API class constructor called: ", cls.__name__)
+            # print("Attributes: ", attributes)
+            # print("Annotations: ", all_annotations)
+            # print("Methods: ", get_methods(cls))
 
             # Instantiate internal class with API attributes
             internal_obj = internal_cls(
@@ -231,7 +234,6 @@ def api_class_for(internal_cls):
                 assert hasattr(
                     self.__internal_obj, method_name
                 ), f"[Py2HWSW bug]: Missing implementation for API method '{method_name}' of class '{cls.__name__}'!"
-                # print("Method called: ", method_name)
                 return getattr(self.__internal_obj, method_name)(*args, **kwargs)
 
             return wrapper
@@ -354,24 +356,17 @@ def internal_api_class(api_module, api_class_name, allow_unknown_args=False):
             user_args,
             user_kwargs,
         ):
-            # if len(args) != 5:
-            #     fail_with_msg(
-            #         f"Py2HWSW bug: Internal class '{cls.__name__}' must not be instantiated directly! Please instantiate API class instead."
-            #     )
-            # else:
-            #     api_object_reference = args[0]  # object
-            #     new_attributes = args[1]  # dict
-            #     new_attributes_annotations = args[2]  # dict
-            #     user_args = args[3]  # list
-            #     user_kwargs = args[4]  # dict
-
-            print("Internal class constructor called: ", cls.__name__)
-            print("Received attributes: ", new_attributes)
-            print("kwargs attributes: ", user_args)
+            # For debug:
+            # print("Internal class constructor called: ", cls.__name__)
+            # print("Received attributes: ", new_attributes)
+            # print("kwargs attributes: ", user_args)
 
             # Update internal class attributes. Use user values if present, else use default values.
             for attribute_name, default_value in new_attributes.items():
                 user_value = user_kwargs.pop(attribute_name, None)
+                # If attribute is a dataclass field, get its default value
+                if type(default_value) is Field:
+                    default_value = get_field_default_value(default_value)
                 # TODO: Maybe add some data type validation here before setting value.
                 setattr(self, attribute_name, user_value or default_value)
             # Update attributes type hints

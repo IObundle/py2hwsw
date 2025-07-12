@@ -231,17 +231,17 @@ class iob_aoi(py2hwsw.iob_core):
 
 
 if __name__ == "__main__":
-    core_obj = py2hwsw.create_core_from_dict(core_dictionary)
-    print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
-    print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])
-    print(
-        ">>> Subblocks of core_obj: ",
-        [i.get_name() for i in core_obj.get_subblocks()],
-    )
-    print(
-        ">>> Ports of iob_and subblock: ",
-        core_obj.get_subblocks()[0].get_ports(),
-    )
+    # core_obj = py2hwsw.create_core_from_dict(core_dictionary)
+    # print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
+    # print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])
+    # print(
+    #     ">>> Subblocks of core_obj: ",
+    #     [i.get_name() for i in core_obj.get_subblocks()],
+    # )
+    # print(
+    #     ">>> Ports of iob_and subblock: ",
+    #     core_obj.get_subblocks()[0].get_ports(),
+    # )
 
     iob_aoi_obj = iob_aoi()
     print(">>> Ports of iob_aoi: ", iob_aoi_obj.get_ports())
@@ -250,4 +250,4 @@ if __name__ == "__main__":
         [i.get_name() for i in iob_aoi_obj.get_ports()],
     )
 
-    # iob_aoi.generate_build_dir()
+    iob_aoi_obj.generate_build_dir()

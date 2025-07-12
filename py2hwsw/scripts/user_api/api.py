@@ -810,7 +810,6 @@ class iob_core:
         use_netlist (bool): Copy `<SETUP_DIR>/CORE.v` netlist instead of `<SETUP_DIR>/hardware/src/*`
         is_system (bool): Sets `IS_FPGA=1` in config_build.mk
         board_list (list): List of FPGAs supported by this core. A standard folder will be created for each board in this list.
-        dest_dir (str): Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`
         ignore_snippets (list): List of `.vs` file includes in verilog to ignore.
         generate_hw (bool): Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.
         parent (dict): Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.
@@ -857,7 +856,6 @@ class iob_core:
     use_netlist: bool = False
     is_system: bool = False
     board_list: list[str] = empty_list()
-    # dest_dir: str = "" # Should not be visible to the user
     ignore_snippets: list[str] = empty_list()
     generate_hw: bool = False
     parent: dict = empty_dict()  # FIXME: not sure if this will be needed in pythase?
@@ -967,7 +965,6 @@ def create_core_from_text(core_text):
             instance_name [-p parameter_name:parameter_value]+ [-c port_name:signal_name]+ [--no_instance]
 
             # Notation specific to iob_core
-            [--dest_dir dest_dir]
             # Below are parameters specific to the 'iob_csrs' module. They should probably not belong in the Py2HWSW API.
             [--no_autoaddr]
             [--rw_overlap]

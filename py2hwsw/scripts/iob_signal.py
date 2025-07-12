@@ -5,7 +5,7 @@
 from dataclasses import dataclass, field
 import copy
 
-from iob_base import fail_with_msg, update_obj_from_dict
+from iob_base import fail_with_msg
 
 
 from api_base import internal_api_class
@@ -28,7 +28,7 @@ class iob_signal:
     # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
     value: str or int = 0
 
-    def __post_init__(self):
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("Signal name is not set", ValueError)
 

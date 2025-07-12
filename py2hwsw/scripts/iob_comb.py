@@ -18,7 +18,11 @@ from api_base import internal_api_class
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
 
-    def __post_init__(self):
+    def validate_attributes(self):
+        pass
+
+    # FIXME: When should this be called? Maybe at the same as 'validate_attributes'? (wrap_verilog_code is the old post_init)
+    def warp_verilog_code(self):
         """Wrap verilog code with the always block"""
         self.verilog_code = (
             f"""\talways @ (*)\n\t\tbegin\n"""

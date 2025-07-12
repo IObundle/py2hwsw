@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-import importlib
 
 from iob_wire import (
     iob_wire,
@@ -27,7 +26,13 @@ from api_base import internal_api_class
 class iob_port(iob_wire):
     """Describes an IO port."""
 
-    def __post_init__(self):
+    def create_signals_from_interface(self):
+        if not self.interface:
+            fail_with_msg(f"Wire '{self.name}' has no interface!", ValueError)
+
+        self.signals += self.interface.get_signals()
+
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("All ports must have a name!", ValueError)
 
@@ -50,9 +55,7 @@ class iob_port(iob_wire):
                 ValueError,
             )
 
-        if self.interface:
-            self.signals += self.interface.get_signals()
-        elif _direction in ["subordinate", "manager"]:
+        if not self.interface and _direction in ["subordinate", "manager"]:
             fail_with_msg(
                 f"Port '{self.name}' is a '{_direction}' port but no interface is defined",
                 ValueError,
@@ -186,17 +189,15 @@ def add_interface_port(core, *args, name, interface, **kwargs):
 def port_from_dict(port_dict):
     port_obj = iob_port()
 
-    # Lazy import iob_port API class to get its public attributes
-    api_class = getattr(importlib.import_module("user_api.api"), "iob_port")
     key_attribute_mapping = {}
     preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
     # Update port_obj attributes with values from given dictionary
     update_obj_from_dict(
-        port_obj,
+        port_obj._get_py2hwsw_internal_obj(),
         port_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        api_class.__annotations__.keys(),
+        port_obj.__annotations__.keys(),
     )
 
     return port_obj

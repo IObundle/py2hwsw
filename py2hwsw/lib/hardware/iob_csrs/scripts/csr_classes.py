@@ -34,6 +34,10 @@ class iob_csr:
     # Optional comment to include in generated verilog of each csr (inside *_csrs.v)
     optional_comment: str = ""
 
+    def validate_attributes(self):
+        # TODO: Implement this method in a similar fashion as the Py2HWSW ones
+        pass
+
     def __post_init__(self):
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
@@ -213,7 +217,8 @@ class iob_csr_group:
     doc_only: bool = False
     doc_clearpage: bool = False
 
-    def __post_init__(self):
+    # FIXME: call this validate_attributes. Maybe in a similar fashion as Py2HWSW ones
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("CSR group name is not set", ValueError)
 

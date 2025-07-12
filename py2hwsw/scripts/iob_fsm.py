@@ -17,7 +17,7 @@ from api_base import internal_api_class
 class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
 
-    def __post_init__(self):
+    def validate_attributes(self):
         if self.kind not in ["prog", "fsm"]:
             raise ValueError("type must be either 'prog' or 'fsm'")
         if self.kind == "fsm":

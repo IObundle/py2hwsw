@@ -235,7 +235,7 @@ class iob_instance(iob_base):
                     p.interface.has_rst |= port.interface.has_rst
                     p.interface.has_en |= port.interface.has_en
                     p.signals = []
-                    p.__post_init__()
+                    p.__post_init__()  # FIXME: no longer exists
                     clk_portmap.connect_external(p, bit_slices=[])
                     return
 

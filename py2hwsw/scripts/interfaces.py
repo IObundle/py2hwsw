@@ -284,17 +284,17 @@ class interface:
     _signals: list = field(default_factory=list)
 
     def __post_init__(self):
-        """Post-initialization method to set up the interface."""
+        if not self.file_prefix:
+            self.file_prefix = self.portmap_port_prefix + self.prefix
+
+    def validate_attributes(self):
         # Check if_direction is valid
         if self.if_direction not in ["", "manager", "subordinate"]:
             print(
-                f"ERROR: __post_init__: invalid if_direction '{self.if_direction}'. "
+                f"ERROR: validate_attributes: invalid if_direction '{self.if_direction}'. "
                 "Valid values are '', 'manager', 'subordinate'."
             )
             exit(1)
-
-        if not self.file_prefix:
-            self.file_prefix = self.portmap_port_prefix + self.prefix
 
     def __get_if_name(self):
         """Get the name of the interface."""

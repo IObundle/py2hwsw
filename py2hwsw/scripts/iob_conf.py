@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-import importlib
 
 from iob_base import (
     convert_dict2obj_list,
@@ -24,7 +23,7 @@ from api_base import internal_api_class
 class iob_conf:
     """Class to represent a configuration option."""
 
-    def __post_init__(self):
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("Every conf must have a name!")
         if self.kind not in ["P", "M", "C", "D"]:
@@ -49,7 +48,7 @@ class iob_conf:
 class iob_conf_group:
     """Class to represent a group of configurations."""
 
-    def __post_init__(self):
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("Conf group name is not set", ValueError)
 
@@ -144,8 +143,6 @@ def rename_dictionary_keys(dictionary, key_mapping):
 def conf_from_dict(conf_dict):
     conf_obj = iob_conf()
 
-    # Lazy import iob_conf API class to get its public attributes
-    api_class = getattr(importlib.import_module("user_api.api"), "iob_conf")
     key_attribute_mapping = {
         "type": "kind",
         "val": "value",
@@ -155,11 +152,11 @@ def conf_from_dict(conf_dict):
     preprocessor_functions = {}
     # Update conf_obj attributes with values from given dictionary
     update_obj_from_dict(
-        conf_obj,
+        conf_obj._get_py2hwsw_internal_obj(),
         conf_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        api_class.__annotations__.keys(),
+        conf_obj.__annotations__.keys(),
     )
 
     return conf_obj
@@ -174,19 +171,17 @@ def conf_from_text(conf_text):
 def conf_group_from_dict(conf_group_dict):
     conf_group_obj = iob_conf_group()
 
-    # Lazy import iob_conf_group API class to get its public attributes
-    api_class = getattr(importlib.import_module("user_api.api"), "iob_conf_group")
     key_attribute_mapping = {}
     preprocessor_functions = {
         "confs": lambda lst: process_elements_from_list(lst, conf_from_dict),
     }
     # Update conf_group_obj attributes with values from given dictionary
     update_obj_from_dict(
-        conf_group_obj,
+        conf_group_obj._get_py2hwsw_internal_obj(),
         conf_group_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        api_class.__annotations__.keys(),
+        conf_group_obj.__annotations__.keys(),
     )
 
     return conf_group_obj

@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Any
-from dataclasses import dataclass, field
-import importlib
+from dataclasses import dataclass
 
 from iob_base import (
     convert_dict2obj_list,
@@ -25,7 +23,7 @@ from api_base import internal_api_class
 class iob_python_parameter:
     """Class to represent a Python Parameter option."""
 
-    def __post_init__(self):
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("Every Python Parameter must have a name!")
 
@@ -35,7 +33,7 @@ class iob_python_parameter:
 class iob_python_parameter_group:
     """Class to represent a Group of Python Parameters."""
 
-    def __post_init__(self):
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("Python Parameter group name is not set", ValueError)
 
@@ -117,10 +115,6 @@ def python_parameter_from_text(python_parameter_text):
 def python_parameter_group_from_dict(python_parameter_group_dict):
     python_parameter_group_obj = iob_python_parameter_group()
 
-    # Lazy import iob_python_parameter_group API class to get its public attributes
-    api_class = getattr(
-        importlib.import_module("user_api.api"), "iob_python_parameter_group"
-    )
     key_attribute_mapping = {}
     preprocessor_functions = {
         "python_parameters": lambda lst: process_elements_from_list(
@@ -129,11 +123,11 @@ def python_parameter_group_from_dict(python_parameter_group_dict):
     }
     # Update python_parameter_group_obj attributes with values from given dictionary
     update_obj_from_dict(
-        python_parameter_group_obj,
+        python_parameter_group_obj._get_py2hwsw_internal_obj(),
         python_parameter_group_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        api_class.__annotations__.keys(),
+        python_parameter_group_obj.__annotations__.keys(),
     )
 
     return python_parameter_group_obj

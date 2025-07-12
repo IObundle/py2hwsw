@@ -5,7 +5,6 @@
 from dataclasses import dataclass, field
 import re
 from typing import List
-import importlib
 
 import interfaces
 from iob_base import (
@@ -34,25 +33,28 @@ from api_base import internal_api_class
 class iob_wire:
     """Class to represent a wire in an iob module"""
 
-    def __post_init__(self):
+    def create_signals_from_interface(self):
+        if not self.interface:
+            fail_with_msg(f"Wire '{self.name}' has no interface!", ValueError)
+
+        self.signals += self.interface.get_signals()
+
+        # Remove signal direction information
+        for signal in self.signals:
+            # Skip signal references
+            if isinstance(signal, iob_signal_reference):
+                continue
+            if hasattr(signal, "direction"):
+                # Remove direction suffix from signal name
+                if signal.name.endswith("_i") or signal.name.endswith("_o"):
+                    signal.name = signal.name[:-2]
+                elif signal.name.endswith("_io"):
+                    signal.name = signal.name[:-3]
+                signal.direction = ""
+
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("All wires must have a name!", ValueError)
-
-        if self.interface:
-            self.signals += self.interface.get_signals()
-
-            # Remove signal direction information
-            for signal in self.signals:
-                # Skip signal references
-                if isinstance(signal, iob_signal_reference):
-                    continue
-                if hasattr(signal, "direction"):
-                    # Remove direction suffix from signal name
-                    if signal.name.endswith("_i") or signal.name.endswith("_o"):
-                        signal.name = signal.name[:-2]
-                    elif signal.name.endswith("_io"):
-                        signal.name = signal.name[:-3]
-                    signal.direction = ""
 
 
 attrs = [
@@ -253,17 +255,15 @@ WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS = {
 def wire_from_dict(wire_dict):
     wire_obj = iob_wire()
 
-    # Lazy import iob_wire API class to get its public attributes
-    api_class = getattr(importlib.import_module("user_api.api"), "iob_wire")
     key_attribute_mapping = {}
     preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
     # Update wire_obj attributes with values from given dictionary
     update_obj_from_dict(
-        wire_obj,
+        wire_obj._get_py2hwsw_internal_obj(),
         wire_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        api_class.__annotations__.keys(),
+        wire_obj.__annotations__.keys(),
     )
 
     return wire_obj

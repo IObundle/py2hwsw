@@ -699,10 +699,10 @@ def update_obj_from_dict(obj, attributes_dict, key_attribute_mapping={}, preproc
         # Only allow valid attributes (if any specified)
         if valid_attributes_list:
             if attribute_name not in valid_attributes_list:
-                fail_with_msg(f"Attribute '{attribute_name}' is not valid for object '{obj.__dict__.get('name', 'Unknown')}'.")
+                fail_with_msg(f"Attribute '{attribute_name}' is not valid for object '{obj.__dict__.get('name', obj)}'.")
         # Sanity check
         if not hasattr(obj, attribute_name):
-            fail_with_msg(f"Attribute '{attribute_name}' does not exist for object '{obj.__dict__.get('name', 'Unknown')}'.")
+            fail_with_msg(f"Attribute '{attribute_name}' does not exist for object '{obj.__dict__.get('name', obj)}'.")
         # Check if should preprocess value
         if attribute_name in preprocessor_functions:
             value = preprocessor_functions[attribute_name](value)

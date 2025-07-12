@@ -60,6 +60,7 @@ import iob_block as internal_block
 import iob_license as internal_license
 import iob_python_parameter as internal_python_parameter
 import iob_core as internal_core
+from py2hwsw_version import PY2HWSW_VERSION
 
 
 # NOTE: for developers:
@@ -813,8 +814,6 @@ class iob_core:
         ignore_snippets (list): List of `.vs` file includes in verilog to ignore.
         generate_hw (bool): Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.
         parent (dict): Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.
-        is_top_module (bool): Selects if core is top module. Auto-filled. DO NOT CHANGE.
-        is_superblock (bool): Selects if core is superblock of another. Auto-filled. DO NOT CHANGE.
         is_tester (bool): Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).
         python_parameters (list): List of core Python Parameters. Used for documentation.
         license (iob_license): License for the core.
@@ -848,8 +847,8 @@ class iob_core:
     instantiate: bool = ""
 
     # Core attributes
-    version: str = None
-    previous_version: str = None
+    version: str = PY2HWSW_VERSION
+    previous_version: str = PY2HWSW_VERSION
     setup_dir: str = None
     build_dir: str = "build"
     # instance_name: str = None
@@ -859,8 +858,6 @@ class iob_core:
     ignore_snippets: list[str] = empty_list()
     generate_hw: bool = False
     parent: dict = empty_dict()  # FIXME: not sure if this will be needed in pythase?
-    is_top_module: bool = False
-    is_superblock: bool = False
     is_tester: bool = False
     # FIXME: Should this be an instance attribute? Should it store received values as well?
     python_parameters: list[object] = empty_list()
@@ -936,8 +933,6 @@ def create_core_from_dict(core_dict):
             - ignore_snippets -> iob_core.ignore_snippets
             - generate_hw -> iob_core.generate_hw
             - parent -> iob_core.parent
-            - is_top_module -> iob_core.is_top_module
-            - is_superblock -> iob_core.is_superblock
             - is_tester -> iob_core.is_tester
             - python_parameters -> iob_core.python_parameters  # FIXME: Cant have two keys with the same name
             - license -> iob_core.license

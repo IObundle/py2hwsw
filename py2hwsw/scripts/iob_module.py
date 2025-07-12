@@ -4,7 +4,12 @@
 
 import copy
 
-from iob_base import iob_base, process_elements_from_list, fail_with_msg
+from iob_base import (
+    iob_base,
+    process_elements_from_list,
+    fail_with_msg,
+    prevent_instantiation,
+)
 from iob_conf import create_conf_group
 from iob_port import create_port_from_dict, add_interface_port, add_signals_port
 from iob_wire import create_wire, get_wire_signal
@@ -15,10 +20,16 @@ from iob_fsm import iob_fsm, create_fsm
 from iob_block import create_block
 
 
+@prevent_instantiation
 class iob_module(iob_base):
     """Class to describe a (Verilog) module"""
 
     global_top_module = None  # Datatype is 'iob_module'
+
+    def __init__(self):
+        # Auto-fill global attributes
+        if not __class__.global_top_module:
+            __class__.global_top_module = self
 
     def set_rst_polarity(self, polarity):
         if self.is_top_module:

@@ -8,6 +8,7 @@ import os
 import re
 
 from latex import write_table
+from api_base import convert2internal
 
 
 def conf_vh(macros, top_module, out_dir):
@@ -37,15 +38,19 @@ def conf_vh(macros, top_module, out_dir):
         # Sort macros macros by type, P first, M second, C third, D last
         sorted_macros = []
         for macro in group.confs:
+            macro = convert2internal(macro)
             if macro.kind == "P":
                 sorted_macros.append(macro)
         for macro in group.confs:
+            macro = convert2internal(macro)
             if macro.kind == "M":
                 sorted_macros.append(macro)
         for macro in group.confs:
+            macro = convert2internal(macro)
             if macro.kind == "C":
                 sorted_macros.append(macro)
         for macro in group.confs:
+            macro = convert2internal(macro)
             if macro.kind == "D":
                 sorted_macros.append(macro)
 
@@ -99,6 +104,7 @@ def conf_h(macros, top_module, out_dir):
         if group.doc_only:
             continue
         for macro in group.confs:
+            macro = convert2internal(macro)
             # If macro has 'doc_only' attribute set to True, skip it
             if macro.doc_only:
                 continue
@@ -156,6 +162,7 @@ def generate_config_tex(confs, out_dir):
     conf_types = []
     for group in confs:
         for conf in group.confs:
+            conf = convert2internal(conf)
             if conf.kind not in conf_types:
                 conf_types.append(conf.kind)
 
@@ -231,6 +238,7 @@ def generate_confs_tex(confs, out_dir):
         derv_params = []
         constants = []
         for conf in group.confs:
+            conf = convert2internal(conf)
             conf_value = conf.value if type(conf.value) is not bool else "1"
             # Macros and parameters are added to the table
             if conf.kind in ["P", "M"]:
@@ -312,9 +320,10 @@ def generate_confs(core):
     """Generate Verilog and software macros based on the core's 'confs' list.
     :param core: core object
     """
+    internal_confs = [convert2internal(i) for i in core.confs]
     conf_vh(
-        core.confs,
+        internal_confs,
         core.name,
         os.path.join(core.build_dir, core.dest_dir),
     )
-    conf_h(core.confs, core.name, core.build_dir + "/software/src")
+    conf_h(internal_confs, core.name, core.build_dir + "/software/src")

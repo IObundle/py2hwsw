@@ -11,6 +11,7 @@ from latex import write_table
 import iob_colors
 from iob_signal import get_real_signal, iob_signal
 import param_gen
+from api_base import convert2internal
 
 
 # Generate subblocks.tex file with TeX table of subblocks (Verilog modules instances)
@@ -51,6 +52,7 @@ def generate_subblocks_tex(subblocks, out_dir):
     # Create table for subblocks
     tex_table = []
     for block in subblocks:
+        block = convert2internal(block)
         if not block.instantiate:
             continue
         tex_table.append(
@@ -70,6 +72,7 @@ def generate_subblocks(core):
     """
     code = ""
     for instance in core.subblocks:
+        instance = convert2internal(instance)
         if not instance.instantiate:
             continue
 

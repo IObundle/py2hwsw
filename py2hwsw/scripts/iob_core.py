@@ -77,27 +77,17 @@ class iob_core(iob_module, iob_instance):
     global_post_setup_callbacks: list = []
 
     def __init__(self, core_dictionary: dict = {}):
-        """Build a core (includes module and instance attributes)
-        :param str dest_dir: Destination directory, within the build directory, for the core
-        :param dict attributes: py2hwsw dictionary describing the core
-            Notes:
-                1) Each key/value pair in the dictionary describes an attribute name and
-                   corresponding attribute value of the core.
-                2) If the dictionary contains a key that does not match any attribute
-                   of the core, then an error will be raised.
-                3) The values will be processed by the `set_handler` method of the
-                   corresponding attribute. This method will convert from the py2hwsw
-                   dictionary datatypes into the internal IObundle datatypes.
-                   For example, it converts a 'wire' dict into an `iob_wire` object.
-                4) If another constructor argument is also given (like the argument
-                   'dest_dir'), and this dictionary also contains a key for the same
-                   attribute (like the key 'dest_dir'), then the value given in the
-                   dictionary will override the one from the constructor argument.
-        :param dict connect: External wires to connect to ports of this instance
-                       Key: Port name, Value: Wire name
-        :param iob_core issuer: Module that is instantiating this instance
-        :param bool is_parent: If this core is a parent core
         """
+        Constructor of IP core.
+
+        Attributes:
+            core_dictionary (dict): Dictionary to initialize core attributes.
+                                    Supports the same keys as the ones supported by the API's `create_core_from_dict()` method, except for `core` and `python_parameters`. The `core` and `python_parameters` keys are only used to instantiate other user-defined/lib cores (not iob_core directly).
+        """
+
+        # Inherit attributes from superclasses
+        iob_module.__init__(self)
+        iob_instance.__init__(self)
 
         # For debug:
         # print("Iob-core: called")
@@ -105,10 +95,25 @@ class iob_core(iob_module, iob_instance):
 
         # Set internal attributes
         "Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`"
-        self.dest_dir = ""
+        self.dest_dir = "hardware/src"
+        "Selects if core is top module."
+        self.is_top_module = __class__.global_top_module == self
+        "Selects if core is superblock of another."
+        self.is_superblock = False # FIXME: Auto fill
+        "Store reference to the issuer block."
+        self.issuer = None # FIXME: Auto fill
+        "Selects if core is parent of another."
+        self.is_parent = False # FIXME: Do we still need this?
+
+        # API attributes with automatic default values
+        # self.previous_version = self.version # FIXME: Should this be updated later? (For example, if version is changed afterwards?)
 
         # Update current core's attributes with values from given core_dictionary
         if core_dictionary:
+            # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
+            if "core" in core_dictionary or "python_parameters" in core_dictionary:
+                fail_with_msg("The 'core' and 'python_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
+            # Map keys and attribute preprocessor functions
             key_attribute_mapping = {
                 "descr": "description",
             }
@@ -124,14 +129,16 @@ class iob_core(iob_module, iob_instance):
             }
             update_obj_from_dict(self, core_dictionary, key_attribute_mapping, preprocessor_functions, self.get_api_obj().get_supported_attributes().keys())
 
-        # Auto fill some attributes (like setup_dir)
-
+        # Set global build directory
+        if self.is_top_module:
+            # FIXME: Ideally make this copy by reference, so that updates to the top's build dir are reflected across all cores
+            __class__.global_build_dir = self.build_dir
 
         return
 
     """
         #
-        # Old constructor code
+        # Old constructor code for reference
         #
 
         # Arguments used by this class
@@ -368,7 +375,7 @@ class iob_core(iob_module, iob_instance):
 
         self.__create_build_dir()
 
-        # subblock setup process
+        # Generate build dir of subblocks
         for subblock in self.subblocks:
             if self.is_superblock:
                 if subblock.original_name == self.issuer.original_name:
@@ -376,12 +383,13 @@ class iob_core(iob_module, iob_instance):
                     continue
             subblock.generate_build_dir()
 
-        # Ensure superblocks are set up only for top module (or wrappers of it)
+        # Generate build dir of superblocks. Ensure superblocks are set up only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
             for superblock in self.superblocks:
                 superblock.generate_build_dir()
 
         if self.is_tester:
+            # FIXME: Tester hack? Is this still needed?
             self.relative_path_to_UUT = os.path.relpath(
                 __class__.global_build_dir, self.build_dir
             )
@@ -392,6 +400,8 @@ class iob_core(iob_module, iob_instance):
             copy_srcs.flows_setup(self)
 
         # Copy files from the module's setup dir
+        # FIXME: Setup dir needs to be defined for top module!
+        print(self.original_name, self.setup_dir)
         copy_srcs.copy_rename_setup_directory(self)
 
         # Generate config_build.mk
@@ -575,7 +585,6 @@ class iob_core(iob_module, iob_instance):
 
         return True
 
-
     @staticmethod
     def append_child_attributes(parent_attributes, child_attributes):
         """Appends/Overrides parent attributes with child attributes"""
@@ -673,7 +682,7 @@ class iob_core(iob_module, iob_instance):
         return new_superblocks
 
     def __create_build_dir(self):
-        """Create build directory if it doesn't exist"""
+        """Create minimal build directory if it doesn't exist"""
         os.makedirs(self.build_dir, exist_ok=True)
         os.makedirs(os.path.join(self.build_dir, self.dest_dir), exist_ok=True)
 

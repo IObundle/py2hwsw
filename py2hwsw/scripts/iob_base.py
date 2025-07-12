@@ -463,6 +463,20 @@ def str_to_kwargs(attrs: list):
     return decorator
 
 
+def prevent_instantiation(cls):
+    """
+    A class decorator to prevent instantiation of a class.
+    
+    This decorator will prevent the instantiation of the decorated class.
+    However, it will not affect the instantiation of its subclasses.
+    """
+    class Wrapper(cls):
+        def __new__(cls, *args, **kwargs):
+            if cls is Wrapper:
+                raise RuntimeError(f"Cannot instantiate {cls.__name__} directly.")
+            return super().__new__(cls, *args, **kwargs)
+    return Wrapper
+
 #
 # Other methods
 #

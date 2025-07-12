@@ -11,11 +11,13 @@ from iob_base import (
     find_obj_in_list,
     fail_with_msg,
     debug,
+    prevent_instantiation,
 )
 from iob_portmap import iob_portmap, get_portmap_port
 from iob_signal import remove_signal_direction_suffixes
 
 
+@prevent_instantiation
 class iob_instance(iob_base):
     """Class to describe a module's (Verilog) instance"""
 

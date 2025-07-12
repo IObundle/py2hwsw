@@ -7,6 +7,7 @@
 import os
 
 from iob_base import find_obj_in_list, fail_with_msg
+from api_base import convert2internal
 
 
 def get_core_params(confs):
@@ -15,7 +16,9 @@ def get_core_params(confs):
     """
     core_parameters = []
     for group in confs:
+        group = convert2internal(group)
         for conf in group.confs:
+            conf = convert2internal(conf)
             if conf.kind in ["P", "D"]:
                 core_parameters.append(conf)
     return core_parameters

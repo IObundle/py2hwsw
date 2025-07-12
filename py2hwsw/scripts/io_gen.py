@@ -12,6 +12,7 @@ import os
 
 import interfaces
 from iob_signal import iob_signal
+from api_base import convert2internal
 
 
 def reverse_port(port_type):
@@ -27,6 +28,7 @@ def generate_ports(core):
     """
     lines = []
     for port_idx, port in enumerate(core.ports):
+        port = convert2internal(port)
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
@@ -34,6 +36,7 @@ def generate_ports(core):
         lines.append(f"    // {port.name}: {port.descr}\n")
 
         for signal_idx, signal in enumerate(port.signals):
+            signal = convert2internal(signal)
             if isinstance(signal, iob_signal):
                 if signal.get_verilog_port():
                     lines.append("    " + signal.get_verilog_port())
@@ -58,6 +61,7 @@ def generate_ports_snippet(core):
         f.write(code)
 
     for port_idx, port in enumerate(core.ports):
+        port = convert2internal(port)
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
@@ -83,6 +87,7 @@ Note that the ouput signals are registered in the core, while the input signals 
     )
 
     for port in ports:
+        port = convert2internal(port)
         if_file.write(
             """
 \\begin{xltabular}{\\textwidth}{|l|l|r|X|}
@@ -116,9 +121,11 @@ def generate_ios_tex(ports, out_dir):
     generate_if_tex(ports, out_dir)
 
     for port in ports:
+        port = convert2internal(port)
         tex_table = []
         # Interface is not standard, read ports
         for signal in port.signals:
+            signal = convert2internal(signal)
             if isinstance(signal, iob_signal):
                 tex_table.append(
                     [

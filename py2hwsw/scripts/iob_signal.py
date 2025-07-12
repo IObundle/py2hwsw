@@ -48,6 +48,7 @@ class iob_signal:
         return f"{wire_type} {width_str}{self.name};\n"
 
     def assert_direction(self):
+        self.validate_attributes()  # FIXME: Not sure if this is the right place to call validate_attributes
         if not self.direction:
             fail_with_msg(f"Signal '{self.name}' has no direction", ValueError)
 

@@ -117,7 +117,7 @@ class iob_core(iob_module, iob_instance):
                 "sw_modules": lambda lst: [core_from_dict(i) for i in lst],
                 "python_parameters": lambda lst: [python_parameter_group_from_dict(i) for i in lst],
             }
-            update_obj_from_dict(self, core_dictionary, key_attribute_mapping, preprocessor_functions, self._get_py2hwsw_internal_obj().__annotations__.keys())
+            update_obj_from_dict(self, core_dictionary, key_attribute_mapping, preprocessor_functions, self.get_api_obj().get_supported_attributes().keys())
 
         # Create subblocks
 

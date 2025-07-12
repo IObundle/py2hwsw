@@ -197,7 +197,7 @@ def port_from_dict(port_dict):
         port_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        port_obj.__annotations__.keys(),
+        port_obj.get_supported_attributes().keys(),
     )
 
     return port_obj

@@ -262,7 +262,7 @@ def wire_from_dict(wire_dict):
         wire_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        wire_obj.__annotations__.keys(),
+        wire_obj.get_supported_attributes().keys(),
     )
 
     return wire_obj

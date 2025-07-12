@@ -155,7 +155,7 @@ def conf_from_dict(conf_dict):
         conf_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        conf_obj.__annotations__.keys(),
+        conf_obj.get_supported_attributes().keys(),
     )
 
     return conf_obj
@@ -180,7 +180,7 @@ def conf_group_from_dict(conf_group_dict):
         conf_group_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        conf_group_obj.__annotations__.keys(),
+        conf_group_obj.get_supported_attributes().keys(),
     )
 
     return conf_group_obj

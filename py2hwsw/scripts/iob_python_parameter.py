@@ -124,7 +124,7 @@ def python_parameter_group_from_dict(python_parameter_group_dict):
         python_parameter_group_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        python_parameter_group_obj.__annotations__.keys(),
+        python_parameter_group_obj.get_supported_attributes().keys(),
     )
 
     return python_parameter_group_obj

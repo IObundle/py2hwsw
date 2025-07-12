@@ -274,6 +274,17 @@ def api_class_for(internal_cls):
 
         cls._get_py2hwsw_internal_obj = _get_py2hwsw_internal_obj
 
+        def get_supported_attributes(self):
+            """
+            Get all attributes supported by the API class of this object.
+
+            Returns:
+                dict: Dictionary with attribute name and type
+            """
+            return self.__class__.__parent_annotations
+
+        cls.get_supported_attributes = get_supported_attributes
+
         return cls
 
     return decorator

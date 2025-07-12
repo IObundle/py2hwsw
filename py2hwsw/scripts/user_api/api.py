@@ -43,6 +43,7 @@
 from datetime import date
 import os
 import sys
+from dataclasses import field
 
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
@@ -861,7 +862,7 @@ class iob_core:
     is_tester: bool = False
     # FIXME: Should this be an instance attribute? Should it store received values as well?
     python_parameters: list[object] = empty_list()
-    license: iob_license = None
+    license: iob_license = field(default_factory=iob_license)
     doc_conf: str = ""
     title: str = ""
 

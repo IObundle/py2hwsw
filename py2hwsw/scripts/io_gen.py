@@ -87,7 +87,6 @@ Note that the ouput signals are registered in the core, while the input signals 
     )
 
     for port in ports:
-        port = convert2internal(port)
         if_file.write(
             """
 \\begin{xltabular}{\\textwidth}{|l|l|r|X|}
@@ -121,7 +120,6 @@ def generate_ios_tex(ports, out_dir):
     generate_if_tex(ports, out_dir)
 
     for port in ports:
-        port = convert2internal(port)
         tex_table = []
         # Interface is not standard, read ports
         for signal in port.signals:

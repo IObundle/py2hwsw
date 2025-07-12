@@ -134,6 +134,18 @@ class iob_core(iob_module, iob_instance):
             # FIXME: Ideally make this copy by reference, so that updates to the top's build dir are reflected across all cores
             __class__.global_build_dir = self.build_dir
 
+        # Get name of (user's) subclass that is inheriting from iob_core
+        subclass_name=type(self.get_api_obj()).__name__
+        # Auto-fill original_name based on user subclass's name (if any). May not have subclass if defined via JSON or direct constructor call.
+        if not self.original_name and subclass_name != "iob_core":
+            self.original_name = subclass_name
+
+        # Try to find core's setup directory based on original name (try to find .py and .json files for it)
+        core_dir, _ = find_module_setup_dir(self.original_name, error_on_not_found=False)
+        # Auto-fill setup_dir based on found core directory.
+        if not self.setup_dir and core_dir:
+            self.setup_dir = core_dir
+
         return
 
     """
@@ -373,6 +385,8 @@ class iob_core(iob_module, iob_instance):
         # Or should each of these scripts handle the conversion to internal object indiviually when needed?
         # Or should we use the API's getters/setters internally as well?
 
+        self.validate_attributes()
+
         self.__create_build_dir()
 
         # Generate build dir of subblocks
@@ -401,7 +415,6 @@ class iob_core(iob_module, iob_instance):
 
         # Copy files from the module's setup dir
         # FIXME: Setup dir needs to be defined for top module!
-        print(self.original_name, self.setup_dir)
         copy_srcs.copy_rename_setup_directory(self)
 
         # Generate config_build.mk
@@ -1044,7 +1057,7 @@ def find_common_deep(path1, path2):
     )
 
 
-def find_module_setup_dir(core_name):
+def find_module_setup_dir(core_name, error_on_not_found=True):
     """Searches for a core's setup directory
     param core_name: The core_name object
     returns: The path to the setup directory
@@ -1058,10 +1071,13 @@ def find_module_setup_dir(core_name):
         [".py", ".json"],
     )
     if not file_path:
-        fail_with_msg(
-            f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!",
-            ModuleNotFoundError,
-        )
+        if error_on_not_found:
+            fail_with_msg(
+                f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!",
+                ModuleNotFoundError,
+            )
+        else:
+            return None, None
 
     file_ext = os.path.splitext(file_path)[1]
 

@@ -52,7 +52,6 @@ def generate_subblocks_tex(subblocks, out_dir):
     # Create table for subblocks
     tex_table = []
     for block in subblocks:
-        block = convert2internal(block)
         if not block.instantiate:
             continue
         tex_table.append(

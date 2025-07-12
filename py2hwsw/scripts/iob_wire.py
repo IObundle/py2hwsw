@@ -15,7 +15,6 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     update_obj_from_dict,
-    process_elements_from_list,
 )
 from iob_signal import (
     iob_signal,
@@ -244,7 +243,7 @@ def dict2interface(name, interface_dict):
 
 # Dictionary of attributes that need to be preprocessed when set from a wire_dictionary, and their corresponding preprocessor functions
 WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS = {
-    "signals": lambda lst: process_elements_from_list(lst, signal_from_dict),
+    "signals": lambda lst: [signal_from_dict(i) for i in lst],
 }
 
 #

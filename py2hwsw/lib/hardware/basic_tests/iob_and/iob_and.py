@@ -76,6 +76,7 @@ if __name__ == "__main__":
         },
     )
     print(">>> Name of conf_group_obj: ", conf_group_obj.get_name())
+    print(">>> Confs of conf_group_obj: ", conf_group_obj.get_confs())
     print(">>> Name of conf_obj: ", conf_group_obj.get_confs()[0].get_name())
 
     port_obj = py2hwsw.create_port_from_dict(

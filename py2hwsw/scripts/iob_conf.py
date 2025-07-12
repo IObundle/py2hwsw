@@ -12,7 +12,6 @@ from iob_base import (
     assert_attributes,
     find_obj_in_list,
     update_obj_from_dict,
-    process_elements_from_list,
 )
 
 from api_base import internal_api_class
@@ -173,7 +172,7 @@ def conf_group_from_dict(conf_group_dict):
 
     key_attribute_mapping = {}
     preprocessor_functions = {
-        "confs": lambda lst: process_elements_from_list(lst, conf_from_dict),
+        "confs": lambda lst: [conf_from_dict(i) for i in lst],
     }
     # Update conf_group_obj attributes with values from given dictionary
     update_obj_from_dict(

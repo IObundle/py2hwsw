@@ -41,7 +41,6 @@ from iob_base import (
     debug,
     get_lib_cores,
     update_obj_from_dict,
-    process_elements_from_list
 )
 from iob_license import iob_license, update_license
 import sw_tools
@@ -109,14 +108,14 @@ class iob_core(iob_module, iob_instance):
                 "descr": "description",
             }
             preprocessor_functions = {
-                "confs": lambda lst: process_elements_from_list(lst, conf_group_from_dict),
-                "ports": lambda lst: process_elements_from_list(lst, port_from_dict),
-                "wires": lambda lst: process_elements_from_list(lst, wire_from_dict),
-                "snippets": lambda lst: process_elements_from_list(lst, snippet_from_dict),
-                "subblocks": lambda lst: process_elements_from_list(lst, core_from_dict),
-                "superblocks": lambda lst: process_elements_from_list(lst, core_from_dict),
-                "sw_modules": lambda lst: process_elements_from_list(lst, core_from_dict),
-                "python_parameters": lambda lst: process_elements_from_list(lst, python_parameter_group_from_dict),
+                "confs": lambda lst: [conf_group_from_dict(i) for i in lst],
+                "ports": lambda lst: [port_from_dict(i) for i in lst],
+                "wires": lambda lst: [wire_from_dict(i) for i in lst],
+                "snippets": lambda lst: [snippet_from_dict(i) for i in lst],
+                "subblocks": lambda lst: [core_from_dict(i) for i in lst],
+                "superblocks": lambda lst: [core_from_dict(i) for i in lst],
+                "sw_modules": lambda lst: [core_from_dict(i) for i in lst],
+                "python_parameters": lambda lst: [python_parameter_group_from_dict(i) for i in lst],
             }
             update_obj_from_dict(self, core_dictionary, key_attribute_mapping, preprocessor_functions, self._get_py2hwsw_internal_obj().__annotations__.keys())
 

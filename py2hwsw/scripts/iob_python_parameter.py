@@ -12,7 +12,6 @@ from iob_base import (
     assert_attributes,
     find_obj_in_list,
     update_obj_from_dict,
-    process_elements_from_list,
 )
 
 from api_base import internal_api_class
@@ -117,9 +116,7 @@ def python_parameter_group_from_dict(python_parameter_group_dict):
 
     key_attribute_mapping = {}
     preprocessor_functions = {
-        "python_parameters": lambda lst: process_elements_from_list(
-            lst, python_parameter_from_dict
-        ),
+        "python_parameters": lambda lst: [python_parameter_from_dict(i) for i in lst],
     }
     # Update python_parameter_group_obj attributes with values from given dictionary
     update_obj_from_dict(

@@ -152,4 +152,4 @@ class iob_reg(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     iob_reg_obj = iob_reg()
-    iob_reg.generate_build_dir()
+    iob_reg_obj.generate_build_dir()

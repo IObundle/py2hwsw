@@ -120,4 +120,4 @@ class iob_aoi_tester(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     iob_aoi_tester_obj = iob_aoi_tester()
-    iob_aoi_tester.generate_build_dir()
+    iob_aoi_tester_obj.generate_build_dir()

@@ -665,26 +665,22 @@ class iob_portmap:
     Class that represents a portmap attribute.
 
     Attributes:
-        e_connect (iob_wire | None): External wire that connects this port
+        e_connect (str): Identifier name of external wire that connects this port
         e_connect_bit_slices (list): List of bit slices for external connections.
-        port (iob_port): Port associated with portmap
+        port (str): IDentifier name of port associated with portmap
     """
 
-    # External wire that connects this port
     e_connect: iob_wire | None = None
-    # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
-    e_connect_bit_slices: list = field(default_factory=list)
-    # Port associated with portmap
-    port: iob_port = None
+    e_connect_bit_slices: list[str] = empty_list()
+    port: str = None
 
 
 @api_for(internal_portmap.portmap_from_dict)
-def create_portmap_from_dict(core, portmap_dict):
+def create_portmap_from_dict(portmap_dict):
     """
     Function to create iob_portmap object from dictionary attributes.
 
     Attributes:
-        core (iob_core): Core object containing the ports to portmap
         portmap_dict (dict): dictionary with values to initialize attributes of iob_portmap object.
             Dictionary format:
             {
@@ -692,6 +688,10 @@ def create_portmap_from_dict(core, portmap_dict):
                 "port2_name": "external_connection2_name",
                 "port3_name": ("external_connection3_name", ["bit_slice_1", "bit_slice_2", ...]),
             }
+            Dictionary element to attribute mapping:
+            port1_name -> iob_portmap.port
+            external_connection1_name -> iob_portmap.e_connect
+            ["bit_slice_1", "bit_slice_2", ...] -> iob_portmap.e_connect_bit_slices
 
     Returns:
         list[iob_portmap]: List of iob_portmap objects

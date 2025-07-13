@@ -45,4 +45,4 @@ class iob_inv(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     iob_inv_obj = iob_inv()
-    iob_inv.generate_build_dir()
+    iob_inv_obj.generate_build_dir()

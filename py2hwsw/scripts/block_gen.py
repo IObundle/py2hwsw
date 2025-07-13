@@ -9,9 +9,10 @@
 from latex import write_table
 
 import iob_colors
-from iob_signal import get_real_signal, iob_signal
+from iob_signal import get_real_signal
 import param_gen
 from api_base import convert2internal
+from iob_base import fail_with_msg, find_obj_in_list
 
 
 # Generate subblocks.tex file with TeX table of subblocks (Verilog modules instances)
@@ -84,7 +85,7 @@ def generate_subblocks(core):
         code += f"""\
         // {instance.instance_description}
         {instance.name} {params_str}{instance.instance_name} (
-    {get_instance_port_connections(instance)}\
+    {get_instance_port_connections(core, instance)}\
         );
 
     """
@@ -102,7 +103,7 @@ def generate_subblocks_snippet(core):
         f.write(code)
 
 
-def get_instance_port_connections(instance):
+def get_instance_port_connections(core, instance):
     """Returns a multi-line string with all port's signals connections
     for the given Verilog instance.
     """
@@ -110,65 +111,85 @@ def get_instance_port_connections(instance):
 
     # Iterate over all ports of the instance
     for portmap in instance.portmap_connections:
-        port = portmap.port
+        portmap = convert2internal(portmap)
+
+        portmap.validate_attributes()
+
+        port = find_obj_in_list(
+            [convert2internal(i) for i in instance.ports], portmap.port
+        )
+        if not port:
+            fail_with_msg(
+                f"Port '{portmap.port}' not found in instance '{instance.name}'!"
+            )
+
+        e_connect = find_obj_in_list(
+            [convert2internal(i) for i in core.wires], portmap.e_connect
+        ) or find_obj_in_list(
+            [convert2internal(i) for i in core.ports], portmap.e_connect
+        )
+        if not e_connect:
+            fail_with_msg(
+                f"Wire/Port '{portmap.e_connect}' not found in core '{core.name}'!"
+            )
+
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
 
-        # Check if there are connections for this instance
-        assert (
-            portmap.e_connect
-        ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
-
         # If one of the ports is not a standard inferface, check if the number of signals is the same
-        if not port.interface or not portmap.e_connect.interface:
+        if not port.interface or not e_connect.interface:
             newlinechar = "\n"
             assert len(port.signals) == len(
-                portmap.e_connect.signals
+                e_connect.signals
             ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
 Port '{port.name}' has the following signals:
 {newlinechar.join("- " + get_real_signal(port).name for port in port.signals)}
 
-External connection '{get_real_signal(portmap.e_connect).name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(port).name for port in portmap.e_connect.signals)}
+External connection '{get_real_signal(e_connect).name}' has the following signals:
+{newlinechar.join("- " + get_real_signal(port).name for port in e_connect.signals)}
 {iob_colors.ENDC}
 """
 
-        # If port has only non-iob signals, skip it
-        if not any(isinstance(port_signal, iob_signal) for port_signal in port.signals):
-            continue
+        # Is this still possible? I think iob_port.signals may only contain iob_signal objects
+        # # If port has only non-iob signals, skip it
+        # if not any(isinstance(port_signal, iob_signal) for port_signal in port.signals):
+        #     continue
 
         # If port has a description, add it to the portmap
         if port.descr and not port.doc_only:
             instance_portmap += f"        // {port.name} port: {port.descr}\n"
 
-        if isinstance(portmap.e_connect, str):
-            if "z" in portmap.e_connect.lower():
+        # Handle ports connected to constants
+        if isinstance(e_connect, str):
+            if "z" in e_connect.lower():
                 instance_portmap += f"        .{port.signals[0].name}(),\n"
             else:
-                instance_portmap += (
-                    f"        .{port.signals[0].name}({portmap.e_connect}),\n"
-                )
+                instance_portmap += f"        .{port.signals[0].name}({e_connect}),\n"
             continue
+
         # Connect individual signals
         for idx, port_signal in enumerate(port.signals):
-            # Skip signals that are not iob_signals
-            if not isinstance(port_signal, iob_signal):
-                continue
+            port_signal = convert2internal(port_signal)
+            # Is this still possible? Port should only contain iob_signals objects
+            # # Skip signals that are not iob_signals
+            # if not isinstance(port_signal, iob_signal):
+            #     continue
             port_name = port_signal.name
 
             # If both ports are standard interfaces, connect by name
-            if port.interface and portmap.e_connect.interface:
+            if port.interface and e_connect.interface:
                 # Remove prefix and suffix from port name
                 port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
-                for e_signal in portmap.e_connect.signals:
+                for e_signal in e_connect.signals:
+                    e_signal = convert2internal(e_signal)
                     real_e_signal = get_real_signal(e_signal)
                     e_signal_name = real_e_signal.name
                     # Remove prefix and suffix from external signal name
                     if e_signal_name[-2:] in ["_o", "_i"]:
                         e_signal_name = e_signal_name[:-2]
                     e_signal_name = e_signal_name.replace(
-                        portmap.e_connect.interface.prefix, "", 1
+                        e_connect.interface.prefix, "", 1
                     )
                     if e_signal_name == port_name:
                         e_signal_name = real_e_signal.name
@@ -177,7 +198,9 @@ External connection '{get_real_signal(portmap.e_connect).name}' has the followin
                 port_name = port_signal.name
             else:
                 # If both ports are not standard interfaces, connect by index
-                real_e_signal = get_real_signal(portmap.e_connect.signals[idx])
+                real_e_signal = get_real_signal(
+                    convert2internal(e_connect.signals[idx])
+                )
                 e_signal_name = real_e_signal.name
 
             # If the signal is a bit slice, get the name of the bit slice

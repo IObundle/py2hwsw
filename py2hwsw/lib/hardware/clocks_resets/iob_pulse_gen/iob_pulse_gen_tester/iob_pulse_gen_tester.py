@@ -87,4 +87,4 @@ class iob_pulse_gen_tester(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     iob_pulse_gen_tester_obj = iob_pulse_gen_tester()
-    iob_pulse_gen_tester.generate_build_dir()
+    iob_pulse_gen_tester_obj.generate_build_dir()

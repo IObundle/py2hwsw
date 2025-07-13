@@ -172,9 +172,10 @@ def conf_group_from_dict(conf_group_dict):
 
     # If "confs" key is missing, then assume dictionary describes a single conf
     if "confs" not in conf_group_dict:
-        conf_group_obj.name = "general_operation"
-        conf_group_obj.descr = "Core configuration."
-        conf_group_obj.confs = [conf_from_dict(conf_group_dict)]
+        internal_conf_group_obj = conf_group_obj._get_py2hwsw_internal_obj()
+        internal_conf_group_obj.name = "general_operation"
+        internal_conf_group_obj.descr = "Core configuration."
+        internal_conf_group_obj.confs = [conf_from_dict(conf_group_dict)]
         return conf_group_obj
 
     key_attribute_mapping = {}

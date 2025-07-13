@@ -106,4 +106,4 @@ if __name__ == "__main__":
     print(">>> Generate_hw of iob_and_obj: ", iob_and_obj.get_generate_hw())
     print(">>> Ports of iob_and_obj: ", [i.get_name() for i in iob_and_obj.get_ports()])
 
-    # iob_and.generate_build_dir()
+    # iob_and_obj.generate_build_dir()

@@ -55,7 +55,7 @@ from iob_snippet import snippet_from_dict
 from iob_python_parameter import python_parameter_group_from_dict
 from iob_portmap import portmap_from_dict
 
-from api_base import internal_api_class
+from api_base import internal_api_class, convert2internal
 
 
 @internal_api_class("user_api.api", "iob_core", allow_unknown_args=True)
@@ -128,7 +128,7 @@ class iob_core(iob_module, iob_instance):
                 "superblocks": lambda lst: [core_from_dict(i) for i in lst],
                 "sw_modules": lambda lst: [core_from_dict(i) for i in lst],
                 "python_parameters": lambda lst: [python_parameter_group_from_dict(i) for i in lst],
-                "portmap_connections": lambda dct: portmap_from_dict(self.get_api_obj(), dct),
+                "portmap_connections": portmap_from_dict,
             }
             update_obj_from_dict(self, core_dictionary, key_attribute_mapping, preprocessor_functions, self.get_api_obj().get_supported_attributes().keys())
 
@@ -531,11 +531,12 @@ class iob_core(iob_module, iob_instance):
         )
         # Add SPDX license headers to every file in build dir
         custom_header = f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
+        internal_license = convert2internal(self.license)
         generate_headers(
             root=self.build_dir,
-            copyright_holder=self.license.author,
-            copyright_year=self.license.year,
-            license_name=self.license.name,
+            copyright_holder=internal_license.author,
+            copyright_year=internal_license.year,
+            license_name=internal_license.name,
             header_template="spdx",
             custom_header_suffix=custom_header,
             skip_existing_headers=True,
@@ -1175,7 +1176,7 @@ def instantiate_core(core_name, python_parameters={}, instantiance_attributes={}
         "connect": "portmap_connections",
     }
     preprocessor_functions = {
-        "portmap_connections": lambda dct: portmap_from_dict(core_obj, dct),
+        "portmap_connections": portmap_from_dict,
     }
     # Filter-out non-instance attributes from dictionary
     # Instead of filtering, should we throw an error if attributes are not the ones expected?

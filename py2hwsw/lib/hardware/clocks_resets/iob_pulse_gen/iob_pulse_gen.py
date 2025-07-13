@@ -180,4 +180,4 @@ class iob_pulse_gen(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     iob_pulse_gen_obj = iob_pulse_gen()
-    iob_pulse_gen.generate_build_dir()
+    iob_pulse_gen_obj.generate_build_dir()

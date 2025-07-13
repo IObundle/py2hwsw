@@ -108,4 +108,4 @@ class iob_counter(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     iob_counter_obj = iob_counter()
-    iob_counter.generate_build_dir()
+    iob_counter_obj.generate_build_dir()

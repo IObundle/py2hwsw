@@ -81,4 +81,4 @@ class iob_or(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     iob_or_obj = iob_or()
-    iob_or.generate_build_dir()
+    iob_or_obj.generate_build_dir()

@@ -23,6 +23,12 @@ class iob_portmap:
     """Describes an IO portmap connection."""
 
     def validate_attributes(self):
+        if not self.port:
+            fail_with_msg("Port is not specified", ValueError)
+        if not self.e_connect:
+            fail_with_msg(f"Port '{self.port}' is not connected!", ValueError)
+
+        # TODO: validate if port and external wires really exist.
         pass
 
     # NOTE: THis connect_external already performs validation (including search for external wire (that may be non-existent).
@@ -131,18 +137,9 @@ def get_portmap_port(portmap):
 #
 
 
-def portmap_from_dict(core, portmap_dict):
-    core = convert2internal(core)
+def portmap_from_dict(portmap_dict):
     portmap_list = []
     for port_name, connection in portmap_dict.items():
-        # Get port from core's ports list
-        port = find_obj_in_list([convert2internal(i) for i in core.ports], port_name)
-        if not port:
-            fail_with_msg(
-                f"Port '{port_name}' not found in instance '{core.instance_name}' of module '{core.issuer.name}'!\n"
-                f"Available ports:\n- "
-                + "\n- ".join([port.name for port in core.ports])
-            )
 
         # Extract external wire and bit slices from connection
         bit_slices = []
@@ -158,37 +155,13 @@ def portmap_from_dict(core, portmap_dict):
         else:
             fail_with_msg(f"Invalid connection value: {connection}")
 
-        # # Set wire as 'str' when connecting to constant/floating
-        # # Otherwise, find wire
-        # if "'" in external_wire_name or external_wire_name.lower() == "z":
-        #     wire = external_wire_name
-        # else:
-        #     wire = find_obj_in_list(
-        #         issuer.wires, external_wire_name
-        #     ) or find_obj_in_list(issuer.ports, external_wire_name)
-        #     if not wire:
-        #         debug(f"Creating implicit wire '{port.name}' in '{issuer.name}'.", 1)
-        #         # Add wire to issuer
-        #         wire_signals = remove_signal_direction_suffixes(port.signals)
-        #         issuer.create_wire(
-        #             name=external_wire_name, signals=wire_signals, descr=port.descr
-        #         )
-        #         # Add wire to attributes_dict as well
-        #         issuer.attributes_dict["wires"].append(
-        #             {
-        #                 "name": external_wire_name,
-        #                 "signals": wire_signals,
-        #                 "descr": port.descr,
-        #             }
-        #         )
-        #         wire = issuer.wires[-1]
-
         # Create portmap and add to list
-        portmap = iob_portmap(port=port)
+        portmap = iob_portmap(
+            port=port_name,
+            e_connect=external_wire_name,
+            e_connect_bit_slices=bit_slices,
+        )
         portmap_list.append(portmap)
-
-        internal_portmap = convert2internal(portmap)
-        internal_portmap.connect_external(external_wire_name, bit_slices=bit_slices)
 
     return portmap_list
 

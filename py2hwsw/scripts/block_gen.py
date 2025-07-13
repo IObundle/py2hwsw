@@ -108,7 +108,7 @@ def get_instance_port_connections(instance):
     """
     instance_portmap = ""
 
-    # Iterade over all ports of the instance
+    # Iterate over all ports of the instance
     for portmap in instance.portmap_connections:
         port = portmap.port
         # If port has 'doc_only' attribute set to True, skip it

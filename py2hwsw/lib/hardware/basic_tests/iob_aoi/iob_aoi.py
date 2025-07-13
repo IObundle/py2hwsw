@@ -159,16 +159,15 @@ core_dictionary = {
             ],
         },
     ],
-    # TODO: Replace "portmap_connections" by "connect"
     "subblocks": [
         {
             "core": "iob_and",
-            "descr": "First and gate",
             "instance_name": "iob_and_ab",
+            "instance_description": "First and gate",
             "parameters": {
                 "W": "W",
             },
-            "portmap_connections": {
+            "connect": {
                 "a_i": "a_i",
                 "b_i": "b_i",
                 "y_o": "and_ab_out",
@@ -176,12 +175,12 @@ core_dictionary = {
         },
         {
             "core": "iob_and",
-            "descr": "Second and gate",
             "instance_name": "io_and_cd",
+            "instance_description": "Second and gate",
             "parameters": {
                 "W": "W",
             },
-            "portmap_connections": {
+            "connect": {
                 "a_i": "c_i",
                 "b_i": "d_i",
                 "y_o": "and_cd_out",
@@ -189,12 +188,12 @@ core_dictionary = {
         },
         {
             "core": "iob_or",
-            "descr": "Or gate",
             "instance_name": "iob_or_abcd",
+            "instance_description": "Or gate",
             "parameters": {
                 "W": "W",
             },
-            "portmap_connections": {
+            "connect": {
                 "a_i": "and_ab_out",
                 "b_i": "and_cd_out",
                 "y_o": "or_out",
@@ -202,12 +201,12 @@ core_dictionary = {
         },
         {
             "core": "iob_inv",
-            "descr": "Inverter",
             "instance_name": "iob_inv_out",
+            "instance_description": "Inverter",
             "parameters": {
                 "W": "W",
             },
-            "portmap_connections": {
+            "connect": {
                 "a_i": "or_out",
                 "y_o": "y_o",
             },

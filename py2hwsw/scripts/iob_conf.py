@@ -111,11 +111,6 @@ def create_conf_group(core, *args, **kwargs):
         raise
 
 
-#
-# API methods
-#
-
-
 def rename_dictionary_keys(dictionary, key_mapping):
     """
     Rename keys in dictionary using a mapping.
@@ -137,6 +132,11 @@ def rename_dictionary_keys(dictionary, key_mapping):
         if old_key in key_mapping:
             dictionary[new_key] = dictionary.pop(old_key)
     return dictionary
+
+
+#
+# API methods
+#
 
 
 def conf_from_dict(conf_dict):

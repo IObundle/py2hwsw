@@ -59,6 +59,7 @@ import iob_comb as internal_comb
 import iob_fsm as internal_fsm
 import iob_block as internal_block
 import iob_license as internal_license
+import iob_portmap as internal_portmap
 import iob_python_parameter as internal_python_parameter
 import iob_core as internal_core
 from py2hwsw_version import PY2HWSW_VERSION
@@ -654,6 +655,66 @@ def create_license_from_text(license_text):
 
 
 #
+# Port map
+#
+
+
+@api_for(internal_portmap.iob_portmap)
+class iob_portmap:
+    """
+    Class that represents a portmap attribute.
+
+    Attributes:
+        e_connect (iob_wire | None): External wire that connects this port
+        e_connect_bit_slices (list): List of bit slices for external connections.
+        port (iob_port): Port associated with portmap
+    """
+
+    # External wire that connects this port
+    e_connect: iob_wire | None = None
+    # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
+    e_connect_bit_slices: list = field(default_factory=list)
+    # Port associated with portmap
+    port: iob_port = None
+
+
+@api_for(internal_portmap.portmap_from_dict)
+def create_portmap_from_dict(core, portmap_dict):
+    """
+    Function to create iob_portmap object from dictionary attributes.
+
+    Attributes:
+        core (iob_core): Core object containing the ports to portmap
+        portmap_dict (dict): dictionary with values to initialize attributes of iob_portmap object.
+            Dictionary format:
+            {
+                "port1_name": "external_connection1_name",
+                "port2_name": "external_connection2_name",
+                "port3_name": ("external_connection3_name", ["bit_slice_1", "bit_slice_2", ...]),
+            }
+
+    Returns:
+        list[iob_portmap]: List of iob_portmap objects
+    """
+    pass
+
+
+@api_for(internal_portmap.portmap_from_text)
+def create_portmap_from_text(portmap_text):
+    """
+    Function to create iob_portmap object from short notation text.
+
+    Attributes:
+        portmap_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_portmap: iob_portmap object
+    """
+    pass
+
+
+#
 # Python Parameter
 #
 
@@ -841,18 +902,18 @@ class iob_core:
     sw_modules: list[iob_core] = empty_list()
 
     # Instance attributes
+    # Should these be in a separate class? It would be easier to distiguish them from other attributes in code.
     instance_name: str = None
-    instance_description: str = ""
+    instance_description: str = "Default instance description"
     portmap_connections: list[str] = empty_list()
     parameters: dict[str, int | str] = empty_dict()
-    instantiate: bool = ""
+    instantiate: bool = True
 
     # Core attributes
     version: str = PY2HWSW_VERSION
     previous_version: str = PY2HWSW_VERSION
     setup_dir: str = None
     build_dir: str = "build"
-    # instance_name: str = None
     use_netlist: bool = False
     is_system: bool = False
     board_list: list[str] = empty_list()
@@ -910,7 +971,7 @@ def create_core_from_dict(core_dict):
             # Instance keys
             - instance_name -> iob_instance.instance_name
             - instance_description -> iob_instance.instance_description
-            - portmap_connections -> iob_instance.portmap_connections
+            - connect -> iob_instance.portmap_connections = create_portmap_from_dict(connect)
             - parameters -> iob_instance.parameters
             - instantiate -> iob_instance.instantiate
             # Non-attribute instance keys

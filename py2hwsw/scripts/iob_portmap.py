@@ -14,18 +14,19 @@ from iob_port import iob_port
 from iob_signal import get_real_signal, iob_signal_reference
 from iob_wire import iob_wire
 
+from api_base import internal_api_class, convert2internal
 
+
+@internal_api_class("user_api.api", "iob_portmap")
 @dataclass
 class iob_portmap:
     """Describes an IO portmap connection."""
 
-    # External wire that connects this port
-    e_connect: iob_wire | None = None
-    # Dictionary of bit slices for external connections. Name: signal name; Value: bit slice
-    e_connect_bit_slices: list = field(default_factory=list)
-    # Port associated with portmap
-    port: iob_port = None
+    def validate_attributes(self):
+        pass
 
+    # NOTE: THis connect_external already performs validation (including search for external wire (that may be non-existent).
+    # We should probably only call this with `validate_attributes()`
     def connect_external(self, wire, bit_slices={}):
         """Connects the port to an external wire
         Verifies that the wire is compatible with the port
@@ -40,7 +41,9 @@ class iob_portmap:
                     ValueError,
                 )
             else:
-                validate_verilog_const(value=wire, direction=self.port.signals[0].direction)
+                validate_verilog_const(
+                    value=wire, direction=self.port.signals[0].direction
+                )
         elif isinstance(wire, iob_wire):
             if self.port.interface and wire.interface:
                 if type(self.port.interface) == type(wire.interface):
@@ -116,9 +119,81 @@ class iob_portmap:
 
 
 def get_portmap_port(portmap):
-    """Given a portmap reference, return the associated port
-    """
+    """Given a portmap reference, return the associated port"""
     port = None
     if isinstance(portmap, iob_portmap):
         port = portmap.port
     return port
+
+
+#
+# API methods
+#
+
+
+def portmap_from_dict(core, portmap_dict):
+    core = convert2internal(core)
+    portmap_list = []
+    for port_name, connection in portmap_dict.items():
+        # Get port from core's ports list
+        port = find_obj_in_list([convert2internal(i) for i in core.ports], port_name)
+        if not port:
+            fail_with_msg(
+                f"Port '{port_name}' not found in instance '{core.instance_name}' of module '{core.issuer.name}'!\n"
+                f"Available ports:\n- "
+                + "\n- ".join([port.name for port in core.ports])
+            )
+
+        # Extract external wire and bit slices from connection
+        bit_slices = []
+        if type(connection) is str:
+            external_wire_name = connection
+        elif type(connection) is tuple:
+            external_wire_name = connection[0]
+            bit_slices = connection[1]
+            if type(bit_slices) is not list:
+                fail_with_msg(
+                    f"Second element of tuple must be a list of bit slices/connections: {connection}"
+                )
+        else:
+            fail_with_msg(f"Invalid connection value: {connection}")
+
+        # # Set wire as 'str' when connecting to constant/floating
+        # # Otherwise, find wire
+        # if "'" in external_wire_name or external_wire_name.lower() == "z":
+        #     wire = external_wire_name
+        # else:
+        #     wire = find_obj_in_list(
+        #         issuer.wires, external_wire_name
+        #     ) or find_obj_in_list(issuer.ports, external_wire_name)
+        #     if not wire:
+        #         debug(f"Creating implicit wire '{port.name}' in '{issuer.name}'.", 1)
+        #         # Add wire to issuer
+        #         wire_signals = remove_signal_direction_suffixes(port.signals)
+        #         issuer.create_wire(
+        #             name=external_wire_name, signals=wire_signals, descr=port.descr
+        #         )
+        #         # Add wire to attributes_dict as well
+        #         issuer.attributes_dict["wires"].append(
+        #             {
+        #                 "name": external_wire_name,
+        #                 "signals": wire_signals,
+        #                 "descr": port.descr,
+        #             }
+        #         )
+        #         wire = issuer.wires[-1]
+
+        # Create portmap and add to list
+        portmap = iob_portmap(port=port)
+        portmap_list.append(portmap)
+
+        internal_portmap = convert2internal(portmap)
+        internal_portmap.connect_external(external_wire_name, bit_slices=bit_slices)
+
+    return portmap_list
+
+
+def portmap_from_text(portmap_text):
+    portmap_dict = {}
+    # TODO: parse short notation text
+    return iob_portmap(**portmap_dict)

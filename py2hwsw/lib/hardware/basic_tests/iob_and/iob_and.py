@@ -75,9 +75,73 @@ if __name__ == "__main__":
             ],
         },
     )
-    print(">>> Name of conf_group_obj: ", conf_group_obj.get_name())
-    print(">>> Confs of conf_group_obj: ", conf_group_obj.get_confs())
-    print(">>> Name of conf_obj: ", conf_group_obj.get_confs()[0].get_name())
+
+    conf_obj = py2hwsw.create_conf_from_text(
+        """
+        W -t P -v 21 -m 1 -M 32
+        -d 'IO width'
+        """
+    )
+
+    conf_groups_obj = py2hwsw.create_conf_group_from_text(
+        """
+        'Default group'
+        -d 'Default group of confs'
+        -doc
+        -doc_clearpage
+        --confs
+            "
+            DATA_W -t P -v 32 -m NA -M NA
+            -d 'Data bus width'
+
+            FRACTIONAL_W -t P -v 0 -m NA -M NA
+            -d 'Fractional part width'
+
+            REAL_W -t P -v 'DATA_W - FRACTIONAL_W' -m NA -M NA
+            -d 'Real part width'
+
+            SIZE_W -t P -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
+            -d 'Size width'
+
+            END_COUNT -t D -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA
+            -d 'End count'
+
+            COUNT_W -t D -v $clog2(END_COUNT) -m NA -M NA
+            -d 'Count width'
+            "
+        """
+    )
+    print(conf_groups_obj.get_name())
+    print(conf_groups_obj.get_descr())
+    print(conf_groups_obj.get_doc_only())
+    print(conf_groups_obj.get_doc_clearpage())
+    for conf in conf_groups_obj.get_confs():
+        print(">>> Conf name: ", conf.get_name())
+        print(">>> Conf kind: ", conf.get_kind())
+        print(">>> Conf value: ", conf.get_value())
+        print(">>> Conf min: ", conf.get_min_value())
+        print(">>> Conf max: ", conf.get_max_value())
+        print(">>> Conf description: ", conf.get_descr())
+
+    print("\n\n")
+    signal_obj = py2hwsw.create_signal_from_text("en -w 1 -d 'Enable signal' -v")
+    print("signal_obj: ", signal_obj.get_name(), end=" ")
+    print("width: ", signal_obj.get_width(), end=" ")
+    print("isvar: ", signal_obj.get_isvar(), end=" ")
+    print("descr: ", signal_obj.get_descr())
+
+    print("\n\n")
+    wire_obj = py2hwsw.create_wire_from_text(
+        """
+            aoi_outs -s aab:W -s cad:W -s oab:1
+            -d 'AOI outputs'
+        """
+    )
+    print("wire_obj: ", wire_obj.get_name(), end=" ")
+    print("width: ", wire_obj.get_interface())
+    for signal in wire_obj.get_signals():
+        print("\tsignal: ", signal.get_name(), "width:", signal.get_width())
+    print("descr: ", wire_obj.get_descr())
 
     port_obj = py2hwsw.create_port_from_dict(
         {
@@ -106,4 +170,4 @@ if __name__ == "__main__":
     print(">>> Generate_hw of iob_and_obj: ", iob_and_obj.get_generate_hw())
     print(">>> Ports of iob_and_obj: ", [i.get_name() for i in iob_and_obj.get_ports()])
 
-    # iob_and_obj.generate_build_dir()
+    iob_and_obj.generate_build_dir()

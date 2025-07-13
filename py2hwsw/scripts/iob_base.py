@@ -722,3 +722,55 @@ def update_obj_from_dict(obj, attributes_dict, key_attribute_mapping={}, preproc
             value = preprocessor_functions[attribute_name](value)
         # Set attribute
         setattr(obj, attribute_name, value)
+
+
+#
+# Short notation functions
+#
+
+
+def create_short_notation_parser(flags: list) -> argparse.ArgumentParser:
+    """Create Short Notation Parser
+    Attributes:
+        flags (list): List of flags to be used in the parser.
+            each list element can be:
+            - string (single name for default arguments)
+            - list with [flag, dict].
+                flag: argument name/flag
+                dict: argparse optional arguments.
+            Example:
+                example_flags = [
+                    "name",
+                    ["-v", {"dest": "value"}],
+                    ["-d", {"dest": "descr", "nargs": "?"}],
+                    ["-doc", {"dest": "doc_only", "action": "store_true"}],
+                ]
+    Returns:
+        argparse.ArgumentParser: Argument parser with the specified flags.
+    """
+    parser = argparse.ArgumentParser()
+    for flag in flags:
+        if isinstance(flag, str):
+            parser.add_argument(flag)
+        elif isinstance(flag, list):
+            parser.add_argument(flag[0], **flag[1])
+        else:
+            raise ValueError(f"ERROR: unsupported flag format: {flag}")
+    return parser
+
+
+def parse_short_notation_text(text: str, flags) -> dict:
+    """Parse Short Notation Text
+    Arguments:
+        text (str): Short notation text to be parsed.
+        flags (list): List of flags to be used in the parser.
+            See create_short_notation_parser() for details.
+    Returns:
+        dict: Parsed short text as flags dictionary.
+    """
+    # preprocess short notation text
+    pre_process_conf_text = shlex.split(text.strip('\n'))
+    # create argument parser
+    parser = create_short_notation_parser(flags)
+    # parse and return text as dict
+    return parser.parse_args(pre_process_conf_text).__dict__

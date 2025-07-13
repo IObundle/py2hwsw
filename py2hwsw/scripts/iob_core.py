@@ -1104,7 +1104,7 @@ def find_module_setup_dir(core_name, error_on_not_found=True):
     filepath = pathlib.Path(file_path)
     # Force core file to be contained in a folder with the same name.
     # Skip this check if we are the top module (no top defined) or trying to setup the top module again (same name as previous defined top)
-    if filepath.parent.name != core_name and (
+    if filepath.parent.resolve().name != core_name and (
         iob_core.global_top_module
         and core_name != iob_core.global_top_module.original_name
     ):

@@ -15,6 +15,7 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     update_obj_from_dict,
+    parse_short_notation_text,
 )
 from iob_signal import (
     iob_signal,
@@ -269,6 +270,22 @@ def wire_from_dict(wire_dict):
 
 
 def wire_from_text(wire_text):
-    wire_dict = {}
-    # TODO: parse short notation text
+    wire_flags = [
+        "name",
+        ["-i", {"dest": "interface"}],
+        ["-s", {"dest": "signals", "action": "append"}],
+        ["-d", {"dest": "descr", "nargs": "?"}],
+    ]
+    wire_dict = parse_short_notation_text(wire_text, wire_flags)
+    wire_signals = []
+    for s in wire_dict.get("signals", []):
+        try:
+            [s_name, s_width] = s.split(":")
+        except ValueError:
+            fail_with_msg(
+                f"Invalid signal format '{s}'! Expected 'name:width' format.",
+                ValueError,
+            )
+        wire_signals.append(signal_from_dict({"name": s_name, "width": s_width}))
+    wire_dict.update({"signals": wire_signals})
     return iob_wire(**wire_dict)

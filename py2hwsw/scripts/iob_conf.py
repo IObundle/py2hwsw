@@ -12,8 +12,8 @@ from iob_base import (
     assert_attributes,
     find_obj_in_list,
     update_obj_from_dict,
+    parse_short_notation_text,
 )
-
 from api_base import internal_api_class
 
 
@@ -161,9 +161,18 @@ def conf_from_dict(conf_dict):
     return conf_obj
 
 
-def conf_from_text(conf_text):
-    conf_dict = {}
-    # TODO: parse short notation text
+def conf_from_text(conf_text: str) -> iob_conf:
+    # parse conf text into a dictionary
+    conf_text_flags = [
+        "name",
+        ["-t", {"dest": "kind"}],
+        ["-v", {"dest": "value"}],
+        ["-m", {"dest": "min_value"}],
+        ["-M", {"dest": "max_value"}],
+        ["-d", {"dest": "descr", "nargs": "?"}],
+        ["-doc", {"dest": "doc_only", "action": "store_true"}],
+    ]
+    conf_dict = parse_short_notation_text(conf_text, conf_text_flags)
     return iob_conf(**conf_dict)
 
 
@@ -194,7 +203,22 @@ def conf_group_from_dict(conf_group_dict):
     return conf_group_obj
 
 
-def conf_group_from_text(conf_group_text):
-    conf_group_dict = {}
-    # TODO: parse short notation text
+def conf_group_from_text(conf_group_text: str):
+    # Create conf_group from short notation text
+    conf_group_flags = [
+        "name",
+        ["--confs", {"dest": "confs"}],
+        ["-doc", {"dest": "doc_only", "action": "store_true"}],
+        ["-doc_clearpage", {"dest": "doc_clearpage", "action": "store_true"}],
+        ["-d", {"dest": "descr"}],
+    ]
+    # Parse conf group text into a dictionary
+    conf_group_dict = parse_short_notation_text(conf_group_text, conf_group_flags)
+
+    # Special processing for conf subflags
+    confs: list[iob_conf] = []
+    for conf_text in conf_group_dict.get("confs", "").split("\n\n"):
+        confs.append(conf_from_text(conf_text))
+    # replace "confs" short notation text with list of conf objects
+    conf_group_dict.update({"confs": confs})
     return iob_conf_group(**conf_group_dict)

@@ -140,7 +140,11 @@ def create_conf_from_text(conf_text):
 
     Attributes:
         conf_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-t kind] [-v value] [-m min_value] [-M max_value]
+            name [-t kind] [-v value] [-m min_value] [-M max_value] [-doc]
+            [-d descr]
+            Example:
+                DATA_W -t P -v 32 -m NA -M NA
+                -d 'Data bus width'
 
     Returns:
         iob_conf: iob_conf object
@@ -195,7 +199,20 @@ def create_conf_group_from_text(conf_group_text):
 
     Attributes:
         conf_group_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-c confs]
+            name [-d descr] [--confs] [-doc] [-doc_clearpage]
+            Example:
+                'Default group'
+                -d 'Default group of confs'
+                -doc
+                -doc_clearpage
+                --confs
+                    "
+                    DATA_W -t P -v 32 -m NA -M NA
+                    -d 'Data bus width'
+
+                    ADDR_W -t P -v 4 -m NA -M NA
+                    -d 'Address width'
+                    "
 
     Returns:
         iob_conf_group: iob_conf_group object
@@ -218,9 +235,6 @@ class iob_signal:
         width (str or int): Number of bits in the signal.
         descr (str): Description of the signal.
         isvar (bool): If enabled, signal will be generated with type `reg` in Verilog.
-        # isreg (bool): Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
-        # reg_signals (list): Used for `iob_comb`: List of signals associated to the infered register.
-        # value (str or int): Logic value for future simulation effort using global signals list.
     """
 
     name: str = ""
@@ -241,9 +255,6 @@ def create_signal_from_dict(signal_dict):
             - width         -> iob_signal.width
             - descr         -> iob_signal.descr
             - isvar         -> iob_signal.isvar
-            - isreg         -> iob_signal.isreg
-            - reg_signals   -> iob_signal.reg_signals
-            - val           -> iob_signal.value
 
     Returns:
         iob_signal: iob_signal object
@@ -258,7 +269,9 @@ def create_signal_from_text(signal_text):
 
     Attributes:
         signal_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-w width] [-d descr] [-r (enables isreg)] [-v value]
+            name [-w width] [-d descr] [-v (enables isvar)]
+            Example:
+                en -w 1 -d 'Enable signal' -v
 
     Returns:
         iob_signal: iob_signal object
@@ -386,7 +399,9 @@ def create_wire_from_text(wire_text):
 
     Attributes:
         wire_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-i interface] [-d descr] [-s signal_name:width]+
+            name [-i interface] [-d descr] [-s signal_name1:width1] [-s signal_name2:width2]+
+            Examples:
+                dbus -d 'data bus' -s wdata:32 -s wstrb:4
 
     Returns:
         iob_wire: iob_wire object

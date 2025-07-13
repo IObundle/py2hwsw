@@ -14,43 +14,47 @@ from iob_base import (
     add_traceback_msg,
     str_to_kwargs,
     assert_attributes,
+    update_obj_from_dict,
+    parse_short_notation_text,
 )
-from iob_signal import iob_signal, iob_signal_reference, get_real_signal
+from iob_signal import (
+    iob_signal,
+    iob_signal_reference,
+    get_real_signal,
+    signal_from_dict,
+    signal_from_text,
+)
+
+from api_base import internal_api_class
 
 
+@internal_api_class("user_api.api", "iob_wire")
 @dataclass
 class iob_wire:
     """Class to represent a wire in an iob module"""
 
-    # Identifier name for the wire.
-    name: str = ""
-    # Name of the standard interface to auto-generate with `interfaces.py` script.
-    interface: interfaces._interface = None
-    # Description of the wire.
-    descr: str = "Default description"
-    # List of signals belonging to this wire
-    # (each signal represents a hardware Verilog wire).
-    signals: List = field(default_factory=list)
+    def create_signals_from_interface(self):
+        if not self.interface:
+            fail_with_msg(f"Wire '{self.name}' has no interface!", ValueError)
 
-    def __post_init__(self):
+        self.signals += self.interface.get_signals()
+
+        # Remove signal direction information
+        for signal in self.signals:
+            # Skip signal references
+            if isinstance(signal, iob_signal_reference):
+                continue
+            if hasattr(signal, "direction"):
+                # Remove direction suffix from signal name
+                if signal.name.endswith("_i") or signal.name.endswith("_o"):
+                    signal.name = signal.name[:-2]
+                elif signal.name.endswith("_io"):
+                    signal.name = signal.name[:-3]
+                signal.direction = ""
+
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("All wires must have a name!", ValueError)
-
-        if self.interface:
-            self.signals += self.interface.get_signals()
-
-            # Remove signal direction information
-            for signal in self.signals:
-                # Skip signal references
-                if isinstance(signal, iob_signal_reference):
-                    continue
-                if hasattr(signal, "direction"):
-                    # Remove direction suffix from signal name
-                    if signal.name.endswith("_i") or signal.name.endswith("_o"):
-                        signal.name = signal.name[:-2]
-                    elif signal.name.endswith("_io"):
-                        signal.name = signal.name[:-3]
-                    signal.direction = ""
 
 
 attrs = [
@@ -77,7 +81,9 @@ def create_wire(core, *args, signals=[], **kwargs):
             sig_obj_list = convert_dict2obj_list(signals, iob_signal)
         elif type(signals) is dict:
             # Convert user interface dictionary into '_interface' object
-            interface_obj = dict2interface(name=kwargs.get("name", ""), interface_dict=signals)
+            interface_obj = dict2interface(
+                name=kwargs.get("name", ""), interface_dict=signals
+            )
             if interface_obj and not interface_obj.file_prefix:
                 interface_obj.file_prefix = core.name + "_"
         else:
@@ -234,3 +240,52 @@ def dict2interface(name, interface_dict):
     )
 
     return interface
+
+
+# Dictionary of attributes that need to be preprocessed when set from a wire_dictionary, and their corresponding preprocessor functions
+WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS = {
+    "signals": lambda lst: [signal_from_dict(i) for i in lst],
+}
+
+#
+# API methods
+#
+
+
+def wire_from_dict(wire_dict):
+    wire_obj = iob_wire()
+
+    key_attribute_mapping = {}
+    preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
+    # Update wire_obj attributes with values from given dictionary
+    update_obj_from_dict(
+        wire_obj._get_py2hwsw_internal_obj(),
+        wire_dict,
+        key_attribute_mapping,
+        preprocessor_functions,
+        wire_obj.get_supported_attributes().keys(),
+    )
+
+    return wire_obj
+
+
+def wire_from_text(wire_text):
+    wire_flags = [
+        "name",
+        ["-i", {"dest": "interface"}],
+        ["-s", {"dest": "signals", "action": "append"}],
+        ["-d", {"dest": "descr", "nargs": "?"}],
+    ]
+    wire_dict = parse_short_notation_text(wire_text, wire_flags)
+    wire_signals = []
+    for s in wire_dict.get("signals", []):
+        try:
+            [s_name, s_width] = s.split(":")
+        except ValueError:
+            fail_with_msg(
+                f"Invalid signal format '{s}'! Expected 'name:width' format.",
+                ValueError,
+            )
+        wire_signals.append(signal_from_dict({"name": s_name, "width": s_width}))
+    wire_dict.update({"signals": wire_signals})
+    return iob_wire(**wire_dict)

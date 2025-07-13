@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 
 from iob_signal import iob_signal, iob_signal_reference
 from iob_globals import iob_globals
+from api_base import internal_api_class
 
 mem_if_details = [
     {
@@ -274,35 +275,26 @@ if_types = [
 ]
 
 
+@internal_api_class("user_api.api", "interface")
 @dataclass
-class _interface:
+class interface:
     """Class to represent an interface for generation"""
 
-    # Interface direction. Examples: '' (unspecified), 'manager', 'subordinate', ...
-    if_direction: str = ""
-    # Prefix for signals of the interface
-    prefix: str = ""
-    # Width multiplier. Used when concatenating multiple instances of the interface.
-    mult: str | int = 1
-    # Prefix for generated "Verilog Snippets" of this interface
-    file_prefix: str = ""
-    # Prefix for "Verilog snippets" of portmaps of this interface:
-    portmap_port_prefix: str = ""
     # List of signals for this interface (Internal, used for generation)
     _signals: list = field(default_factory=list)
 
     def __post_init__(self):
-        """Post-initialization method to set up the interface."""
+        if not self.file_prefix:
+            self.file_prefix = self.portmap_port_prefix + self.prefix
+
+    def validate_attributes(self):
         # Check if_direction is valid
         if self.if_direction not in ["", "manager", "subordinate"]:
             print(
-                f"ERROR: __post_init__: invalid if_direction '{self.if_direction}'. "
+                f"ERROR: validate_attributes: invalid if_direction '{self.if_direction}'. "
                 "Valid values are '', 'manager', 'subordinate'."
             )
             exit(1)
-
-        if not self.file_prefix:
-            self.file_prefix = self.portmap_port_prefix + self.prefix
 
     def __get_if_name(self):
         """Get the name of the interface."""
@@ -375,8 +367,8 @@ class _interface:
         """Reverse the direction of all signals in a list."""
         new_signals = deepcopy(signals)
         for signal in new_signals:
-            signal.direction = _interface.__reverse_direction(signal.direction)
-            signal.name = _interface.__reverse_name_direction(signal.name)
+            signal.direction = interface.__reverse_direction(signal.direction)
+            signal.name = interface.__reverse_name_direction(signal.name)
         return new_signals
 
     @staticmethod
@@ -558,7 +550,7 @@ class _interface:
 
 
 @dataclass
-class iobClkInterface(_interface):
+class iobClkInterface(interface):
     """Class to represent an IOb clock interface for generation"""
 
     has_cke: bool = True
@@ -597,7 +589,7 @@ class iobClkInterface(_interface):
 
 
 @dataclass
-class iobInterface(_interface):
+class iobInterface(interface):
     """Class to represent an IOb interface for generation"""
 
     # Widths for the IOb interface
@@ -641,7 +633,7 @@ class iobInterface(_interface):
 
 
 @dataclass
-class _memInterface(_interface):
+class _memInterface(interface):
     """Class to represent a memory interface for generation"""
 
     # Width for the memory interface
@@ -1079,7 +1071,7 @@ class asymMemInterface(_memInterface):
 
 
 @dataclass
-class AXIStreamInterface(_interface):
+class AXIStreamInterface(interface):
     """Class to represent an AXI-Stream interface for generation"""
 
     # Data width for the AXI-Stream interface
@@ -1119,7 +1111,7 @@ class AXIStreamInterface(_interface):
 
 
 @dataclass
-class AXILiteInterface(_interface):
+class AXILiteInterface(interface):
     """Class to represent an AXI-Lite interface for generation"""
 
     # Data width for the AXI-Lite interface
@@ -1253,7 +1245,7 @@ class AXILiteInterface(_interface):
 
 
 @dataclass
-class AXIInterface(_interface):
+class AXIInterface(interface):
     """Class to represent an AXI interface for generation"""
 
     # Data width for the AXI interface
@@ -1499,7 +1491,7 @@ class AXIInterface(_interface):
 
 
 @dataclass
-class APBInterface(_interface):
+class APBInterface(interface):
     """Class to represent an APB interface for generation"""
 
     # Data width for the APB interface
@@ -1554,7 +1546,7 @@ class APBInterface(_interface):
 
 
 @dataclass
-class AHBInterface(_interface):
+class AHBInterface(interface):
     """Class to represent an AHB interface for generation"""
 
     # Data width for the AHB interface
@@ -1643,7 +1635,7 @@ class AHBInterface(_interface):
 
 
 @dataclass
-class RS232Interface(_interface):
+class RS232Interface(interface):
     """Class to represent an RS232 interface for generation"""
 
     # Number of pins for the RS232 interface
@@ -1726,7 +1718,7 @@ class RS232Interface(_interface):
 
 
 @dataclass
-class wishboneInterface(_interface):
+class wishboneInterface(interface):
     """Class to represent a Wishbone interface for generation"""
 
     # Data width for the Wishbone interface
@@ -2167,3 +2159,18 @@ if __name__ == "__main__":
             file_prefix="bla_",
         )
         interface.gen_all_vs_files()
+
+
+#
+# API methods
+#
+
+
+def interface_from_dict(interface_dict):
+    return interface(**interface_dict)
+
+
+def interface_from_text(interface_text):
+    interface_dict = {}
+    # TODO: parse short notation text
+    return interface(**interface_dict)

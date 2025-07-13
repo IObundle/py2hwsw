@@ -10,6 +10,7 @@
 import interfaces
 import os
 from iob_signal import iob_signal
+from api_base import convert2internal
 
 
 def generate_wires(core):
@@ -18,9 +19,11 @@ def generate_wires(core):
     """
     code = ""
     for wire in core.wires:
+        wire = convert2internal(wire)
 
         signals_code = ""
         for signal in wire.signals:
+            signal = convert2internal(signal)
             if isinstance(signal, iob_signal):
                 if signal.get_verilog_wire():
                     signals_code += "    " + signal.get_verilog_wire()
@@ -43,6 +46,7 @@ def generate_wires_snippet(core):
         f.write(code)
 
     for wire in core.wires:
+        wire = convert2internal(wire)
         # Generate the specific interface snippet as well
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.

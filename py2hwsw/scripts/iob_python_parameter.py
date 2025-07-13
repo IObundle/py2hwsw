@@ -2,8 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-from typing import Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
@@ -11,39 +11,28 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     find_obj_in_list,
+    update_obj_from_dict,
 )
 
+from api_base import internal_api_class
 
+
+@internal_api_class("user_api.api", "iob_python_parameter")
 @dataclass
 class iob_python_parameter:
     """Class to represent a Python Parameter option."""
 
-    # Identifier name for the Python Parameter option.
-    name: str = ""
-    # Value of the Python Parameter option.
-    val: Any = ""
-    # Description of the Python Parameter option.
-    descr: str = "Default description"
-
-    def __post_init__(self):
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("Every Python Parameter must have a name!")
 
 
+@internal_api_class("user_api.api", "iob_python_parameter_group")
 @dataclass
 class iob_python_parameter_group:
-    """Class to represent a group of Python Parameters."""
+    """Class to represent a Group of Python Parameters."""
 
-    # Identifier name for the group of Python Parameters.
-    name: str = ""
-    # Description of the Python Parameter group.
-    descr: str = "Default description"
-    # List of Python Parameter objects.
-    python_parameters: list = field(default_factory=list)
-    # If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
-    doc_clearpage: bool = False
-
-    def __post_init__(self):
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("Python Parameter group name is not set", ValueError)
 
@@ -110,3 +99,38 @@ def create_python_parameter_group(core, *args, **kwargs):
             f"Failed to create python_parameter/group '{kwargs['name']}'."
         )
         raise
+
+
+def python_parameter_from_dict(python_parameter_dict):
+    return iob_python_parameter(**python_parameter_dict)
+
+
+def python_parameter_from_text(python_parameter_text):
+    python_parameter_dict = {}
+    # TODO: parse short notation text
+    return iob_python_parameter(**python_parameter_dict)
+
+
+def python_parameter_group_from_dict(python_parameter_group_dict):
+    python_parameter_group_obj = iob_python_parameter_group()
+
+    key_attribute_mapping = {}
+    preprocessor_functions = {
+        "python_parameters": lambda lst: [python_parameter_from_dict(i) for i in lst],
+    }
+    # Update python_parameter_group_obj attributes with values from given dictionary
+    update_obj_from_dict(
+        python_parameter_group_obj._get_py2hwsw_internal_obj(),
+        python_parameter_group_dict,
+        key_attribute_mapping,
+        preprocessor_functions,
+        python_parameter_group_obj.get_supported_attributes().keys(),
+    )
+
+    return python_parameter_group_obj
+
+
+def python_parameter_group_from_text(python_parameter_group_text):
+    python_parameter_group_dict = {}
+    # TODO: parse short notation text
+    return iob_python_parameter_group(**python_parameter_group_dict)

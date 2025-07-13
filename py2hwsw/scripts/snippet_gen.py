@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+from api_base import convert2internal
+
 
 def generate_snippets(core):
     """Generate verilog code with snippets of this module.
@@ -11,6 +13,7 @@ def generate_snippets(core):
     """
     code = ""
     for snippet in core.snippets:
+        snippet = convert2internal(snippet)
         code += snippet.verilog_code
         code += "\n"
 

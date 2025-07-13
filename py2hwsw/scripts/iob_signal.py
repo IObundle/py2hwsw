@@ -5,21 +5,17 @@
 from dataclasses import dataclass, field
 import copy
 
-from iob_base import fail_with_msg
+from iob_base import fail_with_msg, parse_short_notation_text
+from api_base import internal_api_class
 
 
+@internal_api_class("user_api.api", "iob_signal")
 @dataclass
 class iob_signal:
     """Class that represents a wire/port signal"""
 
-    # Identifier name for the signal.
-    name: str = ""
-    # Number of bits in the signal.
-    width: str or int = 1
-    # Description of the signal.
-    descr: str = "Default description"
-    # If enabled, signal will be generated with type `reg` in Verilog.
-    isvar: bool = False
+    # Undefined by default. Will be set based on suffix of name (_i, _o, _io)
+    direction: str = ""
 
     # Used for `iob_comb`: If enabled, iob_comb will infer a register for this signal.
     isreg: bool = False
@@ -30,7 +26,7 @@ class iob_signal:
     # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
     value: str or int = 0
 
-    def __post_init__(self):
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("Signal name is not set", ValueError)
 
@@ -50,6 +46,7 @@ class iob_signal:
         return f"{wire_type} {width_str}{self.name};\n"
 
     def assert_direction(self):
+        self.validate_attributes()  # FIXME: Not sure if this is the right place to call validate_attributes
         if not self.direction:
             fail_with_msg(f"Signal '{self.name}' has no direction", ValueError)
 
@@ -95,3 +92,23 @@ def remove_signal_direction_suffixes(signal_list):
     for signal in new_list:
         signal.name = signal.name.rsplit("_", 1)[0]
     return new_list
+
+
+#
+# API methods
+#
+
+
+def signal_from_dict(signal_dict):
+    return iob_signal(**signal_dict)
+
+
+def signal_from_text(signal_text):
+    signal_flags = [
+        "name",
+        ["-w", {"dest": "width"}],
+        ["-v", {"dest": "isvar", "action": "store_true"}],
+        ["-d", {"dest": "descr", "nargs": "?"}],
+    ]
+    signal_dict = parse_short_notation_text(signal_text, signal_flags)
+    return iob_signal(**signal_dict)

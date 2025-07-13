@@ -8,6 +8,7 @@ import os
 import re
 
 from latex import write_table
+from api_base import convert2internal
 
 
 def conf_vh(macros, top_module, out_dir):
@@ -37,21 +38,25 @@ def conf_vh(macros, top_module, out_dir):
         # Sort macros macros by type, P first, M second, C third, D last
         sorted_macros = []
         for macro in group.confs:
-            if macro.type == "P":
+            macro = convert2internal(macro)
+            if macro.kind == "P":
                 sorted_macros.append(macro)
         for macro in group.confs:
-            if macro.type == "M":
+            macro = convert2internal(macro)
+            if macro.kind == "M":
                 sorted_macros.append(macro)
         for macro in group.confs:
-            if macro.type == "C":
+            macro = convert2internal(macro)
+            if macro.kind == "C":
                 sorted_macros.append(macro)
         for macro in group.confs:
-            if macro.type == "D":
+            macro = convert2internal(macro)
+            if macro.kind == "D":
                 sorted_macros.append(macro)
 
         prev_type = ""
         for macro in sorted_macros:
-            macro_type = macro.type
+            macro_type = macro.kind
             # If the type of the macro is different from the previous one, add a comment
             if macro_type != prev_type:
                 if macro_type == "P":
@@ -71,11 +76,11 @@ def conf_vh(macros, top_module, out_dir):
                 continue
 
             # Only insert macro if its is not a bool define, and if so only insert it if it is true
-            if type(macro.val) is not bool:
+            if type(macro.value) is not bool:
                 m_name = macro.name.upper()
-                m_default_val = macro.val
+                m_default_val = macro.value
                 file2create.write(f"`define {core_prefix}{m_name} {m_default_val}\n")
-            elif macro.val:
+            elif macro.value:
                 m_name = macro.name.upper()
                 file2create.write(f"`define {core_prefix}{m_name} 1\n")
 
@@ -99,19 +104,20 @@ def conf_h(macros, top_module, out_dir):
         if group.doc_only:
             continue
         for macro in group.confs:
+            macro = convert2internal(macro)
             # If macro has 'doc_only' attribute set to True, skip it
             if macro.doc_only:
                 continue
             # Only insert macro if its is not a bool define, and if so only insert it if it is true
-            if type(macro.val) is not bool:
+            if type(macro.value) is not bool:
                 m_name = macro.name.upper()
                 # Replace any Verilog specific syntax by equivalent C syntax
-                m_default_val = re.sub("\\d+'h", "0x", str(macro.val))
+                m_default_val = re.sub("\\d+'h", "0x", str(macro.value))
                 # Remove Verilog macros ('`')
                 file2create.write(
                     f"#define {core_prefix}{m_name} {str(m_default_val).replace('`', '')}\n"
                 )
-            elif macro.val:
+            elif macro.value:
                 m_name = macro.name.upper()
                 file2create.write(f"#define {core_prefix}{m_name} 1\n")
     file2create.write(f"\n#endif // H_{fname}_H\n")
@@ -156,8 +162,9 @@ def generate_config_tex(confs, out_dir):
     conf_types = []
     for group in confs:
         for conf in group.confs:
-            if conf.type not in conf_types:
-                conf_types.append(conf.type)
+            conf = convert2internal(conf)
+            if conf.kind not in conf_types:
+                conf_types.append(conf.kind)
 
     # Write info about "M" and "P" confs
     if "M" in conf_types or "P" in conf_types:
@@ -231,34 +238,35 @@ def generate_confs_tex(confs, out_dir):
         derv_params = []
         constants = []
         for conf in group.confs:
-            conf_val = conf.val if type(conf.val) is not bool else "1"
+            conf = convert2internal(conf)
+            conf_value = conf.value if type(conf.value) is not bool else "1"
             # Macros and parameters are added to the table
-            if conf.type in ["P", "M"]:
+            if conf.kind in ["P", "M"]:
                 tex_table.append(
                     [
                         conf.name,
-                        conf.type,
-                        conf.min,
-                        conf_val,
-                        conf.max,
+                        conf.kind,
+                        conf.min_value,
+                        conf_value,
+                        conf.max_value,
                         conf.descr,
                     ]
                 )
-            elif conf.type == "C":
+            elif conf.kind == "C":
                 # Add to list of constants
                 constants.append(
                     [
                         conf.name,
-                        conf_val,
+                        conf_value,
                         conf.descr,
                     ]
                 )
-            else:  # conf.type == "D"
+            else:  # conf.kind == "D"
                 # Add to list of derived parameters
                 derv_params.append(
                     [
                         conf.name,
-                        conf_val,
+                        conf_value,
                         conf.descr,
                     ]
                 )
@@ -312,9 +320,10 @@ def generate_confs(core):
     """Generate Verilog and software macros based on the core's 'confs' list.
     :param core: core object
     """
+    internal_confs = [convert2internal(i) for i in core.confs]
     conf_vh(
-        core.confs,
+        internal_confs,
         core.name,
         os.path.join(core.build_dir, core.dest_dir),
     )
-    conf_h(core.confs, core.name, core.build_dir + "/software/src")
+    conf_h(internal_confs, core.name, core.build_dir + "/software/src")

@@ -7,6 +7,7 @@
 import os
 
 from iob_base import find_obj_in_list, fail_with_msg
+from api_base import convert2internal
 
 
 def get_core_params(confs):
@@ -15,8 +16,10 @@ def get_core_params(confs):
     """
     core_parameters = []
     for group in confs:
+        group = convert2internal(group)
         for conf in group.confs:
-            if conf.type in ["P", "D"]:
+            conf = convert2internal(conf)
+            if conf.kind in ["P", "D"]:
                 core_parameters.append(conf)
     return core_parameters
 
@@ -39,7 +42,7 @@ def generate_params(core):
 
         p_name = parameter.name.upper()
         p_comment = ""
-        if parameter.type == "D":
+        if parameter.kind == "D":
             p_comment = "  // Don't change this parameter value!"
         lines.append(f"    parameter {p_name} = `{core_prefix}{p_name},{p_comment}\n")
 
@@ -90,11 +93,11 @@ def validate_params(core):
         conf = find_obj_in_list(core_parameters, p_name)
 
         try:
-            min_val = int(conf.min)
+            min_val = int(conf.min_value)
         except Exception:
             min_val = 0
         try:
-            max_val = int(conf.max)
+            max_val = int(conf.max_value)
         except Exception:
             max_val = 2**31 - 1
         if p_value < min_val or p_value > max_val:

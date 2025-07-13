@@ -10,17 +10,19 @@ from iob_base import fail_with_msg, assert_attributes
 from iob_wire import find_signal_in_wires
 from iob_signal import get_real_signal
 from interfaces import iobClkInterface
+from api_base import internal_api_class
 
 
+@internal_api_class("user_api.api", "iob_comb")
 @dataclass
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""
 
-    code: str = ""
-    clk_if: str = "c_a"
-    clk_prefix: str = ""
+    def validate_attributes(self):
+        pass
 
-    def __post_init__(self):
+    # FIXME: When should this be called? Maybe at the same as 'validate_attributes'? (wrap_verilog_code is the old post_init)
+    def warp_verilog_code(self):
         """Wrap verilog code with the always block"""
         self.verilog_code = (
             f"""\talways @ (*)\n\t\tbegin\n"""
@@ -101,7 +103,7 @@ class iob_comb(iob_snippet):
                     self.verilog_code[:insert_point]
                     + f"\t\t\t{signal_name} = {signal_name[:-4]};\n"
                     + self.verilog_code[insert_point:]
-                ) 
+                )
 
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""
@@ -115,7 +117,10 @@ class iob_comb(iob_snippet):
                     # and overwrite the default one
                     for port in core.ports:
                         if port.interface:
-                            if isinstance(port.interface, iobClkInterface) and port.interface.prefix == self.clk_prefix:
+                            if (
+                                isinstance(port.interface, iobClkInterface)
+                                and port.interface.prefix == self.clk_prefix
+                            ):
                                 clk_if_name = port.name
                                 # If it does not cke or arst, set them
                                 port.interface.has_cke = True
@@ -258,3 +263,18 @@ def create_comb(core, *args, **kwargs):
     comb.set_needed_reg(core)
     comb.infer_registers(core)
     core.comb = comb
+
+
+#
+# API methods
+#
+
+
+def comb_from_dict(comb_dict):
+    return iob_comb(**comb_dict)
+
+
+def comb_from_text(comb_text):
+    comb_dict = {}
+    # TODO: parse short notation text
+    return iob_comb(**comb_dict)

@@ -39,9 +39,10 @@ setup(
     description="A Python framework for managing embedded HW/SW projects",
     url="https://github.com/IObundle/py2hwsw",
     author="IObundle",
-    author_email="some_email@some.provider",
-    license="Some license",
+    author_email="info@iobundle.com",
+    license="MIT",
     packages=["py2hwsw"],
+    # py_modules=["api"], # TODO: Figure out how to add py2hwsw api as an importable module
     entry_points={"console_scripts": ["py2hwsw = py2hwsw.main:main"]},
     package_data={"py2hwsw": ["**/*", ".*"]},
     include_package_data=True,

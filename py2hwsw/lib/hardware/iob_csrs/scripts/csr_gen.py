@@ -196,13 +196,13 @@ class csr_gen:
             n_bytes = 4
         addr = row.addr
         addr_w = self.calc_verilog_addr_w(log2n_items, n_bytes)
-        auto = row.type != "NOAUTO"
+        auto = row.kind != "NOAUTO"
         suffix = "" if row.internal_use else "_o"
         suffix_i = "" if row.internal_use else "_i"
         optional_comment = row.optional_comment
 
         lines = ""
-        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); TYPE: {row.type}. {optional_comment}\n\n"
+        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); TYPE: {row.kind}. {optional_comment}\n\n"
 
         # compute wdata with only the needed bits
         wires.append(
@@ -348,13 +348,13 @@ class csr_gen:
             n_bytes = 4
         addr = row.addr
         addr_w = self.calc_verilog_addr_w(log2n_items, n_bytes)
-        auto = row.type != "NOAUTO"
+        auto = row.kind != "NOAUTO"
         suffix = "" if row.internal_use else "_o"
         suffix_i = "" if row.internal_use else "_i"
         optional_comment = row.optional_comment
 
         lines = ""
-        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); TYPE: {row.type}. {optional_comment}\n\n"
+        lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); TYPE: {row.kind}. {optional_comment}\n\n"
 
         if auto:
             # signal to indicate if the register is addressed
@@ -464,7 +464,7 @@ class csr_gen:
         for row in table:
             name = row.name
             n_bits = row.n_bits
-            auto = row.type != "NOAUTO"
+            auto = row.kind != "NOAUTO"
 
             # version is not a register, it is an internal constant
             if name != "version":
@@ -499,7 +499,7 @@ class csr_gen:
     def gen_portmap(self, table, f):
         for row in table:
             name = row.name
-            auto = row.type != "NOAUTO"
+            auto = row.kind != "NOAUTO"
 
             # version is not a register, it is an internal constant
             if name != "version":
@@ -530,7 +530,7 @@ class csr_gen:
         snippet = ""
         for row in table:
             name = row.name
-            auto = row.type != "NOAUTO"
+            auto = row.kind != "NOAUTO"
             n_bits = row.n_bits
             log2n_items = convert_int(row.log2n_items)
             register_signals = []
@@ -703,7 +703,7 @@ class csr_gen:
         all_auto = True
         all_reads_auto = True
         for row in table:
-            if row.type == "NOAUTO":
+            if row.kind == "NOAUTO":
                 all_auto = False
                 if "R" in row.mode:
                     all_reads_auto = False
@@ -924,7 +924,7 @@ class csr_gen:
         # Create byte aligned wires
         for row in table:
             name = row.name
-            auto = row.type != "NOAUTO"
+            auto = row.kind != "NOAUTO"
             suffix = "" if row.internal_use else "_i"
             n_bits = row.n_bits
             n_bytes = int(self.bceil(n_bits, 3) / 8)
@@ -997,7 +997,7 @@ class csr_gen:
             )
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
             addr_w_base = max(log(self.cpu_n_bytes, 2), addr_w)
-            auto = row.type != "NOAUTO"
+            auto = row.kind != "NOAUTO"
             suffix = "" if row.internal_use else "_i"
 
             if "R" in row.mode:
@@ -1035,7 +1035,7 @@ class csr_gen:
             if n_bytes == 3:
                 n_bytes = 4
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            auto = row.type != "NOAUTO"
+            auto = row.kind != "NOAUTO"
             suffix = "" if row.internal_use else "_i"
 
             if "W" in row.mode:

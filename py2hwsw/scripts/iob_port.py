@@ -4,25 +4,35 @@
 
 from dataclasses import dataclass
 
-from iob_wire import iob_wire, replace_duplicate_signals_by_references, dict2interface
+from iob_wire import (
+    iob_wire,
+    replace_duplicate_signals_by_references,
+    dict2interface,
+    WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS,
+)
 from iob_base import (
     convert_dict2obj_list,
     fail_with_msg,
     str_to_kwargs,
     assert_attributes,
+    update_obj_from_dict,
 )
 from iob_signal import iob_signal
+from api_base import internal_api_class
 
 
+@internal_api_class("user_api.api", "iob_port")
 @dataclass
 class iob_port(iob_wire):
     """Describes an IO port."""
 
-    doc_only: bool = False
-    # If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
-    doc_clearpage: bool = False
+    def create_signals_from_interface(self):
+        if not self.interface:
+            fail_with_msg(f"Wire '{self.name}' has no interface!", ValueError)
 
-    def __post_init__(self):
+        self.signals += self.interface.get_signals()
+
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("All ports must have a name!", ValueError)
 
@@ -45,9 +55,7 @@ class iob_port(iob_wire):
                 ValueError,
             )
 
-        if self.interface:
-            self.signals += self.interface.get_signals()
-        elif _direction in ["subordinate", "manager"]:
+        if not self.interface and _direction in ["subordinate", "manager"]:
             fail_with_msg(
                 f"Port '{self.name}' is a '{_direction}' port but no interface is defined",
                 ValueError,
@@ -56,6 +64,8 @@ class iob_port(iob_wire):
         port_has_inputs = False
         port_has_outputs = False
         for signal in self.signals:
+            # Get internal representation of signal, because 'direction' is a internal attribute
+            signal = signal._get_py2hwsw_internal_obj()
             if not signal.direction:
                 raise Exception("Port direction is required")
             elif signal.direction not in ["input", "output", "inout"]:
@@ -169,3 +179,31 @@ def add_interface_port(core, *args, name, interface, **kwargs):
     port = iob_port(*args, name=name, interface=interface, **kwargs)
     replace_duplicate_signals_by_references(core.ports, port.signals)
     core.ports.append(port)
+
+
+#
+# API methods
+#
+
+
+def port_from_dict(port_dict):
+    port_obj = iob_port()
+
+    key_attribute_mapping = {}
+    preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
+    # Update port_obj attributes with values from given dictionary
+    update_obj_from_dict(
+        port_obj._get_py2hwsw_internal_obj(),
+        port_dict,
+        key_attribute_mapping,
+        preprocessor_functions,
+        port_obj.get_supported_attributes().keys(),
+    )
+
+    return port_obj
+
+
+def port_from_text(port_text):
+    port_dict = {}
+    # TODO: parse short notation text
+    return iob_port(**port_dict)

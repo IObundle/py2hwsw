@@ -23,6 +23,8 @@
 # python3.11-matplotlib-3.8.4
 # python3.11-scipy-1.13.0
 # python3.11-pyserial-3.5
+# python3.11-pydantic-2.6.3
+# python3.11-jinja2-3.1.4
 # texlive-combined-2023
 # riscv-gnu-toolchain (tag 2022.06.10)
 # verible-0.0.3515
@@ -147,5 +149,6 @@ pkgs.mkShell {
   shellHook = ''
     export PATH="$PATH:${bin_path}"
     export PYTHONPATH=${pythonEnv}/${pythonEnv.sitePackages}
+    export PYTHONPATH="$PYTHONPATH:${bin_path}"
   '';
 }

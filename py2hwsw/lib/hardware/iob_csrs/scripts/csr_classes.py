@@ -13,7 +13,7 @@ class iob_csr:
     """Class to represent a Control/Status Register."""
 
     name: str = ""
-    type: str = "REG"
+    kind: str = "REG"
     mode: str = ""
     n_bits: str or int = 1
     rst_val: int = 0
@@ -34,13 +34,17 @@ class iob_csr:
     # Optional comment to include in generated verilog of each csr (inside *_csrs.v)
     optional_comment: str = ""
 
+    def validate_attributes(self):
+        # TODO: Implement this method in a similar fashion as the Py2HWSW ones
+        pass
+
     def __post_init__(self):
         if not self.name:
             fail_with_msg("CSR name is not set", ValueError)
 
-        if self.type not in ["REG", "NOAUTO"]:
+        if self.kind not in ["REG", "NOAUTO"]:
             # FUTURE IMPROVEMENT: Add REGFILE type (different from regarray) to instantiate LUTRAMs.
-            fail_with_msg(f"Invalid CSR type: '{self.type}'", ValueError)
+            fail_with_msg(f"Invalid CSR type: '{self.kind}'", ValueError)
 
         if self.mode not in ["R", "W", "RW"]:
             fail_with_msg(f"Invalid CSR mode: '{self.mode}'", ValueError)
@@ -213,7 +217,8 @@ class iob_csr_group:
     doc_only: bool = False
     doc_clearpage: bool = False
 
-    def __post_init__(self):
+    # FIXME: call this validate_attributes. Maybe in a similar fashion as Py2HWSW ones
+    def validate_attributes(self):
         if not self.name:
             fail_with_msg("CSR group name is not set", ValueError)
 
@@ -228,7 +233,7 @@ def create_csr_group(*args, **kwargs):
         regs = [kwargs]
         group_kwargs = {
             "name": "general_operation",
-            "descr": "General operation group",
+            "descr": "Core configuration.",
         }
 
     # Convert user reg dictionaries into 'iob_csr' objects

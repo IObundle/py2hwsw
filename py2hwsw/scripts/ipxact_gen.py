@@ -10,6 +10,7 @@ import re
 import os
 import sys
 from iob_signal import iob_signal
+from api_base import convert2internal
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "../lib/hardware/iob_csrs")
@@ -88,9 +89,9 @@ class Parameter:
 
     """
 
-    def __init__(self, name, type, def_value, min_value, max_value, description):
+    def __init__(self, name, kind, def_value, min_value, max_value, description):
         self.name = name
-        self.type = type
+        self.kind = kind
         self.def_value = def_value
         self.min_value = min_value
         self.max_value = max_value
@@ -317,6 +318,7 @@ def gen_ports_list(core):
     ports_list = []
 
     for group in core.ports:
+        group = convert2internal(group)
         # Skip doc_only interfaces
         if group.doc_only:
             continue
@@ -326,6 +328,7 @@ def gen_ports_list(core):
             tag = group.name
 
         for signal in group.signals:
+            signal = convert2internal(signal)
             if not isinstance(signal, iob_signal):
                 continue
             n_bits = signal.width
@@ -355,6 +358,7 @@ def gen_bus_interfaces_list(core):
     bus_interfaces_list = []
 
     for group in core.ports:
+        group = convert2internal(group)
         # Skip doc_only interfaces
         if group.doc_only:
             continue
@@ -482,7 +486,7 @@ def gen_bus_interface_xml_file(bus_interface, dest_dir):
 
 
 #    # Create the Abstraction Definition file for the interface
-#    with open(f"{dest_dir}/interface_{bus_interface.type}.{bus_details['version']}.absDef.xml", "w") as f:
+#    with open(f"{dest_dir}/interface_{bus_interface.kind}.{bus_details['version']}.absDef.xml", "w") as f:
 #        f.write(f"""\
 # <?xml version="1.0" encoding="UTF-8"?>
 # <ipxact:abstractionDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2022" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2022 http://www.accellera.org/XMLSchema/IPXACT/1685-2022/index.xsd">
@@ -578,21 +582,23 @@ def gen_parameters_list(core):
 
     parameters_list = []
     for group in core.confs:
+        group = convert2internal(group)
         # Skip doc_only groups
         if group.doc_only:
             continue
         for conf in group.confs:
+            conf = convert2internal(conf)
             # Skip doc_only confs
             if conf.doc_only:
                 continue
-            if conf.type != ["M", "C"]:
+            if conf.kind != ["M", "C"]:
                 parameters_list.append(
                     Parameter(
                         conf.name,
-                        conf.type,
-                        conf.val,
-                        conf.min,
-                        conf.max,
+                        conf.kind,
+                        conf.value,
+                        conf.min_value,
+                        conf.max_value,
                         conf.descr,
                     )
                 )
@@ -710,6 +716,7 @@ def generate_ipxact_xml(core, dest_dir):
     csr_block = None
     # Find iob_csrs block in subblocks list
     for block in core.subblocks:
+        block = convert2internal(block)
         if block.original_name == "iob_csrs":
             csr_block = block
             break
@@ -770,6 +777,8 @@ def generate_ipxact_xml(core, dest_dir):
     # Create the xml file
     xml_file = open(dest_dir + "/" + core_name + ".xml", "w+")
 
+    core_license = convert2internal(core.license)
+
     # Write the xml header
     xml_text = f"""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <ipxact:component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2014" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd">
@@ -794,14 +803,14 @@ def generate_ipxact_xml(core, dest_dir):
 	<ipxact:description>{core.description}</ipxact:description>
 	{parameters_xml}
 	<ipxact:vendorExtensions>
-		<kactus2:author>{core.license.author}</kactus2:author>
+		<kactus2:author>{core_license.author}</kactus2:author>
 		<kactus2:version>3,10,15,0</kactus2:version>
 		<kactus2:kts_attributes>
 			<kactus2:kts_productHier>Flat</kactus2:kts_productHier>
 			<kactus2:kts_implementation>HW</kactus2:kts_implementation>
 			<kactus2:kts_firmness>Mutable</kactus2:kts_firmness>
 		</kactus2:kts_attributes>
-		<kactus2:license>{core.license.name} License, Copyright (c) {core.license.year}</kactus2:license>
+		<kactus2:license>{core_license.name} License, Copyright (c) {core_license.year}</kactus2:license>
 	</ipxact:vendorExtensions>
 </ipxact:component>"""
 

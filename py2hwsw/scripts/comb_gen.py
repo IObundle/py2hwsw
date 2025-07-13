@@ -4,13 +4,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+from api_base import convert2internal
+
 
 def generate_comb(core):
     """Generate verilog code with the comb of this module.
     returns: Generated verilog code
     """
     if core.comb != None:
-        return core.comb.verilog_code + "\n"
+        return convert2internal(core.comb).verilog_code + "\n"
 
     return ""
 

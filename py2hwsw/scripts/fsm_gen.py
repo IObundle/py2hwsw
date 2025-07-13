@@ -4,13 +4,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+from api_base import convert2internal
+
 
 def generate_fsm(core):
     """Generate verilog code with the fsm of this module.
     returns: Generated verilog code
     """
     if core.fsm != None:
-        return core.fsm.verilog_code
+        return convert2internal(core.fsm).verilog_code
 
     return ""
 

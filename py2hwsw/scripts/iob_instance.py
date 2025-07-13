@@ -11,61 +11,63 @@ from iob_base import (
     find_obj_in_list,
     fail_with_msg,
     debug,
+    prevent_instantiation,
 )
 from iob_portmap import iob_portmap, get_portmap_port
 from iob_signal import remove_signal_direction_suffixes
 
 
+@prevent_instantiation
 class iob_instance(iob_base):
     """Class to describe a module's (Verilog) instance"""
 
-    def __init__(
-        self,
-        *args,
-        instance_name: str = None,
-        instance_description: str = None,
-        connect: Dict = {},
-        parameters: Dict = {},
-        instantiate: bool = True,
-        **kwargs,
-    ):
-        """Build a (Verilog) instance
-        param parameters: Verilog parameter values for this instance
-                          Key: Verilog parameter name, Value: Verilog parameter value
-        """
-        self.set_default_attribute(
-            "instance_name",
-            instance_name or self.__class__.__name__ + "_inst",
-            str,
-            descr="Name of the instance",
-            copy_by_reference=False,
-        )
-        self.set_default_attribute(
-            "instance_description",
-            instance_description or "Default description",
-            str,
-            descr="Description of the instance",
-            copy_by_reference=False,
-        )
-        # Instance portmap connections
-        self.set_default_attribute(
-            "portmap_connections", [], list, descr="Instance portmap connections",
-            copy_by_reference=False,
-        )
-        # Verilog parameter values
-        self.set_default_attribute(
-            "parameters", parameters, Dict, descr="Verilog parameter values",
-            copy_by_reference=False,
-        )
-        # Select if should intantiate inside another Verilog module.
-        # May be False if this is a software only module.
-        self.set_default_attribute(
-            "instantiate",
-            instantiate,
-            bool,
-            descr="Select if should intantiate the module inside another Verilog module.",
-            copy_by_reference=False,
-        )
+    # def __init__(
+    #     self,
+    #     *args,
+    #     instance_name: str = None,
+    #     instance_description: str = None,
+    #     connect: Dict = {},
+    #     parameters: Dict = {},
+    #     instantiate: bool = True,
+    #     **kwargs,
+    # ):
+    #     """Build a (Verilog) instance
+    #     param parameters: Verilog parameter values for this instance
+    #                       Key: Verilog parameter name, Value: Verilog parameter value
+    #     """
+    #     self.set_default_attribute(
+    #         "instance_name",
+    #         instance_name or self.__class__.__name__ + "_inst",
+    #         str,
+    #         descr="Name of the instance",
+    #         copy_by_reference=False,
+    #     )
+    #     self.set_default_attribute(
+    #         "instance_description",
+    #         instance_description or "Default description",
+    #         str,
+    #         descr="Description of the instance",
+    #         copy_by_reference=False,
+    #     )
+    #     # Instance portmap connections
+    #     self.set_default_attribute(
+    #         "portmap_connections", [], list, descr="Instance portmap connections",
+    #         copy_by_reference=False,
+    #     )
+    #     # Verilog parameter values
+    #     self.set_default_attribute(
+    #         "parameters", parameters, Dict, descr="Verilog parameter values",
+    #         copy_by_reference=False,
+    #     )
+    #     # Select if should intantiate inside another Verilog module.
+    #     # May be False if this is a software only module.
+    #     self.set_default_attribute(
+    #         "instantiate",
+    #         instantiate,
+    #         bool,
+    #         descr="Select if should intantiate the module inside another Verilog module.",
+    #         copy_by_reference=False,
+    #     )
 
     def __deepcopy__(self, memo):
         """Create a deep copy of this instance:
@@ -235,7 +237,7 @@ class iob_instance(iob_base):
                     p.interface.has_rst |= port.interface.has_rst
                     p.interface.has_en |= port.interface.has_en
                     p.signals = []
-                    p.__post_init__()
+                    p.__post_init__()  # FIXME: no longer exists
                     clk_portmap.connect_external(p, bit_slices=[])
                     return
 

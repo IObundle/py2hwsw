@@ -508,7 +508,7 @@ def create_snippet_from_text(snippet_text):
 
     Attributes:
         snippet_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [snippet_text]
 
     Returns:
         iob_snippet: iob_snippet object

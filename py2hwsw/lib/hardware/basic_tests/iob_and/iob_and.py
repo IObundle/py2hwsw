@@ -179,6 +179,12 @@ if __name__ == "__main__":
     )
     print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
 
+    print("\n\nSnippet from text:")
+    snippet_obj = py2hwsw.create_snippet_from_text(
+        {"verilog_code": "   assign y_o = a_i & b_i;"}
+    )
+    print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
+
     core_obj = py2hwsw.create_core_from_dict(core_dictionary)
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])

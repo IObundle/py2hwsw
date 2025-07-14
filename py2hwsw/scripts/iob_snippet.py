@@ -38,6 +38,5 @@ def snippet_from_dict(snippet_dict):
 
 
 def snippet_from_text(snippet_text):
-    snippet_dict = {}
-    # TODO: parse short notation text
-    return iob_snippet(**snippet_dict)
+    # Snippet shot notation translation is direct
+    return iob_snippet(verilog_code=snippet_text)

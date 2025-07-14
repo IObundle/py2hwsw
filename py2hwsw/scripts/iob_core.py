@@ -95,8 +95,6 @@ class iob_core(iob_module, iob_instance):
         # print("Iob-core attributes:", self.__class__.__annotations__)
 
         # Set internal attributes
-        "Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`"
-        self.dest_dir = "hardware/src"
         "Selects if core is top module."
         self.is_top_module = __class__.global_top_module == self
         "Selects if core is superblock of another."
@@ -1180,7 +1178,7 @@ def instantiate_core(core_name, python_parameters={}, instantiance_attributes={}
     }
     # Filter-out non-instance attributes from dictionary
     # Instead of filtering, should we throw an error if attributes are not the ones expected?
-    instance_attributes_names = ["instance_name", "instance_description", "connect", "parameters", "instantiate"]
+    instance_attributes_names = ["instance_name", "instance_description", "connect", "parameters", "instantiate", "dest_dir"]
     instantiance_attributes = {k:v for k,v in instantiance_attributes.items() if k in instance_attributes_names}
     # Set instance attributes
     update_obj_from_dict(internal_core_obj, instantiance_attributes, key_attribute_mapping, preprocessor_functions)

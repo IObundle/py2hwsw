@@ -143,6 +143,16 @@ if __name__ == "__main__":
         print("\tsignal: ", signal.get_name(), "width:", signal.get_width())
     print("descr: ", wire_obj.get_descr())
 
+    # iface_obj = py2hwsw.create_interface_from_text(
+    #     "axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_"
+    # )
+    # iface_obj = py2hwsw.create_interface_from_text(
+    #     "rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32"
+    # )
+    # iface_obj = py2hwsw.create_interface_from_text(
+    #     "axis -p output_ -P 'has_tlast'"
+    # )
+
     port_obj = py2hwsw.create_port_from_dict(
         {
             "name": "a_i",

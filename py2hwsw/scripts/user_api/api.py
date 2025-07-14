@@ -332,7 +332,11 @@ def create_interface_from_text(interface_text):
 
     Attributes:
         interface_text (str): Short notation text. Object attributes are specified using the following format:
-            type [-p prefix] [-m mult] [-w width]
+            genre [-d direction] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
+            Examples:
+                axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
+                rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32
+                axis -p output_ -P 'has_tlast'
 
     Returns:
         interface: interface object

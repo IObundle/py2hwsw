@@ -529,12 +529,12 @@ class iob_core(iob_module, iob_instance):
         )
         # Add SPDX license headers to every file in build dir
         custom_header = f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
-        internal_license = convert2internal(self.license)
+        lic = convert2internal(self.license)
         generate_headers(
             root=self.build_dir,
-            copyright_holder=internal_license.author,
-            copyright_year=internal_license.year,
-            license_name=internal_license.name,
+            copyright_holder=lic.author,
+            copyright_year=lic.year,
+            license_name=lic.name,
             header_template="spdx",
             custom_header_suffix=custom_header,
             skip_existing_headers=True,
@@ -1166,7 +1166,7 @@ def instantiate_block(block_name, python_parameters={}, block_dict={}):
         debug_print(f"Loading {block_name}.json", 1)
         api_block_obj = core_from_dict(json.load(open(os.path.join(block_dir, f"{block_name}.json"))))
 
-    block_obj = api_block_obj._get_py2hwsw_internal_obj()
+    block_obj = convert2internal(api_block_obj)
 
     # FIXME: These mappings are duplicates from iob_block's constructor. Harder to maintain
     key_attribute_mapping = {

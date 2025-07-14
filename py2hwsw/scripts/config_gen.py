@@ -320,10 +320,10 @@ def generate_confs(core):
     """Generate Verilog and software macros based on the core's 'confs' list.
     :param core: core object
     """
-    internal_confs = [convert2internal(i) for i in core.confs]
+    confs = [convert2internal(i) for i in core.confs]
     conf_vh(
-        internal_confs,
+        confs,
         core.name,
         os.path.join(core.build_dir, core.dest_dir),
     )
-    conf_h(internal_confs, core.name, core.build_dir + "/software/src")
+    conf_h(confs, core.name, core.build_dir + "/software/src")

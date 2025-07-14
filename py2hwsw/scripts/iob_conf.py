@@ -140,7 +140,7 @@ def rename_dictionary_keys(dictionary, key_mapping):
 
 
 def conf_from_dict(conf_dict):
-    conf_obj = iob_conf()
+    api_conf_obj = iob_conf()
 
     key_attribute_mapping = {
         "type": "kind",
@@ -151,14 +151,14 @@ def conf_from_dict(conf_dict):
     preprocessor_functions = {}
     # Update conf_obj attributes with values from given dictionary
     update_obj_from_dict(
-        conf_obj._get_py2hwsw_internal_obj(),
+        api_conf_obj._get_py2hwsw_internal_obj(),
         conf_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        conf_obj.get_supported_attributes().keys(),
+        api_conf_obj.get_supported_attributes().keys(),
     )
 
-    return conf_obj
+    return api_conf_obj
 
 
 def conf_from_text(conf_text: str) -> iob_conf:
@@ -177,15 +177,15 @@ def conf_from_text(conf_text: str) -> iob_conf:
 
 
 def conf_group_from_dict(conf_group_dict):
-    conf_group_obj = iob_conf_group()
+    api_conf_group_obj = iob_conf_group()
 
     # If "confs" key is missing, then assume dictionary describes a single conf
     if "confs" not in conf_group_dict:
-        internal_conf_group_obj = conf_group_obj._get_py2hwsw_internal_obj()
-        internal_conf_group_obj.name = "general_operation"
-        internal_conf_group_obj.descr = "Core configuration."
-        internal_conf_group_obj.confs = [conf_from_dict(conf_group_dict)]
-        return conf_group_obj
+        conf_group_obj = api_conf_group_obj._get_py2hwsw_internal_obj()
+        conf_group_obj.name = "general_operation"
+        conf_group_obj.descr = "Core configuration."
+        conf_group_obj.confs = [conf_from_dict(conf_group_dict)]
+        return api_conf_group_obj
 
     key_attribute_mapping = {}
     preprocessor_functions = {
@@ -193,14 +193,14 @@ def conf_group_from_dict(conf_group_dict):
     }
     # Update conf_group_obj attributes with values from given dictionary
     update_obj_from_dict(
-        conf_group_obj._get_py2hwsw_internal_obj(),
+        api_conf_group_obj._get_py2hwsw_internal_obj(),
         conf_group_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        conf_group_obj.get_supported_attributes().keys(),
+        api_conf_group_obj.get_supported_attributes().keys(),
     )
 
-    return conf_group_obj
+    return api_conf_group_obj
 
 
 def conf_group_from_text(conf_group_text: str):

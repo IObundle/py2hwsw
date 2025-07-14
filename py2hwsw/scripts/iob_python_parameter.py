@@ -112,7 +112,7 @@ def python_parameter_from_text(python_parameter_text):
 
 
 def python_parameter_group_from_dict(python_parameter_group_dict):
-    python_parameter_group_obj = iob_python_parameter_group()
+    api_python_parameter_group_obj = iob_python_parameter_group()
 
     key_attribute_mapping = {}
     preprocessor_functions = {
@@ -120,14 +120,14 @@ def python_parameter_group_from_dict(python_parameter_group_dict):
     }
     # Update python_parameter_group_obj attributes with values from given dictionary
     update_obj_from_dict(
-        python_parameter_group_obj._get_py2hwsw_internal_obj(),
+        api_python_parameter_group_obj._get_py2hwsw_internal_obj(),
         python_parameter_group_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        python_parameter_group_obj.get_supported_attributes().keys(),
+        api_python_parameter_group_obj.get_supported_attributes().keys(),
     )
 
-    return python_parameter_group_obj
+    return api_python_parameter_group_obj
 
 
 def python_parameter_group_from_text(python_parameter_group_text):

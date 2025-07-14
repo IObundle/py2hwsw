@@ -63,9 +63,9 @@ class iob_port(iob_wire):
 
         port_has_inputs = False
         port_has_outputs = False
-        for signal in self.signals:
+        for api_signal in self.signals:
             # Get internal representation of signal, because 'direction' is a internal attribute
-            signal = signal._get_py2hwsw_internal_obj()
+            signal = api_signal._get_py2hwsw_internal_obj()
             if not signal.direction:
                 raise Exception("Port direction is required")
             elif signal.direction not in ["input", "output", "inout"]:
@@ -187,20 +187,20 @@ def add_interface_port(core, *args, name, interface, **kwargs):
 
 
 def port_from_dict(port_dict):
-    port_obj = iob_port()
+    api_port_obj = iob_port()
 
     key_attribute_mapping = {}
     preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
     # Update port_obj attributes with values from given dictionary
     update_obj_from_dict(
-        port_obj._get_py2hwsw_internal_obj(),
+        api_port_obj._get_py2hwsw_internal_obj(),
         port_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        port_obj.get_supported_attributes().keys(),
+        api_port_obj.get_supported_attributes().keys(),
     )
 
-    return port_obj
+    return api_port_obj
 
 
 def port_from_text(port_text):

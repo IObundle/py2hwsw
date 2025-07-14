@@ -253,20 +253,20 @@ WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS = {
 
 
 def wire_from_dict(wire_dict):
-    wire_obj = iob_wire()
+    api_wire_obj = iob_wire()
 
     key_attribute_mapping = {}
     preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
     # Update wire_obj attributes with values from given dictionary
     update_obj_from_dict(
-        wire_obj._get_py2hwsw_internal_obj(),
+        api_wire_obj._get_py2hwsw_internal_obj(),
         wire_dict,
         key_attribute_mapping,
         preprocessor_functions,
-        wire_obj.get_supported_attributes().keys(),
+        api_wire_obj.get_supported_attributes().keys(),
     )
 
-    return wire_obj
+    return api_wire_obj
 
 
 def wire_from_text(wire_text):

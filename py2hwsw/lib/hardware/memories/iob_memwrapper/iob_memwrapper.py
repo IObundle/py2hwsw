@@ -123,8 +123,7 @@ def setup(py_params_dict):
         if "ram" in type:
             # check if memory module has MEM_NO_READ_ON_WRITE conf
             mem_dir, file_ext = find_module_setup_dir(type)
-            import_python_module(os.path.join(mem_dir, f"{type}.py"))
-            mem_module = sys.modules[type]
+            mem_module = import_python_module(os.path.join(mem_dir, f"{type}.py"))
             mem_dict = mem_module.setup({})
             if "MEM_NO_READ_ON_WRITE" in mem_dict["confs"]:
                 extra_params["MEM_NO_READ_ON_WRITE"] = mem_dict["MEM_NO_READ_ON_WRITE"]

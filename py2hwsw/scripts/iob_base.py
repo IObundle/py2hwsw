@@ -251,7 +251,7 @@ def add_traceback_msg(msg):
 debug_level = 0
 
 
-def debug(msg, level=0):
+def debug_print(msg, level=0):
     """Print a message if project debug_level >= level
     :param str msg: message to print
     :param int level: debug level
@@ -547,12 +547,14 @@ def import_python_module(module_path, module_name=None):
 
     # Don't import the same module twice
     if module_name in sys.modules:
-        return
+        return sys.modules[module_name]
 
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
+
+    return sys.modules[module_name]
 
 
 def nix_permission_hack(path):

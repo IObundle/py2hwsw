@@ -38,7 +38,7 @@ from iob_base import (
     import_python_module,
     nix_permission_hack,
     add_traceback_msg,
-    debug,
+    debug_print,
     get_lib_cores,
     update_obj_from_dict,
 )
@@ -649,7 +649,7 @@ class iob_core(iob_module, iob_instance):
                 # Find object and override it
                 for idx, obj in enumerate(parent_attributes[child_attribute_name]):
                     if obj[identifier] == child_obj[identifier]:
-                        debug(f"Overriding {child_obj[identifier]}", 1)
+                        debug_print(f"Overriding {child_obj[identifier]}", 1)
                         parent_attributes[child_attribute_name][idx] = child_obj
                         break
                 else:
@@ -946,10 +946,9 @@ class iob_core(iob_module, iob_instance):
         core_dir, file_ext = find_module_setup_dir(core_name)
 
         if file_ext == ".py":
-            import_python_module(
+            core_module = import_python_module(
                 os.path.join(core_dir, f"{core_name}.py"),
             )
-            core_module = sys.modules[core_name]
             issuer = kwargs.pop("issuer", None)
             # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
             # obtain the core's py2hwsw dictionary.
@@ -1136,40 +1135,40 @@ def clean_build_dir(build_dir):
     )
 
 
-def instantiate_core(core_name, python_parameters={}, instantiance_attributes={}):
+def instantiate_block(block_name, python_parameters={}, block_dict={}):
     """
-    Find a core based on given core_name and instatiate it.
+    Find a block based on given block_name and instatiate it.
 
     Attributes:
-        core (str): The name of the core to instantiate. Will search for <core>.py or <core>.json files.
-                    If <core>.py is found, it must contain a class called <core> that extends iob_core. This class will be used to instantiate the core.
-                    If <core>.json is found, its contents will be read and parsed by the core_from_dict(<json_contents>) function.
-        python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated core.
-                                  Elements from this dictionary will be passed as **kwargs to the instantiated core's constructor.
-                                  Only applicable if instantiated core has a constructor that accepts python parameters (excludes cores defined in JSON or purely by dictionary).
-        instantiance_attributes (dict): Optional. Dictionary of instance attributes to set on the instantiated core.
+        block (str): The name of the block to instantiate. Will search for <block>.py or <block>.json files.
+                    If <block>.py is found, it must contain a class called <block> that extends iob_block. This class will be used to instantiate the block.
+                    If <block>.json is found, its contents will be read and parsed by the block_from_dict(<json_contents>) function.
+        python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated block.
+                                  Elements from this dictionary will be passed as **kwargs to the instantiated block's constructor.
+                                  Only applicable if instantiated block has a constructor that accepts python parameters (excludes blocks defined in JSON or purely by dictionary).
+        block_dict (dict): Optional. Dictionary of instance attributes to set on the instantiated block.
     Returns:
-        iob_core: The instantiated core object
+        iob_block: The instantiated block object
     """
-    core_dir, file_ext = find_module_setup_dir(core_name)
+    block_dir, file_ext = find_module_setup_dir(block_name)
 
     if file_ext == ".py":
-        debug(f"Importing {core_name}.py", 1)
-        import_python_module(
-            os.path.join(core_dir, f"{core_name}.py"),
+        debug_print(f"Importing {block_name}.py", 1)
+        block_module = import_python_module(
+            os.path.join(block_dir, f"{block_name}.py"),
         )
-        core_module = sys.modules[core_name]
 
-        # Instantiate core (call constructor from class defined inside the .py file)
-        core_obj = getattr(core_module, core_name)(**python_parameters)
+        # Instantiate block (call constructor from class defined inside the .py file)
+        block_class = getattr(block_module, block_name)
+        api_block_obj = block_class(**python_parameters)
 
     elif file_ext == ".json":
-        debug(f"Loading {core_name}.json", 1)
-        core_obj = core_from_dict(json.load(open(os.path.join(core_dir, f"{core_name}.json"))))
+        debug_print(f"Loading {block_name}.json", 1)
+        api_block_obj = core_from_dict(json.load(open(os.path.join(block_dir, f"{block_name}.json"))))
 
-    internal_core_obj = core_obj._get_py2hwsw_internal_obj()
+    block_obj = api_block_obj._get_py2hwsw_internal_obj()
 
-    # FIXME: These mappings are duplicates from iob_core's constructor. Harder to maintain
+    # FIXME: These mappings are duplicates from iob_block's constructor. Harder to maintain
     key_attribute_mapping = {
         "connect": "portmap_connections",
     }
@@ -1179,17 +1178,17 @@ def instantiate_core(core_name, python_parameters={}, instantiance_attributes={}
     # Filter-out non-instance attributes from dictionary
     # Instead of filtering, should we throw an error if attributes are not the ones expected?
     instance_attributes_names = ["instance_name", "instance_description", "connect", "parameters", "instantiate", "dest_dir"]
-    instantiance_attributes = {k:v for k,v in instantiance_attributes.items() if k in instance_attributes_names}
+    block_dict = {k:v for k,v in block_dict.items() if k in instance_attributes_names}
     # Set instance attributes
-    update_obj_from_dict(internal_core_obj, instantiance_attributes, key_attribute_mapping, preprocessor_functions)
+    update_obj_from_dict(block_obj, block_dict, key_attribute_mapping, preprocessor_functions)
 
-    # Auto-set core attributes
-    if not internal_core_obj.original_name:
-        internal_core_obj.original_name = core_name
-    if not internal_core_obj.setup_dir:
-        internal_core_obj.setup_dir = core_dir
+    # Auto-set block attributes
+    if not block_obj.original_name:
+        block_obj.original_name = block_name
+    if not block_obj.setup_dir:
+        block_obj.setup_dir = block_dir
 
-    return core_obj
+    return api_block_obj
 
 
 #
@@ -1201,7 +1200,7 @@ def instantiate_core(core_name, python_parameters={}, instantiance_attributes={}
 def core_from_dict(core_dict):
     # If 'core' key is given, find corresponding core and instantiate it. Ignore other non-instance attributes.
     if core_dict.get("core", None):
-        return instantiate_core(core_dict["core"], core_dict.get("python_parameters", {}), core_dict)
+        return instantiate_block(core_dict["core"], core_dict.get("python_parameters", {}), core_dict)
     return iob_core(core_dict)
 
 

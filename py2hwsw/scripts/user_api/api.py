@@ -933,6 +933,7 @@ class iob_core:
 
     # Instance attributes
     # Should these be in a separate class? It would be easier to distiguish them from other attributes in code.
+    # TODO: Make a new iob_instance class, independent from the iob_core class. Subblocks will instantiate iob_instance objects. Each iob_instance will store a reference to an iob_core.
     instance_name: str = None
     instance_description: str = "Default instance description"
     portmap_connections: list[str] = empty_list()

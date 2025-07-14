@@ -10,7 +10,7 @@ from iob_base import (
     iob_base,
     find_obj_in_list,
     fail_with_msg,
-    debug,
+    debug_print,
     prevent_instantiation,
 )
 from iob_portmap import iob_portmap, get_portmap_port
@@ -138,7 +138,7 @@ class iob_instance(iob_base):
                     issuer.ports, wire_name
                 )
                 if not wire:
-                    debug(
+                    debug_print(
                         f"Creating implicit wire '{port.name}' in '{issuer.name}'.", 1
                     )
                     # Add wire to issuer

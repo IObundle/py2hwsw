@@ -529,6 +529,7 @@ class iob_comb(iob_snippet):
     Attributes:
         code (str): Verilog code string
         clk_if (str): Clock interface
+        clk_prefix (str): Clock interface prefix
     """
 
     code: str = ""
@@ -560,7 +561,17 @@ def create_comb_from_text(comb_text):
 
     Attributes:
         comb_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [-c code] [-clk_if clk_if] [-clk_p clk_prefix]
+            Example:
+                '
+                    -c
+                    "
+                        // Register data
+                        data_nxt = data;
+                    "
+                    -clk_if c_a_r
+                    -clk_p data_
+                '
 
     Returns:
         iob_comb: iob_comb object

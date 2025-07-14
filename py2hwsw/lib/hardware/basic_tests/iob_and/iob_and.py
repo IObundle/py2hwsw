@@ -185,6 +185,23 @@ if __name__ == "__main__":
     )
     print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
 
+    comb_obj = py2hwsw.create_comb_from_text(
+        """
+            -c
+            "
+                // Register data
+                data_nxt = data;
+            "
+            -clk_if c_a_r
+            -clk_p data_
+        """
+    )
+    print(">>> comb_obj: clk_if: ", comb_obj.get_clk_if(), end=" ")
+    print("|\t clk_prefix: ", comb_obj.get_clk_prefix())
+    print("code:")
+    print(comb_obj.get_code())
+    print("======\n\n")
+
     core_obj = py2hwsw.create_core_from_dict(core_dictionary)
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])

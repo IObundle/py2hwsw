@@ -111,6 +111,7 @@ class iob_conf:
         pass
 
 
+# TODO: Rename 'keys' to match attribute names. No longer need to map them.
 @api_for(internal_conf.conf_from_dict)
 def create_conf_from_dict(conf_dict):
     """
@@ -708,6 +709,19 @@ def create_portmap_from_dict(portmap_dict):
             external_connection1_name -> iob_portmap.e_connect
             ["bit_slice_1", "bit_slice_2", ...] -> iob_portmap.e_connect_bit_slices
 
+            Bit slices may perform multiple functions:
+            - Slice bits from a signal that is being connected.
+              For example, if we have a signal (iob_addr_signal) with 32 bits, from a wire (iob_bus_wire), and we want to connect it to a port (iob_bus_port) that only accepts an address of 8 bits, we could use:
+              "iob_bus_port": ("iob_bus_wire", ["iob_addr_signal[7:0]"]),
+            - Connect extra signals that do not exist in the wire.
+              For example, if we have a signal (independent_iob_data_signal) that is not included in the wire (iob_bus_wire), but exists in the port (iob_bus_port), we could use:
+              "iob_bus_port": ("iob_bus_wire", ["iob_data_signal_i: independent_iob_data_signal"]),
+              If we didn't have the independent_iob_data_signal, we could instead connect that port's signal to a constant value or high impedance, like so:
+              "iob_bus_port": ("iob_bus_wire", ["iob_data_signal_i: 'b1"]),
+              "iob_bus_port": ("iob_bus_wire", ["iob_data_signal_i: 'bz"]),
+
+
+
     Returns:
         list[iob_portmap]: List of iob_portmap objects
     """
@@ -878,6 +892,7 @@ class iob_core:
         portmap_connections (list): Instance portmap connections.
         parameters (dict): Verilog parameter values for this instance.
         instantiate (bool): Select if should intantiate the module inside another Verilog module.
+        dest_dir (str): Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`.
 
         # Core attributes
         version (str): Core version. By default is the same as Py2HWSW version.
@@ -923,6 +938,7 @@ class iob_core:
     portmap_connections: list[str] = empty_list()
     parameters: dict[str, int | str] = empty_dict()
     instantiate: bool = True
+    dest_dir: str = "hardware/src"
 
     # Core attributes
     version: str = PY2HWSW_VERSION
@@ -989,6 +1005,7 @@ def create_core_from_dict(core_dict):
             - connect -> iob_instance.portmap_connections = create_portmap_from_dict(connect)
             - parameters -> iob_instance.parameters
             - instantiate -> iob_instance.instantiate
+            - dest_dir -> iob_core.dest_dir
             # Non-attribute instance keys
             - core (str): Optional. The name of the core to instantiate. Will search for <core>.py or <core>.json files.
                           If this key is set, all other keys will be ignored! (Except 'python_parameters' key).

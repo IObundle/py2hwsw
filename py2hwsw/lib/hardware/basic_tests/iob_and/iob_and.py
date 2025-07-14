@@ -165,6 +165,15 @@ if __name__ == "__main__":
     print(">>> Name of port_obj: ", port_obj.get_name())
     print(">>> Name of port signal: ", port_obj.get_signals()[0].get_name())
 
+    port_obj = py2hwsw.create_port_from_text(
+        "control -d 'control bus' -s start_i:1 -s done_o:1 -s cmd_i:CMD_W -doc"
+    )
+    print(">>> Name of port_obj: ", port_obj.get_name())
+    print(">>> port_obj doc_only: ", port_obj.get_doc_only())
+    print(">>> port_obj doc_clearpage: ", port_obj.get_doc_clearpage())
+    for s in port_obj.get_signals():
+        print("\t>>> Signal name: ", s.get_name(), "width:", s.get_width())
+
     snippet_obj = py2hwsw.create_snippet_from_dict(
         {"verilog_code": "   assign y_o = a_i & b_i;"}
     )

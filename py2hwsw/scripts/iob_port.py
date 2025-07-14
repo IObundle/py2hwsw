@@ -16,8 +16,9 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     update_obj_from_dict,
+    parse_short_notation_text,
 )
-from iob_signal import iob_signal
+from iob_signal import iob_signal, signal_from_dict
 from api_base import internal_api_class
 
 
@@ -204,6 +205,24 @@ def port_from_dict(port_dict):
 
 
 def port_from_text(port_text):
-    port_dict = {}
-    # TODO: parse short notation text
+    port_flags = [
+        "name",
+        ["-i", {"dest": "interface"}],
+        ["-s", {"dest": "signals", "action": "append"}],
+        ["-d", {"dest": "descr", "nargs": "?"}],
+        ["-doc", {"dest": "doc_only", "action": "store_true"}],
+        ["-doc_clearpage", {"dest": "doc_clearpage", "action": "store_true"}],
+    ]
+    port_dict = parse_short_notation_text(port_text, port_flags)
+    port_signals = []
+    for s in port_dict.get("signals", []):
+        try:
+            [s_name, s_width] = s.split(":")
+        except ValueError:
+            fail_with_msg(
+                f"Invalid signal format '{s}'! Expected 'name:width' format.",
+                ValueError,
+            )
+        port_signals.append(signal_from_dict({"name": s_name, "width": s_width}))
+    port_dict.update({"signals": port_signals})
     return iob_port(**port_dict)

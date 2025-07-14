@@ -458,7 +458,9 @@ def create_port_from_text(port_text):
 
     Attributes:
         port_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-i interface] [-d descr] [-s signal_name:width]+
+            name [-i interface] [-d descr] [-s signal_name:width]+ [-doc] [-doc_clearpage]
+            Example:
+                control -d 'control bus' -s start_i:1 -s done_o:1 -s cmd_i:CMD_W -doc
 
     Returns:
         iob_port: iob_port object

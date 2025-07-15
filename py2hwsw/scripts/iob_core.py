@@ -31,7 +31,6 @@ from py2hwsw_version import PY2HWSW_VERSION
 from iob_python_parameter import create_python_parameter_group
 import interfaces
 from iob_module import iob_module, get_list_attr_handler
-from iob_instance import iob_instance
 from iob_base import (
     fail_with_msg,
     find_file,
@@ -59,7 +58,7 @@ from api_base import internal_api_class, convert2internal
 
 
 @internal_api_class("user_api.api", "iob_core", allow_unknown_args=True)
-class iob_core(iob_module, iob_instance):
+class iob_core(iob_module):
     """Generic class to describe how to generate a base IOb IP core"""
 
     # List of global wires.
@@ -88,7 +87,6 @@ class iob_core(iob_module, iob_instance):
 
         # Inherit attributes from superclasses
         iob_module.__init__(self)
-        iob_instance.__init__(self)
 
         # For debug:
         # print("Iob-core: called")
@@ -174,7 +172,7 @@ class iob_core(iob_module, iob_instance):
 
         # Inherit attributes from superclasses
         iob_module.__init__(self, *args, **kwargs)
-        iob_instance.__init__(self, *args, **kwargs)
+        #iob_instance.__init__(self, *args, **kwargs)
         # Ensure global top module is set
         self.update_global_top_module(attributes)
         # self.set_default_attribute(

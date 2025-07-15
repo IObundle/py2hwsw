@@ -61,6 +61,7 @@ import iob_block as internal_block
 import iob_license as internal_license
 import iob_portmap as internal_portmap
 import iob_python_parameter as internal_python_parameter
+import iob_instance as internal_instance
 import iob_core as internal_core
 from py2hwsw_version import PY2HWSW_VERSION
 
@@ -521,7 +522,23 @@ class iob_comb(iob_snippet):
     Class to represent a Verilog combinatory circuit in an iob module.
 
     Attributes:
-        code (str): Verilog code string
+        code (str): Verilog body code of the @always block.
+                    This string will be parsed to automatically identify and infer registers.
+                    The `iob_reg` Py2HWSW lib module will be automatically instantiated in the core for each signal '<name>' if the following conditions are met:
+                    - The wire '<name>' with single signal '<name>' exists in the core;
+                    - The signal '<name>_nxt' is used in the iob_comb's code. The wire '<name>_nxt' will be automatically created if it does not exist;
+
+                    The infered register will have the instance name '<name>_reg'. It will automatically connect it's input to the '<name>_nxt' signal, and it's output to the '<name>' signal.
+
+                    If the following signals are found in the iob_comb's code, their wires are automatically created and the corresponding register will be updated:
+                    - The '<name>_rst' signal will cause the register to have a reset port, and be connected to this wire;
+                    - The '<name>_en' signal will cause the register to have an enable port, and be connected to this wire;
+
+                    For example, if we define the 'reg_signal' wire in the core, and the iob_comb has the following code:
+                    '''
+                    reg_signal_nxt = reg_signal + 1;
+                    '''
+                    then the 'reg_signal_nxt' wire will be automatically created, and the 'reg_signal_reg' register will be instantiated.
         clk_if (str): Clock interface
     """
 
@@ -850,7 +867,7 @@ def create_python_parameter_group_from_text(python_parameter_group_text):
 
 
 #
-# Core (Subblocks, Superblocks, SwModules)
+# Instance
 #
 
 
@@ -858,6 +875,81 @@ class iob_core:
     """Forward reference of iob_core class. Full declaration of iob_core class is available in below."""
 
     pass
+
+
+@api_for(internal_instance.iob_instance)
+class iob_instance:
+    """
+    Generic class to describe a module's instance.
+
+    Attributes:
+        core (str): Name of the core to instantiate.
+        instance_name (str): Name of the instance. (Will be used as the instance's name in the Verilog module).
+        instance_description (str): Description of the instance.
+        portmap_connections (list): Instance portmap connections.
+        parameters (dict): Verilog parameter values for this instance.
+        instantiate (bool): Select if should intantiate the module inside another Verilog module.
+    """
+
+    # TODO: Make a new iob_instance class, independent from the iob_core class. Subblocks will instantiate iob_instance objects. Each iob_instance will store a reference to an iob_core.
+    core: iob_core = None
+    name: str = None
+    description: str = "Default instance description"
+    portmap_connections: list[str] = empty_list()
+    parameters: dict[str, int | str] = empty_dict()
+    instantiate: bool = True
+
+
+@api_for(internal_instance.instance_from_dict)
+def create_instance_from_dict(instance_dict):
+    """
+    Function to create iob_instance object from dictionary attributes.
+
+    Attributes:
+        instance_dict (dict): dictionary with values to initialize attributes of iob_instance object.
+            This dictionary supports the following keys corresponding to the iob_instance attributes:
+            - core -> iob_instance.core
+            - name -> iob_instance.name
+            - description -> iob_instance.description
+            - connect -> iob_instance.portmap_connections = create_portmap_from_dict(connect)
+            - parameters -> iob_instance.parameters
+            - instantiate -> iob_instance.instantiate
+            # Non-attribute instance keys
+            - core (str): Optional. The name of the core to instantiate. Will search for <core>.py or <core>.json files.
+                          If this key is set, all other keys will be ignored! (Except 'python_parameters' key).
+                          If <core>.py is found, it must contain a class called <core> that extends iob_core. This class will be used to instantiate the core.
+                          If <core>.json is found, its contents will be read and parsed by the create_core_from_dict(<json_contents>) function.
+            - python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated core.
+                                        This key should be used in conjunction with the 'core' key.
+                                        Elements from this dictionary will be passed as **kwargs to the instantiated core's constructor.
+                                        Only applicable if instantiated core has a constructor that accepts python parameters (excludes cores defined in JSON or purely by dictionary).
+
+
+    Returns:
+        iob_instance: iob_instance object
+    """
+    pass
+
+
+@api_for(internal_instance.iob_instance)
+def create_instance_from_text(instance_text):
+    """
+    Function to create iob_instance object from short notation text.
+
+    Attributes:
+        instance_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-p parameter_name:parameter_value]+ [-c port_name:signal_name]+ [--no_instance]
+
+
+    Returns:
+        iob_instance: iob_instance object
+    """
+    pass
+
+
+#
+# Core
+#
 
 
 @api_for(internal_core.iob_core)
@@ -886,14 +978,6 @@ class iob_core:
         superblocks (list): List of wrappers for this core. Will only be setup if this core is a top module, or a wrapper of the top module.
         sw_modules (list): List of software modules required by this core.
 
-        # Instance attributes
-        instance_name (str): Name of the instance. (Will be used as the instance's name in the Verilog module).
-        instance_description (str): Description of the instance.
-        portmap_connections (list): Instance portmap connections.
-        parameters (dict): Verilog parameter values for this instance.
-        instantiate (bool): Select if should intantiate the module inside another Verilog module.
-        dest_dir (str): Relative path inside build directory to copy sources of this core. Will only sources from `hardware/src/*`.
-
         # Core attributes
         version (str): Core version. By default is the same as Py2HWSW version.
         previous_version (str): Core previous version.
@@ -907,10 +991,15 @@ class iob_core:
         generate_hw (bool): Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.
         parent (dict): Select parent of this core (if any). If parent is set, that core will be used as a base for the current one. Any attributes of the current core will override/add to those of the parent.
         is_tester (bool): Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).
-        python_parameters (list): List of core Python Parameters. Used for documentation.
+        supported_python_parameters (list): List of core Python Parameters. Used for documentation.
         license (iob_license): License for the core.
         doc_conf (str): CSR Configuration to use.
         title (str): Title of this core. Used for documentation.
+        dest_dir (str): Relative path to the destination inside build directory to copy sources of this core (from this core's hardware/src/ folder).
+                        Only applicable to subblocks/superblocks. Never the top module.
+                        For example, if this core contains dest_dir="hardware/simulation/src", this core's sources (from the hardware/src/ folder) will be copied to <build_dir>/hardware/simulation/src, during the build directory generation process.
+                        Note: Even though this is a core attribute (each instantiated core only has one copy of it), it is usually specified by the instantiator/issuer of this core.
+
     """
 
     # Module attributes
@@ -927,19 +1016,9 @@ class iob_core:
     snippets: list[iob_snippet] = empty_list()
     comb: iob_comb | None = None
     fsm: iob_fsm | None = None
-    subblocks: list[iob_core] = empty_list()
+    subblocks: list[iob_instance] = empty_list()
     superblocks: list[iob_core] = empty_list()
     sw_modules: list[iob_core] = empty_list()
-
-    # Instance attributes
-    # Should these be in a separate class? It would be easier to distiguish them from other attributes in code.
-    # TODO: Make a new iob_instance class, independent from the iob_core class. Subblocks will instantiate iob_instance objects. Each iob_instance will store a reference to an iob_core.
-    instance_name: str = None
-    instance_description: str = "Default instance description"
-    portmap_connections: list[str] = empty_list()
-    parameters: dict[str, int | str] = empty_dict()
-    instantiate: bool = True
-    dest_dir: str = "hardware/src"
 
     # Core attributes
     version: str = PY2HWSW_VERSION
@@ -954,10 +1033,11 @@ class iob_core:
     parent: dict = empty_dict()  # FIXME: not sure if this will be needed in pythase?
     is_tester: bool = False
     # FIXME: Should this be an instance attribute? Should it store received values as well?
-    python_parameters: list[object] = empty_list()
+    python_parameters: list[iob_python_parameter_group] = empty_list()
     license: iob_license = field(default_factory=iob_license)
     doc_conf: str = ""
     title: str = ""
+    dest_dir: str = "hardware/src"
 
     def __init__(self, core_dictionary: dict = {}):
         """
@@ -1000,23 +1080,6 @@ def create_core_from_dict(core_dict):
             - superblocks -> iob_module.superblocks = [create_core_from_dict(i) for i in superblocks]
             - sw_modules -> iob_module.sw_modules = [create_core_from_dict(i) for i in sw_modules]
 
-            # Instance keys
-            - instance_name -> iob_instance.instance_name
-            - instance_description -> iob_instance.instance_description
-            - connect -> iob_instance.portmap_connections = create_portmap_from_dict(connect)
-            - parameters -> iob_instance.parameters
-            - instantiate -> iob_instance.instantiate
-            - dest_dir -> iob_core.dest_dir
-            # Non-attribute instance keys
-            - core (str): Optional. The name of the core to instantiate. Will search for <core>.py or <core>.json files.
-                          If this key is set, all other keys will be ignored! (Except 'python_parameters' key).
-                          If <core>.py is found, it must contain a class called <core> that extends iob_core. This class will be used to instantiate the core.
-                          If <core>.json is found, its contents will be read and parsed by the create_core_from_dict(<json_contents>) function.
-            - python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated core.
-                                        This key should be used in conjunction with the 'core' key.
-                                        Elements from this dictionary will be passed as **kwargs to the instantiated core's constructor.
-                                        Only applicable if instantiated core has a constructor that accepts python parameters (excludes cores defined in JSON or purely by dictionary).
-
             # Core keys
             - version -> iob_core.version
             - previous_version -> iob_core.previous_version
@@ -1033,6 +1096,7 @@ def create_core_from_dict(core_dict):
             - license -> iob_core.license
             - doc_conf -> iob_core.doc_conf
             - title -> iob_core.title
+            - dest_dir -> iob_core.dest_dir
 
     Returns:
         iob_core: iob_core object
@@ -1043,18 +1107,16 @@ def create_core_from_dict(core_dict):
 @api_for(internal_core.core_from_text)
 def create_core_from_text(core_text):
     """
-    Function to create iob_core object from dictionary attributes.
     Function to create iob_core object from short notation text.
 
     Attributes:
         core_text (str): Short notation text. Object attributes are specified using the following format:
-            # Notation inherited from iob_module
+            # Notation specific to modules
             original_name
 
-            # Notation inherited from iob_instance
-            instance_name [-p parameter_name:parameter_value]+ [-c port_name:signal_name]+ [--no_instance]
+            # Notation specific to cores
+            # TODO
 
-            # Notation specific to iob_core
             # Below are parameters specific to the 'iob_csrs' module. They should probably not belong in the Py2HWSW API.
             [--no_autoaddr]
             [--rw_overlap]

@@ -15,11 +15,20 @@ from iob_base import (
 )
 from iob_portmap import iob_portmap, get_portmap_port
 from iob_signal import remove_signal_direction_suffixes
+from api_base import internal_api_class, convert2internal
 
 
-@prevent_instantiation
+@internal_api_class("user_api.api", "iob_instance")
 class iob_instance(iob_base):
     """Class to describe a module's (Verilog) instance"""
+
+    def validate_attributes(self):
+        """Validate instance attributes"""
+        if not self.name:
+            fail_with_msg("Instance must have a name!")
+        if not self.core:
+            fail_with_msg(f"Instance '{self.name}' has no core reference!")
+        pass
 
     # def __init__(
     #     self,

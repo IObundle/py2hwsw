@@ -696,7 +696,9 @@ def create_license_from_text(license_text):
 
     Attributes:
         license_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [name] [-y year] [-a author]
+            Example:
+                MIT -y 2025 -a 'IObundle, Lda'
 
     Returns:
         iob_license: iob_license object

@@ -227,6 +227,11 @@ if __name__ == "__main__":
     print(">>> state descriptions of fsm_obj:\n", fsm_obj.get_state_descriptions())
     print("======\n")
 
+    license_obj = py2hwsw.create_license_from_text("""MIT -y 2025 -a 'IObundle, Lda'""")
+    print(f">>> License name: {license_obj.get_name()}")
+    print(f"\tyear: {license_obj.get_year()}\n\tauthor: {license_obj.get_author()}")
+    print("======\n")
+
     core_obj = py2hwsw.create_core_from_dict(core_dictionary)
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])

@@ -6,7 +6,7 @@ import re
 
 from dataclasses import dataclass
 from iob_comb import iob_comb
-from iob_base import assert_attributes
+from iob_base import assert_attributes, parse_short_notation_text
 
 
 from api_base import internal_api_class
@@ -131,6 +131,10 @@ def fsm_from_dict(fsm_dict):
 
 
 def fsm_from_text(fsm_text):
-    fsm_dict = {}
-    # TODO: parse short notation text
+    fsm_flags = [
+        ['-t', {"dest": "kind", "choices": ["prog", "fsm"]}],
+        ['-d', {"dest": "default_assignments"}],
+        ['-s', {"dest": "state_descriptions"}],
+    ]
+    fsm_dict = parse_short_notation_text(fsm_text, fsm_flags)
     return iob_fsm(**fsm_dict)

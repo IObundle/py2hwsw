@@ -625,7 +625,24 @@ def create_fsm_from_text(fsm_text):
 
     Attributes:
         fsm_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [-t kind] [-d default_assignments] [-s state_descriptions]
+            Example:
+                -t fsm
+                -d 'a_o = 10;'
+                -s
+                '
+                    A: a_o = 0;
+                    B: a_o = 1;
+                    a_o = 2;
+                    if(a_o == 0)
+                    begin
+                        pcnt_nxt = A;
+                    end
+                    else
+                    begin
+                        pcnt_nxt = B;
+                    end
+                '
 
     Returns:
         iob_fsm: iob_fsm object

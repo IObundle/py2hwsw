@@ -202,6 +202,31 @@ if __name__ == "__main__":
     print(comb_obj.get_code())
     print("======\n\n")
 
+    fsm_obj = py2hwsw.create_fsm_from_text(
+        """
+            -t fsm
+            -d 'a_o = 10;'
+            -s
+            '
+                A: a_o = 0;
+                B: a_o = 1;
+                a_o = 2;
+                if(a_o == 0)
+                begin
+                    pcnt_nxt = A;
+                end
+                else
+                begin
+                    pcnt_nxt = B;
+                end
+            '
+        """
+    )
+    print(">>> fsm_obj: ", fsm_obj.get_kind())
+    print(">>> default assignments of fsm_obj:\n", fsm_obj.get_default_assignments())
+    print(">>> state descriptions of fsm_obj:\n", fsm_obj.get_state_descriptions())
+    print("======\n")
+
     core_obj = py2hwsw.create_core_from_dict(core_dictionary)
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])

@@ -11,7 +11,7 @@ def generate_fsm(core):
     """Generate verilog code with the fsm of this module.
     returns: Generated verilog code
     """
-    if core.fsm != None:
+    if core.fsm is not None:
         return convert2internal(core.fsm).verilog_code
 
     return ""

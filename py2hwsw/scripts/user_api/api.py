@@ -879,7 +879,11 @@ def create_python_parameter_group_from_text(python_parameter_group_text):
 
     Attributes:
         python_parameter_group_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [name] [-d descr] [-doc_clearpage] [-P python_parameters]+
+            Example:
+                param_group -d 'Group of parameters' -doc_clearpage
+                -P "param1 -v 42 -d 'Parameter 1 description'"
+                -P "OUTPUT_W -v DATA_W -d 'Data width'"
 
     Returns:
         iob_python_parameter_group: iob_python_parameter_group object

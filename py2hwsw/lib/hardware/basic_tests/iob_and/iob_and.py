@@ -241,6 +241,20 @@ if __name__ == "__main__":
     )
     print("======\n")
 
+    py_param_group_obj = py2hwsw.create_python_parameter_group_from_text(
+        """
+                param_group -d 'Group of parameters' -doc_clearpage
+                -P "param1 -v 42 -d 'Parameter 1 description'"
+                -P "OUTPUT_W -v DATA_W -d 'Data width'"
+         """
+    )
+    print(f">>> Python parameter group name: {py_param_group_obj.get_name()}")
+    print(f"\tdescr: {py_param_group_obj.get_descr()}")
+    for param in py_param_group_obj.get_python_parameters():
+        print(f"\t>>> Parameter name: {param.get_name()}")
+        print(f"\t\tvalue: {param.get_val()}\n\t\tdescr: {param.get_descr()}")
+    print("======\n")
+
     core_obj = py2hwsw.create_core_from_dict(core_dictionary)
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])

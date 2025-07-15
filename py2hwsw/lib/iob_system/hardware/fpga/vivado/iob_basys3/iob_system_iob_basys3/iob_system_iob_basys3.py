@@ -92,7 +92,7 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "rs232_int",
             "descr": "iob-system uart interface",

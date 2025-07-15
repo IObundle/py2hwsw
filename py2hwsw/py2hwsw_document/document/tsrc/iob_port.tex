@@ -8,13 +8,13 @@
 
 The \href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/scripts/iob_port.py}{iob\_port} class is used to represent an interface for the core.
 An interface is a group of hardware ports (signals) that may be generic or follow a standard.
-Due to the similarities between a port and a wire, this class inherits the attributes from the `iob\_wire` class (Section~\ref{sec:iob_wire}).
+Due to the similarities between a port and a bus, this class inherits the attributes from the `iob\_bus` class (Section~\ref{sec:iob_bus}).
 Besides the inherited attributes, the class contains a set of new port specific attributes, each preceded by a comment describing the purpose of the attribute.
 
 % Show attributes of iob_port
 % py2_macro: class_attributes iob_port from iob_port.py
 
-Similar to the `iob\_wire` class, the `signals` attribute stores a list of signal objects, represented by the `iob\_signal` class  (Section~\ref{sec:iob_signal}).
+Similar to the `iob\_bus` class, the `signals` attribute stores a list of signal objects, represented by the `iob\_signal` class  (Section~\ref{sec:iob_signal}).
 
 %
 % Generator methods

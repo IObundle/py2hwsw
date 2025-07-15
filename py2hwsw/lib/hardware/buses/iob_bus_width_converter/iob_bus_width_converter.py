@@ -76,13 +76,13 @@ interfaces = {
 
 
 def setup(py_params_dict):
-    """Core purely made of wires to convert between two buses with different widths (to suppress verilog warnings).
+    """Core purely made of buses to convert between two buses with different widths (to suppress verilog warnings).
     Use verilog parameters to define widths of each bus.
     :param str interface: Type of interface of buses.
     """
     INTERFACE = py_params_dict["interface"] if "interface" in py_params_dict else "axil"
 
-    wire_assigns = ""
+    bus_assigns = ""
     parameter_names = []
     verilog_parameters = []
     manager_interface_parameters = {}
@@ -100,7 +100,7 @@ def setup(py_params_dict):
             bit_select = f"[SUBORDINATE_{width}-1:0]"
 
         # Connect both interfaces
-        wire_assigns += f"""
+        bus_assigns += f"""
    assign {INTERFACE}_{name}_o = {INTERFACE}_{name}_i{bit_select};
 """
 
@@ -158,7 +158,7 @@ def setup(py_params_dict):
                 },
             },
         ],
-        "snippets": [{"verilog_code": wire_assigns}],
+        "snippets": [{"verilog_code": bus_assigns}],
     }
 
     return attributes_dict

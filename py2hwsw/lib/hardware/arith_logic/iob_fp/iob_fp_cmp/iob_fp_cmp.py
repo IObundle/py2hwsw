@@ -106,38 +106,38 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "equal_int",
-                "descr": "equal wire",
+                "descr": "equal bus",
                 "signals": [
                     {"name": "equal_int", "width": 1},
                 ],
             },
             {
                 "name": "less_int",
-                "descr": "less wire",
+                "descr": "less bus",
                 "signals": [
                     {"name": "less_int", "width": 1},
                 ],
             },
             {
                 "name": "op_a_nan_int",
-                "descr": "op_a_nan wire",
+                "descr": "op_a_nan bus",
                 "signals": [
                     {"name": "op_a_nan_int", "width": 1},
                 ],
             },
             {
                 "name": "op_b_nan_int",
-                "descr": "op_b_nan wire",
+                "descr": "op_b_nan bus",
                 "signals": [
                     {"name": "op_b_nan_int", "width": 1},
                 ],
             },
             {
                 "name": "res_int",
-                "descr": "res wire",
+                "descr": "res bus",
                 "signals": [
                     {"name": "res_int", "width": 1},
                 ],

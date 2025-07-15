@@ -63,24 +63,24 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "dividend_int",
-                "descr": "dividend_int wire",
+                "descr": "dividend_int bus",
                 "signals": [
                     {"name": "dividend_int", "width": "(DATA_W+1)*DATA_W"},
                 ],
             },
             {
                 "name": "divisor_int",
-                "descr": "divisor_int wire",
+                "descr": "divisor_int bus",
                 "signals": [
                     {"name": "divisor_int", "width": "(DATA_W+1)*DATA_W"},
                 ],
             },
             {
                 "name": "quotient_int",
-                "descr": "quotient_int wire",
+                "descr": "quotient_int bus",
                 "signals": [
                     {"name": "quotient_int", "width": "(DATA_W+1)*DATA_W"},
                 ],

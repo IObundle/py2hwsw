@@ -97,7 +97,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "data_nxt",
                 "descr": "Sum result",
@@ -110,7 +110,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "data_int",
-                "descr": "data_int wire",
+                "descr": "data_int bus",
                 "signals": [
                     {"name": "data_int", "width": "DATA_W+1"},
                 ],

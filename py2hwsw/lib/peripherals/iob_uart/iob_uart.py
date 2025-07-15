@@ -45,7 +45,7 @@ def setup(py_params_dict):
                 "descr": "RS232 interface",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "softreset",
                 "descr": "",

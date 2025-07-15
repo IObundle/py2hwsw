@@ -106,52 +106,52 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "rq",
-                "descr": "rq wire",
+                "descr": "rq bus",
                 "signals": [
                     {"name": "rq", "width": "2*DATA_W"},
                 ],
             },
             {
                 "name": "divisor_reg",
-                "descr": "divisor_reg wire",
+                "descr": "divisor_reg bus",
                 "signals": [
                     {"name": "divisor_reg", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "divident_sign",
-                "descr": "divident_sign wire",
+                "descr": "divident_sign bus",
                 "signals": [
                     {"name": "divident_sign", "width": 1},
                 ],
             },
             {
                 "name": "divisor_sign",
-                "descr": "divisor_sign wire",
+                "descr": "divisor_sign bus",
                 "signals": [
                     {"name": "divisor_sign", "width": 1},
                 ],
             },
             {
                 "name": "pcnt",
-                "descr": "pcnt wire",
+                "descr": "pcnt bus",
                 "signals": [
                     {"name": "pcnt", "width": "PC_W"},
                 ],
             },
             {
                 "name": "subtraend",
-                "descr": "subtraend wire",
+                "descr": "subtraend bus",
                 "signals": [
                     {"name": "subtraend", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "tmp",
-                "descr": "tmp wire",
+                "descr": "tmp bus",
                 "signals": [
                     {"name": "tmp", "width": "DATA_W+1"},
                 ],

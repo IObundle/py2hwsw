@@ -84,10 +84,10 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "addr_en",
-                "descr": "addr_en wire",
+                "descr": "addr_en bus",
                 "signals": [
                     {"name": "addr_en", "width": "K"},
                 ],

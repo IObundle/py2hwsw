@@ -48,10 +48,10 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "clk_int",
-                "descr": "clk_int wire",
+                "descr": "clk_int bus",
                 "signals": [
                     {"name": "clk_int", "width": 1},
                 ],

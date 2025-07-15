@@ -103,9 +103,9 @@ def setup(py_params_dict):
         },
     ]
     #
-    # Wires
+    # Buses
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "split_reset",
             "descr": "Reset signal for iob_split components",
@@ -247,7 +247,7 @@ def setup(py_params_dict):
         },
         {
             "name": "axi_dma_ram",
-            "descr": "DMA <-> AXI RAM connection wires",
+            "descr": "DMA <-> AXI RAM connection buses",
             "signals": {
                 "type": "axi",
                 "ADDR_W": "AXI_ADDR_W",
@@ -269,7 +269,7 @@ def setup(py_params_dict):
         },
         {
             "name": "dma_axis_out",
-            "descr": "AXIS OUT <-> DMA connection wires",
+            "descr": "AXIS OUT <-> DMA connection buses",
             "signals": [
                 {"name": "axis_out_tdata", "width": "AXI_DATA_W"},
                 {"name": "axis_out_tvalid", "width": "1"},
@@ -278,7 +278,7 @@ def setup(py_params_dict):
         },
         {
             "name": "dma_axis_in",
-            "descr": "AXIS IN <-> DMA connection wires",
+            "descr": "AXIS IN <-> DMA connection buses",
             "signals": [
                 {"name": "axis_in_tdata", "width": "AXI_DATA_W"},
                 {"name": "axis_in_tvalid", "width": "1"},

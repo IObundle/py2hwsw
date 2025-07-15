@@ -6,7 +6,7 @@
 
 #
 #   Create IOBNATIVEBRIDGEIF in directory specified
-#   The IOBNATIVEBRIDGEIF is a peripheral that only contains wires. It bridges the peripheral bus with an external interface.
+#   The IOBNATIVEBRIDGEIF is a peripheral that only contains buses. It bridges the peripheral bus with an external interface.
 #   It allows the peripheral bus signals to be accessed externally.
 #
 

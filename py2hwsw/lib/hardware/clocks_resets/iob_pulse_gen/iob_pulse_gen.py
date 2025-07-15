@@ -73,24 +73,24 @@ core_dictionary = {
             ],
         },
     ],
-    "wires": [
+    "buses": [
         {
             "name": "start_detected",
-            "descr": "Start detect wire",
+            "descr": "Start detect bus",
             "signals": [
                 {"name": "start_detected", "width": 1},
             ],
         },
         {
             "name": "start_detected_nxt",
-            "descr": "Start detect next wire",
+            "descr": "Start detect next bus",
             "signals": [
                 {"name": "start_detected_nxt", "width": 1},
             ],
         },
         {
             "name": "iob_pulse_gen_int",
-            "descr": "iob_pulse_gen_int wire",
+            "descr": "iob_pulse_gen_int bus",
             "signals": [
                 {"name": "cnt_en", "width": 1},
                 {"name": "start_i"},

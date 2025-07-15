@@ -85,7 +85,7 @@ def setup(py_params_dict):
     assert params["csrs"], "Error: Register list empty."
 
     ports = []
-    reg_wires = []
+    reg_buses = []
     external_reg_connections = {}
     internal_reg_connections = {}
     snippets = ""
@@ -93,8 +93,8 @@ def setup(py_params_dict):
     for csr_group in params["csrs"]:
         for csr in csr_group["regs"]:
             if csr.get("type", "REG") == "REG":
-                # Create wire for reg
-                reg_wires.append(
+                # Create bus for reg
+                reg_buses.append(
                     {
                         "name": csr["name"],
                         "descr": "",
@@ -104,10 +104,10 @@ def setup(py_params_dict):
                     },
                 )
                 if csr["mode"] == "RW":
-                    reg_wires[-1]["signals"].append(
+                    reg_buses[-1]["signals"].append(
                         {"name": csr["name"] + "_2", "width": csr["n_bits"]},
                     )
-                    reg_wires.append(
+                    reg_buses.append(
                         {
                             "name": csr["name"] + "_inv",
                             "descr": "",
@@ -129,7 +129,7 @@ def setup(py_params_dict):
                     external_reg_connections[csr["name"] + "_io"] = csr["name"]
                     internal_reg_connections[csr["name"] + "_io"] = csr["name"] + "_inv"
             elif csr.get("type", "") == "NOAUTO":
-                reg_wires += create_manual_reg_wires(csr)
+                reg_buses += create_manual_reg_buses(csr)
 
                 # Connect register interfaces
                 external_reg_connections[csr["name"] + "_io"] = (
@@ -157,7 +157,7 @@ def setup(py_params_dict):
                             {"name": csr["name"] + "_2_o", "width": csr["n_bits"]},
                         )
 
-                    # Assign wires to ports
+                    # Assign buses to ports
                     if csr.get("type", "REG") == "REG":
                         snippets += f"assign {csr['name'] + '_o'} = {csr['name']};"
                         if csr["mode"] == "RW":
@@ -221,7 +221,7 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
         ],
-        "wires": reg_wires
+        "buses": reg_buses
         + [
             {
                 "name": "internal_iob2",
@@ -277,8 +277,8 @@ def setup(py_params_dict):
     return attributes_dict
 
 
-def create_manual_reg_wires(csr):
-    """Creates wires for registers with NOAUTO"""
+def create_manual_reg_buses(csr):
+    """Creates buses for registers with NOAUTO"""
     internal_signals = []
     external_signals = []
 
@@ -306,17 +306,17 @@ def create_manual_reg_wires(csr):
             "external_" + csr["name"], "RW", csr["n_bits"]
         )
 
-    reg_wires = []
+    reg_buses = []
 
-    reg_wires.append(
+    reg_buses.append(
         {"name": "internal_" + csr["name"], "descr": "", "signals": internal_signals}
     )
 
-    reg_wires.append(
+    reg_buses.append(
         {"name": "external_" + csr["name"], "descr": "", "signals": external_signals}
     )
 
-    return reg_wires
+    return reg_buses
 
 
 def get_manual_signals(name, mode, data_width):

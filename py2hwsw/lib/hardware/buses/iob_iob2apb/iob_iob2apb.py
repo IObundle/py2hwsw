@@ -67,52 +67,52 @@ def setup(py_params_dict):
                 "descr": "APB interface",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "pc_int",
-                "descr": "pc_int wire",
+                "descr": "pc_int bus",
                 "signals": [
                     {"name": "pc_int", "width": 1},
                 ],
             },
             {
                 "name": "pc_nxt_int",
-                "descr": "pc_nxt_int wire",
+                "descr": "pc_nxt_int bus",
                 "signals": [
                     {"name": "pc_nxt_int", "width": 1},
                 ],
             },
             {
                 "name": "apb_rdata_i",
-                "descr": "apb_rdata_i wire",
+                "descr": "apb_rdata_i bus",
                 "signals": [
                     {"name": "apb_rdata_i"},
                 ],
             },
             {
                 "name": "iob_rdata_o",
-                "descr": "iob_rdata_o wire",
+                "descr": "iob_rdata_o bus",
                 "signals": [
                     {"name": "iob_rdata_o"},
                 ],
             },
             {
                 "name": "apb_ready_i",
-                "descr": "apb_ready_i wire",
+                "descr": "apb_ready_i bus",
                 "signals": [
                     {"name": "apb_ready_i"},
                 ],
             },
             {
                 "name": "iob_rvalid_nxt_int",
-                "descr": "iob_rvalid_nxt_int wire",
+                "descr": "iob_rvalid_nxt_int bus",
                 "signals": [
                     {"name": "iob_rvalid_nxt_int", "width": 1},
                 ],
             },
             {
                 "name": "iob_rvalid_o",
-                "descr": "iob_rvalid_o wire",
+                "descr": "iob_rvalid_o bus",
                 "signals": [
                     {"name": "iob_rvalid_o"},
                 ],

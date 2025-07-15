@@ -118,7 +118,7 @@ def setup(py_params_dict):
                 port["signals"]["params"] = "tlast"
                 break
 
-    wires = [
+    buses = [
         {
             "name": "data_valid",
             "descr": "Data valid register",
@@ -239,7 +239,7 @@ def setup(py_params_dict):
             },
         ],
         "ports": ports,
-        "wires": wires,
+        "buses": buses,
         "comb": {
             "code": comb_code,
             # All infered registers use rst_i
@@ -260,7 +260,7 @@ def setup(py_params_dict):
             },
         )
 
-        attributes_dict["wires"].extend(
+        attributes_dict["buses"].extend(
             [
                 {
                     "name": "axis_word_count",

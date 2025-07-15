@@ -109,9 +109,9 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
-                "name": "internal_wires",
+                "name": "internal_buses",
                 "descr": "Wires for internal usage",
                 "signals": [
                     {

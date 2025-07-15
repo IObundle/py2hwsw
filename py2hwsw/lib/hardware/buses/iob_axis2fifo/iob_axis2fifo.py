@@ -110,7 +110,7 @@ def setup(py_params_dict):
                 break
 
     # Wires declaration
-    wires = [
+    buses = [
         {
             "name": "axis_tdata",
             "descr": "AXIS tdata register",
@@ -130,7 +130,7 @@ def setup(py_params_dict):
     ]
 
     if use_tlast:
-        wires.extend(
+        buses.extend(
             [
                 {
                     "name": "axis_tlast",
@@ -163,7 +163,7 @@ def setup(py_params_dict):
         )
 
     if use_en:
-        wires.append(
+        buses.append(
             {
                 "name": "en_input_regs",
                 "descr": "Enable signal for input registers",
@@ -232,7 +232,7 @@ def setup(py_params_dict):
         "generate_hw": True,
         "confs": confs,
         "ports": ports,
-        "wires": wires,
+        "buses": buses,
         "comb": {
             "code": comb_code,
             "clk_if": "c_a_r",
@@ -240,7 +240,7 @@ def setup(py_params_dict):
     }
 
     if use_tlast:
-        attributes_dict["wires"].extend(
+        attributes_dict["buses"].extend(
             [
                 {
                     "name": "clk_en_arst",

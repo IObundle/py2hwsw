@@ -186,7 +186,7 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "interconnect_s_axi",
             "descr": "AXI subordinate bus for interconnect",

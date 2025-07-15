@@ -76,7 +76,7 @@ def setup(py_params_dict):
                 },
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "soft_reset",
                 "descr": "Soft reset signal",

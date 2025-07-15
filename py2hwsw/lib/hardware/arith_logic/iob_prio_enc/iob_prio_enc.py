@@ -47,7 +47,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "unencoded_int",
                 "descr": "",

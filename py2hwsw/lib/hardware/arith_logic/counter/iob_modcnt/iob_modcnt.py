@@ -63,17 +63,17 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "ld_count",
-                "descr": "ld_count wire",
+                "descr": "ld_count bus",
                 "signals": [
                     {"name": "ld_count", "width": 1},
                 ],
             },
             {
                 "name": "data",
-                "descr": "data wire",
+                "descr": "data bus",
                 "signals": [
                     {"name": "data", "width": "DATA_W"},
                 ],

@@ -106,9 +106,9 @@ def create_fsm(core, *args, **kwargs):
         state_descriptions=state_descriptions,
     )
 
-    # Check if the FSM wire is already created, if not create it
-    if not any(wire.name == fsm.state_reg_name for wire in core.wires):
-        core.create_wire(
+    # Check if the FSM bus is already created, if not create it
+    if not any(bus.name == fsm.state_reg_name for bus in core.buses):
+        core.create_bus(
             name=fsm.state_reg_name,
             descr="FSM state",
             signals=[{"name": fsm.state_reg_name, "width": fsm.state_reg_width}],

@@ -20,7 +20,7 @@ class iob_csr:
     addr: int = -1
     log2n_items: int = 0
     descr: str = "Default description"
-    # Select if should generate internal wires or ports for this CSR
+    # Select if should generate internal buses or ports for this CSR
     internal_use: bool = False
     # List of configurations that use this CSR (used for documentation)
     doc_conf_list: list or None = None

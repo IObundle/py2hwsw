@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
 from iob_base import fail_with_msg, assert_attributes
-from iob_wire import find_signal_in_wires
+from iob_bus import find_signal_in_buses
 from iob_signal import get_real_signal
 from interfaces import iobClkInterface
 from api_base import internal_api_class
@@ -54,47 +54,47 @@ class iob_comb(iob_snippet):
 
         for signal_name in outputs | nxt_vars:
             if signal_name.endswith("_o"):
-                signal = find_signal_in_wires(
+                signal = find_signal_in_buses(
                     core.ports,
                     signal_name,
                     process_func=generate_direction_process_func("output"),
                 )
                 signal.isvar = True
             elif signal_name.endswith("_io"):
-                signal = find_signal_in_wires(
+                signal = find_signal_in_buses(
                     core.ports,
                     signal_name,
                     process_func=generate_direction_process_func("inout"),
                 )
                 signal.isvar = True
             elif signal_name.endswith("_nxt"):
-                signal = find_signal_in_wires(core.wires + core.ports, signal_name[:-4])
+                signal = find_signal_in_buses(core.buses + core.ports, signal_name[:-4])
                 if not signal:
                     fail_with_msg(
-                        f"Could not find signal '{signal_name[:-4]}' in wires of '{core.name}' for register implied by '{signal_name}'."
+                        f"Could not find signal '{signal_name[:-4]}' in buses of '{core.name}' for register implied by '{signal_name}'."
                     )
                 signal.isreg = True
                 signal.reg_signals.append("_nxt")
             elif signal_name.endswith("_rst"):
-                signal = find_signal_in_wires(core.wires + core.ports, signal_name[:-4])
+                signal = find_signal_in_buses(core.buses + core.ports, signal_name[:-4])
                 if not signal:
                     fail_with_msg(
-                        f"Could not find signal '{signal_name[:-4]}' in wires of '{core.name}' for register implied by '{signal_name}'."
+                        f"Could not find signal '{signal_name[:-4]}' in buses of '{core.name}' for register implied by '{signal_name}'."
                     )
                 signal.reg_signals.append("_rst")
             elif signal_name.endswith("_en"):
-                signal = find_signal_in_wires(core.wires + core.ports, signal_name[:-3])
+                signal = find_signal_in_buses(core.buses + core.ports, signal_name[:-3])
                 if not signal:
                     fail_with_msg(
-                        f"Could not find signal '{signal_name[:-3]}' in wires of '{core.name}' for register implied by '{signal_name}'."
+                        f"Could not find signal '{signal_name[:-3]}' in buses of '{core.name}' for register implied by '{signal_name}'."
                     )
                 signal.reg_signals.append("_en")
             else:
-                signal = find_signal_in_wires(core.wires + core.ports, signal_name)
+                signal = find_signal_in_buses(core.buses + core.ports, signal_name)
                 signal.isvar = True
 
             if signal is None:
-                fail_with_msg(f"Output '{signal_name}' not found in wires/ports lists!")
+                fail_with_msg(f"Output '{signal_name}' not found in buses/ports lists!")
 
         for signal_name in nxt_vars - outputs:
             insert_point = self.verilog_code.find("\t\t\t")
@@ -108,8 +108,8 @@ class iob_comb(iob_snippet):
     def infer_registers(self, core):
         """Infer registers from the combinatory code and create the necessary subblocks"""
 
-        for wire in core.wires + core.ports:
-            for signal_ref in wire.signals:
+        for bus in core.buses + core.ports:
+            for signal_ref in bus.signals:
                 signal = get_real_signal(signal_ref)
                 if signal.isreg:
                     clk_if_name = "clk_en_rst_s"
@@ -142,11 +142,11 @@ class iob_comb(iob_snippet):
 
                     # Find the register signals (if any)
                     if any(reg_signal == "_nxt" for reg_signal in signal.reg_signals):
-                        # If the _nxt wire does not already exists, create it
+                        # If the _nxt bus does not already exists, create it
                         if not any(
-                            wire.name == f"{signal.name}_nxt" for wire in core.wires
+                            bus.name == f"{signal.name}_nxt" for bus in core.buses
                         ):
-                            core.create_wire(
+                            core.create_bus(
                                 name=f"{signal.name}_nxt",
                                 signals=[
                                     {
@@ -157,8 +157,8 @@ class iob_comb(iob_snippet):
                                     }
                                 ],
                             )
-                        # Create the register wire
-                        core.create_wire(
+                        # Create the register bus
+                        core.create_bus(
                             name=signal.name,
                             signals=[{"name": signal.name}],
                         )
@@ -196,10 +196,10 @@ class iob_comb(iob_snippet):
 
                     if any(x in port_params for x in ["_r", "_e"]):
                         if not any(
-                            wire.name == f"{signal.name}_reg_signals"
-                            for wire in core.wires
+                            bus.name == f"{signal.name}_reg_signals"
+                            for bus in core.buses
                         ):
-                            core.create_wire(
+                            core.create_bus(
                                 name=f"{signal.name}_reg_signals", signals=_reg_signals
                             )
 

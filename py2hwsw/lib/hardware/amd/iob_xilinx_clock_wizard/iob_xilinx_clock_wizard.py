@@ -43,7 +43,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "reset_sync_clk_rst",
                 "descr": "Reset synchronizer inputs",

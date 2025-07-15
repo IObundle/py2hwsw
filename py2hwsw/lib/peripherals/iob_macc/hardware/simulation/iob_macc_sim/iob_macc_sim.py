@@ -47,9 +47,9 @@ def setup(py_params_dict):
         },
     ]
     #
-    # Wires
+    # Buses
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "macc_cbus",
             "descr": "Testbench macc csrs bus",

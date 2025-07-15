@@ -107,17 +107,17 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "sub_sign",
-                "descr": "sub_sign wire",
+                "descr": "sub_sign bus",
                 "signals": [
                     {"name": "sub_sign", "width": 1},
                 ],
             },
             {
                 "name": "sub_res",
-                "descr": "sub_res wire",
+                "descr": "sub_res bus",
                 "signals": [
                     {"name": "sub_res", "width": "2*DATA_W-STAGE+1"},
                 ],

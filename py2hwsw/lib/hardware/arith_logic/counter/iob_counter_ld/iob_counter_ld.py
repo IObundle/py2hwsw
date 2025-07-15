@@ -70,10 +70,10 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "data_int",
-                "descr": "data wire",
+                "descr": "data bus",
                 "signals": [
                     {"name": "data_int", "width": "DATA_W"},
                 ],

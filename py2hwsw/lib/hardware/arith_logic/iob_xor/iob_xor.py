@@ -46,10 +46,10 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "xor_vec",
-                "descr": "xor_vec wire",
+                "descr": "xor_vec bus",
                 "signals": [
                     {"name": "xor_vec", "width": "N*W"},
                 ],

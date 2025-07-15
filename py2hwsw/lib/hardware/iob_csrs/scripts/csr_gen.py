@@ -186,7 +186,7 @@ class csr_gen:
                 return f"{log2n_items}+{ceil(log(n_bytes, 2))}"
 
     def gen_wr_reg(self, row):
-        wires = []
+        buses = []
         name = row.name
         rst_val = int(row.rst_val)
         n_bits = row.n_bits
@@ -205,7 +205,7 @@ class csr_gen:
         lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); TYPE: {row.kind}. {optional_comment}\n\n"
 
         # compute wdata with only the needed bits
-        wires.append(
+        buses.append(
             {
                 "name": f"{name}_wdata",
                 "descr": "",
@@ -257,7 +257,7 @@ class csr_gen:
                     rst_val_str = "{" + str(n_bits) + "{1'd0}}"
             else:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
-            wires.append(
+            buses.append(
                 {
                     "name": f"{name}_w_valid",
                     "descr": "",
@@ -270,7 +270,7 @@ class csr_gen:
 
             if "R" in row.mode:
                 # This is a "RW" CSR. Create logic to mux inputs and assign outputs of reg
-                wires += [
+                buses += [
                     {
                         "name": f"{name}_reg_en",
                         "descr": "",
@@ -335,10 +335,10 @@ class csr_gen:
             if suffix:
                 lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
 
-        return lines, wires
+        return lines, buses
 
     def gen_rd_reg(self, row):
-        wires = []
+        buses = []
         name = row.name
         rst_val = row.rst_val
         n_bits = row.n_bits
@@ -379,7 +379,7 @@ class csr_gen:
 
             # version is not a register, it is an internal constant
             if name == "version":
-                return lines, wires
+                return lines, buses
 
             # fill remaining bits of reset value with 0s
             if isinstance(n_bits, str):
@@ -402,7 +402,7 @@ class csr_gen:
                     rst_val_str = "{" + str(n_bits) + "{1'd0}}"
             else:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
-            wires += [
+            buses += [
                 {
                     "name": f"{name}_rdata",
                     "descr": "",
@@ -442,7 +442,7 @@ class csr_gen:
                 if type(log2n_items) is not int or log2n_items > 0:
                     lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
 
-        return lines, wires
+        return lines, buses
 
     # auxiliar read register case name
     def aux_read_reg_case_name(self, row):
@@ -459,8 +459,8 @@ class csr_gen:
             aux_read_reg_case_name = f"iob_addr_i_{self.bfloor(addr, addr_w_base)}_{self.boffset(addr, self.cpu_n_bytes)}"
         return aux_read_reg_case_name
 
-    # generate wires to connect instance in top module
-    def gen_inst_wire(self, table, f):
+    # generate buses to connect instance in top module
+    def gen_inst_bus(self, table, f):
         for row in table:
             name = row.name
             n_bits = row.n_bits
@@ -523,10 +523,10 @@ class csr_gen:
 """
                         )
 
-    def gen_ports_wires(self, table):
-        """Generate ports and internal wires for csrs instance."""
+    def gen_ports_buses(self, table):
+        """Generate ports and internal buses for csrs instance."""
         ports = []
-        wires = []
+        buses = []
         snippet = ""
         for row in table:
             name = row.name
@@ -652,11 +652,11 @@ class csr_gen:
                     port_has_outputs = True
 
             # Remove suffixes from signals if CSR is for 'internal_use'
-            # and create internal wires instead of ports.
+            # and create internal buses instead of ports.
             if row.internal_use:
                 for reg in register_signals:
                     reg["name"] = reg["name"][:-2]
-                wires.append(
+                buses.append(
                     {
                         "name": name,
                         "descr": f"{name} register interface",
@@ -678,7 +678,7 @@ class csr_gen:
                     }
                 )
 
-        return ports, wires, snippet
+        return ports, buses, snippet
 
     def get_csrs_inst_params(self, core_confs):
         """Return multi-line string with parameters for csrs instance"""
@@ -696,7 +696,7 @@ class csr_gen:
     def write_hwcode(self, table, core_attributes):
         """Generates and appends verilog code to core "snippets" list."""
         ports = []
-        wires = []
+        buses = []
         subblocks = []
         snippet = ""
         # check if all registers are auto
@@ -768,21 +768,21 @@ class csr_gen:
         # insert write register logic
         for row in table:
             if "W" in row.mode:
-                _snippet, _wires = self.gen_wr_reg(row)
+                _snippet, _buses = self.gen_wr_reg(row)
                 snippet += _snippet
-                wires += _wires
+                buses += _buses
 
         # insert read register logic
         for row in table:
             if "R" in row.mode:
-                _snippet, _wires = self.gen_rd_reg(row)
+                _snippet, _buses = self.gen_rd_reg(row)
                 snippet += _snippet
-                wires += _wires
+                buses += _buses
 
         #
         # RESPONSE SWITCH
         #
-        wires += [
+        buses += [
             # iob_regs
             {
                 "name": "iob_rvalid_out",
@@ -838,7 +838,7 @@ class csr_gen:
             },
         ]
         if not all_auto:
-            wires += [
+            buses += [
                 {
                     "name": "rvalid_int",
                     "descr": "Rvalid signal of currently addressed CSR",
@@ -911,7 +911,7 @@ class csr_gen:
             if "R" in row.mode:
                 aux_read_reg = self.aux_read_reg_case_name(row)
                 if aux_read_reg:
-                    wires.append(
+                    buses.append(
                         {
                             "name": aux_read_reg,
                             "descr": "",
@@ -921,7 +921,7 @@ class csr_gen:
                         },
                     )
 
-        # Create byte aligned wires
+        # Create byte aligned buses
         for row in table:
             name = row.name
             auto = row.kind != "NOAUTO"
@@ -1107,7 +1107,7 @@ class csr_gen:
 """
 
         core_attributes["ports"] += ports
-        core_attributes["wires"] += wires
+        core_attributes["buses"] += buses
         core_attributes["subblocks"] += subblocks
         core_attributes["snippets"] += [{"verilog_code": snippet}]
 

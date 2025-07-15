@@ -51,52 +51,52 @@ def setup(py_params_dict):
                 "descr": "Wishbone subordinate interface",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "valid_int",
-                "descr": "valid_int wire",
+                "descr": "valid_int bus",
                 "signals": [
                     {"name": "valid_int", "width": 1},
                 ],
             },
             {
                 "name": "valid_r",
-                "descr": "valid_r wire",
+                "descr": "valid_r bus",
                 "signals": [
                     {"name": "valid_r", "width": 1},
                 ],
             },
             {
                 "name": "rst_valid",
-                "descr": "rst_valid wire",
+                "descr": "rst_valid bus",
                 "signals": [
                     {"name": "rst_valid", "width": 1},
                 ],
             },
             {
                 "name": "wstrb",
-                "descr": "wstrb wire",
+                "descr": "wstrb bus",
                 "signals": [
                     {"name": "wstrb", "width": "DATA_W/8"},
                 ],
             },
             {
                 "name": "wack",
-                "descr": "wack wire",
+                "descr": "wack bus",
                 "signals": [
                     {"name": "wack", "width": 1},
                 ],
             },
             {
                 "name": "wack_r",
-                "descr": "wack_r wire",
+                "descr": "wack_r bus",
                 "signals": [
                     {"name": "wack_r", "width": 1},
                 ],
             },
             {
                 "name": "wb_data_mask",
-                "descr": "wb_data_mask wire",
+                "descr": "wb_data_mask bus",
                 "signals": [
                     {"name": "wb_data_mask", "width": "DATA_W"},
                 ],
@@ -104,7 +104,7 @@ def setup(py_params_dict):
             # Busy reg
             {
                 "name": "busy",
-                "descr": "busy wire",
+                "descr": "busy bus",
                 "signals": [
                     {"name": "busy", "width": 1},
                 ],

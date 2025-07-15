@@ -111,13 +111,13 @@ class iob_instance(iob_base):
 
     def connect_instance_ports(self, connect, issuer):
         """
-        param connect: External wires to connect to ports of this instance
-                       Key: Port name, Value: Wire name or tuple with wire name and signal bit slices
+        param connect: External buses to connect to ports of this instance
+                       Key: Port name, Value: bus name or tuple with bus name and signal bit slices
                        Tuple has format:
-                       (wire_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
+                       (bus_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
         param issuer: Module that is instantiating this instance
         """
-        # Connect instance ports to external wires
+        # Connect instance ports to external buses
         for port_name, connection_value in connect.items():
             port = find_obj_in_list(self.ports, port_name)
             if not port:
@@ -129,9 +129,9 @@ class iob_instance(iob_base):
 
             bit_slices = []
             if type(connection_value) is str:
-                wire_name = connection_value
+                bus_name = connection_value
             elif type(connection_value) is tuple:
-                wire_name = connection_value[0]
+                bus_name = connection_value[0]
                 bit_slices = connection_value[1]
                 if type(bit_slices) is not list:
                     fail_with_msg(
@@ -140,34 +140,34 @@ class iob_instance(iob_base):
             else:
                 fail_with_msg(f"Invalid connection value: {connection_value}")
 
-            if "'" in wire_name or wire_name.lower() == "z":
-                wire = wire_name
+            if "'" in bus_name or bus_name.lower() == "z":
+                bus = bus_name
             else:
-                wire = find_obj_in_list(issuer.wires, wire_name) or find_obj_in_list(
-                    issuer.ports, wire_name
+                bus = find_obj_in_list(issuer.buses, bus_name) or find_obj_in_list(
+                    issuer.ports, bus_name
                 )
-                if not wire:
+                if not bus:
                     debug_print(
-                        f"Creating implicit wire '{port.name}' in '{issuer.name}'.", 1
+                        f"Creating implicit bus '{port.name}' in '{issuer.name}'.", 1
                     )
-                    # Add wire to issuer
-                    wire_signals = remove_signal_direction_suffixes(port.signals)
-                    issuer.create_wire(
-                        name=wire_name, signals=wire_signals, descr=port.descr
+                    # Add bus to issuer
+                    bus_signals = remove_signal_direction_suffixes(port.signals)
+                    issuer.create_bus(
+                        name=bus_name, signals=bus_signals, descr=port.descr
                     )
-                    # Add wire to attributes_dict as well
-                    issuer.attributes_dict["wires"].append(
+                    # Add bus to attributes_dict as well
+                    issuer.attributes_dict["buses"].append(
                         {
-                            "name": wire_name,
-                            "signals": wire_signals,
+                            "name": bus_name,
+                            "signals": bus_signals,
                             "descr": port.descr,
                         }
                     )
-                    wire = issuer.wires[-1]
+                    bus = issuer.buses[-1]
 
             # create portmap and add to instance list
             portmap = iob_portmap(port=port)
-            portmap.connect_external(wire, bit_slices=bit_slices)
+            portmap.connect_external(bus, bit_slices=bit_slices)
             self.portmap_connections.append(portmap)
         # If this module has an issuer and is not a tester
         if issuer and not self.is_tester:
@@ -223,7 +223,7 @@ class iob_instance(iob_base):
         )
         # Connect newly created port to self
         mem_portmap = iob_portmap(port=port)
-        _port = find_obj_in_list(issuer.ports + issuer.wires, _name)
+        _port = find_obj_in_list(issuer.ports + issuer.buses, _name)
         mem_portmap.connect_external(_port, bit_slices=[])
         self.portmap_connections.append(mem_portmap)
 

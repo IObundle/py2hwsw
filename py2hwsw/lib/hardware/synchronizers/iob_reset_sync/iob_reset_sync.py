@@ -31,17 +31,17 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "data_int",
-                "descr": "data_int wire",
+                "descr": "data_int bus",
                 "signals": [
                     {"name": "data_int", "width": 2},
                 ],
             },
             {
                 "name": "sync",
-                "descr": "sync wire",
+                "descr": "sync bus",
                 "signals": [
                     {"name": "sync", "width": 2},
                 ],

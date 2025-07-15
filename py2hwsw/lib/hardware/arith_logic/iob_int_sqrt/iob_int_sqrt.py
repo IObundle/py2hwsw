@@ -69,59 +69,59 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "right",
-                "descr": "right wire",
+                "descr": "right bus",
                 "signals": [
                     {"name": "right", "width": "SIZE_W+2"},
                 ],
             },
             {
                 "name": "left",
-                "descr": "left wire",
+                "descr": "left bus",
                 "signals": [
                     {"name": "left", "width": "SIZE_W+2"},
                 ],
             },
             {
                 "name": "a_in",
-                "descr": "a_in wire",
+                "descr": "a_in bus",
                 "signals": [
                     {"name": "a_in", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "tmp",
-                "descr": "tmp wire",
+                "descr": "tmp bus",
                 "signals": [
                     {"name": "tmp", "width": "SIZE_W+2"},
                 ],
             },
             {
                 "name": "q",
-                "descr": "q wire",
+                "descr": "q bus",
                 "signals": [
                     {"name": "q", "width": "SIZE_W"},
                 ],
             },
             {
                 "name": "counter",
-                "descr": "counter wire",
+                "descr": "counter bus",
                 "signals": [
                     {"name": "counter", "width": "COUNT_W"},
                 ],
             },
             {
                 "name": "a",
-                "descr": "a wire",
+                "descr": "a bus",
                 "signals": [
                     {"name": "a", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "r",
-                "descr": "r wire",
+                "descr": "r bus",
                 "signals": [
                     {"name": "r", "width": "SIZE_W+2"},
                 ],

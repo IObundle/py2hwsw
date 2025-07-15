@@ -15,7 +15,7 @@ def find_and_update_regarray_csrs(csrs_dict, attributes_dict):
     accordingly.
     User should provide a CSR of type "*REGARRAY". This CSR will be replaced by regarray_csrs.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add regarray instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add regarray instance, buses and ports.
     """
     for csr_group in csrs_dict:
         csr_ref = None
@@ -53,7 +53,7 @@ def find_and_update_regfile_csrs(csrs_dict, attributes_dict):
     accordingly.
     REGFILEs use iob_dp_ram, with memories inside the csrs core.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add regfile instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add regfile instance, buses and ports.
     """
     for csr_group in csrs_dict:
         csr_ref = None
@@ -80,7 +80,7 @@ def find_and_update_ram_csrs(csrs_dict, attributes_dict):
     accordingly.
     RAMs use iob_dp_ram, with memories outside the csrs core.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add ram instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add ram instance, buses and ports.
     """
     for csr_group in csrs_dict:
         csr_ref = None
@@ -110,8 +110,8 @@ def find_and_update_ram_csrs(csrs_dict, attributes_dict):
 def create_memory_instance(
     attributes_dict, csr_ref, memory_type="iob_regarray_dp_be", internal_memory=True
 ):
-    """Add memory instance, wires and ports to given attributes_dict, based on memory description provided by CSR.
-    :param dict attributes_dict: Dictionary of core attributes to add memory instance, wires and ports.
+    """Add memory instance, buses and ports to given attributes_dict, based on memory description provided by CSR.
+    :param dict attributes_dict: Dictionary of core attributes to add memory instance, buses and ports.
     :param dict csr_ref: CSR description dictionary, with MEMORY information.
     :param dict memory_type: Memory type to use (regarray, regfile, ram).
     :param bool internal_memory: True if memory should be instantiated inside the CSRs module. Export memory ports otherwise.
@@ -222,7 +222,7 @@ def create_memory_instance(
                 ],
             },
         ]
-    memory_wires = [
+    memory_buses = [
         # Wires for dual ports of memory
         {
             "name": f"{memory_name}_port_a_io",
@@ -249,15 +249,15 @@ def create_memory_instance(
     ]
     if not internal_memory:
         # Export dual ports of memory
-        attributes_dict["ports"] += memory_wires
+        attributes_dict["ports"] += memory_buses
     #
     # Wires
     #
     if internal_memory:
         # Wires for dual ports of memory
-        attributes_dict["wires"] += memory_wires
-    attributes_dict["wires"] += [
-        # Asym converter wires
+        attributes_dict["buses"] += memory_buses
+    attributes_dict["buses"] += [
+        # Asym converter buses
         {
             "name": f"{memory_name}_asym_s_io",
             "descr": "Subordinate interface of asym",

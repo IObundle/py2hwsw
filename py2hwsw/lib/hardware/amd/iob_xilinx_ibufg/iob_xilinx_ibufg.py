@@ -16,7 +16,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "clk_buf",
                 "descr": "",

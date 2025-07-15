@@ -68,18 +68,18 @@ def setup(py_params_dict):
         #
         # Wires
         #
-        "wires": [
+        "buses": [
             # Reg valid
             {
                 "name": "valid_data_i",
-                "descr": "valid intput wire",
+                "descr": "valid intput bus",
                 "signals": [
                     {"name": "iob_valid_i"},
                 ],
             },
             {
                 "name": "valid_data_o",
-                "descr": "valid output wire",
+                "descr": "valid output bus",
                 "signals": [
                     {"name": "iob_valid_r", "width": 1},
                 ],
@@ -87,14 +87,14 @@ def setup(py_params_dict):
             # Reg addr
             {
                 "name": "addr_data_i",
-                "descr": "addr intput wire",
+                "descr": "addr intput bus",
                 "signals": [
                     {"name": "iob_addr_i"},
                 ],
             },
             {
                 "name": "addr_data_o",
-                "descr": "addr output wire",
+                "descr": "addr output bus",
                 "signals": [
                     {"name": "iob_address_r", "width": "ADDR_W"},
                 ],
@@ -102,14 +102,14 @@ def setup(py_params_dict):
             # Reg data
             {
                 "name": "data_data_i",
-                "descr": "data intput wire",
+                "descr": "data intput bus",
                 "signals": [
                     {"name": "iob_wdata_i"},
                 ],
             },
             {
                 "name": "data_data_o",
-                "descr": "data output wire",
+                "descr": "data output bus",
                 "signals": [
                     {"name": "iob_wdata_r", "width": "DATA_W"},
                 ],
@@ -117,14 +117,14 @@ def setup(py_params_dict):
             # Reg we
             {
                 "name": "we_data_i",
-                "descr": "we intput wire",
+                "descr": "we intput bus",
                 "signals": [
                     {"name": "wb_we", "width": 1},
                 ],
             },
             {
                 "name": "we_data_o",
-                "descr": "we output wire",
+                "descr": "we output bus",
                 "signals": [
                     {"name": "wb_we_r", "width": 1},
                 ],
@@ -132,14 +132,14 @@ def setup(py_params_dict):
             # Reg strb
             {
                 "name": "strb_data_i",
-                "descr": "strb intput wire",
+                "descr": "strb intput bus",
                 "signals": [
                     {"name": "wb_select", "width": "DATA_W/8"},
                 ],
             },
             {
                 "name": "strb_data_o",
-                "descr": "strb output wire",
+                "descr": "strb output bus",
                 "signals": [
                     {"name": "wb_select_r", "width": "DATA_W/8"},
                 ],
@@ -147,14 +147,14 @@ def setup(py_params_dict):
             # Reg wb_data
             {
                 "name": "wb_data_data_i",
-                "descr": "wb_data intput wire",
+                "descr": "wb_data intput bus",
                 "signals": [
                     {"name": "wb_dat_i"},
                 ],
             },
             {
                 "name": "wb_data_data_o",
-                "descr": "wb_data output wire",
+                "descr": "wb_data output bus",
                 "signals": [
                     {"name": "wb_data_r", "width": "DATA_W"},
                 ],

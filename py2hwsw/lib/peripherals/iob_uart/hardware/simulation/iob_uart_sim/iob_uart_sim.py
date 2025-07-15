@@ -47,12 +47,12 @@ def setup(py_params_dict):
         },
     ]
     #
-    # Wires
+    # Buses
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "rs232_loopback",
-            "descr": "Uart loopback wires",
+            "descr": "Uart loopback buses",
             "signals": {
                 "type": "rs232",
             },

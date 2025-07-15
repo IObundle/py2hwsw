@@ -33,8 +33,8 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
         ],
-        "wires": [
-            # Register wires
+        "buses": [
+            # Register buses
             {
                 "name": "reset",
                 "descr": "",
@@ -70,7 +70,7 @@ def setup(py_params_dict):
                     {"name": "data_high_rd", "width": 32},
                 ],
             },
-            # Internal wires
+            # Internal buses
             {
                 "name": "time_now",
                 "descr": "",

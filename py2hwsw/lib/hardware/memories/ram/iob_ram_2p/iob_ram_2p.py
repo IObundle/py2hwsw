@@ -51,7 +51,7 @@ def setup(py_params_dict):
                 },
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "clk",
                 "descr": "Input port",
@@ -61,21 +61,21 @@ def setup(py_params_dict):
             },
             {
                 "name": "en_int",
-                "descr": "en wire",
+                "descr": "en bus",
                 "signals": [
                     {"name": "en_int", "width": 1},
                 ],
             },
             {
                 "name": "we_int",
-                "descr": "we wire",
+                "descr": "we bus",
                 "signals": [
                     {"name": "we_int", "width": 1},
                 ],
             },
             {
                 "name": "addr_int",
-                "descr": "addr wire",
+                "descr": "addr bus",
                 "signals": [
                     {"name": "addr_int", "width": "ADDR_W"},
                 ],

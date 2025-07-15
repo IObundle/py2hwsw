@@ -73,7 +73,7 @@ def setup(py_params_dict):
                 "descr": "Merge input interfaces",
             },
         )
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         # Output selection signals
         {
             "name": "sel_reg_rst",

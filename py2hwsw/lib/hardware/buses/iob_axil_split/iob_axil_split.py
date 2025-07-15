@@ -108,7 +108,7 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         # Read selection register signals
         {
             "name": "read_sel_reg_en_rst",
@@ -184,11 +184,11 @@ def setup(py_params_dict):
             ],
         },
     ]
-    # Generate wires for muxers and demuxers
+    # Generate buses for muxers and demuxers
     for signal, direction, width, _ in axil_signals:
         if direction == "input":
             # Demux signals
-            attributes_dict["wires"] += [
+            attributes_dict["buses"] += [
                 {
                     "name": "demux_" + signal + "_i",
                     "descr": f"Input of {signal} demux",
@@ -211,7 +211,7 @@ def setup(py_params_dict):
             ]
         else:  # output direction
             # Mux signals
-            attributes_dict["wires"] += [
+            attributes_dict["buses"] += [
                 {
                     "name": "mux_" + signal + "_i",
                     "descr": f"Input of {signal} demux",

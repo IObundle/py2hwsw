@@ -64,7 +64,7 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "regarray_2p_write_i",
                 "descr": "Write port",

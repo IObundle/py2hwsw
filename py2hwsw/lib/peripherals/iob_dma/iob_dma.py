@@ -122,7 +122,7 @@ def setup(py_params_dict):
                 "descr": "AXI interface",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "receive_enabled",
                 "descr": "",
@@ -163,7 +163,7 @@ def setup(py_params_dict):
                     {"name": "w_length_wdata_reg", "width": "WLEN_W"},
                 ],
             },
-            # Counter wires
+            # Counter buses
             {
                 "name": "counter_en_rst",
                 "descr": "Enable and Synchronous reset interface",
@@ -185,7 +185,7 @@ def setup(py_params_dict):
                     {"name": "axis_in_cnt", "width": "WLEN_W"},
                 ],
             },
-            # AXIS_S_AXI_M configuration wires
+            # AXIS_S_AXI_M configuration buses
             {
                 "name": "config_write",
                 "descr": "Configure write (AXIS in)",
@@ -210,10 +210,10 @@ def setup(py_params_dict):
                     {"name": "r_busy_rd", "width": 1},
                 ],
             },
-            # External memories wires
+            # External memories buses
             {
                 "name": "write_ext_mem",
-                "descr": "External memory write wires",
+                "descr": "External memory write buses",
                 "signals": {
                     "type": "ram_t2p",
                     "prefix": "ext_mem_write_",
@@ -223,7 +223,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "read_ext_mem",
-                "descr": "External memory read wires",
+                "descr": "External memory read buses",
                 "signals": {
                     "type": "ram_t2p",
                     "prefix": "ext_mem_read_",
@@ -231,7 +231,7 @@ def setup(py_params_dict):
                     "DATA_W": "AXI_DATA_W",
                 },
             },
-            # Reg wires
+            # Reg buses
             {
                 "name": "w_addr",
                 "descr": "",

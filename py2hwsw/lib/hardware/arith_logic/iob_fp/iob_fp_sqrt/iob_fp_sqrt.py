@@ -156,136 +156,136 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "A_Mantissa",
-                "descr": "A_Mantissa wire",
+                "descr": "A_Mantissa bus",
                 "signals": [
                     {"name": "A_Mantissa", "width": "MAN_W"},
                 ],
             },
             {
                 "name": "A_Exponent",
-                "descr": "A_Exponent wire",
+                "descr": "A_Exponent bus",
                 "signals": [
                     {"name": "A_Exponent", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "A_sign",
-                "descr": "A_sign wire",
+                "descr": "A_sign bus",
                 "signals": [
                     {"name": "A_sign", "width": 1},
                 ],
             },
             {
                 "name": "Temp_Mantissa",
-                "descr": "Temp_Mantissa wire",
+                "descr": "Temp_Mantissa bus",
                 "signals": [
                     {"name": "Temp_Mantissa", "width": "MAN_W+1"},
                 ],
             },
             {
                 "name": "Temp_Computed_Exponent",
-                "descr": "Temp_Computed_Exponent wire",
+                "descr": "Temp_Computed_Exponent bus",
                 "signals": [
                     {"name": "Temp_Computed_Exponent", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "Mantissa",
-                "descr": "Mantissa wire",
+                "descr": "Mantissa bus",
                 "signals": [
                     {"name": "Mantissa", "width": "MAN_W-1"},
                 ],
             },
             {
                 "name": "Exponent",
-                "descr": "Exponent wire",
+                "descr": "Exponent bus",
                 "signals": [
                     {"name": "Exponent", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "Sign",
-                "descr": "Sign wire",
+                "descr": "Sign bus",
                 "signals": [
                     {"name": "Sign", "width": 1},
                 ],
             },
             {
                 "name": "iob_fp_sqrt_int",
-                "descr": "iob_fp_sqrt_int wire",
+                "descr": "iob_fp_sqrt_int bus",
                 "signals": [
                     {"name": "iob_fp_sqrt_int", "width": 26},
                 ],
             },
             {
                 "name": "Do_start_int",
-                "descr": "Do_start wire",
+                "descr": "Do_start bus",
                 "signals": [
                     {"name": "Do_start", "width": 1},
                 ],
             },
             {
                 "name": "Equal_zero_reg",
-                "descr": "Equal_zero_reg wire",
+                "descr": "Equal_zero_reg bus",
                 "signals": [
                     {"name": "Equal_zero_reg", "width": 1},
                 ],
             },
             {
                 "name": "A_Exponent_diff_reg",
-                "descr": "A_Exponent_diff_reg wire",
+                "descr": "A_Exponent_diff_reg bus",
                 "signals": [
                     {"name": "A_Exponent_diff_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "A_sign_reg",
-                "descr": "A_sign_reg wire",
+                "descr": "A_sign_reg bus",
                 "signals": [
                     {"name": "A_sign_reg", "width": 1},
                 ],
             },
             {
                 "name": "A_Exponent_reg",
-                "descr": "A_Exponent_reg wire",
+                "descr": "A_Exponent_reg bus",
                 "signals": [
                     {"name": "A_Exponent_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "A_Mantissa_reg",
-                "descr": "A_Mantissa_reg wire",
+                "descr": "A_Mantissa_reg bus",
                 "signals": [
                     {"name": "A_Mantissa_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "Temp_Exponent_reg",
-                "descr": "Temp_Exponent_reg wire",
+                "descr": "Temp_Exponent_reg bus",
                 "signals": [
                     {"name": "Temp_Exponent_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "Temp_Mantissa_reg",
-                "descr": "Temp_Mantissa_reg wire",
+                "descr": "Temp_Mantissa_reg bus",
                 "signals": [
                     {"name": "Temp_Mantissa_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "counter",
-                "descr": "counter wire",
+                "descr": "counter bus",
                 "signals": [
                     {"name": "counter", "width": 1},
                 ],
             },
             {
                 "name": "done_int",
-                "descr": "done wire",
+                "descr": "done bus",
                 "signals": [
                     {"name": "done_int", "width": 1},
                 ],

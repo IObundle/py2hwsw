@@ -30,7 +30,7 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "en",
                 "descr": "Enable",

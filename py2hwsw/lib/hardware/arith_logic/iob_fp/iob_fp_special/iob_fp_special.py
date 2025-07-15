@@ -84,45 +84,45 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "sign",
-                "descr": "sign wire",
+                "descr": "sign bus",
                 "signals": [
                     {"name": "sign", "width": 1},
                 ],
             },
             {
                 "name": "exponent",
-                "descr": "exponent wire",
+                "descr": "exponent bus",
                 "signals": [
                     {"name": "exponent", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "mantissa",
-                "descr": "mantissa wire",
+                "descr": "mantissa bus",
                 "signals": [
                     {"name": "mantissa", "width": "MAN_W-1"},
                 ],
             },
             {
                 "name": "exp_all_ones",
-                "descr": "exp_all_ones wire",
+                "descr": "exp_all_ones bus",
                 "signals": [
                     {"name": "exp_all_ones", "width": 1},
                 ],
             },
             {
                 "name": "exp_zero",
-                "descr": "exp_zero wire",
+                "descr": "exp_zero bus",
                 "signals": [
                     {"name": "exp_zero", "width": 1},
                 ],
             },
             {
                 "name": "man_zero",
-                "descr": "man_zero wire",
+                "descr": "man_zero bus",
                 "signals": [
                     {"name": "man_zero", "width": 1},
                 ],

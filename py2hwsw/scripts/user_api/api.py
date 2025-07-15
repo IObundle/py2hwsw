@@ -52,7 +52,7 @@ from api_base import api_for, empty_list, empty_dict
 import iob_conf as internal_conf
 import iob_signal as internal_signal
 import interfaces as internal_interface
-import iob_wire as internal_wire
+import iob_bus as internal_bus
 import iob_port as internal_port
 import iob_snippet as internal_snippet
 import iob_comb as internal_comb
@@ -230,7 +230,7 @@ def create_conf_group_from_text(conf_group_text):
 @api_for(internal_signal.iob_signal)
 class iob_signal:
     """
-    Class that represents a wire/port signal.
+    Class that represents a bus/port signal.
 
     Attributes:
         name (str): Identifier name for the signal.
@@ -342,19 +342,19 @@ def create_interface_from_text(interface_text):
 
 
 #
-# Wires
+# Buses
 #
-@api_for(internal_wire.iob_wire)
-class iob_wire:
+@api_for(internal_bus.iob_bus)
+class iob_bus:
     """
-    Class to represent a wire in an iob module.
+    Class to represent a bus in an iob module.
 
     Attributes:
-        name (str): Identifier name for the wire.
+        name (str): Identifier name for the bus.
         interface (interface): Name of the standard interface to auto-generate with `if_gen.py` script.
-        descr (str): Description of the wire.
-        signals (list): List of signals belonging to this wire
-                        (each signal represents a hardware Verilog wire).
+        descr (str): Description of the bus.
+        signals (list): List of signals belonging to this bus
+                        (each signal represents a hardware Verilog bus).
     """
 
     name: str = ""
@@ -375,38 +375,38 @@ class iob_wire:
         pass
 
 
-@api_for(internal_wire.wire_from_dict)
-def create_wire_from_dict(wire_dict):
+@api_for(internal_bus.bus_from_dict)
+def create_bus_from_dict(bus_dict):
     """
-    Function to create iob_wire object from dictionary attributes.
+    Function to create iob_bus object from dictionary attributes.
 
     Attributes:
-        wire_dict (dict): dictionary with values to initialize attributes of iob_wire object.
-            This dictionary supports the following keys corresponding to the iob_wire attributes:
-            - name           -> iob_wire.name
-            - interface      -> iob_wire.interface
-            - descr          -> iob_wire.descr
-            - signals        -> iob_wire.signals
+        bus_dict (dict): dictionary with values to initialize attributes of iob_bus object.
+            This dictionary supports the following keys corresponding to the iob_bus attributes:
+            - name           -> iob_bus.name
+            - interface      -> iob_bus.interface
+            - descr          -> iob_bus.descr
+            - signals        -> iob_bus.signals
 
     Returns:
-        iob_wire: iob_wire object
+        iob_bus: iob_bus object
     """
     pass
 
 
-@api_for(internal_wire.wire_from_text)
-def create_wire_from_text(wire_text):
+@api_for(internal_bus.bus_from_text)
+def create_bus_from_text(bus_text):
     """
-    Function to create iob_wire object from short notation text.
+    Function to create iob_bus object from short notation text.
 
     Attributes:
-        wire_text (str): Short notation text. Object attributes are specified using the following format:
+        bus_text (str): Short notation text. Object attributes are specified using the following format:
             name [-i interface] [-d descr] [-s signal_name1:width1] [-s signal_name2:width2]+
             Examples:
                 dbus -d 'data bus' -s wdata:32 -s wstrb:4
 
     Returns:
-        iob_wire: iob_wire object
+        iob_bus: iob_bus object
     """
     pass
 
@@ -417,7 +417,7 @@ def create_wire_from_text(wire_text):
 
 
 @api_for(internal_port.iob_port)
-class iob_port(iob_wire):
+class iob_port(iob_bus):
     """
     Describes an IO port.
 
@@ -440,7 +440,7 @@ def create_port_from_dict(port_dict):
             This dictionary supports the following keys corresponding to the iob_port attributes:
             - doc_only -> iob_port.doc_only
             - doc_clearpage -> iob_port.doc_clearpage
-            (Also supports the keys inherited from iob_wire)
+            (Also supports the keys inherited from iob_bus)
 
     Returns:
         iob_port: iob_port object
@@ -525,20 +525,20 @@ class iob_comb(iob_snippet):
         code (str): Verilog body code of the @always block.
                     This string will be parsed to automatically identify and infer registers.
                     The `iob_reg` Py2HWSW lib module will be automatically instantiated in the core for each signal '<name>' if the following conditions are met:
-                    - The wire '<name>' with single signal '<name>' exists in the core;
-                    - The signal '<name>_nxt' is used in the iob_comb's code. The wire '<name>_nxt' will be automatically created if it does not exist;
+                    - The bus '<name>' with single signal '<name>' exists in the core;
+                    - The signal '<name>_nxt' is used in the iob_comb's code. The bus '<name>_nxt' will be automatically created if it does not exist;
 
                     The infered register will have the instance name '<name>_reg'. It will automatically connect it's input to the '<name>_nxt' signal, and it's output to the '<name>' signal.
 
-                    If the following signals are found in the iob_comb's code, their wires are automatically created and the corresponding register will be updated:
-                    - The '<name>_rst' signal will cause the register to have a reset port, and be connected to this wire;
-                    - The '<name>_en' signal will cause the register to have an enable port, and be connected to this wire;
+                    If the following signals are found in the iob_comb's code, their buses are automatically created and the corresponding register will be updated:
+                    - The '<name>_rst' signal will cause the register to have a reset port, and be connected to this bus;
+                    - The '<name>_en' signal will cause the register to have an enable port, and be connected to this bus;
 
-                    For example, if we define the 'reg_signal' wire in the core, and the iob_comb has the following code:
+                    For example, if we define the 'reg_signal' bus in the core, and the iob_comb has the following code:
                     '''
                     reg_signal_nxt = reg_signal + 1;
                     '''
-                    then the 'reg_signal_nxt' wire will be automatically created, and the 'reg_signal_reg' register will be instantiated.
+                    then the 'reg_signal_nxt' bus will be automatically created, and the 'reg_signal_reg' register will be instantiated.
         clk_if (str): Clock interface
     """
 
@@ -698,12 +698,12 @@ class iob_portmap:
     Class that represents a portmap attribute.
 
     Attributes:
-        e_connect (iob_wire): Identifier name of external wire that connects this port
+        e_connect (iob_bus): Identifier name of external bus that connects this port
         e_connect_bit_slices (list): List of bit slices for external connections.
         port (str): IDentifier name of port associated with portmap
     """
 
-    e_connect: iob_wire | None = None
+    e_connect: iob_bus | None = None
     e_connect_bit_slices: list[str] = empty_list()
     port: str = None
 
@@ -728,16 +728,16 @@ def create_portmap_from_dict(portmap_dict):
 
             Bit slices may perform multiple functions:
             - Slice bits from a signal that is being connected.
-              For example, if we have a signal (iob_addr_signal) with 32 bits, from a wire (iob_bus_wire), and we want to connect it to a port (iob_bus_port) that only accepts an address of 8 bits, we could use:
-              "iob_bus_port": ("iob_bus_wire", ["iob_addr_signal[7:0]"]),
-            - Connect extra signals that do not exist in the wire.
-              For example, if we have a signal (independent_iob_data_signal) that is not included in the wire (iob_bus_wire), but exists in the port (iob_bus_port), we could use:
-              "iob_bus_port": ("iob_bus_wire", ["iob_data_signal_i: independent_iob_data_signal"]),
+              For example, if we have a signal (iob_addr_signal) with 32 bits, from a bus (iob_bus_bus), and we want to connect it to a port (iob_bus_port) that only accepts an address of 8 bits, we could use:
+              "iob_bus_port": ("iob_bus_bus", ["iob_addr_signal[7:0]"]),
+            - Connect extra signals that do not exist in the bus.
+              For example, if we have a signal (independent_iob_data_signal) that is not included in the bus (iob_bus_bus), but exists in the port (iob_bus_port), we could use:
+              "iob_bus_port": ("iob_bus_bus", ["iob_data_signal_i: independent_iob_data_signal"]),
               If we didn't have the independent_iob_data_signal, we could instead connect that port's signal to a constant value or high impedance, like so:
-              "iob_bus_port": ("iob_bus_wire", ["iob_data_signal_i: 'b1"]),
-              "iob_bus_port": ("iob_bus_wire", ["iob_data_signal_i: 'bz"]),
+              "iob_bus_port": ("iob_bus_bus", ["iob_data_signal_i: 'b1"]),
+              "iob_bus_port": ("iob_bus_bus", ["iob_data_signal_i: 'bz"]),
 
-              # FIXME: For some reason, connecting extra signals with bit slices only works for connections between ports and wires that have standard interfaces! Not sure why its implemented this way: https://github.com/IObundle/py2hwsw/blob/0679fc64576380c19be96567efb5093667eeb9fd/py2hwsw/scripts/block_gen.py#L121
+              # FIXME: For some reason, connecting extra signals with bit slices only works for connections between ports and buses that have standard interfaces! Not sure why its implemented this way: https://github.com/IObundle/py2hwsw/blob/0679fc64576380c19be96567efb5093667eeb9fd/py2hwsw/scripts/block_gen.py#L121
               # Also, I'm not sure we can connect them to constants/high impedance.
               # It seems to be possible to connect ports to constants like so: https://github.com/IObundle/py2hwsw/pull/236
 
@@ -974,7 +974,7 @@ class iob_core:
         reset_polarity (str): Global reset polarity of the module. Can be 'positive' or 'negative'. (Will override all subblocks' reset polarities).
         confs (list): List of module macros and Verilog (false-)parameters
         ports (list): List of module ports
-        wires (list): List of wires
+        buses (list): List of buses
         snippets (list): List of Verilog code snippets
         comb (iob_comb): Combinational circuit
         fsm (iob_fsm): Finite state machine
@@ -1016,7 +1016,7 @@ class iob_core:
     reset_polarity: str = "positive"
     confs: list[iob_conf_group] = empty_list()
     ports: list[iob_port] = empty_list()
-    wires: list[iob_wire] = empty_list()
+    buses: list[iob_bus] = empty_list()
     snippets: list[iob_snippet] = empty_list()
     comb: iob_comb | None = None
     fsm: iob_fsm | None = None
@@ -1076,7 +1076,7 @@ def create_core_from_dict(core_dict):
             - reset_polarity -> iob_module.reset_polarity
             - confs -> iob_module.confs
             - ports -> iob_module.ports
-            - wires -> iob_module.wires
+            - buses -> iob_module.buses
             - snippets -> iob_module.snippets
             - comb -> iob_module.comb
             - fsm -> iob_module.fsm

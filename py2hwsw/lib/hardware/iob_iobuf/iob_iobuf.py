@@ -68,10 +68,10 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "o_int",
-                "descr": "o_int wire",
+                "descr": "o_int bus",
                 "signals": [
                     {"name": "o_int", "width": 1},
                 ],

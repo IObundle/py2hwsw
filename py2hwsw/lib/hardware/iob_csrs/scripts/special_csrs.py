@@ -8,7 +8,7 @@ from csr_gen import convert_int
 def find_and_update_autoclear_csrs(csrs_dict, attributes_dict):
     """Auto-clear CSR: Same signals as NOAUTO, but already includes internal register that gets cleared automatically on ready (write case) or after rvalid (read case).
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add autoclear instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add autoclear instance, buses and ports.
     """
     # Autoclear register for NOAUTO. If cpu writes 1 to it, it will be autocleared when core returns ready (reads value from it). IPxact should have an attribute for this.
     for csr_group in csrs_dict:
@@ -44,8 +44,8 @@ def find_and_update_autoclear_csrs(csrs_dict, attributes_dict):
 
 
 def create_autoclear_instance(attributes_dict, csr_ref):
-    """Add AUTOCLEAR instance, wires and ports to given attributes_dict, based on autoclear description provided by CSR.
-    :param dict attributes_dict: Dictionary of core attributes to add autoclear instance, wires and ports.
+    """Add AUTOCLEAR instance, buses and ports to given attributes_dict, based on autoclear description provided by CSR.
+    :param dict attributes_dict: Dictionary of core attributes to add autoclear instance, buses and ports.
     :param dict csr_ref: CSR description dictionary, with autoclear information.
     """
     name = csr_ref["name"]
@@ -128,7 +128,7 @@ def create_autoclear_instance(attributes_dict, csr_ref):
     #
     # Wires
     #
-    attributes_dict["wires"] += [
+    attributes_dict["buses"] += [
         {
             "name": f"{name}_en_rst",
             "descr": "",
@@ -139,7 +139,7 @@ def create_autoclear_instance(attributes_dict, csr_ref):
         },
     ]
     if "R" in mode:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": f"{name}_data_i",
                 "descr": "",
@@ -156,7 +156,7 @@ def create_autoclear_instance(attributes_dict, csr_ref):
             },
         ]
     if "W" in mode:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": f"{name}_data_i",
                 "descr": "",

@@ -102,7 +102,7 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "clk",
             "descr": "Clock signal",
@@ -136,7 +136,7 @@ def setup(py_params_dict):
         },
     ]
     if params["use_extmem"]:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": "axi",
                 "descr": "AXI bus to connect SoC to interconnect",
@@ -160,7 +160,7 @@ def setup(py_params_dict):
             },
         ]
     if params["use_ethernet"]:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": "eth_axi",
                 "descr": "Ethernet AXI bus",

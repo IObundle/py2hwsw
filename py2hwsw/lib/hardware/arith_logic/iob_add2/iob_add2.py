@@ -58,10 +58,10 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "sum_int",
-                "descr": "sum wire",
+                "descr": "sum bus",
                 "signals": [
                     {"name": "sum_int", "width": "W+1"},
                 ],

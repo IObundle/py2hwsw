@@ -51,7 +51,7 @@ def setup(py_params_dict):
                 },
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "split_reset",
                 "descr": "Reset signal for iob_split components",

@@ -59,7 +59,7 @@ def setup(py_params_dict):
     AXI_VERILOG_PARAMS_MAP = {i: i for i in axi_verilog_params}
 
     # Address width for merge output
-    # This width is equal to width of internal wires plus the merge input selection bits (that will be later ignored)
+    # This width is equal to width of internal buses plus the merge input selection bits (that will be later ignored)
     MERGE_OUTPUT_WIDTH = axi_python_params["addr_w"] - M_SELECT_NBITS + S_SELECT_NBITS
 
     axi_signals = [
@@ -181,10 +181,10 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    attributes_dict["wires"] = []
+    attributes_dict["buses"] = []
     for i in range(N_SUBORDINATES):
         for j in range(N_MANAGERS):
-            attributes_dict["wires"].append(
+            attributes_dict["buses"].append(
                 {
                     "name": f"connect_s{i}_m{j}",
                     "descr": f"Connect split of subordinate {i} to merge of manager {j}",
@@ -199,7 +199,7 @@ def setup(py_params_dict):
             )
     # Wires for output for merges
     for i in range(N_MANAGERS):
-        attributes_dict["wires"].append(
+        attributes_dict["buses"].append(
             {
                 "name": f"merge_{i}_output",
                 "descr": f"Output of merge {i}",

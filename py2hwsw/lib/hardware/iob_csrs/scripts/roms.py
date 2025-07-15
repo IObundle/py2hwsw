@@ -10,7 +10,7 @@ def find_and_update_rom_csrs(csrs_dict, attributes_dict):
     accordingly.
     User should provide a CSR of type "ROM". This CSR will be replaced by rom_csrs.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add rom instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add rom instance, buses and ports.
     """
     for csr_group in csrs_dict:
         csr_ref = None
@@ -36,8 +36,8 @@ def find_and_update_rom_csrs(csrs_dict, attributes_dict):
 
 
 def create_rom_instance(attributes_dict, csr_ref):
-    """Add ROM instance, wires and ports to given attributes_dict, based on rom description provided by CSR.
-    :param dict attributes_dict: Dictionary of core attributes to add rom instance, wires and ports.
+    """Add ROM instance, buses and ports to given attributes_dict, based on rom description provided by CSR.
+    :param dict attributes_dict: Dictionary of core attributes to add rom instance, buses and ports.
     :param dict csr_ref: CSR description dictionary, with rom information.
     """
     rom_name = csr_ref["name"]
@@ -62,7 +62,7 @@ def create_rom_instance(attributes_dict, csr_ref):
     #
     # ROM Wires
     #
-    attributes_dict["wires"] += [
+    attributes_dict["buses"] += [
         {
             "name": f"{rom_name}_rvalid_data_i",
             "descr": "Register input",

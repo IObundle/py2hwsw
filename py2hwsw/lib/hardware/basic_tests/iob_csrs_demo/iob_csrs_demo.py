@@ -33,8 +33,8 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
         ],
-        "wires": [
-            # Register wires
+        "buses": [
+            # Register buses
             {
                 "name": "single_write",
                 "descr": "",
@@ -67,7 +67,7 @@ def setup(py_params_dict):
                     {"name": "multi_read_write_wrrd_wstrb", "width": 3},
                 ],
             },
-            # Regarray wires
+            # Regarray buses
             {
                 "name": "regarray_write",
                 "descr": "",
@@ -131,7 +131,7 @@ def setup(py_params_dict):
                     {"name": "regarray_read_write_param_ready_wr", "width": 1},
                 ],
             },
-            # FIFO write wires
+            # FIFO write buses
             {
                 "name": "fifo_write_rst",
                 "descr": "",
@@ -196,7 +196,7 @@ def setup(py_params_dict):
                     {"name": "fifo_write_current_level", "width": 5},
                 ],
             },
-            # FIFO read wires
+            # FIFO read buses
             {
                 "name": "fifo_read_rst",
                 "descr": "",
@@ -462,7 +462,7 @@ def setup(py_params_dict):
                     },
                 ],
             },
-            # NOAUTO wires
+            # NOAUTO buses
             {
                 "name": "noauto_write",
                 "descr": "",
@@ -495,7 +495,7 @@ def setup(py_params_dict):
                     {"name": "noauto_read_write_rvalid_wrrd", "width": 1},
                 ],
             },
-            # Autoclear wires
+            # Autoclear buses
             {
                 "name": "autoclear_write",
                 "descr": "",
@@ -516,7 +516,7 @@ def setup(py_params_dict):
                     {"name": "autoclear_read_rvalid_rd", "width": 1},
                 ],
             },
-            # Interrupts wires
+            # Interrupts buses
             {
                 "name": "demo_interrupt_status",
                 "descr": "",

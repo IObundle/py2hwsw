@@ -167,7 +167,7 @@ def setup(py_params_dict):
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "internal_iob",
                 "descr": "Internal iob interface",
@@ -383,10 +383,10 @@ def setup(py_params_dict):
             attributes_with_csrs["build_dir"] + "/document/tsrc",
         )
 
-    # Add ports and internal wires for registers
-    auto_ports, auto_wires, auto_snippet = csr_gen_obj.gen_ports_wires(reg_table)
+    # Add ports and internal buses for registers
+    auto_ports, auto_buses, auto_snippet = csr_gen_obj.gen_ports_buses(reg_table)
     attributes_dict["ports"] += auto_ports
-    attributes_dict["wires"] += auto_wires
+    attributes_dict["buses"] += auto_buses
     attributes_dict["snippets"].append({"verilog_code": auto_snippet})
 
     # TODO: Append csr_if to config_build.mk ?

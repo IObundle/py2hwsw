@@ -288,7 +288,7 @@ def setup(py_params_dict):
             },
         ]
 
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "interrupts",
             "descr": "System interrupts",
@@ -298,8 +298,8 @@ def setup(py_params_dict):
         },
     ]
     if params["cpu"] != "none":
-        # Crossbar wires
-        attributes_dict["wires"] += [
+        # Crossbar buses
+        attributes_dict["buses"] += [
             {
                 "name": "clk",
                 "descr": "Clock signal",
@@ -342,7 +342,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "unused_interconnect_bits",
-                "descr": "Wires to connect to unused output bits of interconnect",
+                "descr": "buses to connect to unused output bits of interconnect",
                 "signals": [
                     {
                         "name": "unused_m0_araddr_bits",
@@ -374,7 +374,7 @@ def setup(py_params_dict):
             },
         ]
     if params["use_intmem"]:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": "int_mem_axi",
                 "descr": "AXI manager interface for internal memory",
@@ -390,7 +390,7 @@ def setup(py_params_dict):
             },
         ]
     if params["use_bootrom"]:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": "bootrom_cbus",
                 "descr": "iob-system boot controller data interface",
@@ -406,7 +406,7 @@ def setup(py_params_dict):
             },
         ]
     if params["use_peripherals"] and params["cpu"] != "none":
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": "axi_periphs_cbus",
                 "descr": "AXI bus for peripheral CSRs",
@@ -421,7 +421,7 @@ def setup(py_params_dict):
             },
         ]
     if params["use_peripherals"]:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": "split_reset",
                 "descr": "Reset signal for iob_split components",
@@ -441,8 +441,8 @@ def setup(py_params_dict):
                     "LEN_W": "AXI_LEN_W",
                 },
             },
-            # Peripheral cbus wires added automatically
-            # NOTE: Add other peripheral wires here
+            # Peripheral cbus buses added automatically
+            # NOTE: Add other peripheral buses here
         ]
     attributes_dict["subblocks"] = []
     if params["cpu"] != "none":

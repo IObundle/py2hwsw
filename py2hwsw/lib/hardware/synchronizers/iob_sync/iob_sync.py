@@ -54,10 +54,10 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "synchronizer",
-                "descr": "synchronizer wire",
+                "descr": "synchronizer bus",
                 "signals": [
                     {"name": "synchronizer", "width": "DATA_W"},
                 ],

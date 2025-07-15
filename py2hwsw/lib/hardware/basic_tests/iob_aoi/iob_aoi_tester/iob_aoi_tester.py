@@ -20,7 +20,7 @@ core_dictionary = {
             "descr": "IO width",
         },
     ],
-    "wires": [
+    "buses": [
         {
             "name": "a",
             "descr": "AOI input port 1",

@@ -66,24 +66,24 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "round",
-                "descr": "round wire",
+                "descr": "round bus",
                 "signals": [
                     {"name": "round", "width": 1},
                 ],
             },
             {
                 "name": "mantissa_rnd_int",
-                "descr": "mantissa_rnd wire",
+                "descr": "mantissa_rnd bus",
                 "signals": [
                     {"name": "mantissa_rnd_int", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "lzc",
-                "descr": "lzc wire",
+                "descr": "lzc bus",
                 "signals": [
                     {"name": "lzc", "width": "$clog2(DATA_W)"},
                 ],

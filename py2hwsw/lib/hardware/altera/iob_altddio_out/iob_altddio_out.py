@@ -58,17 +58,17 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "data_l_i_reg",
-                "descr": "data_l_i_reg wire",
+                "descr": "data_l_i_reg bus",
                 "signals": [
                     {"name": "data_l_i_reg", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "data_h_i_reg",
-                "descr": "data_h_i_reg wire",
+                "descr": "data_h_i_reg bus",
                 "signals": [
                     {"name": "data_h_i_reg", "width": "DATA_W"},
                 ],

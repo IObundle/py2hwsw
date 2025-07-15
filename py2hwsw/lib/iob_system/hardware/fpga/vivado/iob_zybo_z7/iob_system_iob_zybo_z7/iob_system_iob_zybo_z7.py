@@ -322,7 +322,7 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",

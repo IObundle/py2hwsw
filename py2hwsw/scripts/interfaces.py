@@ -398,46 +398,46 @@ class interface:
     #
     # Signal generation private methods
     #
-    def __write_single_wire(self, fout, wire, for_tb):
-        """Write a single wire to the file."""
-        if isinstance(wire, iob_signal_reference):
+    def __write_single_signal(self, fout, signal, for_tb):
+        """Write a single signal to the file."""
+        if isinstance(signal, iob_signal_reference):
             return
-        wire_name = self.prefix + wire.name
-        # Remove suffix from wire name if it is already present
-        suffix = self.__get_suffix(wire.direction)
-        if wire_name.endswith(suffix):
-            wire_name = wire_name[: -len(suffix)]
-        wtype = "wire"
-        # If this is a testbench wire, add the suffix and change the type
+        signal_name = self.prefix + signal.name
+        # Remove suffix from signal name if it is already present
+        suffix = self.__get_suffix(signal.direction)
+        if signal_name.endswith(suffix):
+            signal_name = signal_name[: -len(suffix)]
+        wtype = "signal"
+        # If this is a testbench signal, add the suffix and change the type
         if for_tb:
-            wire_name = wire_name + self.__get_suffix(
-                self.__reverse_direction(wire.direction)
+            signal_name = signal_name + self.__get_suffix(
+                self.__reverse_direction(signal.direction)
             )
-            wtype = self.__get_tbsignal_type(wire.direction)
-        # If this is a variable wire, change the type to reg
-        if wire.isvar:
+            wtype = self.__get_tbsignal_type(signal.direction)
+        # If this is a variable signal, change the type to reg
+        if signal.isvar:
             wtype = "reg"
-        # Write the wire to the file
-        width_str = f" [{wire.width}-1:0] "
-        fout.write(wtype + width_str + wire_name + ";\n")
+        # Write the signal to the file
+        width_str = f" [{signal.width}-1:0] "
+        fout.write(wtype + width_str + signal_name + ";\n")
 
-    def _write_wire(self, fout):
-        """Write wires to the file."""
-        for wire in self.get_signals():
-            self.__write_single_wire(fout, wire, False)
+    def _write_bus(self, fout):
+        """Write buses to the file."""
+        for bus in self.get_signals():
+            self.__write_single_signal(fout, bus, False)
 
-    def __write_tb_wire(self, fout):
-        """Write testbench wires to the file."""
-        for wire in self.get_signals():
-            self.__write_single_wire(fout, wire, True)
+    def __write_tb_bus(self, fout):
+        """Write testbench buses to the file."""
+        for bus in self.get_signals():
+            self.__write_single_signal(fout, bus, True)
 
-    def _write_m_tb_wire(self, fout):
-        """Write master testbench wires to the file."""
-        self.__write_tb_wire(fout)
+    def _write_m_tb_bus(self, fout):
+        """Write master testbench buses to the file."""
+        self.__write_tb_bus(fout)
 
-    def _write_s_tb_wire(self, fout):
-        """Write slave testbench wires to the file."""
-        self._write_m_tb_wire(fout)
+    def _write_s_tb_bus(self, fout):
+        """Write slave testbench buses to the file."""
+        self._write_m_tb_bus(fout)
 
     #
     # Port
@@ -464,14 +464,14 @@ class interface:
     def __write_single_portmap(self, fout, port, connect_to_port):
         """Write a single portmap to the file."""
         port_name = self.portmap_port_prefix + port.name
-        wire_name = self.prefix + port.name
-        # Remove suffix from wire name if it is present
+        bus_name = self.prefix + port.name
+        # Remove suffix from bus name if it is present
         if not connect_to_port:
             suffix = self.__get_suffix(port.direction)
-            if wire_name.endswith(suffix):
-                wire_name = wire_name[: -len(suffix)]
+            if bus_name.endswith(suffix):
+                bus_name = bus_name[: -len(suffix)]
 
-        fout.write(f".{port_name}({wire_name}),\n")
+        fout.write(f".{port_name}({bus_name}),\n")
 
     def _write_m_portmap(self, fout):
         for port in self.get_signals():
@@ -503,13 +503,13 @@ class interface:
 
         return signals
 
-    def gen_wires_vs_file(self):
-        """Generate wires snippet for given interface"""
+    def gen_buses_vs_file(self):
+        """Generate buses snippet for given interface"""
         file_name = self.__get_if_name()
         file_prefix = self.file_prefix
 
-        fout = open(file_prefix + file_name + "_wire.vs", "w")
-        self._write_wire(fout)
+        fout = open(file_prefix + file_name + "_bus.vs", "w")
+        self._write_bus(fout)
         fout.close()
 
     def gen_all_vs_files(self):

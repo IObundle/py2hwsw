@@ -65,7 +65,7 @@ def generate_ports_snippet(core):
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
-        # Also generate snippets for all interface subtypes (portmaps, tb_portmaps, wires, ...)
+        # Also generate snippets for all interface subtypes (portmaps, tb_portmaps, buses, ...)
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.
         if port.interface:

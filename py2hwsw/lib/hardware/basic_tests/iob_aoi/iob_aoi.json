@@ -6,7 +6,7 @@
     "ports": [
         "\n            a_i -s a_i:W\n            -d 'Input port a'\n\n            b_i -s b_i:W\n            -d 'Input port b'\n\n            c_i -s c_i:W\n            -d 'Input port c'\n\n            d_i -s d_i:W\n            -d 'Input port d'\n\n            y_o -s y_o:W\n            -d 'Output port y'\n            "
     ],
-    "wires": [
+    "buses": [
         "\n            and_ab_out -s aab:W\n            -d 'and ab output'\n\n            and_cd_out -s cad:W\n            -d 'and cd output'\n\n            or_out -s oab:1\n            -d 'or output'\n            "
     ],
     "subblocks": [

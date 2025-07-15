@@ -18,7 +18,7 @@ import copy_srcs
 import config_gen
 import param_gen
 import io_gen
-import wire_gen
+import bus_gen
 import block_gen
 import comb_gen
 import fsm_gen
@@ -49,7 +49,7 @@ from manage_headers import generate_headers
 
 from iob_conf import conf_group_from_dict
 from iob_port import port_from_dict
-from iob_wire import wire_from_dict
+from iob_bus import bus_from_dict
 from iob_snippet import snippet_from_dict
 from iob_python_parameter import python_parameter_group_from_dict
 from iob_portmap import portmap_from_dict
@@ -61,9 +61,9 @@ from api_base import internal_api_class, convert2internal
 class iob_core(iob_module):
     """Generic class to describe how to generate a base IOb IP core"""
 
-    # List of global wires.
+    # List of global signals.
     # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
-    global_wires: list
+    global_signals: list
     # Project settings
     global_build_dir: str = ""
     global_project_root: str = "."
@@ -118,7 +118,7 @@ class iob_core(iob_module):
             preprocessor_functions = {
                 "confs": lambda lst: [conf_group_from_dict(i) for i in lst],
                 "ports": lambda lst: [port_from_dict(i) for i in lst],
-                "wires": lambda lst: [wire_from_dict(i) for i in lst],
+                "buses": lambda lst: [bus_from_dict(i) for i in lst],
                 "snippets": lambda lst: [snippet_from_dict(i) for i in lst],
                 "subblocks": lambda lst: [core_from_dict(i) for i in lst],
                 "superblocks": lambda lst: [core_from_dict(i) for i in lst],
@@ -324,7 +324,7 @@ class iob_core(iob_module):
         # Note: Parsing attributes (specifically the subblocks list) also initializes subblocks
         self.parse_attributes_dict(attributes)
 
-        # Connect ports of this instance to external wires (wires of the issuer)
+        # Connect ports of this instance to external buses (buses of the issuer)
         self.connect_instance_ports(connect, self.issuer)
 
         # iob_csrs specific code
@@ -439,8 +439,8 @@ class iob_core(iob_module):
         # Generate ios
         io_gen.generate_ports_snippet(self)
 
-        # Generate wires
-        wire_gen.generate_wires_snippet(self)
+        # Generate buses
+        bus_gen.generate_buses_snippet(self)
 
         # Generate instances
         if self.generate_hw:
@@ -468,7 +468,7 @@ class iob_core(iob_module):
         #    A snippet is a piece of verilog code manually written (should also receive a list of outputs by the user).
         #    A snippet can also be any method that generates a new signal, like the `concat_bits`, or any other that performs logic in from other signals into a new one.
         # TODO as well: Each module has a local `snippets` list.
-        # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
+        # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global signals (that already contain the width).
 
         if (self.is_top_module and not self.is_parent) or self.is_tester:
             self.post_setup()
@@ -694,9 +694,9 @@ class iob_core(iob_module):
                     and portmap.e_connect
                 ):
                     port_width = portmap.port.interface.addr_w
-                    external_wire_prefix = portmap.e_connect.interface.prefix
+                    external_bus_prefix = portmap.e_connect.interface.prefix
                     portmap.e_connect_bit_slices = [
-                        f"{external_wire_prefix}iob_addr[{port_width}-1:0]"
+                        f"{external_bus_prefix}iob_addr[{port_width}-1:0]"
                     ]
 
     def __create_memwrapper(self, superblocks):

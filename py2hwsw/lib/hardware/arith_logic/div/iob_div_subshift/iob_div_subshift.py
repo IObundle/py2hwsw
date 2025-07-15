@@ -92,63 +92,63 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
-            # { # NOTE: This wire is implicitly create by py2
+        "buses": [
+            # { # NOTE: This bus is implicitly create by py2
             #     "name": "dqr_reg_nxt",
-            #     "descr": "dqr_reg_nxt wire",
+            #     "descr": "dqr_reg_nxt bus",
             #     "signals": [
             #         {"name": "dqr_reg_nxt", "width": "DQR_W"},
             #     ],
             # },
             {
                 "name": "dqr_reg",
-                "descr": "dqr_reg wire",
+                "descr": "dqr_reg bus",
                 "signals": [
                     {"name": "dqr_reg", "width": "DQR_W"},
                 ],
             },
-            # { # NOTE: This wire is implicitly create by py2
+            # { # NOTE: This bus is implicitly create by py2
             #    "name": "divisor_reg_nxt",
-            #    "descr": "divisor_reg_nxt wire",
+            #    "descr": "divisor_reg_nxt bus",
             #    "signals": [
             #        {"name": "divisor_reg_nxt", "width": "DIVISOR_W"},
             #    ],
             # },
             {
                 "name": "divisor_reg",
-                "descr": "divisor_reg wire",
+                "descr": "divisor_reg bus",
                 "signals": [
                     {"name": "divisor_reg", "width": "DIVISOR_W"},
                 ],
             },
             {
                 "name": "subtraend",
-                "descr": "subtraend wire",
+                "descr": "subtraend bus",
                 "signals": [
                     {"name": "subtraend", "width": "DIVISOR_W+1"},
                 ],
             },
             {
                 "name": "tmp",
-                "descr": "tmp wire",
+                "descr": "tmp bus",
                 "signals": [
                     {"name": "tmp", "width": "DIVISOR_W+2", "isvar": True},
                 ],
             },
-            # { # NOTE: This wire is implicitly create by py2
+            # { # NOTE: This bus is implicitly create by py2
             #    "name": "pcnt_nxt",
-            #    "descr": "pcnt_nxt wire",
+            #    "descr": "pcnt_nxt bus",
             #    "signals": [
             #        {"name": "pcnt_nxt", "width": "$clog2(DIVIDEND_W+1)"},
             #    ],
             # },
             {
                 "name": "pcnt",
-                "descr": "pcnt wire",
+                "descr": "pcnt bus",
                 "signals": [
                     {
                         "name": "pcnt",
-                        "descr": "pcnt wire",
+                        "descr": "pcnt bus",
                         "width": "$clog2(DIVIDEND_W+1)",
                     },
                 ],

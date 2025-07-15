@@ -140,7 +140,7 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
@@ -188,7 +188,7 @@ def setup(py_params_dict):
     ]
 
     if params["use_extmem"]:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": "axi",
                 "descr": "AXI interface to connect SoC to memory",
@@ -220,7 +220,7 @@ def setup(py_params_dict):
             },
         ]
     if params["use_ethernet"]:
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             # eth clock
             {
                 "name": "rxclk_buf_io",

@@ -22,7 +22,7 @@ def setup(py_params_dict):
                     "iob_cyclonev_gt_dk",
                     "iob_zybo_z7",
                 ],
-                "wires": [
+                "buses": [
                     {
                         "name": "sut_rs232",
                         "descr": "rs232 bus for SUT",

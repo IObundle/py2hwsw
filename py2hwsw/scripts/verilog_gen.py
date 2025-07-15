@@ -10,7 +10,7 @@ import re
 
 import param_gen
 import io_gen
-import wire_gen
+import bus_gen
 import block_gen
 import comb_gen
 import fsm_gen
@@ -198,8 +198,8 @@ def generate_verilog(core):
         params_line = "("
 
     module_body_lines = ""
-    if core.wires:
-        module_body_lines += wire_gen.generate_wires(core) + "\n"
+    if core.buses:
+        module_body_lines += bus_gen.generate_buses(core) + "\n"
 
     if core.comb:
         module_body_lines += comb_gen.generate_comb(core) + "\n"

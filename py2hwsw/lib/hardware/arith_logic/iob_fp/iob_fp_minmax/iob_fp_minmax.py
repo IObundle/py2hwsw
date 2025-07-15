@@ -106,38 +106,38 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "bigger",
-                "descr": "bigger wire",
+                "descr": "bigger bus",
                 "signals": [
                     {"name": "bigger", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "smaller",
-                "descr": "smaller wire",
+                "descr": "smaller bus",
                 "signals": [
                     {"name": "smaller", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "op_a_nan",
-                "descr": "op_a_nan wire",
+                "descr": "op_a_nan bus",
                 "signals": [
                     {"name": "op_a_nan", "width": 1},
                 ],
             },
             {
                 "name": "op_b_nan",
-                "descr": "op_b_nan wire",
+                "descr": "op_b_nan bus",
                 "signals": [
                     {"name": "op_b_nan", "width": 1},
                 ],
             },
             {
                 "name": "rst_int",
-                "descr": "rst wire",
+                "descr": "rst bus",
                 "signals": [
                     {"name": "rst_int", "width": "DATA_W"},
                 ],

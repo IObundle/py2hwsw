@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 #
-#    wire_gen.py: build Verilog module wires
+#    bus_gen.py: build Verilog module buses
 #
 import interfaces
 import os
@@ -13,45 +13,45 @@ from iob_signal import iob_signal
 from api_base import convert2internal
 
 
-def generate_wires(core):
-    """Generate verilog code with wires of this module.
+def generate_buses(core):
+    """Generate verilog code with buses of this module.
     returns: Generated verilog code
     """
     code = ""
-    for wire in core.wires:
-        wire = convert2internal(wire)
+    for bus in core.buses:
+        bus = convert2internal(bus)
 
         signals_code = ""
-        for signal in wire.signals:
+        for signal in bus.signals:
             signal = convert2internal(signal)
             if isinstance(signal, iob_signal):
-                if signal.get_verilog_wire():
-                    signals_code += "    " + signal.get_verilog_wire()
+                if signal.get_verilog_bus():
+                    signals_code += "    " + signal.get_verilog_bus()
         if signals_code:
-            # Add description for the wire if it is not the default one
-            if wire.descr != "" and wire.descr != "Default description":
-                code += f"// {wire.descr}\n"
+            # Add description for the bus if it is not the default one
+            if bus.descr != "" and bus.descr != "Default description":
+                code += f"// {bus.descr}\n"
             code += signals_code
 
     return code
 
 
-def generate_wires_snippet(core):
-    """Write verilog snippet ('.vs' file) with wires of this core.
+def generate_buses_snippet(core):
+    """Write verilog snippet ('.vs' file) with buses of this core.
     This snippet may be included manually in verilog modules if needed.
     """
-    code = generate_wires(core)
+    code = generate_buses(core)
     out_dir = core.build_dir + "/hardware/src"
-    with open(f"{out_dir}/{core.name}_wires.vs", "w+") as f:
+    with open(f"{out_dir}/{core.name}_buses.vs", "w+") as f:
         f.write(code)
 
-    for wire in core.wires:
-        wire = convert2internal(wire)
+    for bus in core.buses:
+        bus = convert2internal(bus)
         # Generate the specific interface snippet as well
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.
-        if wire.interface:
-            wire.interface.gen_wires_vs_file()
+        if bus.interface:
+            bus.interface.gen_buses_vs_file()
 
             # move all .vs files from current directory to out_dir
             for file in os.listdir("."):

@@ -88,7 +88,7 @@ def find_and_update_fifo_csrs(csrs_dict, attributes_dict):
     accordingly.
     User should provide a CSR of type "*FIFO". This CSR will be replaced by fifo_csrs.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add fifo instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add fifo instance, buses and ports.
     """
     csr_group_ref = None
     for csr_group in csrs_dict:
@@ -112,8 +112,8 @@ def find_and_update_fifo_csrs(csrs_dict, attributes_dict):
 
 
 def create_fifo_instance(attributes_dict, csr_ref):
-    """Add fifo instance, wires and ports to given attributes_dict, based on fifo description provided by CSR.
-    :param dict attributes_dict: Dictionary of core attributes to add fifo instance, wires and ports.
+    """Add fifo instance, buses and ports to given attributes_dict, based on fifo description provided by CSR.
+    :param dict attributes_dict: Dictionary of core attributes to add fifo instance, buses and ports.
     :param dict csr_ref: CSR description dictionary, with FIFO information.
     """
     fifo_name = csr_ref["name"]
@@ -484,7 +484,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             },
         ]
     if mode == "W":
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": f"{fifo_name}_data_wen",
                 "descr": "FIFO data write enable",
@@ -494,7 +494,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             },
         ]
     else:  # mode R
-        attributes_dict["wires"] += [
+        attributes_dict["buses"] += [
             {
                 "name": f"{fifo_name}_data_ren",
                 "descr": "FIFO data read enable",
@@ -508,7 +508,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         # Async FIFO Wires
         #
         if mode == "W":
-            attributes_dict["wires"] += [
+            attributes_dict["buses"] += [
                 f"""
                 {fifo_name}_empty -s {fifo_name}_empty:1
                 -d '{fifo_name} empty output'
@@ -530,7 +530,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 },
             ]
         else:  # mode == "R"
-            attributes_dict["wires"] += [
+            attributes_dict["buses"] += [
                 f"""
                 {fifo_name}_full -s {fifo_name}_full:1
                 -d '{fifo_name} full output'
@@ -556,7 +556,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         # Sync FIFO Wires
         #
         if mode == "W":
-            attributes_dict["wires"].append(
+            attributes_dict["buses"].append(
                 {
                     "name": f"{fifo_name}_write_io",
                     "descr": "FIFO write interface.",
@@ -568,7 +568,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 }
             )
         else:  # mode == "R"
-            attributes_dict["wires"].append(
+            attributes_dict["buses"].append(
                 {
                     "name": f"{fifo_name}_read_io",
                     "descr": "FIFO read interface.",

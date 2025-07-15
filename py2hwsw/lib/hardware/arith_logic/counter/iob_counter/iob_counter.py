@@ -58,10 +58,10 @@ core_dictionary = {
             ],
         },
     ],
-    "wires": [
+    "buses": [
         {
             "name": "data_int",
-            "descr": "data_int wire",
+            "descr": "data_int bus",
             "signals": [
                 {"name": "data_int", "width": "DATA_W"},
             ],

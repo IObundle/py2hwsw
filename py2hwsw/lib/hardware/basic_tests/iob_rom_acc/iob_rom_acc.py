@@ -60,7 +60,7 @@ def setup(py_params_dict):
                 "descr": "Result",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "r_data_i",
                 "signals": [{"name": "values_r_data_i"}],

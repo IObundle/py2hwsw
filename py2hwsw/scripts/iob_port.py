@@ -4,11 +4,11 @@
 
 from dataclasses import dataclass
 
-from iob_wire import (
-    iob_wire,
+from iob_bus import (
+    iob_bus,
     replace_duplicate_signals_by_references,
     dict2interface,
-    WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS,
+    BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS,
 )
 from iob_base import (
     convert_dict2obj_list,
@@ -23,12 +23,12 @@ from api_base import internal_api_class
 
 @internal_api_class("user_api.api", "iob_port")
 @dataclass
-class iob_port(iob_wire):
+class iob_port(iob_bus):
     """Describes an IO port."""
 
     def create_signals_from_interface(self):
         if not self.interface:
-            fail_with_msg(f"Wire '{self.name}' has no interface!", ValueError)
+            fail_with_msg(f"Bus '{self.name}' has no interface!", ValueError)
 
         self.signals += self.interface.get_signals()
 
@@ -109,7 +109,7 @@ attrs = [
 @str_to_kwargs(attrs)
 def create_port_from_dict(core, *args, signals=[], **kwargs):
     """Creates a new port object using a dictionary and adds it to the core's port list
-    Also creates a new internal module wire to connect to the new port
+    Also creates a new internal module bus to connect to the new port
     param core: core object
     """
     # Ensure 'ports' list exists
@@ -140,7 +140,7 @@ def create_port_from_dict(core, *args, signals=[], **kwargs):
 @str_to_kwargs(attrs)
 def add_signals_port(core, *args, signals=[], **kwargs):
     """Creates a new port object and adds it to the core's port list
-    Also creates a new internal module wire to connect to the new port
+    Also creates a new internal module bus to connect to the new port
     param core: core object
     """
     # Ensure 'ports' list exists
@@ -161,7 +161,7 @@ def add_signals_port(core, *args, signals=[], **kwargs):
 @str_to_kwargs(attrs)
 def add_interface_port(core, *args, name, interface, **kwargs):
     """Creates a new port object and adds it to the core's port list
-    Also creates a new internal module wire to connect to the new port
+    Also creates a new internal module bus to connect to the new port
     param core: core object
     """
     # Ensure 'ports' list exists
@@ -190,7 +190,7 @@ def port_from_dict(port_dict):
     api_port_obj = iob_port()
 
     key_attribute_mapping = {}
-    preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
+    preprocessor_functions = BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
     # Update port_obj attributes with values from given dictionary
     update_obj_from_dict(
         api_port_obj._get_py2hwsw_internal_obj(),

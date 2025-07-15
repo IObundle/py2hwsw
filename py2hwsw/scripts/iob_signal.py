@@ -12,7 +12,7 @@ from api_base import internal_api_class
 @internal_api_class("user_api.api", "iob_signal")
 @dataclass
 class iob_signal:
-    """Class that represents a wire/port signal"""
+    """Class that represents a bus/port signal"""
 
     # Undefined by default. Will be set based on suffix of name (_i, _o, _io)
     direction: str = ""
@@ -37,13 +37,13 @@ class iob_signal:
         elif self.name.endswith("_io"):
             self.direction = "inout"
 
-    def get_verilog_wire(self):
-        """Generate a verilog wire string from this signal"""
+    def get_verilog_bus(self):
+        """Generate a verilog bus string from this signal"""
         if "'" in self.name or self.name.lower() == "z":
             return None
-        wire_type = "reg" if self.isvar else "wire"
+        bus_type = "reg" if self.isvar else "wire"
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
-        return f"{wire_type} {width_str}{self.name};\n"
+        return f"{bus_type} {width_str}{self.name};\n"
 
     def assert_direction(self):
         self.validate_attributes()  # FIXME: Not sure if this is the right place to call validate_attributes

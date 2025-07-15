@@ -117,7 +117,7 @@ def setup(py_params_dict):
     ]
 
     # Wires List
-    wires = [
+    buses = [
         {
             "name": "start_addr",
             "descr": "Start address for read/write",
@@ -441,7 +441,7 @@ def setup(py_params_dict):
         "generate_hw": True,
         "confs": confs,
         "ports": ports,
-        "wires": wires,
+        "buses": buses,
         "subblocks": subblocks,
         "fsm": fsm,
         "snippets": snippets,

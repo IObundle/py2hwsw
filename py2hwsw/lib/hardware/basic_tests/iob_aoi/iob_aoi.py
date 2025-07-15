@@ -33,7 +33,7 @@ import py2hwsw_api as py2hwsw
 #             -d 'Output port y'
 #             """
 #     ],
-#     "wires": [
+#     "buses": [
 #         """
 #             and_ab_out -s aab:W
 #             -d 'and ab output'
@@ -136,7 +136,7 @@ core_dictionary = {
             ],
         },
     ],
-    "wires": [
+    "buses": [
         {
             "name": "and_ab_out",
             "descr": "and ab output",

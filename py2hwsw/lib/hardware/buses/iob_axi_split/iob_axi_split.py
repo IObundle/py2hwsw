@@ -202,7 +202,7 @@ def setup(py_params_dict):
     #
     # Wires
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         # Active read transfer reg
         {
             "name": "active_transaction_read_reg_en_rst",
@@ -418,14 +418,14 @@ def setup(py_params_dict):
             ],
         },
     ]
-    # Generate wires for muxers and demuxers
+    # Generate buses for muxers and demuxers
     for signal, direction, width, _, _ in axi_signals:
         if direction == "input":
             prefix = "s_"
             if signal in ["axi_arvalid", "axi_awvalid", "axi_wvalid"]:
                 prefix = "demux_"
             # Demux signals
-            attributes_dict["wires"] += [
+            attributes_dict["buses"] += [
                 {
                     "name": "demux_" + signal + "_i",
                     "descr": f"Input of {signal} demux",
@@ -451,7 +451,7 @@ def setup(py_params_dict):
             if signal in ["axi_arready", "axi_awready", "axi_wready"]:
                 prefix = "mux_"
             # Mux signals
-            attributes_dict["wires"] += [
+            attributes_dict["buses"] += [
                 {
                     "name": "mux_" + signal + "_i",
                     "descr": f"Input of {signal} demux",

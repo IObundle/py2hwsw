@@ -68,8 +68,8 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
-            # Register wires
+        "buses": [
+            # Register buses
             {
                 "name": "soft_reset",
                 "descr": "",

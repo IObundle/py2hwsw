@@ -73,7 +73,7 @@ def setup(py_params_dict):
                 "descr": "Split output interface",
             },
         )
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         # Output selection signals
         {
             "name": "sel_reg_en_rst",

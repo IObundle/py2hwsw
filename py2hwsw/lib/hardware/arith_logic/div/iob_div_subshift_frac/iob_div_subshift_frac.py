@@ -82,38 +82,38 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "divisor_reg",
-                "descr": "divisor_reg wire",
+                "descr": "divisor_reg bus",
                 "signals": [
                     {"name": "divisor_reg", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "quotient_int",
-                "descr": "quotient_int wire",
+                "descr": "quotient_int bus",
                 "signals": [
                     {"name": "quotient_int", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "incr",
-                "descr": "incr wire",
+                "descr": "incr bus",
                 "signals": [
                     {"name": "incr", "width": 1, "isvar": True},
                 ],
             },
             {
                 "name": "res_acc",
-                "descr": "res_acc wire",
+                "descr": "res_acc bus",
                 "signals": [
                     {"name": "res_acc", "width": "DATA_W+1"},
                 ],
             },
             {
                 "name": "pcnt",
-                "descr": "pcnt wire",
+                "descr": "pcnt bus",
                 "signals": [
                     {"name": "pcnt", "width": 2, "isvar": True},
                 ],

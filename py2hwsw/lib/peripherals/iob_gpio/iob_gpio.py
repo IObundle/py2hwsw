@@ -109,31 +109,31 @@ def setup(py_params_dict):
             )
     verilog_snippet = ""
     verilog_snippet_generate = ""
-    attributes_dict["wires"] = []
-    # Create wires based on copy of ports
+    attributes_dict["buses"] = []
+    # Create buses based on copy of ports
     for port in attributes_dict["ports"]:
         if not port["name"].startswith("input") and not port["name"].startswith(
             "output"
         ):
             continue
-        wire = copy.deepcopy(port)
+        bus = copy.deepcopy(port)
         # Remove port direction suffix
-        wire["name"] = wire["name"][:-2]
-        wire["signals"][0]["name"] = wire["signals"][0]["name"][:-2]
+        bus["name"] = bus["name"][:-2]
+        bus["signals"][0]["name"] = bus["signals"][0]["name"][:-2]
         # Set correct width for connection with csrs
-        wire["signals"][0]["width"] = 32
-        attributes_dict["wires"].append(wire)
+        bus["signals"][0]["width"] = 32
+        attributes_dict["buses"].append(bus)
 
         if port["name"].endswith("_i"):
             verilog_snippet += f"""
-   assign {wire["signals"][0]["name"]}[INPUT_GPIO_W-1:0] = {port["signals"][0]["name"]};
+   assign {bus["signals"][0]["name"]}[INPUT_GPIO_W-1:0] = {port["signals"][0]["name"]};
 """
             verilog_snippet_generate += f"""
-   assign {wire["signals"][0]["name"]}[32-1:INPUT_GPIO_W] = {{32-INPUT_GPIO_W{{1'b0}}}};
+   assign {bus["signals"][0]["name"]}[32-1:INPUT_GPIO_W] = {{32-INPUT_GPIO_W{{1'b0}}}};
 """
         else:
             verilog_snippet += f"""
-   assign {port["signals"][0]["name"]} = {wire["signals"][0]["name"]}[OUTPUT_GPIO_W-1:0];
+   assign {port["signals"][0]["name"]} = {bus["signals"][0]["name"]}[OUTPUT_GPIO_W-1:0];
 """
 
     regs = []
@@ -177,7 +177,7 @@ def setup(py_params_dict):
                     "descr": f'32 bits: 1 bit for each bit in GPIO output {idx}. Bits with "1" are driven with output value, bits with "0" are in tristate.',
                 }
             )
-        # Connect regs to wires
+        # Connect regs to buses
         reg_connections["output_" + str(idx) + "_o"] = "output_" + str(idx)
         if TRISTATE:
             reg_connections["output_enable_" + str(idx) + "_o"] = (

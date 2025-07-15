@@ -124,7 +124,7 @@ def get_instance_port_connections(core, instance):
             )
 
         e_connect = find_obj_in_list(
-            [convert2internal(i) for i in core.wires], portmap.e_connect
+            [convert2internal(i) for i in core.buses], portmap.e_connect
         ) or find_obj_in_list(
             [convert2internal(i) for i in core.ports], portmap.e_connect
         )

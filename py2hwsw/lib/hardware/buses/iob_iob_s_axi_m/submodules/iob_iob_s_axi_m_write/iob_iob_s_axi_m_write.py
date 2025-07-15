@@ -120,7 +120,7 @@ def setup(py_params_dict):
                 },
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "fifo_w_if",
                 "descr": "FIFO write interface",

@@ -19,7 +19,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -27,7 +27,7 @@ def setup(py_params_dict):
             {
                 "name": "dividend_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "dividend_i",
                         "width": "DATA_W",
@@ -37,7 +37,7 @@ def setup(py_params_dict):
             {
                 "name": "divisor_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "divisor_i",
                         "width": "DATA_W",
@@ -47,23 +47,23 @@ def setup(py_params_dict):
             {
                 "name": "status_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "start_i",
                         "width": 1,
-                        "descr": "Start signal",
+                        "descr": "Start wire",
                     },
                     {
                         "name": "done_o",
                         "width": 1,
-                        "descr": "Done signal",
+                        "descr": "Done wire",
                     },
                 ],
             },
             {
                 "name": "quotient_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "quotient_o",
                         "width": "DATA_W",
@@ -74,7 +74,7 @@ def setup(py_params_dict):
             {
                 "name": "remainder_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "remainder_o",
                         "width": "DATA_W",
@@ -86,42 +86,42 @@ def setup(py_params_dict):
             {
                 "name": "divisor_reg",
                 "descr": "divisor_reg bus",
-                "signals": [
+                "wires": [
                     {"name": "divisor_reg", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "quotient_int",
                 "descr": "quotient_int bus",
-                "signals": [
+                "wires": [
                     {"name": "quotient_int", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "incr",
                 "descr": "incr bus",
-                "signals": [
+                "wires": [
                     {"name": "incr", "width": 1, "isvar": True},
                 ],
             },
             {
                 "name": "res_acc",
                 "descr": "res_acc bus",
-                "signals": [
+                "wires": [
                     {"name": "res_acc", "width": "DATA_W+1"},
                 ],
             },
             {
                 "name": "pcnt",
                 "descr": "pcnt bus",
-                "signals": [
+                "wires": [
                     {"name": "pcnt", "width": 2, "isvar": True},
                 ],
             },
             {
                 "name": "div_frac",
                 "descr": "Division interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "dividend_i",
                     },

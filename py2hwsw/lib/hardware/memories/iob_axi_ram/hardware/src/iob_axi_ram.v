@@ -6,7 +6,7 @@
 /*
 Changes made (2023 Pedro Antunes):
 - formated the code with Verible;
-- removed intialization in "reg" type signals declaration;
+- removed intialization in "reg" type wires declaration;
 - added reset to registers that did not previously have a reset value;
 - separated memory writes and reads from the registers always block
 - added support for memories that can not read and write at the same time
@@ -23,7 +23,7 @@ module iob_axi_ram #(
    parameter DATA_WIDTH      = 32,
    parameter ADDR_WIDTH      = 16,
    parameter STRB_WIDTH      = (DATA_WIDTH / 8),
-   // Width of AXI signals
+   // Width of AXI wires
    parameter ID_WIDTH        = 8,
    parameter LEN_WIDTH       = 8,
    // Extra pipeline register on output

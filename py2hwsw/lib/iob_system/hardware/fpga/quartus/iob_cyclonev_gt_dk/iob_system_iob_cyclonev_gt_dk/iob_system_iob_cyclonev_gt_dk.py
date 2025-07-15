@@ -67,7 +67,7 @@ def setup(py_params_dict):
         {
             "name": "clk_rst_i",
             "descr": "Clock and reset",
-            "signals": [
+            "wires": [
                 {"name": "clk_i", "width": "1"},
                 {"name": "resetn_i", "width": "1"},
             ],
@@ -75,7 +75,7 @@ def setup(py_params_dict):
         {
             "name": "rs232_io",
             "descr": "Serial port",
-            "signals": [
+            "wires": [
                 {"name": "txd_o", "width": "1"},
                 {"name": "rxd_i", "width": "1"},
             ],
@@ -86,7 +86,7 @@ def setup(py_params_dict):
             {
                 "name": "ddr3_io",
                 "descr": "External DDR3 memory interface",
-                "signals": [
+                "wires": [
                     {"name": "ddr3b_a_o", "width": "14"},
                     {"name": "ddr3b_ba_o", "width": "3"},
                     {"name": "ddr3b_rasn_o", "width": "1"},
@@ -107,7 +107,7 @@ def setup(py_params_dict):
             {
                 "name": "rzqin_i",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rzqin_i", "width": "1"},
                 ],
             },
@@ -117,7 +117,7 @@ def setup(py_params_dict):
             {
                 "name": "mii_io",
                 "descr": "MII ethernet interface",
-                "signals": [
+                "wires": [
                     {"name": "enet_resetn_o", "width": "1"},
                     {"name": "enet_rx_clk_i", "width": "1"},
                     {"name": "enet_gtx_clk_o", "width": "1"},
@@ -144,7 +144,7 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
-            "signals": [
+            "wires": [
                 {"name": "clk_i"},
                 {"name": "cke", "width": "1"},
                 {"name": "arst", "width": "1"},
@@ -153,7 +153,7 @@ def setup(py_params_dict):
         {
             "name": "rs232_int",
             "descr": "iob-system uart interface",
-            "signals": [
+            "wires": [
                 {"name": "rxd_i"},
                 {"name": "txd_o"},
                 {"name": "rs232_rts", "width": "1"},
@@ -163,7 +163,7 @@ def setup(py_params_dict):
         {
             "name": "reset_sync_clk_rst",
             "descr": "Reset synchronizer inputs",
-            "signals": [
+            "wires": [
                 {"name": "clk_i"},
                 {
                     "name": "rst_int" if params["use_extmem"] else "resetn_inv",
@@ -174,14 +174,14 @@ def setup(py_params_dict):
         {
             "name": "reset_sync_arst_out",
             "descr": "Reset synchronizer output",
-            "signals": [
+            "wires": [
                 {"name": "arst"},
             ],
         },
         {
             "name": "clk_i",
-            "descr": "Clock signal",
-            "signals": [
+            "descr": "Clock wire",
+            "wires": [
                 {"name": "clk_i"},
             ],
         },
@@ -192,7 +192,7 @@ def setup(py_params_dict):
             {
                 "name": "axi",
                 "descr": "AXI interface to connect SoC to memory",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -204,15 +204,15 @@ def setup(py_params_dict):
             {
                 "name": "ddr3_ctr_clk_rst",
                 "descr": "DDR3 controller clock and areset inputs",
-                "signals": [
+                "wires": [
                     {"name": "clk_i"},
                     {"name": "resetn_i"},
                 ],
             },
             {
                 "name": "ddr3_ctr_general",
-                "descr": "DDR3 controller general signals",
-                "signals": [
+                "descr": "DDR3 controller general wires",
+                "wires": [
                     {"name": "rzqin_i"},
                     {"name": "pll_locked"},
                     {"name": "init_done"},
@@ -225,7 +225,7 @@ def setup(py_params_dict):
             {
                 "name": "rxclk_buf_io",
                 "descr": "rxclkbuf io",
-                "signals": [
+                "wires": [
                     {"name": "enet_rx_clk_i"},
                     {"name": "eth_clk", "width": "1"},
                 ],
@@ -233,7 +233,7 @@ def setup(py_params_dict):
             {
                 "name": "ddio_out_clkbuf_io",
                 "descr": "DDIO clock buffer io",
-                "signals": [
+                "wires": [
                     {"name": "enet_resetn_inv", "width": "1"},
                     {"name": "low", "width": "1"},
                     {"name": "high"},
@@ -244,7 +244,7 @@ def setup(py_params_dict):
             {
                 "name": "phy",
                 "descr": "PHY Interface Ports",
-                "signals": [
+                "wires": [
                     {"name": "eth_MTxClk", "width": "1"},
                     {"name": "MTxEn", "width": "1"},
                     {"name": "MTxD", "width": "4"},

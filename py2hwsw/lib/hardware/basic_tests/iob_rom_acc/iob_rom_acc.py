@@ -36,17 +36,17 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {"type": "iob_clk"},
+                "wires": {"type": "iob_clk"},
                 "descr": "Clock, enable and reset",
             },
             {
                 "name": "start_i",
-                "signals": [{"name": "start_i", "width": 1}],
-                "descr": "Start signal",
+                "wires": [{"name": "start_i", "width": 1}],
+                "descr": "Start wire",
             },
             {
                 "name": "values_m",
-                "signals": {
+                "wires": {
                     "type": "rom_sp",
                     "prefix": "values_",
                     "DATA_W": "VALUES_DATA_W",
@@ -56,38 +56,38 @@ def setup(py_params_dict):
             },
             {
                 "name": "result_o",
-                "signals": [{"name": "result_o", "width": "VALUES_DATA_W"}],
+                "wires": [{"name": "result_o", "width": "VALUES_DATA_W"}],
                 "descr": "Result",
             },
         ],
         "buses": [
             {
                 "name": "r_data_i",
-                "signals": [{"name": "values_r_data_i"}],
+                "wires": [{"name": "values_r_data_i"}],
             },
             {
                 "name": "addr_o",
-                "signals": [{"name": "values_addr_o"}],
+                "wires": [{"name": "values_addr_o"}],
             },
             {
                 "name": "acc_en_rst",
-                "signals": [
-                    {"name": "acc_enable", "width": 1, "descr": "Enable signal"},
+                "wires": [
+                    {"name": "acc_enable", "width": 1, "descr": "Enable wire"},
                     {
                         "name": "acc_reset",
                         "width": 1,
-                        "descr": "Synchronous reset signal",
+                        "descr": "Synchronous reset wire",
                     },
                 ],
             },
             {
                 "name": "ctr_en_rst",
-                "signals": [
-                    {"name": "ctr_enable", "width": 1, "descr": "Enable signal"},
+                "wires": [
+                    {"name": "ctr_enable", "width": 1, "descr": "Enable wire"},
                     {
                         "name": "ctr_reset",
                         "width": 1,
-                        "descr": "Synchronous reset signal",
+                        "descr": "Synchronous reset wire",
                     },
                 ],
             },

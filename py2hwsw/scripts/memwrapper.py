@@ -66,7 +66,7 @@ def initModule(moduleName, tech, type):
 
 
 #
-# Instantiate pinout signals
+# Instantiate pinout wires
 #
 
 

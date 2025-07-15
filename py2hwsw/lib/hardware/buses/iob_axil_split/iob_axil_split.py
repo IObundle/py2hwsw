@@ -32,7 +32,7 @@ def setup(py_params_dict):
         else 8
     )
 
-    axil_signals = [
+    axil_wires = [
         ("axil_araddr", "input", ADDR_W, "read"),
         # ("axil_arprot", "input", PROT_W, "read"),
         ("axil_arvalid", "input", 1, "read"),
@@ -64,15 +64,15 @@ def setup(py_params_dict):
     attributes_dict["ports"] = [
         {
             "name": "clk_en_rst_s",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
             "descr": "Clock, clock enable and async reset",
         },
         {
             "name": "reset_i",
-            "descr": "Reset signal",
-            "signals": [
+            "descr": "Reset wire",
+            "wires": [
                 {
                     "name": "rst_i",
                     "width": "1",
@@ -81,7 +81,7 @@ def setup(py_params_dict):
         },
         {
             "name": "input_s",
-            "signals": {
+            "wires": {
                 "type": "axil",
                 "file_prefix": py_params_dict["name"] + "_input_",
                 "prefix": "input_",
@@ -95,7 +95,7 @@ def setup(py_params_dict):
         attributes_dict["ports"].append(
             {
                 "name": f"output_{port_idx}_m",
-                "signals": {
+                "wires": {
                     "type": "axil",
                     "file_prefix": f"{py_params_dict['name']}_output{port_idx}_",
                     "prefix": f"output{port_idx}_",
@@ -109,11 +109,11 @@ def setup(py_params_dict):
     # Wires
     #
     attributes_dict["buses"] = [
-        # Read selection register signals
+        # Read selection register wires
         {
             "name": "read_sel_reg_en_rst",
-            "descr": "Enable and reset signal for read_sel_reg",
-            "signals": [
+            "descr": "Enable and reset wire for read_sel_reg",
+            "wires": [
                 {"name": "read_sel_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
@@ -121,36 +121,36 @@ def setup(py_params_dict):
         {
             "name": "read_sel_reg_data_i",
             "descr": "Input of read_sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "read_sel", "width": NBITS},
             ],
         },
         {
             "name": "read_sel_reg_data_o",
             "descr": "Output of read_sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "read_sel_reg", "width": NBITS},
             ],
         },
         {
             "name": "output_read_sel",
             "descr": "Select output interface",
-            "signals": [
+            "wires": [
                 {"name": "read_sel"},
             ],
         },
         {
             "name": "output_read_sel_reg",
             "descr": "Registered select output interface",
-            "signals": [
+            "wires": [
                 {"name": "read_sel_reg"},
             ],
         },
-        # Write selection register signals
+        # Write selection register wires
         {
             "name": "write_sel_reg_en_rst",
-            "descr": "Enable and reset signal for write_sel_reg",
-            "signals": [
+            "descr": "Enable and reset wire for write_sel_reg",
+            "wires": [
                 {"name": "write_sel_reg_en", "width": 1},
                 {"name": "rst_i"},
             ],
@@ -158,76 +158,76 @@ def setup(py_params_dict):
         {
             "name": "write_sel_reg_data_i",
             "descr": "Input of write_sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "write_sel", "width": NBITS},
             ],
         },
         {
             "name": "write_sel_reg_data_o",
             "descr": "Output of write_sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "write_sel_reg", "width": NBITS},
             ],
         },
         {
             "name": "output_write_sel",
             "descr": "Select output interface",
-            "signals": [
+            "wires": [
                 {"name": "write_sel"},
             ],
         },
         {
             "name": "output_write_sel_reg",
             "descr": "Registered select output interface",
-            "signals": [
+            "wires": [
                 {"name": "write_sel_reg"},
             ],
         },
     ]
     # Generate buses for muxers and demuxers
-    for signal, direction, width, _ in axil_signals:
+    for wire, direction, width, _ in axil_wires:
         if direction == "input":
-            # Demux signals
+            # Demux wires
             attributes_dict["buses"] += [
                 {
-                    "name": "demux_" + signal + "_i",
-                    "descr": f"Input of {signal} demux",
-                    "signals": [
+                    "name": "demux_" + wire + "_i",
+                    "descr": f"Input of {wire} demux",
+                    "wires": [
                         {
-                            "name": "input_" + signal + "_i",
+                            "name": "input_" + wire + "_i",
                         },
                     ],
                 },
                 {
-                    "name": "demux_" + signal + "_o",
-                    "descr": f"Output of {signal} demux",
-                    "signals": [
+                    "name": "demux_" + wire + "_o",
+                    "descr": f"Output of {wire} demux",
+                    "wires": [
                         {
-                            "name": "demux_" + signal,
+                            "name": "demux_" + wire,
                             "width": NUM_OUTPUTS * width,
                         },
                     ],
                 },
             ]
         else:  # output direction
-            # Mux signals
+            # Mux wires
             attributes_dict["buses"] += [
                 {
-                    "name": "mux_" + signal + "_i",
-                    "descr": f"Input of {signal} demux",
-                    "signals": [
+                    "name": "mux_" + wire + "_i",
+                    "descr": f"Input of {wire} demux",
+                    "wires": [
                         {
-                            "name": "mux_" + signal,
+                            "name": "mux_" + wire,
                             "width": NUM_OUTPUTS * width,
                         },
                     ],
                 },
                 {
-                    "name": "mux_" + signal + "_o",
-                    "descr": f"Output of {signal} demux",
-                    "signals": [
+                    "name": "mux_" + wire + "_o",
+                    "descr": f"Output of {wire} demux",
+                    "wires": [
                         {
-                            "name": "input_" + signal + "_o",
+                            "name": "input_" + wire + "_o",
                         },
                     ],
                 },
@@ -284,40 +284,40 @@ def setup(py_params_dict):
         },
     ]
     # Generate muxers and demuxers
-    for signal, direction, width, sig_type in axil_signals:
+    for wire, direction, width, sig_type in axil_wires:
         if direction == "input":
             # Demuxers
             attributes_dict["subblocks"].append(
                 {
                     "core_name": "iob_demux",
-                    "instance_name": "iob_demux_" + signal,
+                    "instance_name": "iob_demux_" + wire,
                     "parameters": {
                         "DATA_W": width,
                         "N": NUM_OUTPUTS,
                     },
                     "connect": {
                         "sel_i": f"output_{sig_type}_sel",
-                        "data_i": "demux_" + signal + "_i",
-                        "data_o": "demux_" + signal + "_o",
+                        "data_i": "demux_" + wire + "_i",
+                        "data_o": "demux_" + wire + "_o",
                     },
                 },
             )
         else:  # output direction
-            # Use registered select signal for response signals (except for ready)
-            sel_signal_suffix = "" if "ready" in signal else "_reg"
+            # Use registered select wire for response wires (except for ready)
+            sel_wire_suffix = "" if "ready" in wire else "_reg"
             # Muxers
             attributes_dict["subblocks"].append(
                 {
                     "core_name": "iob_mux",
-                    "instance_name": "iob_mux_" + signal,
+                    "instance_name": "iob_mux_" + wire,
                     "parameters": {
                         "DATA_W": width,
                         "N": NUM_OUTPUTS,
                     },
                     "connect": {
-                        "sel_i": f"output_{sig_type}_sel{sel_signal_suffix}",
-                        "data_i": "mux_" + signal + "_i",
-                        "data_o": "mux_" + signal + "_o",
+                        "sel_i": f"output_{sig_type}_sel{sel_wire_suffix}",
+                        "data_i": "mux_" + wire + "_i",
+                        "data_o": "mux_" + wire + "_o",
                     },
                 },
             )
@@ -337,28 +337,28 @@ def setup(py_params_dict):
     ]
 
     verilog_code = ""
-    # Connect address signal
+    # Connect address wire
     for port_idx in range(NUM_OUTPUTS):
         verilog_code += f"""
    assign output{port_idx}_axil_araddr_o = demux_axil_araddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
    assign output{port_idx}_axil_awaddr_o = demux_axil_awaddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
 """
-    # Connect other signals
-    for signal, direction, width, _ in axil_signals:
-        if signal in ["axil_araddr", "axil_awaddr"]:
+    # Connect other wires
+    for wire, direction, width, _ in axil_wires:
+        if wire in ["axil_araddr", "axil_awaddr"]:
             continue
 
         if direction == "input":
             # Connect demuxers outputs
             for port_idx in range(NUM_OUTPUTS):
                 verilog_code += f"""
-   assign output{port_idx}_{signal}_o = demux_{signal}[{port_idx*width}+:{width}];
+   assign output{port_idx}_{wire}_o = demux_{wire}[{port_idx*width}+:{width}];
 """
         else:  # Output direction
             # Connect muxer inputs
-            verilog_code += f"    assign mux_{signal} = {{"
+            verilog_code += f"    assign mux_{wire} = {{"
             for port_idx in range(NUM_OUTPUTS - 1, -1, -1):
-                verilog_code += f"output{port_idx}_{signal}_i, "
+                verilog_code += f"output{port_idx}_{wire}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
     # Create snippet with muxer and demuxer connections
     attributes_dict["snippets"] += [

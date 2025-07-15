@@ -53,7 +53,7 @@ core_dictionary = {
     "ports": [
         {
             "name": "clk_en_rst_s",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
             "descr": "Clock, clock enable and reset",
@@ -61,14 +61,14 @@ core_dictionary = {
         {
             "name": "start_i",
             "descr": "Input port",
-            "signals": [
+            "wires": [
                 {"name": "start_i", "width": 1},
             ],
         },
         {
             "name": "pulse_o",
             "descr": "Output port",
-            "signals": [
+            "wires": [
                 {"name": "pulse_o", "width": 1},
             ],
         },
@@ -77,21 +77,21 @@ core_dictionary = {
         {
             "name": "start_detected",
             "descr": "Start detect bus",
-            "signals": [
+            "wires": [
                 {"name": "start_detected", "width": 1},
             ],
         },
         {
             "name": "start_detected_nxt",
             "descr": "Start detect next bus",
-            "signals": [
+            "wires": [
                 {"name": "start_detected_nxt", "width": 1},
             ],
         },
         {
             "name": "iob_pulse_gen_int",
             "descr": "iob_pulse_gen_int bus",
-            "signals": [
+            "wires": [
                 {"name": "cnt_en", "width": 1},
                 {"name": "start_i"},
             ],
@@ -99,14 +99,14 @@ core_dictionary = {
         {
             "name": "cnt",
             "descr": "",
-            "signals": [
+            "wires": [
                 {"name": "cnt", "width": "WIDTH"},
             ],
         },
         {
             "name": "pulse_nxt",
             "descr": "",
-            "signals": [
+            "wires": [
                 {"name": "pulse_nxt", "width": 1},
             ],
         },
@@ -115,7 +115,7 @@ core_dictionary = {
         {
             "core_name": "iob_reg",
             "instance_name": "start_detected_inst",
-            "instance_description": "Detect start signal",
+            "instance_description": "Detect start wire",
             "parameters": {
                 "DATA_W": 1,
                 "RST_VAL": 0,

@@ -92,7 +92,7 @@ def setup(py_params_dict):
             {
                 "name": "write_io",
                 "descr": "Write interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "w_clk_i",
                         "width": 1,
@@ -126,12 +126,12 @@ def setup(py_params_dict):
                     {
                         "name": "w_full_o",
                         "width": 1,
-                        "descr": "Write full signal",
+                        "descr": "Write full wire",
                     },
                     {
                         "name": "w_empty_o",
                         "width": 1,
-                        "descr": "Write empty signal",
+                        "descr": "Write empty wire",
                     },
                     {
                         "name": "w_level_o",
@@ -143,7 +143,7 @@ def setup(py_params_dict):
             {
                 "name": "read_io",
                 "descr": "Read interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "r_clk_i",
                         "width": 1,
@@ -177,12 +177,12 @@ def setup(py_params_dict):
                     {
                         "name": "r_full_o",
                         "width": 1,
-                        "descr": "Read full signal",
+                        "descr": "Read full wire",
                     },
                     {
                         "name": "r_empty_o",
                         "width": 1,
-                        "descr": "Read empty signal",
+                        "descr": "Read empty wire",
                     },
                     {
                         "name": "r_level_o",
@@ -194,7 +194,7 @@ def setup(py_params_dict):
             {
                 "name": "extmem_io",
                 "descr": "External memory interface",
-                "signals": [
+                "wires": [
                     #  Write port
                     {
                         "name": "ext_mem_w_clk_o",

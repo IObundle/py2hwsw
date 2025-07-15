@@ -31,7 +31,7 @@ def setup(py_params_dict):
             {
                 "name": "start_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "start_i",
                         "width": 1,
@@ -41,7 +41,7 @@ def setup(py_params_dict):
             {
                 "name": "op_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "op_i",
                         "width": "DATA_W",
@@ -51,7 +51,7 @@ def setup(py_params_dict):
             {
                 "name": "done_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "done_o",
                         "width": 1,
@@ -61,7 +61,7 @@ def setup(py_params_dict):
             {
                 "name": "res_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "res_o",
                         "width": "SIZE_W",
@@ -73,56 +73,56 @@ def setup(py_params_dict):
             {
                 "name": "right",
                 "descr": "right bus",
-                "signals": [
+                "wires": [
                     {"name": "right", "width": "SIZE_W+2"},
                 ],
             },
             {
                 "name": "left",
                 "descr": "left bus",
-                "signals": [
+                "wires": [
                     {"name": "left", "width": "SIZE_W+2"},
                 ],
             },
             {
                 "name": "a_in",
                 "descr": "a_in bus",
-                "signals": [
+                "wires": [
                     {"name": "a_in", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "tmp",
                 "descr": "tmp bus",
-                "signals": [
+                "wires": [
                     {"name": "tmp", "width": "SIZE_W+2"},
                 ],
             },
             {
                 "name": "q",
                 "descr": "q bus",
-                "signals": [
+                "wires": [
                     {"name": "q", "width": "SIZE_W"},
                 ],
             },
             {
                 "name": "counter",
                 "descr": "counter bus",
-                "signals": [
+                "wires": [
                     {"name": "counter", "width": "COUNT_W"},
                 ],
             },
             {
                 "name": "a",
                 "descr": "a bus",
-                "signals": [
+                "wires": [
                     {"name": "a", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "r",
                 "descr": "r bus",
-                "signals": [
+                "wires": [
                     {"name": "r", "width": "SIZE_W+2"},
                 ],
             },

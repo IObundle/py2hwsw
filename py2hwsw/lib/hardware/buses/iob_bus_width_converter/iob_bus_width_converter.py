@@ -87,10 +87,10 @@ def setup(py_params_dict):
     verilog_parameters = []
     manager_interface_parameters = {}
     subordinate_interface_parameters = {}
-    for signal in interfaces[INTERFACE]:
-        name = signal[0]
-        direction = signal[1]
-        width = signal[2]
+    for wire in interfaces[INTERFACE]:
+        name = wire[0]
+        direction = wire[1]
+        width = wire[2]
 
         if type(width) is int:
             bit_select = ""
@@ -144,7 +144,7 @@ def setup(py_params_dict):
             {
                 "name": "subordinate_s",
                 "descr": "Subordinate interface (connects to manager)",
-                "signals": {
+                "wires": {
                     "type": INTERFACE,
                     **subordinate_interface_parameters,
                 },
@@ -152,7 +152,7 @@ def setup(py_params_dict):
             {
                 "name": "manager_m",
                 "descr": "Manager interface (connects to subordinate)",
-                "signals": {
+                "wires": {
                     "type": INTERFACE,
                     **manager_interface_parameters,
                 },

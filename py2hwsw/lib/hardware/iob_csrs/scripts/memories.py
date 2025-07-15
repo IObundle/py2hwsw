@@ -164,7 +164,7 @@ def create_memory_instance(
             {
                 "name": f"{memory_name}_read_io",
                 "descr": "MEMORY read interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": f"{memory_name}_r_en_i",
                         "width": 1,
@@ -193,7 +193,7 @@ def create_memory_instance(
             {
                 "name": f"{memory_name}_write_io",
                 "descr": "MEMORY write interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": f"{memory_name}_w_en_i",
                         "width": 1,
@@ -227,7 +227,7 @@ def create_memory_instance(
         {
             "name": f"{memory_name}_port_a_io",
             "descr": f"Port A of memory {memory_name}",
-            "signals": [
+            "wires": [
                 {"name": f"{memory_name}_enA_i", "width": 1},
                 {"name": f"{memory_name}_wstrbA_i", "width": f"{n_bits}/8"},
                 {"name": f"{memory_name}_addrA_i", "width": log2n_items},
@@ -238,7 +238,7 @@ def create_memory_instance(
         {
             "name": f"{memory_name}_port_b_io",
             "descr": f"Port B of memory {memory_name}",
-            "signals": [
+            "wires": [
                 {"name": f"{memory_name}_enB_i", "width": 1},
                 {"name": f"{memory_name}_wstrbB_i", "width": f"{n_bits}/8"},
                 {"name": f"{memory_name}_addrB_i", "width": log2n_items},
@@ -261,7 +261,7 @@ def create_memory_instance(
         {
             "name": f"{memory_name}_asym_s_io",
             "descr": "Subordinate interface of asym",
-            "signals": [
+            "wires": [
                 {
                     "name": f"{memory_name}_asym_en_i",
                     "width": 1,
@@ -341,23 +341,23 @@ def create_memory_instance(
     // Respond with always ready
     assign {memory_name}_ready = 1'b1;
 """
-    # Port A write signals
+    # Port A write wires
     if "W" in mode:
         snippet = f"""
-    // Write signals
+    // Write wires
     assign wstrbA_i = {memory_name}_wstrb;
     assign dA_i = {memory_name}_wdata;
 """
     else:
         snippet = """
-    // Write signals (unused)
+    // Write wires (unused)
     assign wstrbA_i = 'd0;
     assign dA_i = 'd0;
 """
-    # Port A read signals
+    # Port A read wires
     if "R" in mode:
         snippet = f"""
-    // Read signals
+    // Read wires
     assign {memory_name}_rdata = dA_o;
     assign {memory_name}_rvalid = 1'b1;
 """

@@ -11,8 +11,8 @@ from iob_base import (
     prevent_instantiation,
 )
 from iob_conf import create_conf_group
-from iob_port import create_port_from_dict, add_interface_port, add_signals_port
-from iob_bus import create_bus, get_bus_signal
+from iob_port import create_port_from_dict, add_interface_port, add_wires_port
+from iob_bus import create_bus, get_bus_wire
 from iob_snippet import create_snippet
 from iob_globals import iob_globals, create_globals
 from iob_comb import iob_comb, create_comb
@@ -49,14 +49,14 @@ class iob_module(iob_base):
     def add_interface_port(self, *args, **kwargs):
         add_interface_port(self, *args, **kwargs)
 
-    def add_signals_port(self, *args, **kwargs):
-        add_signals_port(self, *args, **kwargs)
+    def add_wires_port(self, *args, **kwargs):
+        add_wires_port(self, *args, **kwargs)
 
     def create_bus(self, *args, **kwargs):
         create_bus(self, *args, **kwargs)
 
-    def get_bus_signal(self, *args, **kwargs):
-        return get_bus_signal(self, *args, **kwargs)
+    def get_bus_wire(self, *args, **kwargs):
+        return get_bus_wire(self, *args, **kwargs)
 
     def create_snippet(self, *args, **kwargs):
         create_snippet(self, *args, **kwargs)

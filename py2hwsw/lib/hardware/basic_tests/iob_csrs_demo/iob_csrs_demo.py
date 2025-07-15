@@ -27,7 +27,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -38,21 +38,21 @@ def setup(py_params_dict):
             {
                 "name": "single_write",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "single_write_wr", "width": 1},
                 ],
             },
             {
                 "name": "single_read",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "single_read_rd", "width": 1},
                 ],
             },
             {
                 "name": "single_read_write",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "single_read_write_wrrd_o", "width": 1},
                     {"name": "single_read_write_wrrd_i", "width": 1},
                     {"name": "single_read_write_wrrd_wstrb", "width": 1},
@@ -61,7 +61,7 @@ def setup(py_params_dict):
             {
                 "name": "multi_read_write",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "multi_read_write_wrrd_o", "width": 23},
                     {"name": "multi_read_write_wrrd_i", "width": 23},
                     {"name": "multi_read_write_wrrd_wstrb", "width": 3},
@@ -71,7 +71,7 @@ def setup(py_params_dict):
             {
                 "name": "regarray_write",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "regarray_read_en_rd", "width": 1},
                     {"name": "regarray_read_addr_rd", "width": 3},
                     {"name": "regarray_read_data_rd", "width": 8},
@@ -81,7 +81,7 @@ def setup(py_params_dict):
             {
                 "name": "regarray_read",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "regarray_write_en_wr", "width": 1},
                     {"name": "regarray_write_strb_wr", "width": int(32 / 8)},
                     {"name": "regarray_write_addr_wr", "width": 1},
@@ -92,7 +92,7 @@ def setup(py_params_dict):
             {
                 "name": "regarray_rw_r",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "regarray_read_write_en_rd", "width": 1},
                     {"name": "regarray_read_write_addr_rd", "width": 3},
                     {"name": "regarray_read_write_data_rd", "width": 16},
@@ -102,7 +102,7 @@ def setup(py_params_dict):
             {
                 "name": "regarray_rw_w",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "regarray_read_write_en_wr", "width": 1},
                     {"name": "regarray_read_write_strb_wr", "width": int(16 / 8)},
                     {"name": "regarray_read_write_addr_wr", "width": 1},
@@ -113,7 +113,7 @@ def setup(py_params_dict):
             {
                 "name": "regarray_param_rw_r",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "regarray_read_write_param_en_rd", "width": 1},
                     {"name": "regarray_read_write_param_addr_rd", "width": 3},
                     {"name": "regarray_read_write_param_data_rd", "width": 16},
@@ -123,7 +123,7 @@ def setup(py_params_dict):
             {
                 "name": "regarray_param_rw_w",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "regarray_read_write_param_en_wr", "width": 1},
                     {"name": "regarray_read_write_param_strb_wr", "width": int(16 / 8)},
                     {"name": "regarray_read_write_param_addr_wr", "width": 1},
@@ -135,14 +135,14 @@ def setup(py_params_dict):
             {
                 "name": "fifo_write_rst",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_write_rst", "width": 1},
                 ],
             },
             {
                 "name": "fifo_write_read",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_write_w_en", "width": 1},
                     {"name": "fifo_write_w_data", "width": 4},
                     {"name": "fifo_write_w_empty", "width": 1},
@@ -151,7 +151,7 @@ def setup(py_params_dict):
             {
                 "name": "fifo_write_extmem",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "fifo_write_ext_mem_clk_o",
                         "width": 1,
@@ -192,7 +192,7 @@ def setup(py_params_dict):
             {
                 "name": "fifo_write_current_level",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_write_current_level", "width": 5},
                 ],
             },
@@ -200,14 +200,14 @@ def setup(py_params_dict):
             {
                 "name": "fifo_read_rst",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_read_rst", "width": 1},
                 ],
             },
             {
                 "name": "fifo_read_write",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_read_r_en", "width": 1},
                     {"name": "fifo_read_r_data", "width": 16},
                     {"name": "fifo_read_r_full", "width": 1},
@@ -216,14 +216,14 @@ def setup(py_params_dict):
             {
                 "name": "fifo_read_interrupt",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_read_interrupt", "width": 1},
                 ],
             },
             {
                 "name": "fifo_read_extmem",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "fifo_read_ext_mem_clk_o",
                         "width": 1,
@@ -264,7 +264,7 @@ def setup(py_params_dict):
             {
                 "name": "fifo_read_current_level",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_read_current_level", "width": 5},
                 ],
             },
@@ -272,7 +272,7 @@ def setup(py_params_dict):
             {
                 "name": "async_fifo_write_read",
                 "descr": "Read interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "async_fifo_write_r_clk_i",
                         "width": 1,
@@ -306,12 +306,12 @@ def setup(py_params_dict):
                     {
                         "name": "async_fifo_write_r_full_o",
                         "width": 1,
-                        "descr": "Read full signal",
+                        "descr": "Read full wire",
                     },
                     {
                         "name": "async_fifo_write_r_empty_o",
                         "width": 1,
-                        "descr": "Read empty signal",
+                        "descr": "Read empty wire",
                     },
                     {
                         "name": "async_fifo_write_r_level_o",
@@ -323,7 +323,7 @@ def setup(py_params_dict):
             {
                 "name": "async_fifo_write_extmem",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "async_fifo_write_ext_mem_w_clk_o",
                         "width": 1,
@@ -369,7 +369,7 @@ def setup(py_params_dict):
             {
                 "name": "async_fifo_read_write",
                 "descr": "Write interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "async_fifo_read_w_clk_i",
                         "width": 1,
@@ -403,12 +403,12 @@ def setup(py_params_dict):
                     {
                         "name": "async_fifo_read_w_full_o",
                         "width": 1,
-                        "descr": "Read full signal",
+                        "descr": "Read full wire",
                     },
                     {
                         "name": "async_fifo_read_w_empty_o",
                         "width": 1,
-                        "descr": "Read empty signal",
+                        "descr": "Read empty wire",
                     },
                     {
                         "name": "async_fifo_read_w_level_o",
@@ -420,7 +420,7 @@ def setup(py_params_dict):
             {
                 "name": "async_fifo_read_extmem",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "async_fifo_read_ext_mem_w_clk_o",
                         "width": 1,
@@ -466,7 +466,7 @@ def setup(py_params_dict):
             {
                 "name": "noauto_write",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "noauto_write_valid_wr", "width": 1},
                     {"name": "noauto_write_wdata_wr", "width": 1},
                     {"name": "noauto_write_wstrb_wr", "width": 1},
@@ -476,7 +476,7 @@ def setup(py_params_dict):
             {
                 "name": "noauto_read",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "noauto_read_valid_rd", "width": 1},
                     {"name": "noauto_read_rdata_rd", "width": 1},
                     {"name": "noauto_read_ready_rd", "width": 1},
@@ -486,7 +486,7 @@ def setup(py_params_dict):
             {
                 "name": "noauto_read_write",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "noauto_read_write_valid_wrrd", "width": 1},
                     {"name": "noauto_read_write_wdata_wrrd", "width": 1},
                     {"name": "noauto_read_write_wstrb_wrrd", "width": 1},
@@ -499,7 +499,7 @@ def setup(py_params_dict):
             {
                 "name": "autoclear_write",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "autoclear_write_valid_wr", "width": 1},
                     {"name": "autoclear_write_wdata_wr", "width": 1},
                     {"name": "autoclear_write_wstrb_wr", "width": 1},
@@ -509,7 +509,7 @@ def setup(py_params_dict):
             {
                 "name": "autoclear_read",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "autoclear_read_valid_rd", "width": 1},
                     {"name": "autoclear_read_rdata_rd", "width": 1},
                     {"name": "autoclear_read_ready_rd", "width": 1},
@@ -520,21 +520,21 @@ def setup(py_params_dict):
             {
                 "name": "demo_interrupt_status",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "demo_interrupt_status_rd", "width": 32},
                 ],
             },
             {
                 "name": "demo_interrupt_mask",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "demo_interrupt_mask_wr", "width": 32},
                 ],
             },
             {
                 "name": "demo_interrupt_clear",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "demo_interrupt_clear_wr", "width": 32},
                 ],
             },

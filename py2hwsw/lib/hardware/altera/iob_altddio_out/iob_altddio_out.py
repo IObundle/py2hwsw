@@ -20,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -30,7 +30,7 @@ def setup(py_params_dict):
             {
                 "name": "data_l_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "data_l_i",
                         "width": "DATA_W",
@@ -40,7 +40,7 @@ def setup(py_params_dict):
             {
                 "name": "data_h_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "data_h_i",
                         "width": "DATA_W",
@@ -50,7 +50,7 @@ def setup(py_params_dict):
             {
                 "name": "data_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "data_o",
                         "width": "DATA_W",
@@ -62,14 +62,14 @@ def setup(py_params_dict):
             {
                 "name": "data_l_i_reg",
                 "descr": "data_l_i_reg bus",
-                "signals": [
+                "wires": [
                     {"name": "data_l_i_reg", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "data_h_i_reg",
                 "descr": "data_h_i_reg bus",
-                "signals": [
+                "wires": [
                     {"name": "data_h_i_reg", "width": "DATA_W"},
                 ],
             },

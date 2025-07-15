@@ -60,7 +60,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Clock",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -70,7 +70,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Synchronous reset",
-                "signals": [
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": 1,
@@ -79,7 +79,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "s_axi_s",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "s_",
                     "mult": "S_COUNT",
@@ -93,7 +93,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "m_axi_m",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "m_",
                     "mult": "M_COUNT",

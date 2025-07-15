@@ -7,8 +7,8 @@ import re
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
 from iob_base import fail_with_msg, assert_attributes
-from iob_bus import find_signal_in_buses
-from iob_signal import get_real_signal
+from iob_bus import find_wire_in_buses
+from iob_wire import get_real_wire
 from interfaces import iobClkInterface
 from api_base import internal_api_class
 
@@ -52,56 +52,56 @@ class iob_comb(iob_snippet):
         for match in nxt_regex.findall(self.verilog_code):
             nxt_vars.add(match)
 
-        for signal_name in outputs | nxt_vars:
-            if signal_name.endswith("_o"):
-                signal = find_signal_in_buses(
+        for wire_name in outputs | nxt_vars:
+            if wire_name.endswith("_o"):
+                wire = find_wire_in_buses(
                     core.ports,
-                    signal_name,
+                    wire_name,
                     process_func=generate_direction_process_func("output"),
                 )
-                signal.isvar = True
-            elif signal_name.endswith("_io"):
-                signal = find_signal_in_buses(
+                wire.isvar = True
+            elif wire_name.endswith("_io"):
+                wire = find_wire_in_buses(
                     core.ports,
-                    signal_name,
+                    wire_name,
                     process_func=generate_direction_process_func("inout"),
                 )
-                signal.isvar = True
-            elif signal_name.endswith("_nxt"):
-                signal = find_signal_in_buses(core.buses + core.ports, signal_name[:-4])
-                if not signal:
+                wire.isvar = True
+            elif wire_name.endswith("_nxt"):
+                wire = find_wire_in_buses(core.buses + core.ports, wire_name[:-4])
+                if not wire:
                     fail_with_msg(
-                        f"Could not find signal '{signal_name[:-4]}' in buses of '{core.name}' for register implied by '{signal_name}'."
+                        f"Could not find wire '{wire_name[:-4]}' in buses of '{core.name}' for register implied by '{wire_name}'."
                     )
-                signal.isreg = True
-                signal.reg_signals.append("_nxt")
-            elif signal_name.endswith("_rst"):
-                signal = find_signal_in_buses(core.buses + core.ports, signal_name[:-4])
-                if not signal:
+                wire.isreg = True
+                wire.reg_wires.append("_nxt")
+            elif wire_name.endswith("_rst"):
+                wire = find_wire_in_buses(core.buses + core.ports, wire_name[:-4])
+                if not wire:
                     fail_with_msg(
-                        f"Could not find signal '{signal_name[:-4]}' in buses of '{core.name}' for register implied by '{signal_name}'."
+                        f"Could not find wire '{wire_name[:-4]}' in buses of '{core.name}' for register implied by '{wire_name}'."
                     )
-                signal.reg_signals.append("_rst")
-            elif signal_name.endswith("_en"):
-                signal = find_signal_in_buses(core.buses + core.ports, signal_name[:-3])
-                if not signal:
+                wire.reg_wires.append("_rst")
+            elif wire_name.endswith("_en"):
+                wire = find_wire_in_buses(core.buses + core.ports, wire_name[:-3])
+                if not wire:
                     fail_with_msg(
-                        f"Could not find signal '{signal_name[:-3]}' in buses of '{core.name}' for register implied by '{signal_name}'."
+                        f"Could not find wire '{wire_name[:-3]}' in buses of '{core.name}' for register implied by '{wire_name}'."
                     )
-                signal.reg_signals.append("_en")
+                wire.reg_wires.append("_en")
             else:
-                signal = find_signal_in_buses(core.buses + core.ports, signal_name)
-                signal.isvar = True
+                wire = find_wire_in_buses(core.buses + core.ports, wire_name)
+                wire.isvar = True
 
-            if signal is None:
-                fail_with_msg(f"Output '{signal_name}' not found in buses/ports lists!")
+            if wire is None:
+                fail_with_msg(f"Output '{wire_name}' not found in buses/ports lists!")
 
-        for signal_name in nxt_vars - outputs:
+        for wire_name in nxt_vars - outputs:
             insert_point = self.verilog_code.find("\t\t\t")
             if insert_point != -1:
                 self.verilog_code = (
                     self.verilog_code[:insert_point]
-                    + f"\t\t\t{signal_name} = {signal_name[:-4]};\n"
+                    + f"\t\t\t{wire_name} = {wire_name[:-4]};\n"
                     + self.verilog_code[insert_point:]
                 )
 
@@ -109,9 +109,9 @@ class iob_comb(iob_snippet):
         """Infer registers from the combinatory code and create the necessary subblocks"""
 
         for bus in core.buses + core.ports:
-            for signal_ref in bus.signals:
-                signal = get_real_signal(signal_ref)
-                if signal.isreg:
+            for wire_ref in bus.wires:
+                wire = get_real_wire(wire_ref)
+                if wire.isreg:
                     clk_if_name = "clk_en_rst_s"
                     # Find the clock interface if it exists
                     # and overwrite the default one
@@ -136,79 +136,79 @@ class iob_comb(iob_snippet):
                     # Connect the register
                     connect = {
                         "clk_en_rst_s": clk_if_name,
-                        "data_i": f"{signal.name}_nxt",
-                        "data_o": f"{signal.name}",
+                        "data_i": f"{wire.name}_nxt",
+                        "data_o": f"{wire.name}",
                     }
 
-                    # Find the register signals (if any)
-                    if any(reg_signal == "_nxt" for reg_signal in signal.reg_signals):
+                    # Find the register wires (if any)
+                    if any(reg_wire == "_nxt" for reg_wire in wire.reg_wires):
                         # If the _nxt bus does not already exists, create it
                         if not any(
-                            bus.name == f"{signal.name}_nxt" for bus in core.buses
+                            bus.name == f"{wire.name}_nxt" for bus in core.buses
                         ):
                             core.create_bus(
-                                name=f"{signal.name}_nxt",
-                                signals=[
+                                name=f"{wire.name}_nxt",
+                                wires=[
                                     {
-                                        "name": f"{signal.name}_nxt",
-                                        "descr": f"{signal.name} next value",
-                                        "width": signal.width,
+                                        "name": f"{wire.name}_nxt",
+                                        "descr": f"{wire.name} next value",
+                                        "width": wire.width,
                                         "isvar": True,
                                     }
                                 ],
                             )
                         # Create the register bus
                         core.create_bus(
-                            name=signal.name,
-                            signals=[{"name": signal.name}],
+                            name=wire.name,
+                            wires=[{"name": wire.name}],
                         )
 
-                    _reg_signals = []
+                    _reg_wires = []
                     bit_slices = []
 
                     if self.clk_if:
                         port_params = self.clk_if
 
-                    # Find, create and connect the enable and reset signals (if they exist)
-                    if any(reg_signal == "_en" for reg_signal in signal.reg_signals):
-                        _reg_signals.append(
+                    # Find, create and connect the enable and reset wires (if they exist)
+                    if any(reg_wire == "_en" for reg_wire in wire.reg_wires):
+                        _reg_wires.append(
                             {
-                                "name": f"{signal.name}_en",
-                                "descr": f"{signal.name} enable",
+                                "name": f"{wire.name}_en",
+                                "descr": f"{wire.name} enable",
                                 "width": 1,
                                 "isvar": True,
                             }
                         )
-                        bit_slices.append(f"en_i:{signal.name}_en")
+                        bit_slices.append(f"en_i:{wire.name}_en")
                         port_params = port_params + "_e"
 
-                    if any(reg_signal == "_rst" for reg_signal in signal.reg_signals):
-                        _reg_signals.append(
+                    if any(reg_wire == "_rst" for reg_wire in wire.reg_wires):
+                        _reg_wires.append(
                             {
-                                "name": f"{signal.name}_rst",
-                                "descr": f"{signal.name} reset",
+                                "name": f"{wire.name}_rst",
+                                "descr": f"{wire.name} reset",
                                 "width": 1,
                                 "isvar": True,
                             }
                         )
-                        bit_slices.append(f"rst_i:{signal.name}_rst")
+                        bit_slices.append(f"rst_i:{wire.name}_rst")
                         port_params = port_params + "_r"
 
                     if any(x in port_params for x in ["_r", "_e"]):
                         if not any(
-                            bus.name == f"{signal.name}_reg_signals"
+                            bus.name == f"{wire.name}_reg_wires"
                             for bus in core.buses
                         ):
                             core.create_bus(
-                                name=f"{signal.name}_reg_signals", signals=_reg_signals
+                                name=f"{wire.name}_reg_wires", wires=_reg_wires
                             )
 
                     # Create the clock interface in the core, if it does not exist
                     if not any(port.name == "clk_en_rst_s" for port in core.ports):
                         core.create_port_from_dict(
                             name="clk_en_rst_s",
-                            signals={"type": "iob_clk", "params": self.clk_if},
-                            descr="Clock interface signals",
+                            wires={"type": "iob_clk", "params": self.clk_if},
+                            descr="Clock interface wires",
                         )
 
                     # if bit_slices is not empty, add it to the connect dictionary
@@ -218,30 +218,30 @@ class iob_comb(iob_snippet):
                     # Create the subblock for the register
                     # if it does not already exist
                     if not any(
-                        block.instance_name == f"{signal.name}_reg"
+                        block.instance_name == f"{wire.name}_reg"
                         for block in core.subblocks
                     ):
                         core.create_subblock(
                             core_name="iob_reg",
-                            instance_name=f"{signal.name}_reg",
-                            parameters={"DATA_W": signal.width, "RST_VAL": 0},
+                            instance_name=f"{wire.name}_reg",
+                            parameters={"DATA_W": wire.width, "RST_VAL": 0},
                             connect=connect,
                             port_params={"clk_en_rst_s": port_params},
-                            instance_description=f"{signal.name} register",
+                            instance_description=f"{wire.name} register",
                         )
 
 
 def generate_direction_process_func(direction):
-    """Generates a process function that returns a signal if it matches the direction"""
+    """Generates a process function that returns a wire if it matches the direction"""
 
-    def filter_signal(signal):
-        signal = get_real_signal(signal)
-        if signal.direction == direction:
-            return signal
-        # Return empty object if not correct signal direction
+    def filter_wire(wire):
+        wire = get_real_wire(wire)
+        if wire.direction == direction:
+            return wire
+        # Return empty object if not correct wire direction
         return None
 
-    return filter_signal
+    return filter_wire
 
 
 def create_comb(core, *args, **kwargs):

@@ -83,7 +83,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -91,7 +91,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Synchronous reset interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": 1,
@@ -102,7 +102,7 @@ def setup(py_params_dict):
             {
                 "name": "write_io",
                 "descr": "Write interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "w_en_i",
                         "width": 1,
@@ -116,14 +116,14 @@ def setup(py_params_dict):
                     {
                         "name": "w_full_o",
                         "width": 1,
-                        "descr": "Write full signal",
+                        "descr": "Write full wire",
                     },
                 ],
             },
             {
                 "name": "read_io",
                 "descr": "Read interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "r_en_i",
                         "width": 1,
@@ -137,14 +137,14 @@ def setup(py_params_dict):
                     {
                         "name": "r_empty_o",
                         "width": 1,
-                        "descr": "Read empty signal",
+                        "descr": "Read empty wire",
                     },
                 ],
             },
             {
                 "name": "extmem_io",
                 "descr": "External memory interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "ext_mem_clk_o",
                         "width": 1,
@@ -186,7 +186,7 @@ def setup(py_params_dict):
             {
                 "name": "fifo_o",
                 "descr": "FIFO interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "level_o",
                         "width": "ADDR_W+1",

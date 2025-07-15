@@ -20,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "data_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "a_i", "width": "W"},
                     {"name": "b_i", "width": "W"},
                     {"name": "sel_i", "width": "1"},
@@ -29,7 +29,7 @@ def setup(py_params_dict):
             {
                 "name": "y_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {"name": "y_o", "width": "W"},
                 ],
             },

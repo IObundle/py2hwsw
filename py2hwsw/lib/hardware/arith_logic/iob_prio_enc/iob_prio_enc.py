@@ -28,7 +28,7 @@ def setup(py_params_dict):
             {
                 "name": "unencoded_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "unencoded_i",
                         "width": "W",
@@ -38,7 +38,7 @@ def setup(py_params_dict):
             {
                 "name": "encoded_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "encoded_o",
                         "width": "$clog2(W+1)",
@@ -51,7 +51,7 @@ def setup(py_params_dict):
             {
                 "name": "unencoded_int",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "unencoded_int", "width": "W+1"},
                 ],
             },

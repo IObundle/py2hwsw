@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 #
-#    Build configured REGFILEIF/NATIVEBRIDGEIF registers and signals
+#    Build configured REGFILEIF/NATIVEBRIDGEIF registers and wires
 #
 
 import sys

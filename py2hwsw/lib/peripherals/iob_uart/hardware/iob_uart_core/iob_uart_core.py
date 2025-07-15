@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                     "params": "a",
                 },
@@ -18,7 +18,7 @@ def setup(py_params_dict):
             {
                 "name": "reg_interface_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rst_soft_i", "width": "1"},
                     {"name": "tx_en_i", "width": "1"},
                     {"name": "rx_en_i", "width": "1"},
@@ -36,7 +36,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "rs232_m",
-                "signals": {
+                "wires": {
                     "type": "rs232",
                 },
                 "descr": "RS232 interface",

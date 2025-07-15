@@ -22,14 +22,14 @@ core_dictionary = {
         {
             "name": "a_i",
             "descr": "Input port",
-            "signals": [
+            "wires": [
                 {"name": "a_i", "width": "W"},
             ],
         },
         {
             "name": "y_o",
             "descr": "Output port",
-            "signals": [
+            "wires": [
                 {"name": "y_o", "width": "W"},
             ],
         },

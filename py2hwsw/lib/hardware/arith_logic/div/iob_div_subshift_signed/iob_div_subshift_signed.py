@@ -28,7 +28,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -38,7 +38,7 @@ def setup(py_params_dict):
             {
                 "name": "en_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "en_i",
                         "width": 1,
@@ -48,7 +48,7 @@ def setup(py_params_dict):
             {
                 "name": "sign_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "sign_i",
                         "width": 1,
@@ -58,7 +58,7 @@ def setup(py_params_dict):
             {
                 "name": "dividend_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "dividend_i",
                         "width": "DATA_W",
@@ -68,7 +68,7 @@ def setup(py_params_dict):
             {
                 "name": "divisor_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "divisor_i",
                         "width": "DATA_W",
@@ -78,7 +78,7 @@ def setup(py_params_dict):
             {
                 "name": "done_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "done_o",
                         "width": 1,
@@ -88,7 +88,7 @@ def setup(py_params_dict):
             {
                 "name": "quotient_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "quotient_o",
                         "width": "DATA_W",
@@ -98,7 +98,7 @@ def setup(py_params_dict):
             {
                 "name": "remainder_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "remainder_o",
                         "width": "DATA_W",
@@ -110,49 +110,49 @@ def setup(py_params_dict):
             {
                 "name": "rq",
                 "descr": "rq bus",
-                "signals": [
+                "wires": [
                     {"name": "rq", "width": "2*DATA_W"},
                 ],
             },
             {
                 "name": "divisor_reg",
                 "descr": "divisor_reg bus",
-                "signals": [
+                "wires": [
                     {"name": "divisor_reg", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "divident_sign",
                 "descr": "divident_sign bus",
-                "signals": [
+                "wires": [
                     {"name": "divident_sign", "width": 1},
                 ],
             },
             {
                 "name": "divisor_sign",
                 "descr": "divisor_sign bus",
-                "signals": [
+                "wires": [
                     {"name": "divisor_sign", "width": 1},
                 ],
             },
             {
                 "name": "pcnt",
                 "descr": "pcnt bus",
-                "signals": [
+                "wires": [
                     {"name": "pcnt", "width": "PC_W"},
                 ],
             },
             {
                 "name": "subtraend",
                 "descr": "subtraend bus",
-                "signals": [
+                "wires": [
                     {"name": "subtraend", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "tmp",
                 "descr": "tmp bus",
-                "signals": [
+                "wires": [
                     {"name": "tmp", "width": "DATA_W+1"},
                 ],
             },

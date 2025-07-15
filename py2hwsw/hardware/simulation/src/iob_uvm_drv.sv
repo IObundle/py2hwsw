@@ -7,7 +7,7 @@
 class iob_driver extends uvm_driver #(iob_transaction);
    `uvm_component_utils(iob_driver)
 
-   virtual iob_if vif;  // Virtual interface for driving signals
+   virtual iob_if vif;  // Virtual interface for driving wires
 
    function new(string name, uvm_component parent);
       super.new(name, parent);
@@ -47,7 +47,7 @@ class iob_driver extends uvm_driver #(iob_transaction);
 
          // Drive the transaction to the DUT
          //`uvm_info("DRV", "Driving transaction to DUT", UVM_MEDIUM);
-         vif.iob_valid_i = 1;  // Assert valid signal
+         vif.iob_valid_i = 1;  // Assert valid wire
          vif.iob_addr_i  = trans.addr;  // Use macro for address alignment
          vif.iob_wdata_i = trans.wdata;  // Use macro for data shifting
          vif.iob_wstrb_i = trans.wstrb;  // Use macro for strobe generation

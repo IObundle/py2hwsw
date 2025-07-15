@@ -98,20 +98,20 @@ def setup(py_params_dict):
                     {
                         "name": csr["name"],
                         "descr": "",
-                        "signals": [
+                        "wires": [
                             {"name": csr["name"], "width": csr["n_bits"]},
                         ],
                     },
                 )
                 if csr["mode"] == "RW":
-                    reg_buses[-1]["signals"].append(
+                    reg_buses[-1]["wires"].append(
                         {"name": csr["name"] + "_2", "width": csr["n_bits"]},
                     )
                     reg_buses.append(
                         {
                             "name": csr["name"] + "_inv",
                             "descr": "",
-                            "signals": [
+                            "wires": [
                                 {"name": csr["name"] + "_2"},
                                 {"name": csr["name"]},
                             ],
@@ -146,14 +146,14 @@ def setup(py_params_dict):
                         {
                             "name": csr["name"] + "_o",
                             "descr": "",
-                            "signals": [
+                            "wires": [
                                 {"name": csr["name"] + "_o", "width": csr["n_bits"]},
                             ],
                         },
                     )
 
                     if csr["mode"] == "RW":
-                        ports[-1]["signals"].append(
+                        ports[-1]["wires"].append(
                             {"name": csr["name"] + "_2_o", "width": csr["n_bits"]},
                         )
 
@@ -215,7 +215,7 @@ def setup(py_params_dict):
         + [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -226,7 +226,7 @@ def setup(py_params_dict):
             {
                 "name": "internal_iob2",
                 "descr": "Internal iob interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "internal2_",
                     "ADDR_W": "ADDR_W",
@@ -279,61 +279,61 @@ def setup(py_params_dict):
 
 def create_manual_reg_buses(csr):
     """Creates buses for registers with NOAUTO"""
-    internal_signals = []
-    external_signals = []
+    internal_wires = []
+    external_wires = []
 
     if csr["mode"] == "W":
-        internal_signals = get_manual_signals(
+        internal_wires = get_manual_wires(
             "internal_" + csr["name"], "W", csr["n_bits"]
         )
-        external_signals = get_manual_signals(
+        external_wires = get_manual_wires(
             "external_" + csr["name"], "R", csr["n_bits"]
         )
 
     elif csr["mode"] == "R":
-        internal_signals = get_manual_signals(
+        internal_wires = get_manual_wires(
             "internal_" + csr["name"], "W", csr["n_bits"]
         )
-        external_signals = get_manual_signals(
+        external_wires = get_manual_wires(
             "external_" + csr["name"], "R", csr["n_bits"]
         )
 
     elif csr["mode"] == "RW":
-        internal_signals = get_manual_signals(
+        internal_wires = get_manual_wires(
             "internal_" + csr["name"], "RW", csr["n_bits"]
         )
-        external_signals = get_manual_signals(
+        external_wires = get_manual_wires(
             "external_" + csr["name"], "RW", csr["n_bits"]
         )
 
     reg_buses = []
 
     reg_buses.append(
-        {"name": "internal_" + csr["name"], "descr": "", "signals": internal_signals}
+        {"name": "internal_" + csr["name"], "descr": "", "wires": internal_wires}
     )
 
     reg_buses.append(
-        {"name": "external_" + csr["name"], "descr": "", "signals": external_signals}
+        {"name": "external_" + csr["name"], "descr": "", "wires": external_wires}
     )
 
     return reg_buses
 
 
-def get_manual_signals(name, mode, data_width):
-    signals = []
+def get_manual_wires(name, mode, data_width):
+    wires = []
 
     if "R" in mode:
-        signals += [
+        wires += [
             {"name": name + "_rdata_i", "width": data_width},
             {"name": name + "_rvalid_i", "width": 1},
             {"name": name + "_ren_o", "width": 1},
             {"name": name + "_ready_i", "width": 1},
         ]
     elif "W" in mode:
-        signals += [
+        wires += [
             {"name": name + "_wdata_o", "width": data_width},
             {"name": name + "_wen_o", "width": 1},
             {"name": name + "_wready_i", "width": 1},
         ]
 
-    return signals
+    return wires

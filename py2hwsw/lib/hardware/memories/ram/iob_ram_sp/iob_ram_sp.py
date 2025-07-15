@@ -44,42 +44,42 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "clk_i", "width": 1},
                 ],
             },
             {
                 "name": "en_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "en_i", "width": 1},
                 ],
             },
             {
                 "name": "we_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "we_i", "width": 1},
                 ],
             },
             {
                 "name": "addr_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "addr_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "d_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {"name": "d_o", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "d_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "d_i", "width": "DATA_W"},
                 ],
             },

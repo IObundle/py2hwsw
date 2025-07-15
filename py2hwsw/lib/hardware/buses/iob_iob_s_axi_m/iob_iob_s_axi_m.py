@@ -62,20 +62,20 @@ def setup(py_params_dict):
     ports = [
         {
             "name": "clk_en_rst_s",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
             "descr": "Clock, clock enable and reset",
         },
         {
             "name": "rst_i",
-            "descr": "Reset signal",
-            "signals": [{"name": "rst_i", "descr": "Reset signal"}],
+            "descr": "Reset wire",
+            "wires": [{"name": "rst_i", "descr": "Reset wire"}],
         },
         {
             "name": "iob_s",
             "descr": "Subordinate IOb interface",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "ADDR_W": "ADDR_W",
                 "DATA_W": "DATA_W",
@@ -84,7 +84,7 @@ def setup(py_params_dict):
         {
             "name": "axi_m",
             "descr": "Manager AXI interface",
-            "signals": {
+            "wires": {
                 "type": "axi",
                 "prefix": "m_",
                 "ID_W": "AXI_ID_W",
@@ -96,7 +96,7 @@ def setup(py_params_dict):
         {
             "name": "control_io",
             "descr": "Control interface",
-            "signals": [
+            "wires": [
                 {
                     "name": "length_i",
                     "width": "(AXI_LEN_W+1)",
@@ -121,7 +121,7 @@ def setup(py_params_dict):
         {
             "name": "start_addr",
             "descr": "Start address for read/write",
-            "signals": [
+            "wires": [
                 {
                     "name": "start_addr",
                     "width": "ADDR_W",
@@ -131,7 +131,7 @@ def setup(py_params_dict):
         {
             "name": "start_addr_reg",
             "descr": "Start address register",
-            "signals": [
+            "wires": [
                 {
                     "name": "start_addr_reg",
                     "width": "ADDR_W",
@@ -141,7 +141,7 @@ def setup(py_params_dict):
         {
             "name": "write_data",
             "descr": "Write data for AXI",
-            "signals": [
+            "wires": [
                 {
                     "name": "iob_wdata_i",
                     "width": "DATA_W",
@@ -151,7 +151,7 @@ def setup(py_params_dict):
         {
             "name": "write_strobe",
             "descr": "Write strobe for AXI",
-            "signals": [
+            "wires": [
                 {
                     "name": "write_strobe",
                     "width": "DATA_W/8",
@@ -160,13 +160,13 @@ def setup(py_params_dict):
         },
         {
             "name": "write_busy",
-            "descr": "Write busy signal",
-            "signals": [{"name": "write_busy"}],
+            "descr": "Write busy wire",
+            "wires": [{"name": "write_busy"}],
         },
         {
             "name": "axi_write",
             "descr": "AXI write interface",
-            "signals": [
+            "wires": [
                 {"name": "m_axi_awaddr_o", "width": "AXI_ADDR_W"},
                 {"name": "m_axi_awvalid_o"},
                 {"name": "m_axi_awready_i"},
@@ -190,34 +190,34 @@ def setup(py_params_dict):
         },
         {
             "name": "start_read_transfer",
-            "descr": "Start read transfer signal",
-            "signals": [{"name": "start_read_transfer", "isvar": True}],
+            "descr": "Start read transfer wire",
+            "wires": [{"name": "start_read_transfer", "isvar": True}],
         },
         {
             "name": "read_data_ready_rst",
             "descr": "Read data ready reset",
-            "signals": [
+            "wires": [
                 {"name": "read_data_ready_rst"},
             ],
         },
         {
             "name": "read_data_ready_en",
             "descr": "Read data ready enable",
-            "signals": [
+            "wires": [
                 {"name": "read_data_ready_en"},
             ],
         },
         {
             "name": "read_data_ready",
-            "descr": "Read data ready signal",
-            "signals": [
+            "descr": "Read data ready wire",
+            "wires": [
                 {"name": "read_data_ready"},
             ],
         },
         {
             "name": "read_data_axis",
-            "descr": "Read data AXI-Stream signals",
-            "signals": [
+            "descr": "Read data AXI-Stream wires",
+            "wires": [
                 {"name": "iob_rdata_o", "width": "DATA_W"},
                 {"name": "iob_rvalid_o"},
                 {"name": "read_data_ready"},
@@ -225,13 +225,13 @@ def setup(py_params_dict):
         },
         {
             "name": "read_busy",
-            "descr": "Read busy signal",
-            "signals": [{"name": "read_busy"}],
+            "descr": "Read busy wire",
+            "wires": [{"name": "read_busy"}],
         },
         {
             "name": "axi_read",
             "descr": "AXI read interface",
-            "signals": [
+            "wires": [
                 {"name": "m_axi_araddr_o", "width": "AXI_ADDR_W"},
                 {"name": "m_axi_arvalid_o"},
                 {"name": "m_axi_arready_i"},
@@ -253,37 +253,37 @@ def setup(py_params_dict):
         {
             "name": "length",
             "descr": "Length of the burst",
-            "signals": [{"name": "length_i", "width": "(AXI_LEN_W+1)"}],
+            "wires": [{"name": "length_i", "width": "(AXI_LEN_W+1)"}],
         },
         {
             "name": "w_level",
             "descr": "Write FIFO level",
-            "signals": [{"name": "w_level_o", "width": "(AXI_LEN_W+1)"}],
+            "wires": [{"name": "w_level_o", "width": "(AXI_LEN_W+1)"}],
         },
         {
             "name": "r_level",
             "descr": "Read FIFO level",
-            "signals": [{"name": "r_level_o", "width": "(AXI_LEN_W+1)"}],
+            "wires": [{"name": "r_level_o", "width": "(AXI_LEN_W+1)"}],
         },
         {
             "name": "ready",
-            "descr": "Ready signal",
-            "signals": [
+            "descr": "Ready wire",
+            "wires": [
                 {
                     "name": "ready",
                     "isvar": True,
-                    "descr": "Ready signal for the IOb interface",
+                    "descr": "Ready wire for the IOb interface",
                 }
             ],
         },
         {
             "name": "en_write",
-            "descr": "Write enable signal",
-            "signals": [
+            "descr": "Write enable wire",
+            "wires": [
                 {
                     "name": "en_write",
                     "isvar": True,
-                    "descr": "Write enable signal for the IOb interface",
+                    "descr": "Write enable wire for the IOb interface",
                 }
             ],
         },

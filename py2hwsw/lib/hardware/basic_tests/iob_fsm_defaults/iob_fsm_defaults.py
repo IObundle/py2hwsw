@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "a_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {"name": "a_o", "width": "8"},
                 ],
             },

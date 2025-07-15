@@ -14,7 +14,7 @@ from iob_base import (
     prevent_instantiation,
 )
 from iob_portmap import iob_portmap, get_portmap_port
-from iob_signal import remove_signal_direction_suffixes
+from iob_wire import remove_wire_direction_suffixes
 from api_base import internal_api_class, convert2internal
 
 
@@ -112,9 +112,9 @@ class iob_instance(iob_base):
     def connect_instance_ports(self, connect, issuer):
         """
         param connect: External buses to connect to ports of this instance
-                       Key: Port name, Value: bus name or tuple with bus name and signal bit slices
+                       Key: Port name, Value: bus name or tuple with bus name and wire bit slices
                        Tuple has format:
-                       (bus_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
+                       (bus_name, wire_name[bit_start:bit_end], other_wire[bit_start:bit_end], ...)
         param issuer: Module that is instantiating this instance
         """
         # Connect instance ports to external buses
@@ -151,15 +151,15 @@ class iob_instance(iob_base):
                         f"Creating implicit bus '{port.name}' in '{issuer.name}'.", 1
                     )
                     # Add bus to issuer
-                    bus_signals = remove_signal_direction_suffixes(port.signals)
+                    bus_wires = remove_wire_direction_suffixes(port.wires)
                     issuer.create_bus(
-                        name=bus_name, signals=bus_signals, descr=port.descr
+                        name=bus_name, wires=bus_wires, descr=port.descr
                     )
                     # Add bus to attributes_dict as well
                     issuer.attributes_dict["buses"].append(
                         {
                             "name": bus_name,
-                            "signals": bus_signals,
+                            "wires": bus_wires,
                             "descr": port.descr,
                         }
                     )
@@ -217,7 +217,7 @@ class iob_instance(iob_base):
         issuer.attributes_dict["ports"].append(
             {
                 "name": _name,
-                "signals": interface_dict,
+                "wires": interface_dict,
                 "descr": port.descr,
             }
         )
@@ -245,7 +245,7 @@ class iob_instance(iob_base):
                     p.interface.has_arst |= port.interface.has_arst
                     p.interface.has_rst |= port.interface.has_rst
                     p.interface.has_en |= port.interface.has_en
-                    p.signals = []
+                    p.wires = []
                     p.__post_init__()  # FIXME: no longer exists
                     clk_portmap.connect_external(p, bit_slices=[])
                     return
@@ -294,7 +294,7 @@ class iob_instance(iob_base):
         issuer.attributes_dict["ports"].append(
             {
                 "name": f"{self.instance_name}_cbus_s",
-                "signals": {
+                "wires": {
                     "type": csr_if_genre,
                     "prefix": self.instance_name + "_",
                     "DATA_W": csrs_port.interface.data_w,

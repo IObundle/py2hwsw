@@ -36,7 +36,7 @@ def setup(py_params_dict):
             {
                 "name": "arst_o",
                 "descr": "Async reset output",
-                "signals": [
+                "wires": [
                     {"name": "arst_o", "width": "1"},
                 ],
             },

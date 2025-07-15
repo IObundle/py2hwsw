@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from iob_bus import (
     iob_bus,
-    replace_duplicate_signals_by_references,
+    replace_duplicate_wires_by_references,
     dict2interface,
     BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS,
 )
@@ -17,7 +17,7 @@ from iob_base import (
     assert_attributes,
     update_obj_from_dict,
 )
-from iob_signal import iob_signal
+from iob_wire import iob_wire
 from api_base import internal_api_class
 
 
@@ -26,11 +26,11 @@ from api_base import internal_api_class
 class iob_port(iob_bus):
     """Describes an IO port."""
 
-    def create_signals_from_interface(self):
+    def create_wires_from_interface(self):
         if not self.interface:
             fail_with_msg(f"Bus '{self.name}' has no interface!", ValueError)
 
-        self.signals += self.interface.get_signals()
+        self.wires += self.interface.get_wires()
 
     def validate_attributes(self):
         if not self.name:
@@ -63,27 +63,27 @@ class iob_port(iob_bus):
 
         port_has_inputs = False
         port_has_outputs = False
-        for api_signal in self.signals:
-            # Get internal representation of signal, because 'direction' is a internal attribute
-            signal = api_signal._get_py2hwsw_internal_obj()
-            if not signal.direction:
+        for api_wire in self.wires:
+            # Get internal representation of wire, because 'direction' is a internal attribute
+            wire = api_wire._get_py2hwsw_internal_obj()
+            if not wire.direction:
                 raise Exception("Port direction is required")
-            elif signal.direction not in ["input", "output", "inout"]:
+            elif wire.direction not in ["input", "output", "inout"]:
                 raise Exception(
                     "Error: Direction must be 'input', 'output', or 'inout'."
                 )
 
-            if _direction in ["input", "output"] and signal.direction != _direction:
+            if _direction in ["input", "output"] and wire.direction != _direction:
                 fail_with_msg(
-                    f"Signal direction '{signal.direction}' does not match port name '{self.name}'",
+                    f"Signal direction '{wire.direction}' does not match port name '{self.name}'",
                     ValueError,
                 )
 
-            if signal.direction == "input":
+            if wire.direction == "input":
                 port_has_inputs = True
-            elif signal.direction == "output":
+            elif wire.direction == "output":
                 port_has_outputs = True
-            elif signal.direction == "inout":
+            elif wire.direction == "inout":
                 port_has_inputs = True
                 port_has_outputs = True
 
@@ -101,13 +101,13 @@ class iob_port(iob_bus):
 
 attrs = [
     "name",
-    ["-i", "signals&i", {"nargs": 1}, ("type",)],
-    ["-s", "signals&s", {"nargs": "+"}, ["name:width"]],
+    ["-i", "wires&i", {"nargs": 1}, ("type",)],
+    ["-s", "wires&s", {"nargs": "+"}, ["name:width"]],
 ]
 
 
 @str_to_kwargs(attrs)
-def create_port_from_dict(core, *args, signals=[], **kwargs):
+def create_port_from_dict(core, *args, wires=[], **kwargs):
     """Creates a new port object using a dictionary and adds it to the core's port list
     Also creates a new internal module bus to connect to the new port
     param core: core object
@@ -117,44 +117,44 @@ def create_port_from_dict(core, *args, signals=[], **kwargs):
     sig_obj_list = []
     interface_obj = None
 
-    if type(signals) is list:
-        # Convert user signal dictionaries into 'iob_signal' objects
-        sig_obj_list = convert_dict2obj_list(signals, iob_signal)
-    elif type(signals) is dict:
+    if type(wires) is list:
+        # Convert user wire dictionaries into 'iob_wire' objects
+        sig_obj_list = convert_dict2obj_list(wires, iob_wire)
+    elif type(wires) is dict:
         # Convert user interface dictionary into an interface object
-        interface_obj = dict2interface(kwargs.get("name", ""), signals)
+        interface_obj = dict2interface(kwargs.get("name", ""), wires)
         if interface_obj and not interface_obj.file_prefix:
             interface_obj.file_prefix = core.name + "_"
     else:
-        fail_with_msg(f"Invalid signal type! {signals}", TypeError)
+        fail_with_msg(f"Invalid wire type! {wires}", TypeError)
     assert_attributes(
         iob_port,
         kwargs,
         error_msg=f"Invalid {kwargs.get('name', '')} port attribute '[arg]'!",
     )
-    port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
-    replace_duplicate_signals_by_references(core.ports, port.signals)
+    port = iob_port(*args, wires=sig_obj_list, interface=interface_obj, **kwargs)
+    replace_duplicate_wires_by_references(core.ports, port.wires)
     core.ports.append(port)
 
 
 @str_to_kwargs(attrs)
-def add_signals_port(core, *args, signals=[], **kwargs):
+def add_wires_port(core, *args, wires=[], **kwargs):
     """Creates a new port object and adds it to the core's port list
     Also creates a new internal module bus to connect to the new port
     param core: core object
     """
     # Ensure 'ports' list exists
     core.set_default_attribute("ports", [])
-    # Check if the list of signals has only iob_signal types
-    if type(signals) is list:
-        for signal in signals:
-            if not isinstance(signal, iob_signal):
+    # Check if the list of wires has only iob_wire types
+    if type(wires) is list:
+        for wire in wires:
+            if not isinstance(wire, iob_wire):
                 fail_with_msg(
-                    f"Signals must be a list of iob_signals! {signals}", TypeError
+                    f"Signals must be a list of iob_wires! {wires}", TypeError
                 )
-    # Create the port with the signals
-    port = iob_port(*args, signals=signals, **kwargs)
-    replace_duplicate_signals_by_references(core.ports, port.signals)
+    # Create the port with the wires
+    port = iob_port(*args, wires=wires, **kwargs)
+    replace_duplicate_wires_by_references(core.ports, port.wires)
     core.ports.append(port)
 
 
@@ -167,7 +167,7 @@ def add_interface_port(core, *args, name, interface, **kwargs):
     # Ensure 'ports' list exists
     core.set_default_attribute("ports", [])
     # Check if the interface is a valid interface object
-    if not hasattr(interface, "get_signals"):
+    if not hasattr(interface, "get_wires"):
         fail_with_msg(
             f"Interface must be a valid interface object! {interface}", TypeError
         )
@@ -177,7 +177,7 @@ def add_interface_port(core, *args, name, interface, **kwargs):
         interface.prefix = f"{name}_"
     # Create the port with the interface
     port = iob_port(*args, name=name, interface=interface, **kwargs)
-    replace_duplicate_signals_by_references(core.ports, port.signals)
+    replace_duplicate_wires_by_references(core.ports, port.wires)
     core.ports.append(port)
 
 

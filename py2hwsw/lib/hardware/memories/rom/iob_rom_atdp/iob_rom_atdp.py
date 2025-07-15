@@ -44,7 +44,7 @@ def setup(py_params_dict):
             {
                 "name": "rom_atdp_s",
                 "descr": "ROM ATDP",
-                "signals": {
+                "wires": {
                     "type": "rom_atdp",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",

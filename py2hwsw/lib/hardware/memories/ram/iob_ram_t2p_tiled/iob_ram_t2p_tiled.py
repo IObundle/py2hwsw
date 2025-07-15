@@ -44,42 +44,42 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Clock",
-                "signals": [
+                "wires": [
                     {"name": "clk_i", "width": 1},
                 ],
             },
             {
                 "name": "w_en_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "w_en_i", "width": 1},
                 ],
             },
             {
                 "name": "r_en_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "r_en_i", "width": 1},
                 ],
             },
             {
                 "name": "w_data_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "w_data_i", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "addr_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "addr_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "r_data_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {"name": "r_data_o", "width": "DATA_W"},
                 ],
             },
@@ -88,7 +88,7 @@ def setup(py_params_dict):
             {
                 "name": "addr_en",
                 "descr": "addr_en bus",
-                "signals": [
+                "wires": [
                     {"name": "addr_en", "width": "K"},
                 ],
             },

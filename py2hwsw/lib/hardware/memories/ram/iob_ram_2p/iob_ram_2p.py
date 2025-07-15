@@ -44,7 +44,7 @@ def setup(py_params_dict):
             {
                 "name": "ram_2p_s",
                 "descr": "RAM interface",
-                "signals": {
+                "wires": {
                     "type": "ram_2p",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -55,42 +55,42 @@ def setup(py_params_dict):
             {
                 "name": "clk",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "clk_i"},
                 ],
             },
             {
                 "name": "en_int",
                 "descr": "en bus",
-                "signals": [
+                "wires": [
                     {"name": "en_int", "width": 1},
                 ],
             },
             {
                 "name": "we_int",
                 "descr": "we bus",
-                "signals": [
+                "wires": [
                     {"name": "we_int", "width": 1},
                 ],
             },
             {
                 "name": "addr_int",
                 "descr": "addr bus",
-                "signals": [
+                "wires": [
                     {"name": "addr_int", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "w_data",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "w_data_i"},
                 ],
             },
             {
                 "name": "r_data",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {"name": "r_data_o"},
                 ],
             },

@@ -112,7 +112,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Clock",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -122,7 +122,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Synchronous reset",
-                "signals": [
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": 1,
@@ -137,7 +137,7 @@ def setup(py_params_dict):
             {
                 "name": f"s{i}_axi_s",
                 "descr": f"Subordinate {i} interface",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",
@@ -164,7 +164,7 @@ def setup(py_params_dict):
             {
                 "name": f"{name}_axi_m",
                 "descr": f"Manager '{name}' axi interface",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"{name}_",
                     "ID_W": "AXI_ID_W",
@@ -190,7 +190,7 @@ def setup(py_params_dict):
         {
             "name": "interconnect_s_axi",
             "descr": "AXI subordinate bus for interconnect",
-            "signals": {
+            "wires": {
                 "type": "axi",
                 "prefix": "intercon_s_",
                 "mult": N_SUBORDINATES,
@@ -203,7 +203,7 @@ def setup(py_params_dict):
         {
             "name": "interconnect_m_axi",
             "descr": "AXI manager bus for interconnect",
-            "signals": {
+            "wires": {
                 "type": "axi",
                 "prefix": "intercon_m_",
                 "mult": len(MANAGERS),
@@ -245,8 +245,8 @@ def setup(py_params_dict):
         assign_str = ""
         for port in subordinate_axi_ports:
             prefix = ""
-            if "prefix" in port["signals"]:
-                prefix = port["signals"]["prefix"]
+            if "prefix" in port["wires"]:
+                prefix = port["wires"]["prefix"]
             assign_str = f"{prefix}axi_{sig_name}_i, " + assign_str
         assign_str = assign_str[:-2]
         verilog_code += (
@@ -256,8 +256,8 @@ def setup(py_params_dict):
     for sig_name, sig_size in AXI_OUT_SIGNAL_NAMES:
         for idx, port in enumerate(subordinate_axi_ports):
             prefix = ""
-            if "prefix" in port["signals"]:
-                prefix = port["signals"]["prefix"]
+            if "prefix" in port["wires"]:
+                prefix = port["wires"]["prefix"]
             bit_select = ""
             if type(sig_size) is not int or sig_size > 1:
                 bit_select = f"[{idx}*{sig_size}+:{sig_size}]"

@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "io_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "clkin_i", "width": "1"},
                     {"name": "clkout_o", "width": "1"},
                 ],

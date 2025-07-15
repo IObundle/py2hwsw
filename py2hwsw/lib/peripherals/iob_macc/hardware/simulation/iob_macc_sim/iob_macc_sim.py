@@ -33,14 +33,14 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
         },
         {
             "name": "macc_s",
             "descr": "Testbench macc csrs interface",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "ADDR_W": 4,
             },
@@ -53,7 +53,7 @@ def setup(py_params_dict):
         {
             "name": "macc_cbus",
             "descr": "Testbench macc csrs bus",
-            "signals": {
+            "wires": {
                 "type": params["csr_if"],
                 "prefix": "internal_",
                 "ADDR_W": 4,

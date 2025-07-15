@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -17,21 +17,21 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rst_i", "width": 1},
                 ],
             },
             {
                 "name": "bit_i",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "bit_i", "width": 1},
                 ],
             },
             {
                 "name": "detected_o",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "detected_o", "width": 1},
                 ],
             },

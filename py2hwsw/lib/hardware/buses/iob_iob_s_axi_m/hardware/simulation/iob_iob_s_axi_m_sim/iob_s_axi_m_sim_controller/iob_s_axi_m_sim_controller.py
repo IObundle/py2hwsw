@@ -28,14 +28,14 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "descr": "Clock, clock enable and reset",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
             },
             {
                 "name": "soft_reset_o",
-                "descr": "Soft reset signal",
-                "signals": [
+                "descr": "Soft reset wire",
+                "wires": [
                     {
                         "name": "soft_reset_o",
                     },
@@ -43,8 +43,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "burst_length_o",
-                "descr": "Burst length signal",
-                "signals": [
+                "descr": "Burst length wire",
+                "wires": [
                     {
                         "name": "burst_length_o",
                         "width": "(AXI_LEN_W+1)",
@@ -53,8 +53,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "w_level_i",
-                "descr": "Write level signal",
-                "signals": [
+                "descr": "Write level wire",
+                "wires": [
                     {
                         "name": "w_level_i",
                         "width": "(AXI_LEN_W+1)",
@@ -63,8 +63,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "r_level_i",
-                "descr": "Read level signal",
-                "signals": [
+                "descr": "Read level wire",
+                "wires": [
                     {
                         "name": "r_level_i",
                         "width": "(AXI_LEN_W+1)",

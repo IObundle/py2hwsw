@@ -28,21 +28,21 @@ core_dictionary = {
         {
             "name": "a_i",
             "descr": "Input port",
-            "signals": [
+            "wires": [
                 {"name": "a_i", "width": "W"},
             ],
         },
         {
             "name": "b_i",
             "descr": "Input port",
-            "signals": [
+            "wires": [
                 {"name": "b_i", "width": "W"},
             ],
         },
         {
             "name": "y_o",
             "descr": "Output port",
-            "signals": [
+            "wires": [
                 {"name": "y_o", "width": "W"},
             ],
         },
@@ -124,11 +124,11 @@ if __name__ == "__main__":
         print(">>> Conf description: ", conf.get_descr())
 
     print("\n\n")
-    signal_obj = py2hwsw.create_signal_from_text("en -w 1 -d 'Enable signal' -v")
-    print("signal_obj: ", signal_obj.get_name(), end=" ")
-    print("width: ", signal_obj.get_width(), end=" ")
-    print("isvar: ", signal_obj.get_isvar(), end=" ")
-    print("descr: ", signal_obj.get_descr())
+    wire_obj = py2hwsw.create_wire_from_text("en -w 1 -d 'Enable wire' -v")
+    print("wire_obj: ", wire_obj.get_name(), end=" ")
+    print("width: ", wire_obj.get_width(), end=" ")
+    print("isvar: ", wire_obj.get_isvar(), end=" ")
+    print("descr: ", wire_obj.get_descr())
 
     print("\n\n")
     bus_obj = py2hwsw.create_bus_from_text(
@@ -139,21 +139,21 @@ if __name__ == "__main__":
     )
     print("bus_obj: ", bus_obj.get_name(), end=" ")
     print("width: ", bus_obj.get_interface())
-    for signal in bus_obj.get_signals():
-        print("\tsignal: ", signal.get_name(), "width:", signal.get_width())
+    for wire in bus_obj.get_wires():
+        print("\twire: ", wire.get_name(), "width:", wire.get_width())
     print("descr: ", bus_obj.get_descr())
 
     port_obj = py2hwsw.create_port_from_dict(
         {
             "name": "a_i",
             "descr": "Input port",
-            "signals": [
+            "wires": [
                 {"name": "a_i", "width": "W"},
             ],
         },
     )
     print(">>> Name of port_obj: ", port_obj.get_name())
-    print(">>> Name of port signal: ", port_obj.get_signals()[0].get_name())
+    print(">>> Name of port wire: ", port_obj.get_wires()[0].get_name())
 
     snippet_obj = py2hwsw.create_snippet_from_dict(
         {"verilog_code": "   assign y_o = a_i & b_i;"}

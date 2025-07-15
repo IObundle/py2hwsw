@@ -27,14 +27,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "iob_m",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -43,7 +43,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "wb_s",
-                "signals": {
+                "wires": {
                     "type": "wb",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -55,49 +55,49 @@ def setup(py_params_dict):
             {
                 "name": "valid_int",
                 "descr": "valid_int bus",
-                "signals": [
+                "wires": [
                     {"name": "valid_int", "width": 1},
                 ],
             },
             {
                 "name": "valid_r",
                 "descr": "valid_r bus",
-                "signals": [
+                "wires": [
                     {"name": "valid_r", "width": 1},
                 ],
             },
             {
                 "name": "rst_valid",
                 "descr": "rst_valid bus",
-                "signals": [
+                "wires": [
                     {"name": "rst_valid", "width": 1},
                 ],
             },
             {
                 "name": "wstrb",
                 "descr": "wstrb bus",
-                "signals": [
+                "wires": [
                     {"name": "wstrb", "width": "DATA_W/8"},
                 ],
             },
             {
                 "name": "wack",
                 "descr": "wack bus",
-                "signals": [
+                "wires": [
                     {"name": "wack", "width": 1},
                 ],
             },
             {
                 "name": "wack_r",
                 "descr": "wack_r bus",
-                "signals": [
+                "wires": [
                     {"name": "wack_r", "width": 1},
                 ],
             },
             {
                 "name": "wb_data_mask",
                 "descr": "wb_data_mask bus",
-                "signals": [
+                "wires": [
                     {"name": "wb_data_mask", "width": "DATA_W"},
                 ],
             },
@@ -105,7 +105,7 @@ def setup(py_params_dict):
             {
                 "name": "busy",
                 "descr": "busy bus",
-                "signals": [
+                "wires": [
                     {"name": "busy", "width": 1},
                 ],
             },

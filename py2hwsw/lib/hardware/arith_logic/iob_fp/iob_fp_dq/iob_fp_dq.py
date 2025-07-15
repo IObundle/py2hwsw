@@ -28,7 +28,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -38,7 +38,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": 1,
@@ -48,7 +48,7 @@ def setup(py_params_dict):
             {
                 "name": "d_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "d_i",
                         "width": "WIDTH",
@@ -58,7 +58,7 @@ def setup(py_params_dict):
             {
                 "name": "q_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "q_o",
                         "width": "WIDTH",

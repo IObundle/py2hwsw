@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "io_io",
                 "descr": "ODDRE1 io",
-                "signals": [
+                "wires": [
                     {"name": "q_o", "width": "1"},
                     {"name": "c_i", "width": "1"},
                     {"name": "d1_i", "width": "1"},

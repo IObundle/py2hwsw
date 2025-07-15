@@ -64,7 +64,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -76,7 +76,7 @@ def setup(py_params_dict):
             {
                 "name": "input_" + str(idx) + "_i",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "input_port_" + str(idx) + "_i",
                         "width": "INPUT_GPIO_W",
@@ -90,7 +90,7 @@ def setup(py_params_dict):
             {
                 "name": "output_" + str(idx) + "_o",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "output_port_" + str(idx) + "_o",
                         "width": "OUTPUT_GPIO_W",
@@ -100,7 +100,7 @@ def setup(py_params_dict):
             }
         )
         if TRISTATE:
-            attributes_dict["ports"][-1]["signals"].append(
+            attributes_dict["ports"][-1]["wires"].append(
                 {
                     "name": "output_enable_" + str(idx) + "_o",
                     "width": "OUTPUT_GPIO_W",
@@ -119,21 +119,21 @@ def setup(py_params_dict):
         bus = copy.deepcopy(port)
         # Remove port direction suffix
         bus["name"] = bus["name"][:-2]
-        bus["signals"][0]["name"] = bus["signals"][0]["name"][:-2]
+        bus["wires"][0]["name"] = bus["wires"][0]["name"][:-2]
         # Set correct width for connection with csrs
-        bus["signals"][0]["width"] = 32
+        bus["wires"][0]["width"] = 32
         attributes_dict["buses"].append(bus)
 
         if port["name"].endswith("_i"):
             verilog_snippet += f"""
-   assign {bus["signals"][0]["name"]}[INPUT_GPIO_W-1:0] = {port["signals"][0]["name"]};
+   assign {bus["wires"][0]["name"]}[INPUT_GPIO_W-1:0] = {port["wires"][0]["name"]};
 """
             verilog_snippet_generate += f"""
-   assign {bus["signals"][0]["name"]}[32-1:INPUT_GPIO_W] = {{32-INPUT_GPIO_W{{1'b0}}}};
+   assign {bus["wires"][0]["name"]}[32-1:INPUT_GPIO_W] = {{32-INPUT_GPIO_W{{1'b0}}}};
 """
         else:
             verilog_snippet += f"""
-   assign {port["signals"][0]["name"]} = {bus["signals"][0]["name"]}[OUTPUT_GPIO_W-1:0];
+   assign {port["wires"][0]["name"]} = {bus["wires"][0]["name"]}[OUTPUT_GPIO_W-1:0];
 """
 
     regs = []

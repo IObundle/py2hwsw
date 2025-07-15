@@ -46,26 +46,26 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "interrupt_o",
-                "descr": "Interrupt signal",
-                "signals": [
+                "descr": "Interrupt wire",
+                "wires": [
                     {
                         "name": "interrupt_o",
                         "width": "1",
-                        "descr": "FIFO threshold interrupt signal",
+                        "descr": "FIFO threshold interrupt wire",
                     },
                 ],
             },
             {
                 "name": "axistream_io",
-                "descr": "AXI Stream interface signals",
-                "signals": [
+                "descr": "AXI Stream interface wires",
+                "wires": [
                     {
                         "name": "axis_clk_i",
                         "width": "1",
@@ -106,7 +106,7 @@ def setup(py_params_dict):
             {
                 "name": "sys_axis_io",
                 "descr": "System AXI Stream interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": "sys_tdata_i",
                         "width": "DATA_W",
@@ -129,28 +129,28 @@ def setup(py_params_dict):
             {
                 "name": "soft_reset",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "soft_reset_wr", "width": 1},
                 ],
             },
             {
                 "name": "enable",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "enable_wr", "width": 1},
                 ],
             },
             {
                 "name": "data_wen_wr",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "data_wen_wr", "width": 1},
                 ],
             },
             {
                 "name": "data",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "data_valid_wr", "width": 1},
                     {"name": "data_wdata_wr", "width": 32},
                     {"name": "data_wstrb_wr", "width": 4},
@@ -160,42 +160,42 @@ def setup(py_params_dict):
             {
                 "name": "mode",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "mode_wr", "width": 1},
                 ],
             },
             {
                 "name": "nwords",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "nwords_wr", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "fifo_full",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_full_rd", "width": 1},
                 ],
             },
             {
                 "name": "fifo_empty",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_empty_rd", "width": 1},
                 ],
             },
             {
                 "name": "fifo_threshold",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_threshold_wr", "width": "FIFO_ADDR_W+1"},
                 ],
             },
             {
                 "name": "fifo_level",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "fifo_level_rd", "width": "FIFO_ADDR_W+1"},
                 ],
             },
@@ -282,7 +282,7 @@ def setup(py_params_dict):
                                 "n_bits": "FIFO_ADDR_W+1",
                                 "rst_val": 8,
                                 "log2n_items": 0,
-                                "descr": "FIFO threshold level for interrupt signal",
+                                "descr": "FIFO threshold level for interrupt wire",
                             },
                             {
                                 "name": "fifo_level",

@@ -80,14 +80,14 @@ When using two systems, such as [IOb-SoC-SUT](https://github.com/IObundle/iob-so
 
 The connection between the external IOb-native interface of the system with the REGFILEIF and the peripheral bus of the Tester can be made using the `peripheral_portmap` list of the Tester.
 
-However, to connect using the portmap, the IOb-native bus signals of the Tester must be externally accessible (the portmap configuration can only map signals that can be accessed externally).
+However, to connect using the portmap, the IOb-native bus wires of the Tester must be externally accessible (the portmap configuration can only map wires that can be accessed externally).
 
 To do this, we use the peripheral **IOBNATIVEBRIDGEIF**, located inside the `nativebridgeif_wrappper` directory of this repository.
 This peripheral also has two IOb-native interfaces, one internal and one external.
 However, unlike REGFILEIF, the external interface of this peripheral is a manager interface. This allows it to be connected to the subordinate IOb-native interface of another module, such as the REGFILEIF.
-The IOBNATIVEBRIDGEIF, allows the peripheral bus signals of the system to be accessed externally.
+The IOBNATIVEBRIDGEIF, allows the peripheral bus wires of the system to be accessed externally.
 
-We use the IOBNATIVEBRIDGEIF as a peripheral of the Tester to allow its peripheral bus signals to be accessed externally, and therefore be port mapped.
+We use the IOBNATIVEBRIDGEIF as a peripheral of the Tester to allow its peripheral bus wires to be accessed externally, and therefore be port mapped.
 
 To instantiate the IOBNATIVEBRIDGEIF peripheral we add a new dictionary to the `peripherals` list of the `subblocks` dictionary, similar to the REGFILEIF instantiation.
 

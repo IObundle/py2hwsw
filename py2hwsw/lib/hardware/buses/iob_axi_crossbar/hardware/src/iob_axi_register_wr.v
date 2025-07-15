@@ -21,19 +21,19 @@ module iob_axi_register_wr #(
    parameter ADDR_WIDTH    = 32,
    // Width of wstrb (width of data bus in words)
    parameter STRB_WIDTH    = (DATA_WIDTH / 8),
-   // Width of ID signal
+   // Width of ID wire
    parameter ID_WIDTH      = 8,
-   // Propagate awuser signal
+   // Propagate awuser wire
    parameter AWUSER_ENABLE = 0,
-   // Width of awuser signal
+   // Width of awuser wire
    parameter AWUSER_WIDTH  = 1,
-   // Propagate wuser signal
+   // Propagate wuser wire
    parameter WUSER_ENABLE  = 0,
-   // Width of wuser signal
+   // Width of wuser wire
    parameter WUSER_WIDTH   = 1,
-   // Propagate buser signal
+   // Propagate buser wire
    parameter BUSER_ENABLE  = 0,
-   // Width of buser signal
+   // Width of buser wire
    parameter BUSER_WIDTH   = 1,
    // AW channel register type
    // 0 to bypass, 1 for simple buffer, 2 for skid buffer

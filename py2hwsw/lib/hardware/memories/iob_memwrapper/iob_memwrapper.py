@@ -38,8 +38,8 @@ def setup(py_params_dict):
     mwrap_ports = []
     memory_ports = []
     for port in attrs["ports"]:
-        if isinstance(port["signals"], dict):
-            if port["signals"]["type"] in mem_if_names:
+        if isinstance(port["wires"], dict):
+            if port["wires"]["type"] in mem_if_names:
                 bus = copy.deepcopy(port)
                 bus["name"] = bus["name"][:-2]
                 mwrap_buses.append(bus)
@@ -83,21 +83,21 @@ def setup(py_params_dict):
 
     list_of_mems = []
     for bus in mwrap_buses:
-        if bus["signals"].get("prefix", None):
-            prefix_str = bus["signals"]["prefix"]
+        if bus["wires"].get("prefix", None):
+            prefix_str = bus["wires"]["prefix"]
         else:
             prefix_str = bus["name"] + "_"
 
-        signals_type = bus["signals"]["type"]
+        wires_type = bus["wires"]["type"]
 
         # Instance name
         name = f"{prefix_str}mem"
         # Memory type
-        type = f"iob_{signals_type}"
+        type = f"iob_{wires_type}"
         # Data bus width
-        data_w = bus["signals"].get("DATA_W", 32)
+        data_w = bus["wires"].get("DATA_W", 32)
         # Address bus width
-        word_addr_w = bus["signals"].get("ADDR_W", 32)
+        word_addr_w = bus["wires"].get("ADDR_W", 32)
         # Memory init hexfile name
         hexfile_param = f"{prefix_str.upper()}HEXFILE"
         hexfile_obj = find_obj_in_list(confs_without_groups, hexfile_param)
@@ -140,7 +140,7 @@ def setup(py_params_dict):
                 }
                 | extra_params,
                 "connect": {
-                    f"{signals_type}_s": bus["name"],
+                    f"{wires_type}_s": bus["name"],
                 },
             }
         )

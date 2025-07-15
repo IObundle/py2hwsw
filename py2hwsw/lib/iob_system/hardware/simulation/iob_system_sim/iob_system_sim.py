@@ -61,14 +61,14 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
         },
         {
             "name": "uart_s",
             "descr": "Testbench uart csrs interface",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "ADDR_W": 3,
             },
@@ -79,7 +79,7 @@ def setup(py_params_dict):
             {
                 "name": "ethernet_s",
                 "descr": "Testbench ethernet csrs interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "ethernet_",
                     "ADDR_W": 12,
@@ -91,7 +91,7 @@ def setup(py_params_dict):
             {
                 "name": "iob_s",
                 "descr": "Direct control of system peripherals csrs",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "pbus_",
                     "ADDR_W": 3,
@@ -105,29 +105,29 @@ def setup(py_params_dict):
     attributes_dict["buses"] = [
         {
             "name": "clk",
-            "descr": "Clock signal",
-            "signals": [
+            "descr": "Clock wire",
+            "wires": [
                 {"name": "clk_i"},
             ],
         },
         {
             "name": "rst",
-            "descr": "Reset signal",
-            "signals": [
+            "descr": "Reset wire",
+            "wires": [
                 {"name": "arst_i"},
             ],
         },
         {
             "name": "rs232",
             "descr": "rs232 bus",
-            "signals": {
+            "wires": {
                 "type": "rs232",
             },
         },
         {
             "name": "rs232_invert",
-            "descr": "Invert order of rs232 signals",
-            "signals": [
+            "descr": "Invert order of rs232 wires",
+            "wires": [
                 {"name": "rs232_txd"},
                 {"name": "rs232_rxd"},
                 {"name": "rs232_cts"},
@@ -140,7 +140,7 @@ def setup(py_params_dict):
             {
                 "name": "axi",
                 "descr": "AXI bus to connect SoC to interconnect",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -152,7 +152,7 @@ def setup(py_params_dict):
             {
                 "name": "axi_ram_mem",
                 "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p_be",
                     "prefix": "ext_mem_",
                     "ADDR_W": "AXI_ADDR_W - 2",
@@ -164,7 +164,7 @@ def setup(py_params_dict):
             {
                 "name": "eth_axi",
                 "descr": "Ethernet AXI bus",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "eth_",
                 },
@@ -172,7 +172,7 @@ def setup(py_params_dict):
             {
                 "name": "phy",
                 "descr": "PHY Interface Ports",
-                "signals": [
+                "wires": [
                     {"name": "eth_MTxClk", "width": "1"},
                     {"name": "MTxEn", "width": "1"},
                     {"name": "MTxD", "width": "4"},
@@ -190,8 +190,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "eth_phy_invert",
-                "descr": "Invert order of signals in ethernet MII bus",
-                "signals": [
+                "descr": "Invert order of wires in ethernet MII bus",
+                "wires": [
                     {"name": "eth_MTxClk"},
                     {"name": "MRxDv"},
                     {"name": "MRxD"},
@@ -210,7 +210,7 @@ def setup(py_params_dict):
             {
                 "name": "eth_int",
                 "descr": "Ethernet interrupt",
-                "signals": [
+                "wires": [
                     {"name": "eth_interrupt"},
                 ],
             },
@@ -347,7 +347,7 @@ def setup(py_params_dict):
     assign eth_axi_rlast   = 1'b0;
     assign eth_axi_rvalid  = 1'b0;
 
-    // Connect ethernet MII signals
+    // Connect ethernet MII wires
     assign eth_MTxClk       = eth_clk;
     assign eth_MRxClk       = eth_clk;
     assign eth_MColl        = 1'b0;

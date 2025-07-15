@@ -44,7 +44,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -52,23 +52,23 @@ def setup(py_params_dict):
             {
                 "name": "status_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "start_i",
                         "width": 1,
-                        "descr": "Start signal",
+                        "descr": "Start wire",
                     },
                     {
                         "name": "done_o",
                         "width": 1,
-                        "descr": "Done signal",
+                        "descr": "Done wire",
                     },
                 ],
             },
             {
                 "name": "div_io",
                 "descr": "Division interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "dividend_i",
                         "width": "DIVIDEND_W",
@@ -96,56 +96,56 @@ def setup(py_params_dict):
             # { # NOTE: This bus is implicitly create by py2
             #     "name": "dqr_reg_nxt",
             #     "descr": "dqr_reg_nxt bus",
-            #     "signals": [
+            #     "wires": [
             #         {"name": "dqr_reg_nxt", "width": "DQR_W"},
             #     ],
             # },
             {
                 "name": "dqr_reg",
                 "descr": "dqr_reg bus",
-                "signals": [
+                "wires": [
                     {"name": "dqr_reg", "width": "DQR_W"},
                 ],
             },
             # { # NOTE: This bus is implicitly create by py2
             #    "name": "divisor_reg_nxt",
             #    "descr": "divisor_reg_nxt bus",
-            #    "signals": [
+            #    "wires": [
             #        {"name": "divisor_reg_nxt", "width": "DIVISOR_W"},
             #    ],
             # },
             {
                 "name": "divisor_reg",
                 "descr": "divisor_reg bus",
-                "signals": [
+                "wires": [
                     {"name": "divisor_reg", "width": "DIVISOR_W"},
                 ],
             },
             {
                 "name": "subtraend",
                 "descr": "subtraend bus",
-                "signals": [
+                "wires": [
                     {"name": "subtraend", "width": "DIVISOR_W+1"},
                 ],
             },
             {
                 "name": "tmp",
                 "descr": "tmp bus",
-                "signals": [
+                "wires": [
                     {"name": "tmp", "width": "DIVISOR_W+2", "isvar": True},
                 ],
             },
             # { # NOTE: This bus is implicitly create by py2
             #    "name": "pcnt_nxt",
             #    "descr": "pcnt_nxt bus",
-            #    "signals": [
+            #    "wires": [
             #        {"name": "pcnt_nxt", "width": "$clog2(DIVIDEND_W+1)"},
             #    ],
             # },
             {
                 "name": "pcnt",
                 "descr": "pcnt bus",
-                "signals": [
+                "wires": [
                     {
                         "name": "pcnt",
                         "descr": "pcnt bus",
@@ -155,7 +155,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "done_reg",
-                "signals": [
+                "wires": [
                     {"name": "done_reg", "width": 1, "isvar": True},
                 ],
             },

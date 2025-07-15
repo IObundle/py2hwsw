@@ -71,12 +71,12 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "signals": {"type": "iob_clk"},
+            "wires": {"type": "iob_clk"},
         },
         {
             "name": "s_s",
             "descr": "Subordinate port",
-            "signals": {
+            "wires": {
                 "type": params["subordinate_if"],
                 "ADDR_W": "ADDR_W",
                 "DATA_W": "DATA_W",
@@ -85,7 +85,7 @@ def setup(py_params_dict):
         {
             "name": "m_m",
             "descr": "Manager port",
-            "signals": {
+            "wires": {
                 "type": params["manager_if"],
                 "ADDR_W": "ADDR_W",
                 "DATA_W": "DATA_W",
@@ -94,12 +94,12 @@ def setup(py_params_dict):
     ]
     # Append ID_W and LEN_W when using AXI interfaces
     if params["subordinate_if"] == "axi":
-        attributes_dict["ports"][-2]["signals"] |= {
+        attributes_dict["ports"][-2]["wires"] |= {
             "ID_W": "AXI_ID_W",
             "LEN_W": "AXI_LEN_W",
         }
     if params["manager_if"] == "axi":
-        attributes_dict["ports"][-1]["signals"] |= {
+        attributes_dict["ports"][-1]["wires"] |= {
             "ID_W": "AXI_ID_W",
             "LEN_W": "AXI_LEN_W",
         }
@@ -110,7 +110,7 @@ def setup(py_params_dict):
         {
             "name": "internal_iob",
             "descr": "Internal IOb bus",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "ADDR_W": "ADDR_W",
                 "DATA_W": "DATA_W",

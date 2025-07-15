@@ -58,14 +58,14 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "descr": "Clock, clock enable and reset",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
             },
             {
                 "name": "m_io",
                 "descr": "Manager interface",
-                "signals": [
+                "wires": [
                     {"name": "m_en_o", "width": 1},
                     {"name": "m_wstrb_o", "width": "M_DATA_W/8"},
                     {"name": "m_addr_o", "width": "M_ADDR_W"},
@@ -76,7 +76,7 @@ def setup(py_params_dict):
             {
                 "name": "s_io",
                 "descr": "Subordinate interface",
-                "signals": [
+                "wires": [
                     {"name": "s_en_i", "width": 1},
                     {"name": "s_wstrb_i", "width": "S_DATA_W/8"},
                     {"name": "s_addr_i", "width": "S_ADDR_W"},

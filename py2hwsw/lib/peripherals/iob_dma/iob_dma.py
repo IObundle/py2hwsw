@@ -78,7 +78,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -86,7 +86,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Synchronous reset interface",
-                "signals": [
+                "wires": [
                     {"name": "rst_i", "width": 1},
                 ],
             },
@@ -94,7 +94,7 @@ def setup(py_params_dict):
             {
                 "name": "dma_input_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "axis_in_tdata_i", "width": "AXI_DATA_W"},
                     {"name": "axis_in_tvalid_i", "width": "1"},
                     {"name": "axis_in_tready_o", "width": "1"},
@@ -103,7 +103,7 @@ def setup(py_params_dict):
             {
                 "name": "dma_output_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "axis_out_tdata_o", "width": "AXI_DATA_W"},
                     {"name": "axis_out_tvalid_o", "width": "1"},
                     {"name": "axis_out_tready_i", "width": "1"},
@@ -112,7 +112,7 @@ def setup(py_params_dict):
             # AXI Interface
             {
                 "name": "axi_m",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -126,14 +126,14 @@ def setup(py_params_dict):
             {
                 "name": "receive_enabled",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "receive_enabled", "width": 1},
                 ],
             },
             {
                 "name": "axis_in",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "axis_in_tdata_i", "width": "AXI_DATA_W"},
                     {"name": "receive_valid", "width": "1"},
                     {"name": "receive_ready", "width": "1"},
@@ -142,7 +142,7 @@ def setup(py_params_dict):
             {
                 "name": "w_length_clk_en",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "clk_i"},
                     {"name": "cke_i"},
                     {"name": "arst_i"},
@@ -152,14 +152,14 @@ def setup(py_params_dict):
             {
                 "name": "w_length_wdata",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_length_wdata_wr", "width": "WLEN_W"},
                 ],
             },
             {
                 "name": "w_length_wdata_reg",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_length_wdata_reg", "width": "WLEN_W"},
                 ],
             },
@@ -167,7 +167,7 @@ def setup(py_params_dict):
             {
                 "name": "counter_en_rst",
                 "descr": "Enable and Synchronous reset interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "counter_en",
                         "width": 1,
@@ -181,7 +181,7 @@ def setup(py_params_dict):
             {
                 "name": "axis_in_cnt",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "axis_in_cnt", "width": "WLEN_W"},
                 ],
             },
@@ -189,7 +189,7 @@ def setup(py_params_dict):
             {
                 "name": "config_write",
                 "descr": "Configure write (AXIS in)",
-                "signals": [
+                "wires": [
                     {"name": "w_addr_wr", "width": "AXI_ADDR_W"},
                     {"name": "w_length_wdata_reg"},
                     {"name": "w_start_wen_wr", "width": 1},
@@ -201,7 +201,7 @@ def setup(py_params_dict):
             {
                 "name": "config_read",
                 "descr": "Configure read (AXIS out)",
-                "signals": [
+                "wires": [
                     {"name": "r_addr_wr", "width": "AXI_ADDR_W"},
                     {"name": "r_length_wr", "width": "WLEN_W"},
                     {"name": "r_start_wen_wr", "width": 1},
@@ -214,7 +214,7 @@ def setup(py_params_dict):
             {
                 "name": "write_ext_mem",
                 "descr": "External memory write buses",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p",
                     "prefix": "ext_mem_write_",
                     "ADDR_W": "AXI_LEN_W",
@@ -224,7 +224,7 @@ def setup(py_params_dict):
             {
                 "name": "read_ext_mem",
                 "descr": "External memory read buses",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p",
                     "prefix": "ext_mem_read_",
                     "ADDR_W": "AXI_LEN_W",
@@ -235,14 +235,14 @@ def setup(py_params_dict):
             {
                 "name": "w_addr",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_addr_wr"},
                 ],
             },
             {
                 "name": "w_length",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_length_valid_wr", "width": 1},
                     {"name": "w_length_wdata_wr"},
                     {"name": "w_length_wstrb_wr", "width": "WLEN_W/8"},  # Unused
@@ -252,14 +252,14 @@ def setup(py_params_dict):
             {
                 "name": "w_busy",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_busy_rd"},
                 ],
             },
             {
                 "name": "w_start",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_start_valid_wr", "width": 1},
                     {"name": "w_start_wdata_wr", "width": 1},
                     {"name": "w_start_wstrb_wr", "width": 1},  # Unused
@@ -269,42 +269,42 @@ def setup(py_params_dict):
             {
                 "name": "w_burstlen",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_burstlen_wr"},
                 ],
             },
             {
                 "name": "w_buf_level",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_buf_level_rd"},
                 ],
             },
             {
                 "name": "r_addr",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "r_addr_wr"},
                 ],
             },
             {
                 "name": "r_length",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "r_length_wr"},
                 ],
             },
             {
                 "name": "r_busy",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "r_busy_rd"},
                 ],
             },
             {
                 "name": "r_start",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "r_start_valid_wr", "width": 1},
                     {"name": "r_start_wdata_wr", "width": 1},
                     {"name": "r_start_wstrb_wr", "width": 1},  # Unused
@@ -314,14 +314,14 @@ def setup(py_params_dict):
             {
                 "name": "r_burstlen",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "r_burstlen_wr"},
                 ],
             },
             {
                 "name": "r_buf_level",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "r_buf_level_rd"},
                 ],
             },

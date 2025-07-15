@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "io_io",
                 "descr": "IBUFG io",
-                "signals": [
+                "wires": [
                     {"name": "i_i", "width": "1"},
                     {"name": "o_o", "width": "1"},
                 ],
@@ -20,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_buf",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "clk_buf", "width": "1"},
                 ],
             },

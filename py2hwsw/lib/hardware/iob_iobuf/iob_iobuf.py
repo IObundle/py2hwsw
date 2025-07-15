@@ -20,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "i_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "i_i",
                         "width": 1,
@@ -30,7 +30,7 @@ def setup(py_params_dict):
             {
                 "name": "t_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "t_i",
                         "width": 1,
@@ -40,7 +40,7 @@ def setup(py_params_dict):
             {
                 "name": "n_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "n_i",
                         "width": 1,
@@ -50,7 +50,7 @@ def setup(py_params_dict):
             {
                 "name": "o_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "o_o",
                         "width": 1,
@@ -60,7 +60,7 @@ def setup(py_params_dict):
             {
                 "name": "io_io",
                 "descr": "In/Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "io_io",
                         "width": 1,
@@ -72,7 +72,7 @@ def setup(py_params_dict):
             {
                 "name": "o_int",
                 "descr": "o_int bus",
-                "signals": [
+                "wires": [
                     {"name": "o_int", "width": 1},
                 ],
             },

@@ -30,13 +30,13 @@ module iob_axi_crossbar_rd #(
    // Output ID field width (towards AXI subordinates)
    // Additional bits required for response routing
    parameter M_ID_WIDTH    = S_ID_WIDTH + $clog2(S_COUNT),
-   // Propagate aruser signal
+   // Propagate aruser wire
    parameter ARUSER_ENABLE = 0,
-   // Width of aruser signal
+   // Width of aruser wire
    parameter ARUSER_WIDTH  = 1,
-   // Propagate ruser signal
+   // Propagate ruser wire
    parameter RUSER_ENABLE  = 0,
-   // Width of ruser signal
+   // Width of ruser wire
    parameter RUSER_WIDTH   = 1,
    // Number of concurrent unique IDs for each subordinate interface
    // S_COUNT concatenated fields of 32 bits

@@ -11,7 +11,7 @@ from iob_globals import iob_globals
 
 def setup(py_params_dict):
     reset_polarity = getattr(iob_globals(reset_polarity="negative"), "reset_polarity")
-    rst_signal = "arst_n_i" if reset_polarity == "negative" else "~arst_i"
+    rst_wire = "arst_n_i" if reset_polarity == "negative" else "~arst_i"
     attributes_dict = {
         "generate_hw": True,
         "confs": [
@@ -35,7 +35,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                     "params": "a",
                 },
@@ -44,7 +44,7 @@ def setup(py_params_dict):
             {
                 "name": "ahb_s",
                 "descr": "Subordinate AHB interface",
-                "signals": {
+                "wires": {
                     "type": "ahb",
                     "prefix": "s_",
                     "ADDR_W": "ADDR_WIDTH",
@@ -62,7 +62,7 @@ def setup(py_params_dict):
       .HSEL     (s_ahb_sel_i),
       // Global Signals
       .HCLK     (clk_i),
-      .HRESETn  ({rst_signal}),
+      .HRESETn  ({rst_wire}),
       // Address, Control & Write Data
       .HREADY   (1'b1),
       .HADDR    (s_ahb_addr_i),

@@ -11,7 +11,7 @@ from iob_base import (
 )
 import iob_colors
 from iob_port import iob_port
-from iob_signal import get_real_signal, iob_signal_reference
+from iob_wire import get_real_wire, iob_wire_reference
 from iob_bus import iob_bus
 
 from api_base import internal_api_class, convert2internal
@@ -37,27 +37,27 @@ class iob_portmap:
         """Connects the port to an external bus
         Verifies that the bus is compatible with the port
         :param iob_bus bus: external bus
-        :param list bit_slices: bit slices of signals in bus
+        :param list bit_slices: bit slices of wires in bus
         """
         # bus must be iob_bus or str
         if isinstance(bus, str):
-            if len(self.port.signals) != 1:
+            if len(self.port.wires) != 1:
                 fail_with_msg(
-                    f"{iob_colors.FAIL}Port '{self.port.name}' has more than one signal but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
+                    f"{iob_colors.FAIL}Port '{self.port.name}' has more than one wire but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
                     ValueError,
                 )
             else:
                 validate_verilog_const(
-                    value=bus, direction=self.port.signals[0].direction
+                    value=bus, direction=self.port.wires[0].direction
                 )
         elif isinstance(bus, iob_bus):
             if self.port.interface and bus.interface:
                 if type(self.port.interface) == type(bus.interface):
-                    for signal in self.port.signals:
-                        # If it is a signal reference, get the real signal
-                        if isinstance(signal, iob_signal_reference):
-                            signal = get_real_signal(signal)
-                        search_name = signal.name.replace(
+                    for wire in self.port.wires:
+                        # If it is a wire reference, get the real wire
+                        if isinstance(wire, iob_wire_reference):
+                            wire = get_real_wire(wire)
+                        search_name = wire.name.replace(
                             self.port.interface.prefix, bus.interface.prefix, 1
                         )
                         if self.port.name[-2] != bus.name[-2]:
@@ -70,48 +70,48 @@ class iob_portmap:
                             else:
                                 search_name = search_name[:-2]
 
-                        e_signal = find_obj_in_list(
-                            bus.signals, search_name, get_real_signal
+                        e_wire = find_obj_in_list(
+                            bus.wires, search_name, get_real_wire
                         )
-                        if not e_signal:
+                        if not e_wire:
                             if not any(
                                 [
-                                    f"{get_real_signal(signal).name}:" in bit_slice
+                                    f"{get_real_wire(wire).name}:" in bit_slice
                                     for bit_slice in bit_slices
                                 ]
                             ):
                                 newlinechar = "\n"
                                 fail_with_msg(
-                                    f"Port '{self.port.name}' signal '{signal.name}' not connected to external bus '{bus.name}'!\n"
-                                    f"Port '{self.port.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n"
-                                    f"External connection '{bus.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in bus.signals)}\n",
+                                    f"Port '{self.port.name}' wire '{wire.name}' not connected to external bus '{bus.name}'!\n"
+                                    f"Port '{self.port.name}' has the following wires:\n"
+                                    f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in self.port.wires)}\n"
+                                    f"External connection '{bus.name}' has the following wires:\n"
+                                    f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in bus.wires)}\n",
                                     ValueError,
                                 )
-                elif len(self.port.signals) != len(bus.signals):
+                elif len(self.port.wires) != len(bus.wires):
                     newlinechar = "\n"
                     fail_with_msg(
-                        f"Port '{self.port.name}' has different number of signals compared to external connection '{bus.name}'!\n"
-                        f"Port '{self.port.name}' has the following signals:\n"
-                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n\n"
-                        f"External connection '{bus.name}' has the following signals:\n"
-                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in bus.signals)}\n",
+                        f"Port '{self.port.name}' has different number of wires compared to external connection '{bus.name}'!\n"
+                        f"Port '{self.port.name}' has the following wires:\n"
+                        f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in self.port.wires)}\n\n"
+                        f"External connection '{bus.name}' has the following wires:\n"
+                        f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in bus.wires)}\n",
                         ValueError,
                     )
-            elif len(self.port.signals) != len(bus.signals):
+            elif len(self.port.wires) != len(bus.wires):
                 newlinechar = "\n"
                 fail_with_msg(
-                    f"Port '{self.port.name}' has different number of signals compared to external connection '{bus.name}'!\n"
-                    f"Port '{self.port.name}' has the following signals:\n"
-                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n\n"
-                    f"External connection '{bus.name}' has the following signals:\n"
-                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in bus.signals)}",
+                    f"Port '{self.port.name}' has different number of wires compared to external connection '{bus.name}'!\n"
+                    f"Port '{self.port.name}' has the following wires:\n"
+                    f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in self.port.wires)}\n\n"
+                    f"External connection '{bus.name}' has the following wires:\n"
+                    f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in bus.wires)}",
                     ValueError,
                 )
             else:
-                for p, w in zip(self.port.signals, bus.signals):
-                    w = get_real_signal(w)
+                for p, w in zip(self.port.wires, bus.wires):
+                    w = get_real_wire(w)
                     if "'" in w.name or w.name.lower() == "z":
                         validate_verilog_const(value=w.name, direction=p.direction)
         else:

@@ -61,9 +61,9 @@ from api_base import internal_api_class, convert2internal
 class iob_core(iob_module):
     """Generic class to describe how to generate a base IOb IP core"""
 
-    # List of global signals.
+    # List of global wires.
     # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
-    global_signals: list
+    global_wires: list
     # Project settings
     global_build_dir: str = ""
     global_project_root: str = "."
@@ -459,16 +459,16 @@ class iob_core(iob_module):
         if self.generate_hw:
             verilog_gen.generate_verilog(self)
 
-        # TODO: Generate a global list of signals
+        # TODO: Generate a global list of wires
         # I think this is a similar concept to 'net' in vivado: https://docs.amd.com/r/en-US/ug912-vivado-properties/NET
         # This list is useful for a python based simulator
-        # 1) Each input of the top generates a global signal
-        # 2) Each output of a leaf generates a global signal
-        # 3) Each output of a snippet generates a global signal
+        # 1) Each input of the top generates a global wire
+        # 2) Each output of a leaf generates a global wire
+        # 3) Each output of a snippet generates a global wire
         #    A snippet is a piece of verilog code manually written (should also receive a list of outputs by the user).
-        #    A snippet can also be any method that generates a new signal, like the `concat_bits`, or any other that performs logic in from other signals into a new one.
+        #    A snippet can also be any method that generates a new wire, like the `concat_bits`, or any other that performs logic in from other wires into a new one.
         # TODO as well: Each module has a local `snippets` list.
-        # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global signals (that already contain the width).
+        # Note: The 'width' attribute of many module's wires are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
         if (self.is_top_module and not self.is_parent) or self.is_tester:
             self.post_setup()

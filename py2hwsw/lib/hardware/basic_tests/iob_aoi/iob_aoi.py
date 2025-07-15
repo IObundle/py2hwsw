@@ -103,35 +103,35 @@ core_dictionary = {
         {
             "name": "a_i",
             "descr": "Input port a",
-            "signals": [
+            "wires": [
                 {"name": "a_i", "width": "W"},
             ],
         },
         {
             "name": "b_i",
             "descr": "Input port b",
-            "signals": [
+            "wires": [
                 {"name": "b_i", "width": "W"},
             ],
         },
         {
             "name": "c_i",
             "descr": "Input port c",
-            "signals": [
+            "wires": [
                 {"name": "c_i", "width": "W"},
             ],
         },
         {
             "name": "d_i",
             "descr": "Input port d",
-            "signals": [
+            "wires": [
                 {"name": "d_i", "width": "W"},
             ],
         },
         {
             "name": "y_o",
             "descr": "Output port y",
-            "signals": [
+            "wires": [
                 {"name": "y_o", "width": "W"},
             ],
         },
@@ -140,21 +140,21 @@ core_dictionary = {
         {
             "name": "and_ab_out",
             "descr": "and ab output",
-            "signals": [
+            "wires": [
                 {"name": "aab", "width": "W"},
             ],
         },
         {
             "name": "and_cd_out",
             "descr": "and cd output",
-            "signals": [
+            "wires": [
                 {"name": "cad", "width": "W"},
             ],
         },
         {
             "name": "or_out",
             "descr": "or output",
-            "signals": [
+            "wires": [
                 {"name": "oab", "width": "1"},
             ],
         },

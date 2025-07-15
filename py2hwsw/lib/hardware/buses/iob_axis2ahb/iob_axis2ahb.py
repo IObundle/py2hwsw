@@ -33,7 +33,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "AXI_ID_WIDTH",
-                "descr": "Width of AXI ID signal",
+                "descr": "Width of AXI ID wire",
                 "type": "P",
                 "val": "8",
                 "min": "1",
@@ -43,7 +43,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -51,7 +51,7 @@ def setup(py_params_dict):
             {
                 "name": "axis_s",
                 "descr": "AXIS IN interface",
-                "signals": {
+                "wires": {
                     "type": "axis",
                     "prefix": "in_",
                     "params": "tlast",
@@ -62,7 +62,7 @@ def setup(py_params_dict):
             {
                 "name": "axis_m",
                 "descr": "AXIS OUT interface",
-                "signals": {
+                "wires": {
                     "type": "axis",
                     "params": "tlast",
                     "prefix": "out_",
@@ -73,7 +73,7 @@ def setup(py_params_dict):
             {
                 "name": "config_in_io",
                 "descr": "AXI Stream input configuration interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "config_in_addr_i",
                         "width": "ADDR_WIDTH",
@@ -94,7 +94,7 @@ def setup(py_params_dict):
             {
                 "name": "config_out_io",
                 "descr": "AXI Stream output configuration interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "config_out_addr_i",
                         "width": "ADDR_WIDTH",
@@ -120,7 +120,7 @@ def setup(py_params_dict):
             {
                 "name": "general_o",
                 "descr": "Generic interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "busy_o",
                         "width": 1,
@@ -131,7 +131,7 @@ def setup(py_params_dict):
             {
                 "name": "ahb_m",
                 "descr": "Manager AHB interface",
-                "signals": {
+                "wires": {
                     "type": "ahb",
                     "prefix": "m_",
                     "ADDR_W": "ADDR_WIDTH",

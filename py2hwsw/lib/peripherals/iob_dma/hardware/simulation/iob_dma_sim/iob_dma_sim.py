@@ -89,14 +89,14 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
         },
         {
             "name": "pbus_s",
             "descr": "Testbench dma sim wrapper csrs interface",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "ADDR_W": 7,
             },
@@ -108,16 +108,16 @@ def setup(py_params_dict):
     attributes_dict["buses"] = [
         {
             "name": "split_reset",
-            "descr": "Reset signal for iob_split components",
-            "signals": [
+            "descr": "Reset wire for iob_split components",
+            "wires": [
                 {"name": "arst_i"},
             ],
         },
         # AXISTREAM IN
         {
             "name": "axistream_in_interrupt",
-            "descr": "Interrupt signal",
-            "signals": [
+            "descr": "Interrupt wire",
+            "wires": [
                 {
                     "name": "axistream_in_interrupt",
                     "width": "1",
@@ -126,8 +126,8 @@ def setup(py_params_dict):
         },
         {
             "name": "axistream_in_axis",
-            "descr": "AXI Stream interface signals",
-            "signals": [
+            "descr": "AXI Stream interface wires",
+            "wires": [
                 {
                     "name": "axis_clk",
                     "width": "1",
@@ -168,7 +168,7 @@ def setup(py_params_dict):
         {
             "name": "axistream_in_csrs",
             "descr": "axistream_in CSRs interface",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "prefix": "axistream_in_csrs_",
                 "ADDR_W": 5,
@@ -177,8 +177,8 @@ def setup(py_params_dict):
         # AXISTREAM OUT
         {
             "name": "axistream_out_interrupt",
-            "descr": "Interrupt signal",
-            "signals": [
+            "descr": "Interrupt wire",
+            "wires": [
                 {
                     "name": "axistream_out_interrupt",
                     "width": "1",
@@ -187,8 +187,8 @@ def setup(py_params_dict):
         },
         {
             "name": "axistream_out_axis",
-            "descr": "AXI Stream interface signals",
-            "signals": [
+            "descr": "AXI Stream interface wires",
+            "wires": [
                 {
                     "name": "axis_clk",
                     "width": "1",
@@ -229,7 +229,7 @@ def setup(py_params_dict):
         {
             "name": "axistream_out_csrs",
             "descr": "axistream_out CSRs interface",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "prefix": "axistream_out_csrs_",
                 "ADDR_W": 5,
@@ -239,7 +239,7 @@ def setup(py_params_dict):
         {
             "name": "dma_csrs",
             "descr": "dma CSRs interface",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "prefix": "dma_csrs_",
                 "ADDR_W": 5,
@@ -248,29 +248,29 @@ def setup(py_params_dict):
         {
             "name": "axi_dma_ram",
             "descr": "DMA <-> AXI RAM connection buses",
-            "signals": {
+            "wires": {
                 "type": "axi",
                 "ADDR_W": "AXI_ADDR_W",
             },
         },
         {
             "name": "clk",
-            "descr": "Clock signal",
-            "signals": [
+            "descr": "Clock wire",
+            "wires": [
                 {"name": "clk_i"},
             ],
         },
         {
             "name": "rst",
-            "descr": "Reset signal",
-            "signals": [
+            "descr": "Reset wire",
+            "wires": [
                 {"name": "arst_i"},
             ],
         },
         {
             "name": "dma_axis_out",
             "descr": "AXIS OUT <-> DMA connection buses",
-            "signals": [
+            "wires": [
                 {"name": "axis_out_tdata", "width": "AXI_DATA_W"},
                 {"name": "axis_out_tvalid", "width": "1"},
                 {"name": "axis_out_tready", "width": "1"},
@@ -279,7 +279,7 @@ def setup(py_params_dict):
         {
             "name": "dma_axis_in",
             "descr": "AXIS IN <-> DMA connection buses",
-            "signals": [
+            "wires": [
                 {"name": "axis_in_tdata", "width": "AXI_DATA_W"},
                 {"name": "axis_in_tvalid", "width": "1"},
                 {"name": "axis_in_tready", "width": "1"},
@@ -288,7 +288,7 @@ def setup(py_params_dict):
         {
             "name": "axi_ram_mem",
             "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
-            "signals": {
+            "wires": {
                 "type": "ram_t2p_be",
                 "ADDR_W": "AXI_ADDR_W - 2",
                 "prefix": "ext_mem_",

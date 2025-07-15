@@ -13,11 +13,11 @@ provided in C for use with the Verilator simulator. Two tasks are provided:
 `iob_write` and `iob_read`. These tasks are used to write and read data to and
 from the IP core, respectively.
 
-The IOb Native Interface, or IOb interface shortly, has the following signals
+The IOb Native Interface, or IOb interface shortly, has the following wires
 from the subordinate perspective. (Note that the `_i` and `_o` suffixes denote input
 and output, respectively.)
 - `clk_i`: interface input clock
-- `valid_i`: source signal valid transaction from manager input
+- `valid_i`: source wire valid transaction from manager input
 - `addr_i`: address for read or write access input
 - `wdata_i`: data to write
 - `wstrb_i`: byte write strobe input

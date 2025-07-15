@@ -36,7 +36,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -46,7 +46,7 @@ def setup(py_params_dict):
             {
                 "name": "dividend_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "dividend_i",
                         "width": "DATA_W",
@@ -56,7 +56,7 @@ def setup(py_params_dict):
             {
                 "name": "divisor_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "divisor_i",
                         "width": "DATA_W",
@@ -66,7 +66,7 @@ def setup(py_params_dict):
             {
                 "name": "quotient_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "quotient_i",
                         "width": "DATA_W",
@@ -76,7 +76,7 @@ def setup(py_params_dict):
             {
                 "name": "dividend_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "dividend_o",
                         "width": "DATA_W",
@@ -87,7 +87,7 @@ def setup(py_params_dict):
             {
                 "name": "divisor_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "divisor_o",
                         "width": "DATA_W",
@@ -98,7 +98,7 @@ def setup(py_params_dict):
             {
                 "name": "quotient_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "quotient_o",
                         "width": "DATA_W",
@@ -111,14 +111,14 @@ def setup(py_params_dict):
             {
                 "name": "sub_sign",
                 "descr": "sub_sign bus",
-                "signals": [
+                "wires": [
                     {"name": "sub_sign", "width": 1},
                 ],
             },
             {
                 "name": "sub_res",
                 "descr": "sub_res bus",
-                "signals": [
+                "wires": [
                     {"name": "sub_res", "width": "2*DATA_W-STAGE+1"},
                 ],
             },

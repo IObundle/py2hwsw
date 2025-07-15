@@ -33,7 +33,7 @@ module iob_axis_s_axi_m_read #(
       .DATA_W    (AXI_DATA_W),
       .AXIS_LEN_W(1)
    ) fifo2axis_inst (
-      // Global signals
+      // Global wires
       .clk_i(clk_i),
       .cke_i(cke_i),
       .arst_i(arst_i),
@@ -56,7 +56,7 @@ module iob_axis_s_axi_m_read #(
       .R_DATA_W(AXI_DATA_W),
       .ADDR_W  (AXI_LEN_W)
    ) buffer_inst (
-      // Global signals
+      // Global wires
       .clk_i           (clk_i),
       .cke_i           (cke_i),
       .arst_i          (arst_i),

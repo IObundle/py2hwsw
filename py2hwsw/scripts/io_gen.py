@@ -11,7 +11,7 @@ from latex import write_table
 import os
 
 import interfaces
-from iob_signal import iob_signal
+from iob_wire import iob_wire
 from api_base import convert2internal
 
 
@@ -35,11 +35,11 @@ def generate_ports(core):
 
         lines.append(f"    // {port.name}: {port.descr}\n")
 
-        for signal_idx, signal in enumerate(port.signals):
-            signal = convert2internal(signal)
-            if isinstance(signal, iob_signal):
-                if signal.get_verilog_port():
-                    lines.append("    " + signal.get_verilog_port())
+        for wire_idx, wire in enumerate(port.wires):
+            wire = convert2internal(wire)
+            if isinstance(wire, iob_wire):
+                if wire.get_verilog_port():
+                    lines.append("    " + wire.get_verilog_port())
 
     # Remove comma from last port line
     if lines:
@@ -82,8 +82,8 @@ def generate_if_tex(ports, out_dir):
     if_file = open(f"{out_dir}/if.tex", "w")
 
     if_file.write(
-        """The interface signals of the core are described in the following tables.
-Note that the ouput signals are registered in the core, while the input signals are not."""
+        """The interface wires of the core are described in the following tables.
+Note that the ouput wires are registered in the core, while the input wires are not."""
     )
 
     for port in ports:
@@ -122,15 +122,15 @@ def generate_ios_tex(ports, out_dir):
     for port in ports:
         tex_table = []
         # Interface is not standard, read ports
-        for signal in port.signals:
-            signal = convert2internal(signal)
-            if isinstance(signal, iob_signal):
+        for wire in port.wires:
+            wire = convert2internal(wire)
+            if isinstance(wire, iob_wire):
                 tex_table.append(
                     [
-                        signal.name,
-                        signal.direction,
-                        signal.width,
-                        signal.descr,
+                        wire.name,
+                        wire.direction,
+                        wire.width,
+                        wire.descr,
                     ]
                 )
 

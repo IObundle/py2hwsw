@@ -143,7 +143,7 @@ def setup(py_params_dict):
             },
             {  # Needed for testbench
                 "name": "RST_POL",
-                "descr": "Reset signal polarity.",
+                "descr": "Reset wire polarity.",
                 "type": "M",
                 "val": "1",
                 "min": "0",
@@ -217,7 +217,7 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
         },
@@ -227,7 +227,7 @@ def setup(py_params_dict):
             {
                 "name": "rom_bus_m",
                 "descr": "Ports for connection with boot ROM memory",
-                "signals": {
+                "wires": {
                     "type": "rom_sp",
                     "prefix": "bootrom_mem_",
                     "ADDR_W": params["bootrom_addr_w"] - 2,
@@ -240,7 +240,7 @@ def setup(py_params_dict):
             {
                 "name": "external_mem_bus_m",
                 "descr": "Port for connection to external 'iob_ram_t2p_be' memory",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p_be",
                     "prefix": "ext_mem_",
                     "ADDR_W": params["mem_addr_w"] - 2,
@@ -253,7 +253,7 @@ def setup(py_params_dict):
             {
                 "name": "axi_m",
                 "descr": "AXI manager interface for DDR memory",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -269,7 +269,7 @@ def setup(py_params_dict):
             {
                 "name": "rs232_m",
                 "descr": "iob-system uart interface",
-                "signals": {
+                "wires": {
                     "type": "rs232",
                 },
             },
@@ -280,7 +280,7 @@ def setup(py_params_dict):
             {
                 "name": "iob_s",
                 "descr": "IOb subordinate interface for external CPU. Gives direct access to system peripherals",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -292,7 +292,7 @@ def setup(py_params_dict):
         {
             "name": "interrupts",
             "descr": "System interrupts",
-            "signals": [
+            "wires": [
                 {"name": "interrupts", "width": 32},
             ],
         },
@@ -302,22 +302,22 @@ def setup(py_params_dict):
         attributes_dict["buses"] += [
             {
                 "name": "clk",
-                "descr": "Clock signal",
-                "signals": [
+                "descr": "Clock wire",
+                "wires": [
                     {"name": "clk_i"},
                 ],
             },
             {
                 "name": "rst",
-                "descr": "Reset signal",
-                "signals": [
+                "descr": "Reset wire",
+                "wires": [
                     {"name": "arst_i"},
                 ],
             },
             {
                 "name": "cpu_ibus",
                 "descr": "CPU instruction bus",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "cpu_i_",
                     "ID_W": "AXI_ID_W",
@@ -330,7 +330,7 @@ def setup(py_params_dict):
             {
                 "name": "cpu_dbus",
                 "descr": "CPU data bus",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "cpu_d_",
                     "ID_W": "AXI_ID_W",
@@ -343,7 +343,7 @@ def setup(py_params_dict):
             {
                 "name": "unused_interconnect_bits",
                 "descr": "buses to connect to unused output bits of interconnect",
-                "signals": [
+                "wires": [
                     {
                         "name": "unused_m0_araddr_bits",
                         "width": params["addr_w"] - params["mem_addr_w"],
@@ -378,7 +378,7 @@ def setup(py_params_dict):
             {
                 "name": "int_mem_axi",
                 "descr": "AXI manager interface for internal memory",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "int_mem_",
                     "ID_W": "AXI_ID_W",
@@ -394,7 +394,7 @@ def setup(py_params_dict):
             {
                 "name": "bootrom_cbus",
                 "descr": "iob-system boot controller data interface",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "bootrom_",
                     "ID_W": "AXI_ID_W",
@@ -410,7 +410,7 @@ def setup(py_params_dict):
             {
                 "name": "axi_periphs_cbus",
                 "descr": "AXI bus for peripheral CSRs",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "periphs_",
                     "ID_W": "AXI_ID_W",
@@ -424,15 +424,15 @@ def setup(py_params_dict):
         attributes_dict["buses"] += [
             {
                 "name": "split_reset",
-                "descr": "Reset signal for iob_split components",
-                "signals": [
+                "descr": "Reset wire for iob_split components",
+                "wires": [
                     {"name": "arst_i"},
                 ],
             },
             {
                 "name": "iob_periphs_cbus",
                 "descr": "AXI-Lite bus for peripheral CSRs",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "periphs_",
                     "ID_W": "AXI_ID_W",
@@ -657,7 +657,7 @@ def setup(py_params_dict):
                 "core_name": "iob_uart",
                 "instance_name": "UART0",
                 "instance_description": "UART peripheral",
-                # This attribute signals to iob_system scripts that this block is a peripheral
+                # This attribute wires to iob_system scripts that this block is a peripheral
                 "is_peripheral": True,
                 "parameters": {},
                 "connect": {

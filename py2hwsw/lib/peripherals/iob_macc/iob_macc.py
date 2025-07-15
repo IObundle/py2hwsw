@@ -24,7 +24,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -34,77 +34,77 @@ def setup(py_params_dict):
             {
                 "name": "en",
                 "descr": "Enable",
-                "signals": [
+                "wires": [
                     {"name": "en", "width": 1},
                 ],
             },
             {
                 "name": "enp",
                 "descr": "Enable",
-                "signals": [
+                "wires": [
                     {"name": "enp", "width": 1},
                 ],
             },
             {
                 "name": "en_int",
                 "descr": "Enable internal",
-                "signals": [
+                "wires": [
                     {"name": "en_int", "width": 1},
                 ],
             },
             {
                 "name": "load",
                 "descr": "Load",
-                "signals": [
+                "wires": [
                     {"name": "load", "width": 1},
                 ],
             },
             {
                 "name": "a",
                 "descr": "operand a",
-                "signals": [
+                "wires": [
                     {"name": "a", "width": 8},
                 ],
             },
             {
                 "name": "b",
                 "descr": "operand b",
-                "signals": [
+                "wires": [
                     {"name": "b", "width": 8},
                 ],
             },
             {
                 "name": "mul1",
                 "descr": "Multiplier reg 1",
-                "signals": [
+                "wires": [
                     {"name": "mul1", "width": 16},
                 ],
             },
             {
                 "name": "mul2",
                 "descr": "Multiplier reg 2",
-                "signals": [
+                "wires": [
                     {"name": "mul2", "width": 16},
                 ],
             },
             {
                 "name": "acc",
                 "descr": "Accumulator",
-                "signals": [
+                "wires": [
                     {"name": "acc", "width": 16},
                 ],
             },
             {
                 "name": "done",
                 "descr": "Done",
-                "signals": [
+                "wires": [
                     {"name": "done", "width": 3},
                 ],
             },
             {
                 "name": "done_int",
                 "descr": "Done internal",
-                "signals": [
+                "wires": [
                     {"name": "done_int", "width": 1},
                 ],
             },

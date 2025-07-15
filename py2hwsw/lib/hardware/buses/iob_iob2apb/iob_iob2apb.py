@@ -43,14 +43,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "iob_s",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -59,7 +59,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "apb_m",
-                "signals": {
+                "wires": {
                     "type": "apb",
                     "ADDR_W": "APB_ADDR_W",
                     "DATA_W": "APB_DATA_W",
@@ -71,49 +71,49 @@ def setup(py_params_dict):
             {
                 "name": "pc_int",
                 "descr": "pc_int bus",
-                "signals": [
+                "wires": [
                     {"name": "pc_int", "width": 1},
                 ],
             },
             {
                 "name": "pc_nxt_int",
                 "descr": "pc_nxt_int bus",
-                "signals": [
+                "wires": [
                     {"name": "pc_nxt_int", "width": 1},
                 ],
             },
             {
                 "name": "apb_rdata_i",
                 "descr": "apb_rdata_i bus",
-                "signals": [
+                "wires": [
                     {"name": "apb_rdata_i"},
                 ],
             },
             {
                 "name": "iob_rdata_o",
                 "descr": "iob_rdata_o bus",
-                "signals": [
+                "wires": [
                     {"name": "iob_rdata_o"},
                 ],
             },
             {
                 "name": "apb_ready_i",
                 "descr": "apb_ready_i bus",
-                "signals": [
+                "wires": [
                     {"name": "apb_ready_i"},
                 ],
             },
             {
                 "name": "iob_rvalid_nxt_int",
                 "descr": "iob_rvalid_nxt_int bus",
-                "signals": [
+                "wires": [
                     {"name": "iob_rvalid_nxt_int", "width": 1},
                 ],
             },
             {
                 "name": "iob_rvalid_o",
                 "descr": "iob_rvalid_o bus",
-                "signals": [
+                "wires": [
                     {"name": "iob_rvalid_o"},
                 ],
             },

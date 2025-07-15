@@ -22,54 +22,54 @@ def setup(py_params_dict):
     ports = [
         {
             "name": "clk_en_rst_s",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
                 "params": "c_a_r",
             },
             "descr": "Clock, clock enable, async and sync reset",
         },
     ]
-    # Use enable signal if requested
+    # Use enable wire if requested
     if use_en:
         ports.append(
             {
                 "name": "en_i",
-                "descr": "Enable signal",
-                "signals": [
+                "descr": "Enable wire",
+                "wires": [
                     {
                         "name": "en_i",
                         "width": 1,
-                        "descr": "Enable signal",
+                        "descr": "Enable wire",
                     },
                 ],
             },
         )
-    # Use len signal if tlast is requested
+    # Use len wire if tlast is requested
     if use_tlast:
         ports.append(
             {
                 "name": "len_i",
-                "descr": "Length signal",
-                "signals": [
+                "descr": "Length wire",
+                "wires": [
                     {
                         "name": "len_i",
                         "width": "AXIS_LEN_W",
-                        "descr": "Length signal",
+                        "descr": "Length wire",
                     },
                 ],
             },
         )
-    # Use level signal if requested
+    # Use level wire if requested
     if use_level:
         ports.append(
             {
                 "name": "level_o",
-                "descr": "Level signal",
-                "signals": [
+                "descr": "Level wire",
+                "wires": [
                     {
                         "name": "level_o",
                         "width": 2,
-                        "descr": "Level signal",
+                        "descr": "Level wire",
                         "isvar": True,
                     },
                 ],
@@ -81,29 +81,29 @@ def setup(py_params_dict):
             {
                 "name": "fifo_r_io",
                 "descr": "FIFO read interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "fifo_read_o",
                         "width": 1,
-                        "descr": "FIFO read signal",
+                        "descr": "FIFO read wire",
                         "isvar": True,
                     },
                     {
                         "name": "fifo_rdata_i",
                         "width": "DATA_W",
-                        "descr": "FIFO read data signal",
+                        "descr": "FIFO read data wire",
                     },
                     {
                         "name": "fifo_empty_i",
                         "width": 1,
-                        "descr": "FIFO empty signal",
+                        "descr": "FIFO empty wire",
                     },
                 ],
             },
             {
                 "name": "axis_m",
                 "descr": "AXIS master interface",
-                "signals": {
+                "wires": {
                     "type": "axis",
                     "DATA_W": "DATA_W",
                 },
@@ -112,17 +112,17 @@ def setup(py_params_dict):
     )
 
     if use_tlast:
-        # append tlast to "params" in axis_m signals
+        # append tlast to "params" in axis_m wires
         for port in ports:
             if port["name"] == "axis_m":
-                port["signals"]["params"] = "tlast"
+                port["wires"]["params"] = "tlast"
                 break
 
     buses = [
         {
             "name": "data_valid",
             "descr": "Data valid register",
-            "signals": [
+            "wires": [
                 {
                     "name": "data_valid",
                     "width": 1,
@@ -133,7 +133,7 @@ def setup(py_params_dict):
         {
             "name": "saved",
             "descr": "Saved register",
-            "signals": [
+            "wires": [
                 {
                     "name": "saved",
                     "width": 1,
@@ -143,7 +143,7 @@ def setup(py_params_dict):
         {
             "name": "saved_tdata",
             "descr": "Saved tdata register",
-            "signals": [
+            "wires": [
                 {
                     "name": "saved_tdata",
                     "width": "DATA_W",
@@ -152,8 +152,8 @@ def setup(py_params_dict):
         },
         {
             "name": "outputs_enable",
-            "descr": "Outputs enable signal",
-            "signals": [
+            "descr": "Outputs enable wire",
+            "wires": [
                 {
                     "name": "outputs_enable",
                     "width": 1,
@@ -163,8 +163,8 @@ def setup(py_params_dict):
         },
         {
             "name": "read_condition",
-            "descr": "Read condition signal",
-            "signals": [
+            "descr": "Read condition wire",
+            "wires": [
                 {
                     "name": "read_condition",
                     "width": 1,
@@ -247,12 +247,12 @@ def setup(py_params_dict):
         },
     }
 
-    # When using tlast, add the modcnt module and necessary logic/signals
+    # When using tlast, add the modcnt module and necessary logic/wires
     if use_tlast:
         attributes_dict["confs"].append(
             {
                 "name": "AXIS_LEN_W",
-                "descr": "AXIS length signal width",
+                "descr": "AXIS length wire width",
                 "type": "P",
                 "val": "1",
                 "min": "1",
@@ -264,8 +264,8 @@ def setup(py_params_dict):
             [
                 {
                     "name": "axis_word_count",
-                    "descr": "AXIS word count signal",
-                    "signals": [
+                    "descr": "AXIS word count wire",
+                    "wires": [
                         {
                             "name": "axis_word_count",
                             "width": "AXIS_LEN_W",
@@ -274,8 +274,8 @@ def setup(py_params_dict):
                 },
                 {
                     "name": "len_int",
-                    "descr": "Length internal signal",
-                    "signals": [
+                    "descr": "Length internal wire",
+                    "wires": [
                         {
                             "name": "len_int",
                             "width": "AXIS_LEN_W",
@@ -286,7 +286,7 @@ def setup(py_params_dict):
                 {
                     "name": "saved_tlast",
                     "descr": "Saved tlast register",
-                    "signals": [
+                    "wires": [
                         {
                             "name": "saved_tlast",
                             "width": 1,
@@ -296,7 +296,7 @@ def setup(py_params_dict):
                 {
                     "name": "en_rst_i_ref",
                     "descr": "Modcnt Synchronous and Enable reset reference",
-                    "signals": [
+                    "wires": [
                         {
                             "name": "rst_i",
                         },

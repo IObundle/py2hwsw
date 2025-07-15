@@ -43,7 +43,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                     "params": "c_a_r",
                 },
@@ -53,7 +53,7 @@ def setup(py_params_dict):
             {
                 "name": "config_write_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_addr_i", "width": "AXI_ADDR_W"},
                     {"name": "w_length_i", "width": "(AXI_LEN_W+1)"},
                     {"name": "w_strb_i", "width": 4},
@@ -65,7 +65,7 @@ def setup(py_params_dict):
             {
                 "name": "axis_in_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "axis_in_data_i", "width": "AXI_DATA_W"},
                     {"name": "axis_in_valid_i"},
                     {"name": "axis_in_ready_o"},
@@ -73,7 +73,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_write_m",
-                "signals": {
+                "wires": {
                     "type": "axi_write",
                     "file_prefix": "iob_axis_s_axi_m_write_int_m_",
                     "ID_W": "AXI_ID_W",

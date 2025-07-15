@@ -9,7 +9,7 @@
 #
 import interfaces
 import os
-from iob_signal import iob_signal
+from iob_wire import iob_wire
 from api_base import convert2internal
 
 
@@ -21,17 +21,17 @@ def generate_buses(core):
     for bus in core.buses:
         bus = convert2internal(bus)
 
-        signals_code = ""
-        for signal in bus.signals:
-            signal = convert2internal(signal)
-            if isinstance(signal, iob_signal):
-                if signal.get_verilog_bus():
-                    signals_code += "    " + signal.get_verilog_bus()
-        if signals_code:
+        wires_code = ""
+        for wire in bus.wires:
+            wire = convert2internal(wire)
+            if isinstance(wire, iob_wire):
+                if wire.get_verilog_bus():
+                    wires_code += "    " + wire.get_verilog_bus()
+        if wires_code:
             # Add description for the bus if it is not the default one
             if bus.descr != "" and bus.descr != "Default description":
                 code += f"// {bus.descr}\n"
-            code += signals_code
+            code += wires_code
 
     return code
 

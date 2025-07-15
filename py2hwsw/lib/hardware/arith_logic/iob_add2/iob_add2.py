@@ -20,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "in1_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "in1_i",
                         "width": "W",
@@ -30,7 +30,7 @@ def setup(py_params_dict):
             {
                 "name": "in2_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "in2_i",
                         "width": "W",
@@ -40,7 +40,7 @@ def setup(py_params_dict):
             {
                 "name": "sum_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "sum_o",
                         "width": "W",
@@ -50,7 +50,7 @@ def setup(py_params_dict):
             {
                 "name": "carry_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "carry_o",
                         "width": 1,
@@ -62,7 +62,7 @@ def setup(py_params_dict):
             {
                 "name": "sum_int",
                 "descr": "sum bus",
-                "signals": [
+                "wires": [
                     {"name": "sum_int", "width": "W+1"},
                 ],
             },

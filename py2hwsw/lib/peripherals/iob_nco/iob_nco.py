@@ -36,7 +36,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "clock, clock enable and reset",
@@ -44,7 +44,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_gen_io",
                 "descr": "Generated clock interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_in_i",
                         "width": "1",
@@ -73,21 +73,21 @@ def setup(py_params_dict):
             {
                 "name": "soft_reset",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "soft_reset_wr", "width": 1},
                 ],
             },
             {
                 "name": "enable",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "enable_wr", "width": 1},
                 ],
             },
             {
                 "name": "period_int",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "period_int_wdata_wr", "width": 32},
                     {"name": "period_int_wen_wr", "width": 1},
                     {"name": "period_int_ready_wr", "width": 1},
@@ -96,7 +96,7 @@ def setup(py_params_dict):
             {
                 "name": "period_frac",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "period_frac_wdata_wr", "width": 32},
                     {"name": "period_frac_wen_wr", "width": 1},
                     {"name": "period_frac_ready_wr", "width": 1},

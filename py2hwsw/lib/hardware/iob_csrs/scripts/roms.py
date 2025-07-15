@@ -50,8 +50,8 @@ def create_rom_instance(attributes_dict, csr_ref):
         # Create standard external memory port for ROM with interfaces.py
         {
             "name": f"{rom_name}_bus_m",
-            "descr": f"External {rom_name} ROM signals.",
-            "signals": {
+            "descr": f"External {rom_name} ROM wires.",
+            "wires": {
                 "type": "rom_sp",
                 "prefix": f"{rom_name}_",
                 "ADDR_W": rom_addr_w,
@@ -66,14 +66,14 @@ def create_rom_instance(attributes_dict, csr_ref):
         {
             "name": f"{rom_name}_rvalid_data_i",
             "descr": "Register input",
-            "signals": [
+            "wires": [
                 {"name": f"{rom_name}_ren"},
             ],
         },
         {
             "name": f"{rom_name}_rvalid_data_o",
             "descr": "Register output",
-            "signals": [
+            "wires": [
                 {"name": f"{rom_name}_rvalid"},
             ],
         },
@@ -103,7 +103,7 @@ def create_rom_instance(attributes_dict, csr_ref):
     attributes_dict["snippets"].append(
         {
             "verilog_code": f"""
-   // Connect ROM to external memory signals
+   // Connect ROM to external memory wires
    assign {rom_name}_clk_o = clk_i;
    assign {rom_name}_en_o   = {rom_name}_ren;
    assign {rom_name}_addr_o = {rom_name}_addr[2+:{rom_addr_w}];

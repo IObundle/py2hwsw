@@ -52,14 +52,14 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "clock",
-                "signals": [
+                "wires": [
                     {"name": "clk_i", "width": 1},
                 ],
             },
             {
                 "name": "port_a_io",
                 "descr": "Port A",
-                "signals": [
+                "wires": [
                     {"name": "enA_i", "width": 1},
                     {"name": "weA_i", "width": 1},
                     {"name": "addrA_i", "width": "ADDR_W"},
@@ -70,7 +70,7 @@ def setup(py_params_dict):
             {
                 "name": "port_b_io",
                 "descr": "Port B",
-                "signals": [
+                "wires": [
                     {"name": "enB_i", "width": 1},
                     {"name": "weB_i", "width": 1},
                     {"name": "addrB_i", "width": "ADDR_W"},

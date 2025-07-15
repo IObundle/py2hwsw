@@ -52,45 +52,45 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "rst_i",
-                "descr": "Reset signal",
-                "signals": [{"name": "rst_i"}],
+                "descr": "Reset wire",
+                "wires": [{"name": "rst_i"}],
             },
             {
                 "name": "start_addr_i",
                 "descr": "Burst start address",
-                "signals": [{"name": "start_addr_i", "width": "AXI_ADDR_W"}],
+                "wires": [{"name": "start_addr_i", "width": "AXI_ADDR_W"}],
             },
             {
                 "name": "length_i",
                 "descr": "Burst length",
-                "signals": [{"name": "length_i", "width": "(AXI_LEN_W+1)"}],
+                "wires": [{"name": "length_i", "width": "(AXI_LEN_W+1)"}],
             },
             {
                 "name": "write_data_i",
                 "descr": "Write data",
-                "signals": [{"name": "write_data_i", "width": "AXI_DATA_W"}],
+                "wires": [{"name": "write_data_i", "width": "AXI_DATA_W"}],
             },
             {
                 "name": "write_strobe_i",
                 "descr": "Write strobe",
-                "signals": [{"name": "write_strobe_i", "width": "WSTRB_W"}],
+                "wires": [{"name": "write_strobe_i", "width": "WSTRB_W"}],
             },
             {
                 "name": "busy_o",
                 "descr": "Signal indicating if the module is busy transferring data",
-                "signals": [{"name": "busy_o", "isvar": True}],
+                "wires": [{"name": "busy_o", "isvar": True}],
             },
             {
                 "name": "level_o",
                 "descr": "FIFO level",
-                "signals": [
+                "wires": [
                     {
                         "name": "level_o",
                         "width": "(AXI_LEN_W+1)",
@@ -101,7 +101,7 @@ def setup(py_params_dict):
             {
                 "name": "axi_write_m",
                 "descr": "AXI write interface",
-                "signals": {
+                "wires": {
                     "type": "axi_write",
                     "prefix": "m_",
                     "ADDR_W": "AXI_ADDR_W",
@@ -112,7 +112,7 @@ def setup(py_params_dict):
             {
                 "name": "write_fifo_external_mem_bus_m",
                 "descr": "Port for connection to external iob_ram_t2p memory",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p",
                     "prefix": "write_fifo_ext_mem_",
                     "ADDR_W": "AXI_LEN_W",
@@ -124,7 +124,7 @@ def setup(py_params_dict):
             {
                 "name": "fifo_w_if",
                 "descr": "FIFO write interface",
-                "signals": [
+                "wires": [
                     {"name": "fifo_wen", "isvar": True},
                     {"name": "write_data_i", "width": "AXI_DATA_W"},
                     {"name": "fifo_w_full"},
@@ -133,7 +133,7 @@ def setup(py_params_dict):
             {
                 "name": "fifo_r_if",
                 "descr": "FIFO read interface",
-                "signals": [
+                "wires": [
                     {"name": "fifo_ren"},
                     {"name": "fifo_r_data", "width": "AXI_DATA_W"},
                     {"name": "fifo_r_empty"},
@@ -141,13 +141,13 @@ def setup(py_params_dict):
             },
             {
                 "name": "en_fifo2axis",
-                "descr": "Enable signal for FIFO to AXI-Stream converter",
-                "signals": [{"name": "en_fifo2axis", "isvar": True}],
+                "descr": "Enable wire for FIFO to AXI-Stream converter",
+                "wires": [{"name": "en_fifo2axis", "isvar": True}],
             },
             {
-                "name": "internal_axis_signals",
-                "descr": "Internal signals for the AXI-Stream interface",
-                "signals": {
+                "name": "internal_axis_wires",
+                "descr": "Internal wires for the AXI-Stream interface",
+                "wires": {
                     "type": "axis",
                     "prefix": "int_",
                     "DATA_W": "AXI_DATA_W",
@@ -156,7 +156,7 @@ def setup(py_params_dict):
             {
                 "name": "fifo2axis_clk_if",
                 "descr": "FIFO to AXI-Stream clock interface",
-                "signals": [
+                "wires": [
                     {"name": "clk_i"},
                     {"name": "cke_i"},
                     {"name": "arst_i"},
@@ -166,7 +166,7 @@ def setup(py_params_dict):
             {
                 "name": "axis_s_axi_m_config_write_if",
                 "descr": "AXI-Stream to AXI write burst converter configuration interface",
-                "signals": [
+                "wires": [
                     {"name": "start_addr_i", "width": "AXI_ADDR_W"},
                     {"name": "length_i", "width": "(AXI_LEN_W+1)"},
                     {"name": "wstrb_int", "width": "WSTRB_W", "isvar": True},
@@ -206,7 +206,7 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "fifo2axis_clk_if",
                     "en_i": "en_fifo2axis",
                     "fifo_r_io": "fifo_r_if",
-                    "axis_m": "internal_axis_signals",
+                    "axis_m": "internal_axis_wires",
                 },
             },
             {
@@ -222,7 +222,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "fifo2axis_clk_if",
                     "config_write_io": "axis_s_axi_m_config_write_if",
-                    "axis_in_io": "internal_axis_signals",
+                    "axis_in_io": "internal_axis_wires",
                     "axi_write_m": "axi_write_m",
                 },
             },

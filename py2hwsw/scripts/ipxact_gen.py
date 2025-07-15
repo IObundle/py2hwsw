@@ -9,7 +9,7 @@ import math
 import re
 import os
 import sys
-from iob_signal import iob_signal
+from iob_wire import iob_wire
 from api_base import convert2internal
 
 sys.path.append(
@@ -327,20 +327,20 @@ def gen_ports_list(core):
         if group.interface:
             tag = group.name
 
-        for signal in group.signals:
-            signal = convert2internal(signal)
-            if not isinstance(signal, iob_signal):
+        for wire in group.wires:
+            wire = convert2internal(wire)
+            if not isinstance(wire, iob_wire):
                 continue
-            n_bits = signal.width
+            n_bits = wire.width
             if type(n_bits) is str and n_bits.isnumeric():
                 n_bits = int(n_bits)
 
             ports_list.append(
                 Port(
-                    signal.name,
-                    signal.direction,
+                    wire.name,
+                    wire.direction,
                     n_bits,
-                    signal.descr,
+                    wire.descr,
                     tag,
                 )
             )
@@ -352,7 +352,7 @@ def gen_bus_interfaces_list(core):
     """
     Generate the bus interfaces list for the given core
     @param core: core object
-    return: bus interfaces list with grouped signals (py2 ports)
+    return: bus interfaces list with grouped wires (py2 ports)
     """
 
     bus_interfaces_list = []
@@ -396,13 +396,13 @@ def gen_ports_xml(ports_list, parameters_list):
 def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
     """
     Generate the bus interfaces xml code
-    @param bus_interfaces_list: list of bus interfaces with grouped signals (py2 ports)
+    @param bus_interfaces_list: list of bus interfaces with grouped wires (py2 ports)
     @param ports_list: list of ports objects
     return: xml code
     """
 
     if_ports = {}
-    # Generate port_list (signal list) of each interface (py2 port)
+    # Generate port_list (wire list) of each interface (py2 port)
     for port in ports_list:
         if port.tag:
             if port.tag not in if_ports:

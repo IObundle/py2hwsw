@@ -49,7 +49,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -57,7 +57,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Synchronous reset interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": 1,
@@ -68,7 +68,7 @@ def setup(py_params_dict):
             {
                 "name": "write_i",
                 "descr": "Write interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "w_en_i",
                         "width": 1,
@@ -89,7 +89,7 @@ def setup(py_params_dict):
             {
                 "name": "read_io",
                 "descr": "Read interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "r_en_i",
                         "width": 1,
@@ -110,7 +110,7 @@ def setup(py_params_dict):
             {
                 "name": "extmem_io",
                 "descr": "External memory interface",
-                "signals": [
+                "wires": [
                     #  Write port
                     {
                         "name": "ext_mem_w_en_o",

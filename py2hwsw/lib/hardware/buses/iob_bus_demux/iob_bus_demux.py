@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                     "params": "a",
                 },

@@ -96,56 +96,56 @@ def setup(py_params_dict):
         {
             "name": "DDR_addr_io",
             "descr": "DDR address bus",
-            "signals": [
+            "wires": [
                 {"name": "DDR_addr_io", "width": "15"},
             ],
         },
         {
             "name": "DDR_ba_io",
             "descr": "DDR bank address bus",
-            "signals": [
+            "wires": [
                 {"name": "DDR_ba_io", "width": "3"},
             ],
         },
         {
             "name": "DDR_cas_n_io",
-            "descr": "DDR CAS signal",
-            "signals": [
+            "descr": "DDR CAS wire",
+            "wires": [
                 {"name": "DDR_cas_n_io", "width": "1"},
             ],
         },
         {
             "name": "DDR_ck_n_io",
-            "descr": "DDR clock negative signal",
-            "signals": [
+            "descr": "DDR clock negative wire",
+            "wires": [
                 {"name": "DDR_ck_n_io", "width": "1"},
             ],
         },
         {
             "name": "DDR_ck_p_io",
-            "descr": "DDR clock positive signal",
-            "signals": [
+            "descr": "DDR clock positive wire",
+            "wires": [
                 {"name": "DDR_ck_p_io", "width": "1"},
             ],
         },
         {
             "name": "DDR_cke_io",
-            "descr": "DDR clock enable signal",
-            "signals": [
+            "descr": "DDR clock enable wire",
+            "wires": [
                 {"name": "DDR_cke_io", "width": "1"},
             ],
         },
         {
             "name": "DDR_cs_n_io",
-            "descr": "DDR chip select signal",
-            "signals": [
+            "descr": "DDR chip select wire",
+            "wires": [
                 {"name": "DDR_cs_n_io", "width": "1"},
             ],
         },
         {
             "name": "DDR_dm_io",
             "descr": "DDR data mask bus",
-            "signals": [
+            "wires": [
                 {
                     "name": "DDR_dm_io",  # Data mask
                     # Width is 4 for DDR3, 8 for DDR4
@@ -170,40 +170,40 @@ def setup(py_params_dict):
             # 64-bit data bus, change width to 64.
             "name": "DDR_dq_io",
             "descr": "DDR data bus",
-            "signals": [
+            "wires": [
                 {"name": "DDR_dq_io", "width": "32"},
             ],
         },
         {
             "name": "DDR_dqs_n_io",
-            "descr": "DDR data strobe negative signal",
-            "signals": [
+            "descr": "DDR data strobe negative wire",
+            "wires": [
                 {"name": "DDR_dqs_n_io", "width": "4"},
             ],
         },
         {
             "name": "DDR_dqs_p_io",
-            "descr": "DDR data strobe positive signal",
-            "signals": [
+            "descr": "DDR data strobe positive wire",
+            "wires": [
                 {"name": "DDR_dqs_p_io", "width": "4"},
             ],
         },
         {
             "name": "DDR_odt_io",
-            "descr": "DDR on-die termination signal",
-            "signals": [
+            "descr": "DDR on-die termination wire",
+            "wires": [
                 {"name": "DDR_odt_io", "width": "1"},
             ],
         },
         {
             "name": "DDR_ras_n_io",
-            "descr": "DDR RAS signal",
-            "signals": [
+            "descr": "DDR RAS wire",
+            "wires": [
                 {"name": "DDR_ras_n_io", "width": "1"},
             ],
         },
         {
-            # DDR reset signal
+            # DDR reset wire
             # This is typically active low.
             # Ensure it matches your design requirements.
             # For Zybo Z7, it is usually active low.
@@ -229,22 +229,22 @@ def setup(py_params_dict):
             # Here we assume an active low reset.
             #
             "name": "DDR_reset_n_io",
-            "descr": "DDR reset signal",
-            "signals": [
+            "descr": "DDR reset wire",
+            "wires": [
                 {"name": "DDR_reset_n_io", "width": "1"},
             ],
         },
         {
             "name": "FIXED_IO_ddr_vrn_io",
             "descr": "DDR voltage reference negative",
-            "signals": [
+            "wires": [
                 {"name": "FIXED_IO_ddr_vrn_io", "width": "1"},
             ],
         },
         {
             "name": "FIXED_IO_ddr_vrp_io",
             "descr": "DDR voltage reference positive",
-            "signals": [
+            "wires": [
                 {"name": "FIXED_IO_ddr_vrp_io", "width": "1"},
             ],
         },
@@ -264,7 +264,7 @@ def setup(py_params_dict):
             # For example, if using 40 MIO pins, change width to 40.
             "name": "FIXED_IO_mio_io",
             "descr": "MIO pins for various functions",
-            "signals": [
+            "wires": [
                 {"name": "FIXED_IO_mio_io", "width": "54"},
             ],
         },
@@ -274,46 +274,46 @@ def setup(py_params_dict):
             # Ensure it matches your design requirements.
             # For Zybo Z7, it is usually connected to a clock source.
             # If using a different clock frequency, adjust accordingly.
-            # Here we assume a standard clock input signal.
+            # Here we assume a standard clock input wire.
             # If you need a different logic level, adjust accordingly.
             # For example, if using active high clock input, change to '1'.
-            # Here we assume an active high clock input signal.
+            # Here we assume an active high clock input wire.
             # If you need a different logic level, adjust accordingly.
             # For example, if using active low clock input, change to '0'.
             # Here we assume an active high clock input
             "name": "FIXED_IO_ps_clk_io",
             "descr": "PS clock input",
-            "signals": [
+            "wires": [
                 {"name": "FIXED_IO_ps_clk_io", "width": "1"},
             ],
         },
         {
-            # PS PORB (Power-On Reset) signal
+            # PS PORB (Power-On Reset) wire
             # This is typically used for system reset.
             # Ensure it matches your design requirements.
             # For Zybo Z7, it is usually connected to a reset source.
             # If using a different reset logic, adjust accordingly.
-            # Here we assume an active low reset signal.
+            # Here we assume an active low reset wire.
             # If you need a different logic level, adjust accordingly.
             # For example, if using active high reset, change to '1'.
             "name": "FIXED_IO_ps_porb_io",
-            "descr": "PS PORB signal",
-            "signals": [
+            "descr": "PS PORB wire",
+            "wires": [
                 {"name": "FIXED_IO_ps_porb_io", "width": "1"},
             ],
         },
         {
-            # PS SRSTB (System Reset) signal
+            # PS SRSTB (System Reset) wire
             # This is typically used for system reset.
             # Ensure it matches your design requirements.
             # For Zybo Z7, it is usually connected to a reset source.
             # If using a different reset logic, adjust accordingly.
-            # Here we assume an active low reset signal.
+            # Here we assume an active low reset wire.
             # If you need a different logic level, adjust accordingly.
             # For example, if using active high reset, change to '1'.
             "name": "FIXED_IO_ps_srstb_io",
-            "descr": "PS SRSTB signal",
-            "signals": [
+            "descr": "PS SRSTB wire",
+            "wires": [
                 {"name": "FIXED_IO_ps_srstb_io", "width": "1"},
             ],
         },
@@ -326,21 +326,21 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst",
             "descr": "Clock, clock enable and reset",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
         },
         {
             "name": "arst_n",
             "descr": "Negated reset",
-            "signals": [
+            "wires": [
                 {"name": "arst_n", "width": "1"},
             ],
         },
         {
             "name": "rs232_int",
             "descr": "iob-system uart interface",
-            "signals": {
+            "wires": {
                 "type": "rs232",
             },
         },

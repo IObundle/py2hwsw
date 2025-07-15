@@ -15,9 +15,9 @@ module iob_axi2iob #(
    parameter DATA_WIDTH    = 32,
    // Width of input (subordinate/manager) AXI/IOb interface wstrb (width of data bus in words)
    parameter STRB_WIDTH    = (DATA_WIDTH / 8),
-   // Width of AXI ID signal
+   // Width of AXI ID wire
    parameter AXI_ID_WIDTH  = 8,
-   // Width of AXI LEN signal
+   // Width of AXI LEN wire
    parameter AXI_LEN_WIDTH = 8
 ) (
    input wire clk_i,

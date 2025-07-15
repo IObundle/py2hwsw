@@ -6,7 +6,7 @@ from csr_gen import convert_int
 
 
 def find_and_update_autoclear_csrs(csrs_dict, attributes_dict):
-    """Auto-clear CSR: Same signals as NOAUTO, but already includes internal register that gets cleared automatically on ready (write case) or after rvalid (read case).
+    """Auto-clear CSR: Same wires as NOAUTO, but already includes internal register that gets cleared automatically on ready (write case) or after rvalid (read case).
     :param dict csrs_dict: Dictionary of CSRs to update.
     :param dict attributes_dict: Dictionary of core attributes to add autoclear instance, buses and ports.
     """
@@ -53,20 +53,20 @@ def create_autoclear_instance(attributes_dict, csr_ref):
     mode = csr_ref["mode"]
     width = csr_ref["n_bits"]
     log2n_items = convert_int(csr_ref["log2n_items"])
-    port_signals = []
+    port_wires = []
     snippet = ""
     if "R" in mode:
-        port_signals += [
+        port_wires += [
             {"name": f"{name}_valid_o", "width": 1},
         ]
         if type(log2n_items) is not int or log2n_items > 0:
-            port_signals += [
+            port_wires += [
                 {"name": f"{name}_addr_o", "width": log2n_items},
             ]
             snippet += f"""
    assign {name}_addr_o = {name}_addr;
 """
-        port_signals += [
+        port_wires += [
             {"name": f"{name}_rvalid_i", "width": 1},
             {"name": f"{name}_rdata_i", "width": width},
             {"name": f"{name}_ready_i", "width": 1},
@@ -85,17 +85,17 @@ def create_autoclear_instance(attributes_dict, csr_ref):
    assign {name}_rst = ~{name}_rvalid_i;
 """
     if "W" in mode:
-        port_signals += [
+        port_wires += [
             {"name": f"{name}_valid_o", "width": 1},
         ]
         if type(log2n_items) is not int or log2n_items > 0:
-            port_signals += [
+            port_wires += [
                 {"name": f"{name}_addr_o", "width": 1},
             ]
             snippet += f"""
    assign {name}_addr_o = {name}_addr;
 """
-        port_signals += [
+        port_wires += [
             {"name": f"{name}_wdata_o", "width": width},
             {"name": f"{name}_wstrb_o", "width": f"{width}/8"},
             {"name": f"{name}_ready_i", "width": 1},
@@ -122,7 +122,7 @@ def create_autoclear_instance(attributes_dict, csr_ref):
         {
             "name": f"{name}_io",
             "descr": descr,
-            "signals": port_signals,
+            "wires": port_wires,
         }
     )
     #
@@ -132,7 +132,7 @@ def create_autoclear_instance(attributes_dict, csr_ref):
         {
             "name": f"{name}_en_rst",
             "descr": "",
-            "signals": [
+            "wires": [
                 {"name": f"{name}_en", "width": 1},
                 {"name": f"{name}_rst", "width": 1},
             ],
@@ -143,14 +143,14 @@ def create_autoclear_instance(attributes_dict, csr_ref):
             {
                 "name": f"{name}_data_i",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": f"{name}_rdata_i"},  # From core
                 ],
             },
             {
                 "name": f"{name}_data_o",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": f"{name}_rdata"},  # To CPU
                 ],
             },
@@ -160,14 +160,14 @@ def create_autoclear_instance(attributes_dict, csr_ref):
             {
                 "name": f"{name}_data_i",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": f"{name}_wdata"},  # From CPU
                 ],
             },
             {
                 "name": f"{name}_data_o",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": f"{name}_wdata_o"},  # To core
                 ],
             },

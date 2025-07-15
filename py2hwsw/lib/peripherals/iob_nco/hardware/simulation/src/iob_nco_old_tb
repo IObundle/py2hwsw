@@ -56,11 +56,11 @@ module iob_nco_tb;
       $dumpvars();
 `endif
 
-      //init cpu bus signals
+      //init cpu bus wires
       iob_valid_i  = 0;
       iob_wstrb_i  = 0;
 
-      // Reset signal
+      // Reset wire
       arst         = 0;
       #100 arst = 1;
       #1_000 arst = 0;

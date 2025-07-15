@@ -9,14 +9,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "axil_s",
-                "signals": {
+                "wires": {
                     "type": "axil",
                     "ADDR_W": "AXIL_ADDR_W",
                     "DATA_W": "AXIL_DATA_W",
@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "iob_m",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",

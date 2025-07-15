@@ -24,35 +24,35 @@ core_dictionary = {
         {
             "name": "a",
             "descr": "AOI input port 1",
-            "signals": [
+            "wires": [
                 {"name": "a", "width": "W"},
             ],
         },
         {
             "name": "b",
             "descr": "AOI input port 2",
-            "signals": [
+            "wires": [
                 {"name": "b", "width": "W"},
             ],
         },
         {
             "name": "c",
             "descr": "AOI input port 3",
-            "signals": [
+            "wires": [
                 {"name": "c", "width": "W"},
             ],
         },
         {
             "name": "d",
             "descr": "AOI input port 4",
-            "signals": [
+            "wires": [
                 {"name": "d", "width": "W"},
             ],
         },
         {
             "name": "y",
             "descr": "AOI output port",
-            "signals": [
+            "wires": [
                 {"name": "y", "width": "W"},
             ],
         },

@@ -51,21 +51,21 @@ core_dictionary = {
         {
             "name": "a_i",
             "descr": "Input port a",
-            "signals": [
+            "wires": [
                 {"name": "a_i", "width": "W"},
             ],
         },
         {
             "name": "b_i",
             "descr": "Input port b",
-            "signals": [
+            "wires": [
                 {"name": "b_i", "width": "W"},
             ],
         },
         {
             "name": "y_o",
             "descr": "Output port y",
-            "signals": [
+            "wires": [
                 {"name": "y_o", "width": "W"},
             ],
         },

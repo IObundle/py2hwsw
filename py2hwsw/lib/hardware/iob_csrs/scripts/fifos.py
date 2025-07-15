@@ -198,7 +198,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 {
                     "name": f"{fifo_name}_write_io",
                     "descr": "Write interface",
-                    "signals": [
+                    "wires": [
                         {
                             "name": f"{fifo_name}_w_clk_i",
                             "width": 1,
@@ -232,12 +232,12 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         {
                             "name": f"{fifo_name}_w_full_o",
                             "width": 1,
-                            "descr": "Write full signal",
+                            "descr": "Write full wire",
                         },
                         {
                             "name": f"{fifo_name}_w_empty_o",
                             "width": 1,
-                            "descr": "Write empty signal",
+                            "descr": "Write empty wire",
                         },
                         {
                             "name": f"{fifo_name}_w_level_o",
@@ -252,7 +252,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 {
                     "name": f"{fifo_name}_read_io",
                     "descr": "Read interface",
-                    "signals": [
+                    "wires": [
                         {
                             "name": f"{fifo_name}_r_clk_i",
                             "width": 1,
@@ -286,12 +286,12 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         {
                             "name": f"{fifo_name}_r_full_o",
                             "width": 1,
-                            "descr": "Read full signal",
+                            "descr": "Read full wire",
                         },
                         {
                             "name": f"{fifo_name}_r_empty_o",
                             "width": 1,
-                            "descr": "Read empty signal",
+                            "descr": "Read empty wire",
                         },
                         {
                             "name": f"{fifo_name}_r_level_o",
@@ -305,7 +305,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "name": f"{fifo_name}_extmem_io",
                 "descr": "External memory interface",
-                "signals": [
+                "wires": [
                     #  Write port
                     {
                         "name": f"{fifo_name}_ext_mem_w_clk_o",
@@ -360,7 +360,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "name": f"{fifo_name}_rst_i",
                 "descr": "Synchronous reset interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": f"{fifo_name}_rst_i",
                         "width": 1,
@@ -374,7 +374,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 {
                     "name": f"{fifo_name}_write_io",
                     "descr": "FIFO write interface.",
-                    "signals": [
+                    "wires": [
                         {
                             "name": f"{fifo_name}_w_en_i",
                             "width": 1,
@@ -388,14 +388,14 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         {
                             "name": f"{fifo_name}_w_full_o",
                             "width": 1,
-                            "descr": "Write full signal",
+                            "descr": "Write full wire",
                         },
                     ],
                 },
                 {
                     "name": f"{fifo_name}_interrupt_o",
                     "descr": "Connects directly to FIFO",
-                    "signals": [
+                    "wires": [
                         {
                             "name": f"{fifo_name}_interrupt_o",
                             "width": 1,
@@ -409,7 +409,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 {
                     "name": f"{fifo_name}_read_io",
                     "descr": "FIFO read interface.",
-                    "signals": [
+                    "wires": [
                         {
                             "name": f"{fifo_name}_r_en_i",
                             "width": 1,
@@ -423,7 +423,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                         {
                             "name": f"{fifo_name}_r_empty_o",
                             "width": 1,
-                            "descr": "Read empty signal",
+                            "descr": "Read empty wire",
                         },
                     ],
                 }
@@ -432,7 +432,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "name": f"{fifo_name}_extmem_io",
                 "descr": "FIFO external memory interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": f"{fifo_name}_ext_mem_clk_o",
                         "width": 1,
@@ -474,7 +474,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "name": f"{fifo_name}_current_level_o",
                 "descr": "Connects directly to FIFO",
-                "signals": [
+                "wires": [
                     {
                         "name": f"{fifo_name}_current_level_o",
                         "width": f"{FIFO_NAME}_ADDR_W+1",
@@ -488,7 +488,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "name": f"{fifo_name}_data_wen",
                 "descr": "FIFO data write enable",
-                "signals": [
+                "wires": [
                     {"name": f"{fifo_name}_data_wen", "width": 1},
                 ],
             },
@@ -498,7 +498,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "name": f"{fifo_name}_data_ren",
                 "descr": "FIFO data read enable",
-                "signals": [
+                "wires": [
                     {"name": f"{fifo_name}_data_ren", "width": 1},
                 ],
             },
@@ -516,7 +516,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 {
                     "name": f"{fifo_name}_write_io",
                     "descr": "FIFO write interface.",
-                    "signals": [
+                    "wires": [
                         {"name": "clk_i"},
                         {"name": "cke_i"},
                         {"name": "arst_i"},
@@ -538,7 +538,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 {
                     "name": f"{fifo_name}_read_io",
                     "descr": "FIFO read interface.",
-                    "signals": [
+                    "wires": [
                         {"name": "clk_i"},
                         {"name": "cke_i"},
                         {"name": "arst_i"},
@@ -560,7 +560,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 {
                     "name": f"{fifo_name}_write_io",
                     "descr": "FIFO write interface.",
-                    "signals": [
+                    "wires": [
                         {"name": f"{fifo_name}_data_wen", "width": 1},
                         {"name": f"{fifo_name}_data_wdata", "width": 32},
                         {"name": f"{fifo_name}_full", "width": 1},
@@ -572,7 +572,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                 {
                     "name": f"{fifo_name}_read_io",
                     "descr": "FIFO read interface.",
-                    "signals": [
+                    "wires": [
                         {"name": f"{fifo_name}_data_ren", "width": 1},
                         {"name": f"{fifo_name}_data_rdata", "width": 32},
                         {"name": f"{fifo_name}_empty", "width": 1},
@@ -649,7 +649,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         attributes_dict["snippets"].append(
             {
                 "verilog_code": f"""
-   // Generate interrupt signal
+   // Generate interrupt wire
    assign {fifo_name}_interrupt_o ={fifo_name}_current_level_o >= {fifo_name}_thresh_rdata;
 """,
             }
@@ -659,7 +659,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         attributes_dict["snippets"] += [
             {
                 "verilog_code": f"""
-   // Generate wen signal
+   // Generate wen wire
    assign {fifo_name}_data_wen = {fifo_name}_data_valid & |{fifo_name}_data_wstrb;
 
 """,
@@ -669,7 +669,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         attributes_dict["snippets"] += [
             {
                 "verilog_code": f"""
-   // Generate ren signal
+   // Generate ren wire
    assign {fifo_name}_data_ren = {fifo_name}_data_valid;
 
 """,

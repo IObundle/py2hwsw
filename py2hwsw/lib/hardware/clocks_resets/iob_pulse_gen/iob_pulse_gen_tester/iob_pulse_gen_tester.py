@@ -28,14 +28,14 @@ core_dictionary = {
                 {
                     "name": "gpio_input",
                     "descr": "",
-                    "signals": [
+                    "wires": [
                         {"name": "gpio_input", "width": 1},
                     ],
                 },
                 {
                     "name": "gpio_output",
                     "descr": "",
-                    "signals": [
+                    "wires": [
                         {"name": "gpio_output", "width": 1},
                     ],
                 },

@@ -698,7 +698,7 @@ class iob_portmap:
     Class that represents a portmap attribute.
 
     Attributes:
-        e_connect (str): Identifier name of external wire that connects this port
+        e_connect (iob_wire): Identifier name of external wire that connects this port
         e_connect_bit_slices (list): List of bit slices for external connections.
         port (str): IDentifier name of port associated with portmap
     """
@@ -736,6 +736,10 @@ def create_portmap_from_dict(portmap_dict):
               If we didn't have the independent_iob_data_signal, we could instead connect that port's signal to a constant value or high impedance, like so:
               "iob_bus_port": ("iob_bus_wire", ["iob_data_signal_i: 'b1"]),
               "iob_bus_port": ("iob_bus_wire", ["iob_data_signal_i: 'bz"]),
+
+              # FIXME: For some reason, connecting extra signals with bit slices only works for connections between ports and wires that have standard interfaces! Not sure why its implemented this way: https://github.com/IObundle/py2hwsw/blob/0679fc64576380c19be96567efb5093667eeb9fd/py2hwsw/scripts/block_gen.py#L121
+              # Also, I'm not sure we can connect them to constants/high impedance.
+              # It seems to be possible to connect ports to constants like so: https://github.com/IObundle/py2hwsw/pull/236
 
 
 

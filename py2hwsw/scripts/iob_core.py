@@ -460,6 +460,7 @@ class iob_core(iob_module):
             verilog_gen.generate_verilog(self)
 
         # TODO: Generate a global list of signals
+        # I think this is a similar concept to 'net' in vivado: https://docs.amd.com/r/en-US/ug912-vivado-properties/NET
         # This list is useful for a python based simulator
         # 1) Each input of the top generates a global signal
         # 2) Each output of a leaf generates a global signal

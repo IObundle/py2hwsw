@@ -125,12 +125,12 @@ module iob_axistream_out #(
       .DATA_W (DATA_W),
       .RST_VAL({DATA_W{1'd0}})
    ) word_count_inst (
-      .clk_i (axis_clk_i),
-      .cke_i (axis_cke_i),
-      .arst_i(axis_arst_i),
-      .rst_i (axis_sw_rst),
-      .en_i  (axis_fifo_read),
-      .data_o(axis_word_count)
+      .clk_i        (axis_clk_i),
+      .cke_i        (axis_cke_i),
+      .arst_i       (axis_arst_i),
+      .counter_rst_i(axis_sw_rst),
+      .counter_inc_i(axis_fifo_read),
+      .data_o       (axis_word_count)
    );
 
 

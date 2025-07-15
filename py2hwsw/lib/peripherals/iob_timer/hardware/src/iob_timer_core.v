@@ -23,12 +23,12 @@ module iob_timer_core #(
       .DATA_W (2 * DATA_W),
       .RST_VAL(0)
    ) time_counter_cnt (
-      .clk_i (clk_i),
-      .cke_i (cke_i),
-      .arst_i(arst_i),
-      .rst_i (rst_i),
-      .en_i  (en_i),
-      .data_o(time_counter)
+      .clk_i        (clk_i),
+      .cke_i        (cke_i),
+      .arst_i       (arst_i),
+      .counter_rst_i(rst_i),
+      .counter_inc_i(en_i),
+      .data_o       (time_counter)
    );
 
    //time counter register

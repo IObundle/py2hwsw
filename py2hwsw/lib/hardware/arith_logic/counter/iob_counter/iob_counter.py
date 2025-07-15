@@ -33,27 +33,19 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
             {
-                "name": "en_rst_i",
-                "descr": "Enable and Synchronous reset interface",
-                "signals": [
-                    {
-                        "name": "en_i",
-                        "width": 1,
-                        "descr": "Enable input",
-                    },
-                    {
-                        "name": "rst_i",
-                        "width": 1,
-                        "descr": "Synchronous reset input",
-                    },
-                ],
+                "name": "counter_rst_i",
+                "descr": "Counter reset input",
+                "signals": [{"name": "counter_rst_i"}],
+            },
+            {
+                "name": "counter_inc_i",
+                "descr": "Counter increment input",
+                "signals": [{"name": "counter_inc_i"}],
             },
             {
                 "name": "data_o",
                 "descr": "Output port",
-                "signals": [
-                    {"name": "data_o", "width": "DATA_W"},
-                ],
+                "signals": [{"name": "data_o", "width": "DATA_W"}],
             },
         ],
         "wires": [
@@ -80,8 +72,8 @@ def setup(py_params_dict):
                     "clk_en_rst_s": (
                         "clk_en_rst_s",
                         [
-                            "en_i:en_i",
-                            "rst_i:rst_i",
+                            "en_i:counter_inc_i",
+                            "rst_i:counter_rst_i",
                         ],
                     ),
                     "data_i": "data_int",
@@ -89,13 +81,11 @@ def setup(py_params_dict):
                 },
             },
         ],
-        "snippets": [
-            {
-                "verilog_code": """
-        assign data_int =  data_o + 1'b1;
-            """,
-            },
-        ],
+        "comb": {
+            "code": """
+        data_int = data_o + 1'b1;
+        """,
+        },
     }
 
     return attributes_dict

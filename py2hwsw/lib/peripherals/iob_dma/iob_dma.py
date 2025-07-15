@@ -165,18 +165,9 @@ def setup(py_params_dict):
             },
             # Counter wires
             {
-                "name": "counter_en_rst",
-                "descr": "Enable and Synchronous reset interface",
-                "signals": [
-                    {
-                        "name": "counter_en",
-                        "width": 1,
-                        "descr": "Enable input",
-                    },
-                    {
-                        "name": "w_length_wen_wr",
-                    },
-                ],
+                "name": "counter_en",
+                "descr": "Counter enable signal",
+                "signals": [{"name": "counter_en"}],
             },
             {
                 "name": "axis_in_cnt",
@@ -494,7 +485,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "counter_en_rst",
+                    "counter_rst_i": "w_length_wen_wr",
+                    "counter_inc_i": "counter_en",
                     "data_o": "axis_in_cnt",
                 },
             },

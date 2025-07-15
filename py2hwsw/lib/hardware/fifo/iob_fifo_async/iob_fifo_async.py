@@ -90,106 +90,80 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "write_io",
-                "descr": "Write interface",
-                "signals": [
-                    {
-                        "name": "w_clk_i",
-                        "width": 1,
-                        "descr": "Write clock",
-                    },
-                    {
-                        "name": "w_cke_i",
-                        "width": 1,
-                        "descr": "Write clock enable",
-                    },
-                    {
-                        "name": "w_arst_i",
-                        "width": 1,
-                        "descr": "Write async reset",
-                    },
-                    {
-                        "name": "w_rst_i",
-                        "width": 1,
-                        "descr": "Write sync reset",
-                    },
-                    {
-                        "name": "w_en_i",
-                        "width": 1,
-                        "descr": "Write enable",
-                    },
-                    {
-                        "name": "w_data_i",
-                        "width": "W_DATA_W",
-                        "descr": "Write data",
-                    },
-                    {
-                        "name": "w_full_o",
-                        "width": 1,
-                        "descr": "Write full signal",
-                    },
-                    {
-                        "name": "w_empty_o",
-                        "width": 1,
-                        "descr": "Write empty signal",
-                    },
-                    {
-                        "name": "w_level_o",
-                        "width": "ADDR_W+1",
-                        "descr": "Write fifo level",
-                    },
-                ],
+                "name": "w_clk_en_rst_s",
+                "descr": "Write clock, clock enable and async reset",
+                "signals": {
+                    "type": "iob_clk",
+                    "prefix": "w_",
+                },
             },
             {
-                "name": "read_io",
-                "descr": "Read interface",
-                "signals": [
-                    {
-                        "name": "r_clk_i",
-                        "width": 1,
-                        "descr": "Read clock",
-                    },
-                    {
-                        "name": "r_cke_i",
-                        "width": 1,
-                        "descr": "Read clock enable",
-                    },
-                    {
-                        "name": "r_arst_i",
-                        "width": 1,
-                        "descr": "Read async reset",
-                    },
-                    {
-                        "name": "r_rst_i",
-                        "width": 1,
-                        "descr": "Read sync reset",
-                    },
-                    {
-                        "name": "r_en_i",
-                        "width": 1,
-                        "descr": "Read enable",
-                    },
-                    {
-                        "name": "r_data_o",
-                        "width": "R_DATA_W",
-                        "descr": "Read data",
-                    },
-                    {
-                        "name": "r_full_o",
-                        "width": 1,
-                        "descr": "Read full signal",
-                    },
-                    {
-                        "name": "r_empty_o",
-                        "width": 1,
-                        "descr": "Read empty signal",
-                    },
-                    {
-                        "name": "r_level_o",
-                        "width": "ADDR_W+1",
-                        "descr": "Read fifo level",
-                    },
-                ],
+                "name": "w_rst_i",
+                "descr": "Write sync reset",
+                "signals": [{"name": "w_rst_i"}],
+            },
+            {
+                "name": "w_en_i",
+                "descr": "Write enable",
+                "signals": [{"name": "w_en_i"}],
+            },
+            {
+                "name": "w_data_i",
+                "descr": "Write data",
+                "signals": [{"name": "w_data_i", "width": "W_DATA_W"}],
+            },
+            {
+                "name": "w_full_o",
+                "descr": "Write full signal",
+                "signals": [{"name": "w_full_o"}],
+            },
+            {
+                "name": "w_empty_o",
+                "descr": "Write empty signal",
+                "signals": [{"name": "w_empty_o"}],
+            },
+            {
+                "name": "w_level_o",
+                "descr": "Write FIFO level",
+                "signals": [{"name": "w_level_o", "width": "ADDR_W+1"}],
+            },
+            {
+                "name": "r_clk_en_rst_s",
+                "descr": "Read clock, clock enable and async reset",
+                "signals": {
+                    "type": "iob_clk",
+                    "prefix": "r_",
+                },
+            },
+            {
+                "name": "r_rst_i",
+                "descr": "Read sync reset",
+                "signals": [{"name": "r_rst_i"}],
+            },
+            {
+                "name": "r_en_i",
+                "descr": "Read enable",
+                "signals": [{"name": "r_en_i"}],
+            },
+            {
+                "name": "r_data_o",
+                "descr": "Read data",
+                "signals": [{"name": "r_data_o", "width": "R_DATA_W"}],
+            },
+            {
+                "name": "r_full_o",
+                "descr": "Read full signal",
+                "signals": [{"name": "r_full_o"}],
+            },
+            {
+                "name": "r_empty_o",
+                "descr": "Read empty signal",
+                "signals": [{"name": "r_empty_o"}],
+            },
+            {
+                "name": "r_level_o",
+                "descr": "Read fifo level",
+                "signals": [{"name": "r_level_o", "width": "ADDR_W+1"}],
             },
             {
                 "name": "extmem_io",

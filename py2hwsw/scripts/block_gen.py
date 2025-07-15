@@ -119,7 +119,9 @@ def get_instance_port_connections(instance):
         ), f"{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' is not connected!{iob_colors.ENDC}"
 
         # If one of the ports is not a standard inferface, check if the number of signals is the same
-        if not port.interface or not portmap.e_connect.interface:
+        if (not port.interface or not portmap.e_connect.interface) and not isinstance(
+            portmap.e_connect, str
+        ):
             newlinechar = "\n"
             assert len(port.signals) == len(
                 portmap.e_connect.signals

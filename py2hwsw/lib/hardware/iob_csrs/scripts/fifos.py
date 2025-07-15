@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
+from sqlite3 import connect
+
+from matplotlib.pylab import f
 from csr_classes import fail_with_msg
 
 
@@ -194,113 +197,98 @@ def create_fifo_instance(attributes_dict, csr_ref):
         # Async FIFO Ports
         #
         if mode == "R":
-            attributes_dict["ports"].append(
+            attributes_dict["ports"] += [
                 {
-                    "name": f"{fifo_name}_write_io",
-                    "descr": "Write interface",
+                    "name": f"{fifo_name}_w_clk_en_rst_s",
+                    "descr": "Write clock, clock enable and async reset",
+                    "signals": {
+                        "type": "iob_clk",
+                        "prefix": "w_",
+                    },
+                },
+                {
+                    "name": f"{fifo_name}_w_rst_i",
+                    "descr": "Write sync reset",
+                    "signals": [{"name": f"{fifo_name}_w_rst_i"}],
+                },
+                {
+                    "name": f"{fifo_name}_w_en_i",
+                    "descr": "Write enable",
+                    "signals": [{"name": f"{fifo_name}_w_en_i"}],
+                },
+                {
+                    "name": f"{fifo_name}_w_data_i",
+                    "descr": "Write data",
+                    "signals": [{"name": f"{fifo_name}_w_data_i", "width": wdata_w}],
+                },
+                {
+                    "name": f"{fifo_name}_w_full_o",
+                    "descr": "Write full signal",
+                    "signals": [{"name": f"{fifo_name}_w_full_o"}],
+                },
+                {
+                    "name": f"{fifo_name}_w_empty_o",
+                    "descr": "Write empty signal",
+                    "signals": [{"name": f"{fifo_name}_w_empty_o"}],
+                },
+                {
+                    "name": f"{fifo_name}_w_level_o",
+                    "descr": "Write FIFO level",
                     "signals": [
-                        {
-                            "name": f"{fifo_name}_w_clk_i",
-                            "width": 1,
-                            "descr": "Write clock",
-                        },
-                        {
-                            "name": f"{fifo_name}_w_cke_i",
-                            "width": 1,
-                            "descr": "Write clock enable",
-                        },
-                        {
-                            "name": f"{fifo_name}_w_arst_i",
-                            "width": 1,
-                            "descr": "Write async reset",
-                        },
-                        {
-                            "name": f"{fifo_name}_w_rst_i",
-                            "width": 1,
-                            "descr": "Write sync reset",
-                        },
-                        {
-                            "name": f"{fifo_name}_w_en_i",
-                            "width": 1,
-                            "descr": "Write enable",
-                        },
-                        {
-                            "name": f"{fifo_name}_w_data_i",
-                            "width": wdata_w,
-                            "descr": "Write data",
-                        },
-                        {
-                            "name": f"{fifo_name}_w_full_o",
-                            "width": 1,
-                            "descr": "Write full signal",
-                        },
-                        {
-                            "name": f"{fifo_name}_w_empty_o",
-                            "width": 1,
-                            "descr": "Write empty signal",
-                        },
                         {
                             "name": f"{fifo_name}_w_level_o",
                             "width": f"{FIFO_NAME}_ADDR_W+1",
-                            "descr": "Write fifo level",
-                        },
+                        }
                     ],
-                }
-            )
+                },
+            ]
         else:  # mode == "W":
-            attributes_dict["ports"].append(
+            attributes_dict["ports"] += [
                 {
-                    "name": f"{fifo_name}_read_io",
-                    "descr": "Read interface",
+                    "name": f"{fifo_name}_r_clk_en_rst_s",
+                    "descr": "Read clock, clock enable and async reset",
+                    "signals": {
+                        "type": "iob_clk",
+                        "prefix": "r_",
+                    },
+                },
+                {
+                    "name": f"{fifo_name}_r_rst_i",
+                    "descr": "Read sync reset",
+                    "signals": [{"name": f"{fifo_name}_r_rst_i"}],
+                },
+                {
+                    "name": f"{fifo_name}_r_en_i",
+                    "descr": "Read enable",
+                    "signals": [{"name": f"{fifo_name}_r_en_i"}],
+                },
+                {
+                    "name": f"{fifo_name}_r_data_o",
+                    "descr": "Read data",
+                    "signals": [{"name": f"{fifo_name}_r_data_o", "width": rdata_w}],
+                },
+                {
+                    "name": f"{fifo_name}_r_full_o",
+                    "descr": "Read full signal",
+                    "signals": [{"name": f"{fifo_name}_r_full_o"}],
+                },
+                {
+                    "name": f"{fifo_name}_r_empty_o",
+                    "descr": "Read empty signal",
+                    "signals": [{"name": f"{fifo_name}_r_empty_o"}],
+                },
+                {
+                    "name": f"{fifo_name}_r_level_o",
+                    "descr": "Read fifo level",
                     "signals": [
-                        {
-                            "name": f"{fifo_name}_r_clk_i",
-                            "width": 1,
-                            "descr": "Read clock",
-                        },
-                        {
-                            "name": f"{fifo_name}_r_cke_i",
-                            "width": 1,
-                            "descr": "Read clock enable",
-                        },
-                        {
-                            "name": f"{fifo_name}_r_arst_i",
-                            "width": 1,
-                            "descr": "Read async reset",
-                        },
-                        {
-                            "name": f"{fifo_name}_r_rst_i",
-                            "width": 1,
-                            "descr": "Read sync reset",
-                        },
-                        {
-                            "name": f"{fifo_name}_r_en_i",
-                            "width": 1,
-                            "descr": "Read enable",
-                        },
-                        {
-                            "name": f"{fifo_name}_r_data_o",
-                            "width": f"{FIFO_NAME}_R_DATA_W",
-                            "descr": "Read data",
-                        },
-                        {
-                            "name": f"{fifo_name}_r_full_o",
-                            "width": 1,
-                            "descr": "Read full signal",
-                        },
-                        {
-                            "name": f"{fifo_name}_r_empty_o",
-                            "width": 1,
-                            "descr": "Read empty signal",
-                        },
                         {
                             "name": f"{fifo_name}_r_level_o",
                             "width": f"{FIFO_NAME}_ADDR_W+1",
-                            "descr": "Read fifo level",
-                        },
+                        }
                     ],
-                }
-            )
+                },
+            ]
+
         attributes_dict["ports"].append(
             {
                 "name": f"{fifo_name}_extmem_io",
@@ -509,46 +497,67 @@ def create_fifo_instance(attributes_dict, csr_ref):
         #
         if mode == "W":
             attributes_dict["wires"] += [
-                f"""
-                {fifo_name}_empty -s {fifo_name}_empty:1
-                -d '{fifo_name} empty output'
-                """,
                 {
-                    "name": f"{fifo_name}_write_io",
-                    "descr": "FIFO write interface.",
+                    "name": f"{fifo_name}_data_wen",
+                    "descr": "FIFO data write enable",
                     "signals": [
-                        {"name": "clk_i"},
-                        {"name": "cke_i"},
-                        {"name": "arst_i"},
-                        {"name": "arst_i"},  # Synchronous reset
-                        {"name": f"{fifo_name}_data_wen", "width": 1},
-                        {"name": f"{fifo_name}_data_wdata", "width": 32},
-                        {"name": f"{fifo_name}_full", "width": 1},
-                        {"name": f"{fifo_name}_empty"},
-                        {"name": f"{fifo_name}_level", "width": 32},
+                        {"name": f"{fifo_name}_data_wen"},
                     ],
                 },
+                {
+                    "name": f"{fifo_name}_data_wdata",
+                    "descr": "FIFO data write data",
+                    "signals": [
+                        {"name": f"{fifo_name}_data_wdata", "width": 32},
+                    ],
+                },
+                {
+                    "name": f"{fifo_name}_full",
+                    "descr": "FIFO full signal",
+                    "signals": [{"name": f"{fifo_name}_full"}],
+                },
+                {
+                    "name": f"{fifo_name}_empty",
+                    "descr": "FIFO empty signal",
+                    "signals": [{"name": f"{fifo_name}_empty"}],
+                },
+                {
+                    "name": f"{fifo_name}_level",
+                    "descr": "FIFO level",
+                    "signals": [{"name": f"{fifo_name}_level", "width": 32}],
+                },
             ]
+
         else:  # mode == "R"
             attributes_dict["wires"] += [
-                f"""
-                {fifo_name}_full -s {fifo_name}_full:1
-                -d '{fifo_name} full output'
-                """,
                 {
-                    "name": f"{fifo_name}_read_io",
-                    "descr": "FIFO read interface.",
+                    "name": f"{fifo_name}_data_ren",
+                    "descr": "FIFO data read enable",
                     "signals": [
-                        {"name": "clk_i"},
-                        {"name": "cke_i"},
-                        {"name": "arst_i"},
-                        {"name": "arst_i"},  # Synchronous reset
-                        {"name": f"{fifo_name}_data_ren", "width": 1},
-                        {"name": f"{fifo_name}_data_rdata", "width": 32},
-                        {"name": f"{fifo_name}_full"},
-                        {"name": f"{fifo_name}_empty", "width": 1},
-                        {"name": f"{fifo_name}_level", "width": 32},
+                        {"name": f"{fifo_name}_data_ren"},
                     ],
+                },
+                {
+                    "name": f"{fifo_name}_data_rdata",
+                    "descr": "FIFO data read data",
+                    "signals": [
+                        {"name": f"{fifo_name}_data_rdata", "width": 32},
+                    ],
+                },
+                {
+                    "name": f"{fifo_name}_full",
+                    "descr": "FIFO full signal",
+                    "signals": [{"name": f"{fifo_name}_full"}],
+                },
+                {
+                    "name": f"{fifo_name}_empty",
+                    "descr": "FIFO empty signal",
+                    "signals": [{"name": f"{fifo_name}_empty"}],
+                },
+                {
+                    "name": f"{fifo_name}_level",
+                    "descr": "FIFO level",
+                    "signals": [{"name": f"{fifo_name}_level", "width": 32}],
                 },
             ]
     else:  # not is_async
@@ -583,6 +592,46 @@ def create_fifo_instance(attributes_dict, csr_ref):
     # Blocks
     #
     if is_async:
+        if mode == "W":
+            # Connect write interface to CSR wires and read interface to ports
+            fifo_connect = {
+                "w_clk_en_rst_s": "clk_en_rst_s",
+                "w_rst_i": "1'd0",
+                "w_en_i": f"{fifo_name}_data_wen",
+                "w_data_i": f"{fifo_name}_data_wdata",
+                "w_full_o": f"{fifo_name}_full",
+                "w_empty_o": f"{fifo_name}_empty",
+                "w_level_o": f"{fifo_name}_level",
+                "r_clk_en_rst_s": f"{fifo_name}_r_clk_en_rst_s",
+                "r_rst_i": f"{fifo_name}_r_rst_i",
+                "r_en_i": f"{fifo_name}_r_en_i",
+                "r_data_o": f"{fifo_name}_r_data_o",
+                "r_full_o": f"{fifo_name}_r_full_o",
+                "r_empty_o": f"{fifo_name}_r_empty_o",
+                "r_level_o": f"{fifo_name}_r_level_o",
+            }
+
+        else:  # mode == "R"
+            # Connect read interface to CSR wires and write interface to ports
+            fifo_connect = {
+                "r_clk_en_rst_s": "clk_en_rst_s",
+                "r_rst_i": "1'd0",
+                "r_en_i": f"{fifo_name}_data_ren",
+                "r_data_o": f"{fifo_name}_data_rdata",
+                "r_full_o": f"{fifo_name}_full",
+                "r_empty_o": f"{fifo_name}_empty",
+                "r_level_o": f"{fifo_name}_level",
+                "w_clk_en_rst_s": f"{fifo_name}_w_clk_en_rst_s",
+                "w_rst_i": f"{fifo_name}_w_rst_i",
+                "w_en_i": f"{fifo_name}_w_en_i",
+                "w_data_i": f"{fifo_name}_w_data_i",
+                "w_full_o": f"{fifo_name}_w_full_o",
+                "w_empty_o": f"{fifo_name}_w_empty_o",
+                "w_level_o": f"{fifo_name}_w_level_o",
+            }
+
+        fifo_connect["extmem_io"] = f"{fifo_name}_extmem_io"
+
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_fifo_async",
@@ -593,21 +642,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     "R_DATA_W": f"{FIFO_NAME}_R_DATA_W",
                     "ADDR_W": f"{FIFO_NAME}_ADDR_W",
                 },
-                "connect": {
-                    "write_io": (
-                        f"{fifo_name}_write_io",
-                        [
-                            f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
-                        ],
-                    ),
-                    "read_io": (
-                        f"{fifo_name}_read_io",
-                        [
-                            f"{fifo_name}_level[{FIFO_NAME}_ADDR_W+1-1:0]",
-                        ],
-                    ),
-                    "extmem_io": f"{fifo_name}_extmem_io",
-                },
+                "connect": fifo_connect,
             }
         )
     else:  # not is_async

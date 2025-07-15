@@ -477,6 +477,9 @@ class iob_port:
         doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     """
 
+    # FIXME: Should the port reference a global wire or a local bus? 
+    # Since we probably dont want to create a port for every single wire (of an AXI bus for example), then I assume the port should reference a bus.
+    # However, we dont have a global bus list (since global wires are not necessarly always grouped together).
     global_wire: iob_global_wire = None
     direction: str = ""
     doc_only: bool = False

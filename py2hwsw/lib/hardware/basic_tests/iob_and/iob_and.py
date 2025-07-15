@@ -232,6 +232,15 @@ if __name__ == "__main__":
     print(f"\tyear: {license_obj.get_year()}\n\tauthor: {license_obj.get_author()}")
     print("======\n")
 
+    python_parameter_obj = py2hwsw.create_python_parameter_from_text(
+        "my_param -v 42 -d 'My parameter description'"
+    )
+    print(f">>> python_parameter name: {python_parameter_obj.get_name()}")
+    print(
+        f"\tvalue: {python_parameter_obj.get_val()}\n\tdescr: {python_parameter_obj.get_descr()}"
+    )
+    print("======\n")
+
     core_obj = py2hwsw.create_core_from_dict(core_dictionary)
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
     print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])

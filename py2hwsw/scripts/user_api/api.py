@@ -825,7 +825,9 @@ def create_python_parameter_from_text(python_parameter_text):
 
     Attributes:
         python_parameter_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [name] [-v value] [-d descr]
+            Example:
+                my_param -v 42 -d 'My parameter description'
 
     Returns:
         iob_python_parameter: iob_python_parameter object

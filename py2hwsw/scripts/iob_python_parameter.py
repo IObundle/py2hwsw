@@ -12,6 +12,7 @@ from iob_base import (
     assert_attributes,
     find_obj_in_list,
     update_obj_from_dict,
+    parse_short_notation_text,
 )
 
 from api_base import internal_api_class
@@ -106,8 +107,14 @@ def python_parameter_from_dict(python_parameter_dict):
 
 
 def python_parameter_from_text(python_parameter_text):
-    python_parameter_dict = {}
-    # TODO: parse short notation text
+    python_parameter_flags = [
+        "name",
+        ["-v", {"dest": "val"}],
+        ["-d", {"dest": "descr"}],
+    ]
+    python_parameter_dict = parse_short_notation_text(
+        python_parameter_text, python_parameter_flags
+    )
     return iob_python_parameter(**python_parameter_dict)
 
 
@@ -131,6 +138,5 @@ def python_parameter_group_from_dict(python_parameter_group_dict):
 
 
 def python_parameter_group_from_text(python_parameter_group_text):
-    python_parameter_group_dict = {}
     # TODO: parse short notation text
     return iob_python_parameter_group(**python_parameter_group_dict)

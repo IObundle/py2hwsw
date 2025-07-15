@@ -48,6 +48,7 @@ import verilog_lint
 from manage_headers import generate_headers
 
 from iob_conf import conf_group_from_dict
+from iob_wire import iob_global_wire
 from iob_port import port_from_dict
 from iob_bus import bus_from_dict
 from iob_snippet import snippet_from_dict
@@ -61,9 +62,9 @@ from api_base import internal_api_class, convert2internal
 class iob_core(iob_module):
     """Generic class to describe how to generate a base IOb IP core"""
 
-    # List of global wires.
+    # List of global wires (netlist)
     # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
-    global_wires: list
+    global_wires: list[iob_global_wire] = []
     # Project settings
     global_build_dir: str = ""
     global_project_root: str = "."
@@ -1195,7 +1196,6 @@ def instantiate_block(block_name, python_parameters={}, block_dict={}):
 #
 
 
-# FIXME: Rename to create_from_dict
 def core_from_dict(core_dict):
     # If 'core' key is given, find corresponding core and instantiate it. Ignore other non-instance attributes.
     if core_dict.get("core", None):
@@ -1207,3 +1207,7 @@ def core_from_text(core_text):
     core_dict = {}
     # TODO: parse short notation text
     return iob_core(**core_dict)
+
+
+def get_global_wires_list():
+    return iob_core.global_wires

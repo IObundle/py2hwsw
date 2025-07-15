@@ -12,7 +12,15 @@ from api_base import internal_api_class
 @internal_api_class("user_api.api", "iob_wire")
 @dataclass
 class iob_wire:
-    """Class that represents a bus/port wire"""
+    """Class that represents a core's internal wire"""
+
+    pass
+
+
+@internal_api_class("user_api.api", "iob_global_wire")
+@dataclass
+class iob_global_wire:
+    """Class that represents a global wire (net)"""
 
     # Undefined by default. Will be set based on suffix of name (_i, _o, _io)
     direction: str = ""
@@ -21,10 +29,6 @@ class iob_wire:
     isreg: bool = False
     # Used for `iob_comb`: List of wires associated to the infered register.
     reg_wires: list[str] = field(default_factory=list)
-
-    # Logic value for future simulation effort using global wires list.
-    # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
-    value: str or int = 0
 
     def validate_attributes(self):
         if not self.name:
@@ -73,7 +77,7 @@ class iob_wire_reference:
     Use to distinguish from a real wire (for generator scripts)
     """
 
-    wire: iob_wire | None = None
+    wire: iob_global_wire | None = None
 
 
 def get_real_wire(wire):
@@ -105,10 +109,22 @@ def wire_from_dict(wire_dict):
 
 def wire_from_text(wire_text):
     wire_flags = [
+        # TODO:
+    ]
+    wire_dict = parse_short_notation_text(wire_text, wire_flags)
+    return iob_wire(**wire_dict)
+
+
+def global_wire_from_dict(global_wire_dict):
+    return iob_global_wire(**global_wire_dict)
+
+
+def global_wire_from_text(global_wire_text):
+    global_wire_flags = [
         "name",
         ["-w", {"dest": "width"}],
         ["-v", {"dest": "isvar", "action": "store_true"}],
         ["-d", {"dest": "descr", "nargs": "?"}],
     ]
-    wire_dict = parse_short_notation_text(wire_text, wire_flags)
-    return iob_wire(**wire_dict)
+    global_wire_dict = parse_short_notation_text(global_wire_text, global_wire_flags)
+    return iob_global_wire(**global_wire_dict)

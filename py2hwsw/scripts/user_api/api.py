@@ -227,22 +227,75 @@ def create_conf_group_from_text(conf_group_text):
 #
 
 
-@api_for(internal_wire.iob_wire)
-class iob_wire:
+@api_for(internal_wire.iob_global_wire)
+class iob_global_wire:
     """
-    Class that represents a bus/port wire.
+    Class that represents a global wire. Similar concept to 'net' in HDL terminology: https://vhdlwhiz.com/terminology/net/#net
 
     Attributes:
-        name (str): Identifier name for the wire.
-        width (str or int): Number of bits in the wire.
-        descr (str): Description of the wire.
-        isvar (bool): If enabled, wire will be generated with type `reg` in Verilog.
+        name (str): Identifier name for the global_wire.
+        width (str or int): Number of bits in the global_wire.
+        descr (str): Description of the global_wire.
+        isvar (bool): If enabled, global_wire will be generated with type `reg` in Verilog.
+        value (str or int): Logic value for future simulation effort using global wires list.
+                            See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
     """
 
     name: str = ""
     width: str or int = 1
     descr: str = "Default description"
     isvar: bool = False
+    value: str or int = 0
+
+
+@api_for(internal_wire.global_wire_from_dict)
+def create_global_wire_from_dict(global_wire_dict):
+    """
+    Function to create iob_global_wire object from dictionary attributes.
+
+    Attributes:
+        global_wire_dict (dict): dictionary with values to initialize attributes of iob_global_wire object.
+            This dictionary supports the following keys corresponding to the iob_global_wire attributes:
+            - name          -> iob_global_wire.name
+            - width         -> iob_global_wire.width
+            - descr         -> iob_global_wire.descr
+            - isvar         -> iob_global_wire.isvar
+
+    Returns:
+        iob_global_wire: iob_global_wire object
+    """
+    pass
+
+
+@api_for(internal_wire.global_wire_from_text)
+def create_global_wire_from_text(global_wire_text):
+    """
+    Function to create iob_global_wire object from short notation text.
+
+    Attributes:
+        global_wire_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-w width] [-d descr] [-v (enables isvar)]
+            Example:
+                en -w 1 -d 'Enable global_wire' -v
+
+    Returns:
+        iob_global_wire: iob_global_wire object
+    """
+    pass
+
+
+@api_for(internal_wire.iob_wire)
+class iob_wire:
+    """
+    Class that represents a core's internal wire.
+
+    Attributes:
+        name (str): Name for the wire inside the core. Verilog wire will be generated with this name.
+        global_wire (iob_global_wire): Reference to the global_wire (net) that drives the internal wire.
+    """
+
+    name: str = ""
+    global_wire: iob_global_wire = None
 
 
 @api_for(internal_wire.wire_from_dict)
@@ -254,9 +307,7 @@ def create_wire_from_dict(wire_dict):
         wire_dict (dict): dictionary with values to initialize attributes of iob_wire object.
             This dictionary supports the following keys corresponding to the iob_wire attributes:
             - name          -> iob_wire.name
-            - width         -> iob_wire.width
-            - descr         -> iob_wire.descr
-            - isvar         -> iob_wire.isvar
+            - global_wire   -> iob_wire.global_wire
 
     Returns:
         iob_wire: iob_wire object
@@ -271,9 +322,7 @@ def create_wire_from_text(wire_text):
 
     Attributes:
         wire_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-w width] [-d descr] [-v (enables isvar)]
-            Example:
-                en -w 1 -d 'Enable wire' -v
+            TODO:
 
     Returns:
         iob_wire: iob_wire object
@@ -417,15 +466,19 @@ def create_bus_from_text(bus_text):
 
 
 @api_for(internal_port.iob_port)
-class iob_port(iob_bus):
+class iob_port:
     """
     Describes an IO port.
 
     Attributes:
+        global_wire (iob_global_wire): Reference to the global wire that drives this port
+        direction (str): Port direction
         doc_only (bool): Only add to documentation
         doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     """
 
+    global_wire: iob_global_wire = None
+    direction: str = ""
     doc_only: bool = False
     doc_clearpage: bool = False
 
@@ -438,6 +491,7 @@ def create_port_from_dict(port_dict):
     Attributes:
         port_dict (dict): dictionary with values to initialize attributes of iob_port object.
             This dictionary supports the following keys corresponding to the iob_port attributes:
+            - global_wire -> iob_port.global_wire
             - doc_only -> iob_port.doc_only
             - doc_clearpage -> iob_port.doc_clearpage
             (Also supports the keys inherited from iob_bus)
@@ -1131,5 +1185,16 @@ def create_core_from_text(core_text):
 
     Returns:
         iob_core: iob_core object
+    """
+    pass
+
+
+@api_for(internal_core.get_global_wires_list)
+def get_global_wires_list():
+    """
+    Function to get a reference to the global wires list (netlist) of the project.
+
+    Returns:
+        list[iob_global_wire]: Global wires list
     """
     pass

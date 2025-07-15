@@ -8,7 +8,6 @@ from iob_bus import (
     iob_bus,
     replace_duplicate_wires_by_references,
     dict2interface,
-    BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS,
 )
 from iob_base import (
     convert_dict2obj_list,
@@ -23,7 +22,7 @@ from api_base import internal_api_class
 
 @internal_api_class("user_api.api", "iob_port")
 @dataclass
-class iob_port(iob_bus):
+class iob_port:
     """Describes an IO port."""
 
     def create_wires_from_interface(self):
@@ -187,20 +186,7 @@ def add_interface_port(core, *args, name, interface, **kwargs):
 
 
 def port_from_dict(port_dict):
-    api_port_obj = iob_port()
-
-    key_attribute_mapping = {}
-    preprocessor_functions = BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
-    # Update port_obj attributes with values from given dictionary
-    update_obj_from_dict(
-        api_port_obj._get_py2hwsw_internal_obj(),
-        port_dict,
-        key_attribute_mapping,
-        preprocessor_functions,
-        api_port_obj.get_supported_attributes().keys(),
-    )
-
-    return api_port_obj
+    return iob_port(**port_dict)
 
 
 def port_from_text(port_text):

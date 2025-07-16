@@ -132,7 +132,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "counter_rst_i": "start_i",
-                    "counter_inc_i": "cnt_en",
+                    "counter_en_i": "cnt_en",
                     "data_o": "cnt",
                 },
             },

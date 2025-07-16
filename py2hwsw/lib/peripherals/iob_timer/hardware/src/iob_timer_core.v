@@ -27,7 +27,7 @@ module iob_timer_core #(
       .cke_i        (cke_i),
       .arst_i       (arst_i),
       .counter_rst_i(rst_i),
-      .counter_inc_i(en_i),
+      .counter_en_i(en_i),
       .data_o       (time_counter)
    );
 

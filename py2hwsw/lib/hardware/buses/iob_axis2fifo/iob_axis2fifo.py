@@ -273,7 +273,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_arst",
                     "counter_rst_i": "rst_i",
-                    "counter_inc_i": "axis_word_count_inc",
+                    "counter_en_i": "axis_word_count_inc",
                     "data_o": "len_o",
                 },
             },

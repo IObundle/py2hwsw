@@ -196,7 +196,7 @@ module iob_axis_s_axi_m_write_int #(
       .cke_i        (cke_i),
       .arst_i       (arst_i),
       .counter_rst_i(transfer_count_rst),
-      .counter_inc_i(transfer_count_incr),
+      .counter_en_i(transfer_count_incr),
       .data_o       (transf_data_count)
    );
 

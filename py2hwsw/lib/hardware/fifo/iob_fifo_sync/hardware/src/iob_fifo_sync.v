@@ -30,7 +30,7 @@ module iob_fifo_sync #(
       `include "iob_fifo_sync_iob_clk_s_s_portmap.vs"
 
       .counter_rst_i(rst_i),
-      .counter_inc_i(w_en_int),
+      .counter_en_i(w_en_int),
       .data_o       (w_addr)
    );
 
@@ -47,7 +47,7 @@ module iob_fifo_sync #(
       `include "iob_fifo_sync_iob_clk_s_s_portmap.vs"
 
       .counter_rst_i(rst_i),
-      .counter_inc_i(r_en_int),
+      .counter_en_i(r_en_int),
       .data_o       (r_addr)
    );
 

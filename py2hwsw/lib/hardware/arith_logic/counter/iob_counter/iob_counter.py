@@ -38,9 +38,9 @@ def setup(py_params_dict):
                 "signals": [{"name": "counter_rst_i"}],
             },
             {
-                "name": "counter_inc_i",
-                "descr": "Counter increment input",
-                "signals": [{"name": "counter_inc_i"}],
+                "name": "counter_en_i",
+                "descr": "Counter enable input",
+                "signals": [{"name": "counter_en_i"}],
             },
             {
                 "name": "data_o",
@@ -72,7 +72,7 @@ def setup(py_params_dict):
                     "clk_en_rst_s": (
                         "clk_en_rst_s",
                         [
-                            "en_i:counter_inc_i",
+                            "en_i:counter_en_i",
                             "rst_i:counter_rst_i",
                         ],
                     ),

@@ -74,7 +74,7 @@ module iob_shift_reg #(
   ) w_addr_cnt0 (
       `include "iob_shift_reg_iob_clk_s_s_portmap.vs"
       .counter_rst_i (rst_int_w),
-      .counter_inc_i (en_i),
+      .counter_en_i (en_i),
       .data_o(addr_w)
   );
 

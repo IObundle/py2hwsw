@@ -486,7 +486,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "counter_rst_i": "w_length_wen_wr",
-                    "counter_inc_i": "counter_en",
+                    "counter_en_i": "counter_en",
                     "data_o": "axis_in_cnt",
                 },
             },

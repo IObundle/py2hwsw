@@ -106,7 +106,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "counter_rst_i": "ctr_reset",
-                    "counter_inc_i": "ctr_enable",
+                    "counter_en_i": "ctr_enable",
                     "data_o": "addr_o",
                 },
             },

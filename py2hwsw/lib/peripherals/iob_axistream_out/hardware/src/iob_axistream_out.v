@@ -129,7 +129,7 @@ module iob_axistream_out #(
       .cke_i        (axis_cke_i),
       .arst_i       (axis_arst_i),
       .counter_rst_i(axis_sw_rst),
-      .counter_inc_i(axis_fifo_read),
+      .counter_en_i(axis_fifo_read),
       .data_o       (axis_word_count)
    );
 

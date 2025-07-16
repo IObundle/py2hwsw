@@ -1916,6 +1916,8 @@ def create_interface(
                     has_rst = True
                 elif param == "e":
                     has_en = True
+                elif param == "n":
+                    continue  # 'n' is only used in the iob_reg module
                 else:
                     raise ValueError(
                         f"Unknown parameter '{param}' for IOb clock interface."

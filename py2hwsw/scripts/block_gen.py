@@ -188,9 +188,7 @@ External connection '{get_real_wire(e_connect).name}' has the following wires:
                     # Remove prefix and suffix from external wire name
                     if e_wire_name[-2:] in ["_o", "_i"]:
                         e_wire_name = e_wire_name[:-2]
-                    e_wire_name = e_wire_name.replace(
-                        e_connect.interface.prefix, "", 1
-                    )
+                    e_wire_name = e_wire_name.replace(e_connect.interface.prefix, "", 1)
                     if e_wire_name == port_name:
                         e_wire_name = real_e_wire.name
                         port_name = port_wire.name
@@ -198,9 +196,7 @@ External connection '{get_real_wire(e_connect).name}' has the following wires:
                 port_name = port_wire.name
             else:
                 # If both ports are not standard interfaces, connect by index
-                real_e_wire = get_real_wire(
-                    convert2internal(e_connect.wires[idx])
-                )
+                real_e_wire = get_real_wire(convert2internal(e_connect.wires[idx]))
                 e_wire_name = real_e_wire.name
 
             # If the wire is a bit slice, get the name of the bit slice
@@ -225,7 +221,11 @@ External connection '{get_real_wire(e_connect).name}' has the following wires:
                         e_wire_name = bit_slice
                     break
 
-            instance_portmap += f"        .{port_name}({e_wire_name}),\n"
+            if e_wire_name.lower() == "z":
+                # If the external wire is 'z', do not connect it
+                instance_portmap += f"        .{port_name}(),\n"
+            else:
+                instance_portmap += f"        .{port_name}({e_wire_name}),\n"
 
     instance_portmap = instance_portmap[:-2] + "\n"  # Remove last comma
 

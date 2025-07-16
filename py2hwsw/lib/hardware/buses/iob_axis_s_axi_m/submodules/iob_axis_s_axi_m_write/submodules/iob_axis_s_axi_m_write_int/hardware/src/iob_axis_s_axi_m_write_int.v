@@ -15,12 +15,12 @@ module iob_axis_s_axi_m_write_int #(
    localparam WAIT_START = 2'd0, TRANSF_BURST = 2'd1, WAIT_BRESP = 2'd2;
 
    // Internal signals
-   wire [   AXI_DATA_W-1:0] axi_wdata_nxt;
+   wire [    AXI_DATA_W-1:0] axi_wdata_nxt;
 
    // Instantiation wires
-   wire [            2-1:0] state;
-   wire [    AXI_LEN_W-1:0] transf_data_count;
-   wire [(AXI_LEN_W+1)-1:0] length;
+   wire [             2-1:0] state;
+   wire [     AXI_LEN_W-1:0] transf_data_count;
+   wire [ (AXI_LEN_W+1)-1:0] length;
 
    // FSM signals
    reg                       transfer_count_rst;
@@ -43,19 +43,19 @@ module iob_axis_s_axi_m_write_int #(
    // AXIS
    assign axis_in_ready_o = axis_in_ready_int;
    // AXI
-   assign axi_wdata_nxt = axis_in_data_i;
-   assign axi_wstrb_o   = w_strb_i;
+   assign axi_wdata_nxt   = axis_in_data_i;
+   assign axi_wstrb_o     = w_strb_i;
    // Constants
-   assign axi_awid_o    = {AXI_ID_W{1'd0}};
-   assign axi_awsize_o  = 3'd2;
-   assign axi_awburst_o = 2'd1;
-   assign axi_awlock_o  = 2'd0;
-   assign axi_awcache_o = 4'd2;
-   assign axi_awqos_o   = 4'd0;
-   assign axi_bready_o  = 1'b1;
+   assign axi_awid_o      = {AXI_ID_W{1'd0}};
+   assign axi_awsize_o    = 3'd2;
+   assign axi_awburst_o   = 2'd1;
+   assign axi_awlock_o    = 2'd0;
+   assign axi_awcache_o   = 4'd2;
+   assign axi_awqos_o     = 4'd0;
+   assign axi_bready_o    = 1'b1;
 
    // Busy signal
-   assign w_busy_o      = state != WAIT_START;
+   assign w_busy_o        = state != WAIT_START;
 
    always @* begin
       // Calculate the last address of the burst using the normal burst length
@@ -137,7 +137,7 @@ module iob_axis_s_axi_m_write_int #(
             if((data_done_nxt && address_done_nxt) ||
                ((data_done && address_done_nxt) ||
                (data_done_nxt && address_done))) begin
-               state_nxt        = WAIT_BRESP;  // Wait for the response
+               state_nxt = WAIT_BRESP;  // Wait for the response
             end
 
          end
@@ -146,8 +146,8 @@ module iob_axis_s_axi_m_write_int #(
             if (axi_bvalid_i) begin  // When the response is valid, check if the transfer is done
                transfer_count_rst = 1'd1;
                // Reset the done signals
-               address_done_nxt = 1'd0;
-               data_done_nxt    = 1'd0;
+               address_done_nxt   = 1'd0;
+               data_done_nxt      = 1'd0;
                if (length == 0) begin
                   state_nxt = WAIT_START;
                end else begin  // Transfer the remaining data
@@ -168,8 +168,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) address_done_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .data_i(address_done_nxt),
@@ -180,8 +180,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (1),
       .RST_VAL(1'd0)
    ) data_done_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .data_i(data_done_nxt),
@@ -192,20 +192,20 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (AXI_LEN_W),
       .RST_VAL(0)
    ) transfer_count_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
-      .arst_i(arst_i),
-      .rst_i (transfer_count_rst),
-      .en_i  (transfer_count_incr),
-      .data_o(transf_data_count)
+      .clk_i        (clk_i),
+      .cke_i        (cke_i),
+      .arst_i       (arst_i),
+      .counter_rst_i(transfer_count_rst),
+      .counter_en_i(transfer_count_incr),
+      .data_o       (transf_data_count)
    );
 
    iob_reg_car #(
       .DATA_W ((AXI_LEN_W + 1)),
       .RST_VAL(0)
    ) length_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .data_i(length_nxt),
@@ -216,8 +216,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (2),
       .RST_VAL(0)
    ) state_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .data_i(state_nxt),
@@ -229,8 +229,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (AXI_LEN_W),
       .RST_VAL(0)
    ) axi_awlen_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .data_i(axi_awlen_nxt),
@@ -241,8 +241,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (AXI_ADDR_W),
       .RST_VAL(0)
    ) axi_awaddr_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .data_i(axi_awaddr_nxt),
@@ -253,8 +253,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_awvalid_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .data_i(axi_awvalid_nxt),
@@ -265,8 +265,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (AXI_DATA_W),
       .RST_VAL(0)
    ) axi_wdata_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .en_i  (axi_wready_i),
@@ -278,8 +278,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_wvalid_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .en_i  (axi_wready_i),
@@ -291,8 +291,8 @@ module iob_axis_s_axi_m_write_int #(
       .DATA_W (1),
       .RST_VAL(0)
    ) axi_wlast_reg (
-      .clk_i(clk_i),
-      .cke_i(cke_i),
+      .clk_i (clk_i),
+      .cke_i (cke_i),
       .arst_i(arst_i),
       .rst_i (rst_i),
       .en_i  (axi_wready_i),

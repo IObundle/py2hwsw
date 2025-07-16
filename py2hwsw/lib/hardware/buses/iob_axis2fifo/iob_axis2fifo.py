@@ -252,11 +252,6 @@ def setup(py_params_dict):
                     ],
                 },
                 {
-                    "name": "counter_en_rst",
-                    "descr": "Counter enable and reset",
-                    "signals": [{"name": "axis_word_count_inc"}, {"name": "rst_i"}],
-                },
-                {
                     "name": "rst_i",
                     "descr": "Reset signal",
                     "signals": [
@@ -277,7 +272,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_arst",
-                    "en_rst_i": "counter_en_rst",
+                    "counter_rst_i": "rst_i",
+                    "counter_en_i": "axis_word_count_inc",
                     "data_o": "len_o",
                 },
             },

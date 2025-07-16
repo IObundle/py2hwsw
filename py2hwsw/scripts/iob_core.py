@@ -39,6 +39,7 @@ from iob_base import (
     add_traceback_msg,
     debug_print,
     get_lib_cores,
+    replace_dictionary_values,
     update_obj_from_dict,
 )
 from iob_license import iob_license, update_license
@@ -111,8 +112,8 @@ class iob_core(iob_module):
             # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
             if "core" in core_dictionary or "python_parameters" in core_dictionary:
                 fail_with_msg("The 'core' and 'python_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
-            # Attribute preprocessor functions
-            preprocessor_functions = {
+            # Functions to run on each dictionary element, to convert it to an object
+            replacement_functions = {
                 "confs": lambda lst: [conf_group_from_dict(i) for i in lst],
                 "ports": lambda lst: [port_from_dict(i) for i in lst],
                 "buses": lambda lst: [bus_from_dict(i) for i in lst],
@@ -123,7 +124,11 @@ class iob_core(iob_module):
                 "python_parameters": lambda lst: [python_parameter_group_from_dict(i) for i in lst],
                 "portmap_connections": portmap_from_dict,
             }
-            update_obj_from_dict(self, core_dictionary, preprocessor_functions, self.get_api_obj().get_supported_attributes().keys())
+            core_dictionary_with_objects = replace_dictionary_values(
+                core_dictionary,
+                replacement_functions,
+            )
+            update_obj_from_dict(self, core_dictionary_with_objects, valid_attributes_list=self.get_api_obj().get_supported_attributes().keys())
 
         # Set global build directory
         if self.is_top_module:

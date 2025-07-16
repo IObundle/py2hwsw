@@ -14,7 +14,6 @@ from iob_base import (
     fail_with_msg,
     str_to_kwargs,
     assert_attributes,
-    update_obj_from_dict,
 )
 from iob_wire import iob_wire
 from api_base import internal_api_class

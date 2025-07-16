@@ -11,10 +11,10 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     find_obj_in_list,
-    update_obj_from_dict,
+    replace_dictionary_values,
     parse_short_notation_text,
 )
-from api_base import internal_api_class
+from api_base import internal_api_class, convert2internal
 
 
 @internal_api_class("user_api.api", "iob_conf")
@@ -140,18 +140,7 @@ def rename_dictionary_keys(dictionary, key_mapping):
 
 
 def conf_from_dict(conf_dict):
-    api_conf_obj = iob_conf()
-
-    preprocessor_functions = {}
-    # Update conf_obj attributes with values from given dictionary
-    update_obj_from_dict(
-        api_conf_obj._get_py2hwsw_internal_obj(),
-        conf_dict,
-        preprocessor_functions,
-        api_conf_obj.get_supported_attributes().keys(),
-    )
-
-    return api_conf_obj
+    return iob_conf(**conf_dict)
 
 
 def conf_from_text(conf_text: str) -> iob_conf:
@@ -170,28 +159,24 @@ def conf_from_text(conf_text: str) -> iob_conf:
 
 
 def conf_group_from_dict(conf_group_dict):
-    api_conf_group_obj = iob_conf_group()
-
     # If "confs" key is missing, then assume dictionary describes a single conf
     if "confs" not in conf_group_dict:
-        conf_group_obj = api_conf_group_obj._get_py2hwsw_internal_obj()
+        api_conf_group_obj = iob_conf_group()
+        conf_group_obj = convert2internal(api_conf_group_obj)
         conf_group_obj.name = "general_operation"
         conf_group_obj.descr = "Core configuration."
         conf_group_obj.confs = [conf_from_dict(conf_group_dict)]
         return api_conf_group_obj
 
-    preprocessor_functions = {
+    # Functions to run on each dictionary element, to convert it to an object
+    replacement_functions = {
         "confs": lambda lst: [conf_from_dict(i) for i in lst],
     }
-    # Update conf_group_obj attributes with values from given dictionary
-    update_obj_from_dict(
-        api_conf_group_obj._get_py2hwsw_internal_obj(),
+    kwargs = replace_dictionary_values(
         conf_group_dict,
-        preprocessor_functions,
-        api_conf_group_obj.get_supported_attributes().keys(),
+        replacement_functions,
     )
-
-    return api_conf_group_obj
+    return iob_conf_group(**kwargs)
 
 
 def conf_group_from_text(conf_group_text: str):

@@ -14,7 +14,7 @@ from iob_base import (
     add_traceback_msg,
     str_to_kwargs,
     assert_attributes,
-    update_obj_from_dict,
+    replace_dictionary_values,
     parse_short_notation_text,
 )
 from iob_wire import (
@@ -240,29 +240,21 @@ def dict2interface(name, interface_dict):
     return interface
 
 
-# Dictionary of attributes that need to be preprocessed when set from a bus_dictionary, and their corresponding preprocessor functions
-BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS = {
-    "wires": lambda lst: [wire_from_dict(i) for i in lst],
-}
-
 #
 # API methods
 #
 
 
 def bus_from_dict(bus_dict):
-    api_bus_obj = iob_bus()
-
-    preprocessor_functions = BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
-    # Update bus_obj attributes with values from given dictionary
-    update_obj_from_dict(
-        api_bus_obj._get_py2hwsw_internal_obj(),
+    # Functions to run on each dictionary element, to convert it to an object
+    replacement_functions = {
+        "wires": lambda lst: [wire_from_dict(i) for i in lst],
+    }
+    kwargs = replace_dictionary_values(
         bus_dict,
-        preprocessor_functions,
-        api_bus_obj.get_supported_attributes().keys(),
+        replacement_functions,
     )
-
-    return api_bus_obj
+    return iob_bus(**kwargs)
 
 
 def bus_from_text(bus_text):

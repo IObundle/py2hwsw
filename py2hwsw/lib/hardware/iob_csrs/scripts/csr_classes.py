@@ -247,7 +247,10 @@ def create_csr_group(*args, **kwargs):
 def iob_csr_text2dict(csr_text: str):
     """Convert iob_csr short notation text to dictionary
     Attributes:
-        csr_text (str): short notation text
+        csr_text (str): short notation text. Specified with the following format:
+            name:width [-k KIND] [-m MODE] [--ret_val RST_VAL] [--addr ADDR]
+            [-d descr] [--int_use] [--field FIELD]+ [--doc_conf DOC_CONF]+
+            [--no-volatile] [--assym A] [--opt_comment COMMENT]
             Example:
                 "softreset:1 -m W -d 'Soft reset' --rst_val 0 --addr 0 --log2n_items 0
 
@@ -262,8 +265,10 @@ def iob_csr_text2dict(csr_text: str):
         ["--addr", {"dest": "addr", "default": -1}],
         ["--log2n_items", {"dest": "log2n_items", "default": 0}],
         ["-d", {"dest": "descr"}],
-        ["--int_use", {"dest": "internal_use", "default": False}],
-        ["--fields", {"dest": "fields"}],
+        ["--doc_conf", {"dest": "doc_conf_list", "action": "append"}],
+        ["--no-volatile", {"dest": "volatile", "action": "store_false"}],
+        ["--int_use", {"dest": "internal_use", "action": "store_true"}],
+        ["--field", {"dest": "fields", "action": "append"}],
         ["--assym", {"dest": "assym", "default": 1}],
         ["--opt_comment", {"dest": "optional_comment", "default": ""}],
     ]
@@ -284,6 +289,7 @@ def iob_csr_group_text2dict(csr_group_text: str):
     Attributes:
         csr_group_text (str): short notation text
             [csr group name] [-d descr] [-r reg]+ [-doc] [-doc_clearpage]
+            See `iob_csr_text2dict()` for `csr` format details.
             Example:
                 ctrl_regs
                 -d 'control registers'

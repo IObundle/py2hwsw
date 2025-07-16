@@ -250,11 +250,11 @@ def bus_from_dict(bus_dict):
     replacement_functions = {
         "wires": lambda lst: [wire_from_dict(i) for i in lst],
     }
-    kwargs = replace_dictionary_values(
+    bus_dict_with_objects = replace_dictionary_values(
         bus_dict,
         replacement_functions,
     )
-    return iob_bus(**kwargs)
+    return iob_bus(**bus_dict_with_objects)
 
 
 def bus_from_text(bus_text):

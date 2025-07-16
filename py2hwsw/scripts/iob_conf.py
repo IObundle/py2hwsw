@@ -14,7 +14,7 @@ from iob_base import (
     replace_dictionary_values,
     parse_short_notation_text,
 )
-from api_base import internal_api_class, convert2internal
+from api_base import internal_api_class
 
 
 @internal_api_class("user_api.api", "iob_conf")
@@ -161,22 +161,21 @@ def conf_from_text(conf_text: str) -> iob_conf:
 def conf_group_from_dict(conf_group_dict):
     # If "confs" key is missing, then assume dictionary describes a single conf
     if "confs" not in conf_group_dict:
-        api_conf_group_obj = iob_conf_group()
-        conf_group_obj = convert2internal(api_conf_group_obj)
-        conf_group_obj.name = "general_operation"
-        conf_group_obj.descr = "Core configuration."
-        conf_group_obj.confs = [conf_from_dict(conf_group_dict)]
-        return api_conf_group_obj
+        return iob_conf_group(
+            name="general_operation",
+            descr="Core configuration.",
+            confs=[conf_from_dict(conf_group_dict)],
+        )
 
     # Functions to run on each dictionary element, to convert it to an object
     replacement_functions = {
         "confs": lambda lst: [conf_from_dict(i) for i in lst],
     }
-    kwargs = replace_dictionary_values(
+    conf_group_dict_with_objects = replace_dictionary_values(
         conf_group_dict,
         replacement_functions,
     )
-    return iob_conf_group(**kwargs)
+    return iob_conf_group(**conf_group_dict_with_objects)
 
 
 def conf_group_from_text(conf_group_text: str):

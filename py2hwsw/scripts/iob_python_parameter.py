@@ -116,11 +116,11 @@ def python_parameter_group_from_dict(python_parameter_group_dict):
     replacement_functions = {
         "python_parameters": lambda lst: [python_parameter_from_dict(i) for i in lst],
     }
-    kwargs = replace_dictionary_values(
+    python_parameter_group_dict_with_objects = replace_dictionary_values(
         python_parameter_group_dict,
         replacement_functions,
     )
-    return iob_python_parameter_group(**kwargs)
+    return iob_python_parameter_group(**python_parameter_group_dict_with_objects)
 
 
 def python_parameter_group_from_text(python_parameter_group_text):

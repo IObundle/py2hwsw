@@ -475,7 +475,7 @@ def csrs_text2dict(csrs_text):
         list: with csrs attributes / python parameters list
     """
     csrs_flags = [
-        ["--csr_if", {"dest": "csr_if", "default": "iob"}],
+        ["--csr_if", {"dest": "csr_if"}],
         ["--rw_overlap", {"dest": "rw_overlap", "action": "store_true"}],
         ["--no-autoaddr", {"dest": "autoaddr", "action": "store_false"}],
         ["--doc_conf", {"dest": "doc_conf"}],

@@ -773,4 +773,7 @@ def parse_short_notation_text(text: str, flags) -> dict:
     # create argument parser
     parser = create_short_notation_parser(flags)
     # parse and return text as dict
-    return parser.parse_args(pre_process_conf_text).__dict__
+    parsed_dict = parser.parse_args(pre_process_conf_text).__dict__
+    # filter out None values, no need to set default values for arguments
+    filtered_dict = {k: v for k, v in parsed_dict.items() if v is not None}
+    return filtered_dict

@@ -259,18 +259,18 @@ def iob_csr_text2dict(csr_text: str):
     """
     csr_flags = [
         "name&width",
-        ["-k", {"dest": "kind", "choices": ["REG", "NOAUTO"], "default": "REG"}],
-        ["-m", {"dest": "mode", "choices": ["R", "W", "RW"], "default": ""}],
-        ["--rst_val", {"dest": "rst_val", "default": 0}],
-        ["--addr", {"dest": "addr", "default": -1}],
-        ["--log2n_items", {"dest": "log2n_items", "default": 0}],
+        ["-k", {"dest": "kind", "choices": ["REG", "NOAUTO"]}],
+        ["-m", {"dest": "mode", "choices": ["R", "W", "RW"]}],
+        ["--rst_val", {"dest": "rst_val"}],
+        ["--addr", {"dest": "addr"}],
+        ["--log2n_items", {"dest": "log2n_items"}],
         ["-d", {"dest": "descr"}],
         ["--doc_conf", {"dest": "doc_conf_list", "action": "append"}],
         ["--no-volatile", {"dest": "volatile", "action": "store_false"}],
         ["--int_use", {"dest": "internal_use", "action": "store_true"}],
         ["--field", {"dest": "fields", "action": "append"}],
-        ["--assym", {"dest": "assym", "default": 1}],
-        ["--opt_comment", {"dest": "optional_comment", "default": ""}],
+        ["--assym", {"dest": "assym"}],
+        ["--opt_comment", {"dest": "optional_comment"}],
     ]
 
     csr_dict = parse_short_notation_text(csr_text, csr_flags)

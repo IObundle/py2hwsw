@@ -191,7 +191,9 @@ def setup(py_params_dict):
                 "use_en": True,
                 "connect": {
                     "clk_en_rst_s": "clk_w_rst_ref",
-                    "fifo_r_io": "fifo_r_if",
+                    "fifo_read_o": "fifo_ren",
+                    "fifo_rdata_i": "fifo_rdata",
+                    "fifo_empty_i": "fifo_empty",
                     "en_i": "en_fifo2axis",
                     "axis_m": "read_data_axis_io",
                 },
@@ -227,7 +229,9 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_w_rst_ref",
-                    "fifo_w_io": "fifo_w_if",
+                    "fifo_write_o": "fifo_wen",
+                    "fifo_wdata_o": "fifo_wdata",
+                    "fifo_full_i": "fifo_full",
                     "axis_s": "axi2axis_signals",
                 },
             },

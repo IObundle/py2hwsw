@@ -4,6 +4,7 @@
 
 from dataclasses import dataclass, field
 import copy
+import importlib
 
 from iob_base import fail_with_msg, parse_short_notation_text
 from api_base import internal_api_class
@@ -14,7 +15,62 @@ from api_base import internal_api_class
 class iob_wire:
     """Class that represents a core's internal wire"""
 
-    pass
+    def __post_init__(self):
+        print("DEBUG: Replacing global_wire attrs by setters and getters")
+        global_wire_attributes = self.__create_global_wire_attribute_wrappers()
+        print("DEBUG: Creating global wire")
+        self.global_wire = iob_global_wire(**global_wire_attributes)
+
+    def __create_global_wire_attribute_wrappers(self) -> dict:
+        # Lazy import the global API class to get its attributes
+        global_wire_api_class = getattr(
+            importlib.import_module("user_api.api"), "iob_global_wire"
+        )
+
+        # Local utility functions
+        def _generate_setter(attribute_name):
+            """
+            Function to generate setter for a given attribute.
+            Setter will pass the given value to the corresponding attribute in the internal object.
+            """
+
+            def setter(self, value):
+                # print("Setter called for attribute: ", attribute_name)
+                setattr(self.global_wire, attribute_name, value)
+
+            return setter
+
+        def _generate_getter(attribute_name):
+            """
+            Function to generate getter for a given attribute.
+            Getter will get value from the corresponding attribute in the internal object.
+            """
+
+            def getter(self):
+                # print("Getter called for attribute: ", attribute_name)
+                return getattr(self.global_wire, attribute_name)
+
+            return getter
+
+        # Remove API attributes of global wire from this class;
+        # Generate setter and getter for them
+        global_wire_attributes = {}
+        for global_attr in global_wire_api_class.__annotations__:
+            wrapper_attr = global_attr
+            # Replace real "name" attribute of global wire by "global_name" wrapper attribute
+            if wrapper_attr == "name":
+                wrapper_attr = "global_name"
+
+            # Extract values of attributes set by API and delete them
+            global_wire_attributes[global_attr] = getattr(self, wrapper_attr)
+            delattr(self, wrapper_attr)
+
+            # Create setter and getter for the attribute
+            print("Creating wrapper attribute", wrapper_attr)
+            setattr(self, f"set_{wrapper_attr}", _generate_setter(wrapper_attr))
+            setattr(self, f"get_{wrapper_attr}", _generate_getter(wrapper_attr))
+
+        return global_wire_attributes
 
 
 @internal_api_class("user_api.api", "iob_global_wire")
@@ -29,6 +85,9 @@ class iob_global_wire:
     isreg: bool = False
     # Used for `iob_comb`: List of wires associated to the infered register.
     reg_wires: list[str] = field(default_factory=list)
+
+    def __post_init__(self):
+        print("DEBUG: Creating global wire")
 
     def validate_attributes(self):
         if not self.name:

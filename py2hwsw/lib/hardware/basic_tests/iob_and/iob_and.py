@@ -130,13 +130,14 @@ if __name__ == "__main__":
     # print("isvar: ", wire_obj.get_isvar(), end=" ")
     # print("descr: ", wire_obj.get_descr())
 
-    print("\n\n")
+    # print("\n\n")
     bus_obj = py2hwsw.create_bus_from_text(
         """
             aoi_outs -s aab:W -s cad:W -s oab:1
             -d 'AOI outputs'
         """
     )
+    exit(1)  # DEBUG
     print("bus_obj: ", bus_obj.get_name(), end=" ")
     print("width: ", bus_obj.get_interface())
     for wire in bus_obj.get_wires():

@@ -223,10 +223,9 @@ def create_conf_group_from_text(conf_group_text):
 
 
 #
-# Signals
+# Wires
 #
-
-
+# NOTE: I think each internal wire/port may create its own (new) global wire (net). We could then merge all connected global wires (nets) into one. Maybe during the generate_build_dir() process?
 @api_for(internal_wire.iob_global_wire)
 class iob_global_wire:
     """
@@ -296,6 +295,12 @@ class iob_wire:
 
     name: str = ""
     global_wire: iob_global_wire = None
+    # Attributes below are actually wrappers for the attributes of the global_wire. They are not real attributes of iob_wire, but can be used as such.
+    global_name: str = ""
+    width: str or int = 1
+    descr: str = "Default description"
+    isvar: bool = False
+    value: str or int = 0
 
 
 @api_for(internal_wire.wire_from_dict)

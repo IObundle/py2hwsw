@@ -152,9 +152,7 @@ class iob_instance(iob_base):
                     )
                     # Add bus to issuer
                     bus_wires = remove_wire_direction_suffixes(port.wires)
-                    issuer.create_bus(
-                        name=bus_name, wires=bus_wires, descr=port.descr
-                    )
+                    issuer.create_bus(name=bus_name, wires=bus_wires, descr=port.descr)
                     # Add bus to attributes_dict as well
                     issuer.attributes_dict["buses"].append(
                         {
@@ -303,3 +301,25 @@ class iob_instance(iob_base):
                 "descr": "Control and Status Registers interface (auto-generated)",
             }
         )
+
+
+#
+# API methods
+#
+
+
+def instance_from_dict(instance_dict):
+    # If 'instance' key is given, find corresponding instance and instantiate it. Ignore other non-instance attributes.
+    # if instance_dict.get("instance", None):
+    #     return instantiate_block(
+    #         instance_dict["instance"],
+    #         instance_dict.get("python_parameters", {}),
+    #         instance_dict,
+    #     )
+    return iob_instance(**instance_dict)
+
+
+def instance_from_text(instance_text):
+    instance_dict = {}
+    # TODO: parse short notation text
+    return iob_instance(**instance_dict)

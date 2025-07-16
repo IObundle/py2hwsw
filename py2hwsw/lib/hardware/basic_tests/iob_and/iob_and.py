@@ -15,10 +15,10 @@ core_dictionary = {
             "confs": [
                 {
                     "name": "W",
-                    "type": "P",
-                    "val": "21",
-                    "min": "1",
-                    "max": "32",
+                    "kind": "P",
+                    "value": "21",
+                    "min_value": "1",
+                    "max_value": "32",
                     "descr": "IO width",
                 },
             ],
@@ -66,10 +66,10 @@ if __name__ == "__main__":
             "confs": [
                 {
                     "name": "W",
-                    "type": "P",
-                    "val": "21",
-                    "min": "1",
-                    "max": "32",
+                    "kind": "P",
+                    "value": "21",
+                    "min_value": "1",
+                    "max_value": "32",
                     "descr": "IO width",
                 },
             ],
@@ -124,11 +124,11 @@ if __name__ == "__main__":
         print(">>> Conf description: ", conf.get_descr())
 
     print("\n\n")
-    wire_obj = py2hwsw.create_wire_from_text("en -w 1 -d 'Enable wire' -v")
-    print("wire_obj: ", wire_obj.get_name(), end=" ")
-    print("width: ", wire_obj.get_width(), end=" ")
-    print("isvar: ", wire_obj.get_isvar(), end=" ")
-    print("descr: ", wire_obj.get_descr())
+    # wire_obj = py2hwsw.create_wire_from_text("en -w 1 -d 'Enable wire' -v")
+    # print("wire_obj: ", wire_obj.get_name(), end=" ")
+    # print("width: ", wire_obj.get_width(), end=" ")
+    # print("isvar: ", wire_obj.get_isvar(), end=" ")
+    # print("descr: ", wire_obj.get_descr())
 
     print("\n\n")
     bus_obj = py2hwsw.create_bus_from_text(

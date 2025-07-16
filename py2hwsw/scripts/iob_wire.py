@@ -104,6 +104,8 @@ def remove_wire_direction_suffixes(wire_list):
 
 
 def wire_from_dict(wire_dict):
+    # Create iob_global_wire if it does not exist?
+
     return iob_wire(**wire_dict)
 
 

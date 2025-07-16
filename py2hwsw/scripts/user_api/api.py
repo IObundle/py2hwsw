@@ -471,7 +471,7 @@ class iob_port:
     Describes an IO port.
 
     Attributes:
-        global_wire (iob_bus): Reference to the core's bus that will become a port/interface.
+        global_wire (iob_global_wire): Reference to the global wire (net) that drives the port. TODO: How to create interfaces (ports of entire buses)?
         direction (str): Port direction
         doc_only (bool): Only add to documentation
         doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
@@ -480,7 +480,8 @@ class iob_port:
     # FIXME: Should the port reference a global wire or a local bus?
     # Since we probably dont want to create a port for every single wire (of an AXI bus for example), then I assume the port should reference a bus.
     # However, we dont have a global bus list (since global wires are not necessarly always grouped together).
-    global_wire: iob_bus = None
+    # On the other hand, each port has a single 'direction', so it should match a wire, not a bus (a bus might have multiple wires with different directions).
+    global_wire: iob_global_wire = None
     direction: str = ""
     doc_only: bool = False
     doc_clearpage: bool = False

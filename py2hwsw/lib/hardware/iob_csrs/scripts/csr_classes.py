@@ -4,6 +4,8 @@
 
 from dataclasses import dataclass, field
 
+from iob_base import parse_short_notation_text
+
 FAIL = "\033[91mError: "  # Red
 ENDC = "\033[0m"  # White
 
@@ -240,3 +242,74 @@ def create_csr_group(*args, **kwargs):
     csr_obj_list = convert_dict2obj_list(regs, iob_csr)
     csr_group = iob_csr_group(regs=csr_obj_list, **group_kwargs)
     return csr_group
+
+
+def iob_csr_text2dict(csr_text: str):
+    """Convert iob_csr short notation text to dictionary
+    Attributes:
+        csr_text (str): short notation text
+            Example:
+                "softreset:1 -m W -d 'Soft reset' --rst_val 0 --addr 0 --log2n_items 0
+
+    Returns:
+        dict: dictionary with iob_csr attributes
+    """
+    csr_flags = [
+        "name&width",
+        ["-k", {"dest": "kind", "choices": ["REG", "NOAUTO"], "default": "REG"}],
+        ["-m", {"dest": "mode", "choices": ["R", "W", "RW"], "default": ""}],
+        ["--rst_val", {"dest": "rst_val", "default": 0}],
+        ["--addr", {"dest": "addr", "default": -1}],
+        ["--log2n_items", {"dest": "log2n_items", "default": 0}],
+        ["-d", {"dest": "descr"}],
+        ["--int_use", {"dest": "internal_use", "default": False}],
+        ["--fields", {"dest": "fields"}],
+        ["--assym", {"dest": "assym", "default": 1}],
+        ["--opt_comment", {"dest": "optional_comment", "default": ""}],
+    ]
+
+    csr_dict = parse_short_notation_text(csr_text, csr_flags)
+    # process 'name&width', with format '[name]:[width]'
+    name_and_width = csr_dict.pop('name&width', "")
+    try:
+        csr_dict['name'], csr_dict['width'] = name_and_width.split(':', 1)
+    except ValueError:
+        csr_dict['name'] = name_and_width
+        csr_dict['width'] = 1  # default width 1 if not specified
+    return csr_dict
+
+
+def iob_csr_group_text2dict(csr_group_text: str):
+    """Convert iob_csr_group short notation text to dictionary
+    Attributes:
+        csr_group_text (str): short notation text
+            [csr group name] [-d descr] [-r reg]+ [-doc] [-doc_clearpage]
+            Example:
+                ctrl_regs
+                -d 'control registers'
+                -doc
+                -doc_clearpage
+                -r "softreset:1 -m W -d 'Soft reset' --rst_val 0 --addr 0 --log2n_items 0"
+                -r "start:1 -m W -d 'Start operation' --rst_val 0 --addr 1 --log2n_items 1"
+                -r "done:1 -m R -d 'Operation Complete' --rst_val 1 --addr 2 --log2n_items 1"
+
+    Returns:
+        dict: dictionary with iob_csr attributes
+    """
+    csr_group_flags = [
+        "name",
+        ["-d", {"dest": "descr"}],
+        ["-doc", {"dest": "doc_only", "action": "store_true"}],
+        ["-doc_clearpage", {"dest": "doc_clearpage", "action": "store_true"}],
+        ["-r", {"dest": "regs", "action": "append"}],
+    ]
+
+    csr_group_dict = parse_short_notation_text(csr_group_text, csr_group_flags)
+    # process regs
+    csr_group_regs = []
+    for r in csr_group_dict.get('regs', []):
+        # Convert each reg from text to dict
+        csr_group_regs.append(iob_csr_text2dict(r))
+    # update csr_group regs
+    csr_group_dict.update({'regs': csr_group_regs})
+    return csr_group_dict

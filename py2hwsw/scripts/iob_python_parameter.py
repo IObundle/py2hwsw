@@ -114,7 +114,6 @@ def python_parameter_from_text(python_parameter_text):
 def python_parameter_group_from_dict(python_parameter_group_dict):
     api_python_parameter_group_obj = iob_python_parameter_group()
 
-    key_attribute_mapping = {}
     preprocessor_functions = {
         "python_parameters": lambda lst: [python_parameter_from_dict(i) for i in lst],
     }
@@ -122,7 +121,6 @@ def python_parameter_group_from_dict(python_parameter_group_dict):
     update_obj_from_dict(
         api_python_parameter_group_obj._get_py2hwsw_internal_obj(),
         python_parameter_group_dict,
-        key_attribute_mapping,
         preprocessor_functions,
         api_python_parameter_group_obj.get_supported_attributes().keys(),
     )

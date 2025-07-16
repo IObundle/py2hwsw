@@ -681,7 +681,7 @@ def validate_verilog_const(value: str, direction: str):
         )
 
 
-def update_obj_from_dict(obj, attributes_dict, key_attribute_mapping={}, preprocessor_functions={}, valid_attributes_list=[]):
+def update_obj_from_dict(obj, attributes_dict, preprocessor_functions={}, valid_attributes_list=[], key_attribute_mapping={}):
     """
     Update a given object's attributes with values from a dictionary.
     Supports mapping keys to different attribute names.

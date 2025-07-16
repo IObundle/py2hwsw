@@ -115,9 +115,7 @@ def get_bus_wire(core, bus_name: str, wire_name: str):
 
     wire = find_obj_in_list(bus.wires, wire_name, process_func=get_real_wire)
     if not wire:
-        fail_with_msg(
-            f"Could not find wire '{wire_name}' of bus/port '{bus_name}'!"
-        )
+        fail_with_msg(f"Could not find wire '{wire_name}' of bus/port '{bus_name}'!")
 
     return iob_wire_reference(wire=wire)
 
@@ -255,13 +253,11 @@ BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS = {
 def bus_from_dict(bus_dict):
     api_bus_obj = iob_bus()
 
-    key_attribute_mapping = {}
     preprocessor_functions = BUS_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
     # Update bus_obj attributes with values from given dictionary
     update_obj_from_dict(
         api_bus_obj._get_py2hwsw_internal_obj(),
         bus_dict,
-        key_attribute_mapping,
         preprocessor_functions,
         api_bus_obj.get_supported_attributes().keys(),
     )

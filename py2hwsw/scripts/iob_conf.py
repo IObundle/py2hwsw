@@ -142,18 +142,11 @@ def rename_dictionary_keys(dictionary, key_mapping):
 def conf_from_dict(conf_dict):
     api_conf_obj = iob_conf()
 
-    key_attribute_mapping = {
-        "type": "kind",
-        "val": "value",
-        "min": "min_value",
-        "max": "max_value",
-    }
     preprocessor_functions = {}
     # Update conf_obj attributes with values from given dictionary
     update_obj_from_dict(
         api_conf_obj._get_py2hwsw_internal_obj(),
         conf_dict,
-        key_attribute_mapping,
         preprocessor_functions,
         api_conf_obj.get_supported_attributes().keys(),
     )
@@ -187,7 +180,6 @@ def conf_group_from_dict(conf_group_dict):
         conf_group_obj.confs = [conf_from_dict(conf_group_dict)]
         return api_conf_group_obj
 
-    key_attribute_mapping = {}
     preprocessor_functions = {
         "confs": lambda lst: [conf_from_dict(i) for i in lst],
     }
@@ -195,7 +187,6 @@ def conf_group_from_dict(conf_group_dict):
     update_obj_from_dict(
         api_conf_group_obj._get_py2hwsw_internal_obj(),
         conf_group_dict,
-        key_attribute_mapping,
         preprocessor_functions,
         api_conf_group_obj.get_supported_attributes().keys(),
     )

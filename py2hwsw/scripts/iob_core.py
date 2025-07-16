@@ -111,11 +111,7 @@ class iob_core(iob_module):
             # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
             if "core" in core_dictionary or "python_parameters" in core_dictionary:
                 fail_with_msg("The 'core' and 'python_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
-            # Map keys and attribute preprocessor functions
-            key_attribute_mapping = {
-                "descr": "description",
-                "connect": "portmap_connections",
-            }
+            # Attribute preprocessor functions
             preprocessor_functions = {
                 "confs": lambda lst: [conf_group_from_dict(i) for i in lst],
                 "ports": lambda lst: [port_from_dict(i) for i in lst],
@@ -127,7 +123,7 @@ class iob_core(iob_module):
                 "python_parameters": lambda lst: [python_parameter_group_from_dict(i) for i in lst],
                 "portmap_connections": portmap_from_dict,
             }
-            update_obj_from_dict(self, core_dictionary, key_attribute_mapping, preprocessor_functions, self.get_api_obj().get_supported_attributes().keys())
+            update_obj_from_dict(self, core_dictionary, preprocessor_functions, self.get_api_obj().get_supported_attributes().keys())
 
         # Set global build directory
         if self.is_top_module:
@@ -1168,10 +1164,7 @@ def instantiate_block(block_name, python_parameters={}, block_dict={}):
 
     block_obj = convert2internal(api_block_obj)
 
-    # FIXME: These mappings are duplicates from iob_block's constructor. Harder to maintain
-    key_attribute_mapping = {
-        "connect": "portmap_connections",
-    }
+    # FIXME: These preprocessors are duplicates from iob_block's constructor. Harder to maintain
     preprocessor_functions = {
         "portmap_connections": portmap_from_dict,
     }
@@ -1180,7 +1173,7 @@ def instantiate_block(block_name, python_parameters={}, block_dict={}):
     instance_attributes_names = ["instance_name", "instance_description", "connect", "parameters", "instantiate", "dest_dir"]
     block_dict = {k:v for k,v in block_dict.items() if k in instance_attributes_names}
     # Set instance attributes
-    update_obj_from_dict(block_obj, block_dict, key_attribute_mapping, preprocessor_functions)
+    update_obj_from_dict(block_obj, block_dict, preprocessor_functions)
 
     # Auto-set block attributes
     if not block_obj.original_name:

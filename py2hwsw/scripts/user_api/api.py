@@ -122,10 +122,10 @@ def create_conf_from_dict(conf_dict):
         conf_dict (dict): dictionary with values to initialize attributes of iob_conf object.
             This dictionary supports the following keys corresponding to the iob_conf attributes:
             - name           -> iob_conf.name
-            - type           -> iob_conf.kind
-            - val            -> iob_conf.value
-            - min            -> iob_conf.min_value
-            - max            -> iob_conf.max_value
+            - kind           -> iob_conf.kind
+            - value          -> iob_conf.value
+            - min_value      -> iob_conf.min_value
+            - max_value      -> iob_conf.max_value
             - descr          -> iob_conf.descr
             - doc_only       -> iob_conf.doc_only
 
@@ -471,16 +471,16 @@ class iob_port:
     Describes an IO port.
 
     Attributes:
-        global_wire (iob_global_wire): Reference to the global wire that drives this port
+        global_wire (iob_bus): Reference to the core's bus that will become a port/interface.
         direction (str): Port direction
         doc_only (bool): Only add to documentation
         doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     """
 
-    # FIXME: Should the port reference a global wire or a local bus? 
+    # FIXME: Should the port reference a global wire or a local bus?
     # Since we probably dont want to create a port for every single wire (of an AXI bus for example), then I assume the port should reference a bus.
     # However, we dont have a global bus list (since global wires are not necessarly always grouped together).
-    global_wire: iob_global_wire = None
+    global_wire: iob_bus = None
     direction: str = ""
     doc_only: bool = False
     doc_clearpage: bool = False
@@ -972,7 +972,7 @@ def create_instance_from_dict(instance_dict):
             - core -> iob_instance.core
             - name -> iob_instance.name
             - description -> iob_instance.description
-            - connect -> iob_instance.portmap_connections = create_portmap_from_dict(connect)
+            - portmap_connections -> iob_instance.portmap_connections = create_portmap_from_dict(portmap_connections)
             - parameters -> iob_instance.parameters
             - instantiate -> iob_instance.instantiate
             # Non-attribute instance keys
@@ -1129,7 +1129,7 @@ def create_core_from_dict(core_dict):
             # Module keys
             - original_name -> iob_module.original_name
             - name -> iob_module.name
-            - descr -> iob_module.description
+            - description -> iob_module.description
             - reset_polarity -> iob_module.reset_polarity
             - confs -> iob_module.confs
             - ports -> iob_module.ports

@@ -172,6 +172,24 @@ core_dictionary = {
                 "b_i": "b_i",
                 "y_o": "and_ab_out",
             },
+            # Elements from 'python_parameters' dictionary will be expanded and passed to the constructor of the iob_and class, like so:
+            # iob_and(**python_parameters)
+            "python_parameters": {
+                "my_custom_py_param1": None,
+                "my_initialization_paramter": 123,
+                # Init attributes via short notation
+                "short_notation": "--noautoaddr --rw_overlap --csr_if iob",
+                # Init attributes via dictionary interface
+                "dictionary_interface": {
+                    "auto": False,
+                    "rw_overlap": True,
+                    "csr_if": "iob",
+                },
+                # Init attributes via arguments
+                "auto": False,
+                "rw_overlap": True,
+                "csr_if": "iob",
+            },
         },
         {
             "core": "iob_and",

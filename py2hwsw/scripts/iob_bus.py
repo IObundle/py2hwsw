@@ -14,7 +14,6 @@ from iob_base import (
     add_traceback_msg,
     str_to_kwargs,
     assert_attributes,
-    replace_dictionary_values,
     parse_short_notation_text,
 )
 from iob_wire import (
@@ -246,15 +245,10 @@ def dict2interface(name, interface_dict):
 
 
 def bus_from_dict(bus_dict):
-    # Functions to run on each dictionary element, to convert it to an object
-    replacement_functions = {
-        "wires": lambda lst: [wire_from_dict(i) for i in lst],
-    }
-    bus_dict_with_objects = replace_dictionary_values(
-        bus_dict,
-        replacement_functions,
-    )
-    return iob_bus(**bus_dict_with_objects)
+    # Convert dictionary elements to objects
+    kwargs = bus_dict.copy()
+    kwargs["wires"] = [wire_from_dict(i) for i in bus_dict["wires"]]
+    return iob_bus(**kwargs)
 
 
 def bus_from_text(bus_text):

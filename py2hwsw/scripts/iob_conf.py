@@ -11,7 +11,6 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     find_obj_in_list,
-    replace_dictionary_values,
     parse_short_notation_text,
 )
 from api_base import internal_api_class
@@ -167,15 +166,10 @@ def conf_group_from_dict(conf_group_dict):
             confs=[conf_from_dict(conf_group_dict)],
         )
 
-    # Functions to run on each dictionary element, to convert it to an object
-    replacement_functions = {
-        "confs": lambda lst: [conf_from_dict(i) for i in lst],
-    }
-    conf_group_dict_with_objects = replace_dictionary_values(
-        conf_group_dict,
-        replacement_functions,
-    )
-    return iob_conf_group(**conf_group_dict_with_objects)
+    # Convert dictionary elements to objects
+    kwargs = conf_group_dict.copy()
+    kwargs["confs"] = [conf_from_dict(i) for i in conf_group_dict["confs"]]
+    return iob_conf_group(**kwargs)
 
 
 def conf_group_from_text(conf_group_text: str):

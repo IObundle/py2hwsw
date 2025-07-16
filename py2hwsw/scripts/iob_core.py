@@ -39,7 +39,6 @@ from iob_base import (
     add_traceback_msg,
     debug_print,
     get_lib_cores,
-    replace_dictionary_values,
     update_obj_from_dict,
 )
 from iob_license import iob_license, update_license
@@ -112,23 +111,18 @@ class iob_core(iob_module):
             # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
             if "core" in core_dictionary or "python_parameters" in core_dictionary:
                 fail_with_msg("The 'core' and 'python_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
-            # Functions to run on each dictionary element, to convert it to an object
-            replacement_functions = {
-                "confs": lambda lst: [conf_group_from_dict(i) for i in lst],
-                "ports": lambda lst: [port_from_dict(i) for i in lst],
-                "buses": lambda lst: [bus_from_dict(i) for i in lst],
-                "snippets": lambda lst: [snippet_from_dict(i) for i in lst],
-                "subblocks": lambda lst: [core_from_dict(i) for i in lst],
-                "superblocks": lambda lst: [core_from_dict(i) for i in lst],
-                "sw_modules": lambda lst: [core_from_dict(i) for i in lst],
-                "python_parameters": lambda lst: [python_parameter_group_from_dict(i) for i in lst],
-                "portmap_connections": portmap_from_dict,
-            }
-            core_dictionary_with_objects = replace_dictionary_values(
-                core_dictionary,
-                replacement_functions,
-            )
-            update_obj_from_dict(self, core_dictionary_with_objects, valid_attributes_list=self.get_api_obj().get_supported_attributes().keys())
+            # Convert core dictionary elements to objects
+            core_dict_with_objects = core_dictionary.copy()
+            core_dict_with_objects["confs"] = [conf_group_from_dict(i) for i in core_dictionary["confs"]]
+            core_dict_with_objects["ports"] = [port_from_dict(i) for i in core_dictionary["ports"]]
+            core_dict_with_objects["buses"] = [bus_from_dict(i) for i in core_dictionary["buses"]]
+            core_dict_with_objects["snippets"] = [snippet_from_dict(i) for i in core_dictionary["snippets"]]
+            core_dict_with_objects["subblocks"] = [core_from_dict(i) for i in core_dictionary["subblocks"]]
+            core_dict_with_objects["superblocks"] = [core_from_dict(i) for i in core_dictionary["superblocks"]]
+            core_dict_with_objects["sw_modules"] = [core_from_dict(i) for i in core_dictionary["sw_modules"]]
+            core_dict_with_objects["python_parameters"] = [python_parameter_group_from_dict(i) for i in core_dictionary["python_parameters"]]
+            core_dict_with_objects["portmap_connections"] = portmap_from_dict(core_dictionary["portmap_connections"])
+            update_obj_from_dict(self, core_dict_with_objects, valid_attributes_list=self.get_api_obj().get_supported_attributes().keys())
 
         # Set global build directory
         if self.is_top_module:

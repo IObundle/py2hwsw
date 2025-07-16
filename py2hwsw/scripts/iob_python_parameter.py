@@ -11,7 +11,6 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     find_obj_in_list,
-    replace_dictionary_values,
 )
 
 from api_base import internal_api_class
@@ -112,15 +111,13 @@ def python_parameter_from_text(python_parameter_text):
 
 
 def python_parameter_group_from_dict(python_parameter_group_dict):
-    # Functions to run on each dictionary element, to convert it to an object
-    replacement_functions = {
-        "python_parameters": lambda lst: [python_parameter_from_dict(i) for i in lst],
-    }
-    python_parameter_group_dict_with_objects = replace_dictionary_values(
-        python_parameter_group_dict,
-        replacement_functions,
-    )
-    return iob_python_parameter_group(**python_parameter_group_dict_with_objects)
+    # Convert dictionary elements to objects
+    kwargs = python_parameter_group_dict.copy()
+    kwargs["python_parameters"] = [
+        python_parameter_from_dict(i)
+        for i in python_parameter_group_dict["python_parameters"]
+    ]
+    return iob_python_parameter_group(**kwargs)
 
 
 def python_parameter_group_from_text(python_parameter_group_text):

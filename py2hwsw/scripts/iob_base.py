@@ -726,30 +726,6 @@ def update_obj_from_dict(obj, attributes_dict, preprocessor_functions={}, valid_
         setattr(obj, attribute_name, value)
 
 
-def replace_dictionary_values(dictionary: dict, replacements_functions: dict={}) -> dict:
-    """
-    Given a dictionary with k,v pairs, replaces the values in the dictionary with the result of the
-    corresponding function.
-
-    Args:
-        dictionary (dict): Dictionary to replace values in.
-        replacements_functions (dict): Dictionary of function to replace values with.
-                            Replacement dictionary format:
-                            {
-                                "key_name1": function_to_replace_value_of_key_name_1,
-                                "key_name2": function_to_replace_value_of_key_name_2,
-                            }
-    Returns:
-        dict: A new dictionary with replaced values.
-    """
-    replaced_dict = {}
-    for key, value in dictionary.items():
-        if key in replacements_functions:
-            value = replacements_functions[key](value)
-        replaced_dict[key] = value
-    return replaced_dict
-
-
 #
 # Short notation functions
 #

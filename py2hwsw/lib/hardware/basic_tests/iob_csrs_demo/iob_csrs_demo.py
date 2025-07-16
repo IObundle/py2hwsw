@@ -140,13 +140,19 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "fifo_write_read",
+                "name": "fifo_write_r_en",
                 "descr": "",
-                "signals": [
-                    {"name": "fifo_write_w_en", "width": 1},
-                    {"name": "fifo_write_w_data", "width": 4},
-                    {"name": "fifo_write_w_empty", "width": 1},
-                ],
+                "signals": [{"name": "fifo_write_r_en"}],
+            },
+            {
+                "name": "fifo_write_r_data",
+                "descr": "",
+                "signals": [{"name": "fifo_write_r_data", "width": 4}],
+            },
+            {
+                "name": "fifo_write_r_empty",
+                "descr": "",
+                "signals": [{"name": "fifo_write_r_empty"}],
             },
             {
                 "name": "fifo_write_extmem",
@@ -205,13 +211,19 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "fifo_read_write",
+                "name": "fifo_read_w_en",
                 "descr": "",
-                "signals": [
-                    {"name": "fifo_read_r_en", "width": 1},
-                    {"name": "fifo_read_r_data", "width": 16},
-                    {"name": "fifo_read_r_full", "width": 1},
-                ],
+                "signals": [{"name": "fifo_read_w_en"}],
+            },
+            {
+                "name": "fifo_read_w_data",
+                "descr": "",
+                "signals": [{"name": "fifo_read_w_data", "width": 16}],
+            },
+            {
+                "name": "fifo_read_w_full",
+                "descr": "",
+                "signals": [{"name": "fifo_read_w_full"}],
             },
             {
                 "name": "fifo_read_interrupt",
@@ -802,12 +814,16 @@ def setup(py_params_dict):
                     "regarray_read_write_param_write_io": "regarray_param_rw_w",
                     # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
-                    "fifo_write_read_io": "fifo_write_read",
+                    "fifo_write_r_en_i": "fifo_write_r_en",
+                    "fifo_write_r_data_o": "fifo_write_r_data",
+                    "fifo_write_r_empty_o": "fifo_write_r_empty",
                     "fifo_write_extmem_io": "fifo_write_extmem",
                     "fifo_write_current_level_o": "fifo_write_current_level",
                     # FIFO read
                     "fifo_read_rst_i": "fifo_read_rst",
-                    "fifo_read_write_io": "fifo_read_write",
+                    "fifo_read_w_en_i": "fifo_read_w_en",
+                    "fifo_read_w_data_i": "fifo_read_w_data",
+                    "fifo_read_w_full_o": "fifo_read_w_full",
                     "fifo_read_interrupt_o": "fifo_read_interrupt",
                     "fifo_read_extmem_io": "fifo_read_extmem",
                     "fifo_read_current_level_o": "fifo_read_current_level",

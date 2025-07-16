@@ -128,22 +128,34 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "fifo_w_if",
-                "descr": "FIFO write interface",
-                "signals": [
-                    {"name": "fifo_wen"},
-                    {"name": "fifo_wdata", "width": "AXI_DATA_W"},
-                    {"name": "fifo_full"},
-                ],
+                "name": "fifo_wen",
+                "descr": "FIFO write enable signal",
+                "signals": [{"name": "fifo_wen"}],
             },
             {
-                "name": "fifo_r_if",
-                "descr": "FIFO read interface",
-                "signals": [
-                    {"name": "fifo_ren"},
-                    {"name": "fifo_rdata", "width": "AXI_DATA_W"},
-                    {"name": "fifo_empty"},
-                ],
+                "name": "fifo_wdata",
+                "descr": "FIFO write data signal",
+                "signals": [{"name": "fifo_wdata", "width": "AXI_DATA_W"}],
+            },
+            {
+                "name": "fifo_full",
+                "descr": "FIFO full signal",
+                "signals": [{"name": "fifo_full"}],
+            },
+            {
+                "name": "fifo_ren",
+                "descr": "FIFO read enable signal",
+                "signals": [{"name": "fifo_ren"}],
+            },
+            {
+                "name": "fifo_rdata",
+                "descr": "FIFO read data signal",
+                "signals": [{"name": "fifo_rdata", "width": "AXI_DATA_W"}],
+            },
+            {
+                "name": "fifo_empty",
+                "descr": "FIFO empty signal",
+                "signals": [{"name": "fifo_empty"}],
             },
             {
                 "name": "axi2axis_signals",
@@ -196,10 +208,14 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "rst_i": "rst_i",
-                    "write_io": "fifo_w_if",
-                    "read_io": "fifo_r_if",
+                    "w_en_i": "fifo_wen",
+                    "w_data_i": "fifo_wdata",
+                    "w_full_o": "fifo_full",
+                    "r_en_i": "fifo_ren",
+                    "r_data_o": "fifo_rdata",
+                    "r_empty_o": "fifo_empty",
+                    "level_o": "level_o",
                     "extmem_io": "read_fifo_external_mem_bus_m",
-                    "fifo_o": "level_o",
                 },
             },
             {

@@ -13,7 +13,7 @@ import pathlib
 
 import iob_colors
 
-import copy_srcs
+import setup_srcs
 
 import config_gen
 import param_gen
@@ -422,7 +422,7 @@ class iob_core(iob_module, iob_instance):
             return True
 
         # Copy files from the module's setup dir
-        copy_srcs.copy_rename_setup_directory(self)
+        setup_srcs.copy_rename_setup_directory(self)
 
         # Run post setup
         if is_first_module_called:
@@ -455,10 +455,10 @@ class iob_core(iob_module, iob_instance):
         # Copy files from LIB to setup various flows
         # (should run before copy of files from module's setup dir)
         if self.is_top_module or self.is_tester:
-            copy_srcs.flows_setup(self)
+            setup_srcs.flows_setup(self)
 
         # Copy files from the module's setup dir
-        copy_srcs.copy_rename_setup_directory(self)
+        setup_srcs.copy_rename_setup_directory(self)
 
         # Generate config_build.mk
         if self.is_top_module or self.is_tester:
@@ -610,7 +610,7 @@ class iob_core(iob_module, iob_instance):
         os.makedirs(f"{self.build_dir}/document/tsrc", exist_ok=True)
 
         shutil.copyfile(
-            f"{copy_srcs.get_lib_dir()}/build.mk", f"{self.build_dir}/Makefile"
+            f"{setup_srcs.get_lib_dir()}/build.mk", f"{self.build_dir}/Makefile"
         )
         nix_permission_hack(f"{self.build_dir}/Makefile")
 
@@ -888,8 +888,8 @@ class iob_core(iob_module, iob_instance):
             setup_dir=os.path.join(os.path.dirname(__file__), "../py2hwsw_document"),
             build_dir="py2hwsw_generated_docs",
         )
-        copy_srcs.doc_setup(core)
-        copy_srcs.copy_rename_setup_subdir(core, "document")
+        setup_srcs.doc_setup(core)
+        setup_srcs.copy_rename_setup_subdir(core, "document")
         with open(f"{core.build_dir}/config_build.mk", "w") as f:
             f.write("NAME=Py2HWSW\n")
         with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:

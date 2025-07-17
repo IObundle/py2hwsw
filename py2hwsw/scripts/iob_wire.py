@@ -16,12 +16,18 @@ class iob_wire:
     """Class that represents a core's internal wire"""
 
     def __post_init__(self):
-        print("DEBUG: Replacing global_wire attrs by setters and getters")
+        # print("DEBUG: Replacing global_wire attrs in current (local) wire by setters and getters")
         global_wire_attributes = self.__create_global_wire_attribute_wrappers()
-        print("DEBUG: Creating global wire")
+        # print("DEBUG: Creating global wire")
         self.global_wire = iob_global_wire(**global_wire_attributes)
 
     def __create_global_wire_attribute_wrappers(self) -> dict:
+        """
+        Deletes global wire attributes from current iob_wire object;
+        Generates setter and getter for them, pointing to the attributes of the corresponding global wire.
+        Returns:
+            dict: The attributes of the global wire and their default values (the ones from the locally deleted attributes).
+        """
         # Lazy import the global API class to get its attributes
         global_wire_api_class = getattr(
             importlib.import_module("user_api.api"), "iob_global_wire"
@@ -66,9 +72,18 @@ class iob_wire:
             delattr(self, wrapper_attr)
 
             # Create setter and getter for the attribute
-            print("Creating wrapper attribute", wrapper_attr)
-            setattr(self, f"set_{wrapper_attr}", _generate_setter(wrapper_attr))
-            setattr(self, f"get_{wrapper_attr}", _generate_getter(wrapper_attr))
+            # print("DEBUG: Creating wrapper attribute", wrapper_attr)
+            setter = _generate_setter(wrapper_attr)
+            getter = _generate_getter(wrapper_attr)
+            setattr(self, f"set_{wrapper_attr}", setter)
+            setattr(self, f"get_{wrapper_attr}", getter)
+
+            # Create a property for the wrapped attribute
+            setattr(
+                self,
+                wrapper_attr,
+                property(getter, setter),
+            )
 
         return global_wire_attributes
 

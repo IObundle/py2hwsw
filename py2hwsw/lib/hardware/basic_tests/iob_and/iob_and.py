@@ -137,13 +137,13 @@ if __name__ == "__main__":
             -d 'AOI outputs'
         """
     )
-    exit(1)  # DEBUG
     print("bus_obj: ", bus_obj.get_name(), end=" ")
     print("width: ", bus_obj.get_interface())
     for wire in bus_obj.get_wires():
         print("\twire: ", wire.get_name(), "width:", wire.get_width())
     print("descr: ", bus_obj.get_descr())
 
+    exit(1)  # DEBUG
     port_obj = py2hwsw.create_port_from_dict(
         {
             "name": "a_i",

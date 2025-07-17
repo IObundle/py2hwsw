@@ -36,10 +36,10 @@ signature.tex: $(DOC)_signature.tex
 	mv $< $@
 
 ug_signature.tex pb_signature.tex:
-	@echo `cat name.tex`-USG-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+	@echo `tail -n 1 name.tex`-USG-`tail -n 1 $(NAME)_version.tex`-`tail -n 1 shortHash.tex` > $@
 
 rn_signature.tex:
-	@echo `cat name.tex`-REL-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+	@echo `tail -n 1 name.tex`-REL-`tail -n 1 $(NAME)_version.tex`-`tail -n 1 shortHash.tex` > $@
 
 
 #make figures

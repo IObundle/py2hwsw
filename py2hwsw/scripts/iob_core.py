@@ -1208,7 +1208,7 @@ def core_from_dict(core_dict):
     return iob_core(core_dict)
 
 
-def core_from_text(core_text):
+def core_text2dict(core_text):
     core_flags = [
         # iob_module attributes
         "original_name",
@@ -1254,4 +1254,8 @@ def core_from_text(core_text):
     #   - subblocks, superblocks, sw_modules
     #   - connect -> portmap_connections, parameters, ignore_snippets?
     #   - parent?, python_parameters
-    return core_from_dict(core_dict)
+    return core_dict
+
+
+def core_from_text(core_text):
+    return core_from_dict(core_text2dict(core_text))

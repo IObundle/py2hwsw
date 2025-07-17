@@ -134,6 +134,18 @@ def create_conf_from_dict(conf_dict):
     pass
 
 
+@api_for(internal_conf.conf_text2dict)
+def conf_text2dict(conf_text):
+    """Convert conf short notation text to dictionary.
+    Atributes:
+        conf_text (str): Short notation text. See `create_conf_from_text` for format.
+
+    Returns:
+        dict: Dictionary with conf attributes.
+    """
+    pass
+
+
 @api_for(internal_conf.conf_from_text)
 def create_conf_from_text(conf_text):
     """
@@ -189,6 +201,18 @@ def create_conf_group_from_dict(conf_group_dict):
 
     Returns:
         iob_conf_group: iob_conf_group object
+    """
+    pass
+
+
+@api_for(internal_conf.conf_group_text2dict)
+def conf_group_text2dict(conf_group_text):
+    """Convert conf_group short notation text to dictionary.
+    Atributes:
+        conf_group_text (str): Short notation text. See `create_conf_group_from_text` for format.
+
+    Returns:
+        dict: Dictionary with conf_group attributes.
     """
     pass
 
@@ -262,6 +286,18 @@ def create_signal_from_dict(signal_dict):
     pass
 
 
+@api_for(internal_signal.signal_text2dict)
+def signal_text2dict(signal_text):
+    """Convert signal short notation text to dictionary.
+    Atributes:
+        signal_text (str): Short notation text. See `create_signal_from_text` for format.
+
+    Returns:
+        dict: Dictionary with signal attributes.
+    """
+    pass
+
+
 @api_for(internal_signal.signal_from_text)
 def create_signal_from_text(signal_text):
     """
@@ -320,6 +356,18 @@ def create_interface_from_dict(interface_dict):
 
     Returns:
         interface: interface object
+    """
+    pass
+
+
+@api_for(internal_interface.interface_text2dict)
+def interface_text2dict(interface_text):
+    """Convert interface short notation text to dictionary.
+    Atributes:
+        interface_text (str): Short notation text. See `create_interface_from_text` for format.
+
+    Returns:
+        dict: Dictionary with interface attributes.
     """
     pass
 
@@ -398,6 +446,18 @@ def create_wire_from_dict(wire_dict):
     pass
 
 
+@api_for(internal_wire.wire_text2dict)
+def wire_text2dict(wire_text):
+    """Convert wire short notation text to dictionary.
+    Atributes:
+        wire_text (str): Short notation text. See `create_wire_from_text` for format.
+
+    Returns:
+        dict: Dictionary with wire attributes.
+    """
+    pass
+
+
 @api_for(internal_wire.wire_from_text)
 def create_wire_from_text(wire_text):
     """
@@ -452,6 +512,18 @@ def create_port_from_dict(port_dict):
     pass
 
 
+@api_for(internal_port.port_text2dict)
+def port_text2dict(port_text):
+    """Convert port short notation text to dictionary.
+    Atributes:
+        port_text (str): Short notation text. See `create_port_from_text` for format.
+
+    Returns:
+        dict: Dictionary with port attributes.
+    """
+    pass
+
+
 @api_for(internal_port.port_from_text)
 def create_port_from_text(port_text):
     """
@@ -498,6 +570,18 @@ def create_snippet_from_dict(snippet_dict):
 
     Returns:
         iob_snippet: iob_snippet object
+    """
+    pass
+
+
+@api_for(internal_snippet.snippet_text2dict)
+def snippet_text2dict(snippet_text):
+    """Convert snippet short notation text to dictionary.
+    Atributes:
+        snippet_text (str): Short notation text. See `create_snippet_from_text` for format.
+
+    Returns:
+        dict: Dictionary with snippet attributes.
     """
     pass
 
@@ -551,6 +635,18 @@ def create_comb_from_dict(comb_dict):
 
     Returns:
         iob_comb: iob_comb object
+    """
+    pass
+
+
+@api_for(internal_comb.comb_text2dict)
+def comb_text2dict(comb_text):
+    """Convert comb short notation text to dictionary.
+    Atributes:
+        comb_text (str): Short notation text. See `create_comb_from_text` for format.
+
+    Returns:
+        dict: Dictionary with comb attributes.
     """
     pass
 
@@ -613,6 +709,18 @@ def create_fsm_from_dict(fsm_dict):
 
     Returns:
         iob_fsm: iob_fsm object
+    """
+    pass
+
+
+@api_for(internal_fsm.fsm_text2dict)
+def fsm_text2dict(fsm_text):
+    """Convert fsm short notation text to dictionary.
+    Atributes:
+        fsm_text (str): Short notation text. See `create_fsm_from_text` for format.
+
+    Returns:
+        dict: Dictionary with fsm attributes.
     """
     pass
 
@@ -684,6 +792,18 @@ def create_license_from_dict(license_dict):
 
     Returns:
         iob_license: iob_license object
+    """
+    pass
+
+
+@api_for(internal_license.license_text2dict)
+def license_text2dict(license_text):
+    """Convert license short notation text to dictionary.
+    Atributes:
+        license_text (str): Short notation text. See `create_license_from_text` for format.
+
+    Returns:
+        dict: Dictionary with license attributes.
     """
     pass
 
@@ -817,6 +937,18 @@ def create_python_parameter_from_dict(python_parameter_dict):
     pass
 
 
+@api_for(internal_python_parameter.python_parameter_text2dict)
+def python_parameter_text2dict(python_parameter_text):
+    """Convert python_parameter short notation text to dictionary.
+    Atributes:
+        python_parameter_text (str): Short notation text. See `create_python_parameter_from_text` for format.
+
+    Returns:
+        dict: Dictionary with python_parameter attributes.
+    """
+    pass
+
+
 @api_for(internal_python_parameter.python_parameter_from_text)
 def create_python_parameter_from_text(python_parameter_text):
     """
@@ -867,6 +999,18 @@ def create_python_parameter_group_from_dict(python_parameter_group_dict):
 
     Returns:
         iob_python_parameter_group: iob_python_parameter_group object
+    """
+    pass
+
+
+@api_for(internal_python_parameter.python_parameter_group_text2dict)
+def python_parameter_group_text2dict(python_parameter_group_text):
+    """Convert python_parameter_group short notation text to dictionary.
+    Atributes:
+        python_parameter_group_text (str): Short notation text. See `create_python_parameter_group_from_text` for format.
+
+    Returns:
+        dict: Dictionary with python_parameter_group attributes.
     """
     pass
 
@@ -1076,6 +1220,18 @@ def create_core_from_dict(core_dict):
 
     Returns:
         iob_core: iob_core object
+    """
+    pass
+
+
+@api_for(internal_core.core_text2dict)
+def core_text2dict(core_text):
+    """Convert core short notation text to dictionary.
+    Atributes:
+        core_text (str): Short notation text. See `create_core_from_text` for format.
+
+    Returns:
+        dict: Dictionary with core attributes.
     """
     pass
 

@@ -2172,7 +2172,7 @@ def interface_from_dict(interface_dict):
     return create_interface(**interface_dict)
 
 
-def interface_from_text(interface_text):
+def interface_text2dict(interface_text):
     interface_flags = [
         "genre",
         ["-d", {"dest": "if_direction", "choices": ["", "manager", "subordinate"]}],
@@ -2193,4 +2193,8 @@ def interface_from_text(interface_text):
             else:
                 raise ValueError(f"Invalid width specification: {width}")
     interface_dict.update({"widths": width_dict})
-    return create_interface(**interface_dict)
+    return interface_dict
+
+
+def interface_from_text(interface_text):
+    return interface_from_dict(interface_text2dict(interface_text))

@@ -35,11 +35,14 @@ def license_from_dict(license_dict):
     return iob_license(**license_dict)
 
 
-def license_from_text(license_text):
+def license_text2dict(license_text):
     license_flags = [
         "name",
         ["-y", {"dest": "year"}],
         ["-a", {"dest": "author"}],
     ]
-    license_dict = parse_short_notation_text(license_text, license_flags)
-    return iob_license(**license_dict)
+    return parse_short_notation_text(license_text, license_flags)
+
+
+def license_from_text(license_text):
+    return license_from_dict(license_text2dict(license_text))

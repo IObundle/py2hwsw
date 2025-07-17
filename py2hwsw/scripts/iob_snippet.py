@@ -37,6 +37,9 @@ def snippet_from_dict(snippet_dict):
     return iob_snippet(**snippet_dict)
 
 
+def snippet_text2dict(snippet_text):
+    return {'verilog_code': snippet_text}
+
+
 def snippet_from_text(snippet_text):
-    # Snippet shot notation translation is direct
-    return iob_snippet(verilog_code=snippet_text)
+    return iob_snippet(snippet_text2dict(snippet_text))

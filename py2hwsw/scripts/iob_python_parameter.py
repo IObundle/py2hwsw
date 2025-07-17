@@ -106,16 +106,17 @@ def python_parameter_from_dict(python_parameter_dict):
     return iob_python_parameter(**python_parameter_dict)
 
 
-def python_parameter_from_text(python_parameter_text):
+def python_parameter_text2dict(python_parameter_text):
     python_parameter_flags = [
         "name",
         ["-v", {"dest": "val"}],
         ["-d", {"dest": "descr"}],
     ]
-    python_parameter_dict = parse_short_notation_text(
-        python_parameter_text, python_parameter_flags
-    )
-    return iob_python_parameter(**python_parameter_dict)
+    return parse_short_notation_text(python_parameter_text, python_parameter_flags)
+
+
+def python_parameter_from_text(python_parameter_text):
+    return python_parameter_from_dict(python_parameter_text2dict(python_parameter_text))
 
 
 def python_parameter_group_from_dict(python_parameter_group_dict):
@@ -137,7 +138,7 @@ def python_parameter_group_from_dict(python_parameter_group_dict):
     return python_parameter_group_obj
 
 
-def python_parameter_group_from_text(python_parameter_group_text):
+def python_parameter_group_text2dict(python_parameter_group_text):
     python_parameter_group_flags = [
         "name",
         ["-d", {"dest": "descr"}],
@@ -149,7 +150,13 @@ def python_parameter_group_from_text(python_parameter_group_text):
     # Special processing for python_parameter subflags
     params: list[iob_python_parameter] = []
     for param_text in python_parameter_group_dict.get("python_parameters", []):
-        params.append(python_parameter_from_text(param_text))
-    # replace "python_parameters" short notation text with list of python parameter objects
+        params.append(python_parameter_text2dict(param_text))
+    # replace "python_parameters" short notation text with list of python parameter dicts
     python_parameter_group_dict.update({"python_parameters": params})
-    return iob_python_parameter_group(**python_parameter_group_dict)
+    return python_parameter_group_dict
+
+
+def python_parameter_group_from_text(python_parameter_group_text):
+    return python_parameter_group_from_dict(
+        python_parameter_group_text2dict(python_parameter_group_text)
+    )

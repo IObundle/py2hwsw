@@ -204,7 +204,7 @@ def port_from_dict(port_dict):
     return port_obj
 
 
-def port_from_text(port_text):
+def port_text2dict(port_text):
     port_flags = [
         "name",
         ["-i", {"dest": "interface"}],
@@ -225,4 +225,8 @@ def port_from_text(port_text):
             )
         port_signals.append(signal_from_dict({"name": s_name, "width": s_width}))
     port_dict.update({"signals": port_signals})
-    return iob_port(**port_dict)
+    return port_dict
+
+
+def port_from_text(port_text):
+    return port_from_dict(port_text2dict(port_text))

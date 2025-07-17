@@ -130,11 +130,14 @@ def fsm_from_dict(fsm_dict):
     return iob_fsm(**fsm_dict)
 
 
-def fsm_from_text(fsm_text):
+def fsm_text2dict(fsm_text):
     fsm_flags = [
         ['-t', {"dest": "kind", "choices": ["prog", "fsm"]}],
         ['-d', {"dest": "default_assignments"}],
         ['-s', {"dest": "state_descriptions"}],
     ]
-    fsm_dict = parse_short_notation_text(fsm_text, fsm_flags)
-    return iob_fsm(**fsm_dict)
+    return parse_short_notation_text(fsm_text, fsm_flags)
+
+
+def fsm_from_text(fsm_text):
+    return fsm_from_dict(fsm_text2dict(fsm_text))

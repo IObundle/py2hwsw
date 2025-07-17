@@ -274,12 +274,15 @@ def comb_from_dict(comb_dict):
     return iob_comb(**comb_dict)
 
 
-def comb_from_text(comb_text):
+def comb_text2dict(comb_text):
     comb_flags = [
         ["-c", {"dest": "code"}],
         ["-clk_if", {"dest": "clk_if"}],
         ["-clk_p", {"dest": "clk_prefix"}],
     ]
     # Parse comb text into a dictionary
-    comb_dict = parse_short_notation_text(comb_text, comb_flags)
-    return iob_comb(**comb_dict)
+    return parse_short_notation_text(comb_text, comb_flags)
+
+
+def comb_from_text(comb_text):
+    return comb_from_dict(comb_text2dict(comb_text))

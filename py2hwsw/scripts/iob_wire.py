@@ -269,7 +269,7 @@ def wire_from_dict(wire_dict):
     return wire_obj
 
 
-def wire_from_text(wire_text):
+def wire_text2dict(wire_text):
     wire_flags = [
         "name",
         ["-i", {"dest": "interface"}],
@@ -288,4 +288,8 @@ def wire_from_text(wire_text):
             )
         wire_signals.append(signal_from_dict({"name": s_name, "width": s_width}))
     wire_dict.update({"signals": wire_signals})
-    return iob_wire(**wire_dict)
+    return wire_dict
+
+
+def wire_from_text(wire_text):
+    return wire_from_dict(wire_text2dict(wire_text))

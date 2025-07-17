@@ -42,4 +42,4 @@ def snippet_text2dict(snippet_text):
 
 
 def snippet_from_text(snippet_text):
-    return iob_snippet(snippet_text2dict(snippet_text))
+    return snippet_from_dict(snippet_text2dict(snippet_text))

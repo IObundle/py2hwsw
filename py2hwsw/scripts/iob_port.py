@@ -223,7 +223,7 @@ def port_text2dict(port_text):
                 f"Invalid signal format '{s}'! Expected 'name:width' format.",
                 ValueError,
             )
-        port_signals.append(signal_from_dict({"name": s_name, "width": s_width}))
+        port_signals.append({"name": s_name, "width": s_width})
     port_dict.update({"signals": port_signals})
     return port_dict
 

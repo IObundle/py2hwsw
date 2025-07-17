@@ -180,9 +180,7 @@ if __name__ == "__main__":
     print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
 
     print("\n\nSnippet from text:")
-    snippet_obj = py2hwsw.create_snippet_from_text(
-        {"verilog_code": "   assign y_o = a_i & b_i;"}
-    )
+    snippet_obj = py2hwsw.create_snippet_from_text("   assign y_o = a_i & b_i;")
     print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
 
     comb_obj = py2hwsw.create_comb_from_text(

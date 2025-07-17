@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass, field
-import re
-from typing import List
+from dataclasses import dataclass
 
 import interfaces
 from iob_base import (
@@ -22,7 +20,7 @@ from iob_signal import (
     iob_signal_reference,
     get_real_signal,
     signal_from_dict,
-    signal_from_text,
+    signal_text2dict,
 )
 
 from api_base import internal_api_class
@@ -286,7 +284,7 @@ def wire_text2dict(wire_text):
                 f"Invalid signal format '{s}'! Expected 'name:width' format.",
                 ValueError,
             )
-        wire_signals.append(signal_from_dict({"name": s_name, "width": s_width}))
+        wire_signals.append({"name": s_name, "width": s_width})
     wire_dict.update({"signals": wire_signals})
     return wire_dict
 

@@ -143,6 +143,7 @@ def python_parameter_group_text2dict(python_parameter_group_text):
         "name",
         ["-d", {"dest": "descr"}],
         ["-P", {"dest": "python_parameters", "action": "append"}],
+        ["-doc_clearpage", {"dest": "doc_clearpage", "action": "store_true"}],
     ]
     python_parameter_group_dict = parse_short_notation_text(
         python_parameter_group_text, python_parameter_group_flags

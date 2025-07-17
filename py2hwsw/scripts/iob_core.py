@@ -1230,13 +1230,13 @@ def core_text2dict(core_text):
         ['-c', {'dest': 'connect', 'action': 'append'}],  # port:ext format
         ['--param', {'dest': 'parameters', 'action': 'append'}],  # PARAM:VALUE format
         ['--no-instantiate', {'dest': 'instantiate', 'action': 'store_false'}],
-        ['--dest_dir', {'dest': 'dest-dir'}],
+        ['--dest_dir', {'dest': 'dest_dir'}],
         # iob_core attributes
         ['-v', {'dest': 'version'}],
         ['--prev_v', {'dest': 'previous_version'}],
         ['--setup_dir', {'dest': 'setup_dir'}],
         ['--build_dir', {'dest': 'build_dir'}],
-        ['--use_netlist', {'dest': 'build_dir', 'action': 'store_true'}],
+        ['--use_netlist', {'dest': 'use_netlist', 'action': 'store_true'}],
         ['--system', {'dest': 'is_system', 'action': 'store_true'}],
         ['--board', {'dest': 'board_list', 'action': 'append'}],
         ['--ignore_snippet', {'dest': 'ignore_snippets', 'action': 'append'}],

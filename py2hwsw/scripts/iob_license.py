@@ -38,7 +38,7 @@ def license_from_dict(license_dict):
 def license_text2dict(license_text):
     license_flags = [
         "name",
-        ["-y", {"dest": "year"}],
+        ["-y", {"dest": "year", "type": int}],
         ["-a", {"dest": "author"}],
     ]
     return parse_short_notation_text(license_text, license_flags)

@@ -6,7 +6,7 @@
 
 import os
 import sys
-import wire
+import signal
 import importlib.util
 import time
 import select
@@ -198,13 +198,13 @@ def clean_exit():
 
 
 def cleanup_before_exit(signum, frame):
-    print(f"\n{PROGNAME}: Received wire {signum}. Ending...")
+    print(f"\n{PROGNAME}: Received signal {signum}. Ending...")
     clean_exit()
 
 
-# Register the cleanup function for SIGTERM and SIGINT wires
-wire.wire(wire.SIGTERM, cleanup_before_exit)
-wire.wire(wire.SIGINT, cleanup_before_exit)
+# Register the cleanup function for SIGTERM and SIGINT signals
+signal.signal(signal.SIGTERM, cleanup_before_exit)
+signal.signal(signal.SIGINT, cleanup_before_exit)
 
 
 def init_print():

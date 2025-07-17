@@ -9,7 +9,7 @@ import socket
 import os
 import time
 import subprocess
-import wire
+import signal
 import argparse
 import importlib.util
 from typing import List
@@ -116,7 +116,7 @@ def send_request(request):
 
 
 # Function to send a request to release the board
-def release_board(wire=None, frame=None):
+def release_board(signal=None, frame=None):
     request = form_request("release")
     send_request(request)
 
@@ -136,7 +136,7 @@ def kill_processes(sig=None, frame=None):
         # Check if process is still running
         if proc.poll() is None:
             # Gracefully terminate process group (the process and its children)
-            os.killpg(os.getpgid(proc.pid), wire.SIGTERM)
+            os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
             try:
                 # Wait for process to terminate gracefully
                 proc.wait(2)
@@ -145,8 +145,8 @@ def kill_processes(sig=None, frame=None):
                     "Timeout waiting for process to terminate gracefully! Forcing process kill..."
                 )
                 # Process did not terminate gracefully, kill it
-                os.killpg(os.getpgid(proc.pid), wire.SIGKILL)
-    # Dont throw an error if the function is called from wire handler
+                os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+    # Dont throw an error if the function is called from signal handler
     if sig is None:
         exit_program(1)
     else:
@@ -238,9 +238,9 @@ if __name__ == "__main__":
         send_request(request)
 
     if command == "grab":
-        # Call `kill_processes()` when termination wires are received
-        wire.wire(wire.SIGINT, kill_processes)
-        wire.wire(wire.SIGTERM, kill_processes)
+        # Call `kill_processes()` when termination signals are received
+        signal.signal(signal.SIGINT, kill_processes)
+        signal.signal(signal.SIGTERM, kill_processes)
     else:
         # End program if command is not "grab"
         sys.exit(0)

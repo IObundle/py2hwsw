@@ -134,18 +134,6 @@ def create_conf_from_dict(conf_dict):
     pass
 
 
-@api_for(internal_conf.conf_text2dict)
-def conf_text2dict(conf_text):
-    """Convert conf short notation text to dictionary.
-    Atributes:
-        conf_text (str): Short notation text. See `create_conf_from_text` for format.
-
-    Returns:
-        dict: Dictionary with conf attributes.
-    """
-    pass
-
-
 @api_for(internal_conf.conf_from_text)
 def create_conf_from_text(conf_text):
     """
@@ -165,92 +153,9 @@ def create_conf_from_text(conf_text):
     pass
 
 
-@api_for(internal_conf.iob_conf_group)
-class iob_conf_group:
-    """
-    Class to represent a group of configurations.
 
-    Attributes:
-        name (str): Configuration group identifier name.
-        descr (str): Description of the configuration group.
-        confs (list): List of configuration objects.
-        doc_only (bool): If enabled, configuration group will only appear in documentation. Not in the verilog code.
-        doc_clearpage (bool): If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
-    """
-
-    name: str = ""
-    descr: str = "Default description"
-    confs: list[iob_conf] = empty_list()
-    doc_only: bool = False
-    doc_clearpage: bool = False
-
-
-@api_for(internal_conf.conf_group_from_dict)
-def create_conf_group_from_dict(conf_group_dict):
-    """
-    Function to create iob_conf_group object from dictionary attributes.
-
-    Attributes:
-        conf_group_dict (dict): dictionary with values to initialize attributes of iob_conf_group object.
-            This dictionary supports the following keys corresponding to the iob_conf_group attributes:
-            - name          -> iob_conf_group.name
-            - descr         -> iob_conf_group.descr
-            - confs         -> iob_conf_group.confs
-            - doc_only      -> iob_conf_group.doc_only
-            - doc_clearpage -> iob_conf_group.doc_clearpage
-
-    Returns:
-        iob_conf_group: iob_conf_group object
-    """
-    pass
-
-
-@api_for(internal_conf.conf_group_text2dict)
-def conf_group_text2dict(conf_group_text):
-    """Convert conf_group short notation text to dictionary.
-    Atributes:
-        conf_group_text (str): Short notation text. See `create_conf_group_from_text` for format.
-
-    Returns:
-        dict: Dictionary with conf_group attributes.
-    """
-    pass
-
-
-@api_for(internal_conf.conf_group_from_text)
-def create_conf_group_from_text(conf_group_text):
-    """
-    Function to create iob_conf_group object from short notation text.
-
-    Attributes:
-        conf_group_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-d descr] [--confs] [-doc] [-doc_clearpage]
-            Example:
-                'Default group'
-                -d 'Default group of confs'
-                -doc
-                -doc_clearpage
-                --confs {{
-                    DATA_W -t P -v 32 -m NA -M NA
-                    -d 'Data bus width'
-
-                    ADDR_W -t P -v 4 -m NA -M NA
-                    -d 'Address width'
-                }}
-
-    Returns:
-        iob_conf_group: iob_conf_group object
-    """
-    pass
-
-
-#
-# Signals
-#
-
-
-@api_for(internal_signal.iob_signal)
-class iob_signal:
+@api_for(internal_signal.iob_wire)
+class iob_wire:
     """
     Class that represents a wire/port signal.
 
@@ -267,7 +172,7 @@ class iob_signal:
     isvar: bool = False
 
 
-@api_for(internal_signal.signal_from_dict)
+@api_for(internal_wire.signal_from_dict)
 def create_signal_from_dict(signal_dict):
     """
     Function to create iob_signal object from dictionary attributes.

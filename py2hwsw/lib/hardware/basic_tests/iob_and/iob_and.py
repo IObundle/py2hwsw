@@ -90,7 +90,7 @@ if __name__ == "__main__":
         -doc
         -doc_clearpage
         --confs
-            "
+            {{
             DATA_W -t P -v 32 -m NA -M NA
             -d 'Data bus width'
 
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
             COUNT_W -t D -v $clog2(END_COUNT) -m NA -M NA
             -d 'Count width'
-            "
+            }}
         """
     )
     print(conf_groups_obj.get_name())
@@ -188,10 +188,10 @@ if __name__ == "__main__":
     comb_obj = py2hwsw.create_comb_from_text(
         """
             -c
-            "
+            {{
                 // Register data
                 data_nxt = data;
-            "
+            }}
             -clk_if c_a_r
             -clk_p data_
         """
@@ -207,7 +207,7 @@ if __name__ == "__main__":
             -t fsm
             -d 'a_o = 10;'
             -s
-            '
+            {{
                 A: a_o = 0;
                 B: a_o = 1;
                 a_o = 2;
@@ -219,7 +219,7 @@ if __name__ == "__main__":
                 begin
                     pcnt_nxt = B;
                 end
-            '
+             }}
         """
     )
     print(">>> fsm_obj: ", fsm_obj.get_kind())

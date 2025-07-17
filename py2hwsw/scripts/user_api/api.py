@@ -206,14 +206,13 @@ def create_conf_group_from_text(conf_group_text):
                 -d 'Default group of confs'
                 -doc
                 -doc_clearpage
-                --confs
-                    "
+                --confs {{
                     DATA_W -t P -v 32 -m NA -M NA
                     -d 'Data bus width'
 
                     ADDR_W -t P -v 4 -m NA -M NA
                     -d 'Address width'
-                    "
+                }}
 
     Returns:
         iob_conf_group: iob_conf_group object
@@ -335,7 +334,9 @@ def create_interface_from_text(interface_text):
             genre [-d direction] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
             Examples:
                 axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
+
                 rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32
+
                 axis -p output_ -P 'has_tlast'
 
     Returns:
@@ -563,15 +564,13 @@ def create_comb_from_text(comb_text):
         comb_text (str): Short notation text. Object attributes are specified using the following format:
             [-c code] [-clk_if clk_if] [-clk_p clk_prefix]
             Example:
-                '
-                    -c
-                    "
-                        // Register data
-                        data_nxt = data;
-                    "
-                    -clk_if c_a_r
-                    -clk_p data_
-                '
+                -c
+                {{
+                    // Register data
+                    data_nxt = data;
+                }}
+                -clk_if c_a_r
+                -clk_p data_
 
     Returns:
         iob_comb: iob_comb object
@@ -630,7 +629,7 @@ def create_fsm_from_text(fsm_text):
                 -t fsm
                 -d 'a_o = 10;'
                 -s
-                '
+                {{
                     A: a_o = 0;
                     B: a_o = 1;
                     a_o = 2;
@@ -642,7 +641,7 @@ def create_fsm_from_text(fsm_text):
                     begin
                         pcnt_nxt = B;
                     end
-                '
+                }}
 
     Returns:
         iob_fsm: iob_fsm object

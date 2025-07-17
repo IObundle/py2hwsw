@@ -201,14 +201,6 @@ module iob_fifo_sync_tb;
       .cke_i (cke),
       .rst_i (reset),
 
-      .ext_mem_clk_o   (ext_mem_clk),
-      .ext_mem_w_en_o  (ext_mem_w_en),
-      .ext_mem_w_addr_o(ext_mem_w_addr),
-      .ext_mem_w_data_o(ext_mem_w_data),
-      .ext_mem_r_en_o  (ext_mem_r_en),
-      .ext_mem_r_addr_o(ext_mem_r_addr),
-      .ext_mem_r_data_i(ext_mem_r_data),
-
       .r_en_i   (r_en),
       .r_data_o (r_data),
       .r_empty_o(r_empty),
@@ -216,7 +208,15 @@ module iob_fifo_sync_tb;
       .w_en_i  (w_en),
       .w_data_i(w_data),
       .w_full_o(w_full),
-      .level_o (level)
+      .level_o (level),
+
+      .ext_mem_clk_o   (ext_mem_clk),
+      .ext_mem_w_en_o  (ext_mem_w_en),
+      .ext_mem_w_addr_o(ext_mem_w_addr),
+      .ext_mem_w_data_o(ext_mem_w_data),
+      .ext_mem_r_en_o  (ext_mem_r_en),
+      .ext_mem_r_addr_o(ext_mem_r_addr),
+      .ext_mem_r_data_i(ext_mem_r_data)
    );
 
    genvar p;

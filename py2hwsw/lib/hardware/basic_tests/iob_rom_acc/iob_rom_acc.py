@@ -80,17 +80,6 @@ def setup(py_params_dict):
                     },
                 ],
             },
-            {
-                "name": "ctr_en_rst",
-                "signals": [
-                    {"name": "ctr_enable", "width": 1, "descr": "Enable signal"},
-                    {
-                        "name": "ctr_reset",
-                        "width": 1,
-                        "descr": "Synchronous reset signal",
-                    },
-                ],
-            },
         ],
         "subblocks": [
             {
@@ -116,7 +105,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "ctr_en_rst",
+                    "counter_rst_i": "ctr_reset",
+                    "counter_en_i": "ctr_enable",
                     "data_o": "addr_o",
                 },
             },

@@ -29,9 +29,9 @@ module iob_fifo_sync #(
    ) w_addr_cnt0 (
       `include "iob_fifo_sync_iob_clk_s_s_portmap.vs"
 
-      .rst_i (rst_i),
-      .en_i  (w_en_int),
-      .data_o(w_addr)
+      .counter_rst_i(rst_i),
+      .counter_en_i(w_en_int),
+      .data_o       (w_addr)
    );
 
    //effective read enable
@@ -46,9 +46,9 @@ module iob_fifo_sync #(
    ) r_addr_cnt0 (
       `include "iob_fifo_sync_iob_clk_s_s_portmap.vs"
 
-      .rst_i (rst_i),
-      .en_i  (r_en_int),
-      .data_o(r_addr)
+      .counter_rst_i(rst_i),
+      .counter_en_i(r_en_int),
+      .data_o       (r_addr)
    );
 
    //assign according to assymetry type

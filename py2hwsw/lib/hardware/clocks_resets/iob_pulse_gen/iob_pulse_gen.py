@@ -87,12 +87,9 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "iob_pulse_gen_int",
-                "descr": "iob_pulse_gen_int wire",
-                "signals": [
-                    {"name": "cnt_en", "width": 1},
-                    {"name": "start_i"},
-                ],
+                "name": "cnt_en",
+                "descr": "Counter enable signal",
+                "signals": [{"name": "cnt_en"}],
             },
             {
                 "name": "cnt",
@@ -134,7 +131,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "en_rst_i": "iob_pulse_gen_int",
+                    "counter_rst_i": "start_i",
+                    "counter_en_i": "cnt_en",
                     "data_o": "cnt",
                 },
             },

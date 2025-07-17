@@ -50,8 +50,6 @@ def setup(py_params_dict):
                       assign bin_o[pos] = ^gr_i[DATA_W-1:pos];
                    end
                 endgenerate
-
-
                 """
             }
         ],

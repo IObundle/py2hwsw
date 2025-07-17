@@ -140,13 +140,19 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "fifo_write_read",
+                "name": "fifo_write_r_en",
                 "descr": "",
-                "signals": [
-                    {"name": "fifo_write_w_en", "width": 1},
-                    {"name": "fifo_write_w_data", "width": 4},
-                    {"name": "fifo_write_w_empty", "width": 1},
-                ],
+                "signals": [{"name": "fifo_write_r_en"}],
+            },
+            {
+                "name": "fifo_write_r_data",
+                "descr": "",
+                "signals": [{"name": "fifo_write_r_data", "width": 4}],
+            },
+            {
+                "name": "fifo_write_r_empty",
+                "descr": "",
+                "signals": [{"name": "fifo_write_r_empty"}],
             },
             {
                 "name": "fifo_write_extmem",
@@ -205,13 +211,19 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "fifo_read_write",
+                "name": "fifo_read_w_en",
                 "descr": "",
-                "signals": [
-                    {"name": "fifo_read_r_en", "width": 1},
-                    {"name": "fifo_read_r_data", "width": 16},
-                    {"name": "fifo_read_r_full", "width": 1},
-                ],
+                "signals": [{"name": "fifo_read_w_en"}],
+            },
+            {
+                "name": "fifo_read_w_data",
+                "descr": "",
+                "signals": [{"name": "fifo_read_w_data", "width": 16}],
+            },
+            {
+                "name": "fifo_read_w_full",
+                "descr": "",
+                "signals": [{"name": "fifo_read_w_full"}],
             },
             {
                 "name": "fifo_read_interrupt",
@@ -270,54 +282,54 @@ def setup(py_params_dict):
             },
             # Async write FIFO
             {
-                "name": "async_fifo_write_read",
-                "descr": "Read interface",
+                "name": "async_fifo_write_r_clk_en_rst",
+                "descr": "Read clock, clock enable and async reset",
                 "signals": [
-                    {
-                        "name": "async_fifo_write_r_clk_i",
-                        "width": 1,
-                        "descr": "Read clock",
-                    },
-                    {
-                        "name": "async_fifo_write_r_cke_i",
-                        "width": 1,
-                        "descr": "Read clock enable",
-                    },
-                    {
-                        "name": "async_fifo_write_r_arst_i",
-                        "width": 1,
-                        "descr": "Read async reset",
-                    },
-                    {
-                        "name": "async_fifo_write_r_rst_i",
-                        "width": 1,
-                        "descr": "Read sync reset",
-                    },
-                    {
-                        "name": "async_fifo_write_r_en_i",
-                        "width": 1,
-                        "descr": "Read enable",
-                    },
-                    {
-                        "name": "async_fifo_write_r_data_o",
-                        "width": 8,
-                        "descr": "Read data",
-                    },
-                    {
-                        "name": "async_fifo_write_r_full_o",
-                        "width": 1,
-                        "descr": "Read full signal",
-                    },
-                    {
-                        "name": "async_fifo_write_r_empty_o",
-                        "width": 1,
-                        "descr": "Read empty signal",
-                    },
-                    {
-                        "name": "async_fifo_write_r_level_o",
-                        "width": 5,
-                        "descr": "Read fifo level",
-                    },
+                    {"name": "async_fifo_write_r_clk_i"},
+                    {"name": "async_fifo_write_r_cke_i"},
+                    {"name": "async_fifo_write_r_arst_i"},
+                ],
+            },
+            {
+                "name": "async_fifo_write_r_rst_i",
+                "descr": "Read sync reset",
+                "signals": [
+                    {"name": "async_fifo_write_r_rst_i"},
+                ],
+            },
+            {
+                "name": "async_fifo_write_r_en_i",
+                "descr": "Read enable",
+                "signals": [
+                    {"name": "async_fifo_write_r_en_i"},
+                ],
+            },
+            {
+                "name": "async_fifo_write_r_data_o",
+                "descr": "Read data",
+                "signals": [
+                    {"name": "async_fifo_write_r_data_o", "width": 8},
+                ],
+            },
+            {
+                "name": "async_fifo_write_r_full_o",
+                "descr": "Read full signal",
+                "signals": [
+                    {"name": "async_fifo_write_r_full_o"},
+                ],
+            },
+            {
+                "name": "async_fifo_write_r_empty_o",
+                "descr": "Read empty signal",
+                "signals": [
+                    {"name": "async_fifo_write_r_empty_o"},
+                ],
+            },
+            {
+                "name": "async_fifo_write_r_level_o",
+                "descr": "Read fifo level",
+                "signals": [
+                    {"name": "async_fifo_write_r_level_o", "width": 5},
                 ],
             },
             {
@@ -367,54 +379,54 @@ def setup(py_params_dict):
             },
             # Async read FIFO
             {
-                "name": "async_fifo_read_write",
-                "descr": "Write interface",
+                "name": "async_fifo_read_r_clk_en_rst",
+                "descr": "Read clock, clock enable and async reset",
                 "signals": [
-                    {
-                        "name": "async_fifo_read_w_clk_i",
-                        "width": 1,
-                        "descr": "Read clock",
-                    },
-                    {
-                        "name": "async_fifo_read_w_cke_i",
-                        "width": 1,
-                        "descr": "Read clock enable",
-                    },
-                    {
-                        "name": "async_fifo_read_w_arst_i",
-                        "width": 1,
-                        "descr": "Read async reset",
-                    },
-                    {
-                        "name": "async_fifo_read_w_rst_i",
-                        "width": 1,
-                        "descr": "Read sync reset",
-                    },
-                    {
-                        "name": "async_fifo_read_w_en_i",
-                        "width": 1,
-                        "descr": "Read enable",
-                    },
-                    {
-                        "name": "async_fifo_read_w_data_o",
-                        "width": 8,
-                        "descr": "Read data",
-                    },
-                    {
-                        "name": "async_fifo_read_w_full_o",
-                        "width": 1,
-                        "descr": "Read full signal",
-                    },
-                    {
-                        "name": "async_fifo_read_w_empty_o",
-                        "width": 1,
-                        "descr": "Read empty signal",
-                    },
-                    {
-                        "name": "async_fifo_read_w_level_o",
-                        "width": 5,
-                        "descr": "Read fifo level",
-                    },
+                    {"name": "async_fifo_read_w_clk_i"},
+                    {"name": "async_fifo_read_w_cke_i"},
+                    {"name": "async_fifo_read_w_arst_i"},
+                ],
+            },
+            {
+                "name": "async_fifo_read_w_rst_i",
+                "descr": "Read sync reset",
+                "signals": [
+                    {"name": "async_fifo_read_w_rst_i"},
+                ],
+            },
+            {
+                "name": "async_fifo_read_w_en_i",
+                "descr": "Read enable",
+                "signals": [
+                    {"name": "async_fifo_read_w_en_i"},
+                ],
+            },
+            {
+                "name": "async_fifo_read_w_data_i",
+                "descr": "Read data",
+                "signals": [
+                    {"name": "async_fifo_read_w_data_i", "width": 8},
+                ],
+            },
+            {
+                "name": "async_fifo_read_w_full_o",
+                "descr": "Read full signal",
+                "signals": [
+                    {"name": "async_fifo_read_w_full_o"},
+                ],
+            },
+            {
+                "name": "async_fifo_read_w_empty_o",
+                "descr": "Read empty signal",
+                "signals": [
+                    {"name": "async_fifo_read_w_empty_o"},
+                ],
+            },
+            {
+                "name": "async_fifo_read_w_level_o",
+                "descr": "Read fifo level",
+                "signals": [
+                    {"name": "async_fifo_read_w_level_o", "width": 5},
                 ],
             },
             {
@@ -802,20 +814,36 @@ def setup(py_params_dict):
                     "regarray_read_write_param_write_io": "regarray_param_rw_w",
                     # FIFO write
                     "fifo_write_rst_i": "fifo_write_rst",
-                    "fifo_write_read_io": "fifo_write_read",
+                    "fifo_write_r_en_i": "fifo_write_r_en",
+                    "fifo_write_r_data_o": "fifo_write_r_data",
+                    "fifo_write_r_empty_o": "fifo_write_r_empty",
                     "fifo_write_extmem_io": "fifo_write_extmem",
                     "fifo_write_current_level_o": "fifo_write_current_level",
                     # FIFO read
                     "fifo_read_rst_i": "fifo_read_rst",
-                    "fifo_read_write_io": "fifo_read_write",
+                    "fifo_read_w_en_i": "fifo_read_w_en",
+                    "fifo_read_w_data_i": "fifo_read_w_data",
+                    "fifo_read_w_full_o": "fifo_read_w_full",
                     "fifo_read_interrupt_o": "fifo_read_interrupt",
                     "fifo_read_extmem_io": "fifo_read_extmem",
                     "fifo_read_current_level_o": "fifo_read_current_level",
                     # Async FIFO write
-                    "async_fifo_write_read_io": "async_fifo_write_read",
+                    "async_fifo_write_r_clk_en_rst_s": "async_fifo_write_r_clk_en_rst",
+                    "async_fifo_write_r_rst_i": "async_fifo_write_r_rst_i",
+                    "async_fifo_write_r_en_i": "async_fifo_write_r_en_i",
+                    "async_fifo_write_r_data_o": "async_fifo_write_r_data_o",
+                    "async_fifo_write_r_full_o": "async_fifo_write_r_full_o",
+                    "async_fifo_write_r_empty_o": "async_fifo_write_r_empty_o",
+                    "async_fifo_write_r_level_o": "async_fifo_write_r_level_o",
                     "async_fifo_write_extmem_io": "async_fifo_write_extmem",
                     # Async FIFO read
-                    "async_fifo_read_write_io": "async_fifo_read_write",
+                    "async_fifo_read_w_clk_en_rst_s": "async_fifo_read_w_clk_en_rst",
+                    "async_fifo_read_w_rst_i": "async_fifo_read_w_rst_i",
+                    "async_fifo_read_w_en_i": "async_fifo_read_w_en_i",
+                    "async_fifo_read_w_data_i": "async_fifo_read_w_data_i",
+                    "async_fifo_read_w_full_o": "async_fifo_read_w_full_o",
+                    "async_fifo_read_w_empty_o": "async_fifo_read_w_empty_o",
+                    "async_fifo_read_w_level_o": "async_fifo_read_w_level_o",
                     "async_fifo_read_extmem_io": "async_fifo_read_extmem",
                     # No auto
                     "noauto_write_io": "noauto_write",

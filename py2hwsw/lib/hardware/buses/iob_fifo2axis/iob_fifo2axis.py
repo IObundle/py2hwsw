@@ -79,26 +79,19 @@ def setup(py_params_dict):
     ports.extend(
         [
             {
-                "name": "fifo_r_io",
-                "descr": "FIFO read interface",
-                "signals": [
-                    {
-                        "name": "fifo_read_o",
-                        "width": 1,
-                        "descr": "FIFO read signal",
-                        "isvar": True,
-                    },
-                    {
-                        "name": "fifo_rdata_i",
-                        "width": "DATA_W",
-                        "descr": "FIFO read data signal",
-                    },
-                    {
-                        "name": "fifo_empty_i",
-                        "width": 1,
-                        "descr": "FIFO empty signal",
-                    },
-                ],
+                "name": "fifo_read_o",
+                "descr": "FIFO read signal",
+                "signals": [{"name": "fifo_read_o"}],
+            },
+            {
+                "name": "fifo_rdata_i",
+                "descr": "FIFO read data signal",
+                "signals": [{"name": "fifo_rdata_i", "width": "DATA_W"}],
+            },
+            {
+                "name": "fifo_empty_i",
+                "descr": "FIFO empty signal",
+                "signals": [{"name": "fifo_empty_i"}],
             },
             {
                 "name": "axis_m",

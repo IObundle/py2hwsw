@@ -6,7 +6,7 @@
 
 import os
 import sys
-import wire
+import signal
 import importlib.util
 import time
 import select

@@ -19,6 +19,9 @@ from memories import find_and_update_regfile_csrs
 from memories import find_and_update_ram_csrs
 from special_csrs import find_and_update_autoclear_csrs
 
+from iob_base import parse_short_notation_text
+from csr_classes import iob_csr_group_text2dict
+
 # Static (shared) dictionary to store reg tables of generated csrs
 # May be read by other python modules
 static_reg_tables = {}
@@ -445,3 +448,41 @@ def _reset_autoaddrs(autoaddr, csrs):
         for csr_group in csrs:
             for r in csr_group.regs:
                 r.addr = -1
+
+
+def csrs_text2dict(csrs_text):
+    """Convert iob_csrs short notation text to dictionary
+    Attributes:
+        csrs_text (str): short notation text. Specified with the following format:
+            [--csr_if CSR_IF] [--rw_overlap] [--autoaddr] [--doc_conf DOC_CONF]
+            [--csr-group csr_group]+
+            See `iob_csr_group_text2dict()` for `csr_group` format details.
+            Example:
+                --csr_if iob --rw_overlap --no-autoaddr --doc_conf full
+                --csr-group "
+                    ctrl -d 'Control registers' -doc -doc_clearpage
+                    -r \\"softreset:1 -m W -d 'Soft reset' --rst_val 0 --addr 0 --log2n_items 0\\"
+                    -r \\"start:1 -m W -d 'Start operation' --rst_val 0 --addr 1 --log2n_items 1\\"
+                    -r \\"done:1 -m R -d 'Operation Complete' --rst_val 1 --addr 2 --log2n_items 1 --doc_conf full\\"
+                "
+                --csr-group "
+                    data -d 'Data registers' -doc -doc_clearpage
+                    -r \\"d_in:32 -m W -d 'Data input' --rst_val 0 --addr 4 --log2n_items 0\\"
+                    -r \\"d_out:8 -m R -d 'Data output' --rst_val 255 --addr 8 --log2n_items 0\\"
+                "
+
+    Returns:
+        list: with csrs attributes / python parameters list
+    """
+    csrs_flags = [
+        ["--csr_if", {"dest": "csr_if"}],
+        ["--rw_overlap", {"dest": "rw_overlap", "action": "store_true"}],
+        ["--no-autoaddr", {"dest": "autoaddr", "action": "store_false"}],
+        ["--doc_conf", {"dest": "doc_conf"}],
+        ["--csr-group", {"dest": "csr-group", "action": "append"}],
+    ]
+    csrs_dict: dict = parse_short_notation_text(csrs_text, csrs_flags)
+    csrs_list: list = []
+    for c_group in csrs_dict.get("csr-group", []):
+        csrs_list.append(iob_csr_group_text2dict(c_group))
+    return csrs_list

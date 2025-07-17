@@ -161,7 +161,7 @@ def conf_from_dict(conf_dict):
     return conf_obj
 
 
-def conf_from_text(conf_text: str) -> iob_conf:
+def conf_text2dict(conf_text: str) -> dict:
     # parse conf text into a dictionary
     conf_text_flags = [
         "name",
@@ -172,8 +172,11 @@ def conf_from_text(conf_text: str) -> iob_conf:
         ["-d", {"dest": "descr", "nargs": "?"}],
         ["-doc", {"dest": "doc_only", "action": "store_true"}],
     ]
-    conf_dict = parse_short_notation_text(conf_text, conf_text_flags)
-    return iob_conf(**conf_dict)
+    return parse_short_notation_text(conf_text, conf_text_flags)
+
+
+def conf_from_text(conf_text: str) -> iob_conf:
+    return conf_from_dict(conf_text2dict(conf_text))
 
 
 def conf_group_from_dict(conf_group_dict):
@@ -203,7 +206,7 @@ def conf_group_from_dict(conf_group_dict):
     return conf_group_obj
 
 
-def conf_group_from_text(conf_group_text: str):
+def conf_group_text2dict(conf_group_text: str) -> dict:
     # Create conf_group from short notation text
     conf_group_flags = [
         "name",
@@ -218,7 +221,11 @@ def conf_group_from_text(conf_group_text: str):
     # Special processing for conf subflags
     confs: list[iob_conf] = []
     for conf_text in conf_group_dict.get("confs", "").split("\n\n"):
-        confs.append(conf_from_text(conf_text))
+        confs.append(conf_text2dict(conf_text))
     # replace "confs" short notation text with list of conf objects
     conf_group_dict.update({"confs": confs})
-    return iob_conf_group(**conf_group_dict)
+    return conf_group_dict
+
+
+def conf_group_from_text(conf_group_text: str):
+    return conf_group_from_dict(conf_group_text2dict(conf_group_text))

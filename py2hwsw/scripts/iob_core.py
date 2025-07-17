@@ -41,6 +41,7 @@ from iob_base import (
     debug,
     get_lib_cores,
     update_obj_from_dict,
+    parse_short_notation_text,
 )
 from iob_license import iob_license, update_license
 import sw_tools
@@ -1207,7 +1208,54 @@ def core_from_dict(core_dict):
     return iob_core(core_dict)
 
 
+def core_text2dict(core_text):
+    core_flags = [
+        # iob_module attributes
+        "original_name",
+        "name",
+        ['-d', {'dest': 'descr'}],
+        ['--rst_pol', {'dest': 'rst_policy'}],
+        ['--conf', {'dest': 'confs', 'action': 'append'}],
+        ['--port', {'dest': 'ports', 'action': 'append'}],
+        ['--wire', {'dest': 'wires', 'action': 'append'}],
+        ['--snippet', {'dest': 'snippets', 'action': 'append'}],
+        ['--comb', {'dest': 'comb'}],
+        ['--fsm', {'dest': 'fsm'}],
+        ['--subblock', {'dest': 'subblocks', 'action': 'append'}],
+        ['--superblock', {'dest': 'superblocks', 'action': 'append'}],
+        ['--sw_module', {'dest': 'sw_modules', 'action': 'append'}],
+        # iob_instance attributes
+        ['--inst_name', {'dest': 'instance_name'}],
+        ['--inst_d', {'dest': 'instance_description'}],
+        ['-c', {'dest': 'connect', 'action': 'append'}],  # port:ext format
+        ['--param', {'dest': 'parameters', 'action': 'append'}],  # PARAM:VALUE format
+        ['--no-instantiate', {'dest': 'instantiate', 'action': 'store_false'}],
+        ['--dest_dir', {'dest': 'dest_dir'}],
+        # iob_core attributes
+        ['-v', {'dest': 'version'}],
+        ['--prev_v', {'dest': 'previous_version'}],
+        ['--setup_dir', {'dest': 'setup_dir'}],
+        ['--build_dir', {'dest': 'build_dir'}],
+        ['--use_netlist', {'dest': 'use_netlist', 'action': 'store_true'}],
+        ['--system', {'dest': 'is_system', 'action': 'store_true'}],
+        ['--board', {'dest': 'board_list', 'action': 'append'}],
+        ['--ignore_snippet', {'dest': 'ignore_snippets', 'action': 'append'}],
+        ['--gen_hw', {'dest': 'generate_hw', 'action': 'store_true'}],
+        ['--parent', {'dest': 'parent'}],
+        ['--tester', {'dest': 'is_tester', 'action': 'store_true'}],
+        ['--py_param', {'dest': 'python_parameters', 'action': 'append'}],
+        ['--lic', {'dest': 'license'}],
+        ['--doc_conf', {'dest': 'doc_conf'}],
+        ['--title', {'dest': 'title'}],
+    ]
+    core_dict = parse_short_notation_text(core_text, core_flags)
+    # TODO: process core_dict:
+    #   - confs, ports, wires, snippets, comb, fsm,
+    #   - subblocks, superblocks, sw_modules
+    #   - connect -> portmap_connections, parameters, ignore_snippets?
+    #   - parent?, python_parameters
+    return core_dict
+
+
 def core_from_text(core_text):
-    core_dict = {}
-    # TODO: parse short notation text
-    return iob_core(**core_dict)
+    return core_from_dict(core_text2dict(core_text))

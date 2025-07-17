@@ -3,10 +3,8 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
-from datetime import date
 
-from iob_base import fail_with_msg
-
+from iob_base import fail_with_msg, parse_short_notation_text
 
 from api_base import internal_api_class
 
@@ -37,7 +35,14 @@ def license_from_dict(license_dict):
     return iob_license(**license_dict)
 
 
+def license_text2dict(license_text):
+    license_flags = [
+        "name",
+        ["-y", {"dest": "year", "type": int}],
+        ["-a", {"dest": "author"}],
+    ]
+    return parse_short_notation_text(license_text, license_flags)
+
+
 def license_from_text(license_text):
-    license_dict = {}
-    # TODO: parse short notation text
-    return iob_license(**license_dict)
+    return license_from_dict(license_text2dict(license_text))

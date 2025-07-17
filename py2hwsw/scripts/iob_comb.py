@@ -6,7 +6,7 @@ import re
 
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
-from iob_base import fail_with_msg, assert_attributes
+from iob_base import fail_with_msg, assert_attributes, parse_short_notation_text
 from iob_wire import find_signal_in_wires
 from iob_signal import get_real_signal
 from interfaces import iobClkInterface
@@ -274,7 +274,15 @@ def comb_from_dict(comb_dict):
     return iob_comb(**comb_dict)
 
 
+def comb_text2dict(comb_text):
+    comb_flags = [
+        ["-c", {"dest": "code"}],
+        ["-clk_if", {"dest": "clk_if"}],
+        ["-clk_p", {"dest": "clk_prefix"}],
+    ]
+    # Parse comb text into a dictionary
+    return parse_short_notation_text(comb_text, comb_flags)
+
+
 def comb_from_text(comb_text):
-    comb_dict = {}
-    # TODO: parse short notation text
-    return iob_comb(**comb_dict)
+    return comb_from_dict(comb_text2dict(comb_text))

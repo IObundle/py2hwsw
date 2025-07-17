@@ -90,7 +90,7 @@ if __name__ == "__main__":
         -doc
         -doc_clearpage
         --confs
-            "
+            {{
             DATA_W -t P -v 32 -m NA -M NA
             -d 'Data bus width'
 
@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
             COUNT_W -t D -v $clog2(END_COUNT) -m NA -M NA
             -d 'Count width'
-            "
+            }}
         """
     )
     print(conf_groups_obj.get_name())
@@ -143,6 +143,16 @@ if __name__ == "__main__":
         print("\tsignal: ", signal.get_name(), "width:", signal.get_width())
     print("descr: ", wire_obj.get_descr())
 
+    # iface_obj = py2hwsw.create_interface_from_text(
+    #     "axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_"
+    # )
+    # iface_obj = py2hwsw.create_interface_from_text(
+    #     "rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32"
+    # )
+    # iface_obj = py2hwsw.create_interface_from_text(
+    #     "axis -p output_ -P 'has_tlast'"
+    # )
+
     port_obj = py2hwsw.create_port_from_dict(
         {
             "name": "a_i",
@@ -155,10 +165,93 @@ if __name__ == "__main__":
     print(">>> Name of port_obj: ", port_obj.get_name())
     print(">>> Name of port signal: ", port_obj.get_signals()[0].get_name())
 
+    port_obj = py2hwsw.create_port_from_text(
+        "control -d 'control bus' -s start_i:1 -s done_o:1 -s cmd_i:CMD_W -doc"
+    )
+    print(">>> Name of port_obj: ", port_obj.get_name())
+    print(">>> port_obj doc_only: ", port_obj.get_doc_only())
+    print(">>> port_obj doc_clearpage: ", port_obj.get_doc_clearpage())
+    for s in port_obj.get_signals():
+        print("\t>>> Signal name: ", s.get_name(), "width:", s.get_width())
+
     snippet_obj = py2hwsw.create_snippet_from_dict(
         {"verilog_code": "   assign y_o = a_i & b_i;"}
     )
     print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
+
+    print("\n\nSnippet from text:")
+    snippet_obj = py2hwsw.create_snippet_from_text("   assign y_o = a_i & b_i;")
+    print(">>> Verilog of snippet_obj: ", snippet_obj.get_verilog_code())
+
+    comb_obj = py2hwsw.create_comb_from_text(
+        """
+            -c
+            {{
+                // Register data
+                data_nxt = data;
+            }}
+            -clk_if c_a_r
+            -clk_p data_
+        """
+    )
+    print(">>> comb_obj: clk_if: ", comb_obj.get_clk_if(), end=" ")
+    print("|\t clk_prefix: ", comb_obj.get_clk_prefix())
+    print("code:")
+    print(comb_obj.get_code())
+    print("======\n\n")
+
+    fsm_obj = py2hwsw.create_fsm_from_text(
+        """
+            -t fsm
+            -d 'a_o = 10;'
+            -s
+            {{
+                A: a_o = 0;
+                B: a_o = 1;
+                a_o = 2;
+                if(a_o == 0)
+                begin
+                    pcnt_nxt = A;
+                end
+                else
+                begin
+                    pcnt_nxt = B;
+                end
+             }}
+        """
+    )
+    print(">>> fsm_obj: ", fsm_obj.get_kind())
+    print(">>> default assignments of fsm_obj:\n", fsm_obj.get_default_assignments())
+    print(">>> state descriptions of fsm_obj:\n", fsm_obj.get_state_descriptions())
+    print("======\n")
+
+    license_obj = py2hwsw.create_license_from_text("""MIT -y 2025 -a 'IObundle, Lda'""")
+    print(f">>> License name: {license_obj.get_name()}")
+    print(f"\tyear: {license_obj.get_year()}\n\tauthor: {license_obj.get_author()}")
+    print("======\n")
+
+    python_parameter_obj = py2hwsw.create_python_parameter_from_text(
+        "my_param -v 42 -d 'My parameter description'"
+    )
+    print(f">>> python_parameter name: {python_parameter_obj.get_name()}")
+    print(
+        f"\tvalue: {python_parameter_obj.get_val()}\n\tdescr: {python_parameter_obj.get_descr()}"
+    )
+    print("======\n")
+
+    py_param_group_obj = py2hwsw.create_python_parameter_group_from_text(
+        """
+                param_group -d 'Group of parameters' -doc_clearpage
+                -P "param1 -v 42 -d 'Parameter 1 description'"
+                -P "OUTPUT_W -v DATA_W -d 'Data width'"
+         """
+    )
+    print(f">>> Python parameter group name: {py_param_group_obj.get_name()}")
+    print(f"\tdescr: {py_param_group_obj.get_descr()}")
+    for param in py_param_group_obj.get_python_parameters():
+        print(f"\t>>> Parameter name: {param.get_name()}")
+        print(f"\t\tvalue: {param.get_val()}\n\t\tdescr: {param.get_descr()}")
+    print("======\n")
 
     core_obj = py2hwsw.create_core_from_dict(core_dictionary)
     print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())

@@ -103,12 +103,15 @@ def signal_from_dict(signal_dict):
     return iob_signal(**signal_dict)
 
 
-def signal_from_text(signal_text):
+def signal_text2dict(signal_text):
     signal_flags = [
         "name",
         ["-w", {"dest": "width"}],
         ["-v", {"dest": "isvar", "action": "store_true"}],
         ["-d", {"dest": "descr", "nargs": "?"}],
     ]
-    signal_dict = parse_short_notation_text(signal_text, signal_flags)
-    return iob_signal(**signal_dict)
+    return parse_short_notation_text(signal_text, signal_flags)
+
+
+def signal_from_text(signal_text):
+    return signal_from_dict(signal_text2dict(signal_text))

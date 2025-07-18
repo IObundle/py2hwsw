@@ -21,7 +21,7 @@ HELP_MSG = """\
 Py2HWSW Python Shell
 ------------------------------------------------------------------------
 
-To create IP cores using Py2HWSW refer to our exemples by typing:
+To create IP cores using Py2HWSW refer to our examples by typing:
 
 >>> show("example_name")
 

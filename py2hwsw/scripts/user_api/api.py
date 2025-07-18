@@ -49,20 +49,20 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 )
 from api_base import api_for, empty_list, empty_dict
-import iob_conf as internal_conf
-import iob_wire as internal_wire
-import interfaces as internal_interface
-import iob_bus as internal_bus
-import iob_port as internal_port
-import iob_snippet as internal_snippet
-import iob_comb as internal_comb
-import iob_fsm as internal_fsm
-import iob_block as internal_block
-import iob_license as internal_license
-import iob_portmap as internal_portmap
-import iob_python_parameter as internal_python_parameter
-import iob_instance as internal_instance
-import iob_core as internal_core
+import iob_conf as py2hwsw_conf
+import iob_wire as py2hwsw_wire
+import interfaces as py2hwsw_interface
+import iob_bus as py2hwsw_bus
+import iob_port as py2hwsw_port
+import iob_snippet as py2hwsw_snippet
+import iob_comb as py2hwsw_comb
+import iob_fsm as py2hwsw_fsm
+import iob_block as py2hwsw_block
+import iob_license as py2hwsw_license
+import iob_portmap as py2hwsw_portmap
+import iob_python_parameter as py2hwsw_python_parameter
+import iob_instance as py2hwsw_instance
+import iob_core as py2hwsw_core
 from py2hwsw_version import PY2HWSW_VERSION
 
 
@@ -82,7 +82,7 @@ from py2hwsw_version import PY2HWSW_VERSION
 #
 # Confs
 #
-@api_for(internal_conf.iob_conf)
+@api_for(py2hwsw_conf.iob_conf)
 class iob_conf:
     """
     Class to represent a configuration option.
@@ -113,7 +113,7 @@ class iob_conf:
 
 
 # TODO: Rename 'keys' to match attribute names. No longer need to map them.
-@api_for(internal_conf.conf_from_dict)
+@api_for(py2hwsw_conf.conf_from_dict)
 def create_conf_from_dict(conf_dict):
     """
     Function to create iob_conf object from dictionary attributes.
@@ -135,7 +135,7 @@ def create_conf_from_dict(conf_dict):
     pass
 
 
-@api_for(internal_conf.conf_from_text)
+@api_for(py2hwsw_conf.conf_from_text)
 def create_conf_from_text(conf_text):
     """
     Function to create iob_conf object from short notation text.
@@ -157,8 +157,8 @@ def create_conf_from_text(conf_text):
 #
 # Wires
 #
-# NOTE: I think each internal wire/port may create its own (new) global wire (net). We could then merge all connected global wires (nets) into one. Maybe during the generate_build_dir() process?
-@api_for(internal_wire.iob_global_wire)
+# NOTE: I think each py2hwsw wire/port may create its own (new) global wire (net). We could then merge all connected global wires (nets) into one. Maybe during the generate_build_dir() process?
+@api_for(py2hwsw_wire.iob_global_wire)
 class iob_global_wire:
     """
     Class that represents a global wire. Similar concept to 'net' in HDL terminology: https://vhdlwhiz.com/terminology/net/#net
@@ -179,7 +179,7 @@ class iob_global_wire:
     value: str or int = 0
 
 
-@api_for(internal_wire.global_wire_from_dict)
+@api_for(py2hwsw_wire.global_wire_from_dict)
 def create_global_wire_from_dict(global_wire_dict):
     """
     Function to create iob_global_wire object from dictionary attributes.
@@ -198,7 +198,7 @@ def create_global_wire_from_dict(global_wire_dict):
     pass
 
 
-@api_for(internal_wire.global_wire_text2dict)
+@api_for(py2hwsw_wire.global_wire_text2dict)
 def global_wire_text2dict(global_wire_text):
     """Convert global_wire short notation text to dictionary.
     Atributes:
@@ -210,7 +210,7 @@ def global_wire_text2dict(global_wire_text):
     pass
 
 
-@api_for(internal_wire.global_wire_from_text)
+@api_for(py2hwsw_wire.global_wire_from_text)
 def create_global_wire_from_text(global_wire_text):
     """
     Function to create iob_global_wire object from short notation text.
@@ -227,14 +227,14 @@ def create_global_wire_from_text(global_wire_text):
     pass
 
 
-@api_for(internal_wire.iob_wire)
+@api_for(py2hwsw_wire.iob_wire)
 class iob_wire:
     """
-    Class that represents a core's internal wire.
+    Class that represents a core's py2hwsw wire.
 
     Attributes:
         name (str): Name for the wire inside the core. Verilog wire will be generated with this name.
-        global_wire (iob_global_wire): Reference to the global_wire (net) that drives the internal wire.
+        global_wire (iob_global_wire): Reference to the global_wire (net) that drives the py2hwsw wire.
     """
 
     name: str = ""
@@ -247,7 +247,7 @@ class iob_wire:
     value: str or int = 0
 
 
-@api_for(internal_wire.wire_from_dict)
+@api_for(py2hwsw_wire.wire_from_dict)
 def create_wire_from_dict(wire_dict):
     """
     Function to create iob_wire object from dictionary attributes.
@@ -264,7 +264,7 @@ def create_wire_from_dict(wire_dict):
     pass
 
 
-@api_for(internal_wire.wire_from_text)
+@api_for(py2hwsw_wire.wire_from_text)
 def create_wire_from_text(wire_text):
     """
     Function to create iob_wire object from short notation text.
@@ -284,7 +284,7 @@ def create_wire_from_text(wire_text):
 #
 
 
-@api_for(internal_interface.interface)
+@api_for(py2hwsw_interface.interface)
 class interface:
     """
     Class to represent an interface for generation.
@@ -304,7 +304,7 @@ class interface:
     portmap_port_prefix: str = ""
 
 
-@api_for(internal_interface.interface_from_dict)
+@api_for(py2hwsw_interface.interface_from_dict)
 def create_interface_from_dict(interface_dict):
     """
     Function to create interface object from dictionary attributes.
@@ -324,7 +324,7 @@ def create_interface_from_dict(interface_dict):
     pass
 
 
-@api_for(internal_interface.interface_text2dict)
+@api_for(py2hwsw_interface.interface_text2dict)
 def interface_text2dict(interface_text):
     """Convert interface short notation text to dictionary.
     Atributes:
@@ -336,7 +336,7 @@ def interface_text2dict(interface_text):
     pass
 
 
-@api_for(internal_interface.interface_from_text)
+@api_for(py2hwsw_interface.interface_from_text)
 def create_interface_from_text(interface_text):
     """
     Function to create interface object from short notation text.
@@ -360,7 +360,7 @@ def create_interface_from_text(interface_text):
 #
 # Buses
 #
-@api_for(internal_bus.iob_bus)
+@api_for(py2hwsw_bus.iob_bus)
 class iob_bus:
     """
     Class to represent a bus in an iob module.
@@ -391,7 +391,7 @@ class iob_bus:
         pass
 
 
-@api_for(internal_bus.bus_from_dict)
+@api_for(py2hwsw_bus.bus_from_dict)
 def create_bus_from_dict(bus_dict):
     """
     Function to create iob_bus object from dictionary attributes.
@@ -410,7 +410,7 @@ def create_bus_from_dict(bus_dict):
     pass
 
 
-@api_for(internal_bus.bus_from_text)
+@api_for(py2hwsw_bus.bus_from_text)
 def create_bus_from_text(bus_text):
     """
     Function to create iob_bus object from short notation text.
@@ -432,7 +432,7 @@ def create_bus_from_text(bus_text):
 #
 
 
-@api_for(internal_port.iob_port)
+@api_for(py2hwsw_port.iob_port)
 class iob_port:
     """
     Describes an IO port.
@@ -454,7 +454,7 @@ class iob_port:
     doc_clearpage: bool = False
 
 
-@api_for(internal_port.port_from_dict)
+@api_for(py2hwsw_port.port_from_dict)
 def create_port_from_dict(port_dict):
     """
     Function to create iob_port object from dictionary attributes.
@@ -473,7 +473,7 @@ def create_port_from_dict(port_dict):
     pass
 
 
-@api_for(internal_port.port_text2dict)
+@api_for(py2hwsw_port.port_text2dict)
 def port_text2dict(port_text):
     """Convert port short notation text to dictionary.
     Atributes:
@@ -485,7 +485,7 @@ def port_text2dict(port_text):
     pass
 
 
-@api_for(internal_port.port_from_text)
+@api_for(py2hwsw_port.port_from_text)
 def create_port_from_text(port_text):
     """
     Function to create iob_port object from short notation text.
@@ -507,7 +507,7 @@ def create_port_from_text(port_text):
 #
 
 
-@api_for(internal_snippet.iob_snippet)
+@api_for(py2hwsw_snippet.iob_snippet)
 class iob_snippet:
     """
     Class to represent a Verilog snippet in an iob module.
@@ -519,7 +519,7 @@ class iob_snippet:
     verilog_code: str = ""
 
 
-@api_for(internal_snippet.snippet_from_dict)
+@api_for(py2hwsw_snippet.snippet_from_dict)
 def create_snippet_from_dict(snippet_dict):
     """
     Function to create iob_snippet object from dictionary attributes.
@@ -535,7 +535,7 @@ def create_snippet_from_dict(snippet_dict):
     pass
 
 
-@api_for(internal_snippet.snippet_text2dict)
+@api_for(py2hwsw_snippet.snippet_text2dict)
 def snippet_text2dict(snippet_text):
     """Convert snippet short notation text to dictionary.
     Atributes:
@@ -547,7 +547,7 @@ def snippet_text2dict(snippet_text):
     pass
 
 
-@api_for(internal_snippet.snippet_from_text)
+@api_for(py2hwsw_snippet.snippet_from_text)
 def create_snippet_from_text(snippet_text):
     """
     Function to create iob_snippet object from short notation text.
@@ -567,7 +567,7 @@ def create_snippet_from_text(snippet_text):
 #
 
 
-@api_for(internal_comb.iob_comb)
+@api_for(py2hwsw_comb.iob_comb)
 class iob_comb(iob_snippet):
     """
     Class to represent a Verilog combinatory circuit in an iob module.
@@ -599,7 +599,7 @@ class iob_comb(iob_snippet):
     clk_prefix: str = ""
 
 
-@api_for(internal_comb.comb_from_dict)
+@api_for(py2hwsw_comb.comb_from_dict)
 def create_comb_from_dict(comb_dict):
     """
     Function to create iob_comb object from dictionary attributes.
@@ -616,7 +616,7 @@ def create_comb_from_dict(comb_dict):
     pass
 
 
-@api_for(internal_comb.comb_text2dict)
+@api_for(py2hwsw_comb.comb_text2dict)
 def comb_text2dict(comb_text):
     """Convert comb short notation text to dictionary.
     Atributes:
@@ -628,7 +628,7 @@ def comb_text2dict(comb_text):
     pass
 
 
-@api_for(internal_comb.comb_from_text)
+@api_for(py2hwsw_comb.comb_from_text)
 def create_comb_from_text(comb_text):
     """
     Function to create iob_comb object from short notation text.
@@ -656,7 +656,7 @@ def create_comb_from_text(comb_text):
 #
 
 
-@api_for(internal_fsm.iob_fsm)
+@api_for(py2hwsw_fsm.iob_fsm)
 class iob_fsm(iob_comb):
     """
     Class to represent a Verilog finite state machine in an iob module.
@@ -672,7 +672,7 @@ class iob_fsm(iob_comb):
     state_descriptions: str = ""
 
 
-@api_for(internal_fsm.fsm_from_dict)
+@api_for(py2hwsw_fsm.fsm_from_dict)
 def create_fsm_from_dict(fsm_dict):
     """
     Function to create iob_fsm object from dictionary attributes.
@@ -690,7 +690,7 @@ def create_fsm_from_dict(fsm_dict):
     pass
 
 
-@api_for(internal_fsm.fsm_text2dict)
+@api_for(py2hwsw_fsm.fsm_text2dict)
 def fsm_text2dict(fsm_text):
     """Convert fsm short notation text to dictionary.
     Atributes:
@@ -703,7 +703,7 @@ def fsm_text2dict(fsm_text):
 
 
 
-@api_for(internal_fsm.fsm_from_text)
+@api_for(py2hwsw_fsm.fsm_from_text)
 def create_fsm_from_text(fsm_text):
     """
     Function to create iob_fsm object from short notation text.
@@ -740,7 +740,7 @@ def create_fsm_from_text(fsm_text):
 #
 
 
-@api_for(internal_license.license_text2dict)
+@api_for(py2hwsw_license.license_text2dict)
 def license_text2dict(license_text):
     """Convert license short notation text to dictionary.
     Atributes:
@@ -752,7 +752,7 @@ def license_text2dict(license_text):
     pass
 
 
-@api_for(internal_license.iob_license)
+@api_for(py2hwsw_license.iob_license)
 class iob_license:
     """
     Class that represents a license attribute.
@@ -768,7 +768,7 @@ class iob_license:
     author: str = "IObundle, Lda"
 
 
-@api_for(internal_license.license_from_dict)
+@api_for(py2hwsw_license.license_from_dict)
 def create_license_from_dict(license_dict):
     """
     Function to create iob_license object from dictionary attributes.
@@ -786,7 +786,7 @@ def create_license_from_dict(license_dict):
     pass
 
 
-@api_for(internal_license.license_from_text)
+@api_for(py2hwsw_license.license_from_text)
 def create_license_from_text(license_text):
     """
     Function to create iob_license object from short notation text.
@@ -808,7 +808,7 @@ def create_license_from_text(license_text):
 #
 
 
-@api_for(internal_portmap.iob_portmap)
+@api_for(py2hwsw_portmap.iob_portmap)
 class iob_portmap:
     """
     Class that represents a portmap attribute.
@@ -824,7 +824,7 @@ class iob_portmap:
     port: str = None
 
 
-@api_for(internal_portmap.portmap_from_dict)
+@api_for(py2hwsw_portmap.portmap_from_dict)
 def create_portmap_from_dict(portmap_dict):
     """
     Function to create iob_portmap object from dictionary attributes.
@@ -865,7 +865,7 @@ def create_portmap_from_dict(portmap_dict):
     pass
 
 
-@api_for(internal_portmap.portmap_from_text)
+@api_for(py2hwsw_portmap.portmap_from_text)
 def create_portmap_from_text(portmap_text):
     """
     Function to create iob_portmap object from short notation text.
@@ -885,7 +885,7 @@ def create_portmap_from_text(portmap_text):
 #
 
 
-@api_for(internal_python_parameter.iob_python_parameter)
+@api_for(py2hwsw_python_parameter.iob_python_parameter)
 class iob_python_parameter:
     """
     Class that represents a python parameter attribute.
@@ -901,7 +901,7 @@ class iob_python_parameter:
     descr: str = "Default description"
 
 
-@api_for(internal_python_parameter.python_parameter_from_dict)
+@api_for(py2hwsw_python_parameter.python_parameter_from_dict)
 def create_python_parameter_from_dict(python_parameter_dict):
     """
     Function to create iob_python_parameter object from dictionary attributes.
@@ -919,7 +919,7 @@ def create_python_parameter_from_dict(python_parameter_dict):
     pass
 
 
-@api_for(internal_python_parameter.python_parameter_text2dict)
+@api_for(py2hwsw_python_parameter.python_parameter_text2dict)
 def python_parameter_text2dict(python_parameter_text):
     """Convert python_parameter short notation text to dictionary.
     Atributes:
@@ -932,7 +932,7 @@ def python_parameter_text2dict(python_parameter_text):
 
 
 
-@api_for(internal_python_parameter.python_parameter_from_text)
+@api_for(py2hwsw_python_parameter.python_parameter_from_text)
 def create_python_parameter_from_text(python_parameter_text):
     """
     Function to create iob_python_parameter object from short notation text.
@@ -949,7 +949,7 @@ def create_python_parameter_from_text(python_parameter_text):
     pass
 
 
-@api_for(internal_python_parameter.iob_python_parameter_group)
+@api_for(py2hwsw_python_parameter.iob_python_parameter_group)
 class iob_python_parameter_group:
     """
     Class that represents a group of Python Parameters.
@@ -967,7 +967,7 @@ class iob_python_parameter_group:
     doc_clearpage: bool = False
 
 
-@api_for(internal_python_parameter.python_parameter_group_from_dict)
+@api_for(py2hwsw_python_parameter.python_parameter_group_from_dict)
 def create_python_parameter_group_from_dict(python_parameter_group_dict):
     """
     Function to create iob_python_parameter_group object from dictionary attributes.
@@ -986,7 +986,7 @@ def create_python_parameter_group_from_dict(python_parameter_group_dict):
     pass
 
 
-@api_for(internal_python_parameter.python_parameter_group_from_text)
+@api_for(py2hwsw_python_parameter.python_parameter_group_from_text)
 def create_python_parameter_group_from_text(python_parameter_group_text):
     """
     Function to create iob_python_parameter_group object from short notation text.
@@ -1012,7 +1012,7 @@ class iob_core:
     pass
 
 
-@api_for(internal_instance.iob_instance)
+@api_for(py2hwsw_instance.iob_instance)
 class iob_instance:
     """
     Generic class to describe a module's instance.
@@ -1035,7 +1035,7 @@ class iob_instance:
     instantiate: bool = True
 
 
-@api_for(internal_instance.instance_from_dict)
+@api_for(py2hwsw_instance.instance_from_dict)
 def create_instance_from_dict(instance_dict):
     """
     Function to create iob_instance object from dictionary attributes.
@@ -1066,7 +1066,7 @@ def create_instance_from_dict(instance_dict):
     pass
 
 
-@api_for(internal_instance.iob_instance)
+@api_for(py2hwsw_instance.iob_instance)
 def create_instance_from_text(instance_text):
     """
     Function to create iob_instance object from short notation text.
@@ -1087,7 +1087,7 @@ def create_instance_from_text(instance_text):
 #
 
 
-@api_for(internal_core.iob_core)
+@api_for(py2hwsw_core.iob_core)
 class iob_core:
     """
     Generic class to describe how to generate a base IOb IP core.
@@ -1138,7 +1138,7 @@ class iob_core:
     """
 
     # Module attributes
-    # FIXME: Remove original_name attribute. Create internal `get_original_name()` method that obtains class name dynamically.
+    # FIXME: Remove original_name attribute. Create py2hwsw `get_original_name()` method that obtains class name dynamically.
     # The lack of this attribute may cause some issues for .json cores, or cores created with iob_core(core_dict).
     # But we can probably work around this by creating dynamic subclasses of iob_core with the correct name.
     original_name: str = None
@@ -1191,7 +1191,7 @@ class iob_core:
         pass
 
 
-@api_for(internal_core.core_from_dict)
+@api_for(py2hwsw_core.core_from_dict)
 def create_core_from_dict(core_dict):
     """
     Function to create iob_core object from dictionary attributes.
@@ -1239,7 +1239,7 @@ def create_core_from_dict(core_dict):
     pass
 
 
-@api_for(internal_core.core_text2dict)
+@api_for(py2hwsw_core.core_text2dict)
 def core_text2dict(core_text):
     """Convert core short notation text to dictionary.
     Atributes:
@@ -1251,7 +1251,7 @@ def core_text2dict(core_text):
     pass
 
 
-@api_for(internal_core.core_from_text)
+@api_for(py2hwsw_core.core_from_text)
 def create_core_from_text(core_text):
     """
     Function to create iob_core object from short notation text.
@@ -1278,7 +1278,7 @@ def create_core_from_text(core_text):
     pass
 
 
-@api_for(internal_core.get_global_wires_list)
+@api_for(py2hwsw_core.get_global_wires_list)
 def get_global_wires_list():
     """
     Function to get a reference to the global wires list (netlist) of the project.

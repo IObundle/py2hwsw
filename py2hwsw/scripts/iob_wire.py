@@ -13,7 +13,7 @@ from api_base import internal_api_class
 @internal_api_class("user_api.api", "iob_wire")
 @dataclass
 class iob_wire:
-    """Class that represents a core's internal wire"""
+    """Py2HWSW's internal implementation of 'iob_wire' API class."""
 
     def __post_init__(self):
         # print("DEBUG: Replacing global_wire attrs in current (local) wire by setters and getters")
@@ -102,7 +102,8 @@ class iob_global_wire:
     reg_wires: list[str] = field(default_factory=list)
 
     def __post_init__(self):
-        print("DEBUG: Creating global wire")
+        # print("DEBUG: Creating global wire")
+        pass
 
     def validate_attributes(self):
         if not self.name:
@@ -122,27 +123,6 @@ class iob_global_wire:
         bus_type = "reg" if self.isvar else "wire"
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
         return f"{bus_type} {width_str}{self.name};\n"
-
-    def assert_direction(self):
-        self.validate_attributes()  # FIXME: Not sure if this is the right place to call validate_attributes
-        if not self.direction:
-            fail_with_msg(f"Wire '{self.name}' has no direction", ValueError)
-
-    def get_verilog_port(self, comma=True):
-        """Generate a verilog port string from this wire"""
-        if "'" in self.name or self.name.lower() == "z":
-            return None
-        self.assert_direction()
-        comma_char = "," if comma else ""
-        port_type = " reg" if self.isvar else ""
-        width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
-        return f"{self.direction}{port_type} {width_str}{self.name}{comma_char}\n"
-
-    def get_width_int(self):
-        try:
-            return int(self.width)
-        except ValueError:
-            return self.width
 
 
 @dataclass

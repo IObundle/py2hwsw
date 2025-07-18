@@ -29,19 +29,24 @@ def generate_ports(core):
     lines = []
     for port_idx, api_port in enumerate(core.ports):
         port = convert2internal(api_port)
-        # If port has 'doc_only' attribute set to True, skip it
-        if port.doc_only:
+
+        # FIXME: This function was originaly written to handle interfaces (groups of ports)
+        """
+        # If interface has 'doc_only' attribute set to True, skip it
+        if interface.doc_only:
             continue
 
-        lines.append(f"    // {port.name}: {port.descr}\n")
+        lines.append(f"    // {interface.name}: {interface.descr}\n")
 
-        for wire_idx, api_wire in enumerate(port.wires):
+        for wire_idx, api_wire in enumerate(interface.wires):
             wire = convert2internal(api_wire)
             if isinstance(wire, iob_wire):
                 if wire.get_verilog_port():
                     lines.append("    " + wire.get_verilog_port())
+        """
+        lines.append("    " + port.get_verilog_port())
 
-    # Remove comma from last port line
+    # Remove comma from last interface line
     if lines:
         i = -1
         while lines[i].startswith("`endif") or lines[i].startswith("    // "):
@@ -60,6 +65,8 @@ def generate_ports_snippet(core):
     with open(f"{out_dir}/{core.name}_io.vs", "w+") as f:
         f.write(code)
 
+    # FIXME: Port is no longer a group
+    """
     for port_idx, api_port in enumerate(core.ports):
         port = convert2internal(api_port)
         # If port has 'doc_only' attribute set to True, skip it
@@ -75,6 +82,7 @@ def generate_ports_snippet(core):
             for file in os.listdir("."):
                 if file.endswith(".vs"):
                     os.rename(file, f"{out_dir}/{file}")
+    """
 
 
 # Generate if.tex file with list TeX tables of IOs

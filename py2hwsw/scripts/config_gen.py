@@ -30,20 +30,16 @@ def conf_vh(macros, top_module, out_dir):
 
     # Sort macros macros by type, P first, M second, C third, D last
     sorted_macros = []
-    for api_macro in macros:
-        macro = convert2internal(api_macro)
+    for macro in macros:
         if macro.kind == "P":
             sorted_macros.append(macro)
-    for api_macro in macros:
-        macro = convert2internal(api_macro)
+    for macro in macros:
         if macro.kind == "M":
             sorted_macros.append(macro)
-    for api_macro in macros:
-        macro = convert2internal(api_macro)
+    for macro in macros:
         if macro.kind == "C":
             sorted_macros.append(macro)
-    for api_macro in macros:
-        macro = convert2internal(api_macro)
+    for macro in macros:
         if macro.kind == "D":
             sorted_macros.append(macro)
 
@@ -90,8 +86,7 @@ def conf_h(macros, top_module, out_dir):
     fname = f"{core_prefix}CONF"
     file2create.write(f"#ifndef H_{fname}_H\n")
     file2create.write(f"#define H_{fname}_H\n\n")
-    for api_macro in macros:
-        macro = convert2internal(api_macro)
+    for macro in macros:
         # If macro has 'doc_only' attribute set to True, skip it
         if macro.doc_only:
             continue
@@ -147,8 +142,7 @@ def generate_config_tex(confs, out_dir):
 
     # Find all conf types present
     conf_types = []
-    for api_conf in confs:
-        conf = convert2internal(api_conf)
+    for conf in confs:
         if conf.kind not in conf_types:
             conf_types.append(conf.kind)
 
@@ -213,8 +207,7 @@ def generate_confs_tex(confs, out_dir):
     tex_table = []
     derv_params = []
     constants = []
-    for api_conf in confs:
-        conf = convert2internal(api_conf)
+    for conf in confs:
         conf_value = conf.value if type(conf.value) is not bool else "1"
         # Macros and parameters are added to the table
         if conf.kind in ["P", "M"]:

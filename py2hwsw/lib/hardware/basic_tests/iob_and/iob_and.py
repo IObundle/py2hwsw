@@ -10,42 +10,18 @@ core_dictionary = {
     "generate_hw": True,
     "confs": [
         {
-            "name": "general",
-            "descr": "General group of confs",
-            "confs": [
-                {
-                    "name": "W",
-                    "kind": "P",
-                    "value": "21",
-                    "min_value": "1",
-                    "max_value": "32",
-                    "descr": "IO width",
-                },
-            ],
+            "name": "W",
+            "kind": "P",
+            "value": "21",
+            "min_value": "1",
+            "max_value": "32",
+            "descr": "IO width",
         },
     ],
     "ports": [
-        {
-            "name": "a_i",
-            "descr": "Input port",
-            "wires": [
-                {"name": "a_i", "width": "W"},
-            ],
-        },
-        {
-            "name": "b_i",
-            "descr": "Input port",
-            "wires": [
-                {"name": "b_i", "width": "W"},
-            ],
-        },
-        {
-            "name": "y_o",
-            "descr": "Output port",
-            "wires": [
-                {"name": "y_o", "width": "W"},
-            ],
-        },
+        {"name": "a_i", "width": "W"},
+        {"name": "b_i", "width": "W"},
+        {"name": "y_o", "width": "W"},
     ],
     "snippets": [{"verilog_code": "   assign y_o = a_i & b_i;"}],
 }
@@ -53,7 +29,7 @@ core_dictionary = {
 
 class iob_and(py2hwsw.iob_core):
     def __init__(self):
-        print("iob_and constructor called.")
+        print("[DEBUG]: iob_and constructor called.")
         super().__init__(core_dictionary)
 
 
@@ -228,7 +204,10 @@ if __name__ == "__main__":
     # conf_obj.test_method()
 
     iob_and_obj = iob_and()
-    print(">>> Generate_hw of iob_and_obj: ", iob_and_obj.get_generate_hw())
-    print(">>> Ports of iob_and_obj: ", [i.get_name() for i in iob_and_obj.get_ports()])
+    print(">>> Generate_hw of iob_and_obj:", iob_and_obj.get_generate_hw())
+    print(
+        ">>> Ports of iob_and_obj:",
+        [i.get_global_wire().get_name() for i in iob_and_obj.get_ports()],
+    )
 
     iob_and_obj.generate_build_dir()

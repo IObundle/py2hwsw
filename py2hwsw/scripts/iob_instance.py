@@ -2,8 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
 import copy
-from typing import Dict
+import json
 
 import interfaces
 from iob_base import (
@@ -11,11 +12,12 @@ from iob_base import (
     find_obj_in_list,
     fail_with_msg,
     debug_print,
-    prevent_instantiation,
+    import_python_module,
 )
 from iob_portmap import iob_portmap, get_portmap_port
 from iob_wire import remove_wire_direction_suffixes
 from api_base import internal_api_class, convert2internal
+from iob_core import core_from_dict, find_module_setup_dir
 
 
 @internal_api_class("user_api.api", "iob_instance")
@@ -303,6 +305,54 @@ class iob_instance(iob_base):
         )
 
 
+def instantiate_block(
+    block_name: str, python_parameters: dict = {}, block_dict: dict = {}
+):
+    """
+    Find a block based on given block_name and instatiate it.
+
+    Attributes:
+        block (str): The name of the block to instantiate. Will search for <block>.py or <block>.json files.
+                    If <block>.py is found, it must contain a class called <block> that extends iob_block. This class will be used to instantiate the block.
+                    If <block>.json is found, its contents will be read and parsed by the block_from_dict(<json_contents>) function.
+        python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated block.
+                                  Elements from this dictionary will be passed as **kwargs to the instantiated block's constructor.
+                                  Only applicable if instantiated block has a constructor that accepts python parameters (excludes blocks defined in JSON or purely by dictionary).
+        block_dict (dict): Dictionary of instance attributes to set on the instantiated block.
+    Returns:
+        iob_instance: The instantiated block object
+    """
+    block_dir, file_ext = find_module_setup_dir(block_name)
+
+    if file_ext == ".py":
+        debug_print(f"Importing {block_name}.py", 1)
+        block_module = import_python_module(
+            os.path.join(block_dir, f"{block_name}.py"),
+        )
+
+        # Instantiate block (call constructor from class defined inside the .py file)
+        block_class = getattr(block_module, block_name)
+        api_block_obj = block_class(**python_parameters)
+
+    elif file_ext == ".json":
+        debug_print(f"Loading {block_name}.json", 1)
+        api_block_obj = core_from_dict(
+            json.load(open(os.path.join(block_dir, f"{block_name}.json")))
+        )
+
+    # Create instance of block
+    api_instance_obj = iob_instance(**block_dict, core=api_block_obj)
+
+    # block_obj = convert2internal(api_block_obj)
+    # # Auto-set block attributes
+    # if not block_obj.original_name:
+    #     block_obj.original_name = block_name
+    # if not block_obj.setup_dir:
+    #     block_obj.setup_dir = block_dir
+
+    return api_instance_obj
+
+
 #
 # API methods
 #
@@ -316,6 +366,12 @@ def instance_from_dict(instance_dict):
     #         instance_dict.get("python_parameters", {}),
     #         instance_dict,
     #     )
+    # If 'core' key is given, find corresponding core and instantiate it. Ignore other non-instance attributes.
+
+    # instantiate_block(core_dict["core"], core_dict.get("python_parameters", {}), core_dict)
+
+    # instance_dict_with_objects["portmap_connections"] = portmap_from_dict(instance_dictionary.get("portmap_connections", {}))
+
     return iob_instance(**instance_dict)
 
 

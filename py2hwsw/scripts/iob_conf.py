@@ -4,17 +4,14 @@
 
 from dataclasses import dataclass
 
-from iob_base import (
-    fail_with_msg,
-    parse_short_notation_text,
-)
+from iob_base import fail_with_msg, parse_short_notation_text
 from api_base import internal_api_class
 
 
 @internal_api_class("user_api.api", "iob_conf")
 @dataclass
 class iob_conf:
-    """Class to represent a configuration option."""
+    """Py2HWSW's internal implementation of 'iob_conf' API class."""
 
     def validate_attributes(self):
         if not self.name:
@@ -34,29 +31,6 @@ class iob_conf:
                 )
         except ValueError:
             pass
-
-
-def rename_dictionary_keys(dictionary, key_mapping):
-    """
-    Rename keys in dictionary using a mapping.
-    Mapping format:
-    {
-        "old_key": "new_key",
-        ...
-    }
-
-    Attributes:
-        dictionary (dict): Dictionary to rename keys in.
-        key_mapping (dict): Mapping of keys to rename.
-
-    Returns:
-        dict: Dictionary with renamed keys.
-    """
-    # Replace key with corresponding attribute name
-    for old_key, new_key in key_mapping.items():
-        if old_key in key_mapping:
-            dictionary[new_key] = dictionary.pop(old_key)
-    return dictionary
 
 
 #

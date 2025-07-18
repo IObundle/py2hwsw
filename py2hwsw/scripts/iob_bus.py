@@ -27,7 +27,7 @@ from api_base import internal_api_class
 @internal_api_class("user_api.api", "iob_bus")
 @dataclass
 class iob_bus:
-    """Class to represent a bus in an iob module"""
+    """Py2HWSW's internal implementation of 'iob_bus' API class."""
 
     def create_wires_from_interface(self):
         if not self.interface:
@@ -244,7 +244,7 @@ def dict2interface(name, interface_dict):
 def bus_from_dict(bus_dict):
     # Convert dictionary elements to objects
     kwargs = bus_dict.copy()
-    kwargs["wires"] = [wire_from_dict(i) for i in bus_dict["wires"]]
+    kwargs["wires"] = [wire_from_dict(i) for i in bus_dict.get("wires", [])]
     return iob_bus(**kwargs)
 
 

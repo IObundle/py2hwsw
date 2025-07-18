@@ -76,10 +76,11 @@ def generate_params_snippets(core):
     with open(f"{out_dir}/{core.name}_params.vs", "w") as f:
         f.write(code)
 
-    code = generate_inst_params(core)
-    out_dir = core.build_dir + "/hardware/src"
-    with open(f"{out_dir}/{core.instance_name}_{id(core)}_inst_params.vs", "w") as f:
-        f.write(code)
+    # FIXME: Make this work with new iob_instance
+    # code = generate_inst_params(core)
+    # out_dir = core.build_dir + "/hardware/src"
+    # with open(f"{out_dir}/{core.instance_name}_{id(core)}_inst_params.vs", "w") as f:
+    #     f.write(code)
 
 
 def validate_params(core):

@@ -35,12 +35,6 @@ class iob_and(py2hwsw.iob_core):
 
 if __name__ == "__main__": 
 
-    iob_and_obj = iob_and()
-    iob_and_obj.get_generate_hw();
+    iob_and_obj = iob_and(width=8)
     iob_and_obj.generate_build_dir()
-
-    #OF COURSE THIS IS NOT THE RIGHT WAY TO DO IT! TO BE DELETED
-    # GLOBAL WIRES ARE NOT EXPOSED . USERS DO NOT NEED TO KNOW ABOUT THEM
-    # get_ports is useful
-    #[i.get_global_wire().get_name() for i in iob_and_obj.get_ports()],
     

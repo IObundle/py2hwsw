@@ -22,6 +22,12 @@ foreach file [split $VSRC \ ] {
     }
 }
 
+#include directories, use -include_dirs option
+set SYNTH_FLAGS {}
+foreach dir $INCLUDE_DIRS {
+    lappend SYNTH_FLAGS "-include_dirs" "${dir}"
+}
+
 #read board properties
 source vivado/$BOARD/board.tcl
 
@@ -29,11 +35,6 @@ source vivado/$BOARD/board.tcl
 #set pre-map custom assignments
 if {[file exists "vivado/premap.tcl"]} {
     source "vivado/premap.tcl"
-}
-
-set SYNTH_FLAGS {}
-foreach dir $INCLUDE_DIRS {
-    lappend SYNTH_FLAGS "-include_dirs" "${dir}"
 }
 
 

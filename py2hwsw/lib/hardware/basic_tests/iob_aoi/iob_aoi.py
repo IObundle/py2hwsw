@@ -85,55 +85,39 @@ core_dictionary = {
     "generate_hw": True,
     "confs": [
         {
-            "name": "general",
-            "descr": "General group of confs",
-            "confs": [
-                {
-                    "name": "W",
-                    "type": "P",
-                    "val": "1",
-                    "min": "1",
-                    "max": "32",
-                    "descr": "Ports width",
-                },
-            ],
+            "name": "W",
+            "kind": "P",
+            "value": "1",
+            "min_value": "1",
+            "max_value": "32",
+            "descr": "Ports width",
         },
     ],
     "ports": [
         {
             "name": "a_i",
+            "width": "W",
             "descr": "Input port a",
-            "wires": [
-                {"name": "a_i", "width": "W"},
-            ],
         },
         {
             "name": "b_i",
             "descr": "Input port b",
-            "wires": [
-                {"name": "b_i", "width": "W"},
-            ],
+            "width": "W",
         },
         {
             "name": "c_i",
             "descr": "Input port c",
-            "wires": [
-                {"name": "c_i", "width": "W"},
-            ],
+            "width": "W",
         },
         {
             "name": "d_i",
             "descr": "Input port d",
-            "wires": [
-                {"name": "d_i", "width": "W"},
-            ],
+            "width": "W",
         },
         {
             "name": "y_o",
             "descr": "Output port y",
-            "wires": [
-                {"name": "y_o", "width": "W"},
-            ],
+            "width": "W",
         },
     ],
     "buses": [
@@ -264,7 +248,7 @@ if __name__ == "__main__":
     print(">>> Ports of iob_aoi: ", iob_aoi_obj.get_ports())
     print(
         ">>> Names of ports of iob_aoi: ",
-        [i.get_name() for i in iob_aoi_obj.get_ports()],
+        [i.get_global_wire().get_name() for i in iob_aoi_obj.get_ports()],
     )
 
     iob_aoi_obj.generate_build_dir()

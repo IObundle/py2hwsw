@@ -275,12 +275,12 @@ def iob_csr_text2dict(csr_text: str):
 
     csr_dict = parse_short_notation_text(csr_text, csr_flags)
     # process 'name&width', with format '[name]:[width]'
-    name_and_width = csr_dict.pop('name&width', "")
+    name_and_width = csr_dict.pop("name&width", "")
     try:
-        csr_dict['name'], csr_dict['width'] = name_and_width.split(':', 1)
+        csr_dict["name"], csr_dict["width"] = name_and_width.split(":", 1)
     except ValueError:
-        csr_dict['name'] = name_and_width
-        csr_dict['width'] = 1  # default width 1 if not specified
+        csr_dict["name"] = name_and_width
+        csr_dict["width"] = 1  # default width 1 if not specified
     return csr_dict
 
 
@@ -313,9 +313,9 @@ def iob_csr_group_text2dict(csr_group_text: str):
     csr_group_dict = parse_short_notation_text(csr_group_text, csr_group_flags)
     # process regs
     csr_group_regs = []
-    for r in csr_group_dict.get('regs', []):
+    for r in csr_group_dict.get("regs", []):
         # Convert each reg from text to dict
         csr_group_regs.append(iob_csr_text2dict(r))
     # update csr_group regs
-    csr_group_dict.update({'regs': csr_group_regs})
+    csr_group_dict.update({"regs": csr_group_regs})
     return csr_group_dict

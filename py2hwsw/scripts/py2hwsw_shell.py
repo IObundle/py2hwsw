@@ -13,13 +13,8 @@ HELP_MSG = """\
 Py2HWSW Python Shell
 ------------------------------------------------------------------------
 Type 'exit' or 'quit' to exit the shell.
-Type 'help' for this message.
-Type 'help(api)' to view the entire Py2HWSW API.
-Type 'help(<api_object>)' for API object-specific help. Example: 'help(iob_conf)'
-
-All classes and functions in Py2HWSW API have been imported into this shell.
 ------------------------------------------------------------------------
-Type help() for interactive help, or help(object) for help about object.
+Type help() for interactive help
 """
 
 

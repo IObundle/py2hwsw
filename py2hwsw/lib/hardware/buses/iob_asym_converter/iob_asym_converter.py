@@ -258,7 +258,9 @@ def setup(py_params_dict):
             .DATA_W ($clog2(R)),
             .RST_VAL({$clog2(R) {1'd0}})
          ) r_addr_reg_inst (
-            `include "iob_asym_converter_iob_clk_s_s_portmap.vs"
+            .clk_i (clk_i),
+            .cke_i (cke_i),
+            .arst_i(arst_i),
             .en_i  (r_en_i),
             .data_i(r_addr_i[$clog2(R)-1:0]),
             .data_o(r_addr_lsbs_reg)

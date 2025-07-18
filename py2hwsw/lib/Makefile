@@ -35,7 +35,11 @@ ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)
 SETUP_ARGS =--no_verilog_lint 
 endif
 
-all: sim-test
+all: sim-run
+
+py2shell:
+	nix-shell --run "py2hwsw_shell"
+
 
 setup:
 	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params '$(PY_PARAMS)' $(SETUP_ARGS)"

@@ -11,7 +11,7 @@ import sys
 import os
 
 # Do NOT remove this 'import readline'. It looks like its not used, but it is!
-# Is allows arrow_up and arrow_down keys to work for previous/next commands
+# It allows arrow_up and arrow_down keys to work for previous/next commands
 import readline
 
 from iob_base import get_lib_cores, import_python_module

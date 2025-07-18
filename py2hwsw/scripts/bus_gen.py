@@ -7,7 +7,6 @@
 #
 #    bus_gen.py: build Verilog module buses
 #
-import interfaces
 import os
 from iob_wire import iob_wire
 from api_base import convert2internal

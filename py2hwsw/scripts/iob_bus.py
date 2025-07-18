@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass
 
-import interfaces
+import iob_interface
 from iob_base import (
     find_obj_in_list,
     convert_dict2obj_list,
@@ -222,7 +222,7 @@ def dict2interface(name, interface_dict):
         ]
     }
 
-    interface = interfaces.create_interface(
+    interface = iob_interface.create_interface(
         genre=genre,
         if_direction=if_direction,
         mult=mult,

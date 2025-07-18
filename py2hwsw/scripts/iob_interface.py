@@ -278,7 +278,7 @@ if_types = [
 
 @internal_api_class("user_api.api", "interface")
 @dataclass
-class interface:
+class iob_interface:
     """Class to represent an interface for generation"""
 
     # List of wires for this interface (Internal, used for generation)
@@ -368,8 +368,8 @@ class interface:
         """Reverse the direction of all wires in a list."""
         new_wires = deepcopy(wires)
         for wire in new_wires:
-            wire.direction = interface.__reverse_direction(wire.direction)
-            wire.name = interface.__reverse_name_direction(wire.name)
+            wire.direction = iob_interface.__reverse_direction(wire.direction)
+            wire.name = iob_interface.__reverse_name_direction(wire.name)
         return new_wires
 
     @staticmethod
@@ -551,7 +551,7 @@ class interface:
 
 
 @dataclass
-class iobClkInterface(interface):
+class iobClkInterface(iob_interface):
     """Class to represent an IOb clock interface for generation"""
 
     has_cke: bool = True
@@ -590,7 +590,7 @@ class iobClkInterface(interface):
 
 
 @dataclass
-class iobInterface(interface):
+class iobInterface(iob_interface):
     """Class to represent an IOb interface for generation"""
 
     # Widths for the IOb interface
@@ -634,7 +634,7 @@ class iobInterface(interface):
 
 
 @dataclass
-class _memInterface(interface):
+class _memInterface(iob_interface):
     """Class to represent a memory interface for generation"""
 
     # Width for the memory interface
@@ -1072,7 +1072,7 @@ class asymMemInterface(_memInterface):
 
 
 @dataclass
-class AXIStreamInterface(interface):
+class AXIStreamInterface(iob_interface):
     """Class to represent an AXI-Stream interface for generation"""
 
     # Data width for the AXI-Stream interface
@@ -1112,7 +1112,7 @@ class AXIStreamInterface(interface):
 
 
 @dataclass
-class AXILiteInterface(interface):
+class AXILiteInterface(iob_interface):
     """Class to represent an AXI-Lite interface for generation"""
 
     # Data width for the AXI-Lite interface
@@ -1246,7 +1246,7 @@ class AXILiteInterface(interface):
 
 
 @dataclass
-class AXIInterface(interface):
+class AXIInterface(iob_interface):
     """Class to represent an AXI interface for generation"""
 
     # Data width for the AXI interface
@@ -1492,7 +1492,7 @@ class AXIInterface(interface):
 
 
 @dataclass
-class APBInterface(interface):
+class APBInterface(iob_interface):
     """Class to represent an APB interface for generation"""
 
     # Data width for the APB interface
@@ -1547,7 +1547,7 @@ class APBInterface(interface):
 
 
 @dataclass
-class AHBInterface(interface):
+class AHBInterface(iob_interface):
     """Class to represent an AHB interface for generation"""
 
     # Data width for the AHB interface
@@ -1636,7 +1636,7 @@ class AHBInterface(interface):
 
 
 @dataclass
-class RS232Interface(interface):
+class RS232Interface(iob_interface):
     """Class to represent an RS232 interface for generation"""
 
     # Number of pins for the RS232 interface
@@ -1719,7 +1719,7 @@ class RS232Interface(interface):
 
 
 @dataclass
-class wishboneInterface(interface):
+class wishboneInterface(iob_interface):
     """Class to represent a Wishbone interface for generation"""
 
     # Data width for the Wishbone interface

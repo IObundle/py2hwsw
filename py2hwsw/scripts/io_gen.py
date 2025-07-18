@@ -8,9 +8,7 @@
 #    ios.py: build Verilog module IO and documentation
 #
 from latex import write_table
-import os
 
-import interfaces
 from iob_wire import iob_wire
 from api_base import convert2internal
 

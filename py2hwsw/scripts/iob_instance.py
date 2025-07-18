@@ -6,7 +6,7 @@ import os
 import copy
 import json
 
-import interfaces
+import iob_interface
 from iob_base import (
     iob_base,
     find_obj_in_list,
@@ -179,10 +179,10 @@ class iob_instance(iob_base):
                     and port.interface
                 ):
                     if isinstance(
-                        port.interface, interfaces.symMemInterface
-                    ) or isinstance(port.interface, interfaces.asymMemInterface):
+                        port.interface, iob_interface.symMemInterface
+                    ) or isinstance(port.interface, iob_interface.asymMemInterface):
                         self.__connect_memory(port, issuer)
-                    elif isinstance(port.interface, interfaces.iobClkInterface):
+                    elif isinstance(port.interface, iob_interface.iobClkInterface):
                         self.__connect_clk_interface(port, issuer)
 
         # iob_csrs specific code
@@ -206,10 +206,10 @@ class iob_instance(iob_base):
             "portmap_port_prefix": port.interface.portmap_port_prefix,
             "ADDR_W": port.interface.addr_w,
         }
-        if isinstance(port.interface, interfaces.symMemInterface):
+        if isinstance(port.interface, iob_interface.symMemInterface):
             # If symmetric memory, add 'DATA_W'
             interface_dict["DATA_W"] = port.interface.data_w
-        elif isinstance(port.interface, interfaces.asymMemInterface):
+        elif isinstance(port.interface, iob_interface.asymMemInterface):
             # If asymmetric memory, add 'W_DATA_W' and 'R_DATA_W'
             interface_dict["W_DATA_W"] = port.interface.w_data_w
             interface_dict["R_DATA_W"] = port.interface.r_data_w
@@ -238,7 +238,7 @@ class iob_instance(iob_base):
         self.portmap_connections.append(clk_portmap)
 
         for p in issuer.ports:
-            if isinstance(p.interface, interfaces.iobClkInterface):
+            if isinstance(p.interface, iob_interface.iobClkInterface):
                 # If interface is the same, connect it and add parameters if needed
                 if p.interface.prefix == port.interface.prefix:
                     p.interface.has_cke |= port.interface.has_cke
@@ -285,9 +285,9 @@ class iob_instance(iob_base):
         # TODO: Remove attributes_dict from the system
         # Add port to instantiator's attributes_dict
         csr_if_genre = "iob_clk"
-        if isinstance(csrs_port.interface, interfaces.AXILiteInterface):
+        if isinstance(csrs_port.interface, iob_interface.AXILiteInterface):
             csr_if_genre = "axil"
-        if isinstance(csrs_port.interface, interfaces.APBInterface):
+        if isinstance(csrs_port.interface, iob_interface.APBInterface):
             csr_if_genre = "apb"
 
         # Add port to issuer's attributes_dict

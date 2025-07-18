@@ -15,12 +15,10 @@ def get_core_params(confs):
     Returns a new filtered list containing only 'P' and 'D' parameters.
     """
     core_parameters = []
-    for group in confs:
-        group = convert2internal(group)
-        for conf in group.confs:
-            conf = convert2internal(conf)
-            if conf.kind in ["P", "D"]:
-                core_parameters.append(conf)
+    for api_conf in confs:
+        conf = convert2internal(api_conf)
+        if conf.kind in ["P", "D"]:
+            core_parameters.append(conf)
     return core_parameters
 
 

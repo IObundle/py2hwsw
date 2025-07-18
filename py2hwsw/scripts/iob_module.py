@@ -10,13 +10,7 @@ from iob_base import (
     fail_with_msg,
     prevent_instantiation,
 )
-from iob_conf import create_conf_group
-from iob_port import create_port_from_dict, add_interface_port, add_wires_port
-from iob_bus import create_bus, get_bus_wire
-from iob_snippet import create_snippet
 from iob_globals import iob_globals, create_globals
-from iob_comb import iob_comb, create_comb
-from iob_fsm import iob_fsm, create_fsm
 from iob_block import create_block
 
 
@@ -39,33 +33,6 @@ class iob_module(iob_base):
                 fail_with_msg(
                     f"Reset polarity '{polarity}' is not the same as global reset polarity '{getattr(iob_globals(), 'reset_polarity', 'positive')}'."
                 )
-
-    def create_conf_group(self, *args, **kwargs):
-        create_conf_group(self, *args, **kwargs)
-
-    def create_port_from_dict(self, *args, **kwargs):
-        create_port_from_dict(self, *args, **kwargs)
-
-    def add_interface_port(self, *args, **kwargs):
-        add_interface_port(self, *args, **kwargs)
-
-    def add_wires_port(self, *args, **kwargs):
-        add_wires_port(self, *args, **kwargs)
-
-    def create_bus(self, *args, **kwargs):
-        create_bus(self, *args, **kwargs)
-
-    def get_bus_wire(self, *args, **kwargs):
-        return get_bus_wire(self, *args, **kwargs)
-
-    def create_snippet(self, *args, **kwargs):
-        create_snippet(self, *args, **kwargs)
-
-    def create_comb(self, *args, **kwargs):
-        create_comb(self, *args, **kwargs)
-
-    def create_fsm(self, *args, **kwargs):
-        create_fsm(self, *args, **kwargs)
 
     def create_superblock(self, *args, **kwargs):
         kwargs.pop("instantiate", None)

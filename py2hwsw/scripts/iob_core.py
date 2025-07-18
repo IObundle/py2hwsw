@@ -48,7 +48,7 @@ import verilog_format
 import verilog_lint
 from manage_headers import generate_headers
 
-from iob_conf import conf_group_from_dict
+from iob_conf import conf_from_dict
 from iob_wire import iob_global_wire
 from iob_port import port_from_dict
 from iob_bus import bus_from_dict
@@ -114,7 +114,7 @@ class iob_core(iob_module):
                 fail_with_msg("The 'core' and 'python_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
             # Convert core dictionary elements to objects
             core_dict_with_objects = core_dictionary.copy()
-            core_dict_with_objects["confs"] = [conf_group_from_dict(i) for i in core_dictionary["confs"]]
+            core_dict_with_objects["confs"] = [conf_from_dict(i) for i in core_dictionary["confs"]]
             core_dict_with_objects["ports"] = [port_from_dict(i) for i in core_dictionary["ports"]]
             core_dict_with_objects["buses"] = [bus_from_dict(i) for i in core_dictionary["buses"]]
             core_dict_with_objects["snippets"] = [snippet_from_dict(i) for i in core_dictionary["snippets"]]
@@ -348,7 +348,7 @@ class iob_core(iob_module):
                 superblocks = self.__create_memwrapper(superblocks=superblocks)
 
         # Add 'VERSION' macro
-        self.create_conf_group(
+        self.create_conf(
             name="VERSION",
             type="C",
             val="16'h" + self.version_str_to_digits(self.version),

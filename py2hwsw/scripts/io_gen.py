@@ -27,16 +27,16 @@ def generate_ports(core):
     returns: Generated verilog code
     """
     lines = []
-    for port_idx, port in enumerate(core.ports):
-        port = convert2internal(port)
+    for port_idx, api_port in enumerate(core.ports):
+        port = convert2internal(api_port)
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
 
         lines.append(f"    // {port.name}: {port.descr}\n")
 
-        for wire_idx, wire in enumerate(port.wires):
-            wire = convert2internal(wire)
+        for wire_idx, api_wire in enumerate(port.wires):
+            wire = convert2internal(api_wire)
             if isinstance(wire, iob_wire):
                 if wire.get_verilog_port():
                     lines.append("    " + wire.get_verilog_port())
@@ -60,8 +60,8 @@ def generate_ports_snippet(core):
     with open(f"{out_dir}/{core.name}_io.vs", "w+") as f:
         f.write(code)
 
-    for port_idx, port in enumerate(core.ports):
-        port = convert2internal(port)
+    for port_idx, api_port in enumerate(core.ports):
+        port = convert2internal(api_port)
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
@@ -122,8 +122,8 @@ def generate_ios_tex(ports, out_dir):
     for port in ports:
         tex_table = []
         # Interface is not standard, read ports
-        for wire in port.wires:
-            wire = convert2internal(wire)
+        for api_wire in port.wires:
+            wire = convert2internal(api_wire)
             if isinstance(wire, iob_wire):
                 tex_table.append(
                     [

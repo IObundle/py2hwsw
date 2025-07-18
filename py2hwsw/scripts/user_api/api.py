@@ -1145,7 +1145,7 @@ class iob_core:
     name: str = ""
     description: str = "Default description"
     reset_polarity: str = "positive"
-    confs: list[iob_conf_group] = empty_list()
+    confs: list[iob_conf] = empty_list()
     ports: list[iob_port] = empty_list()
     buses: list[iob_bus] = empty_list()
     snippets: list[iob_snippet] = empty_list()

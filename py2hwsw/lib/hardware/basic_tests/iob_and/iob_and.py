@@ -59,21 +59,15 @@ class iob_and(py2hwsw.iob_core):
 
 if __name__ == "__main__":
     # conf_obj = py2hwsw.iob_conf(name="a")
-    conf_group_obj = py2hwsw.create_conf_group_from_dict(
+    conf_obj = py2hwsw.create_conf_from_dict(
         {
-            "name": "general",
-            "descr": "General group of confs",
-            "confs": [
-                {
-                    "name": "W",
-                    "kind": "P",
-                    "value": "21",
-                    "min_value": "1",
-                    "max_value": "32",
-                    "descr": "IO width",
-                },
-            ],
-        },
+            "name": "W",
+            "kind": "P",
+            "value": "21",
+            "min_value": "1",
+            "max_value": "32",
+            "descr": "IO width",
+        }
     )
 
     conf_obj = py2hwsw.create_conf_from_text(
@@ -83,45 +77,18 @@ if __name__ == "__main__":
         """
     )
 
-    conf_groups_obj = py2hwsw.create_conf_group_from_text(
+    conf_obj = py2hwsw.create_conf_rom_text(
         """
-        'Default group'
-        -d 'Default group of confs'
-        -doc
-        -doc_clearpage
-        --confs
-            {{
-            DATA_W -t P -v 32 -m NA -M NA
-            -d 'Data bus width'
-
-            FRACTIONAL_W -t P -v 0 -m NA -M NA
-            -d 'Fractional part width'
-
-            REAL_W -t P -v 'DATA_W - FRACTIONAL_W' -m NA -M NA
-            -d 'Real part width'
-
-            SIZE_W -t P -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
-            -d 'Size width'
-
-            END_COUNT -t D -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA
-            -d 'End count'
-
-            COUNT_W -t D -v $clog2(END_COUNT) -m NA -M NA
-            -d 'Count width'
-            }}
+        DATA_W -t P -v 32 -m NA -M NA
+        -d 'Data bus width'
         """
     )
-    print(conf_groups_obj.get_name())
-    print(conf_groups_obj.get_descr())
-    print(conf_groups_obj.get_doc_only())
-    print(conf_groups_obj.get_doc_clearpage())
-    for conf in conf_groups_obj.get_confs():
-        print(">>> Conf name: ", conf.get_name())
-        print(">>> Conf kind: ", conf.get_kind())
-        print(">>> Conf value: ", conf.get_value())
-        print(">>> Conf min: ", conf.get_min_value())
-        print(">>> Conf max: ", conf.get_max_value())
-        print(">>> Conf description: ", conf.get_descr())
+    print(">>> Conf name: ", conf_obj.get_name())
+    print(">>> Conf kind: ", conf_obj.get_kind())
+    print(">>> Conf value: ", conf_obj.get_value())
+    print(">>> Conf min: ", conf_obj.get_min_value())
+    print(">>> Conf max: ", conf_obj.get_max_value())
+    print(">>> Conf description: ", conf_obj.get_descr())
 
     print("\n\n")
     # wire_obj = py2hwsw.create_wire_from_text("en -w 1 -d 'Enable wire' -v")

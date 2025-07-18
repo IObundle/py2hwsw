@@ -71,8 +71,8 @@ def generate_subblocks(core):
     returns: Generated verilog code
     """
     code = ""
-    for instance in core.subblocks:
-        instance = convert2internal(instance)
+    for api_instance in core.subblocks:
+        instance = convert2internal(api_instance)
         if not instance.instantiate:
             continue
 
@@ -110,8 +110,8 @@ def get_instance_port_connections(core, instance):
     instance_portmap = ""
 
     # Iterate over all ports of the instance
-    for portmap in instance.portmap_connections:
-        portmap = convert2internal(portmap)
+    for api_portmap in instance.portmap_connections:
+        portmap = convert2internal(api_portmap)
 
         portmap.validate_attributes()
 
@@ -169,8 +169,8 @@ External connection '{get_real_wire(e_connect).name}' has the following wires:
             continue
 
         # Connect individual wires
-        for idx, port_wire in enumerate(port.wires):
-            port_wire = convert2internal(port_wire)
+        for idx, api_port_wire in enumerate(port.wires):
+            port_wire = convert2internal(api_port_wire)
             # Is this still possible? Port should only contain iob_wires objects
             # # Skip wires that are not iob_wires
             # if not isinstance(port_wire, iob_wire):
@@ -181,8 +181,8 @@ External connection '{get_real_wire(e_connect).name}' has the following wires:
             if port.interface and e_connect.interface:
                 # Remove prefix and suffix from port name
                 port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
-                for e_wire in e_connect.wires:
-                    e_wire = convert2internal(e_wire)
+                for api_e_wire in e_connect.wires:
+                    e_wire = convert2internal(api_e_wire)
                     real_e_wire = get_real_wire(e_wire)
                     e_wire_name = real_e_wire.name
                     # Remove prefix and suffix from external wire name

@@ -18,12 +18,12 @@ def generate_buses(core):
     returns: Generated verilog code
     """
     code = ""
-    for bus in core.buses:
-        bus = convert2internal(bus)
+    for api_bus in core.buses:
+        bus = convert2internal(api_bus)
 
         wires_code = ""
-        for wire in bus.wires:
-            wire = convert2internal(wire)
+        for api_wire in bus.wires:
+            wire = convert2internal(api_wire)
             if isinstance(wire, iob_wire):
                 if wire.get_verilog_bus():
                     wires_code += "    " + wire.get_verilog_bus()
@@ -45,8 +45,8 @@ def generate_buses_snippet(core):
     with open(f"{out_dir}/{core.name}_buses.vs", "w+") as f:
         f.write(code)
 
-    for bus in core.buses:
-        bus = convert2internal(bus)
+    for api_bus in core.buses:
+        bus = convert2internal(api_bus)
         # Generate the specific interface snippet as well
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.

@@ -317,8 +317,8 @@ def gen_ports_list(core):
 
     ports_list = []
 
-    for group in core.ports:
-        group = convert2internal(group)
+    for api_group in core.ports:
+        group = convert2internal(api_group)
         # Skip doc_only interfaces
         if group.doc_only:
             continue
@@ -327,8 +327,8 @@ def gen_ports_list(core):
         if group.interface:
             tag = group.name
 
-        for wire in group.wires:
-            wire = convert2internal(wire)
+        for api_wire in group.wires:
+            wire = convert2internal(api_wire)
             if not isinstance(wire, iob_wire):
                 continue
             n_bits = wire.width
@@ -357,8 +357,8 @@ def gen_bus_interfaces_list(core):
 
     bus_interfaces_list = []
 
-    for group in core.ports:
-        group = convert2internal(group)
+    for api_group in core.ports:
+        group = convert2internal(api_group)
         # Skip doc_only interfaces
         if group.doc_only:
             continue
@@ -581,13 +581,13 @@ def gen_parameters_list(core):
     """
 
     parameters_list = []
-    for group in core.confs:
-        group = convert2internal(group)
+    for api_group in core.confs:
+        group = convert2internal(api_group)
         # Skip doc_only groups
         if group.doc_only:
             continue
-        for conf in group.confs:
-            conf = convert2internal(conf)
+        for api_conf in group.confs:
+            conf = convert2internal(api_conf)
             # Skip doc_only confs
             if conf.doc_only:
                 continue
@@ -715,8 +715,8 @@ def generate_ipxact_xml(core, dest_dir):
 
     csr_block = None
     # Find iob_csrs block in subblocks list
-    for block in core.subblocks:
-        block = convert2internal(block)
+    for api_block in core.subblocks:
+        block = convert2internal(api_block)
         if block.original_name == "iob_csrs":
             csr_block = block
             break

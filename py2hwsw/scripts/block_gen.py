@@ -10,6 +10,7 @@ from latex import write_table
 
 import iob_colors
 from iob_wire import get_real_wire
+from iob_port import port_obj_list_process
 import param_gen
 from api_base import convert2internal
 from iob_base import fail_with_msg, find_obj_in_list
@@ -58,8 +59,8 @@ def generate_subblocks_tex(subblocks, out_dir):
         tex_table.append(
             [
                 block.name,
-                block.instance_name,
-                block.instance_description,
+                block.name,
+                block.description,
             ]
         )
 
@@ -83,8 +84,8 @@ def generate_subblocks(core):
     ) """
 
         code += f"""\
-        // {instance.instance_description}
-        {instance.name} {params_str}{instance.instance_name} (
+        // {instance.description}
+        {instance.name} {params_str}{instance.name} (
     {get_instance_port_connections(core, instance)}\
         );
 
@@ -116,7 +117,7 @@ def get_instance_port_connections(core, instance):
         portmap.validate_attributes()
 
         port = find_obj_in_list(
-            [convert2internal(i) for i in instance.ports], portmap.port
+            [convert2internal(i) for i in core.ports], portmap.port, process_func=port_obj_list_process
         )
         if not port:
             fail_with_msg(
@@ -126,7 +127,7 @@ def get_instance_port_connections(core, instance):
         e_connect = find_obj_in_list(
             [convert2internal(i) for i in core.buses], portmap.e_connect
         ) or find_obj_in_list(
-            [convert2internal(i) for i in core.ports], portmap.e_connect
+            [convert2internal(i) for i in core.ports], portmap.e_connect, process_func=port_obj_list_process
         )
         if not e_connect:
             fail_with_msg(

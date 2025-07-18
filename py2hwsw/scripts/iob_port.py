@@ -41,6 +41,11 @@ class iob_port:
             return port_width
 
 
+def port_obj_list_process(port):
+    """Process ports for `find_obj_in_list()`"""
+    return convert2internal(port.global_wire)
+
+
 #
 # API methods
 #

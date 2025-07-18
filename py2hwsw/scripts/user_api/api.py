@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-Bla bla bla
-Some api description here
+Here we define the user API for Py2HWSW.
 """
 
 # User API for interfacing with Py2HWSW
@@ -30,11 +29,11 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 )
 from api_base import api_for, empty_list, empty_dict
+import iob_port as py2hwsw_port
+import interfaces as py2hwsw_interface #jts: should be renamed to iob_interface
 import iob_conf as py2hwsw_conf
 import iob_wire as py2hwsw_wire
-import interfaces as py2hwsw_interface
 import iob_bus as py2hwsw_bus
-import iob_port as py2hwsw_port
 import iob_snippet as py2hwsw_snippet
 import iob_comb as py2hwsw_comb
 import iob_fsm as py2hwsw_fsm
@@ -44,9 +43,9 @@ import iob_portmap as py2hwsw_portmap
 import iob_python_parameter as py2hwsw_python_parameter
 import iob_instance as py2hwsw_instance
 import iob_core as py2hwsw_core
-from py2hwsw_version import PY2HWSW_VERSION
+from py2hwsw_version import PY2HWSW_VERSION #should be renamed to iob_version
 
-
+#jts: remove these comment: version will be updated only in the end, as 
 # NOTE: for developers:
 # - Update py2hwsw version every time API changes!
 #   Must change major version if new API is not backwards compatible.
@@ -95,6 +94,7 @@ class iob_conf:
         pass
 
 
+    #jts: use the same name in the API as in the py2hwsw_conf module
 @api_for(py2hwsw_conf.conf_from_dict)
 def create_conf_from_dict(conf_dict):
     """
@@ -139,6 +139,8 @@ def create_conf_from_text(conf_text):
 #
 # Wires
 #
+
+# jts: I dont understand why global wire must be in the API
 @api_for(py2hwsw_wire.iob_global_wire)
 class iob_global_wire:
     """

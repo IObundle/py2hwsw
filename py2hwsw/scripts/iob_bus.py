@@ -19,7 +19,6 @@ from iob_wire import (
     iob_wire_reference,
     get_real_wire,
     wire_from_dict,
-    wire_text2dict,
 )
 
 from api_base import internal_api_class

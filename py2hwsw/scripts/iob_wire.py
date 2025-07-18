@@ -202,5 +202,5 @@ def global_wire_text2dict(global_wire_text):
     return parse_short_notation_text(global_wire_text, global_wire_flags)
 
 
-def signal_from_text(signal_text):
-    return global_wire_from_dict(global_wire_text2dict(signal_text))
+def global_wire_from_text(global_wire_text):
+    return global_wire_from_dict(global_wire_text2dict(global_wire_text))

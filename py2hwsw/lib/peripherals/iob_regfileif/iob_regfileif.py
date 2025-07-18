@@ -283,20 +283,12 @@ def create_manual_reg_buses(csr):
     external_wires = []
 
     if csr["mode"] == "W":
-        internal_wires = get_manual_wires(
-            "internal_" + csr["name"], "W", csr["n_bits"]
-        )
-        external_wires = get_manual_wires(
-            "external_" + csr["name"], "R", csr["n_bits"]
-        )
+        internal_wires = get_manual_wires("internal_" + csr["name"], "W", csr["n_bits"])
+        external_wires = get_manual_wires("external_" + csr["name"], "R", csr["n_bits"])
 
     elif csr["mode"] == "R":
-        internal_wires = get_manual_wires(
-            "internal_" + csr["name"], "W", csr["n_bits"]
-        )
-        external_wires = get_manual_wires(
-            "external_" + csr["name"], "R", csr["n_bits"]
-        )
+        internal_wires = get_manual_wires("internal_" + csr["name"], "W", csr["n_bits"])
+        external_wires = get_manual_wires("external_" + csr["name"], "R", csr["n_bits"])
 
     elif csr["mode"] == "RW":
         internal_wires = get_manual_wires(

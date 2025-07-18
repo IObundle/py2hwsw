@@ -26,7 +26,7 @@ Currently the following examples are available:
 iob_and: illustrates a basic module with a generic parameter
 iob_aoi: illustrates a structural description based on subblocks
 
-Type 'help(api) for a complete reference'
+Type 'help(api)' for a complete reference.
 Type 'exit' or 'quit' to exit the shell.
 Type 'help' for this message.
 """

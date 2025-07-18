@@ -142,8 +142,8 @@ set_property include_dirs "../src ../common_src ./src ./vivado/$BOARD" [get_file
 puts "SYNTH_FLAGS: $SYNTH_FLAGS"
 
 #remove all '-include_dirs' from SYNTH_FLAGS
-set SYNTH_FLAGS [regsub -all { -include_dirs .*} $SYNTH_FLAGS ""]
-puts "SYNTH_FLAGS after cleanup: $SYNTH_FLAGS"
+#set SYNTH_FLAGS [regsub -all { -include_dirs .*} $SYNTH_FLAGS ""]
+#puts "SYNTH_FLAGS after cleanup: $SYNTH_FLAGS"
 
 
 # Create HDL wrapper for the block design

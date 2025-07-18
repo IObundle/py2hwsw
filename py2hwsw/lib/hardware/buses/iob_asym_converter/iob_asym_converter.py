@@ -233,11 +233,11 @@ def setup(py_params_dict):
         ],
         "comb": {
             "code": """
-                     if (r_data_valid_reg) begin
-                        r_data_int = ext_mem_r_data_i;
-                    end else begin
-                        r_data_int = r_data_reg;
-                    end
+                if (r_data_valid_reg) begin
+                    r_data_int = ext_mem_r_data_i;
+                end else begin
+                    r_data_int = r_data_reg;
+                end
             """,
         },
         "snippets": [

@@ -106,7 +106,7 @@ class iob_global_wire:
 
     def validate_attributes(self):
         if not self.name:
-            fail_with_msg("Signal name is not set", ValueError)
+            fail_with_msg("Wire name is not set", ValueError)
 
         if self.name.endswith("_i"):
             self.direction = "input"
@@ -126,7 +126,7 @@ class iob_global_wire:
     def assert_direction(self):
         self.validate_attributes()  # FIXME: Not sure if this is the right place to call validate_attributes
         if not self.direction:
-            fail_with_msg(f"Signal '{self.name}' has no direction", ValueError)
+            fail_with_msg(f"Wire '{self.name}' has no direction", ValueError)
 
     def get_verilog_port(self, comma=True):
         """Generate a verilog port string from this wire"""
@@ -184,23 +184,23 @@ def wire_from_dict(wire_dict):
 
 
 def wire_from_text(wire_text):
-    wire_flags = [
-        # TODO:
-    ]
-    wire_dict = parse_short_notation_text(wire_text, wire_flags)
-    return iob_wire(**wire_dict)
+    # TODO:
+    pass
 
 
 def global_wire_from_dict(global_wire_dict):
     return iob_global_wire(**global_wire_dict)
 
 
-def global_wire_from_text(global_wire_text):
+def global_wire_text2dict(global_wire_text):
     global_wire_flags = [
         "name",
         ["-w", {"dest": "width"}],
         ["-v", {"dest": "isvar", "action": "store_true"}],
         ["-d", {"dest": "descr", "nargs": "?"}],
     ]
-    global_wire_dict = parse_short_notation_text(global_wire_text, global_wire_flags)
-    return iob_global_wire(**global_wire_dict)
+    return parse_short_notation_text(global_wire_text, global_wire_flags)
+
+
+def signal_from_text(signal_text):
+    return global_wire_from_dict(global_wire_text2dict(signal_text))

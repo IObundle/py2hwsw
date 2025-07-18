@@ -761,6 +761,38 @@ def create_short_notation_parser(flags: list) -> argparse.ArgumentParser:
     return parser
 
 
+def process_short_notation(text: str):
+    """Process short notation.
+    Perform correct string escaping and parsing of nested structures.
+    Use '{{' and '}}' to denote nested structures.
+    Attributes:
+        text (str): input string containing the short notation.
+            Example:
+                L1
+                -d 'Level 1 descr'
+                -l2
+                {{
+                    -d 'Level 2 descr'
+                    -l3
+                    {{
+                        -d 'Level 3 descr'
+                        -v val3
+                    }}
+                    -P L2_W
+                }}
+                -P L1_W
+
+    Returns:
+        str: processed string with correct escaping and parsing.
+    """
+    if "{{" in text and "}}" in text:
+        prefix, parts = text.split("{{", maxsplit=1)
+        substr, sufix = parts.rsplit("}}", maxsplit=1)
+        escaped_substr = shlex.quote(process_short_notation(substr))
+        return f"{prefix}{escaped_substr}{sufix}"
+    return text
+
+
 def parse_short_notation_text(text: str, flags) -> dict:
     """Parse Short Notation Text
     Arguments:
@@ -771,8 +803,12 @@ def parse_short_notation_text(text: str, flags) -> dict:
         dict: Parsed short text as flags dictionary.
     """
     # preprocess short notation text
-    pre_process_conf_text = shlex.split(text.strip('\n'))
+    escaped_text = process_short_notation(text)
+    pre_process_conf_text = shlex.split(escaped_text.strip('\n'))
     # create argument parser
     parser = create_short_notation_parser(flags)
     # parse and return text as dict
-    return parser.parse_args(pre_process_conf_text).__dict__
+    parsed_dict = parser.parse_args(pre_process_conf_text).__dict__
+    # filter out None values, no need to set default values for arguments
+    filtered_dict = {k: v for k, v in parsed_dict.items() if v is not None}
+    return filtered_dict

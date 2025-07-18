@@ -130,7 +130,7 @@ def get_instance_port_connections(core, instance):
         )
         if not e_connect:
             fail_with_msg(
-                f"Wire/Port '{portmap.e_connect}' not found in core '{core.name}'!"
+                f"Bus/Port '{portmap.e_connect}' not found in core '{core.name}'!"
             )
 
         # If port has 'doc_only' attribute set to True, skip it

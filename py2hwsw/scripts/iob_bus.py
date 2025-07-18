@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass, field
-import re
-from typing import List
+from dataclasses import dataclass
 
 import interfaces
 from iob_base import (
@@ -21,7 +19,7 @@ from iob_wire import (
     iob_wire_reference,
     get_real_wire,
     wire_from_dict,
-    wire_from_text,
+    wire_text2dict,
 )
 
 from api_base import internal_api_class
@@ -142,9 +140,9 @@ def replace_duplicate_wires_by_references(buses, wires):
         for key, value in wire.items():
             if original_wire.__dict__[key] != value:
                 fail_with_msg(
-                    f"Signal reference '{wire['name']}' has different '{key}' than the original wire!\n"
+                    f"Wire reference '{wire['name']}' has different '{key}' than the original wire!\n"
                     f"Original wire '{original_wire.name}' value: '{original_wire.__dict__[key]}'.\n"
-                    f"Signal reference '{wire['name']}' value: '{value}'."
+                    f"Wire reference '{wire['name']}' value: '{value}'."
                 )
         # Replace wire by a reference to the original
         wires[idx] = iob_wire_reference(wire=original_wire)
@@ -251,7 +249,7 @@ def bus_from_dict(bus_dict):
     return iob_bus(**kwargs)
 
 
-def bus_from_text(bus_text):
+def bus_text2dict(bus_text):
     bus_flags = [
         "name",
         ["-i", {"dest": "interface"}],
@@ -268,6 +266,10 @@ def bus_from_text(bus_text):
                 f"Invalid wire format '{s}'! Expected 'name:width' format.",
                 ValueError,
             )
-        bus_wires.append(wire_from_dict({"name": s_name, "width": s_width}))
+        bus_wires.append({"name": s_name, "width": s_width})
     bus_dict.update({"wires": bus_wires})
-    return iob_bus(**bus_dict)
+    return bus_dict
+
+
+def bus_from_text(bus_text):
+    return bus_from_dict(bus_text2dict(bus_text))

@@ -320,7 +320,7 @@ def setup(py_params_dict):
     ]
 
     #
-    # Wires
+    # Buses
     #
     attributes_dict["buses"] = [
         {

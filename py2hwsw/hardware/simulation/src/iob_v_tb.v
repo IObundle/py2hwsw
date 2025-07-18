@@ -23,7 +23,7 @@
 
 module iob_v_tb;
 
-   // Signals (examples - adjust as needed for your design)
+   // Wires (examples - adjust as needed for your design)
    reg                            clk;
    reg                            cke;
    reg                            arst;
@@ -50,14 +50,14 @@ module iob_v_tb;
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
-      iob_valid_i  = 0;
-      iob_wdata_i  = 0;
-      iob_addr_i   = 0;
-      iob_wstrb_i  = 0;
+      iob_valid_i = 0;
+      iob_wdata_i = 0;
+      iob_addr_i  = 0;
+      iob_wstrb_i = 0;
 
-      clk          = 0;
-      cke          = 1;
-      arst         = 0;
+      clk         = 0;
+      cke         = 1;
+      arst        = 0;
       #10;
       arst = 1;
       #10;

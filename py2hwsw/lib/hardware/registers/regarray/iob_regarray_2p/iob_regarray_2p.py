@@ -112,7 +112,7 @@ def setup(py_params_dict):
         "buses": [
             {
                 "name": "internal_buses",
-                "descr": "Wires for internal usage",
+                "descr": "Buses for internal usage",
                 "wires": [
                     {
                         "name": "regarray",

@@ -66,7 +66,7 @@ def setup(py_params_dict):
             },
         ],
         #
-        # Wires
+        # Buses
         #
         "buses": [
             # Reg valid

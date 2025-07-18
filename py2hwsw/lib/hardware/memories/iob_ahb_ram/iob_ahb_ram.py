@@ -58,9 +58,9 @@ def setup(py_params_dict):
    AHB2MEM #(
       .MEMWIDTH(ADDR_WIDTH)
    ) ahb2bram_inst (
-      // Subordinate Select Signals
+      // Subordinate Select Wires
       .HSEL     (s_ahb_sel_i),
-      // Global Signals
+      // Global Wires
       .HCLK     (clk_i),
       .HRESETn  ({rst_wire}),
       // Address, Control & Write Data

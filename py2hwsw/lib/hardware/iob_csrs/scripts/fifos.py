@@ -505,7 +505,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
         ]
     if is_async:
         #
-        # Async FIFO Wires
+        # Async FIFO Buses
         #
         if mode == "W":
             attributes_dict["buses"] += [
@@ -553,7 +553,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             ]
     else:  # not is_async
         #
-        # Sync FIFO Wires
+        # Sync FIFO Buses
         #
         if mode == "W":
             attributes_dict["buses"].append(

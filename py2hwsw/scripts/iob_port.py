@@ -14,8 +14,9 @@ from iob_base import (
     fail_with_msg,
     str_to_kwargs,
     assert_attributes,
+    parse_short_notation_text,
 )
-from iob_wire import iob_wire
+from iob_wire import iob_wire, wire_from_dict
 from api_base import internal_api_class
 
 
@@ -73,7 +74,7 @@ class iob_port:
 
             if _direction in ["input", "output"] and wire.direction != _direction:
                 fail_with_msg(
-                    f"Signal direction '{wire.direction}' does not match port name '{self.name}'",
+                    f"Wire direction '{wire.direction}' does not match port name '{self.name}'",
                     ValueError,
                 )
 
@@ -147,9 +148,7 @@ def add_wires_port(core, *args, wires=[], **kwargs):
     if type(wires) is list:
         for wire in wires:
             if not isinstance(wire, iob_wire):
-                fail_with_msg(
-                    f"Signals must be a list of iob_wires! {wires}", TypeError
-                )
+                fail_with_msg(f"Wires must be a list of iob_wires! {wires}", TypeError)
     # Create the port with the wires
     port = iob_port(*args, wires=wires, **kwargs)
     replace_duplicate_wires_by_references(core.ports, port.wires)
@@ -188,7 +187,29 @@ def port_from_dict(port_dict):
     return iob_port(**port_dict)
 
 
+def port_text2dict(port_text):
+    port_flags = [
+        "name",
+        ["-i", {"dest": "interface"}],
+        ["-w", {"dest": "wires", "action": "append"}],
+        ["-d", {"dest": "descr", "nargs": "?"}],
+        ["-doc", {"dest": "doc_only", "action": "store_true"}],
+        ["-doc_clearpage", {"dest": "doc_clearpage", "action": "store_true"}],
+    ]
+    port_dict = parse_short_notation_text(port_text, port_flags)
+    port_wires = []
+    for s in port_dict.get("wires", []):
+        try:
+            [s_name, s_width] = s.split(":")
+        except ValueError:
+            fail_with_msg(
+                f"Invalid wire format '{s}'! Expected 'name:width' format.",
+                ValueError,
+            )
+        port_wires.append({"name": s_name, "width": s_width})
+    port_dict.update({"wires": port_wires})
+    return port_dict
+
+
 def port_from_text(port_text):
-    port_dict = {}
-    # TODO: parse short notation text
-    return iob_port(**port_dict)
+    return port_from_dict(port_text2dict(port_text))

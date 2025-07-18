@@ -200,7 +200,7 @@ def setup(py_params_dict):
             },
         )
     #
-    # Wires
+    # Buses
     #
     attributes_dict["buses"] = [
         # Active read transfer reg
@@ -265,7 +265,7 @@ def setup(py_params_dict):
         # Allow write address wires
         {
             "name": "allow_write_address",
-            "descr": "Signals to allow address valid/ready",
+            "descr": "Wires to allow address valid/ready",
             "wires": [
                 {"name": "wants_change_write_sel", "width": 1},
                 {"name": "allow_write_address", "width": 1},
@@ -325,7 +325,7 @@ def setup(py_params_dict):
         # Allow write data
         {
             "name": "allow_write_data",
-            "descr": "Signal to allow data valid/ready",
+            "descr": "Wire to allow data valid/ready",
             "wires": [
                 {"name": "allow_write_data", "width": 1},
             ],

@@ -109,7 +109,7 @@ def setup(py_params_dict):
                 port["wires"]["params"] = "tlast"
                 break
 
-    # Wires declaration
+    # Buses declaration
     buses = [
         {
             "name": "axis_tdata",

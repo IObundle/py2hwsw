@@ -6,7 +6,7 @@ import re
 
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
-from iob_base import fail_with_msg, assert_attributes
+from iob_base import fail_with_msg, assert_attributes, parse_short_notation_text
 from iob_bus import find_wire_in_buses
 from iob_wire import get_real_wire
 from interfaces import iobClkInterface
@@ -196,8 +196,7 @@ class iob_comb(iob_snippet):
 
                     if any(x in port_params for x in ["_r", "_e"]):
                         if not any(
-                            bus.name == f"{wire.name}_reg_wires"
-                            for bus in core.buses
+                            bus.name == f"{wire.name}_reg_wires" for bus in core.buses
                         ):
                             core.create_bus(
                                 name=f"{wire.name}_reg_wires", wires=_reg_wires
@@ -274,7 +273,15 @@ def comb_from_dict(comb_dict):
     return iob_comb(**comb_dict)
 
 
+def comb_text2dict(comb_text):
+    comb_flags = [
+        ["-c", {"dest": "code"}],
+        ["-clk_if", {"dest": "clk_if"}],
+        ["-clk_p", {"dest": "clk_prefix"}],
+    ]
+    # Parse comb text into a dictionary
+    return parse_short_notation_text(comb_text, comb_flags)
+
+
 def comb_from_text(comb_text):
-    comb_dict = {}
-    # TODO: parse short notation text
-    return iob_comb(**comb_dict)
+    return comb_from_dict(comb_text2dict(comb_text))

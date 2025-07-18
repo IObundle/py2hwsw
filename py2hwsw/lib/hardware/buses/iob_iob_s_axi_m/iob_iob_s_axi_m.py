@@ -116,7 +116,7 @@ def setup(py_params_dict):
         },
     ]
 
-    # Wires List
+    # Buses List
     buses = [
         {
             "name": "start_addr",

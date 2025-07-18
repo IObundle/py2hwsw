@@ -179,7 +179,7 @@ def setup(py_params_dict):
             }
         )
     #
-    # Wires
+    # Buses
     #
     attributes_dict["buses"] = []
     for i in range(N_SUBORDINATES):
@@ -197,7 +197,7 @@ def setup(py_params_dict):
                     | {"ADDR_W": axi_python_params["addr_w"] - M_SELECT_NBITS},
                 }
             )
-    # Wires for output for merges
+    # Buses for output for merges
     for i in range(N_MANAGERS):
         attributes_dict["buses"].append(
             {

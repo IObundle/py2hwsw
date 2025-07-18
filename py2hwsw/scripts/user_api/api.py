@@ -154,74 +154,6 @@ def create_conf_from_text(conf_text):
     pass
 
 
-@api_for(internal_conf.iob_conf_group)
-class iob_conf_group:
-    """
-    Class to represent a group of configurations.
-
-    Attributes:
-        name (str): Configuration group identifier name.
-        descr (str): Description of the configuration group.
-        confs (list): List of configuration objects.
-        doc_only (bool): If enabled, configuration group will only appear in documentation. Not in the verilog code.
-        doc_clearpage (bool): If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
-    """
-
-    name: str = ""
-    descr: str = "Default description"
-    confs: list[iob_conf] = empty_list()
-    doc_only: bool = False
-    doc_clearpage: bool = False
-
-
-@api_for(internal_conf.conf_group_from_dict)
-def create_conf_group_from_dict(conf_group_dict):
-    """
-    Function to create iob_conf_group object from dictionary attributes.
-
-    Attributes:
-        conf_group_dict (dict): dictionary with values to initialize attributes of iob_conf_group object.
-            This dictionary supports the following keys corresponding to the iob_conf_group attributes:
-            - name          -> iob_conf_group.name
-            - descr         -> iob_conf_group.descr
-            - confs         -> iob_conf_group.confs
-            - doc_only      -> iob_conf_group.doc_only
-            - doc_clearpage -> iob_conf_group.doc_clearpage
-
-    Returns:
-        iob_conf_group: iob_conf_group object
-    """
-    pass
-
-
-@api_for(internal_conf.conf_group_from_text)
-def create_conf_group_from_text(conf_group_text):
-    """
-    Function to create iob_conf_group object from short notation text.
-
-    Attributes:
-        conf_group_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-d descr] [--confs] [-doc] [-doc_clearpage]
-            Example:
-                'Default group'
-                -d 'Default group of confs'
-                -doc
-                -doc_clearpage
-                --confs
-                    "
-                    DATA_W -t P -v 32 -m NA -M NA
-                    -d 'Data bus width'
-
-                    ADDR_W -t P -v 4 -m NA -M NA
-                    -d 'Address width'
-                    "
-
-    Returns:
-        iob_conf_group: iob_conf_group object
-    """
-    pass
-
-
 #
 # Wires
 #
@@ -262,6 +194,18 @@ def create_global_wire_from_dict(global_wire_dict):
 
     Returns:
         iob_global_wire: iob_global_wire object
+    """
+    pass
+
+
+@api_for(internal_wire.global_wire_text2dict)
+def global_wire_text2dict(global_wire_text):
+    """Convert global_wire short notation text to dictionary.
+    Atributes:
+        global_wire_text (str): Short notation text. See `create_global_wire_from_text` for format.
+
+    Returns:
+        dict: Dictionary with global_wire attributes.
     """
     pass
 
@@ -380,6 +324,18 @@ def create_interface_from_dict(interface_dict):
     pass
 
 
+@api_for(internal_interface.interface_text2dict)
+def interface_text2dict(interface_text):
+    """Convert interface short notation text to dictionary.
+    Atributes:
+        interface_text (str): Short notation text. See `create_interface_from_text` for format.
+
+    Returns:
+        dict: Dictionary with interface attributes.
+    """
+    pass
+
+
 @api_for(internal_interface.interface_from_text)
 def create_interface_from_text(interface_text):
     """
@@ -387,7 +343,13 @@ def create_interface_from_text(interface_text):
 
     Attributes:
         interface_text (str): Short notation text. Object attributes are specified using the following format:
-            type [-p prefix] [-m mult] [-w width]
+            genre [-d direction] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
+            Examples:
+                axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
+
+                rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32
+
+                axis -p output_ -P 'has_tlast'
 
     Returns:
         interface: interface object
@@ -511,6 +473,18 @@ def create_port_from_dict(port_dict):
     pass
 
 
+@api_for(internal_port.port_text2dict)
+def port_text2dict(port_text):
+    """Convert port short notation text to dictionary.
+    Atributes:
+        port_text (str): Short notation text. See `create_port_from_text` for format.
+
+    Returns:
+        dict: Dictionary with port attributes.
+    """
+    pass
+
+
 @api_for(internal_port.port_from_text)
 def create_port_from_text(port_text):
     """
@@ -518,7 +492,9 @@ def create_port_from_text(port_text):
 
     Attributes:
         port_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-i interface] [-d descr] [-s wire_name:width]+
+            name [-i interface] [-d descr] [-s wire_name:width]+ [-doc] [-doc_clearpage]
+            Example:
+                control -d 'control bus' -s start_i:1 -s done_o:1 -s cmd_i:CMD_W -doc
 
     Returns:
         iob_port: iob_port object
@@ -559,6 +535,18 @@ def create_snippet_from_dict(snippet_dict):
     pass
 
 
+@api_for(internal_snippet.snippet_text2dict)
+def snippet_text2dict(snippet_text):
+    """Convert snippet short notation text to dictionary.
+    Atributes:
+        snippet_text (str): Short notation text. See `create_snippet_from_text` for format.
+
+    Returns:
+        dict: Dictionary with snippet attributes.
+    """
+    pass
+
+
 @api_for(internal_snippet.snippet_from_text)
 def create_snippet_from_text(snippet_text):
     """
@@ -566,7 +554,7 @@ def create_snippet_from_text(snippet_text):
 
     Attributes:
         snippet_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [snippet_text]
 
     Returns:
         iob_snippet: iob_snippet object
@@ -603,6 +591,7 @@ class iob_comb(iob_snippet):
                     '''
                     then the 'reg_wire_nxt' bus will be automatically created, and the 'reg_wire_reg' register will be instantiated.
         clk_if (str): Clock interface
+        clk_prefix (str): Clock interface prefix
     """
 
     code: str = ""
@@ -627,6 +616,18 @@ def create_comb_from_dict(comb_dict):
     pass
 
 
+@api_for(internal_comb.comb_text2dict)
+def comb_text2dict(comb_text):
+    """Convert comb short notation text to dictionary.
+    Atributes:
+        comb_text (str): Short notation text. See `create_comb_from_text` for format.
+
+    Returns:
+        dict: Dictionary with comb attributes.
+    """
+    pass
+
+
 @api_for(internal_comb.comb_from_text)
 def create_comb_from_text(comb_text):
     """
@@ -634,7 +635,15 @@ def create_comb_from_text(comb_text):
 
     Attributes:
         comb_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [-c code] [-clk_if clk_if] [-clk_p clk_prefix]
+            Example:
+                -c
+                {{
+                    // Register data
+                    data_nxt = data;
+                }}
+                -clk_if c_a_r
+                -clk_p data_
 
     Returns:
         iob_comb: iob_comb object
@@ -681,6 +690,19 @@ def create_fsm_from_dict(fsm_dict):
     pass
 
 
+@api_for(internal_fsm.fsm_text2dict)
+def fsm_text2dict(fsm_text):
+    """Convert fsm short notation text to dictionary.
+    Atributes:
+        fsm_text (str): Short notation text. See `create_fsm_from_text` for format.
+
+    Returns:
+        dict: Dictionary with fsm attributes.
+    """
+    pass
+
+
+
 @api_for(internal_fsm.fsm_from_text)
 def create_fsm_from_text(fsm_text):
     """
@@ -688,7 +710,24 @@ def create_fsm_from_text(fsm_text):
 
     Attributes:
         fsm_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [-t kind] [-d default_assignments] [-s state_descriptions]
+            Example:
+                -t fsm
+                -d 'a_o = 10;'
+                -s
+                {{
+                    A: a_o = 0;
+                    B: a_o = 1;
+                    a_o = 2;
+                    if(a_o == 0)
+                    begin
+                        pcnt_nxt = A;
+                    end
+                    else
+                    begin
+                        pcnt_nxt = B;
+                    end
+                }}
 
     Returns:
         iob_fsm: iob_fsm object
@@ -699,6 +738,18 @@ def create_fsm_from_text(fsm_text):
 #
 # License
 #
+
+
+@api_for(internal_license.license_text2dict)
+def license_text2dict(license_text):
+    """Convert license short notation text to dictionary.
+    Atributes:
+        license_text (str): Short notation text. See `create_license_from_text` for format.
+
+    Returns:
+        dict: Dictionary with license attributes.
+    """
+    pass
 
 
 @api_for(internal_license.iob_license)
@@ -742,7 +793,9 @@ def create_license_from_text(license_text):
 
     Attributes:
         license_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [name] [-y year] [-a author]
+            Example:
+                MIT -y 2025 -a 'IObundle, Lda'
 
     Returns:
         iob_license: iob_license object
@@ -866,6 +919,19 @@ def create_python_parameter_from_dict(python_parameter_dict):
     pass
 
 
+@api_for(internal_python_parameter.python_parameter_text2dict)
+def python_parameter_text2dict(python_parameter_text):
+    """Convert python_parameter short notation text to dictionary.
+    Atributes:
+        python_parameter_text (str): Short notation text. See `create_python_parameter_from_text` for format.
+
+    Returns:
+        dict: Dictionary with python_parameter attributes.
+    """
+    pass
+
+
+
 @api_for(internal_python_parameter.python_parameter_from_text)
 def create_python_parameter_from_text(python_parameter_text):
     """
@@ -873,7 +939,9 @@ def create_python_parameter_from_text(python_parameter_text):
 
     Attributes:
         python_parameter_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+            [name] [-v value] [-d descr]
+            Example:
+                my_param -v 42 -d 'My parameter description'
 
     Returns:
         iob_python_parameter: iob_python_parameter object
@@ -1167,6 +1235,18 @@ def create_core_from_dict(core_dict):
 
     Returns:
         iob_core: iob_core object
+    """
+    pass
+
+
+@api_for(internal_core.core_text2dict)
+def core_text2dict(core_text):
+    """Convert core short notation text to dictionary.
+    Atributes:
+        core_text (str): Short notation text. See `create_core_from_text` for format.
+
+    Returns:
+        dict: Dictionary with core attributes.
     """
     pass
 

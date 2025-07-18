@@ -80,7 +80,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "busy_o",
-                "descr": "Signal indicating if the module is busy transferring data",
+                "descr": "Wire indicating if the module is busy transferring data",
                 "wires": [{"name": "busy_o", "isvar": True}],
             },
             {

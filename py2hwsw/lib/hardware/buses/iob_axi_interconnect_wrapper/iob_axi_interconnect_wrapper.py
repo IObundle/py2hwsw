@@ -184,7 +184,7 @@ def setup(py_params_dict):
         manager_addr_w_parameter = "{" + manager_addr_w_parameter + "}"
     attributes_dict["ports"] += subordinate_axi_ports + manager_axi_ports
     #
-    # Wires
+    # Buses
     #
     attributes_dict["buses"] = [
         {

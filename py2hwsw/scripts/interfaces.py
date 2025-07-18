@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from iob_wire import iob_wire, iob_wire_reference
 from iob_globals import iob_globals
 from api_base import internal_api_class
+from iob_base import parse_short_notation_text
 
 mem_if_details = [
     {
@@ -336,7 +337,7 @@ class interface:
             exit(1)
 
     #
-    # Signal manipulation private methods
+    # Wire manipulation private methods
     #
     @staticmethod
     def __reverse_name_direction(name):
@@ -396,7 +397,7 @@ class interface:
             exit(1)
 
     #
-    # Signal generation private methods
+    # Wire generation private methods
     #
     def __write_single_wire(self, fout, wire, for_tb):
         """Write a single wire to the file."""
@@ -1820,26 +1821,29 @@ class wishboneInterface(interface):
 
 
 def create_interface(
-    genre,
-    if_direction="",
-    mult=1,
-    widths={},
-    params=None,
+    genre: str,
+    if_direction: str = "",
+    mult: int | str = 1,
+    widths: dict = {},
+    params: list = None,
     prefix="",
     portmap_port_prefix="",
     file_prefix="",
 ):
     """Creates an interface with the given genre and parameters.
-    param genre: Name of the interface.
-    param if_direction: Direction of the interface.
-                Examples: '' (unspecified), 'manager', 'subordinate', ...
-    param mult: Multiplication factor for all wire widths.
-    param widths: Dictionary for configuration of specific wire widths.
-    param params: Dictionary for configuration of specific parameters.
-    param prefix: Prefix to add to all wire names.
-    param portmap_port_prefix: Prefix to add to all portmap ports.
-    param file_prefix: Prefix to add to the file name.
-    return: An instance of the interface class.
+    Attributes:
+        genre (str): Name of the interface.
+        if_direction (str): Direction of the interface.
+            Examples: '' (unspecified), 'manager', 'subordinate', ...
+        mult (int|str): Multiplication factor for all wire widths.
+        widths (dict): Dictionary for configuration of specific wire widths.
+        params (list): List for configuration of specific parameters.
+        prefix (str): Prefix to add to all wire names.
+        portmap_port_prefix (str): Prefix to add to all portmap ports.
+        file_prefix (str): Prefix to add to the file name.
+
+    Returns:
+        interface (interface): An instance of the interface class.
     Raises ValueError if the genre is not recognized or if the widths are not of the correct.
     """
 
@@ -2167,10 +2171,31 @@ if __name__ == "__main__":
 
 
 def interface_from_dict(interface_dict):
-    return interface(**interface_dict)
+    return create_interface(**interface_dict)
 
+
+def interface_text2dict(interface_text):
+    interface_flags = [
+        "genre",
+        ["-d", {"dest": "if_direction", "choices": ["", "manager", "subordinate"]}],
+        ["-m", {"dest": "mult"}],
+        ["-w", {"dest": "widths", "action": "append"}],  # create accepts dictionary
+        ["-P", {"dest": "params", "action": "append"}],
+        ["-p", {"dest": "prefix", "type": str}],
+        ["-pm", {"dest": "portmap_port_prefix", "type": str}],
+        ["-f", {"dest": "file_prefix", "type": str}],
+    ]
+    interface_dict = parse_short_notation_text(interface_text, interface_flags)
+    width_dict = {}
+    if "widths" in interface_dict and interface_dict["widths"]:
+        for width in interface_dict["widths"]:
+            if ":" in width:
+                w_key, value = width.split(":", 1)
+                width_dict[w_key] = value
+            else:
+                raise ValueError(f"Invalid width specification: {width}")
+    interface_dict.update({"widths": width_dict})
+    return interface_dict
 
 def interface_from_text(interface_text):
-    interface_dict = {}
-    # TODO: parse short notation text
-    return interface(**interface_dict)
+    return interface_from_dict(interface_text2dict(interface_text))

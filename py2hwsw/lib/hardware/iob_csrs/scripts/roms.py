@@ -60,7 +60,7 @@ def create_rom_instance(attributes_dict, csr_ref):
         }
     )
     #
-    # ROM Wires
+    # ROM Buses
     #
     attributes_dict["buses"] += [
         {

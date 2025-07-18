@@ -104,7 +104,7 @@ def setup(py_params_dict):
             "LEN_W": "AXI_LEN_W",
         }
     #
-    # Wires
+    # Buses
     #
     attributes_dict["buses"] = [
         {

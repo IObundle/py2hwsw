@@ -126,7 +126,7 @@ def create_autoclear_instance(attributes_dict, csr_ref):
         }
     )
     #
-    # Wires
+    # Buses
     #
     attributes_dict["buses"] += [
         {

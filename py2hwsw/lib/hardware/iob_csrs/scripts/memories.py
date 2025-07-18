@@ -223,7 +223,7 @@ def create_memory_instance(
             },
         ]
     memory_buses = [
-        # Wires for dual ports of memory
+        # Buses for dual ports of memory
         {
             "name": f"{memory_name}_port_a_io",
             "descr": f"Port A of memory {memory_name}",
@@ -251,10 +251,10 @@ def create_memory_instance(
         # Export dual ports of memory
         attributes_dict["ports"] += memory_buses
     #
-    # Wires
+    # Buses
     #
     if internal_memory:
-        # Wires for dual ports of memory
+        # Buses for dual ports of memory
         attributes_dict["buses"] += memory_buses
     attributes_dict["buses"] += [
         # Asym converter buses
@@ -333,7 +333,7 @@ def create_memory_instance(
     // MEMORY: {MEMORY_NAME}
 
 """
-    # Signals for Port A of memory (connect to cpu)
+    # Wires for Port A of memory (connect to cpu)
     snippet = f"""
     // Connect Port A to internal logic (for cbus)
     assign enA_i = {memory_name}_valid & {memory_name}_ready;
@@ -362,7 +362,7 @@ def create_memory_instance(
     assign {memory_name}_rvalid = 1'b1;
 """
 
-    # Signals for subordinate port of asym converter (connect to core)
+    # Wires for subordinate port of asym converter (connect to core)
     snippet = f"""
     // Connect asym converter subordinate port to core's logic
     assign {memory_name}_r_ready_o = {memory_name}_asym_ready_o;

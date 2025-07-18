@@ -21,25 +21,6 @@
 # may call special conversion methods instead of setting the attribute directly.
 
 
-# Note for developers:
-# To achieve backwards compatibility, consider the following best practices:
-#
-# - Add new methods, don't change existing ones:
-#       When adding new functionality, introduce new methods or interfaces instead of
-#       modifying existing ones. This ensures that existing user code will not break.
-# - Use default values or optional parameters:
-#       When adding new parameters to existing methods, use default values or make
-#       them optional to avoid breaking existing user code.
-# - Avoid removing methods or interfaces:
-#       Once a method or interface is published, avoid removing it in future versions.
-#       Instead, consider deprecating it and providing a replacement or alternative
-#       implementation.
-# - Document changes and deprecations:
-#       Clearly document any changes, deprecations, or removals in your API, including
-#       the version number or identifier where the change occurred. This helps users
-#       understand the impact of updates and plan accordingly.
-
-
 from datetime import date
 import os
 import sys

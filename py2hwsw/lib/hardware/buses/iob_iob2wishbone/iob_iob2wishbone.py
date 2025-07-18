@@ -159,21 +159,6 @@ def setup(py_params_dict):
                     {"name": "wb_data_r", "width": "DATA_W"},
                 ],
             },
-            # Reg wb_ack
-            {
-                "name": "wb_ack_data_i",
-                "descr": "wb_ack intput wire",
-                "signals": [
-                    {"name": "wb_ack_i"},
-                ],
-            },
-            {
-                "name": "wb_ack_data_o",
-                "descr": "wb_ack output wire",
-                "signals": [
-                    {"name": "wb_ack_r", "width": 1},
-                ],
-            },
         ],
     }
     #
@@ -307,28 +292,6 @@ def setup(py_params_dict):
                 "data_o": "wb_data_data_o",
             },
         },
-        {
-            "core_name": "iob_reg",
-            "instance_name": "iob_reg_wb_ack",
-            "parameters": {
-                "DATA_W": 1,
-                "RST_VAL": 0,
-            },
-            "port_params": {
-                "clk_en_rst_s": "c_a_r_e",
-            },
-            "connect": {
-                "clk_en_rst_s": (
-                    "clk_en_rst_s",
-                    [
-                        "en_i:wb_ack_i",
-                        "rst_i:iob_rready_i",
-                    ],
-                ),
-                "data_i": "wb_ack_data_i",
-                "data_o": "wb_ack_data_o",
-            },
-        },
     ]
     #
     # Snippets
@@ -347,7 +310,7 @@ def setup(py_params_dict):
    assign wb_select    = wb_we ? iob_wstrb_i : {READ_BYTES{1'b1}};
    assign wb_we        = |iob_wstrb_i;
 
-   assign iob_rvalid_o = wb_ack_i ? wb_ack_i & (~wb_we_r) : wb_ack_r & (~wb_we_r);
+   assign iob_rvalid_o = wb_ack_i & (~wb_we_r);
    assign iob_rdata_o  = wb_ack_i ? wb_dat_i : wb_data_r;
    assign iob_ready_o  = wb_ack_i;
 """,

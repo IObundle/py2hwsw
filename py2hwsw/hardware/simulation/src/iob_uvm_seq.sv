@@ -25,7 +25,6 @@ class iob_transaction extends uvm_sequence_item;
    bit [                31:0] rdata;
    bit                        rvalid;
    bit                        ready;
-   bit                        rready;
 
    function new(string name = "iob_transaction");
       super.new(name);
@@ -39,7 +38,6 @@ class iob_transaction extends uvm_sequence_item;
       `uvm_field_int(rdata, UVM_ALL_ON)
       `uvm_field_int(rvalid, UVM_ALL_ON)
       `uvm_field_int(ready, UVM_ALL_ON)
-      `uvm_field_int(rready, UVM_ALL_ON)
    `uvm_object_utils_end
 
 endclass

@@ -39,6 +39,7 @@
 # reuse-3.0.2
 # fusesoc-2.2.1
 # kactus2 (commit 19c5702)
+# doxygen 1.10.0
 
 
 let
@@ -75,6 +76,19 @@ let
 
   yosys = import ./scripts/yosys.nix { inherit pkgs; };
 
+  pythonEnv = pkgs.python3.withPackages (ps: with ps; [
+    black
+    mypy
+    parse
+    numpy
+    wavedrom
+    matplotlib
+    scipy
+    pyserial
+    pydantic
+    jinja2
+  ]);
+
   py2hwsw_dependencies = with pkgs; [
     bash
     gnumake
@@ -82,15 +96,8 @@ let
     verilator
     gtkwave
     python3
-    python3Packages.black
-    python3Packages.mypy
-    python3Packages.parse
-    python3Packages.numpy
-    python3Packages.wavedrom
-    python3Packages.matplotlib
-    python3Packages.scipy
-    python3Packages.pyserial
-    (texlive.combine { inherit (texlive) scheme-medium multirow lipsum catchfile nowidow enumitem placeins xltabular ltablex titlesec makecell datetime fmtcount comment textpos csquotes amsmath cancel listings hyperref biblatex pmboxdraw; })
+    pythonEnv
+    (texlive.combine { inherit (texlive) scheme-medium multirow lipsum catchfile nowidow enumitem placeins xltabular ltablex titlesec makecell datetime fmtcount comment textpos csquotes amsmath cancel listings hyperref biblatex pmboxdraw varwidth hanging adjustbox stackengine alphalph; })
     (callPackage ./scripts/riscv-gnu-toolchain.nix { })
     verible
     black
@@ -117,6 +124,7 @@ let
     reuse
     fusesoc
     (callPackage ./scripts/kactus2.nix { })
+    doxygen
     py2hwsw
   ] ++ extra_pkgs;
 
@@ -138,5 +146,6 @@ pkgs.mkShell {
   buildInputs = py2hwsw_dependencies;
   shellHook = ''
     export PATH="$PATH:${bin_path}"
+    export PYTHONPATH=${pythonEnv}/${pythonEnv.sitePackages}
   '';
 }

@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "confs": [
             {
                 "name": "W_DATA_W",
-                "descr": "",
+                "descr": "Write data width",
                 "type": "P",
                 "val": "21",
                 "min": "NA",
@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "R_DATA_W",
-                "descr": "",
+                "descr": "Read data width",
                 "type": "P",
                 "val": "21",
                 "min": "NA",
@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "ADDR_W",
-                "descr": "Higher ADDR_W lower DATA_W",
+                "descr": "Higher ADDR_W (lower DATA_W)",
                 "type": "P",
                 "val": "21",
                 "min": "NA",
@@ -33,7 +33,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "MAXDATA_W",
-                "descr": "",
+                "descr": "Computed maximum data width",
                 "type": "D",
                 "val": "iob_max(W_DATA_W, R_DATA_W)",
                 "min": "NA",
@@ -41,7 +41,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "MINDATA_W",
-                "descr": "",
+                "descr": "Computed minimum data width",
                 "type": "D",
                 "val": "iob_min(W_DATA_W, R_DATA_W)",
                 "min": "NA",
@@ -49,7 +49,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "R",
-                "descr": "",
+                "descr": "Computed ratio between maximum and minimum data widths",
                 "type": "D",
                 "val": "MAXDATA_W / MINDATA_W",
                 "min": "NA",
@@ -65,7 +65,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "W_ADDR_W",
-                "descr": "",
+                "descr": "Computed write address width",
                 "type": "D",
                 "val": "(W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W",
                 "min": "NA",
@@ -73,7 +73,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "R_ADDR_W",
-                "descr": "",
+                "descr": "Computed read address width",
                 "type": "D",
                 "val": "(R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W",
                 "min": "NA",
@@ -90,54 +90,47 @@ def setup(py_params_dict):
             },
             {
                 "name": "rst_i",
-                "descr": "Synchronous reset interface",
-                "signals": [
-                    {
-                        "name": "rst_i",
-                        "width": 1,
-                        "descr": "Synchronous reset input",
-                    },
-                ],
+                "descr": "Synchronous reset input",
+                "signals": [{"name": "rst_i"}],
             },
             {
-                "name": "write_io",
-                "descr": "Write interface",
-                "signals": [
-                    {
-                        "name": "w_en_i",
-                        "width": 1,
-                        "descr": "Write enable",
-                    },
-                    {
-                        "name": "w_data_i",
-                        "width": "W_DATA_W",
-                        "descr": "Write data",
-                    },
-                    {
-                        "name": "w_full_o",
-                        "width": 1,
-                        "descr": "Write full signal",
-                    },
-                ],
+                "name": "w_en_i",
+                "descr": "Write enable input",
+                "signals": [{"name": "w_en_i"}],
             },
             {
-                "name": "read_io",
-                "descr": "Read interface",
+                "name": "w_data_i",
+                "descr": "Write data input",
+                "signals": [{"name": "w_data_i", "width": "W_DATA_W"}],
+            },
+            {
+                "name": "w_full_o",
+                "descr": "Write full output",
+                "signals": [{"name": "w_full_o"}],
+            },
+            {
+                "name": "r_en_i",
+                "descr": "Read enable input",
+                "signals": [{"name": "r_en_i"}],
+            },
+            {
+                "name": "r_data_o",
+                "descr": "Read data output",
+                "signals": [{"name": "r_data_o", "width": "R_DATA_W"}],
+            },
+            {
+                "name": "r_empty_o",
+                "descr": "Read empty output",
+                "signals": [{"name": "r_empty_o"}],
+            },
+            {
+                "name": "level_o",
+                "descr": "FIFO interface",
                 "signals": [
                     {
-                        "name": "r_en_i",
-                        "width": 1,
-                        "descr": "Read enable",
-                    },
-                    {
-                        "name": "r_data_o",
-                        "width": "R_DATA_W",
-                        "descr": "Read data",
-                    },
-                    {
-                        "name": "r_empty_o",
-                        "width": 1,
-                        "descr": "Read empty signal",
+                        "name": "level_o",
+                        "width": "ADDR_W+1",
+                        "descr": "FIFO level",
                     },
                 ],
             },
@@ -180,17 +173,6 @@ def setup(py_params_dict):
                         "name": "ext_mem_w_data_o",
                         "width": "MAXDATA_W",
                         "descr": "Memory write data",
-                    },
-                ],
-            },
-            {
-                "name": "fifo_o",
-                "descr": "FIFO interface",
-                "signals": [
-                    {
-                        "name": "level_o",
-                        "width": "ADDR_W+1",
-                        "descr": "FIFO level",
                     },
                 ],
             },

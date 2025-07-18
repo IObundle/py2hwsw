@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass, field
+import copy
 
 from iob_base import fail_with_msg
 
@@ -85,3 +86,12 @@ def get_real_signal(signal):
     while isinstance(signal, iob_signal_reference):
         signal = signal.signal
     return signal
+
+
+def remove_signal_direction_suffixes(signal_list):
+    """Given a signal list (usually from a port) that includes direction suffixes in their names (like _i, _o, _io),
+    return a new list with the suffixes removed"""
+    new_list = copy.deepcopy(signal_list)
+    for signal in new_list:
+        signal.name = signal.name.rsplit("_", 1)[0]
+    return new_list

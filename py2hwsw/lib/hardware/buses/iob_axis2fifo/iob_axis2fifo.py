@@ -60,7 +60,7 @@ def setup(py_params_dict):
         )
     # Use len and done signal if tlast is requested
     if use_tlast:
-        ports.append(
+        ports += [
             {
                 "name": "len_o",
                 "descr": "Length signal",
@@ -72,35 +72,36 @@ def setup(py_params_dict):
                     },
                 ],
             },
-        )
-        ports.append(
             {
                 "name": "done_o",
                 "descr": "Done signal",
                 "signals": [{"name": "done_o", "descr": "Done signal"}],
             },
-        )
+        ]
 
-    # AXIS Interface - without last
-    ports.append(
+    ports += [
+        # AXIS Interface - without last
         {
             "name": "axis_s",
             "descr": "AXIS slave interface",
             "signals": {"type": "axis", "DATA_W": "DATA_W"},
-        }
-    )
-    # FIFO write interface
-    ports.append(
+        },
         {
-            "name": "fifo_w_io",
+            "name": "fifo_write_o",
             "descr": "FIFO write interface",
-            "signals": [
-                {"name": "fifo_write_o", "isvar": True},
-                {"name": "fifo_wdata_o", "width": "DATA_W", "isvar": True},
-                {"name": "fifo_full_i"},
-            ],
-        }
-    )
+            "signals": [{"name": "fifo_write_o", "isvar": True}],
+        },
+        {
+            "name": "fifo_wdata_o",
+            "descr": "FIFO write data signal",
+            "signals": [{"name": "fifo_wdata_o", "width": "DATA_W", "isvar": True}],
+        },
+        {
+            "name": "fifo_full_i",
+            "descr": "FIFO full signal",
+            "signals": [{"name": "fifo_full_i"}],
+        },
+    ]
 
     if use_tlast:
         # append tlast to "params" in axis_s signals
@@ -252,11 +253,6 @@ def setup(py_params_dict):
                     ],
                 },
                 {
-                    "name": "counter_en_rst",
-                    "descr": "Counter enable and reset",
-                    "signals": [{"name": "axis_word_count_inc"}, {"name": "rst_i"}],
-                },
-                {
                     "name": "rst_i",
                     "descr": "Reset signal",
                     "signals": [
@@ -277,7 +273,8 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_arst",
-                    "en_rst_i": "counter_en_rst",
+                    "counter_rst_i": "rst_i",
+                    "counter_en_i": "axis_word_count_inc",
                     "data_o": "len_o",
                 },
             },

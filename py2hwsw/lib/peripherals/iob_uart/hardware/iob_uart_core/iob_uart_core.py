@@ -49,6 +49,12 @@ def setup(py_params_dict):
                     "clk_en_rst_s": "c_a_e",
                 },
             },
+            {
+                "core_name": "iob_reg",
+                "port_params": {
+                    "clk_en_rst_s": "c_a_r_e",
+                },
+            },
             {"core_name": "iob_sync", "instantiate": False},
         ],
     }

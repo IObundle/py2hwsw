@@ -19,6 +19,8 @@ def setup(py_params_dict):
 
     reset_polarity = getattr(iob_globals(), "reset_polarity", "positive")
 
+    clk_port_params = port_params["clk_en_rst_s"]
+
     if reset_polarity != "positive":
         port_params["clk_en_rst_s"] = port_params["clk_en_rst_s"].replace("a", "an")
 
@@ -73,7 +75,7 @@ def setup(py_params_dict):
             {
                 "name": "port_params",
                 "val": port_params,
-                "descr": "Port parameters are passed to if_gen interfaces to generate different interfaces based on the parameters.",
+                "descr": "Port parameters are passed to interfaces to generate different interfaces.",
             },
         ],
         "version": "0.1",
@@ -100,7 +102,7 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
-                    "params": port_params["clk_en_rst_s"],
+                    "params": clk_port_params,
                 },
                 "descr": "Clock, clock enable and reset",
             },

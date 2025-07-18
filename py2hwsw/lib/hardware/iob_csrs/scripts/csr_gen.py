@@ -291,9 +291,9 @@ class csr_gen:
                 ]
 
                 lines += (
-                    f"    assign {name}_rdata = {name}{suffix};\n"
-                    f"    assign {name}_reg_en = {name}_w_valid | {name}_r_valid;\n"
-                    f"    assign {name}_reg_data = {name}_w_valid ? {name}_wdata : {name}{suffix_i};\n"
+                    f"    assign {name}_rdata = {name}_rdata{suffix};\n"
+                    f"    assign {name}_reg_en = {name}_w_valid | (|{name}_wstrb_i);\n"
+                    f"    assign {name}_reg_data = {name}_w_valid ? {name}_wdata : {name}_wdata{suffix_i};\n"
                 )
 
             # Create reg
@@ -316,7 +316,7 @@ class csr_gen:
                     f"      .en_i   ({name}_w_valid),\n"
                     f"      .data_i ({name}_wdata),\n"
                 )
-            lines += f"      .data_o ({name}{suffix})\n" "    );\n\n"
+            lines += f"      .data_o ({name}_rdata{suffix})\n" "    );\n\n"
         else:  # not auto: compute valid
             # signal to indicate if the register is addressed
             lines += f"    wire {name}_addressed;\n"
@@ -404,13 +404,6 @@ class csr_gen:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
             wires += [
                 {
-                    "name": f"{name}_r_valid",
-                    "descr": "",
-                    "signals": [
-                        {"name": f"{name}_r_valid", "width": 1},
-                    ],
-                },
-                {
                     "name": f"{name}_rdata",
                     "descr": "",
                     "signals": [
@@ -419,19 +412,16 @@ class csr_gen:
                 },
             ]
 
-            lines += f"    assign {name}_r_valid = internal_iob_valid & (!write_en & {name}_addressed_r);\n"
-
             # Create reg only if this is not a "RW" CSR. For "RW" we reuse CSR created previously.
             if "W" not in row.mode:
-                lines += "    iob_reg_cae #(\n"
+                lines += "    iob_reg_ca #(\n"
                 lines += f"      .DATA_W({n_bits}),\n"
                 lines += f"      .RST_VAL({rst_val_str})\n"
                 lines += f"    ) {name}_datareg_rd (\n"
                 lines += "      .clk_i  (clk_i),\n"
                 lines += "      .cke_i  (cke_i),\n"
                 lines += "      .arst_i (arst_i),\n"
-                lines += f"      .en_i   ({name}_r_valid),\n"
-                lines += f"      .data_i ({name}{suffix_i}),\n"
+                lines += f"      .data_i ({name}_wdata{suffix_i}),\n"
                 lines += f"      .data_o ({name}_rdata)\n"
                 lines += "    );\n\n"
         else:  # not auto: output read enable
@@ -451,8 +441,6 @@ class csr_gen:
                 lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed & ~write_en;\n"
                 if type(log2n_items) is not int or log2n_items > 0:
                     lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
-
-            lines += f"    assign {name}_rready{suffix} = internal_iob_rready;\n"
 
         return lines, wires
 
@@ -502,7 +490,6 @@ class csr_gen:
     wire [{self.verilog_max(n_bits,1)}-1:0] {name}_rdata_rd;
     wire {name}_rvalid_rd;
     wire {name}_valid_rd;
-    wire {name}_rready_rd;
     wire {name}_ready_rd;
 """
                         )
@@ -531,7 +518,6 @@ class csr_gen:
                             f"""
     .{name}_rdata_i({name}_rdata_rd),
     .{name}_rvalid_i({name}_rvalid_rd),
-    .{name}_rready_o({name}_rready_rd),
     .{name}_ren_o({name}_valid_rd),
     .{name}_ready_i({name}_ready_rd),
 """
@@ -572,7 +558,7 @@ class csr_gen:
                 if auto:
                     register_signals.append(
                         {
-                            "name": name + "_o",
+                            "name": name + "_rdata_o",
                             "width": self.verilog_max(n_bits, 1),
                         }
                     )
@@ -614,16 +600,16 @@ class csr_gen:
                 if auto:
                     register_signals.append(
                         {
-                            "name": name + "_i",
+                            "name": name + "_wdata_i",
                             "width": self.verilog_max(n_bits, 1),
                         }
                     )
-                    # If CSR mode is "RW", then also include a wen signal (to mux input of single RW CSR)
+                    # If CSR mode is "RW", then also include a wstrb signal (to mux input of single RW CSR)
                     if "W" in row.mode:
                         register_signals.append(
                             {
-                                "name": name + "_wen_i",
-                                "width": self.verilog_max(n_bits, 1),
+                                "name": name + "_wstrb_i",
+                                "width": self.verilog_max(f"{n_bits}/8", 1),
                             }
                         )
                     port_has_inputs = True
@@ -647,10 +633,6 @@ class csr_gen:
                         {
                             "name": f"{name}_rdata_i",
                             "width": self.verilog_max(n_bits, 1),
-                        },
-                        {
-                            "name": f"{name}_rready_o",
-                            "width": 1,
                         },
                     ]
                     if "W" not in row.mode:
@@ -717,7 +699,7 @@ class csr_gen:
         wires = []
         subblocks = []
         snippet = ""
-        # check if all registers are auto and add rready_int if not
+        # check if all registers are auto
         all_auto = True
         all_reads_auto = True
         for row in table:
@@ -727,108 +709,30 @@ class csr_gen:
                     all_reads_auto = False
                     break
 
-        if not all_reads_auto:
-            wires.append(
+        subblocks.append(
+            {
+                "core_name": "iob_universal_converter",
+                "instance_name": "iob_universal_converter",
+                "instance_description": "Convert IOb port from testbench into correct interface for UART CSRs bus",
+                "subordinate_if": core_attributes["csr_if"],
+                "manager_if": "iob",
+                "parameters": {
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "s_s": "control_if_s",
+                    "m_m": "internal_iob",
+                },
+            }
+        )
+        if core_attributes["csr_if"] == "axi":
+            # Append AXI_ID and AXI_LEN parameters
+            subblocks[-1]["parameters"].update(
                 {
-                    "name": "rready_int",
-                    "descr": "",
-                    "signals": [
-                        {"name": "rready_int", "width": 1, "isvar": True},
-                    ],
-                }
-            )
-
-        # TODO: These converters should be handled by a single universal converter as specified in: https://github.com/IObundle/py2hwsw/issues/259
-        if core_attributes["csr_if"] == "iob":
-            # "IOb" CSR_IF
-            snippet += """
-   assign internal_iob_valid = iob_valid_i;
-   assign internal_iob_addr = iob_addr_i;
-   assign internal_iob_wdata = iob_wdata_i;
-   assign internal_iob_wstrb = iob_wstrb_i;
-   assign internal_iob_rready = iob_rready_i;
-   assign iob_rvalid_o = internal_iob_rvalid;
-   assign iob_rdata_o = internal_iob_rdata;
-   assign iob_ready_o = internal_iob_ready;
-"""
-        elif core_attributes["csr_if"] == "apb":
-            # "APB" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_apb2iob",
-                    "instance_name": "iob_apb2iob_coverter",
-                    "instance_description": "Convert APB port into internal IOb interface",
-                    "parameters": {
-                        "APB_ADDR_W": "ADDR_W",
-                        "APB_DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "apb_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
-                }
-            )
-        elif core_attributes["csr_if"] == "axil":
-            # "AXI_Lite" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_axil2iob",
-                    "instance_name": "iob_axil2iob_coverter",
-                    "instance_description": "Convert AXI-Lite port into internal IOb interface",
-                    "parameters": {
-                        "AXIL_ADDR_W": "ADDR_W",
-                        "AXIL_DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "axil_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
-                }
-            )
-        elif core_attributes["csr_if"] == "axi":
-            # "AXI" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_axi2iob",
-                    "instance_name": "iob_axi2iob_coverter",
-                    "instance_description": "Convert AXI port into internal IOb interface",
-                    "parameters": {
-                        "ADDR_WIDTH": "ADDR_W",
-                        "DATA_WIDTH": "DATA_W",
-                        "AXI_ID_WIDTH": "AXI_ID_W",
-                        "AXI_LEN_WIDTH": "AXI_LEN_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "axi_s": (
-                            "control_if_s",
-                            [
-                                "axi_awlock_i[0]",
-                                "axi_arlock_i[0]",
-                            ],
-                        ),
-                        "iob_m": "internal_iob",
-                    },
-                }
-            )
-        elif core_attributes["csr_if"] == "wb":
-            # "wb" CSR_IF
-            subblocks.append(
-                {
-                    "core_name": "iob_wishbone2iob",
-                    "instance_name": "iob_wishbone2iob_coverter",
-                    "instance_description": "Convert Wishbone port into internal IOb interface",
-                    "parameters": {
-                        "ADDR_W": "ADDR_W",
-                        "DATA_W": "DATA_W",
-                    },
-                    "connect": {
-                        "clk_en_rst_s": "clk_en_rst_s",
-                        "wb_s": "control_if_s",
-                        "iob_m": "internal_iob",
-                    },
+                    "AXI_ID_W": "AXI_ID_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
                 }
             )
 
@@ -1030,13 +934,13 @@ class csr_gen:
                 if name == "version":
                     pass
                 elif auto:
-                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}{suffix};\n"
-                    snippet += f"assign byte_aligned_{name}{suffix} = {name}_rdata;\n"
+                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name};\n"
+                    snippet += f"assign byte_aligned_{name} = {name}_rdata;\n"
                 else:
+                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata;\n"
                     snippet += (
-                        f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata{suffix};\n"
+                        f"assign byte_aligned_{name}_rdata = {name}_rdata{suffix};\n"
                     )
-                    snippet += f"assign byte_aligned_{name}_rdata{suffix} = {name}_rdata{suffix};\n"
 
         # Response signals switch logic
         if all_auto:
@@ -1106,10 +1010,10 @@ class csr_gen:
                     rst_val = row.rst_val
                     snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {8*n_bytes}'h{rst_val}|{8*n_bytes}'d0;\n"
                 elif auto:
-                    snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}{suffix}|{8*n_bytes}'d0;\n"
+                    snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}|{8*n_bytes}'d0;\n"
                 else:
                     snippet += f"""
-            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}_rdata{suffix}|{8*n_bytes}'d0;
+            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}_rdata|{8*n_bytes}'d0;
             rvalid_int = {name}_rvalid{suffix};
 """
                 if not auto:
@@ -1155,10 +1059,6 @@ class csr_gen:
         iob_rvalid_nxt = 1'b0;
         state_nxt = state;
 """
-        if not all_reads_auto:
-            snippet += """
-        rready_int = 1'b0;
-"""
         snippet += """
 
         //FSM state machine
@@ -1183,11 +1083,7 @@ class csr_gen:
             end
 
             default: begin  // WAIT_RVALID
-                if (internal_iob_rready & internal_iob_rvalid) begin // Transfer done
-"""
-        if not all_reads_auto:
-            snippet += """
-                    rready_int = 1'b1;
+                if (internal_iob_rvalid) begin // Transfer done
 """
         snippet += """
                     iob_rvalid_nxt = 1'b0;
@@ -1262,18 +1158,49 @@ class csr_gen:
 
         fswhdr.write(f"#ifndef H_{core_prefix_upper}CSRS_H\n")
         fswhdr.write(f"#define H_{core_prefix_upper}CSRS_H\n\n")
+
+        doxygen_core = top.strip("_csrs")
+        fswhdr.write(f"/** @file {top}.h\n")
+        fswhdr.write(f" *  @brief Function prototypes for the {doxygen_core} core.\n")
+        fswhdr.write(" *\n")
+        fswhdr.write(
+            " *  This file contains the function prototypes to access the Control and Status\n"
+        )
+        fswhdr.write(f" * Registers (CSRs) for the {doxygen_core} core.\n")
+        fswhdr.write(" *\n")
+        fswhdr.write(" *  This file is automatically generated by Py2HWSW\n")
+        fswhdr.write(" */\n\n")
+
         fswhdr.write("#include <stdint.h>\n\n")
 
         fswhdr.write("//used address space width\n")
-        fswhdr.write(f"#define  {core_prefix_upper}CSRS_ADDR_W {self.core_addr_w}\n\n")
+
+        addr_w_macro = f"{core_prefix_upper}CSRS_ADDR_W"
+        fswhdr.write("/**\n")
+        fswhdr.write(f" * @def {addr_w_macro}\n")
+        fswhdr.write(" * @brief Used core address space width.\n")
+        fswhdr.write(" *\n")
+        fswhdr.write(
+            " * This macro defines the required address width in bits to access all core\n"
+        )
+        fswhdr.write(" * CSRs.\n")
+        fswhdr.write(" */\n")
+        fswhdr.write(f"#define  {addr_w_macro} {self.core_addr_w}\n\n")
 
         fswhdr.write("//Addresses\n")
+
         for row in table:
             name = row.name.upper()
             if "W" in row.mode or "R" in row.mode:
-                fswhdr.write(f"#define {core_prefix_upper}{name}_ADDR {row.addr}\n")
+                addr_macro = f"{core_prefix_upper}{name}_ADDR"
+                fswhdr.write("/**\n")
+                fswhdr.write(f" * @def {addr_macro}\n")
+                fswhdr.write(f" * @brief {row.name} CSR address.\n")
+                fswhdr.write(" */\n")
+                fswhdr.write(f"#define {addr_macro} {row.addr}\n")
 
         fswhdr.write("\n//Data widths (bit)\n")
+
         for row in table:
             name = row.name.upper()
             n_bits = row.n_bits
@@ -1281,19 +1208,50 @@ class csr_gen:
             if n_bytes == 3:
                 n_bytes = 4
             if "W" in row.mode or "R" in row.mode:
-                fswhdr.write(f"#define {core_prefix_upper}{name}_W {n_bytes*8}\n")
+                width_macro = f"{core_prefix_upper}{name}_W"
+                fswhdr.write("/**\n")
+                fswhdr.write(f" * @def {width_macro}\n")
+                fswhdr.write(f" * @brief {row.name} CSR Width.\n")
+                fswhdr.write(" */\n")
+                fswhdr.write(f"#define {width_macro} {n_bytes*8}\n")
 
         fswhdr.write("\n// Base Address\n")
+
+        fswhdr.write("/**\n")
+        fswhdr.write(" * @brief Set core base address.\n")
+        fswhdr.write(" *\n")
+        fswhdr.write(
+            " * This function sets the base address for the core in the system. All other\n"
+        )
+        fswhdr.write(" * accesses are offset from this base address.\n")
+        fswhdr.write(" *\n")
+        fswhdr.write(" * @param addr Base address for core.\n")
+        fswhdr.write(" */\n")
         fswhdr.write(f"void {core_prefix}init_baseaddr(uint32_t addr);\n")
 
         fswhdr.write("\n// IO read and write function prototypes\n")
-
+        fswhdr.write("/**\n")
+        fswhdr.write(" * @brief Write access function prototype.\n")
+        fswhdr.write(" *\n")
+        fswhdr.write(" * @param addr Address to write to.\n")
+        fswhdr.write(" * @param data_w Data width in bits.\n")
+        fswhdr.write(" * @param value Value to write.\n")
+        fswhdr.write(" */\n")
         fswhdr.write(
             "void iob_write(uint32_t addr, uint32_t data_w, uint32_t value);\n"
         )
+
+        fswhdr.write("/**\n")
+        fswhdr.write(" * @brief Read access function prototype.\n")
+        fswhdr.write(" *\n")
+        fswhdr.write(" * @param addr Address to write to.\n")
+        fswhdr.write(" * @param data_w Data width in bits.\n")
+        fswhdr.write(" * @return uint32_t Read data value.\n")
+        fswhdr.write(" */\n")
         fswhdr.write("uint32_t iob_read(uint32_t addr, uint32_t data_w);\n")
 
         fswhdr.write("\n// Core Setters and Getters\n")
+
         for row in table:
             name = row.name
             n_bits = row.n_bits
@@ -1305,16 +1263,30 @@ class csr_gen:
             if "W" in row.mode:
                 sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
+
+                fswhdr.write("/**\n")
+                fswhdr.write(f" * @brief Set {name} value.\n")
+                fswhdr.write(f" * {row.descr}\n")
+                fswhdr.write(f" * @param value {name} Value.\n")
                 if addr_w / n_bytes > 1:
                     addr_arg = ", int addr"
+                    fswhdr.write(f" * @param addr {name} array address.\n")
+                fswhdr.write(" */\n")
                 fswhdr.write(
                     f"void {core_prefix}set_{name}({sw_type} value{addr_arg});\n"
                 )
             if "R" in row.mode:
                 sw_type = self.csr_type(name, n_bytes)
                 addr_arg = ""
+
+                fswhdr.write("/**\n")
+                fswhdr.write(f" * @brief Get {name} value.\n")
+                fswhdr.write(f" * {row.descr}\n")
                 if addr_w / n_bytes > 1:
                     addr_arg = "int addr"
+                    fswhdr.write(f" * @param addr {name} array address.\n")
+                fswhdr.write(f" * @return {sw_type} {name} value.\n")
+                fswhdr.write(" */\n")
                 fswhdr.write(f"{sw_type} {core_prefix}get_{name}({addr_arg});\n")
 
         fswhdr.write(f"\n#endif // H_{core_prefix_upper}_CSRS_H\n")
@@ -1482,7 +1454,16 @@ class csr_gen:
         csrs_file.write(
             """
 The software accessible registers of the core are described in the following
-tables. The tables give information on the name, read/write capability, address, width in bits, and a textual description.
+tables. Each subsection corresponds to a specific configuration of the core, since
+different configurations have different registers available. 
+The tables give information on the name, read/write capability, address, hardware and software width, and a 
+textual description. The addresses are byte aligned and given in hexadecimal format.
+The hardware width is the number of bits that the register occupies in the hardware, while the
+software width is the number of bits that the register occupies in the software.
+In each address, the right-justified field having "Hw width" bits conveys the relevant information. 
+Each register has only one type of access, either read or write, meaning that reading from 
+a write-only register will produce invalid data or writing to a read-only register will 
+not have any effect.
 """
         )
 
@@ -1492,11 +1473,13 @@ tables. The tables give information on the name, read/write capability, address,
             for csr_group in doc_table:
                 csrs_file.write(
                     """
-\\begin{xltabular}{\\textwidth}{|l|c|c|c|c|X|}
+\\begin{xltabular}{\\textwidth}{|l|c|c|c|c|c|X|}
 
   \\hline
   \\rowcolor{iob-green}
-  {\\bf Name} & {\\bf R/W} & {\\bf Addr} & {\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ \\hline
+  {\\bf Name} & {\\bf R/W} & {\\bf Addr} & \multicolumn{2}{c|}{\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ 
+              &            &             & {\\bf Hw}       & {\\bf Sw}     &                &                    \\\\
+  \\hline
 
   \\input """
                     + doc_conf
@@ -1523,7 +1506,6 @@ tables. The tables give information on the name, read/write capability, address,
     # doc_tables: dictionary of doc_conf tables,
     #    each ['doc_conf'] key as respective doc_table only with valid registers
     # out_dir: output directory
-    @classmethod
     def generate_regs_tex(self, doc_tables, out_dir):
         os.makedirs(out_dir, exist_ok=True)
         # Create csrs.tex file
@@ -1533,12 +1515,16 @@ tables. The tables give information on the name, read/write capability, address,
             for csr_group in doc_table:
                 tex_table = []
                 for reg in csr_group.regs:
+                    sw_width = self.bceil(reg.n_bits, 3)
+                    if sw_width == 24:
+                        sw_width = 32
                     tex_table.append(
                         [
                             reg.name.upper(),
                             reg.mode,
-                            str(reg.addr),
+                            f"0x{reg.addr:X}",  # Capitalized hex
                             str(reg.n_bits),
+                            str(sw_width),
                             str(reg.rst_val),
                             reg.descr,
                         ]

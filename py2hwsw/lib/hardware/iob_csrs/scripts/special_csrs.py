@@ -6,7 +6,7 @@ from csr_gen import convert_int
 
 
 def find_and_update_autoclear_csrs(csrs_dict, attributes_dict):
-    """Auto-clear CSR: Same signals as NOAUTO, but already includes internal register that gets cleared automatically on ready/rready.
+    """Auto-clear CSR: Same signals as NOAUTO, but already includes internal register that gets cleared automatically on ready (write case) or after rvalid (read case).
     :param dict csrs_dict: Dictionary of CSRs to update.
     :param dict attributes_dict: Dictionary of core attributes to add autoclear instance, wires and ports.
     """
@@ -70,22 +70,19 @@ def create_autoclear_instance(attributes_dict, csr_ref):
             {"name": f"{name}_rvalid_i", "width": 1},
             {"name": f"{name}_rdata_i", "width": width},
             {"name": f"{name}_ready_i", "width": 1},
-            {"name": f"{name}_rready_o", "width": 1},
         ]
         snippet += f"""
    assign {name}_valid_o = {name}_valid;
    // assign {name}_rdata = {name}_rdata_i;
    assign {name}_ready = {name}_ready_i;
 
-   // Always ready to receive new value from core
-   assign {name}_rready_o = 1'b1;
    // Always ready to send value value to CPU
    assign {name}_rvalid = 1'b1;
 
    // Set rdata from core
    assign {name}_en = {name}_rvalid_i;
-   // Auto-clear when CPU reads
-   assign {name}_rst = {name}_rready;
+   // Auto-clear on cycle after rvalid: CPU always ready to read
+   assign {name}_rst = ~{name}_rvalid_i;
 """
     if "W" in mode:
         port_signals += [

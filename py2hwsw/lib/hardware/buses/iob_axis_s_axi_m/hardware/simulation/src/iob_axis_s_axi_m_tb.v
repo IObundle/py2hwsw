@@ -456,7 +456,6 @@ module iob_axis_s_axi_m_tb;
       .iob_csrs_iob_wstrb_i (axis_in_iob_wstrb),
       .iob_csrs_iob_rvalid_o(axis_in_iob_rvalid),
       .iob_csrs_iob_rdata_o (axis_in_iob_rdata),
-      .iob_csrs_iob_rready_i(axis_in_iob_rready),
       .iob_csrs_iob_ready_o (axis_in_iob_ready)
    );
 
@@ -491,7 +490,6 @@ module iob_axis_s_axi_m_tb;
       .iob_csrs_iob_wstrb_i (axis_out_iob_wstrb),
       .iob_csrs_iob_rvalid_o(axis_out_iob_rvalid),
       .iob_csrs_iob_rdata_o (axis_out_iob_rdata),
-      .iob_csrs_iob_rready_i(axis_out_iob_rready),
       .iob_csrs_iob_ready_o (axis_out_iob_ready)
    );
 
@@ -600,11 +598,9 @@ module iob_axis_s_axi_m_tb;
 
          #1 while (!axis_in_iob_ready) #1;
          @(posedge clk) #1 axis_in_iob_valid = 0;
-         @(posedge clk) #1 axis_in_iob_rready = 1;
 
          while (!axis_in_iob_rvalid) #1;
          data = #1 `IOB_GET_RDATA(addr, axis_in_iob_rdata, width);
-         @(posedge clk) #1 axis_in_iob_rready = 0;
       end
    endtask
 
@@ -640,11 +636,9 @@ module iob_axis_s_axi_m_tb;
 
          #1 while (!axis_out_iob_ready) #1;
          @(posedge clk) #1 axis_out_iob_valid = 0;
-         @(posedge clk) #1 axis_out_iob_rready = 1;
 
          while (!axis_out_iob_rvalid) #1;
          data = #1 `IOB_GET_RDATA(addr, axis_out_iob_rdata, width);
-         @(posedge clk) #1 axis_out_iob_rready = 0;
       end
    endtask
 

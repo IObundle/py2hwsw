@@ -4,17 +4,10 @@
 
 `timescale 1ns / 1ps
 
+`include "iob_fifo_sync_conf.vh"
+
 module iob_fifo_sync #(
-   parameter W_DATA_W = 21,
-   R_DATA_W = 21,
-   ADDR_W = 21,  //higher ADDR_W lower DATA_W
-   //determine W_ADDR_W and R_ADDR_W
-   MAXDATA_W = iob_max(W_DATA_W, R_DATA_W),
-   MINDATA_W = iob_min(W_DATA_W, R_DATA_W),
-   R = MAXDATA_W / MINDATA_W,
-   MINADDR_W = ADDR_W - $clog2(R),  //lower ADDR_W (higher DATA_W)
-   W_ADDR_W = (W_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W,
-   R_ADDR_W = (R_DATA_W == MAXDATA_W) ? MINADDR_W : ADDR_W
+   `include "iob_fifo_sync_params.vs"
 ) (
    `include "iob_fifo_sync_io.vs"
 );
@@ -36,9 +29,9 @@ module iob_fifo_sync #(
    ) w_addr_cnt0 (
       `include "iob_fifo_sync_iob_clk_s_s_portmap.vs"
 
-      .rst_i (rst_i),
-      .en_i  (w_en_int),
-      .data_o(w_addr)
+      .counter_rst_i(rst_i),
+      .counter_en_i(w_en_int),
+      .data_o       (w_addr)
    );
 
    //effective read enable
@@ -53,9 +46,9 @@ module iob_fifo_sync #(
    ) r_addr_cnt0 (
       `include "iob_fifo_sync_iob_clk_s_s_portmap.vs"
 
-      .rst_i (rst_i),
-      .en_i  (r_en_int),
-      .data_o(r_addr)
+      .counter_rst_i(rst_i),
+      .counter_en_i(r_en_int),
+      .data_o       (r_addr)
    );
 
    //assign according to assymetry type

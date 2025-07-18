@@ -45,24 +45,24 @@ def setup(py_params_dict):
             }
         ]
         py_params_dict["build_dir"] = "dummy_folder"
-        py_params_dict["instantiator"] = {
+        py_params_dict["issuer"] = {
             "name": "iob",
             "confs": [],
         }
         py_params_dict["dest_dir"] = "dummy_dest"
 
-    # by default use same version as instantiator
+    # by default use same version as issuer
     # use py2hwsw version as fallback
     default_version = py_params_dict["py2hwsw_version"]
-    if "instantiator" in py_params_dict:
-        default_version = py_params_dict["instantiator"].get("version", default_version)
+    if "issuer" in py_params_dict:
+        default_version = py_params_dict["issuer"].get("version", default_version)
 
     params = {
-        # Use the same name as instantiator + the suffix "_csrs"
-        "name": py_params_dict["instantiator"]["name"] + "_csrs",
+        # Use the same name as issuer + the suffix "_csrs"
+        "name": py_params_dict["issuer"]["name"] + "_csrs",
         # Destination directory
         "dest_dir": py_params_dict["dest_dir"],
-        # Version of the CSRs module (by default use instantiator version, py2hwsw as fallback)
+        # Version of the CSRs module (by default use issuer version, py2hwsw as fallback)
         "version": default_version,
         # Type of interface for CSR bus
         "csr_if": "iob",
@@ -94,7 +94,7 @@ def setup(py_params_dict):
     if params["csr_if"] == "axi":
         csr_if_params = {"AXI_ID_W": 1, "AXI_LEN_W": 8}
 
-    # Copy instantiator confs but skip ADDR_W and CSR params
+    # Copy issuer confs but skip ADDR_W and CSR params
     confs = [
         {
             "name": "ADDR_W",
@@ -105,14 +105,14 @@ def setup(py_params_dict):
             "descr": "Address bus width",
         },
     ]
-    for conf in py_params_dict["instantiator"].get("confs", []):
+    for conf in py_params_dict["issuer"].get("confs", []):
         if conf["name"] == "ADDR_W" or conf["name"] in csr_if_params:
             continue
         confs.append(conf)
 
     # Append DATA_W parameter if not already present
     if "DATA_W" not in [
-        conf["name"] for conf in py_params_dict["instantiator"].get("confs", [])
+        conf["name"] for conf in py_params_dict["issuer"].get("confs", [])
     ]:
         confs.append(
             {
@@ -126,7 +126,7 @@ def setup(py_params_dict):
         )
 
     # Append parameters for csr interface
-    if_gen_params = {}
+    interface_params = {}
     for param_name, param_value in csr_if_params.items():
         confs.append(
             {
@@ -140,7 +140,7 @@ def setup(py_params_dict):
         )
         # Remove csr_if suffix from parameter name (remove "AXI_" prefix)
         name_without_suffix = param_name[len(params["csr_if"]) + 1 :]
-        if_gen_params[name_without_suffix] = param_name
+        interface_params[name_without_suffix] = param_name
 
     attributes_dict = {
         "name": params["name"],
@@ -162,7 +162,7 @@ def setup(py_params_dict):
                     "type": params["csr_if"],
                     # ADDR_W set automatically
                     "DATA_W": "DATA_W",
-                    **if_gen_params,
+                    **interface_params,
                 },
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",
             },

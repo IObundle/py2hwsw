@@ -19,6 +19,7 @@ module iob_iob2axil #(
 
    reg axil_awvalid_int;
    reg axil_arvalid_int;
+   reg axil_rready_int;
    reg axil_wvalid_int;
    reg axil_bready_int;
    reg iob_ready_int;
@@ -54,7 +55,7 @@ module iob_iob2axil #(
    assign axil_araddr_o  = iob_addr_i;
 
    // read
-   assign axil_rready_o  = iob_rready_i;
+   assign axil_rready_o  = axil_rready_int;
 
    //program counter
    wire [2:0] pc_cnt;
@@ -75,6 +76,7 @@ module iob_iob2axil #(
       pc_cnt_nxt       = pc_cnt;
       axil_awvalid_int = 1'b0;
       axil_arvalid_int = 1'b0;
+      axil_rready_int  = 1'b0;
       axil_wvalid_int  = 1'b0;
       axil_bready_int  = 1'b0;
       iob_ready_int    = 1'b0;
@@ -89,6 +91,7 @@ module iob_iob2axil #(
                      pc_cnt_nxt = WAIT_AWREADY;
                 end else begin
                     axil_arvalid_int = 1'b1;
+                    axil_rready_int = 1'b1;
                     if (axil_arready_i) begin
                         iob_ready_int = 1'b1;
                         pc_cnt_nxt = WAIT_RVALID;
@@ -121,7 +124,8 @@ module iob_iob2axil #(
              end
          end
          WAIT_RVALID: begin
-             if (axil_rvalid_i & iob_rready_i) begin
+             axil_rready_int = 1'b1;
+             if (axil_rvalid_i) begin
                  pc_cnt_nxt = WAIT_AVALID;
              end
          end

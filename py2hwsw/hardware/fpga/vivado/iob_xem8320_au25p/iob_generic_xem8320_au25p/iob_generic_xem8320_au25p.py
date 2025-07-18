@@ -5,7 +5,7 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "name": py_params_dict["instantiator"]["name"] + "_iob_xem8320_au25p",
+        "name": py_params_dict["issuer"]["name"] + "_iob_xem8320_au25p",
         "generate_hw": False,
         "confs": [
             {

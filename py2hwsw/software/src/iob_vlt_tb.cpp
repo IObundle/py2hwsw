@@ -115,7 +115,6 @@ unsigned int iob_read(unsigned int address, unsigned int data_w) {
   }
   clk_tick();
   dut->iob_valid_i = 0;
-  dut->iob_rready_i = 1;
   while (dut->iob_rvalid_o == 0) {
     clk_tick();
   }
@@ -131,7 +130,6 @@ unsigned int iob_read(unsigned int address, unsigned int data_w) {
     break;
   }
   clk_tick();
-  dut->iob_rready_i = 0;
   return data;
 }
 

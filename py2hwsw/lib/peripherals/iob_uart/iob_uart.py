@@ -104,7 +104,6 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "rxdata_valid_rd", "width": 1},
                     {"name": "rxdata_rdata_rd", "width": 8},
-                    {"name": "rxdata_rready_rd", "width": 1},
                     {"name": "rxdata_ready_rd", "width": 1},
                     {"name": "rxdata_rvalid_rd", "width": 1},
                 ],
@@ -122,7 +121,7 @@ def setup(py_params_dict):
                 "name": "iob_reg_rvalid_data_i",
                 "descr": "",
                 "signals": [
-                    {"name": "rxdata_rvalid_nxt", "width": 1},
+                    {"name": "rxdata_valid_rd", "width": 1},
                 ],
             },
             {
@@ -194,15 +193,8 @@ def setup(py_params_dict):
                     "DATA_W": 1,
                     "RST_VAL": "1'b0",
                 },
-                "port_params": {"clk_en_rst_s": "c_a_r_e"},
                 "connect": {
-                    "clk_en_rst_s": (
-                        "clk_en_rst_s",
-                        [
-                            "en_i:rxdata_rvalid_en",
-                            "rst_i:rxdata_rvalid_rst",
-                        ],
-                    ),
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "iob_reg_rvalid_data_i",
                     "data_o": "iob_reg_rvalid_data_o",
                 },
@@ -241,10 +233,6 @@ def setup(py_params_dict):
     // rxdata Manual logic
     assign rxdata_ready_rd = 1'b1;
 
-    // set rxdata on read enable, reset on (rready and rvalid)
-    assign rxdata_rvalid_en = rxdata_valid_rd;
-    assign rxdata_rvalid_rst = rxdata_rvalid_rd & rxdata_rready_rd;
-    assign rxdata_rvalid_nxt = rxdata_valid_rd;
 """,
             },
         ],

@@ -4,9 +4,22 @@
 
 
 def setup(py_params_dict):
-    attributes_dict = {
-        "generate_hw": True,
-        "confs": [
+    """Setup function for the iob_ram_at2p module.
+    :param py_params_dict: Dictionary with parameters for the module.
+    :return: Dictionary with attributes for the module.
+    """
+    # Validate the input parameters
+    if not isinstance(py_params_dict, dict):
+        raise TypeError("py_params_dict must be a dictionary")
+    init_mem = py_params_dict.get("init_mem", False)
+
+    # change parameter to boolean
+    if isinstance(init_mem, str):
+        init_mem = init_mem.lower() == "true"
+
+    # Create the configuration list based on the init_mem parameter
+    if init_mem:
+        confs = [
             {
                 "name": "HEXFILE",
                 "type": "P",
@@ -15,105 +28,44 @@ def setup(py_params_dict):
                 "max": "NA",
                 "descr": "Name of file to load into RAM",
             },
-            {
-                "name": "DATA_W",
-                "type": "P",
-                "val": "1",
-                "min": "1",
-                "max": "NA",
-                "descr": "DATA width",
-            },
-            {
-                "name": "ADDR_W",
-                "type": "P",
-                "val": "1",
-                "min": "1",
-                "max": "NA",
-                "descr": "Address bus width",
-            },
-            {
-                "name": "MEM_INIT_FILE_INT",
-                "type": "D",
-                "val": "HEXFILE",
-                "min": "NA",
-                "max": "NA",
-                "descr": "",
-            },
-        ],
-        "ports": [
-            {
-                "name": "w_clk_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "w_clk_i", "width": 1},
-                ],
-            },
-            {
-                "name": "w_en_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "w_en_i", "width": 1},
-                ],
-            },
-            {
-                "name": "w_addr_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "w_addr_i", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "w_data_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "w_data_i", "width": "DATA_W"},
-                ],
-            },
-            {
-                "name": "r_clk_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_clk_i", "width": 1},
-                ],
-            },
-            {
-                "name": "r_en_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_en_i", "width": 1},
-                ],
-            },
-            {
-                "name": "r_addr_i",
-                "descr": "Input port",
-                "signals": [
-                    {"name": "r_addr_i", "width": "ADDR_W"},
-                ],
-            },
-            {
-                "name": "r_data_o",
-                "descr": "Output port",
-                "signals": [
-                    {"name": "r_data_o", "width": "DATA_W"},
-                ],
-            },
-        ],
-        "snippets": [
-            {
-                "verilog_code": """
-   localparam INIT_RAM = (HEXFILE != "none") ? 1 : 0;
-            // Declare the RAM
+        ]
+    else:
+        confs = []
+
+    confs += [
+        {
+            "name": "DATA_W",
+            "type": "P",
+            "val": "32",
+            "min": "1",
+            "max": "NA",
+            "descr": "DATA width",
+        },
+        {
+            "name": "ADDR_W",
+            "type": "P",
+            "val": "1",
+            "min": "1",
+            "max": "NA",
+            "descr": "Address bus width",
+        },
+    ]
+
+    code_snippet = """
+    // Declare the RAM
    reg [DATA_W-1:0] ram[(2**ADDR_W)-1:0];
-   reg [DATA_W-1:0] r_data_o_reg;
-   assign r_data_o=r_data_o_reg;
+   reg [DATA_W-1:0] r_data_int;
+   assign r_data_o = r_data_int;
+        """
 
+    # Add initialization code if init_mem is True
+    if init_mem:
+        code_snippet += """
    // Initialize the RAM
-   generate
-       if (INIT_RAM) begin : mem_init
-           initial $readmemh(MEM_INIT_FILE_INT, ram, 0, (2 ** ADDR_W) - 1);
-       end
-   endgenerate
+   initial $readmemh(HEXFILE, ram, 0, (2 ** ADDR_W) - 1);
+            """
 
+    code_snippet += """
    //write
    always @(posedge w_clk_i) begin
        if (w_en_i) begin
@@ -124,10 +76,34 @@ def setup(py_params_dict):
    //read
    always @(posedge r_clk_i) begin
        if (r_en_i) begin
-           r_data_o_reg <= ram[r_addr_i];
+           r_data_int <= ram[r_addr_i];
        end
    end
-            """,
+            """
+
+    if init_mem:
+        name = "iob_ram_at2p_w_init"
+    else:
+        name = "iob_ram_at2p"
+
+    attributes_dict = {
+        "generate_hw": True,
+        "name": name,
+        "confs": confs,
+        "ports": [
+            {
+                "name": "ram_at2p_s",
+                "descr": "RAM interface",
+                "signals": {
+                    "type": "ram_at2p",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
+                },
+            },
+        ],
+        "snippets": [
+            {
+                "verilog_code": code_snippet,
             },
         ],
     }

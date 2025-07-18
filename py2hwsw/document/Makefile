@@ -30,18 +30,16 @@ TSRC = $(patsubst tsrc/%, ./%, $(wildcard tsrc/*))
 	cp $< $@
 
 TSRC+=name.tex
-name.tex:
-	@echo $(NAME) | sed 's/_/\\_/g' > $@
 
 TSRC+=signature.tex
 signature.tex: $(DOC)_signature.tex
 	mv $< $@
 
 ug_signature.tex pb_signature.tex:
-	@echo `cat name.tex`-USG-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+	@echo `tail -n 1 name.tex`-USG-`tail -n 1 $(NAME)_version.tex`-`tail -n 1 shortHash.tex` > $@
 
 rn_signature.tex:
-	@echo `cat name.tex`-REL-`cat $(NAME)_version.tex`-`cat shortHash.tex` > $@
+	@echo `tail -n 1 name.tex`-REL-`tail -n 1 $(NAME)_version.tex`-`tail -n 1 shortHash.tex` > $@
 
 
 #make figures
@@ -50,6 +48,19 @@ figs:
 
 pb_figs:
 	make -C ./figures pb_figs
+
+#doxygen documentation
+ifeq ($(DOXYGEN),1)
+TSRC+=doxygen.tex
+doxygen.tex: doxygen
+	cp doxygen/latex/*.tex .
+	cp doxygen/latex/*.sty .
+	cp doxygen/*.sty . # copy custom .sty files after generated doxygen .sty
+	cp doxygen/doxygen.tex $@
+
+doxygen:
+	make -C ./doxygen all
+endif
 
 #build document
 build: debug $(DOC).pdf
@@ -85,6 +96,7 @@ ugtop.tex:
 	if [ -f mems_tab.tex ]; then echo "\def\MEMS{Y}" >> $@; fi
 	if [ $(ASICSYNTH) == 1 ]; then echo "\def\ASICSYNTH{Y}" >> $@; fi
 	if [ $(FPGACOMP) == 1 ]; then echo "\def\FPGACOMP{Y}" >> $@; fi
+	if [ $(DOXYGEN) == 1 ]; then echo "\def\DOXYGEN{Y}" >> $@; fi
 	make doctop DOC=ug
 
 #include implementation results if available
@@ -144,5 +156,5 @@ debug: $(TSRC)
 	@echo AMD_FPGA=$(AMD_FPGA)
 	@echo ASIC_NODE=$(ASIC_NODE)
 
-.PHONY: view doctop figs results build clean test debug
+.PHONY: view doctop figs results build clean test debug doxygen
 

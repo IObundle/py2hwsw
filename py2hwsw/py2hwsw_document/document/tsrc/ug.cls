@@ -29,7 +29,7 @@
 \RequirePackage[section]{placeins}
 \RequirePackage{mathtools}
 \RequirePackage{amsthm}
-\RequirePackage[OT1]{fontenc} 
+\RequirePackage[T1]{fontenc} 
 \RequirePackage{array}
 \RequirePackage[binary-units=true]{siunitx}
 \RequirePackage[all]{nowidow}

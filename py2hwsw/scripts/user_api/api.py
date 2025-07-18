@@ -2,6 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
+"""
+Bla bla bla
+Some api description here
+"""
+
 # User API for interfacing with Py2HWSW
 #
 # Py2HWSW has 3 user interfaces in total:
@@ -855,6 +860,7 @@ def create_portmap_from_text(portmap_text):
 #
 
 
+# TODO: Rename iob_python_parameter_group --> iob_configuration
 @api_for(py2hwsw_python_parameter.iob_python_parameter)
 class iob_python_parameter:
     """

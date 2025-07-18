@@ -20,7 +20,7 @@ from api_base import internal_api_class, convert2internal
 from iob_core import core_from_dict, find_module_setup_dir
 
 
-@internal_api_class("user_api.api", "iob_instance")
+@internal_api_class("user_api.draft_api", "iob_instance")
 class iob_instance(iob_base):
     """Class to describe a module's (Verilog) instance"""
 

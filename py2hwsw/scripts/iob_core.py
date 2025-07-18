@@ -51,8 +51,7 @@ from iob_portmap import portmap_from_dict
 class iob_core(iob_module):
     """Generic class to describe how to generate a base IOb IP core"""
 
-    # List of global wires (netlist)
-    # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
+    # List of global wires. Similar concept to 'netlist' in HDL terminology: https://vhdlwhiz.com/terminology/net/#net
     global_wires: list[iob_global_wire] = []
     # Project settings
     global_build_dir: str = ""

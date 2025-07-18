@@ -24,7 +24,7 @@ from iob_wire import (
 from api_base import internal_api_class
 
 
-@internal_api_class("user_api.api", "iob_bus")
+@internal_api_class("user_api.draft_api", "iob_bus")
 @dataclass
 class iob_bus:
     """Py2HWSW's internal implementation of 'iob_bus' API class."""

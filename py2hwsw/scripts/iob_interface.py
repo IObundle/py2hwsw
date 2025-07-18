@@ -276,7 +276,7 @@ if_types = [
 ]
 
 
-@internal_api_class("user_api.api", "interface")
+@internal_api_class("user_api.draft_api", "interface")
 @dataclass
 class iob_interface:
     """Class to represent an interface for generation"""

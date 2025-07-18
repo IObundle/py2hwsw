@@ -13,7 +13,7 @@ from interfaces import iobClkInterface
 from api_base import internal_api_class
 
 
-@internal_api_class("user_api.api", "iob_comb")
+@internal_api_class("user_api.draft_api", "iob_comb")
 @dataclass
 class iob_comb(iob_snippet):
     """Class to represent a Verilog combinatory circuit in an iob module"""

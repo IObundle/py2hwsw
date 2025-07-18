@@ -33,7 +33,6 @@ import iob_portmap as py2hwsw_portmap
 import iob_python_parameter as py2hwsw_python_parameter
 import iob_instance as py2hwsw_instance
 import iob_core as py2hwsw_core
-from py2hwsw_version import PY2HWSW_VERSION  # should be renamed to iob_version
 
 
 #
@@ -65,77 +64,6 @@ def create_conf_from_text(conf_text):
 #
 
 
-# jts: I dont understand why global wire must be in the API
-@api_for(py2hwsw_wire.iob_global_wire)
-class iob_global_wire:
-    """
-    Class that represents a global wire. Similar concept to 'net' in HDL terminology: https://vhdlwhiz.com/terminology/net/#net
-
-    Attributes:
-        name (str): Identifier name for the global_wire.
-        width (str or int): Number of bits in the global_wire.
-        descr (str): Description of the global_wire.
-        isvar (bool): If enabled, global_wire will be generated with type `reg` in Verilog.
-        value (str or int): Logic value for future simulation effort using global wires list.
-                            See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
-    """
-
-    name: str = ""
-    width: str or int = 1
-    descr: str = "Default description"
-    isvar: bool = False
-    value: str or int = 0
-
-
-@api_for(py2hwsw_wire.global_wire_from_dict)
-def create_global_wire_from_dict(global_wire_dict):
-    """
-    Function to create iob_global_wire object from dictionary attributes.
-
-    Attributes:
-        global_wire_dict (dict): dictionary with values to initialize attributes of iob_global_wire object.
-            This dictionary supports the following keys corresponding to the iob_global_wire attributes:
-            - name          -> iob_global_wire.name
-            - width         -> iob_global_wire.width
-            - descr         -> iob_global_wire.descr
-            - isvar         -> iob_global_wire.isvar
-
-    Returns:
-        iob_global_wire: iob_global_wire object
-    """
-    pass
-
-
-@api_for(py2hwsw_wire.global_wire_text2dict)
-def global_wire_text2dict(global_wire_text):
-    """Convert global_wire short notation text to dictionary.
-    Atributes:
-        global_wire_text (str): Short notation text. See `create_global_wire_from_text` for format.
-
-    Returns:
-        dict: Dictionary with global_wire attributes.
-    """
-    pass
-
-
-@api_for(py2hwsw_wire.global_wire_from_text)
-def create_global_wire_from_text(global_wire_text):
-    """
-    Function to create iob_global_wire object from short notation text.
-
-    Attributes:
-        global_wire_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO:
-
-    Returns:
-        iob_global_wire: iob_global_wire object
-    """
-    pass
-
-
-# Internal wire
-
-
 @api_for(py2hwsw_wire.wire_from_text)
 def create_wire_from_text(wire_text):
     """
@@ -145,7 +73,7 @@ def create_wire_from_text(wire_text):
         wire_text (str): Short notation text. Object attributes are specified using the following format:
             name [-w width] [-d descr] [-v (enables isvar)]
             Example:
-                en -w 1 -d 'Enable global_wire' -v
+                en -w 1 -d 'Enable wire' -v
 
     Returns:
         iob_wire: iob_wire object
@@ -925,16 +853,5 @@ def create_core_from_text(core_text):
 
     Returns:
         iob_core: iob_core object
-    """
-    pass
-
-
-@api_for(py2hwsw_core.get_global_wires_list)
-def get_global_wires_list():
-    """
-    Function to get a reference to the global wires list (netlist) of the project.
-
-    Returns:
-        list[iob_global_wire]: Global wires list
     """
     pass

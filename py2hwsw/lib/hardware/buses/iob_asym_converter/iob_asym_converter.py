@@ -243,7 +243,7 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": r"""
-                 `include "iob_functions.vs"
+   `include "iob_functions.vs"
                 //Generate the RAM based on the parameters
    generate
       if (W_DATA_W > R_DATA_W) begin : g_write_wider

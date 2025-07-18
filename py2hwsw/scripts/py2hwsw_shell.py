@@ -77,6 +77,27 @@ def import_lib_cores(namespace: dict):
         namespace[module_name] = imported_module.__dict__[module_name]
 
 
+def show_lib_core_code(core_name: str = None):
+    if not core_name:
+        print(
+            "No lib core name given. Please provide a name, like: 'show(\"iob_and\")'."
+        )
+        return
+    if type(core_name) is not str:
+        print("Lib core name must be a string.")
+        return
+    cores_paths = get_lib_cores()
+    for path in cores_paths:
+        module_name, file_extension = os.path.basename(path).split(".")
+        if module_name == core_name:
+            print(f"Displaying code for {core_name} core")
+            with open(path, "r") as f:
+                print(f.read())
+            break
+    else:
+        print(f"Could not find lib core '{core_name}'.")
+
+
 # Create an instance of the custom shell
 def main():
     sys.ps1 = ">>> "
@@ -87,6 +108,7 @@ def main():
     exec("from py2hwsw_api import *", local_vars)
     local_vars["help"] = CustomFunction(help, HELP_MSG)
     import_lib_cores(local_vars)
+    local_vars["show"] = show_lib_core_code
     shell = Py2hwswShell(locals=local_vars)
     shell.interact()
 

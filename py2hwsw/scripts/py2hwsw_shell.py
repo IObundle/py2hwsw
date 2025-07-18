@@ -11,6 +11,7 @@ import sys
 import os
 
 from iob_base import get_lib_cores, import_python_module
+from iob_core import iob_core
 
 HELP_MSG = """\
 Py2HWSW Python Shell
@@ -63,10 +64,17 @@ def import_lib_cores(namespace: dict):
     cores_paths = get_lib_cores()
     for path in cores_paths:
         module_name, file_extension = os.path.basename(path).split(".")
-        # Skip non-py files, like .json
-        if file_extension != "py":
+        # Convert dictionaries from .json cores into dynamic subclass of iob_core
+        if file_extension == "json":
             continue
-        namespace[module_name] = import_python_module(path, module_name=module_name)
+        imported_module = import_python_module(path, module_name=module_name)
+
+        # FIXME: Temporarily only import a few modules (the ones that have a class defined inside)
+        if module_name not in ["iob_and", "iob_aoi"]:
+            continue
+
+        # Import only the class defined in that module
+        namespace[module_name] = imported_module.__dict__[module_name]
 
 
 # Create an instance of the custom shell

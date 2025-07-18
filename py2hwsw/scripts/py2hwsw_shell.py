@@ -8,13 +8,26 @@
 
 import code
 import sys
+import os
+
+from iob_base import get_lib_cores, import_python_module
 
 HELP_MSG = """\
 Py2HWSW Python Shell
 ------------------------------------------------------------------------
+
+To create IP cores using Py2HWSW refer to our exemples by typing:
+
+>>> show(example_name)
+
+Currently the following examples are available:
+
+iob_and: illustrates a basic module with a generic parameter
+iob_aoi: illustrates a structural description based on subblocks
+
+Type 'help(api) for a complete reference'
 Type 'exit' or 'quit' to exit the shell.
-------------------------------------------------------------------------
-Type help() for interactive help
+Type 'help' for this message.
 """
 
 
@@ -45,6 +58,17 @@ class Py2hwswShell(code.InteractiveConsole):
         print(HELP_MSG)
 
 
+def import_lib_cores(namespace: dict):
+    """Import lib cores into given python namespace"""
+    cores_paths = get_lib_cores()
+    for path in cores_paths:
+        module_name, file_extension = os.path.basename(path).split(".")
+        # Skip non-py files, like .json
+        if file_extension != "py":
+            continue
+        namespace[module_name] = import_python_module(path, module_name=module_name)
+
+
 # Create an instance of the custom shell
 def main():
     sys.ps1 = ">>> "
@@ -54,6 +78,7 @@ def main():
     exec("import py2hwsw_api as api", local_vars)
     exec("from py2hwsw_api import *", local_vars)
     local_vars["help"] = CustomFunction(help, HELP_MSG)
+    import_lib_cores(local_vars)
     shell = Py2hwswShell(locals=local_vars)
     shell.interact()
 

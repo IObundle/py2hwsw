@@ -34,15 +34,15 @@ def setup(py_params_dict):
         "confs": attrs["confs"],
     }
 
-    mwrap_wires = []
+    mwrap_buses = []
     mwrap_ports = []
     memory_ports = []
     for port in attrs["ports"]:
-        if isinstance(port["signals"], dict):
-            if port["signals"]["type"] in mem_if_names:
-                wire = copy.deepcopy(port)
-                wire["name"] = wire["name"][:-2]
-                mwrap_wires.append(wire)
+        if isinstance(port["wires"], dict):
+            if port["wires"]["type"] in mem_if_names:
+                bus = copy.deepcopy(port)
+                bus["name"] = bus["name"][:-2]
+                mwrap_buses.append(bus)
                 memory_ports.append(port)
             else:
                 mwrap_ports.append(port)
@@ -51,11 +51,11 @@ def setup(py_params_dict):
 
     attributes_dict["ports"] = mwrap_ports
 
-    attributes_dict["wires"] = mwrap_wires
+    attributes_dict["buses"] = mwrap_buses
 
     connect_dict = {
         p["name"]: w["name"]
-        for p, w in zip(memory_ports + mwrap_ports, mwrap_wires + mwrap_ports)
+        for p, w in zip(memory_ports + mwrap_ports, mwrap_buses + mwrap_ports)
     }
 
     confs_without_groups = []
@@ -82,22 +82,22 @@ def setup(py_params_dict):
     ]
 
     list_of_mems = []
-    for wire in mwrap_wires:
-        if wire["signals"].get("prefix", None):
-            prefix_str = wire["signals"]["prefix"]
+    for bus in mwrap_buses:
+        if bus["wires"].get("prefix", None):
+            prefix_str = bus["wires"]["prefix"]
         else:
-            prefix_str = wire["name"] + "_"
+            prefix_str = bus["name"] + "_"
 
-        signals_type = wire["signals"]["type"]
+        wires_type = bus["wires"]["type"]
 
         # Instance name
         name = f"{prefix_str}mem"
         # Memory type
-        type = f"iob_{signals_type}"
+        type = f"iob_{wires_type}"
         # Data bus width
-        data_w = wire["signals"].get("DATA_W", 32)
+        data_w = bus["wires"].get("DATA_W", 32)
         # Address bus width
-        word_addr_w = wire["signals"].get("ADDR_W", 32)
+        word_addr_w = bus["wires"].get("ADDR_W", 32)
         # Memory init hexfile name
         hexfile_param = f"{prefix_str.upper()}HEXFILE"
         hexfile_obj = find_obj_in_list(confs_without_groups, hexfile_param)
@@ -123,8 +123,7 @@ def setup(py_params_dict):
         if "ram" in type:
             # check if memory module has MEM_NO_READ_ON_WRITE conf
             mem_dir, file_ext = find_module_setup_dir(type)
-            import_python_module(os.path.join(mem_dir, f"{type}.py"))
-            mem_module = sys.modules[type]
+            mem_module = import_python_module(os.path.join(mem_dir, f"{type}.py"))
             mem_dict = mem_module.setup({})
             if "MEM_NO_READ_ON_WRITE" in mem_dict["confs"]:
                 extra_params["MEM_NO_READ_ON_WRITE"] = mem_dict["MEM_NO_READ_ON_WRITE"]
@@ -141,7 +140,7 @@ def setup(py_params_dict):
                 }
                 | extra_params,
                 "connect": {
-                    f"{signals_type}_s": wire["name"],
+                    f"{wires_type}_s": bus["name"],
                 },
             }
         )

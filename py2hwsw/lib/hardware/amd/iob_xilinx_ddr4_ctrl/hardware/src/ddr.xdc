@@ -196,11 +196,11 @@ set_property IOSTANDARD POD12_DCI [get_ports {c0_ddr4_dq_io[2]}]
 set_property IOSTANDARD POD12_DCI [get_ports {c0_ddr4_dq_io[1]}]
 set_property IOSTANDARD POD12_DCI [get_ports {c0_ddr4_dq_io[0]}]
 
-## WE_N Signal
+## WE_N Wire
 set_property PACKAGE_PIN Y25 [get_ports {c0_ddr4_adr_o[14]}]
-## CAS_N Signal
+## CAS_N Wire
 set_property PACKAGE_PIN Y26 [get_ports {c0_ddr4_adr_o[15]}]
-## RAS_N Signal
+## RAS_N Wire
 set_property PACKAGE_PIN U26 [get_ports {c0_ddr4_adr_o[16]}]
 
 set_property OUTPUT_IMPEDANCE RDRV_40_40 [get_ports {c0_ddr4_adr_o[14]}]

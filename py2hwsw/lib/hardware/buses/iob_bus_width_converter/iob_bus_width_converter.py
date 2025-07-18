@@ -76,21 +76,21 @@ interfaces = {
 
 
 def setup(py_params_dict):
-    """Core purely made of wires to convert between two buses with different widths (to suppress verilog warnings).
+    """Core purely made of buses to convert between two buses with different widths (to suppress verilog warnings).
     Use verilog parameters to define widths of each bus.
     :param str interface: Type of interface of buses.
     """
     INTERFACE = py_params_dict["interface"] if "interface" in py_params_dict else "axil"
 
-    wire_assigns = ""
+    bus_assigns = ""
     parameter_names = []
     verilog_parameters = []
     manager_interface_parameters = {}
     subordinate_interface_parameters = {}
-    for signal in interfaces[INTERFACE]:
-        name = signal[0]
-        direction = signal[1]
-        width = signal[2]
+    for wire in interfaces[INTERFACE]:
+        name = wire[0]
+        direction = wire[1]
+        width = wire[2]
 
         if type(width) is int:
             bit_select = ""
@@ -100,7 +100,7 @@ def setup(py_params_dict):
             bit_select = f"[SUBORDINATE_{width}-1:0]"
 
         # Connect both interfaces
-        wire_assigns += f"""
+        bus_assigns += f"""
    assign {INTERFACE}_{name}_o = {INTERFACE}_{name}_i{bit_select};
 """
 
@@ -144,7 +144,7 @@ def setup(py_params_dict):
             {
                 "name": "subordinate_s",
                 "descr": "Subordinate interface (connects to manager)",
-                "signals": {
+                "wires": {
                     "type": INTERFACE,
                     **subordinate_interface_parameters,
                 },
@@ -152,13 +152,13 @@ def setup(py_params_dict):
             {
                 "name": "manager_m",
                 "descr": "Manager interface (connects to subordinate)",
-                "signals": {
+                "wires": {
                     "type": INTERFACE,
                     **manager_interface_parameters,
                 },
             },
         ],
-        "snippets": [{"verilog_code": wire_assigns}],
+        "snippets": [{"verilog_code": bus_assigns}],
     }
 
     return attributes_dict

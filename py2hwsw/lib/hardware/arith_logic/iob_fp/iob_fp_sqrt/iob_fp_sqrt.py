@@ -68,7 +68,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -78,7 +78,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": 1,
@@ -88,7 +88,7 @@ def setup(py_params_dict):
             {
                 "name": "start_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "start_i",
                         "width": 1,
@@ -98,7 +98,7 @@ def setup(py_params_dict):
             {
                 "name": "op_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "op_i",
                         "width": "DATA_W",
@@ -108,7 +108,7 @@ def setup(py_params_dict):
             {
                 "name": "done_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "done_o",
                         "width": 1,
@@ -118,7 +118,7 @@ def setup(py_params_dict):
             {
                 "name": "overflow_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "overflow_o",
                         "width": 1,
@@ -128,7 +128,7 @@ def setup(py_params_dict):
             {
                 "name": "underflow_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "underflow_o",
                         "width": 1,
@@ -138,7 +138,7 @@ def setup(py_params_dict):
             {
                 "name": "exception_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "exception_o",
                         "width": 1,
@@ -148,7 +148,7 @@ def setup(py_params_dict):
             {
                 "name": "res_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "res_o",
                         "width": "DATA_W",
@@ -156,137 +156,137 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "A_Mantissa",
-                "descr": "A_Mantissa wire",
-                "signals": [
+                "descr": "A_Mantissa bus",
+                "wires": [
                     {"name": "A_Mantissa", "width": "MAN_W"},
                 ],
             },
             {
                 "name": "A_Exponent",
-                "descr": "A_Exponent wire",
-                "signals": [
+                "descr": "A_Exponent bus",
+                "wires": [
                     {"name": "A_Exponent", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "A_sign",
-                "descr": "A_sign wire",
-                "signals": [
+                "descr": "A_sign bus",
+                "wires": [
                     {"name": "A_sign", "width": 1},
                 ],
             },
             {
                 "name": "Temp_Mantissa",
-                "descr": "Temp_Mantissa wire",
-                "signals": [
+                "descr": "Temp_Mantissa bus",
+                "wires": [
                     {"name": "Temp_Mantissa", "width": "MAN_W+1"},
                 ],
             },
             {
                 "name": "Temp_Computed_Exponent",
-                "descr": "Temp_Computed_Exponent wire",
-                "signals": [
+                "descr": "Temp_Computed_Exponent bus",
+                "wires": [
                     {"name": "Temp_Computed_Exponent", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "Mantissa",
-                "descr": "Mantissa wire",
-                "signals": [
+                "descr": "Mantissa bus",
+                "wires": [
                     {"name": "Mantissa", "width": "MAN_W-1"},
                 ],
             },
             {
                 "name": "Exponent",
-                "descr": "Exponent wire",
-                "signals": [
+                "descr": "Exponent bus",
+                "wires": [
                     {"name": "Exponent", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "Sign",
-                "descr": "Sign wire",
-                "signals": [
+                "descr": "Sign bus",
+                "wires": [
                     {"name": "Sign", "width": 1},
                 ],
             },
             {
                 "name": "iob_fp_sqrt_int",
-                "descr": "iob_fp_sqrt_int wire",
-                "signals": [
+                "descr": "iob_fp_sqrt_int bus",
+                "wires": [
                     {"name": "iob_fp_sqrt_int", "width": 26},
                 ],
             },
             {
                 "name": "Do_start_int",
-                "descr": "Do_start wire",
-                "signals": [
+                "descr": "Do_start bus",
+                "wires": [
                     {"name": "Do_start", "width": 1},
                 ],
             },
             {
                 "name": "Equal_zero_reg",
-                "descr": "Equal_zero_reg wire",
-                "signals": [
+                "descr": "Equal_zero_reg bus",
+                "wires": [
                     {"name": "Equal_zero_reg", "width": 1},
                 ],
             },
             {
                 "name": "A_Exponent_diff_reg",
-                "descr": "A_Exponent_diff_reg wire",
-                "signals": [
+                "descr": "A_Exponent_diff_reg bus",
+                "wires": [
                     {"name": "A_Exponent_diff_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "A_sign_reg",
-                "descr": "A_sign_reg wire",
-                "signals": [
+                "descr": "A_sign_reg bus",
+                "wires": [
                     {"name": "A_sign_reg", "width": 1},
                 ],
             },
             {
                 "name": "A_Exponent_reg",
-                "descr": "A_Exponent_reg wire",
-                "signals": [
+                "descr": "A_Exponent_reg bus",
+                "wires": [
                     {"name": "A_Exponent_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "A_Mantissa_reg",
-                "descr": "A_Mantissa_reg wire",
-                "signals": [
+                "descr": "A_Mantissa_reg bus",
+                "wires": [
                     {"name": "A_Mantissa_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "Temp_Exponent_reg",
-                "descr": "Temp_Exponent_reg wire",
-                "signals": [
+                "descr": "Temp_Exponent_reg bus",
+                "wires": [
                     {"name": "Temp_Exponent_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "Temp_Mantissa_reg",
-                "descr": "Temp_Mantissa_reg wire",
-                "signals": [
+                "descr": "Temp_Mantissa_reg bus",
+                "wires": [
                     {"name": "Temp_Mantissa_reg", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "counter",
-                "descr": "counter wire",
-                "signals": [
+                "descr": "counter bus",
+                "wires": [
                     {"name": "counter", "width": 1},
                 ],
             },
             {
                 "name": "done_int",
-                "descr": "done wire",
-                "signals": [
+                "descr": "done bus",
+                "wires": [
                     {"name": "done_int", "width": 1},
                 ],
             },

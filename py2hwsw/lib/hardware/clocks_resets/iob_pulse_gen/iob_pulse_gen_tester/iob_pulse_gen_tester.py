@@ -24,18 +24,18 @@ core_dictionary = {
                 "iob_cyclonev_gt_dk",
                 "iob_zybo_z7",
             ],
-            "wires": [
+            "buses": [
                 {
                     "name": "gpio_input",
                     "descr": "",
-                    "signals": [
+                    "wires": [
                         {"name": "gpio_input", "width": 1},
                     ],
                 },
                 {
                     "name": "gpio_output",
                     "descr": "",
-                    "signals": [
+                    "wires": [
                         {"name": "gpio_output", "width": 1},
                     ],
                 },

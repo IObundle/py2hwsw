@@ -68,14 +68,14 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Clock",
-                "signals": [
+                "wires": [
                     {"name": "clk_i", "width": 1},
                 ],
             },
             {
                 "name": "port_a_io",
                 "descr": "Memory interface A",
-                "signals": [
+                "wires": [
                     {"name": "enA_i", "width": 1},
                     {"name": "wstrbA_i", "width": "DATA_W/8"},
                     {"name": "addrA_i", "width": "ADDR_W"},
@@ -86,7 +86,7 @@ def setup(py_params_dict):
             {
                 "name": "port_b_io",
                 "descr": "Memory interface B",
-                "signals": [
+                "wires": [
                     {"name": "enB_i", "width": 1},
                     {"name": "wstrbB_i", "width": "DATA_W/8"},
                     {"name": "addrB_i", "width": "ADDR_W"},

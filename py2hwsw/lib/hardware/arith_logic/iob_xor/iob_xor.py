@@ -28,7 +28,7 @@ def setup(py_params_dict):
             {
                 "name": "in_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "in_i",
                         "width": "N*W",
@@ -38,7 +38,7 @@ def setup(py_params_dict):
             {
                 "name": "out_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "out_o",
                         "width": "W",
@@ -46,11 +46,11 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "xor_vec",
-                "descr": "xor_vec wire",
-                "signals": [
+                "descr": "xor_vec bus",
+                "wires": [
                     {"name": "xor_vec", "width": "N*W"},
                 ],
             },

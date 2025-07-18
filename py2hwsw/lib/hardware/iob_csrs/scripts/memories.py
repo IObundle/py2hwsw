@@ -15,7 +15,7 @@ def find_and_update_regarray_csrs(csrs_dict, attributes_dict):
     accordingly.
     User should provide a CSR of type "*REGARRAY". This CSR will be replaced by regarray_csrs.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add regarray instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add regarray instance, buses and ports.
     """
     for csr_group in csrs_dict:
         csr_ref = None
@@ -53,7 +53,7 @@ def find_and_update_regfile_csrs(csrs_dict, attributes_dict):
     accordingly.
     REGFILEs use iob_dp_ram, with memories inside the csrs core.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add regfile instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add regfile instance, buses and ports.
     """
     for csr_group in csrs_dict:
         csr_ref = None
@@ -80,7 +80,7 @@ def find_and_update_ram_csrs(csrs_dict, attributes_dict):
     accordingly.
     RAMs use iob_dp_ram, with memories outside the csrs core.
     :param dict csrs_dict: Dictionary of CSRs to update.
-    :param dict attributes_dict: Dictionary of core attributes to add ram instance, wires and ports.
+    :param dict attributes_dict: Dictionary of core attributes to add ram instance, buses and ports.
     """
     for csr_group in csrs_dict:
         csr_ref = None
@@ -110,8 +110,8 @@ def find_and_update_ram_csrs(csrs_dict, attributes_dict):
 def create_memory_instance(
     attributes_dict, csr_ref, memory_type="iob_regarray_dp_be", internal_memory=True
 ):
-    """Add memory instance, wires and ports to given attributes_dict, based on memory description provided by CSR.
-    :param dict attributes_dict: Dictionary of core attributes to add memory instance, wires and ports.
+    """Add memory instance, buses and ports to given attributes_dict, based on memory description provided by CSR.
+    :param dict attributes_dict: Dictionary of core attributes to add memory instance, buses and ports.
     :param dict csr_ref: CSR description dictionary, with MEMORY information.
     :param dict memory_type: Memory type to use (regarray, regfile, ram).
     :param bool internal_memory: True if memory should be instantiated inside the CSRs module. Export memory ports otherwise.
@@ -164,7 +164,7 @@ def create_memory_instance(
             {
                 "name": f"{memory_name}_read_io",
                 "descr": "MEMORY read interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": f"{memory_name}_r_en_i",
                         "width": 1,
@@ -193,7 +193,7 @@ def create_memory_instance(
             {
                 "name": f"{memory_name}_write_io",
                 "descr": "MEMORY write interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": f"{memory_name}_w_en_i",
                         "width": 1,
@@ -222,12 +222,12 @@ def create_memory_instance(
                 ],
             },
         ]
-    memory_wires = [
-        # Wires for dual ports of memory
+    memory_buses = [
+        # Buses for dual ports of memory
         {
             "name": f"{memory_name}_port_a_io",
             "descr": f"Port A of memory {memory_name}",
-            "signals": [
+            "wires": [
                 {"name": f"{memory_name}_enA_i", "width": 1},
                 {"name": f"{memory_name}_wstrbA_i", "width": f"{n_bits}/8"},
                 {"name": f"{memory_name}_addrA_i", "width": log2n_items},
@@ -238,7 +238,7 @@ def create_memory_instance(
         {
             "name": f"{memory_name}_port_b_io",
             "descr": f"Port B of memory {memory_name}",
-            "signals": [
+            "wires": [
                 {"name": f"{memory_name}_enB_i", "width": 1},
                 {"name": f"{memory_name}_wstrbB_i", "width": f"{n_bits}/8"},
                 {"name": f"{memory_name}_addrB_i", "width": log2n_items},
@@ -249,19 +249,19 @@ def create_memory_instance(
     ]
     if not internal_memory:
         # Export dual ports of memory
-        attributes_dict["ports"] += memory_wires
+        attributes_dict["ports"] += memory_buses
     #
-    # Wires
+    # Buses
     #
     if internal_memory:
-        # Wires for dual ports of memory
-        attributes_dict["wires"] += memory_wires
-    attributes_dict["wires"] += [
-        # Asym converter wires
+        # Buses for dual ports of memory
+        attributes_dict["buses"] += memory_buses
+    attributes_dict["buses"] += [
+        # Asym converter buses
         {
             "name": f"{memory_name}_asym_s_io",
             "descr": "Subordinate interface of asym",
-            "signals": [
+            "wires": [
                 {
                     "name": f"{memory_name}_asym_en_i",
                     "width": 1,
@@ -333,7 +333,7 @@ def create_memory_instance(
     // MEMORY: {MEMORY_NAME}
 
 """
-    # Signals for Port A of memory (connect to cpu)
+    # Wires for Port A of memory (connect to cpu)
     snippet = f"""
     // Connect Port A to internal logic (for cbus)
     assign enA_i = {memory_name}_valid & {memory_name}_ready;
@@ -341,28 +341,28 @@ def create_memory_instance(
     // Respond with always ready
     assign {memory_name}_ready = 1'b1;
 """
-    # Port A write signals
+    # Port A write wires
     if "W" in mode:
         snippet = f"""
-    // Write signals
+    // Write wires
     assign wstrbA_i = {memory_name}_wstrb;
     assign dA_i = {memory_name}_wdata;
 """
     else:
         snippet = """
-    // Write signals (unused)
+    // Write wires (unused)
     assign wstrbA_i = 'd0;
     assign dA_i = 'd0;
 """
-    # Port A read signals
+    # Port A read wires
     if "R" in mode:
         snippet = f"""
-    // Read signals
+    // Read wires
     assign {memory_name}_rdata = dA_o;
     assign {memory_name}_rvalid = 1'b1;
 """
 
-    # Signals for subordinate port of asym converter (connect to core)
+    # Wires for subordinate port of asym converter (connect to core)
     snippet = f"""
     // Connect asym converter subordinate port to core's logic
     assign {memory_name}_r_ready_o = {memory_name}_asym_ready_o;

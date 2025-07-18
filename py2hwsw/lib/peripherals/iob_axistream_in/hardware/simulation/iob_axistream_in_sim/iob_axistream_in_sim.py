@@ -38,32 +38,32 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "descr": "Clock, clock enable and reset",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
             },
             {
                 "name": "pbus_s",
                 "descr": "Testbench peripherals CSRs interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": 6,
                 },
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "split_reset",
-                "descr": "Reset signal for iob_split components",
-                "signals": [
+                "descr": "Reset wire for iob_split components",
+                "wires": [
                     {"name": "arst_i"},
                 ],
             },
             # AXISTREAM IN
             {
                 "name": "axistream_in_interrupt",
-                "descr": "Interrupt signal",
-                "signals": [
+                "descr": "Interrupt wire",
+                "wires": [
                     {
                         "name": "axistream_in_interrupt",
                         "width": "1",
@@ -72,8 +72,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "axistream_in_axis",
-                "descr": "AXI Stream interface signals",
-                "signals": [
+                "descr": "AXI Stream interface wires",
+                "wires": [
                     {
                         "name": "axis_clk",
                         "width": "1",
@@ -114,7 +114,7 @@ def setup(py_params_dict):
             {
                 "name": "axistream_in_sys_axis",
                 "descr": "System AXI Stream interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": "axistream_in_sys_tdata",
                         "width": "DATA_W",
@@ -135,7 +135,7 @@ def setup(py_params_dict):
             {
                 "name": "axistream_in_csrs",
                 "descr": "axistream_in CSRs interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "axistream_in_csrs_",
                     "ADDR_W": 5,
@@ -144,8 +144,8 @@ def setup(py_params_dict):
             # AXISTREAM OUT
             {
                 "name": "axistream_out_interrupt",
-                "descr": "Interrupt signal",
-                "signals": [
+                "descr": "Interrupt wire",
+                "wires": [
                     {
                         "name": "axistream_out_interrupt",
                         "width": "1",
@@ -154,8 +154,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "axistream_out_axis",
-                "descr": "AXI Stream interface signals",
-                "signals": [
+                "descr": "AXI Stream interface wires",
+                "wires": [
                     {
                         "name": "axis_clk",
                         "width": "1",
@@ -196,7 +196,7 @@ def setup(py_params_dict):
             {
                 "name": "axistream_out_sys_axis",
                 "descr": "System AXI Stream interface.",
-                "signals": [
+                "wires": [
                     {
                         "name": "axistream_out_sys_tdata",
                         "width": "DATA_W",
@@ -217,7 +217,7 @@ def setup(py_params_dict):
             {
                 "name": "axistream_out_csrs",
                 "descr": "axistream_out CSRs interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "axistream_out_csrs_",
                     "ADDR_W": 5,

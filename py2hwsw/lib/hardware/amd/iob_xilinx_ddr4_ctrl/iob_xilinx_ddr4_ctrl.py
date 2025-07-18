@@ -49,7 +49,7 @@ def setup(py_params_dict):
             #
             {
                 "name": "clk_rst_i",
-                "signals": [
+                "wires": [
                     {"name": "clk_p_i", "width": "1"},
                     {"name": "clk_n_i", "width": "1"},
                     {"name": "arst_i", "width": "1"},
@@ -57,14 +57,14 @@ def setup(py_params_dict):
             },
             {
                 "name": "ui_clk_o",
-                "signals": [
+                "wires": [
                     {"name": "clkout_o", "width": "1"},
                 ],
             },
             {
                 "name": "axi_clk_rst_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "axi_clk_o", "width": "1"},
                     {"name": "axi_clk_rst_o", "width": "1"},
                     {"name": "axi_arstn_i", "width": "1"},
@@ -72,7 +72,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_s",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "LEN_W": "AXI_LEN_W",
@@ -85,7 +85,7 @@ def setup(py_params_dict):
             {
                 "name": "ddr4_io",
                 "descr": "DDR4 interface",
-                "signals": [
+                "wires": [
                     {"name": "ddr4_act_n_o", "width": "1"},
                     {"name": "ddr4_adr_o", "width": "17"},
                     {"name": "ddr4_ba_o", "width": "2"},

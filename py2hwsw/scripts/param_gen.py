@@ -15,12 +15,10 @@ def get_core_params(confs):
     Returns a new filtered list containing only 'P' and 'D' parameters.
     """
     core_parameters = []
-    for group in confs:
-        group = convert2internal(group)
-        for conf in group.confs:
-            conf = convert2internal(conf)
-            if conf.kind in ["P", "D"]:
-                core_parameters.append(conf)
+    for api_conf in confs:
+        conf = convert2internal(api_conf)
+        if conf.kind in ["P", "D"]:
+            core_parameters.append(conf)
     return core_parameters
 
 
@@ -78,10 +76,11 @@ def generate_params_snippets(core):
     with open(f"{out_dir}/{core.name}_params.vs", "w") as f:
         f.write(code)
 
-    code = generate_inst_params(core)
-    out_dir = core.build_dir + "/hardware/src"
-    with open(f"{out_dir}/{core.instance_name}_{id(core)}_inst_params.vs", "w") as f:
-        f.write(code)
+    # FIXME: Make this work with new iob_instance
+    # code = generate_inst_params(core)
+    # out_dir = core.build_dir + "/hardware/src"
+    # with open(f"{out_dir}/{core.instance_name}_{id(core)}_inst_params.vs", "w") as f:
+    #     f.write(code)
 
 
 def validate_params(core):

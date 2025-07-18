@@ -14,7 +14,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                     "params": "a",
                 },
@@ -23,7 +23,7 @@ def setup(py_params_dict):
             {
                 "name": "arst_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "arst_o",
                         "width": 1,
@@ -31,18 +31,18 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "data_int",
-                "descr": "data_int wire",
-                "signals": [
+                "descr": "data_int bus",
+                "wires": [
                     {"name": "data_int", "width": 2},
                 ],
             },
             {
                 "name": "sync",
-                "descr": "sync wire",
-                "signals": [
+                "descr": "sync bus",
+                "wires": [
                     {"name": "sync", "width": 2},
                 ],
             },

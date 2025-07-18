@@ -33,34 +33,34 @@ def setup(py_params_dict):
         {
             "name": "clk_en_rst_s",
             "descr": "Clock, clock enable and reset",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
         },
         {
             "name": "uart_s",
             "descr": "Testbench uart csrs interface",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "ADDR_W": 3,
             },
         },
     ]
     #
-    # Wires
+    # Buses
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         {
             "name": "rs232_loopback",
-            "descr": "Uart loopback wires",
-            "signals": {
+            "descr": "Uart loopback buses",
+            "wires": {
                 "type": "rs232",
             },
         },
         {
             "name": "uart_cbus",
             "descr": "Testbench uart csrs bus",
-            "signals": {
+            "wires": {
                 "type": params["csr_if"],
                 "prefix": "internal_",
                 "ADDR_W": 3,

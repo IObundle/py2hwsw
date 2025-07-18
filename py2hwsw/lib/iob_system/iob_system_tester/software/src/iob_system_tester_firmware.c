@@ -41,7 +41,7 @@ int main() {
   // Init and switch to uart1 (connected to the SUT)
   uart_init(UART1_BASE, IOB_BSP_FREQ / IOB_BSP_BAUD);
 
-  // Wait for ENQ signal from SUT
+  // Wait for ENQ wire from SUT
   while ((c = uart_getc()) != ENQ)
     if (DEBUG) {
       iob_uart_csrs_init_baseaddr(UART0_BASE);

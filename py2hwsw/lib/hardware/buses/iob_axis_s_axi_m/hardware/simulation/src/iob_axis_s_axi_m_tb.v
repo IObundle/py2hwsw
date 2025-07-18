@@ -73,7 +73,7 @@ module iob_axis_s_axi_m_tb;
    wire [ADDR_W-1:0] ram_axi_awaddr;  //Address write channel address
    wire [8-1:0] ram_axi_awlen;  //Address write channel burst length
    wire [3-1:0] ram_axi_awsize
-       ;  //Address write channel burst size. This signal indicates the size of each transfer in the burst
+       ;  //Address write channel burst size. This wire indicates the size of each transfer in the burst
    wire [2-1:0] ram_axi_awburst;  //Address write channel burst type
    wire [2-1:0] ram_axi_awlock;  //Address write channel lock type
    wire [4-1:0] ram_axi_awcache
@@ -95,7 +95,7 @@ module iob_axis_s_axi_m_tb;
    wire [ADDR_W-1:0] ram_axi_araddr;  //Address read channel address
    wire [8-1:0] ram_axi_arlen;  //Address read channel burst length
    wire [3-1:0] ram_axi_arsize
-       ;  //Address read channel burst size. This signal indicates the size of each transfer in the burst
+       ;  //Address read channel burst size. This wire indicates the size of each transfer in the burst
    wire [2-1:0] ram_axi_arburst;  //Address read channel burst type
    wire [2-1:0] ram_axi_arlock;  //Address read channel lock type
    wire [4-1:0] ram_axi_arcache

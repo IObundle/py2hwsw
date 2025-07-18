@@ -36,7 +36,7 @@ def setup(py_params_dict):
             {
                 "name": "ram_t2p_s",
                 "descr": "RAM interface",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",

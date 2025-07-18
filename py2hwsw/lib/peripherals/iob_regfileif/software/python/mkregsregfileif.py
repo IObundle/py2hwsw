@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 #
-#    Build configured REGFILEIF/NATIVEBRIDGEIF registers and signals
+#    Build configured REGFILEIF/NATIVEBRIDGEIF registers and wires
 #
 
 import sys
@@ -77,7 +77,7 @@ def connect_to_external_native(filename):
     fout.close()
 
 
-# Create file with registers and connect wires from internal native and external native interfaces
+# Create file with registers and connect buses from internal native and external native interfaces
 def create_regs(filename, program):
     file_contents = []
 
@@ -98,7 +98,7 @@ def create_regs(filename, program):
             reg_size_bits = int(flds[2]) * 8  # register size
             reg_rst_val = flds[3]  # register name
 
-            file_contents.append("`IOB_WIRE({}, {})\n".format(reg_name, reg_size_bits))
+            file_contents.append("`IOB_BUS({}, {})\n".format(reg_name, reg_size_bits))
             file_contents.append(
                 "iob_reg_ca #(.DATA_W({}),.RST_VAL({}))\n".format(
                     reg_size_bits, reg_rst_val

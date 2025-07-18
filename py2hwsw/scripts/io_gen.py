@@ -11,7 +11,7 @@ from latex import write_table
 import os
 
 import interfaces
-from iob_signal import iob_signal
+from iob_wire import iob_wire
 from api_base import convert2internal
 
 
@@ -27,21 +27,26 @@ def generate_ports(core):
     returns: Generated verilog code
     """
     lines = []
-    for port_idx, port in enumerate(core.ports):
-        port = convert2internal(port)
-        # If port has 'doc_only' attribute set to True, skip it
-        if port.doc_only:
+    for port_idx, api_port in enumerate(core.ports):
+        port = convert2internal(api_port)
+
+        # FIXME: This function was originaly written to handle interfaces (groups of ports)
+        """
+        # If interface has 'doc_only' attribute set to True, skip it
+        if interface.doc_only:
             continue
 
-        lines.append(f"    // {port.name}: {port.descr}\n")
+        lines.append(f"    // {interface.name}: {interface.descr}\n")
 
-        for signal_idx, signal in enumerate(port.signals):
-            signal = convert2internal(signal)
-            if isinstance(signal, iob_signal):
-                if signal.get_verilog_port():
-                    lines.append("    " + signal.get_verilog_port())
+        for wire_idx, api_wire in enumerate(interface.wires):
+            wire = convert2internal(api_wire)
+            if isinstance(wire, iob_wire):
+                if wire.get_verilog_port():
+                    lines.append("    " + wire.get_verilog_port())
+        """
+        lines.append("    " + port.get_verilog_port())
 
-    # Remove comma from last port line
+    # Remove comma from last interface line
     if lines:
         i = -1
         while lines[i].startswith("`endif") or lines[i].startswith("    // "):
@@ -60,12 +65,14 @@ def generate_ports_snippet(core):
     with open(f"{out_dir}/{core.name}_io.vs", "w+") as f:
         f.write(code)
 
-    for port_idx, port in enumerate(core.ports):
-        port = convert2internal(port)
+    # FIXME: Port is no longer a group
+    """
+    for port_idx, api_port in enumerate(core.ports):
+        port = convert2internal(api_port)
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
-        # Also generate snippets for all interface subtypes (portmaps, tb_portmaps, wires, ...)
+        # Also generate snippets for all interface subtypes (portmaps, tb_portmaps, buses, ...)
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.
         if port.interface:
@@ -75,6 +82,7 @@ def generate_ports_snippet(core):
             for file in os.listdir("."):
                 if file.endswith(".vs"):
                     os.rename(file, f"{out_dir}/{file}")
+    """
 
 
 # Generate if.tex file with list TeX tables of IOs
@@ -82,8 +90,8 @@ def generate_if_tex(ports, out_dir):
     if_file = open(f"{out_dir}/if.tex", "w")
 
     if_file.write(
-        """The interface signals of the core are described in the following tables.
-Note that the ouput signals are registered in the core, while the input signals are not."""
+        """The interface wires of the core are described in the following tables.
+Note that the ouput wires are registered in the core, while the input wires are not."""
     )
 
     for port in ports:
@@ -122,15 +130,15 @@ def generate_ios_tex(ports, out_dir):
     for port in ports:
         tex_table = []
         # Interface is not standard, read ports
-        for signal in port.signals:
-            signal = convert2internal(signal)
-            if isinstance(signal, iob_signal):
+        for api_wire in port.wires:
+            wire = convert2internal(api_wire)
+            if isinstance(wire, iob_wire):
                 tex_table.append(
                     [
-                        signal.name,
-                        signal.direction,
-                        signal.width,
-                        signal.descr,
+                        wire.name,
+                        wire.direction,
+                        wire.width,
+                        wire.descr,
                     ]
                 )
 

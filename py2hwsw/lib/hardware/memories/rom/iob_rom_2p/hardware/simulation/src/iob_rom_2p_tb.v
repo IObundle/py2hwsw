@@ -11,13 +11,13 @@ module iob_rom_2p_tb;
    // Inputs
    reg                clk;
 
-   // Read 1 signals
+   // Read 1 wires
    reg                r1_en;
    reg  [`ADDR_W-1:0] r1_addr;
    wire               r1_ready;
 
 
-   // Read 2 signals
+   // Read 2 wires
    reg                r2_en;
    reg  [`ADDR_W-1:0] r2_addr;
    wire               r2_ready;

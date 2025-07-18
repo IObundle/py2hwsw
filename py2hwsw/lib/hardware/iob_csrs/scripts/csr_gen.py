@@ -186,7 +186,7 @@ class csr_gen:
                 return f"{log2n_items}+{ceil(log(n_bytes, 2))}"
 
     def gen_wr_reg(self, row):
-        wires = []
+        buses = []
         name = row.name
         rst_val = int(row.rst_val)
         n_bits = row.n_bits
@@ -205,11 +205,11 @@ class csr_gen:
         lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items, n_bytes)} (max); TYPE: {row.kind}. {optional_comment}\n\n"
 
         # compute wdata with only the needed bits
-        wires.append(
+        buses.append(
             {
                 "name": f"{name}_wdata",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": f"{name}_wdata", "width": self.verilog_max(n_bits, 1)},
                 ],
             },
@@ -217,7 +217,7 @@ class csr_gen:
         lines += f"    assign {name}_wdata = internal_iob_wdata[{self.boffset(addr,self.cpu_n_bytes)}+:{self.verilog_max(n_bits,1)}];\n"
 
         if auto:  # generate register
-            # signal to indicate if the register is addressed
+            # wire to indicate if the register is addressed
             lines += f"    wire {name}_addressed_w;\n"
 
             # test if addr and addr_w are int and substitute with their values
@@ -257,11 +257,11 @@ class csr_gen:
                     rst_val_str = "{" + str(n_bits) + "{1'd0}}"
             else:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
-            wires.append(
+            buses.append(
                 {
                     "name": f"{name}_w_valid",
                     "descr": "",
-                    "signals": [
+                    "wires": [
                         {"name": f"{name}_w_valid", "width": 1},
                     ],
                 },
@@ -270,18 +270,18 @@ class csr_gen:
 
             if "R" in row.mode:
                 # This is a "RW" CSR. Create logic to mux inputs and assign outputs of reg
-                wires += [
+                buses += [
                     {
                         "name": f"{name}_reg_en",
                         "descr": "",
-                        "signals": [
+                        "wires": [
                             {"name": f"{name}_reg_en", "width": 1},
                         ],
                     },
                     {
                         "name": f"{name}_reg_data",
                         "descr": "",
-                        "signals": [
+                        "wires": [
                             {
                                 "name": f"{name}_reg_data",
                                 "width": self.verilog_max(n_bits, 1),
@@ -318,7 +318,7 @@ class csr_gen:
                 )
             lines += f"      .data_o ({name}_rdata{suffix})\n" "    );\n\n"
         else:  # not auto: compute valid
-            # signal to indicate if the register is addressed
+            # wire to indicate if the register is addressed
             lines += f"    wire {name}_addressed;\n"
 
             # test if addr and addr_w are int and substitute with their values
@@ -335,10 +335,10 @@ class csr_gen:
             if suffix:
                 lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
 
-        return lines, wires
+        return lines, buses
 
     def gen_rd_reg(self, row):
-        wires = []
+        buses = []
         name = row.name
         rst_val = row.rst_val
         n_bits = row.n_bits
@@ -357,7 +357,7 @@ class csr_gen:
         lines += f"\n\n//NAME: {name};\n//MODE: {row.mode}; WIDTH: {n_bits}; RST_VAL: {rst_val}; ADDR: {addr}; SPACE (bytes): {2**self.calc_addr_w(log2n_items,n_bytes)} (max); TYPE: {row.kind}. {optional_comment}\n\n"
 
         if auto:
-            # signal to indicate if the register is addressed
+            # wire to indicate if the register is addressed
             lines += f"    wire {name}_addressed_r;\n"
 
             # test if addr and addr_w are int and substitute with their values
@@ -379,7 +379,7 @@ class csr_gen:
 
             # version is not a register, it is an internal constant
             if name == "version":
-                return lines, wires
+                return lines, buses
 
             # fill remaining bits of reset value with 0s
             if isinstance(n_bits, str):
@@ -402,11 +402,11 @@ class csr_gen:
                     rst_val_str = "{" + str(n_bits) + "{1'd0}}"
             else:
                 rst_val_str = str(n_bits) + "'d" + str(rst_val)
-            wires += [
+            buses += [
                 {
                     "name": f"{name}_rdata",
                     "descr": "",
-                    "signals": [
+                    "wires": [
                         {"name": f"{name}_rdata", "width": self.verilog_max(n_bits, 1)},
                     ],
                 },
@@ -427,7 +427,7 @@ class csr_gen:
         else:  # not auto: output read enable
             # If CSR is also "W", then use same valid and addr as generated by "W", otherwise create a new one
             if "W" not in row.mode:
-                # signal to indicate if the register is addressed
+                # wire to indicate if the register is addressed
                 lines += f"    wire {name}_addressed;\n"
 
                 # test if addr and addr_w are int and substitute with their values
@@ -437,12 +437,12 @@ class csr_gen:
                 else:
                     lines += f"    assign {name}_addressed = (internal_iob_addr_stable >= ({addr})) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
 
-                # Create new valid and addr signals
+                # Create new valid and addr wires
                 lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed & ~write_en;\n"
                 if type(log2n_items) is not int or log2n_items > 0:
                     lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
 
-        return lines, wires
+        return lines, buses
 
     # auxiliar read register case name
     def aux_read_reg_case_name(self, row):
@@ -459,8 +459,8 @@ class csr_gen:
             aux_read_reg_case_name = f"iob_addr_i_{self.bfloor(addr, addr_w_base)}_{self.boffset(addr, self.cpu_n_bytes)}"
         return aux_read_reg_case_name
 
-    # generate wires to connect instance in top module
-    def gen_inst_wire(self, table, f):
+    # generate buses to connect instance in top module
+    def gen_inst_bus(self, table, f):
         for row in table:
             name = row.name
             n_bits = row.n_bits
@@ -523,17 +523,17 @@ class csr_gen:
 """
                         )
 
-    def gen_ports_wires(self, table):
-        """Generate ports and internal wires for csrs instance."""
+    def gen_ports_buses(self, table):
+        """Generate ports and internal buses for csrs instance."""
         ports = []
-        wires = []
+        buses = []
         snippet = ""
         for row in table:
             name = row.name
             auto = row.kind != "NOAUTO"
             n_bits = row.n_bits
             log2n_items = convert_int(row.log2n_items)
-            register_signals = []
+            register_wires = []
             port_has_inputs = False
             port_has_outputs = False
             n_bits = convert_int(n_bits)
@@ -553,10 +553,10 @@ class csr_gen:
             if name == "version":
                 continue
 
-            # Create ports signals for write CSR
+            # Create ports wires for write CSR
             if "W" in row.mode:
                 if auto:
-                    register_signals.append(
+                    register_wires.append(
                         {
                             "name": name + "_rdata_o",
                             "width": self.verilog_max(n_bits, 1),
@@ -564,22 +564,22 @@ class csr_gen:
                     )
                     port_has_outputs = True
                 else:  # Not auto
-                    register_signals += []
+                    register_wires += []
                     port_has_outputs = True
-                    register_signals += [
+                    register_wires += [
                         {
                             "name": f"{name}_valid_o",
                             "width": 1,
                         },
                     ]
                     if type(log2n_items) is not int or log2n_items > 0:
-                        register_signals += [
+                        register_wires += [
                             {
                                 "name": f"{name}_addr_o",
                                 "width": internal_addr_w,
                             },
                         ]
-                    register_signals += [
+                    register_wires += [
                         {
                             "name": f"{name}_wdata_o",
                             "width": self.verilog_max(n_bits, 1),
@@ -595,18 +595,18 @@ class csr_gen:
                     ]
                     port_has_inputs = True
                     port_has_outputs = True
-            # Create ports signals for read CSR
+            # Create ports wires for read CSR
             if "R" in row.mode:
                 if auto:
-                    register_signals.append(
+                    register_wires.append(
                         {
                             "name": name + "_wdata_i",
                             "width": self.verilog_max(n_bits, 1),
                         }
                     )
-                    # If CSR mode is "RW", then also include a wstrb signal (to mux input of single RW CSR)
+                    # If CSR mode is "RW", then also include a wstrb wire (to mux input of single RW CSR)
                     if "W" in row.mode:
-                        register_signals.append(
+                        register_wires.append(
                             {
                                 "name": name + "_wstrb_i",
                                 "width": self.verilog_max(f"{n_bits}/8", 1),
@@ -616,33 +616,33 @@ class csr_gen:
                 else:  # not auto
                     # Valid, addr, and ready are shared with "W" mode. Don't create them if they already exist.
                     if "W" not in row.mode:
-                        register_signals += [
+                        register_wires += [
                             {
                                 "name": f"{name}_valid_o",
                                 "width": 1,
                             },
                         ]
                         if type(log2n_items) is not int or log2n_items > 0:
-                            register_signals += [
+                            register_wires += [
                                 {
                                     "name": f"{name}_addr_o",
                                     "width": internal_addr_w,
                                 },
                             ]
-                    register_signals += [
+                    register_wires += [
                         {
                             "name": f"{name}_rdata_i",
                             "width": self.verilog_max(n_bits, 1),
                         },
                     ]
                     if "W" not in row.mode:
-                        register_signals += [
+                        register_wires += [
                             {
                                 "name": f"{name}_ready_i",
                                 "width": 1,
                             },
                         ]
-                    register_signals += [
+                    register_wires += [
                         {
                             "name": f"{name}_rvalid_i",
                             "width": 1,
@@ -651,16 +651,16 @@ class csr_gen:
                     port_has_inputs = True
                     port_has_outputs = True
 
-            # Remove suffixes from signals if CSR is for 'internal_use'
-            # and create internal wires instead of ports.
+            # Remove suffixes from wires if CSR is for 'internal_use'
+            # and create internal buses instead of ports.
             if row.internal_use:
-                for reg in register_signals:
+                for reg in register_wires:
                     reg["name"] = reg["name"][:-2]
-                wires.append(
+                buses.append(
                     {
                         "name": name,
                         "descr": f"{name} register interface",
-                        "signals": register_signals,
+                        "wires": register_wires,
                     }
                 )
             else:  # CSR is implemented externally. Create port.
@@ -674,11 +674,11 @@ class csr_gen:
                     {
                         "name": name + direction,
                         "descr": f"{name} register interface",
-                        "signals": register_signals,
+                        "wires": register_wires,
                     }
                 )
 
-        return ports, wires, snippet
+        return ports, buses, snippet
 
     def get_csrs_inst_params(self, core_confs):
         """Return multi-line string with parameters for csrs instance"""
@@ -696,7 +696,7 @@ class csr_gen:
     def write_hwcode(self, table, core_attributes):
         """Generates and appends verilog code to core "snippets" list."""
         ports = []
-        wires = []
+        buses = []
         subblocks = []
         snippet = ""
         # check if all registers are auto
@@ -768,33 +768,33 @@ class csr_gen:
         # insert write register logic
         for row in table:
             if "W" in row.mode:
-                _snippet, _wires = self.gen_wr_reg(row)
+                _snippet, _buses = self.gen_wr_reg(row)
                 snippet += _snippet
-                wires += _wires
+                buses += _buses
 
         # insert read register logic
         for row in table:
             if "R" in row.mode:
-                _snippet, _wires = self.gen_rd_reg(row)
+                _snippet, _buses = self.gen_rd_reg(row)
                 snippet += _snippet
-                wires += _wires
+                buses += _buses
 
         #
         # RESPONSE SWITCH
         #
-        wires += [
+        buses += [
             # iob_regs
             {
                 "name": "iob_rvalid_out",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "iob_rvalid_out", "width": 1},
                 ],
             },
             {
                 "name": "iob_rvalid_nxt",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "iob_rvalid_nxt",
                         "width": 1,
@@ -806,14 +806,14 @@ class csr_gen:
             {
                 "name": "iob_rdata_out",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "iob_rdata_out", "width": 8 * self.cpu_n_bytes},
                 ],
             },
             {
                 "name": "iob_rdata_nxt",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {
                         "name": "iob_rdata_nxt",
                         "width": 8 * self.cpu_n_bytes,
@@ -825,38 +825,38 @@ class csr_gen:
             {
                 "name": "iob_ready_out",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "iob_ready_out", "width": 1},
                 ],
             },
             {
                 "name": "iob_ready_nxt",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "iob_ready_nxt", "width": 1, "isvar": True, "isreg": True},
                 ],
             },
         ]
         if not all_auto:
-            wires += [
+            buses += [
                 {
                     "name": "rvalid_int",
-                    "descr": "Rvalid signal of currently addressed CSR",
-                    "signals": [
+                    "descr": "Rvalid wire of currently addressed CSR",
+                    "wires": [
                         {"name": "rvalid_int", "width": 1, "isvar": True},
                     ],
                 },
                 {
                     "name": "ready_int",
-                    "descr": "Ready signal of currently addressed CSR",
-                    "signals": [
+                    "descr": "Ready wire of currently addressed CSR",
+                    "wires": [
                         {"name": "ready_int", "width": 1, "isvar": True},
                     ],
                 },
                 {
                     "name": "auto_addressed",
                     "descr": "Flag if an auto-register is currently addressed",
-                    "signals": [
+                    "wires": [
                         {"name": "auto_addressed", "width": 1, "isvar": True},
                     ],
                 },
@@ -911,17 +911,17 @@ class csr_gen:
             if "R" in row.mode:
                 aux_read_reg = self.aux_read_reg_case_name(row)
                 if aux_read_reg:
-                    wires.append(
+                    buses.append(
                         {
                             "name": aux_read_reg,
                             "descr": "",
-                            "signals": [
+                            "wires": [
                                 {"name": aux_read_reg, "width": 1, "isvar": True},
                             ],
                         },
                     )
 
-        # Create byte aligned wires
+        # Create byte aligned buses
         for row in table:
             name = row.name
             auto = row.kind != "NOAUTO"
@@ -942,7 +942,7 @@ class csr_gen:
                         f"assign byte_aligned_{name}_rdata = {name}_rdata{suffix};\n"
                     )
 
-        # Response signals switch logic
+        # Response wires switch logic
         if all_auto:
             snippet += """
     //RESPONSE SWITCH
@@ -955,7 +955,7 @@ class csr_gen:
             snippet += """
     //RESPONSE SWITCH
 
-    // Don't register response signals if accessing non-auto CSR
+    // Don't register response wires if accessing non-auto CSR
     assign internal_iob_rvalid = auto_addressed ? iob_rvalid_out : rvalid_int;
     assign internal_iob_rdata = auto_addressed ? iob_rdata_out : iob_rdata_nxt;
     assign internal_iob_ready = auto_addressed ? iob_ready_out : ready_int;
@@ -1107,7 +1107,7 @@ class csr_gen:
 """
 
         core_attributes["ports"] += ports
-        core_attributes["wires"] += wires
+        core_attributes["buses"] += buses
         core_attributes["subblocks"] += subblocks
         core_attributes["snippets"] += [{"verilog_code": snippet}]
 

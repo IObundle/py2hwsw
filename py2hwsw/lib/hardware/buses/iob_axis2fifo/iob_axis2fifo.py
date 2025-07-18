@@ -42,33 +42,33 @@ def setup(py_params_dict):
     ports = [
         {
             "name": "clk_en_rst_s",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
                 "params": "c_a_r",
             },
             "descr": "Clock, clock enable, async and sync reset",
         },
     ]
-    # Use enable signal if requested
+    # Use enable wire if requested
     if use_en:
         ports.append(
             {
                 "name": "en_i",
-                "descr": "Enable signal",
-                "signals": [{"name": "en_i", "descr": "Enable signal"}],
+                "descr": "Enable wire",
+                "wires": [{"name": "en_i", "descr": "Enable wire"}],
             },
         )
-    # Use len and done signal if tlast is requested
+    # Use len and done wire if tlast is requested
     if use_tlast:
         ports.append(
             {
                 "name": "len_o",
-                "descr": "Length signal",
-                "signals": [
+                "descr": "Length wire",
+                "wires": [
                     {
                         "name": "len_o",
                         "width": "AXIS_LEN_W",
-                        "descr": "Length signal",
+                        "descr": "Length wire",
                     },
                 ],
             },
@@ -76,8 +76,8 @@ def setup(py_params_dict):
         ports.append(
             {
                 "name": "done_o",
-                "descr": "Done signal",
-                "signals": [{"name": "done_o", "descr": "Done signal"}],
+                "descr": "Done wire",
+                "wires": [{"name": "done_o", "descr": "Done wire"}],
             },
         )
 
@@ -86,7 +86,7 @@ def setup(py_params_dict):
         {
             "name": "axis_s",
             "descr": "AXIS slave interface",
-            "signals": {"type": "axis", "DATA_W": "DATA_W"},
+            "wires": {"type": "axis", "DATA_W": "DATA_W"},
         }
     )
     # FIFO write interface
@@ -94,7 +94,7 @@ def setup(py_params_dict):
         {
             "name": "fifo_w_io",
             "descr": "FIFO write interface",
-            "signals": [
+            "wires": [
                 {"name": "fifo_write_o", "isvar": True},
                 {"name": "fifo_wdata_o", "width": "DATA_W", "isvar": True},
                 {"name": "fifo_full_i"},
@@ -103,18 +103,18 @@ def setup(py_params_dict):
     )
 
     if use_tlast:
-        # append tlast to "params" in axis_s signals
+        # append tlast to "params" in axis_s wires
         for port in ports:
             if port["name"] == "axis_s":
-                port["signals"]["params"] = "tlast"
+                port["wires"]["params"] = "tlast"
                 break
 
-    # Wires declaration
-    wires = [
+    # Buses declaration
+    buses = [
         {
             "name": "axis_tdata",
             "descr": "AXIS tdata register",
-            "signals": [
+            "wires": [
                 {
                     "name": "axis_tdata",
                     "width": "DATA_W",
@@ -125,22 +125,22 @@ def setup(py_params_dict):
         {
             "name": "axis_tvalid",
             "descr": "AXIS tvalid register",
-            "signals": [{"name": "axis_tvalid", "descr": "AXIS tvalid register"}],
+            "wires": [{"name": "axis_tvalid", "descr": "AXIS tvalid register"}],
         },
     ]
 
     if use_tlast:
-        wires.extend(
+        buses.extend(
             [
                 {
                     "name": "axis_tlast",
                     "descr": "AXIS tlast register",
-                    "signals": [{"name": "axis_tlast", "descr": "AXIS tlast register"}],
+                    "wires": [{"name": "axis_tlast", "descr": "AXIS tlast register"}],
                 },
                 {
                     "name": "axis_word_count_inc",
                     "descr": "AXIS word count increment",
-                    "signals": [
+                    "wires": [
                         {
                             "name": "axis_word_count_inc",
                             "descr": "AXIS word count increment",
@@ -150,11 +150,11 @@ def setup(py_params_dict):
                 },
                 {
                     "name": "axis_tlast_int",
-                    "descr": "AXIS tlast internal signal",
-                    "signals": [
+                    "descr": "AXIS tlast internal wire",
+                    "wires": [
                         {
                             "name": "axis_tlast_int",
-                            "descr": "AXIS tlast internal signal",
+                            "descr": "AXIS tlast internal wire",
                             "isvar": True,
                         }
                     ],
@@ -163,11 +163,11 @@ def setup(py_params_dict):
         )
 
     if use_en:
-        wires.append(
+        buses.append(
             {
                 "name": "en_input_regs",
-                "descr": "Enable signal for input registers",
-                "signals": [{"name": "en_input_regs", "isvar": True}],
+                "descr": "Enable wire for input registers",
+                "wires": [{"name": "en_input_regs", "isvar": True}],
             },
         )
 
@@ -232,7 +232,7 @@ def setup(py_params_dict):
         "generate_hw": True,
         "confs": confs,
         "ports": ports,
-        "wires": wires,
+        "buses": buses,
         "comb": {
             "code": comb_code,
             "clk_if": "c_a_r",
@@ -240,12 +240,12 @@ def setup(py_params_dict):
     }
 
     if use_tlast:
-        attributes_dict["wires"].extend(
+        attributes_dict["buses"].extend(
             [
                 {
                     "name": "clk_en_arst",
                     "descr": "Clock, clock enable and async reset",
-                    "signals": [
+                    "wires": [
                         {"name": "clk_i"},
                         {"name": "cke_i"},
                         {"name": "arst_i"},
@@ -254,12 +254,12 @@ def setup(py_params_dict):
                 {
                     "name": "counter_en_rst",
                     "descr": "Counter enable and reset",
-                    "signals": [{"name": "axis_word_count_inc"}, {"name": "rst_i"}],
+                    "wires": [{"name": "axis_word_count_inc"}, {"name": "rst_i"}],
                 },
                 {
                     "name": "rst_i",
-                    "descr": "Reset signal",
-                    "signals": [
+                    "descr": "Reset wire",
+                    "wires": [
                         {"name": "rst_i"},
                     ],
                 },

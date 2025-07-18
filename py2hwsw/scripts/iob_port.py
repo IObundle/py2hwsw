@@ -4,182 +4,41 @@
 
 from dataclasses import dataclass
 
-from iob_wire import (
-    iob_wire,
-    replace_duplicate_signals_by_references,
-    dict2interface,
-    WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS,
-)
-from iob_base import (
-    convert_dict2obj_list,
-    fail_with_msg,
-    str_to_kwargs,
-    assert_attributes,
-    update_obj_from_dict,
-    parse_short_notation_text,
-)
-from iob_signal import iob_signal, signal_from_dict
-from api_base import internal_api_class
+from iob_base import fail_with_msg, parse_short_notation_text
+from api_base import internal_api_class, convert2internal
+from iob_wire import iob_global_wire
 
 
 @internal_api_class("user_api.api", "iob_port")
 @dataclass
-class iob_port(iob_wire):
-    """Describes an IO port."""
-
-    def create_signals_from_interface(self):
-        if not self.interface:
-            fail_with_msg(f"Wire '{self.name}' has no interface!", ValueError)
-
-        self.signals += self.interface.get_signals()
+class iob_port:
+    """Py2HWSW's internal implementation of 'iob_port' API class."""
 
     def validate_attributes(self):
-        if not self.name:
-            fail_with_msg("All ports must have a name!", ValueError)
+        if not self.global_wire:
+            fail_with_msg("Port not associated to global wire!")
+        if self.direction not in ["input", "output", "inout"]:
+            fail_with_msg(f"Missing direction for port {self.global_wire.name}!")
 
-        _sufix_dict = {
-            "_i": "input",
-            "_o": "output",
-            "_io": "inout",
-            "_s": "subordinate",
-            "_m": "manager",
-        }
-        _direction = None
-        for sufix, d in _sufix_dict.items():
-            if self.name.endswith(sufix):
-                _direction = d
-                break
-        else:
-            fail_with_msg(
-                f"Port name '{self.name}' does not end with a valid direction suffix!\n"
-                f"Must have one of the following suffixes: {', '.join(_sufix_dict.keys())}.",
-                ValueError,
-            )
+    def get_verilog_port(self, comma=True):
+        """Generate a verilog port string from this wire"""
+        self.validate_attributes()
+        port_name = convert2internal(self.global_wire).name
+        port_width = convert2internal(self.global_wire).width
+        port_isvar = convert2internal(self.global_wire).isvar
+        if "'" in port_name or port_name.lower() == "z":
+            return None
+        comma_char = "," if comma else ""
+        port_type = " reg" if port_isvar else ""
+        width_str = "" if self.get_width_int() == 1 else f"[{port_width}-1:0] "
+        return f"{self.direction}{port_type} {width_str}{port_name}{comma_char}\n"
 
-        if not self.interface and _direction in ["subordinate", "manager"]:
-            fail_with_msg(
-                f"Port '{self.name}' is a '{_direction}' port but no interface is defined",
-                ValueError,
-            )
-
-        port_has_inputs = False
-        port_has_outputs = False
-        for signal in self.signals:
-            # Get internal representation of signal, because 'direction' is a internal attribute
-            signal = signal._get_py2hwsw_internal_obj()
-            if not signal.direction:
-                raise Exception("Port direction is required")
-            elif signal.direction not in ["input", "output", "inout"]:
-                raise Exception(
-                    "Error: Direction must be 'input', 'output', or 'inout'."
-                )
-
-            if _direction in ["input", "output"] and signal.direction != _direction:
-                fail_with_msg(
-                    f"Signal direction '{signal.direction}' does not match port name '{self.name}'",
-                    ValueError,
-                )
-
-            if signal.direction == "input":
-                port_has_inputs = True
-            elif signal.direction == "output":
-                port_has_outputs = True
-            elif signal.direction == "inout":
-                port_has_inputs = True
-                port_has_outputs = True
-
-        if _direction == "inout" and not port_has_inputs:
-            fail_with_msg(
-                f"Port '{self.name}' has 'inout' direction but no inputs defined",
-                ValueError,
-            )
-        elif _direction == "inout" and not port_has_outputs:
-            fail_with_msg(
-                f"Port '{self.name}' has 'inout' direction but no outputs defined",
-                ValueError,
-            )
-
-
-attrs = [
-    "name",
-    ["-i", "signals&i", {"nargs": 1}, ("type",)],
-    ["-s", "signals&s", {"nargs": "+"}, ["name:width"]],
-]
-
-
-@str_to_kwargs(attrs)
-def create_port_from_dict(core, *args, signals=[], **kwargs):
-    """Creates a new port object using a dictionary and adds it to the core's port list
-    Also creates a new internal module wire to connect to the new port
-    param core: core object
-    """
-    # Ensure 'ports' list exists
-    core.set_default_attribute("ports", [])
-    sig_obj_list = []
-    interface_obj = None
-
-    if type(signals) is list:
-        # Convert user signal dictionaries into 'iob_signal' objects
-        sig_obj_list = convert_dict2obj_list(signals, iob_signal)
-    elif type(signals) is dict:
-        # Convert user interface dictionary into an interface object
-        interface_obj = dict2interface(kwargs.get("name", ""), signals)
-        if interface_obj and not interface_obj.file_prefix:
-            interface_obj.file_prefix = core.name + "_"
-    else:
-        fail_with_msg(f"Invalid signal type! {signals}", TypeError)
-    assert_attributes(
-        iob_port,
-        kwargs,
-        error_msg=f"Invalid {kwargs.get('name', '')} port attribute '[arg]'!",
-    )
-    port = iob_port(*args, signals=sig_obj_list, interface=interface_obj, **kwargs)
-    replace_duplicate_signals_by_references(core.ports, port.signals)
-    core.ports.append(port)
-
-
-@str_to_kwargs(attrs)
-def add_signals_port(core, *args, signals=[], **kwargs):
-    """Creates a new port object and adds it to the core's port list
-    Also creates a new internal module wire to connect to the new port
-    param core: core object
-    """
-    # Ensure 'ports' list exists
-    core.set_default_attribute("ports", [])
-    # Check if the list of signals has only iob_signal types
-    if type(signals) is list:
-        for signal in signals:
-            if not isinstance(signal, iob_signal):
-                fail_with_msg(
-                    f"Signals must be a list of iob_signals! {signals}", TypeError
-                )
-    # Create the port with the signals
-    port = iob_port(*args, signals=signals, **kwargs)
-    replace_duplicate_signals_by_references(core.ports, port.signals)
-    core.ports.append(port)
-
-
-@str_to_kwargs(attrs)
-def add_interface_port(core, *args, name, interface, **kwargs):
-    """Creates a new port object and adds it to the core's port list
-    Also creates a new internal module wire to connect to the new port
-    param core: core object
-    """
-    # Ensure 'ports' list exists
-    core.set_default_attribute("ports", [])
-    # Check if the interface is a valid interface object
-    if not hasattr(interface, "get_signals"):
-        fail_with_msg(
-            f"Interface must be a valid interface object! {interface}", TypeError
-        )
-    if not interface.file_prefix:
-        interface.file_prefix = core.name + "_"
-    if interface.prefix == "":
-        interface.prefix = f"{name}_"
-    # Create the port with the interface
-    port = iob_port(*args, name=name, interface=interface, **kwargs)
-    replace_duplicate_signals_by_references(core.ports, port.signals)
-    core.ports.append(port)
+    def get_width_int(self):
+        port_width = convert2internal(self.global_wire).width
+        try:
+            return int(port_width)
+        except ValueError:
+            return port_width
 
 
 #
@@ -188,43 +47,39 @@ def add_interface_port(core, *args, name, interface, **kwargs):
 
 
 def port_from_dict(port_dict):
-    port_obj = iob_port()
-
-    key_attribute_mapping = {}
-    preprocessor_functions = WIRE_ATTRIBUTES_PREPROCESSOR_FUNCTIONS
-    # Update port_obj attributes with values from given dictionary
-    update_obj_from_dict(
-        port_obj._get_py2hwsw_internal_obj(),
-        port_dict,
-        key_attribute_mapping,
-        preprocessor_functions,
-        port_obj.get_supported_attributes().keys(),
+    # Create a global wire for this port
+    api_iob_global_wire = iob_global_wire(
+        name=port_dict["name"], width=port_dict["width"]
     )
 
-    return port_obj
+    # Get port direction form name suffix
+    dir_suffix = port_dict["name"].split("_")[-1]
+    dirs = {"i": "input", "o": "output", "io": "inout"}
+
+    return iob_port(global_wire=api_iob_global_wire, direction=dirs[dir_suffix])
 
 
 def port_text2dict(port_text):
     port_flags = [
         "name",
         ["-i", {"dest": "interface"}],
-        ["-s", {"dest": "signals", "action": "append"}],
+        ["-w", {"dest": "wires", "action": "append"}],
         ["-d", {"dest": "descr", "nargs": "?"}],
         ["-doc", {"dest": "doc_only", "action": "store_true"}],
         ["-doc_clearpage", {"dest": "doc_clearpage", "action": "store_true"}],
     ]
     port_dict = parse_short_notation_text(port_text, port_flags)
-    port_signals = []
-    for s in port_dict.get("signals", []):
+    port_wires = []
+    for s in port_dict.get("wires", []):
         try:
             [s_name, s_width] = s.split(":")
         except ValueError:
             fail_with_msg(
-                f"Invalid signal format '{s}'! Expected 'name:width' format.",
+                f"Invalid wire format '{s}'! Expected 'name:width' format.",
                 ValueError,
             )
-        port_signals.append({"name": s_name, "width": s_width})
-    port_dict.update({"signals": port_signals})
+        port_wires.append({"name": s_name, "width": s_width})
+    port_dict.update({"wires": port_wires})
     return port_dict
 
 

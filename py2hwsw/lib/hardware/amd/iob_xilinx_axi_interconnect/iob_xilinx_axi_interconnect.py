@@ -61,7 +61,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_rst_s",
                 "descr": "Clock and reset inputs",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                     "params": "a",
                 },
@@ -73,14 +73,14 @@ def setup(py_params_dict):
             {
                 "name": f"s{i}_clk_rst_io",
                 "descr": f"Subordinate {i} clock reset interface",
-                "signals": [
+                "wires": [
                     {"name": f"s{i}_clk_i", "width": "1"},
                     {"name": f"s{i}_arstn_o", "width": "1"},
                 ],
             },
             {
                 "name": f"s{i}_axi_s",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",
@@ -96,14 +96,14 @@ def setup(py_params_dict):
             {
                 "name": f"m{i}_clk_rst_io",
                 "descr": f"Manager {i} clock reset output interface",
-                "signals": [
+                "wires": [
                     {"name": f"m{i}_clk_i", "width": "1"},
                     {"name": f"m{i}_arstn_o", "width": "1"},
                 ],
             },
             {
                 "name": f"m{i}_axi_m",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"m{i}_",
                     "ID_W": "AXI_ID_W",

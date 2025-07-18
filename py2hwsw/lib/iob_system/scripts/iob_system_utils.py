@@ -207,12 +207,12 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
 
     for idx, peripheral in enumerate(peripherals):
         peripheral_name = peripheral["instance_name"].lower()
-        # Add peripheral cbus wire
-        attributes_dict["wires"].append(
+        # Add peripheral cbus bus
+        attributes_dict["buses"].append(
             {
                 "name": f"{peripheral_name}_cbus",
                 "descr": f"{peripheral_name} Control/Status Registers bus",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": f"{peripheral_name}_cbus_",
                     "ADDR_W": peripheral_addr_w,
@@ -224,12 +224,12 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
         # Connect cbus to peripheral
         peripheral["connect"]["iob_csrs_cbus_s"] = f"{peripheral_name}_cbus"
 
-    # Add CLINT and PLIC wires (they are not in peripherals list)
-    attributes_dict["wires"] += [
+    # Add CLINT and PLIC buses (they are not in peripherals list)
+    attributes_dict["buses"] += [
         {
             "name": "clint_cbus",
             "descr": "CLINT Control/Status Registers bus",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "prefix": "clint_cbus_",
                 "ADDR_W": peripheral_addr_w,
@@ -238,7 +238,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
         {
             "name": "plic_cbus",
             "descr": "PLIC Control/Status Registers bus",
-            "signals": {
+            "wires": {
                 "type": "iob",
                 "prefix": "plic_cbus_",
                 "ADDR_W": peripheral_addr_w,

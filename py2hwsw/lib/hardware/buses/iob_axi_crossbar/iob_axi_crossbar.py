@@ -70,16 +70,16 @@ def setup(py_params_dict):
             "S_ID_WIDTH+$clog2(S_COUNT)",
             "Output ID field width (towards AXI subordinates)",
         ),
-        ("AWUSER_ENABLE", 0, "Propagate awuser signal"),
-        ("AWUSER_WIDTH", 1, "Width of awuser signal"),
-        ("WUSER_ENABLE", 0, "Propagate wuser signal"),
-        ("WUSER_WIDTH", 1, "Width of wuser signal"),
-        ("BUSER_ENABLE", 0, "Propagate buser signal"),
-        ("BUSER_WIDTH", 1, "Width of buser signal"),
-        ("ARUSER_ENABLE", 0, "Propagate aruser signal"),
-        ("ARUSER_WIDTH", 1, "Width of aruser signal"),
-        ("RUSER_ENABLE", 0, "Propagate ruser signal"),
-        ("RUSER_WIDTH", 1, "Width of ruser signal"),
+        ("AWUSER_ENABLE", 0, "Propagate awuser wire"),
+        ("AWUSER_WIDTH", 1, "Width of awuser wire"),
+        ("WUSER_ENABLE", 0, "Propagate wuser wire"),
+        ("WUSER_WIDTH", 1, "Width of wuser wire"),
+        ("BUSER_ENABLE", 0, "Propagate buser wire"),
+        ("BUSER_WIDTH", 1, "Width of buser wire"),
+        ("ARUSER_ENABLE", 0, "Propagate aruser wire"),
+        ("ARUSER_WIDTH", 1, "Width of aruser wire"),
+        ("RUSER_ENABLE", 0, "Propagate ruser wire"),
+        ("RUSER_WIDTH", 1, "Width of ruser wire"),
         ("M_REGIONS", 1, "Number of regions per manager interface"),
     ]
     for p in range(m):
@@ -203,7 +203,7 @@ def setup(py_params_dict):
         {
             "name": "clk_i",
             "descr": "Clock",
-            "signals": [
+            "wires": [
                 {
                     "name": "clk_i",
                     "width": 1,
@@ -213,7 +213,7 @@ def setup(py_params_dict):
         {
             "name": "rst_i",
             "descr": "Synchronous reset",
-            "signals": [
+            "wires": [
                 {
                     "name": "rst_i",
                     "width": 1,
@@ -226,7 +226,7 @@ def setup(py_params_dict):
             {
                 "name": f"m{p}_axi_m",
                 "descr": f"Manager interface {p}",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"m{p:02d}_",
                     "ID_W": "M_ID_WIDTH",
@@ -242,7 +242,7 @@ def setup(py_params_dict):
             {
                 "name": f"s{p}_axi_s",
                 "descr": f"Subordinate interface {p}",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"s{p:02d}_",
                     "ID_W": "S_ID_WIDTH",

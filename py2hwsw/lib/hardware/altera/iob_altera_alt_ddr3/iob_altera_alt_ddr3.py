@@ -51,7 +51,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_rst_i",
                 "descr": "Clock and reset",
-                "signals": [
+                "wires": [
                     {"name": "clk_i", "width": "1"},
                     {"name": "resetn_i", "width": "1"},
                 ],
@@ -59,7 +59,7 @@ def setup(py_params_dict):
             {
                 "name": "general_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rzqin_i", "width": "1"},
                     {"name": "pll_locked_o", "width": "1"},
                     {"name": "init_done_o", "width": "1"},
@@ -68,7 +68,7 @@ def setup(py_params_dict):
             {
                 "name": "ddr3_io",
                 "descr": "External DDR3 memory interface",
-                "signals": [
+                "wires": [
                     {"name": "ddr3b_a_o", "width": "14"},
                     {"name": "ddr3b_ba_o", "width": "3"},
                     {"name": "ddr3b_rasn_o", "width": "1"},
@@ -92,7 +92,7 @@ def setup(py_params_dict):
         attributes_dict["ports"] += [
             {
                 "name": f"s{i}_axi_s",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"s{i}_",
                     "ID_W": "AXI_ID_W",

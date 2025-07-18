@@ -9,7 +9,7 @@
 from latex import write_table
 
 import iob_colors
-from iob_signal import get_real_signal
+from iob_wire import get_real_wire
 import param_gen
 from api_base import convert2internal
 from iob_base import fail_with_msg, find_obj_in_list
@@ -71,8 +71,8 @@ def generate_subblocks(core):
     returns: Generated verilog code
     """
     code = ""
-    for instance in core.subblocks:
-        instance = convert2internal(instance)
+    for api_instance in core.subblocks:
+        instance = convert2internal(api_instance)
         if not instance.instantiate:
             continue
 
@@ -104,14 +104,14 @@ def generate_subblocks_snippet(core):
 
 
 def get_instance_port_connections(core, instance):
-    """Returns a multi-line string with all port's signals connections
+    """Returns a multi-line string with all port's wires connections
     for the given Verilog instance.
     """
     instance_portmap = ""
 
     # Iterate over all ports of the instance
-    for portmap in instance.portmap_connections:
-        portmap = convert2internal(portmap)
+    for api_portmap in instance.portmap_connections:
+        portmap = convert2internal(api_portmap)
 
         portmap.validate_attributes()
 
@@ -124,36 +124,36 @@ def get_instance_port_connections(core, instance):
             )
 
         e_connect = find_obj_in_list(
-            [convert2internal(i) for i in core.wires], portmap.e_connect
+            [convert2internal(i) for i in core.buses], portmap.e_connect
         ) or find_obj_in_list(
             [convert2internal(i) for i in core.ports], portmap.e_connect
         )
         if not e_connect:
             fail_with_msg(
-                f"Wire/Port '{portmap.e_connect}' not found in core '{core.name}'!"
+                f"Bus/Port '{portmap.e_connect}' not found in core '{core.name}'!"
             )
 
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
 
-        # If one of the ports is not a standard inferface, check if the number of signals is the same
+        # If one of the ports is not a standard inferface, check if the number of wires is the same
         if not port.interface or not e_connect.interface:
             newlinechar = "\n"
-            assert len(port.signals) == len(
-                e_connect.signals
-            ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of signals compared to external connection '{port.e_connect.name}'!
-Port '{port.name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(port).name for port in port.signals)}
+            assert len(port.wires) == len(
+                e_connect.wires
+            ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of wires compared to external connection '{port.e_connect.name}'!
+Port '{port.name}' has the following wires:
+{newlinechar.join("- " + get_real_wire(port).name for port in port.wires)}
 
-External connection '{get_real_signal(e_connect).name}' has the following signals:
-{newlinechar.join("- " + get_real_signal(port).name for port in e_connect.signals)}
+External connection '{get_real_wire(e_connect).name}' has the following wires:
+{newlinechar.join("- " + get_real_wire(port).name for port in e_connect.wires)}
 {iob_colors.ENDC}
 """
 
-        # Is this still possible? I think iob_port.signals may only contain iob_signal objects
-        # # If port has only non-iob signals, skip it
-        # if not any(isinstance(port_signal, iob_signal) for port_signal in port.signals):
+        # Is this still possible? I think iob_port.wires may only contain iob_wire objects
+        # # If port has only non-iob wires, skip it
+        # if not any(isinstance(port_wire, iob_wire) for port_wire in port.wires):
         #     continue
 
         # If port has a description, add it to the portmap
@@ -163,73 +163,69 @@ External connection '{get_real_signal(e_connect).name}' has the following signal
         # Handle ports connected to constants
         if isinstance(e_connect, str):
             if "z" in e_connect.lower():
-                instance_portmap += f"        .{port.signals[0].name}(),\n"
+                instance_portmap += f"        .{port.wires[0].name}(),\n"
             else:
-                instance_portmap += f"        .{port.signals[0].name}({e_connect}),\n"
+                instance_portmap += f"        .{port.wires[0].name}({e_connect}),\n"
             continue
 
-        # Connect individual signals
-        for idx, port_signal in enumerate(port.signals):
-            port_signal = convert2internal(port_signal)
-            # Is this still possible? Port should only contain iob_signals objects
-            # # Skip signals that are not iob_signals
-            # if not isinstance(port_signal, iob_signal):
+        # Connect individual wires
+        for idx, api_port_wire in enumerate(port.wires):
+            port_wire = convert2internal(api_port_wire)
+            # Is this still possible? Port should only contain iob_wires objects
+            # # Skip wires that are not iob_wires
+            # if not isinstance(port_wire, iob_wire):
             #     continue
-            port_name = port_signal.name
+            port_name = port_wire.name
 
             # If both ports are standard interfaces, connect by name
             if port.interface and e_connect.interface:
                 # Remove prefix and suffix from port name
                 port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
-                for e_signal in e_connect.signals:
-                    e_signal = convert2internal(e_signal)
-                    real_e_signal = get_real_signal(e_signal)
-                    e_signal_name = real_e_signal.name
-                    # Remove prefix and suffix from external signal name
-                    if e_signal_name[-2:] in ["_o", "_i"]:
-                        e_signal_name = e_signal_name[:-2]
-                    e_signal_name = e_signal_name.replace(
-                        e_connect.interface.prefix, "", 1
-                    )
-                    if e_signal_name == port_name:
-                        e_signal_name = real_e_signal.name
-                        port_name = port_signal.name
+                for api_e_wire in e_connect.wires:
+                    e_wire = convert2internal(api_e_wire)
+                    real_e_wire = get_real_wire(e_wire)
+                    e_wire_name = real_e_wire.name
+                    # Remove prefix and suffix from external wire name
+                    if e_wire_name[-2:] in ["_o", "_i"]:
+                        e_wire_name = e_wire_name[:-2]
+                    e_wire_name = e_wire_name.replace(e_connect.interface.prefix, "", 1)
+                    if e_wire_name == port_name:
+                        e_wire_name = real_e_wire.name
+                        port_name = port_wire.name
                         break
-                port_name = port_signal.name
+                port_name = port_wire.name
             else:
                 # If both ports are not standard interfaces, connect by index
-                real_e_signal = get_real_signal(
-                    convert2internal(e_connect.signals[idx])
-                )
-                e_signal_name = real_e_signal.name
+                real_e_wire = get_real_wire(convert2internal(e_connect.wires[idx]))
+                e_wire_name = real_e_wire.name
 
-            # If the signal is a bit slice, get the name of the bit slice
+            # If the wire is a bit slice, get the name of the bit slice
             # and the name of the port (this overwrites the previous connection)
             for bit_slice in portmap.e_connect_bit_slices:
-                if e_signal_name in bit_slice:
+                if e_wire_name in bit_slice:
                     # Connection is not a bit_slice
-                    if f"{port_signal.name}:" in bit_slice:
-                        e_signal_name = bit_slice.split(":")[1]
-                        port_name = port_signal.name
+                    if f"{port_wire.name}:" in bit_slice:
+                        e_wire_name = bit_slice.split(":")[1]
+                        port_name = port_wire.name
                     else:
                         # Connection is a bit slice
-                        e_signal_name = bit_slice
+                        e_wire_name = bit_slice
                     break
-                elif port_signal.name in bit_slice:
+                elif port_wire.name in bit_slice:
                     # Connection is not a bit_slice
-                    if f"{port_signal.name}:" in bit_slice:
-                        e_signal_name = bit_slice.split(":")[1]
-                        port_name = port_signal.name
+                    if f"{port_wire.name}:" in bit_slice:
+                        e_wire_name = bit_slice.split(":")[1]
+                        port_name = port_wire.name
                     else:
                         # Connection is a bit slice
-                        e_signal_name = bit_slice
+                        e_wire_name = bit_slice
                     break
 
-            if e_signal_name.lower() == "z":
-                # If the external signal is 'z', do not connect it
+            if e_wire_name.lower() == "z":
+                # If the external wire is 'z', do not connect it
                 instance_portmap += f"        .{port_name}(),\n"
             else:
-                instance_portmap += f"        .{port_name}({e_signal_name}),\n"
+                instance_portmap += f"        .{port_name}({e_wire_name}),\n"
 
     instance_portmap = instance_portmap[:-2] + "\n"  # Remove last comma
 

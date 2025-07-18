@@ -22,19 +22,19 @@ def setup(py_params_dict):
                     "iob_cyclonev_gt_dk",
                     "iob_zybo_z7",
                 ],
-                "wires": [
+                "buses": [
                     {
                         "name": "sut_rs232",
                         "descr": "rs232 bus for SUT",
-                        "signals": {
+                        "wires": {
                             "type": "rs232",
                             "prefix": "sut_",
                         },
                     },
                     {
                         "name": "sut_rs232_inverted",
-                        "descr": "Invert order of rs232 signals",
-                        "signals": [
+                        "descr": "Invert order of rs232 wires",
+                        "wires": [
                             {"name": "sut_rs232_txd"},
                             {"name": "sut_rs232_rxd"},
                             {"name": "sut_rs232_cts"},

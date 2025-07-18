@@ -101,7 +101,7 @@ module iob_uart_core (
    );
 
    iob_reg_care #(
-      .DATA_W(10),
+      .DATA_W (10),
       .RST_VAL({10{1'b1}})
    ) tx_pattern_reg (
       .clk_i (clk_i),
@@ -140,11 +140,11 @@ module iob_uart_core (
 
 
    always @* begin
-      tx_pc_nxt = tx_pc + 2'd1;  //increment pc by default
-      tx_pattern_nxt = tx_pattern;
-      tx_bitcnt_nxt = tx_bitcnt;
+      tx_pc_nxt       = tx_pc + 2'd1;  //increment pc by default
+      tx_pattern_nxt  = tx_pattern;
+      tx_bitcnt_nxt   = tx_bitcnt;
       tx_cyclecnt_nxt = tx_cyclecnt;
-      tx_ready_nxt = tx_ready_o;
+      tx_ready_nxt    = tx_ready_o;
 
       case (tx_pc)
 
@@ -248,7 +248,7 @@ module iob_uart_core (
    );
 
    iob_reg_care #(
-      .DATA_W(16),
+      .DATA_W (16),
       .RST_VAL(16'b1)
    ) rx_cyclecnt_reg (
       .clk_i (clk_i),
@@ -290,14 +290,14 @@ module iob_uart_core (
    );
 
    always @* begin
-      rx_pc_nxt = rx_pc + 3'd1;  //increment pc by default
+      rx_pc_nxt       = rx_pc + 3'd1;  //increment pc by default
       rx_cyclecnt_nxt = rx_cyclecnt;
-      rx_bitcnt_nxt = rx_bitcnt;
-      rx_pattern_nxt = rx_pattern;
-      rx_ready_nxt = rx_ready_o;
+      rx_bitcnt_nxt   = rx_bitcnt;
+      rx_pattern_nxt  = rx_pattern;
+      rx_ready_nxt    = rx_ready_o;
 
-      rs232_rts_nxt = rs232_rts_o;
-      rx_data_nxt = rx_data_o;
+      rs232_rts_nxt   = rs232_rts_o;
+      rx_data_nxt     = rx_data_o;
 
       case (rx_pc)
 

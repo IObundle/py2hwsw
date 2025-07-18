@@ -113,10 +113,10 @@ Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), 
     #
     # Create verilog parameters
     #
-    for signal in interfaces[INTERFACE]:
-        name = signal[0]
-        width = signal[2]
-        default_width = signal[2] if type(width) is int else signal[3]
+    for wire in interfaces[INTERFACE]:
+        name = wire[0]
+        width = wire[2]
+        default_width = wire[2] if type(width) is int else wire[3]
 
         # Only create verilog parameters for strings that represent widths
         if type(width) is int or not width.endswith("_W"):
@@ -144,9 +144,9 @@ Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), 
     #
     # Connect interfaces
     #
-    for signal in interfaces[INTERFACE]:
-        name = signal[0]
-        # Skip address signal
+    for wire in interfaces[INTERFACE]:
+        name = wire[0]
+        # Skip address wire
         if "addr" in name:
             continue
         # Connect both interfaces
@@ -161,27 +161,27 @@ Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), 
     for zone in MEMORY_ZONES:
         zone_start, zone_end, offset = zone
         translation_snippet_body += f"""\
-if (signal_name_i >= 'h{zone_start:x} && signal_name_i <= 'h{zone_end:x}) begin
-         signal_name_reg = signal_name_i + 'h{offset:x}; // signal_name_i is in the range 0x{zone_start:x} to 0x{zone_end:x}
+if (wire_name_i >= 'h{zone_start:x} && wire_name_i <= 'h{zone_end:x}) begin
+         wire_name_reg = wire_name_i + 'h{offset:x}; // wire_name_i is in the range 0x{zone_start:x} to 0x{zone_end:x}
       end else \
 """
 
     translation_snippet_body += """\
 begin
-         signal_name_reg = signal_name_i; // Default case
+         wire_name_reg = wire_name_i; // Default case
       end
 """
 
-    for signal in interfaces[INTERFACE]:
-        name = INTERFACE + "_" + signal[0]
+    for wire in interfaces[INTERFACE]:
+        name = INTERFACE + "_" + wire[0]
         if "addr" not in name:
             continue
         verilog_snippet += f"""
-   // Translate {name} signal
+   // Translate {name} wire
    reg [ADDR_W-1:0] {name}_reg;
    assign {name}_o = {name}_reg;
    always @(*) begin
-{translation_snippet_body.replace("signal_name", name)}
+{translation_snippet_body.replace("wire_name", name)}
    end
 """
 
@@ -196,7 +196,7 @@ begin
             {
                 "name": "subordinate_s",
                 "descr": "Subordinate interface (connects to manager)",
-                "signals": {
+                "wires": {
                     "type": INTERFACE,
                     **interface_parameters,
                 },
@@ -204,7 +204,7 @@ begin
             {
                 "name": "manager_m",
                 "descr": "Manager interface (connects to subordinate)",
-                "signals": {
+                "wires": {
                     "type": INTERFACE,
                     **interface_parameters,
                 },

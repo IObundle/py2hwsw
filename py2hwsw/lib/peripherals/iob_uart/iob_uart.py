@@ -32,38 +32,38 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "rs232_m",
-                "signals": {
+                "wires": {
                     "type": "rs232",
                 },
                 "descr": "RS232 interface",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "softreset",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "softreset_wr", "width": 1},
                 ],
             },
             {
                 "name": "div",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "div_wr", "width": 16},
                 ],
             },
             {
                 "name": "txdata",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "txdata_valid_wr", "width": 1},
                     {"name": "txdata_wdata_wr", "width": 8},
                     {"name": "txdata_wstrb_wr", "width": 1},
@@ -73,35 +73,35 @@ def setup(py_params_dict):
             {
                 "name": "txen",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "txen_wr", "width": 1},
                 ],
             },
             {
                 "name": "rxen",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rxen_wr", "width": 1},
                 ],
             },
             {
                 "name": "txready",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "txready_rd", "width": 1},
                 ],
             },
             {
                 "name": "rxready",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rxready_rd", "width": 1},
                 ],
             },
             {
                 "name": "rxdata",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rxdata_valid_rd", "width": 1},
                     {"name": "rxdata_rdata_rd", "width": 8},
                     {"name": "rxdata_ready_rd", "width": 1},
@@ -112,7 +112,7 @@ def setup(py_params_dict):
             {
                 "name": "iob_reg_rvalid_en_rst",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rxdata_rvalid_en", "width": 1},
                     {"name": "rxdata_rvalid_rst", "width": 1},
                 ],
@@ -120,14 +120,14 @@ def setup(py_params_dict):
             {
                 "name": "iob_reg_rvalid_data_i",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rxdata_valid_rd", "width": 1},
                 ],
             },
             {
                 "name": "iob_reg_rvalid_data_o",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "rxdata_rvalid_rd"},
                 ],
             },
@@ -135,7 +135,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_rst",
                 "descr": "Clock and reset",
-                "signals": [
+                "wires": [
                     {"name": "clk_i"},
                     {"name": "arst_i"},
                 ],
@@ -143,7 +143,7 @@ def setup(py_params_dict):
             {
                 "name": "iob_uart_core_reg_interface",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "softreset_wr"},
                     {"name": "txen_wr"},
                     {"name": "rxen_wr"},

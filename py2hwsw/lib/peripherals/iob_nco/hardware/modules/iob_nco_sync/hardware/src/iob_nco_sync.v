@@ -33,7 +33,7 @@ module iob_nco_sync #(
       .signal_o(enable_o)
    );
 
-   // async fifo memory signals
+   // async fifo memory wires
    wire                period_fifo_w_clk;
    wire [PERIOD_W-1:0] period_fifo_w_data;
    wire                period_fifo_w_addr;

@@ -322,6 +322,10 @@ def internal_api_class(api_module, api_class_name, allow_unknown_args=False):
 
     Attributes received by constructor will be added to this internal class.
 
+    The constructor is intended to be automatically called by the scripts generated with the @api_class_for decorator.
+
+    If any py2hwsw script tries to call the constructor of the decorated class directly, the call will be redirected to the constructor of corresponding API class. So, calling the constructor of internal class will actually return an object of corresponding API class!
+
     Attributes:
         api_module (str): module in which the API class is defined. Example: "user_api.api"
         api_class_name (str): name of the API class. Example: "iob_conf"

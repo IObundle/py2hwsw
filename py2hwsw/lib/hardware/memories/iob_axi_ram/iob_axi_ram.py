@@ -84,7 +84,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Clock",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -94,7 +94,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Synchronous reset",
-                "signals": [
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": 1,
@@ -103,7 +103,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_s",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "ID_W": "ID_WIDTH",
                     "ADDR_W": "ADDR_WIDTH",
@@ -115,7 +115,7 @@ def setup(py_params_dict):
             {
                 "name": "external_mem_bus_m",
                 "descr": "Port for connection to external 'iob_ram_t2p_be' memory",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p_be",
                     "prefix": "ext_mem_",
                     "ADDR_W": "ADDR_WIDTH - 2",

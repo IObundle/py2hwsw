@@ -63,31 +63,31 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "descr": "Clock, clock enable and reset",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
             },
             {
                 "name": "pbus_s",
                 "descr": "Testbench peripherals CSRs interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",  # Includes 2 LSBs
                 },
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "soft_reset",
-                "descr": "Soft reset signal",
-                "signals": [
+                "descr": "Soft reset wire",
+                "wires": [
                     {"name": "soft_reset"},
                 ],
             },
             {
                 "name": "uut_access",
-                "descr": "UUT access signal",
-                "signals": {
+                "descr": "UUT access wire",
+                "wires": {
                     "type": "iob",
                     "prefix": "uut_access_",
                     "ADDR_W": "AXI_ADDR_W",
@@ -95,8 +95,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_access",
-                "descr": "AXI access signal",
-                "signals": {
+                "descr": "AXI access wire",
+                "wires": {
                     "type": "axi",
                     "prefix": "axi_m_",
                     "ID_W": "AXI_ID_W",
@@ -107,8 +107,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "iob_s_axi_m_control_length",
-                "descr": "Burst length signal",
-                "signals": [
+                "descr": "Burst length wire",
+                "wires": [
                     {
                         "name": "iob_s_axi_m_control_length",
                         "width": "(AXI_LEN_W+1)",
@@ -117,8 +117,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "iob_s_axi_m_control_w_level",
-                "descr": "Write level signal",
-                "signals": [
+                "descr": "Write level wire",
+                "wires": [
                     {
                         "name": "iob_s_axi_m_control_w_level",
                         "width": "(AXI_LEN_W+1)",
@@ -127,8 +127,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "iob_s_axi_m_control_r_level",
-                "descr": "Read level signal",
-                "signals": [
+                "descr": "Read level wire",
+                "wires": [
                     {
                         "name": "iob_s_axi_m_control_r_level",
                         "width": "(AXI_LEN_W+1)",
@@ -137,8 +137,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "iob_s_axi_m_control",
-                "descr": "Control signals",
-                "signals": [
+                "descr": "Control wires",
+                "wires": [
                     {
                         "name": "iob_s_axi_m_control_length",
                         "width": "(AXI_LEN_W+1)",
@@ -155,15 +155,15 @@ def setup(py_params_dict):
             },
             {
                 "name": "split_reset",
-                "descr": "Split reset signal",
-                "signals": [
+                "descr": "Split reset wire",
+                "wires": [
                     {"name": "arst_i"},
                 ],
             },
             {
                 "name": "split_control_csrs",
                 "descr": "Control/Status Registers interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "split_control_",
                     "ADDR_W": 16,
@@ -172,7 +172,7 @@ def setup(py_params_dict):
             {
                 "name": "control_csrs",
                 "descr": "Control/Status Registers interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "control_",
                     "ADDR_W": 4,
@@ -180,13 +180,13 @@ def setup(py_params_dict):
             },
             {
                 "name": "clk",
-                "descr": "Clock signal",
-                "signals": [{"name": "clk_i"}],
+                "descr": "Clock wire",
+                "wires": [{"name": "clk_i"}],
             },
             {
                 "name": "axi_ram_ext_mem",
                 "descr": "AXI RAM external memory bus",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p_be",
                     "prefix": "ext_mem_",
                     "ADDR_W": "AXI_ADDR_W - 2",

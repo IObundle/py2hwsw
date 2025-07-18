@@ -43,7 +43,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -51,7 +51,7 @@ def setup(py_params_dict):
             {
                 "name": "axi_s",
                 "descr": "Subordinate AXI interface",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": "s_",
                     "ADDR_W": "ADDR_WIDTH",
@@ -61,7 +61,7 @@ def setup(py_params_dict):
             {
                 "name": "iob_m",
                 "descr": "Manager IOb interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "ADDR_WIDTH",
                     "DATA_W": "DATA_WIDTH",

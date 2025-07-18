@@ -154,14 +154,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "control_if_s",
-                "signals": {
+                "wires": {
                     "type": params["csr_if"],
                     # ADDR_W set automatically
                     "DATA_W": "DATA_W",
@@ -170,11 +170,11 @@ def setup(py_params_dict):
                 "descr": "CSR control interface. Interface type defined by `csr_if` parameter.",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "internal_iob",
                 "descr": "Internal iob interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "prefix": "internal_",
                     "ADDR_W": "ADDR_W",
@@ -184,49 +184,49 @@ def setup(py_params_dict):
             {
                 "name": "state",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "state", "width": 1},
                 ],
             },
             {
                 "name": "state_nxt",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "state_nxt", "width": 1, "isvar": True, "isreg": True},
                 ],
             },
             {
                 "name": "write_en",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "write_en", "width": 1},
                 ],
             },
             {
                 "name": "internal_iob_addr",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "internal_iob_addr"},
                 ],
             },
             {
                 "name": "internal_iob_addr_stable",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "internal_iob_addr_stable", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "internal_iob_addr_reg",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "internal_iob_addr_reg", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "internal_iob_addr_reg_en",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "internal_iob_addr_reg_en", "width": 1},
                 ],
             },
@@ -386,10 +386,10 @@ def setup(py_params_dict):
             attributes_with_csrs["build_dir"] + "/document/tsrc",
         )
 
-    # Add ports and internal wires for registers
-    auto_ports, auto_wires, auto_snippet = csr_gen_obj.gen_ports_wires(reg_table)
+    # Add ports and internal buses for registers
+    auto_ports, auto_buses, auto_snippet = csr_gen_obj.gen_ports_buses(reg_table)
     attributes_dict["ports"] += auto_ports
-    attributes_dict["wires"] += auto_wires
+    attributes_dict["buses"] += auto_buses
     attributes_dict["snippets"].append({"verilog_code": auto_snippet})
 
     # TODO: Append csr_if to config_build.mk ?
@@ -398,7 +398,7 @@ def setup(py_params_dict):
     # Set correct address width in ADDR_W (false-)parameter
     attributes_dict["confs"][0]["val"] = csr_gen_obj.core_addr_w
     # Set correct address width in control_if port
-    attributes_dict["ports"][1]["signals"]["ADDR_W"] = max(1, csr_gen_obj.core_addr_w)
+    attributes_dict["ports"][1]["wires"]["ADDR_W"] = max(1, csr_gen_obj.core_addr_w)
 
     return attributes_dict
 

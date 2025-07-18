@@ -36,7 +36,7 @@ def setup(py_params_dict):
             {
                 "name": "data_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "data_i",
                         "width": "DATA_W",
@@ -46,7 +46,7 @@ def setup(py_params_dict):
             {
                 "name": "nan_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "nan_o",
                         "width": 1,
@@ -56,7 +56,7 @@ def setup(py_params_dict):
             {
                 "name": "infinite_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "infinite_o",
                         "width": 1,
@@ -66,7 +66,7 @@ def setup(py_params_dict):
             {
                 "name": "zero_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "zero_o",
                         "width": 1,
@@ -76,7 +76,7 @@ def setup(py_params_dict):
             {
                 "name": "sub_normal_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "sub_normal_o",
                         "width": 1,
@@ -84,46 +84,46 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "sign",
-                "descr": "sign wire",
-                "signals": [
+                "descr": "sign bus",
+                "wires": [
                     {"name": "sign", "width": 1},
                 ],
             },
             {
                 "name": "exponent",
-                "descr": "exponent wire",
-                "signals": [
+                "descr": "exponent bus",
+                "wires": [
                     {"name": "exponent", "width": "EXP_W"},
                 ],
             },
             {
                 "name": "mantissa",
-                "descr": "mantissa wire",
-                "signals": [
+                "descr": "mantissa bus",
+                "wires": [
                     {"name": "mantissa", "width": "MAN_W-1"},
                 ],
             },
             {
                 "name": "exp_all_ones",
-                "descr": "exp_all_ones wire",
-                "signals": [
+                "descr": "exp_all_ones bus",
+                "wires": [
                     {"name": "exp_all_ones", "width": 1},
                 ],
             },
             {
                 "name": "exp_zero",
-                "descr": "exp_zero wire",
-                "signals": [
+                "descr": "exp_zero bus",
+                "wires": [
                     {"name": "exp_zero", "width": 1},
                 ],
             },
             {
                 "name": "man_zero",
-                "descr": "man_zero wire",
-                "signals": [
+                "descr": "man_zero bus",
+                "wires": [
                     {"name": "man_zero", "width": 1},
                 ],
             },

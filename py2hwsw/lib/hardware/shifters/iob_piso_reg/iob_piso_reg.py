@@ -19,7 +19,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -27,7 +27,7 @@ def setup(py_params_dict):
             {
                 "name": "ld_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "ld_i",
                         "width": 1,
@@ -37,7 +37,7 @@ def setup(py_params_dict):
             {
                 "name": "p_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "p_i",
                         "width": "DATA_W",
@@ -47,7 +47,7 @@ def setup(py_params_dict):
             {
                 "name": "s_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "s_o",
                         "width": 1,
@@ -55,18 +55,18 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "data_reg_int",
-                "descr": "data_reg_int wire",
-                "signals": [
+                "descr": "data_reg_int bus",
+                "wires": [
                     {"name": "data_reg_int", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "data_int",
-                "descr": "data_int wire",
-                "signals": [
+                "descr": "data_int bus",
+                "wires": [
                     {"name": "data_int", "width": "DATA_W"},
                 ],
             },

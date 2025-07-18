@@ -20,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "clk0_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk0_i",
                         "width": 1,
@@ -30,7 +30,7 @@ def setup(py_params_dict):
             {
                 "name": "clk1_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk1_i",
                         "width": 1,
@@ -40,7 +40,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_sel_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_sel_i",
                         "width": 1,
@@ -50,7 +50,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_o",
                         "width": 1,

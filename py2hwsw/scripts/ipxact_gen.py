@@ -9,7 +9,7 @@ import math
 import re
 import os
 import sys
-from iob_signal import iob_signal
+from iob_wire import iob_wire
 from api_base import convert2internal
 
 sys.path.append(
@@ -317,8 +317,8 @@ def gen_ports_list(core):
 
     ports_list = []
 
-    for group in core.ports:
-        group = convert2internal(group)
+    for api_group in core.ports:
+        group = convert2internal(api_group)
         # Skip doc_only interfaces
         if group.doc_only:
             continue
@@ -327,20 +327,20 @@ def gen_ports_list(core):
         if group.interface:
             tag = group.name
 
-        for signal in group.signals:
-            signal = convert2internal(signal)
-            if not isinstance(signal, iob_signal):
+        for api_wire in group.wires:
+            wire = convert2internal(api_wire)
+            if not isinstance(wire, iob_wire):
                 continue
-            n_bits = signal.width
+            n_bits = wire.width
             if type(n_bits) is str and n_bits.isnumeric():
                 n_bits = int(n_bits)
 
             ports_list.append(
                 Port(
-                    signal.name,
-                    signal.direction,
+                    wire.name,
+                    wire.direction,
                     n_bits,
-                    signal.descr,
+                    wire.descr,
                     tag,
                 )
             )
@@ -352,13 +352,13 @@ def gen_bus_interfaces_list(core):
     """
     Generate the bus interfaces list for the given core
     @param core: core object
-    return: bus interfaces list with grouped signals (py2 ports)
+    return: bus interfaces list with grouped wires (py2 ports)
     """
 
     bus_interfaces_list = []
 
-    for group in core.ports:
-        group = convert2internal(group)
+    for api_group in core.ports:
+        group = convert2internal(api_group)
         # Skip doc_only interfaces
         if group.doc_only:
             continue
@@ -396,13 +396,13 @@ def gen_ports_xml(ports_list, parameters_list):
 def gen_bus_interfaces_xml(bus_interfaces_list, ports_list, parameters_list):
     """
     Generate the bus interfaces xml code
-    @param bus_interfaces_list: list of bus interfaces with grouped signals (py2 ports)
+    @param bus_interfaces_list: list of bus interfaces with grouped wires (py2 ports)
     @param ports_list: list of ports objects
     return: xml code
     """
 
     if_ports = {}
-    # Generate port_list (signal list) of each interface (py2 port)
+    # Generate port_list (wire list) of each interface (py2 port)
     for port in ports_list:
         if port.tag:
             if port.tag not in if_ports:
@@ -581,13 +581,13 @@ def gen_parameters_list(core):
     """
 
     parameters_list = []
-    for group in core.confs:
-        group = convert2internal(group)
+    for api_group in core.confs:
+        group = convert2internal(api_group)
         # Skip doc_only groups
         if group.doc_only:
             continue
-        for conf in group.confs:
-            conf = convert2internal(conf)
+        for api_conf in group.confs:
+            conf = convert2internal(api_conf)
             # Skip doc_only confs
             if conf.doc_only:
                 continue
@@ -715,8 +715,8 @@ def generate_ipxact_xml(core, dest_dir):
 
     csr_block = None
     # Find iob_csrs block in subblocks list
-    for block in core.subblocks:
-        block = convert2internal(block)
+    for api_block in core.subblocks:
+        block = convert2internal(api_block)
         if block.original_name == "iob_csrs":
             csr_block = block
             break

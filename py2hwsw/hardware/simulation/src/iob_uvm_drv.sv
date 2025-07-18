@@ -7,7 +7,7 @@
 class iob_driver extends uvm_driver #(iob_transaction);
    `uvm_component_utils(iob_driver)
 
-   virtual iob_if vif;  // Virtual interface for driving signals
+   virtual iob_if vif;  // Virtual interface for driving wires
 
    function new(string name, uvm_component parent);
       super.new(name, parent);
@@ -33,10 +33,10 @@ class iob_driver extends uvm_driver #(iob_transaction);
    virtual task drive();
       iob_transaction trans;
 
-      vif.iob_valid_i  <= 1'd0;
-      vif.iob_addr_i   <= 32'd0;
-      vif.iob_wdata_i  <= 32'd0;
-      vif.iob_wstrb_i  <= 4'd0;
+      vif.iob_valid_i <= 1'd0;
+      vif.iob_addr_i  <= 32'd0;
+      vif.iob_wdata_i <= 32'd0;
+      vif.iob_wstrb_i <= 4'd0;
 
       forever begin
 
@@ -47,7 +47,7 @@ class iob_driver extends uvm_driver #(iob_transaction);
 
          // Drive the transaction to the DUT
          //`uvm_info("DRV", "Driving transaction to DUT", UVM_MEDIUM);
-         vif.iob_valid_i = 1;  // Assert valid signal
+         vif.iob_valid_i = 1;  // Assert valid wire
          vif.iob_addr_i  = trans.addr;  // Use macro for address alignment
          vif.iob_wdata_i = trans.wdata;  // Use macro for data shifting
          vif.iob_wstrb_i = trans.wstrb;  // Use macro for strobe generation
@@ -59,7 +59,7 @@ class iob_driver extends uvm_driver #(iob_transaction);
                    ), UVM_MEDIUM);
          while (!vif.iob_ready_o) @(posedge vif.clk_i);
 
-         vif.iob_valid_i  = 0;
+         vif.iob_valid_i = 0;
 
          // If it's a read transaction, wait for iob_rvalid_o
          if (trans.wstrb == 0) begin

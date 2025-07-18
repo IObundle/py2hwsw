@@ -27,14 +27,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "iob_m",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -43,7 +43,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "wb_s",
-                "signals": {
+                "wires": {
                     "type": "wb",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -51,61 +51,61 @@ def setup(py_params_dict):
                 "descr": "Wishbone subordinate interface",
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "valid_int",
-                "descr": "valid_int wire",
-                "signals": [
+                "descr": "valid_int bus",
+                "wires": [
                     {"name": "valid_int", "width": 1},
                 ],
             },
             {
                 "name": "valid_r",
-                "descr": "valid_r wire",
-                "signals": [
+                "descr": "valid_r bus",
+                "wires": [
                     {"name": "valid_r", "width": 1},
                 ],
             },
             {
                 "name": "rst_valid",
-                "descr": "rst_valid wire",
-                "signals": [
+                "descr": "rst_valid bus",
+                "wires": [
                     {"name": "rst_valid", "width": 1},
                 ],
             },
             {
                 "name": "wstrb",
-                "descr": "wstrb wire",
-                "signals": [
+                "descr": "wstrb bus",
+                "wires": [
                     {"name": "wstrb", "width": "DATA_W/8"},
                 ],
             },
             {
                 "name": "wack",
-                "descr": "wack wire",
-                "signals": [
+                "descr": "wack bus",
+                "wires": [
                     {"name": "wack", "width": 1},
                 ],
             },
             {
                 "name": "wack_r",
-                "descr": "wack_r wire",
-                "signals": [
+                "descr": "wack_r bus",
+                "wires": [
                     {"name": "wack_r", "width": 1},
                 ],
             },
             {
                 "name": "wb_data_mask",
-                "descr": "wb_data_mask wire",
-                "signals": [
+                "descr": "wb_data_mask bus",
+                "wires": [
                     {"name": "wb_data_mask", "width": "DATA_W"},
                 ],
             },
             # Busy reg
             {
                 "name": "busy",
-                "descr": "busy wire",
-                "signals": [
+                "descr": "busy bus",
+                "wires": [
                     {"name": "busy", "width": 1},
                 ],
             },

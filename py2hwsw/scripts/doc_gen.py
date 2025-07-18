@@ -18,6 +18,8 @@ from api_base import convert2internal
 
 def generate_docs(core):
     """Generate common documentation files"""
+    # FIXME: Docs disabled during wires/buses/global_wires/ports/interfaces rework
+    return
     if core.is_top_module:
         config_gen.generate_confs_tex([convert2internal(i) for i in core.confs], core.build_dir + "/document/tsrc")
         io_gen.generate_ios_tex([convert2internal(i) for i in core.ports], core.build_dir + "/document/tsrc")

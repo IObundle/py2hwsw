@@ -29,7 +29,7 @@ core_dictionary = {
     "ports": [
         {
             "name": "clk_en_rst_s",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
             "descr": "Clock, clock enable and reset",
@@ -37,7 +37,7 @@ core_dictionary = {
         {
             "name": "en_rst_i",
             "descr": "Enable and Synchronous reset interface",
-            "signals": [
+            "wires": [
                 {
                     "name": "en_i",
                     "width": 1,
@@ -53,16 +53,16 @@ core_dictionary = {
         {
             "name": "data_o",
             "descr": "Output port",
-            "signals": [
+            "wires": [
                 {"name": "data_o", "width": "DATA_W"},
             ],
         },
     ],
-    "wires": [
+    "buses": [
         {
             "name": "data_int",
-            "descr": "data_int wire",
-            "signals": [
+            "descr": "data_int bus",
+            "wires": [
                 {"name": "data_int", "width": "DATA_W"},
             ],
         },

@@ -44,12 +44,12 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "descr": "Clock, clock enable and reset",
-                "signals": {"type": "iob_clk"},
+                "wires": {"type": "iob_clk"},
             },
             {
                 "name": "iob_s",
                 "descr": "Subordinate IOb interface",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -58,7 +58,7 @@ def setup(py_params_dict):
             {
                 "name": "axil_m",
                 "descr": "Manager AXI Lite interface",
-                "signals": {
+                "wires": {
                     "type": "axil",
                     "ADDR_W": "AXIL_ADDR_W",
                     "DATA_W": "AXIL_DATA_W",

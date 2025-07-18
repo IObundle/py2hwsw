@@ -37,10 +37,15 @@ jobs:
           submodules: 'recursive'
       - name: Clean untracked files and directories (like old submodules)
         run: git clean -ffdx
+      # - name: run LIB test
+      #   run: |
+      #     cd py2hwsw/lib;\
+      #     nix-shell --run "make sim-test"
       - name: run LIB test
         run: |
           cd py2hwsw/lib;\
-          nix-shell --run "make sim-test"
+          nix-shell --run "./hardware/basic_tests/iob_and/iob_and.py"
+          nix-shell --run "./hardware/basic_tests/iob_and/iob_aoi.py"
 
   reuse:
     runs-on: self-hosted

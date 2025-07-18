@@ -77,23 +77,23 @@ module iob_axistream_in #(
    assign int_tready     = (mode_wr) ? sys_tready_i : data_read;
 
    // read data only after valid + ready handshake
-   assign data_read_nxt = data_valid_rd & data_ready_rd;
+   assign data_read_nxt  = data_valid_rd & data_ready_rd;
    iob_reg_ca #(
-    .DATA_W (1),
-    .RST_VAL(1'd0)
+      .DATA_W (1),
+      .RST_VAL(1'd0)
    ) data_valid_reg_inst (
-       .clk_i (clk_i),
-       .cke_i (cke_i),
-       .arst_i(arst_i),
-       .data_i(data_read_nxt),
-       .data_o(data_read)
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+      .data_i(data_read_nxt),
+      .data_o(data_read)
    );
-        
+
 
    // empty = fifo empty + no data in fifo2axis
-   assign fifo_empty_rd  = fifo_empty & (~int_tvalid);
+   assign fifo_empty_rd = fifo_empty & (~int_tvalid);
    // level = fifo level + data in fifo2axis
-   assign fifo_level_rd  = fifo_level + int_tvalid;
+   assign fifo_level_rd = fifo_level + int_tvalid;
 
    wire ready_int;
    // Ready if not full and, if in CSR mode, tlast not detected

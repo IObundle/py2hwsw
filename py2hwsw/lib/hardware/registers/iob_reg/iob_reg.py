@@ -108,7 +108,7 @@ class iob_reg(py2hwsw.iob_core):
             "ports": [
                 {
                     "name": "clk_en_rst_s",
-                    "signals": {
+                    "wires": {
                         "type": "iob_clk",
                         "params": clk_port_params,
                     },
@@ -117,7 +117,7 @@ class iob_reg(py2hwsw.iob_core):
                 {
                     "name": "data_i",
                     "descr": "Data input",
-                    "signals": [
+                    "wires": [
                         {
                             "name": "data_i",
                             "width": "DATA_W",
@@ -127,7 +127,7 @@ class iob_reg(py2hwsw.iob_core):
                 {
                     "name": "data_o",
                     "descr": "Data output",
-                    "signals": [
+                    "wires": [
                         {
                             "name": "data_o",
                             "width": "DATA_W",

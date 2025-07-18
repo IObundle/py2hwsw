@@ -39,14 +39,14 @@
 \newlabel{sec:cp}{{2.2.2}{3}{Parameters}{subsubsection.2.2.2}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Synthesis Parameters.\relax }}{3}{table.caption.7}\protected@file@percent }
 \newlabel{tab:sp}{{1}{3}{Synthesis Parameters.\relax }{table.caption.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Interface Signals}{3}{subsection.2.3}\protected@file@percent }
-\newlabel{sec:ifsig}{{2.3}{3}{Interface Signals}{subsection.2.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces General Interface Signals.\relax }}{3}{table.caption.8}\protected@file@percent }
-\newlabel{gen_if_tab:is}{{2}{3}{General Interface Signals.\relax }{table.caption.8}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces IObundle Interface Signals\relax }}{3}{table.caption.9}\protected@file@percent }
-\newlabel{tab:if_iob_s}{{3}{3}{IObundle Interface Signals\relax }{table.caption.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces RS232 Interface Signals\relax }}{3}{table.caption.10}\protected@file@percent }
-\newlabel{tab:if_rs232}{{4}{3}{RS232 Interface Signals\relax }{table.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Interface Wires}{3}{subsection.2.3}\protected@file@percent }
+\newlabel{sec:ifsig}{{2.3}{3}{Interface Wires}{subsection.2.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces General Interface Wires.\relax }}{3}{table.caption.8}\protected@file@percent }
+\newlabel{gen_if_tab:is}{{2}{3}{General Interface Wires.\relax }{table.caption.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces IObundle Interface Wires\relax }}{3}{table.caption.9}\protected@file@percent }
+\newlabel{tab:if_iob_s}{{3}{3}{IObundle Interface Wires\relax }{table.caption.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces RS232 Interface Wires\relax }}{3}{table.caption.10}\protected@file@percent }
+\newlabel{tab:if_rs232}{{4}{3}{RS232 Interface Wires\relax }{table.caption.10}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Software Accessible Registers}{4}{subsection.2.4}\protected@file@percent }
 \newlabel{sec:csrs}{{2.4}{4}{Software Accessible Registers}{subsection.2.4}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces UART software accessible registers.\relax }}{4}{table.caption.11}\protected@file@percent }

@@ -41,14 +41,14 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "iob_s",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -57,7 +57,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "wb_m",
-                "signals": {
+                "wires": {
                     "type": "wb",
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
@@ -66,96 +66,96 @@ def setup(py_params_dict):
             },
         ],
         #
-        # Wires
+        # Buses
         #
-        "wires": [
+        "buses": [
             # Reg valid
             {
                 "name": "valid_data_i",
-                "descr": "valid intput wire",
-                "signals": [
+                "descr": "valid intput bus",
+                "wires": [
                     {"name": "iob_valid_i"},
                 ],
             },
             {
                 "name": "valid_data_o",
-                "descr": "valid output wire",
-                "signals": [
+                "descr": "valid output bus",
+                "wires": [
                     {"name": "iob_valid_r", "width": 1},
                 ],
             },
             # Reg addr
             {
                 "name": "addr_data_i",
-                "descr": "addr intput wire",
-                "signals": [
+                "descr": "addr intput bus",
+                "wires": [
                     {"name": "iob_addr_i"},
                 ],
             },
             {
                 "name": "addr_data_o",
-                "descr": "addr output wire",
-                "signals": [
+                "descr": "addr output bus",
+                "wires": [
                     {"name": "iob_address_r", "width": "ADDR_W"},
                 ],
             },
             # Reg data
             {
                 "name": "data_data_i",
-                "descr": "data intput wire",
-                "signals": [
+                "descr": "data intput bus",
+                "wires": [
                     {"name": "iob_wdata_i"},
                 ],
             },
             {
                 "name": "data_data_o",
-                "descr": "data output wire",
-                "signals": [
+                "descr": "data output bus",
+                "wires": [
                     {"name": "iob_wdata_r", "width": "DATA_W"},
                 ],
             },
             # Reg we
             {
                 "name": "we_data_i",
-                "descr": "we intput wire",
-                "signals": [
+                "descr": "we intput bus",
+                "wires": [
                     {"name": "wb_we", "width": 1},
                 ],
             },
             {
                 "name": "we_data_o",
-                "descr": "we output wire",
-                "signals": [
+                "descr": "we output bus",
+                "wires": [
                     {"name": "wb_we_r", "width": 1},
                 ],
             },
             # Reg strb
             {
                 "name": "strb_data_i",
-                "descr": "strb intput wire",
-                "signals": [
+                "descr": "strb intput bus",
+                "wires": [
                     {"name": "wb_select", "width": "DATA_W/8"},
                 ],
             },
             {
                 "name": "strb_data_o",
-                "descr": "strb output wire",
-                "signals": [
+                "descr": "strb output bus",
+                "wires": [
                     {"name": "wb_select_r", "width": "DATA_W/8"},
                 ],
             },
             # Reg wb_data
             {
                 "name": "wb_data_data_i",
-                "descr": "wb_data intput wire",
-                "signals": [
+                "descr": "wb_data intput bus",
+                "wires": [
                     {"name": "wb_dat_i"},
                 ],
             },
             {
                 "name": "wb_data_data_o",
-                "descr": "wb_data output wire",
-                "signals": [
+                "descr": "wb_data output bus",
+                "wires": [
                     {"name": "wb_data_r", "width": "DATA_W"},
                 ],
             },

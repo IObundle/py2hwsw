@@ -44,35 +44,35 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "rst_i",
-                "descr": "Reset signal",
-                "signals": [{"name": "rst_i"}],
+                "descr": "Reset wire",
+                "wires": [{"name": "rst_i"}],
             },
             {
                 "name": "start_addr_i",
                 "descr": "Burst start address",
-                "signals": [{"name": "start_addr_i", "width": "AXI_ADDR_W"}],
+                "wires": [{"name": "start_addr_i", "width": "AXI_ADDR_W"}],
             },
             {
                 "name": "length_i",
                 "descr": "Burst length",
-                "signals": [{"name": "length_i", "width": "(AXI_LEN_W+1)"}],
+                "wires": [{"name": "length_i", "width": "(AXI_LEN_W+1)"}],
             },
             {
                 "name": "start_transfer_i",
-                "descr": "Start transfer signal",
-                "signals": [{"name": "start_transfer_i"}],
+                "descr": "Start transfer wire",
+                "wires": [{"name": "start_transfer_i"}],
             },
             {
                 "name": "read_data_axis_io",
-                "descr": "Read data AXI-Stream signals",
-                "signals": [
+                "descr": "Read data AXI-Stream wires",
+                "wires": [
                     {"name": "read_data_o", "width": "AXI_DATA_W"},
                     {"name": "read_data_valid_o"},
                     {"name": "read_data_ready_i"},
@@ -80,13 +80,13 @@ def setup(py_params_dict):
             },
             {
                 "name": "busy_o",
-                "descr": "Signal indicating if the module is busy transferring data",
-                "signals": [{"name": "busy_o", "isvar": True}],
+                "descr": "Wire indicating if the module is busy transferring data",
+                "wires": [{"name": "busy_o", "isvar": True}],
             },
             {
                 "name": "level_o",
                 "descr": "FIFO level",
-                "signals": [
+                "wires": [
                     {
                         "name": "level_o",
                         "width": "(AXI_LEN_W+1)",
@@ -97,7 +97,7 @@ def setup(py_params_dict):
             {
                 "name": "axi_read_m",
                 "descr": "AXI Read interface",
-                "signals": {
+                "wires": {
                     "type": "axi_read",
                     "prefix": "m_",
                     "ADDR_W": "AXI_ADDR_W",
@@ -108,7 +108,7 @@ def setup(py_params_dict):
             {
                 "name": "read_fifo_external_mem_bus_m",
                 "descr": "Port for connection to external iob_ram_t2p memory",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p",
                     "prefix": "read_fifo_ext_mem_",
                     "ADDR_W": "AXI_LEN_W",
@@ -116,11 +116,11 @@ def setup(py_params_dict):
                 },
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "clk_w_rst_ref",
                 "descr": "FIFO to AXI-Stream clock interface",
-                "signals": [
+                "wires": [
                     {"name": "clk_i"},
                     {"name": "cke_i"},
                     {"name": "arst_i"},
@@ -130,7 +130,7 @@ def setup(py_params_dict):
             {
                 "name": "fifo_w_if",
                 "descr": "FIFO write interface",
-                "signals": [
+                "wires": [
                     {"name": "fifo_wen"},
                     {"name": "fifo_wdata", "width": "AXI_DATA_W"},
                     {"name": "fifo_full"},
@@ -139,16 +139,16 @@ def setup(py_params_dict):
             {
                 "name": "fifo_r_if",
                 "descr": "FIFO read interface",
-                "signals": [
+                "wires": [
                     {"name": "fifo_ren"},
                     {"name": "fifo_rdata", "width": "AXI_DATA_W"},
                     {"name": "fifo_empty"},
                 ],
             },
             {
-                "name": "axi2axis_signals",
-                "descr": "Internal signals for the AXI converter AXI-Stream interface",
-                "signals": {
+                "name": "axi2axis_wires",
+                "descr": "Internal wires for the AXI converter AXI-Stream interface",
+                "wires": {
                     "type": "axis",
                     "prefix": "axi2axis_",
                     "DATA_W": "AXI_DATA_W",
@@ -156,13 +156,13 @@ def setup(py_params_dict):
             },
             {
                 "name": "en_fifo2axis",
-                "descr": "Enable signal for FIFO to AXI-Stream converter",
-                "signals": [{"name": "en_fifo2axis", "isvar": True}],
+                "descr": "Enable wire for FIFO to AXI-Stream converter",
+                "wires": [{"name": "en_fifo2axis", "isvar": True}],
             },
             {
                 "name": "axis_s_axi_m_config_read_if",
                 "descr": "AXI read burst converter to AXI-Stream configuration interface",
-                "signals": [
+                "wires": [
                     {"name": "start_addr_i", "width": "AXI_ADDR_W"},
                     {"name": "length_i", "width": "(AXI_LEN_W+1)"},
                     {"name": "start_transfer_i"},
@@ -212,7 +212,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_w_rst_ref",
                     "fifo_w_io": "fifo_w_if",
-                    "axis_s": "axi2axis_signals",
+                    "axis_s": "axi2axis_wires",
                 },
             },
             {
@@ -228,7 +228,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_w_rst_ref",
                     "config_read_io": "axis_s_axi_m_config_read_if",
-                    "axis_out_io": "axi2axis_signals",
+                    "axis_out_io": "axi2axis_wires",
                     "axi_read_m": "axi_read_m",
                 },
             },

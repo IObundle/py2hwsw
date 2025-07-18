@@ -78,7 +78,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -86,7 +86,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Synchronous reset interface",
-                "signals": [
+                "wires": [
                     {"name": "rst_i", "width": 1},
                 ],
             },
@@ -94,7 +94,7 @@ def setup(py_params_dict):
             {
                 "name": "config_write_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "w_addr_i", "width": "AXI_ADDR_W"},
                     {"name": "w_length_i", "width": "WLEN_W"},
                     {"name": "w_start_transfer_i", "width": "1"},
@@ -106,7 +106,7 @@ def setup(py_params_dict):
             {
                 "name": "config_read_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "r_addr_i", "width": "AXI_ADDR_W"},
                     {"name": "r_length_i", "width": "RLEN_W"},
                     {"name": "r_start_transfer_i", "width": "1"},
@@ -119,7 +119,7 @@ def setup(py_params_dict):
             {
                 "name": "axis_in_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "axis_in_tdata_i", "width": "AXI_DATA_W"},
                     {"name": "axis_in_tvalid_i", "width": "1"},
                     {"name": "axis_in_tready_o", "width": "1"},
@@ -128,7 +128,7 @@ def setup(py_params_dict):
             {
                 "name": "axis_out_io",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "axis_out_tdata_o", "width": "AXI_DATA_W"},
                     {"name": "axis_out_tvalid_o", "width": "1"},
                     {"name": "axis_out_tready_i", "width": "1"},
@@ -137,7 +137,7 @@ def setup(py_params_dict):
             {
                 "name": "write_ext_mem_m",
                 "descr": "External memory interface",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p",
                     "prefix": "ext_mem_write_",
                     "ADDR_W": "AXI_LEN_W",
@@ -147,7 +147,7 @@ def setup(py_params_dict):
             {
                 "name": "read_ext_mem_m",
                 "descr": "External memory interface",
-                "signals": {
+                "wires": {
                     "type": "ram_t2p",
                     "prefix": "ext_mem_read_",
                     "ADDR_W": "AXI_LEN_W",
@@ -156,7 +156,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axi_m",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",

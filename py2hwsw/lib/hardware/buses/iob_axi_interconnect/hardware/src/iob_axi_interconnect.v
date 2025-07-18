@@ -6,7 +6,7 @@
 /*
 Changes made (2023 Pedro Antunes):
 - formated the code with Verible
-- removed intialization in "reg" type signals declaration.
+- removed intialization in "reg" type wires declaration.
 - added reset to registers that did not previously have a reset value.
 */
 
@@ -28,27 +28,27 @@ module iob_axi_interconnect #(
    parameter ADDR_WIDTH      = 32,
    // Width of wstrb (width of data bus in words)
    parameter STRB_WIDTH      = (DATA_WIDTH / 8),
-   // Width of ID signal
+   // Width of ID wire
    parameter ID_WIDTH        = 8,
-   // Propagate awuser signal
+   // Propagate awuser wire
    parameter AWUSER_ENABLE   = 0,
-   // Width of awuser signal
+   // Width of awuser wire
    parameter AWUSER_WIDTH    = 1,
-   // Propagate wuser signal
+   // Propagate wuser wire
    parameter WUSER_ENABLE    = 0,
-   // Width of wuser signal
+   // Width of wuser wire
    parameter WUSER_WIDTH     = 1,
-   // Propagate buser signal
+   // Propagate buser wire
    parameter BUSER_ENABLE    = 0,
-   // Width of buser signal
+   // Width of buser wire
    parameter BUSER_WIDTH     = 1,
-   // Propagate aruser signal
+   // Propagate aruser wire
    parameter ARUSER_ENABLE   = 0,
-   // Width of aruser signal
+   // Width of aruser wire
    parameter ARUSER_WIDTH    = 1,
-   // Propagate ruser signal
+   // Propagate ruser wire
    parameter RUSER_ENABLE    = 0,
-   // Width of ruser signal
+   // Width of ruser wire
    parameter RUSER_WIDTH     = 1,
    // Propagate ID field
    parameter FORWARD_ID      = 0,

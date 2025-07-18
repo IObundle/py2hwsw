@@ -85,7 +85,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -93,7 +93,7 @@ def setup(py_params_dict):
             {
                 "name": "write_i",
                 "descr": "Write port",
-                "signals": [
+                "wires": [
                     {"name": "w_en_i", "width": 1},
                     {"name": "w_strb_i", "width": "WSTRB_W"},
                     {"name": "w_addr_i", "width": "WADDR_W"},
@@ -103,17 +103,17 @@ def setup(py_params_dict):
             {
                 "name": "read_io",
                 "descr": "read port",
-                "signals": [
+                "wires": [
                     {"name": "r_addr_i", "width": "RADDR_W"},
                     {"name": "r_data_o", "width": "RDATA_W"},
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
-                "name": "internal_wires",
-                "descr": "Wires for internal usage",
-                "signals": [
+                "name": "internal_buses",
+                "descr": "Buses for internal usage",
+                "wires": [
                     {
                         "name": "regarray",
                         "width": "N*W",

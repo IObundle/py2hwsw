@@ -60,84 +60,84 @@ def setup(py_params_dict):
             {
                 "name": "clkA_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "clkA_i", "width": 1},
                 ],
             },
             {
                 "name": "enA_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "enA_i", "width": 1},
                 ],
             },
             {
                 "name": "wstrbA_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "wstrbA_i", "width": "DATA_W/8"},
                 ],
             },
             {
                 "name": "addrA_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "addrA_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "dA_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "dA_i", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "dA_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {"name": "dA_o", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "clkB_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "clkB_i", "width": 1},
                 ],
             },
             {
                 "name": "enB_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "enB_i", "width": 1},
                 ],
             },
             {
                 "name": "wstrbB_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "wstrbB_i", "width": "DATA_W/8"},
                 ],
             },
             {
                 "name": "addrB_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "addrB_i", "width": "ADDR_W"},
                 ],
             },
             {
                 "name": "dB_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {"name": "dB_i", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "dB_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {"name": "dB_o", "width": "DATA_W"},
                 ],
             },

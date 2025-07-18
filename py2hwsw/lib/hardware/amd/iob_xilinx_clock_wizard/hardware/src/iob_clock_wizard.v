@@ -75,7 +75,7 @@ module iob_clock_wizard #(
       .DWE        (1'b0),
       .CLKOUTPHYEN(1'b0),
       .CLKOUTPHY  (clkoutphy_unused),
-      // Other control and status signals
+      // Other control and status wires
       .LOCKED     (locked_int),
       .PWRDWN     (1'b0),
       .RST        (arst_i)

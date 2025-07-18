@@ -1,4 +1,4 @@
-{signal: [
+{wire: [
   {name: 'clk_i', wave: 'p...........'},
   {name: 'valid_i', wave: '0..1......0.'},
 

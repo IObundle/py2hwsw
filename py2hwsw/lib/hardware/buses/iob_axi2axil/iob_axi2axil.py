@@ -6,7 +6,7 @@
 def setup(py_params_dict):
     """AXI to AXI-Lite converter
     This converter has the same limitations as AXI-Lite:
-    - No Burst Support: burst-related signals (like AWLEN, AWSIZE, ARBURST, etc.) are ignored.
+    - No Burst Support: burst-related wires (like AWLEN, AWSIZE, ARBURST, etc.) are ignored.
     """
     attributes_dict = {
         "generate_hw": True,
@@ -48,7 +48,7 @@ def setup(py_params_dict):
             {
                 "name": "axi_s",
                 "descr": "AXI subordinate interface to connect to external manager",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
@@ -59,7 +59,7 @@ def setup(py_params_dict):
             {
                 "name": "axil_m",
                 "descr": "AXI Lite manager interface to connect to external subordinate",
-                "signals": {
+                "wires": {
                     "type": "axil",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",

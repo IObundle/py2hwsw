@@ -28,7 +28,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -38,7 +38,7 @@ def setup(py_params_dict):
             {
                 "name": "rst_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": 1,
@@ -48,7 +48,7 @@ def setup(py_params_dict):
             {
                 "name": "start_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "start_i",
                         "width": 1,
@@ -58,7 +58,7 @@ def setup(py_params_dict):
             {
                 "name": "max_n_min_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "max_n_min_i",
                         "width": 1,
@@ -68,7 +68,7 @@ def setup(py_params_dict):
             {
                 "name": "op_a_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "op_a_i",
                         "width": "DATA_W",
@@ -78,7 +78,7 @@ def setup(py_params_dict):
             {
                 "name": "op_b_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "op_b_i",
                         "width": "DATA_W",
@@ -88,7 +88,7 @@ def setup(py_params_dict):
             {
                 "name": "done_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "done_o",
                         "width": 1,
@@ -98,7 +98,7 @@ def setup(py_params_dict):
             {
                 "name": "res_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "res_o",
                         "width": "DATA_W",
@@ -106,39 +106,39 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "bigger",
-                "descr": "bigger wire",
-                "signals": [
+                "descr": "bigger bus",
+                "wires": [
                     {"name": "bigger", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "smaller",
-                "descr": "smaller wire",
-                "signals": [
+                "descr": "smaller bus",
+                "wires": [
                     {"name": "smaller", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "op_a_nan",
-                "descr": "op_a_nan wire",
-                "signals": [
+                "descr": "op_a_nan bus",
+                "wires": [
                     {"name": "op_a_nan", "width": 1},
                 ],
             },
             {
                 "name": "op_b_nan",
-                "descr": "op_b_nan wire",
-                "signals": [
+                "descr": "op_b_nan bus",
+                "wires": [
                     {"name": "op_b_nan", "width": 1},
                 ],
             },
             {
                 "name": "rst_int",
-                "descr": "rst wire",
-                "signals": [
+                "descr": "rst bus",
+                "wires": [
                     {"name": "rst_int", "width": "DATA_W"},
                 ],
             },

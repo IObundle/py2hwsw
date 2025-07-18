@@ -14,7 +14,7 @@ module iob_axis_s_axi_m_write_int #(
 
    localparam WAIT_START = 2'd0, TRANSF_BURST = 2'd1, WAIT_BRESP = 2'd2;
 
-   // Internal signals
+   // Internal wires
    wire [   AXI_DATA_W-1:0] axi_wdata_nxt;
 
    // Instantiation wires
@@ -22,7 +22,7 @@ module iob_axis_s_axi_m_write_int #(
    wire [    AXI_LEN_W-1:0] transf_data_count;
    wire [(AXI_LEN_W+1)-1:0] length;
 
-   // FSM signals
+   // FSM wires
    reg                       transfer_count_rst;
    reg                       transfer_count_incr;
    reg                       axi_awvalid_nxt;
@@ -54,7 +54,7 @@ module iob_axis_s_axi_m_write_int #(
    assign axi_awqos_o   = 4'd0;
    assign axi_bready_o  = 1'b1;
 
-   // Busy signal
+   // Busy wire
    assign w_busy_o      = state != WAIT_START;
 
    always @* begin
@@ -99,7 +99,7 @@ module iob_axis_s_axi_m_write_int #(
                axi_wvalid_nxt      = axis_in_valid_i;
                transfer_count_incr = axi_wready_i & axis_in_valid_i;
 
-               // Set the last signal in the last data
+               // Set the last wire in the last data
                if ((transf_data_count == axi_awlen_nxt) && axis_in_valid_i) begin
                   axi_wlast_nxt = 1'd1;
                   if (axi_wready_i) begin
@@ -110,7 +110,7 @@ module iob_axis_s_axi_m_write_int #(
             end
          end
 
-         TRANSF_BURST: begin  // Set burst address, send data and wait for both ready signals
+         TRANSF_BURST: begin  // Set burst address, send data and wait for both ready wires
             // Check if the address channel is done
             if (!address_done) begin
                if (axi_awready_i) begin
@@ -122,7 +122,7 @@ module iob_axis_s_axi_m_write_int #(
 
             // Check if the data channel is done
             if (!data_done) begin
-               axis_in_ready_int   = axi_wready_i;  // Set ready signal for the input stream
+               axis_in_ready_int   = axi_wready_i;  // Set ready wire for the input stream
                transfer_count_incr = axi_wready_i & axis_in_valid_i;
                axi_wvalid_nxt      = axis_in_valid_i;
                if ((transf_data_count == axi_awlen_o) && axis_in_valid_i) begin
@@ -145,7 +145,7 @@ module iob_axis_s_axi_m_write_int #(
          default: begin  // WAIT_BRESP: Wait for response
             if (axi_bvalid_i) begin  // When the response is valid, check if the transfer is done
                transfer_count_rst = 1'd1;
-               // Reset the done signals
+               // Reset the done wires
                address_done_nxt = 1'd0;
                data_done_nxt    = 1'd0;
                if (length == 0) begin

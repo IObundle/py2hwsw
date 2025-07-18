@@ -11,7 +11,6 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     find_obj_in_list,
-    update_obj_from_dict,
     parse_short_notation_text,
 )
 
@@ -120,22 +119,13 @@ def python_parameter_from_text(python_parameter_text):
 
 
 def python_parameter_group_from_dict(python_parameter_group_dict):
-    python_parameter_group_obj = iob_python_parameter_group()
-
-    key_attribute_mapping = {}
-    preprocessor_functions = {
-        "python_parameters": lambda lst: [python_parameter_from_dict(i) for i in lst],
-    }
-    # Update python_parameter_group_obj attributes with values from given dictionary
-    update_obj_from_dict(
-        python_parameter_group_obj._get_py2hwsw_internal_obj(),
-        python_parameter_group_dict,
-        key_attribute_mapping,
-        preprocessor_functions,
-        python_parameter_group_obj.get_supported_attributes().keys(),
-    )
-
-    return python_parameter_group_obj
+    # Convert dictionary elements to objects
+    kwargs = python_parameter_group_dict.copy()
+    kwargs["python_parameters"] = [
+        python_parameter_from_dict(i)
+        for i in python_parameter_group_dict["python_parameters"]
+    ]
+    return iob_python_parameter_group(**kwargs)
 
 
 def python_parameter_group_text2dict(python_parameter_group_text):

@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "in_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "in_i",
                         "width": 1,
@@ -20,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "en_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "en_i",
                         "width": 1,
@@ -30,7 +30,7 @@ def setup(py_params_dict):
             {
                 "name": "out_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "out_o",
                         "width": 1,
@@ -40,7 +40,7 @@ def setup(py_params_dict):
             {
                 "name": "in_out_io",
                 "descr": "In/Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "in_out_io",
                         "width": 1,

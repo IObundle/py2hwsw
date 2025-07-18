@@ -2,24 +2,35 @@
 #
 # SPDX-License-Identifier: MIT
 
+import os
 import copy
-from typing import Dict
+import json
 
 import interfaces
 from iob_base import (
     iob_base,
     find_obj_in_list,
     fail_with_msg,
-    debug,
-    prevent_instantiation,
+    debug_print,
+    import_python_module,
 )
 from iob_portmap import iob_portmap, get_portmap_port
-from iob_signal import remove_signal_direction_suffixes
+from iob_wire import remove_wire_direction_suffixes
+from api_base import internal_api_class, convert2internal
+from iob_core import core_from_dict, find_module_setup_dir
 
 
-@prevent_instantiation
+@internal_api_class("user_api.api", "iob_instance")
 class iob_instance(iob_base):
     """Class to describe a module's (Verilog) instance"""
+
+    def validate_attributes(self):
+        """Validate instance attributes"""
+        if not self.name:
+            fail_with_msg("Instance must have a name!")
+        if not self.core:
+            fail_with_msg(f"Instance '{self.name}' has no core reference!")
+        pass
 
     # def __init__(
     #     self,
@@ -102,13 +113,13 @@ class iob_instance(iob_base):
 
     def connect_instance_ports(self, connect, issuer):
         """
-        param connect: External wires to connect to ports of this instance
-                       Key: Port name, Value: Wire name or tuple with wire name and signal bit slices
+        param connect: External buses to connect to ports of this instance
+                       Key: Port name, Value: bus name or tuple with bus name and wire bit slices
                        Tuple has format:
-                       (wire_name, signal_name[bit_start:bit_end], other_signal[bit_start:bit_end], ...)
+                       (bus_name, wire_name[bit_start:bit_end], other_wire[bit_start:bit_end], ...)
         param issuer: Module that is instantiating this instance
         """
-        # Connect instance ports to external wires
+        # Connect instance ports to external buses
         for port_name, connection_value in connect.items():
             port = find_obj_in_list(self.ports, port_name)
             if not port:
@@ -120,9 +131,9 @@ class iob_instance(iob_base):
 
             bit_slices = []
             if type(connection_value) is str:
-                wire_name = connection_value
+                bus_name = connection_value
             elif type(connection_value) is tuple:
-                wire_name = connection_value[0]
+                bus_name = connection_value[0]
                 bit_slices = connection_value[1]
                 if type(bit_slices) is not list:
                     fail_with_msg(
@@ -131,34 +142,32 @@ class iob_instance(iob_base):
             else:
                 fail_with_msg(f"Invalid connection value: {connection_value}")
 
-            if "'" in wire_name or wire_name.lower() == "z":
-                wire = wire_name
+            if "'" in bus_name or bus_name.lower() == "z":
+                bus = bus_name
             else:
-                wire = find_obj_in_list(issuer.wires, wire_name) or find_obj_in_list(
-                    issuer.ports, wire_name
+                bus = find_obj_in_list(issuer.buses, bus_name) or find_obj_in_list(
+                    issuer.ports, bus_name
                 )
-                if not wire:
-                    debug(
-                        f"Creating implicit wire '{port.name}' in '{issuer.name}'.", 1
+                if not bus:
+                    debug_print(
+                        f"Creating implicit bus '{port.name}' in '{issuer.name}'.", 1
                     )
-                    # Add wire to issuer
-                    wire_signals = remove_signal_direction_suffixes(port.signals)
-                    issuer.create_wire(
-                        name=wire_name, signals=wire_signals, descr=port.descr
-                    )
-                    # Add wire to attributes_dict as well
-                    issuer.attributes_dict["wires"].append(
+                    # Add bus to issuer
+                    bus_wires = remove_wire_direction_suffixes(port.wires)
+                    issuer.create_bus(name=bus_name, wires=bus_wires, descr=port.descr)
+                    # Add bus to attributes_dict as well
+                    issuer.attributes_dict["buses"].append(
                         {
-                            "name": wire_name,
-                            "signals": wire_signals,
+                            "name": bus_name,
+                            "wires": bus_wires,
                             "descr": port.descr,
                         }
                     )
-                    wire = issuer.wires[-1]
+                    bus = issuer.buses[-1]
 
             # create portmap and add to instance list
             portmap = iob_portmap(port=port)
-            portmap.connect_external(wire, bit_slices=bit_slices)
+            portmap.connect_external(bus, bit_slices=bit_slices)
             self.portmap_connections.append(portmap)
         # If this module has an issuer and is not a tester
         if issuer and not self.is_tester:
@@ -208,13 +217,13 @@ class iob_instance(iob_base):
         issuer.attributes_dict["ports"].append(
             {
                 "name": _name,
-                "signals": interface_dict,
+                "wires": interface_dict,
                 "descr": port.descr,
             }
         )
         # Connect newly created port to self
         mem_portmap = iob_portmap(port=port)
-        _port = find_obj_in_list(issuer.ports + issuer.wires, _name)
+        _port = find_obj_in_list(issuer.ports + issuer.buses, _name)
         mem_portmap.connect_external(_port, bit_slices=[])
         self.portmap_connections.append(mem_portmap)
 
@@ -236,7 +245,7 @@ class iob_instance(iob_base):
                     p.interface.has_arst |= port.interface.has_arst
                     p.interface.has_rst |= port.interface.has_rst
                     p.interface.has_en |= port.interface.has_en
-                    p.signals = []
+                    p.wires = []
                     p.__post_init__()  # FIXME: no longer exists
                     clk_portmap.connect_external(p, bit_slices=[])
                     return
@@ -285,7 +294,7 @@ class iob_instance(iob_base):
         issuer.attributes_dict["ports"].append(
             {
                 "name": f"{self.instance_name}_cbus_s",
-                "signals": {
+                "wires": {
                     "type": csr_if_genre,
                     "prefix": self.instance_name + "_",
                     "DATA_W": csrs_port.interface.data_w,
@@ -294,3 +303,79 @@ class iob_instance(iob_base):
                 "descr": "Control and Status Registers interface (auto-generated)",
             }
         )
+
+
+def instantiate_block(
+    block_name: str, python_parameters: dict = {}, block_dict: dict = {}
+):
+    """
+    Find a block based on given block_name and instatiate it.
+
+    Attributes:
+        block (str): The name of the block to instantiate. Will search for <block>.py or <block>.json files.
+                    If <block>.py is found, it must contain a class called <block> that extends iob_block. This class will be used to instantiate the block.
+                    If <block>.json is found, its contents will be read and parsed by the block_from_dict(<json_contents>) function.
+        python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated block.
+                                  Elements from this dictionary will be passed as **kwargs to the instantiated block's constructor.
+                                  Only applicable if instantiated block has a constructor that accepts python parameters (excludes blocks defined in JSON or purely by dictionary).
+        block_dict (dict): Dictionary of instance attributes to set on the instantiated block.
+    Returns:
+        iob_instance: The instantiated block object
+    """
+    block_dir, file_ext = find_module_setup_dir(block_name)
+
+    if file_ext == ".py":
+        debug_print(f"Importing {block_name}.py", 1)
+        block_module = import_python_module(
+            os.path.join(block_dir, f"{block_name}.py"),
+        )
+
+        # Instantiate block (call constructor from class defined inside the .py file)
+        block_class = getattr(block_module, block_name)
+        api_block_obj = block_class(**python_parameters)
+
+    elif file_ext == ".json":
+        debug_print(f"Loading {block_name}.json", 1)
+        api_block_obj = core_from_dict(
+            json.load(open(os.path.join(block_dir, f"{block_name}.json")))
+        )
+
+    # Create instance of block
+    api_instance_obj = iob_instance(**block_dict, core=api_block_obj)
+
+    # block_obj = convert2internal(api_block_obj)
+    # # Auto-set block attributes
+    # if not block_obj.original_name:
+    #     block_obj.original_name = block_name
+    # if not block_obj.setup_dir:
+    #     block_obj.setup_dir = block_dir
+
+    return api_instance_obj
+
+
+#
+# API methods
+#
+
+
+def instance_from_dict(instance_dict):
+    # If 'instance' key is given, find corresponding instance and instantiate it. Ignore other non-instance attributes.
+    # if instance_dict.get("instance", None):
+    #     return instantiate_block(
+    #         instance_dict["instance"],
+    #         instance_dict.get("python_parameters", {}),
+    #         instance_dict,
+    #     )
+    # If 'core' key is given, find corresponding core and instantiate it. Ignore other non-instance attributes.
+
+    # instantiate_block(core_dict["core"], core_dict.get("python_parameters", {}), core_dict)
+
+    # instance_dict_with_objects["portmap_connections"] = portmap_from_dict(instance_dictionary.get("portmap_connections", {}))
+
+    return iob_instance(**instance_dict)
+
+
+def instance_from_text(instance_text):
+    instance_dict = {}
+    # TODO: parse short notation text
+    return iob_instance(**instance_dict)

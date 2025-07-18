@@ -27,54 +27,54 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
             },
         ],
-        "wires": [
-            # Register wires
+        "buses": [
+            # Register buses
             {
                 "name": "reset",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "reset_wr", "width": 1},
                 ],
             },
             {
                 "name": "enable",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "enable_wr", "width": 1},
                 ],
             },
             {
                 "name": "sample",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "sample_wr", "width": 1},
                 ],
             },
             {
                 "name": "data_low",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "data_low_rd", "width": 32},
                 ],
             },
             {
                 "name": "data_high",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "data_high_rd", "width": 32},
                 ],
             },
-            # Internal wires
+            # Internal buses
             {
                 "name": "time_now",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "time_now", "width": 64},
                 ],
             },
@@ -82,7 +82,7 @@ def setup(py_params_dict):
             {
                 "name": "iob_timer_core_reg_interface",
                 "descr": "",
-                "signals": [
+                "wires": [
                     {"name": "enable_wr"},
                     {"name": "reset_wr"},
                     {"name": "sample_wr"},

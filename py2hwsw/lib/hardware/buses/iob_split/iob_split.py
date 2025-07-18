@@ -31,15 +31,15 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and async reset",
             },
             {
                 "name": "reset_i",
-                "descr": "Reset signal",
-                "signals": [
+                "descr": "Reset wire",
+                "wires": [
                     {
                         "name": "rst_i",
                         "width": "1",
@@ -48,7 +48,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "input_s",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "file_prefix": py_params_dict["name"] + "_input_",
                     "prefix": "input_",
@@ -63,7 +63,7 @@ def setup(py_params_dict):
         attributes_dict["ports"].append(
             {
                 "name": f"output_{port_idx}_m",
-                "signals": {
+                "wires": {
                     "type": "iob",
                     "file_prefix": f"{py_params_dict['name']}_output{port_idx}_",
                     "prefix": f"output{port_idx}_",
@@ -73,12 +73,12 @@ def setup(py_params_dict):
                 "descr": "Split output interface",
             },
         )
-    attributes_dict["wires"] = [
-        # Output selection signals
+    attributes_dict["buses"] = [
+        # Output selection wires
         {
             "name": "sel_reg_en_rst",
-            "descr": "Enable and reset signal for sel_reg",
-            "signals": [
+            "descr": "Enable and reset wire for sel_reg",
+            "wires": [
                 {"name": "input_iob_valid_i"},
                 {"name": "rst_i"},
             ],
@@ -86,128 +86,128 @@ def setup(py_params_dict):
         {
             "name": "sel_reg_data_i",
             "descr": "Input of sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "sel", "width": NBITS},
             ],
         },
         {
             "name": "sel_reg_data_o",
             "descr": "Output of sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "sel_reg", "width": NBITS},
             ],
         },
         {
             "name": "output_sel",
             "descr": "Select output interface",
-            "signals": [
+            "wires": [
                 {"name": "sel"},
             ],
         },
         {
             "name": "output_sel_reg",
             "descr": "Registered select output interface",
-            "signals": [
+            "wires": [
                 {"name": "sel_reg"},
             ],
         },
-        # Demux signals
+        # Demux wires
         {
             "name": "demux_valid_data_i",
             "descr": "Input of valid demux",
-            "signals": [
+            "wires": [
                 {"name": "input_iob_valid_i"},
             ],
         },
         {
             "name": "demux_valid_data_o",
             "descr": "Output of valid demux",
-            "signals": [
+            "wires": [
                 {"name": "demux_valid_output", "width": NUM_OUTPUTS},
             ],
         },
         {
             "name": "demux_addr_data_i",
             "descr": "Input of address demux",
-            "signals": [
+            "wires": [
                 {"name": "input_iob_addr_i"},
             ],
         },
         {
             "name": "demux_addr_data_o",
             "descr": "Output of address demux",
-            "signals": [
+            "wires": [
                 {"name": "demux_addr_output", "width": NUM_OUTPUTS * ADDR_W},
             ],
         },
         {
             "name": "demux_wdata_data_i",
             "descr": "Input of wdata demux",
-            "signals": [
+            "wires": [
                 {"name": "input_iob_wdata_i"},
             ],
         },
         {
             "name": "demux_wdata_data_o",
             "descr": "Output of wdata demux",
-            "signals": [
+            "wires": [
                 {"name": "demux_wdata_output", "width": NUM_OUTPUTS * DATA_W},
             ],
         },
         {
             "name": "demux_wstrb_data_i",
             "descr": "Input of wstrb demux",
-            "signals": [
+            "wires": [
                 {"name": "input_iob_wstrb_i"},
             ],
         },
         {
             "name": "demux_wstrb_data_o",
             "descr": "Output of wstrb demux",
-            "signals": [
+            "wires": [
                 {"name": "demux_wstrb_output", "width": NUM_OUTPUTS * int(DATA_W / 8)},
             ],
         },
-        # Mux signals
+        # Mux wires
         {
             "name": "mux_rdata_data_i",
             "descr": "Input of rdata mux",
-            "signals": [
+            "wires": [
                 {"name": "mux_rdata_input", "width": NUM_OUTPUTS * DATA_W},
             ],
         },
         {
             "name": "mux_rdata_data_o",
             "descr": "Output of rdata mux",
-            "signals": [
+            "wires": [
                 {"name": "input_iob_rdata_o"},
             ],
         },
         {
             "name": "mux_rvalid_data_i",
             "descr": "Input of rvalid mux",
-            "signals": [
+            "wires": [
                 {"name": "mux_rvalid_input", "width": NUM_OUTPUTS},
             ],
         },
         {
             "name": "mux_rvalid_data_o",
             "descr": "Output of rvalid mux",
-            "signals": [
+            "wires": [
                 {"name": "input_iob_rvalid_o"},
             ],
         },
         {
             "name": "mux_ready_data_i",
             "descr": "Input of ready mux",
-            "signals": [
+            "wires": [
                 {"name": "mux_ready_input", "width": NUM_OUTPUTS},
             ],
         },
         {
             "name": "mux_ready_data_o",
             "descr": "Output of ready mux",
-            "signals": [
+            "wires": [
                 {"name": "input_iob_ready_o"},
             ],
         },
@@ -348,10 +348,10 @@ def setup(py_params_dict):
 """
     verilog_code += "\n"
     # Connect muxer inputs
-    for signal in ["rdata", "rvalid", "ready"]:
-        verilog_code += f"    assign mux_{signal}_input = {{"
+    for wire in ["rdata", "rvalid", "ready"]:
+        verilog_code += f"    assign mux_{wire}_input = {{"
         for port_idx in range(NUM_OUTPUTS - 1, -1, -1):
-            verilog_code += f"output{port_idx}_iob_{signal}_i, "
+            verilog_code += f"output{port_idx}_iob_{wire}_i, "
         verilog_code = verilog_code[:-2] + "};\n"
     # Create snippet with muxer and demuxer connections
     attributes_dict["snippets"] += [

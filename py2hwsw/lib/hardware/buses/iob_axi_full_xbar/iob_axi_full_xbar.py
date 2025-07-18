@@ -59,10 +59,10 @@ def setup(py_params_dict):
     AXI_VERILOG_PARAMS_MAP = {i: i for i in axi_verilog_params}
 
     # Address width for merge output
-    # This width is equal to width of internal wires plus the merge input selection bits (that will be later ignored)
+    # This width is equal to width of internal buses plus the merge input selection bits (that will be later ignored)
     MERGE_OUTPUT_WIDTH = axi_python_params["addr_w"] - M_SELECT_NBITS + S_SELECT_NBITS
 
-    axi_signals = [
+    axi_wires = [
         # AXI-Lite Write
         ("axi_awaddr", "input", axi_python_params["addr_w"], "write"),
         # ("axi_awprot", "input", axi_python_params["prot_w"], "write"),
@@ -136,7 +136,7 @@ def setup(py_params_dict):
     attributes_dict["ports"] = [
         {
             "name": "clk_en_rst_s",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
             "descr": "Clock, clock enable and async reset",
@@ -144,7 +144,7 @@ def setup(py_params_dict):
         {
             "name": "rst_i",
             "descr": "Synchronous reset",
-            "signals": [
+            "wires": [
                 {
                     "name": "rst_i",
                     "width": 1,
@@ -157,7 +157,7 @@ def setup(py_params_dict):
             {
                 "name": f"m{i}_axi_m",
                 "descr": f"Manager {i} interface",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"m{i}_",
                     **AXI_VERILOG_PARAMS_MAP,
@@ -170,7 +170,7 @@ def setup(py_params_dict):
             {
                 "name": f"s{i}_axi_s",
                 "descr": f"Subordinate {i} interface",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"s{i}_",
                     **AXI_VERILOG_PARAMS_MAP,
@@ -179,16 +179,16 @@ def setup(py_params_dict):
             }
         )
     #
-    # Wires
+    # Buses
     #
-    attributes_dict["wires"] = []
+    attributes_dict["buses"] = []
     for i in range(N_SUBORDINATES):
         for j in range(N_MANAGERS):
-            attributes_dict["wires"].append(
+            attributes_dict["buses"].append(
                 {
                     "name": f"connect_s{i}_m{j}",
                     "descr": f"Connect split of subordinate {i} to merge of manager {j}",
-                    "signals": {
+                    "wires": {
                         "type": "axi",
                         "prefix": f"s{i}_m{j}_",
                         **AXI_VERILOG_PARAMS_MAP,
@@ -197,13 +197,13 @@ def setup(py_params_dict):
                     | {"ADDR_W": axi_python_params["addr_w"] - M_SELECT_NBITS},
                 }
             )
-    # Wires for output for merges
+    # Buses for output for merges
     for i in range(N_MANAGERS):
-        attributes_dict["wires"].append(
+        attributes_dict["buses"].append(
             {
                 "name": f"merge_{i}_output",
                 "descr": f"Output of merge {i}",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "prefix": f"merge_{i}_",
                     **AXI_VERILOG_PARAMS_MAP,
@@ -269,19 +269,19 @@ def setup(py_params_dict):
     snippet_code = ""
     # Connect merge outputs to manager interfaces
     for i in range(N_MANAGERS):
-        # Connect all signals except for address ones
-        for signal, direction, _, _ in axi_signals:
-            if signal in ["axi_awaddr", "axi_araddr"]:
+        # Connect all wires except for address ones
+        for wire, direction, _, _ in axi_wires:
+            if wire in ["axi_awaddr", "axi_araddr"]:
                 continue
             if direction == "input":
                 snippet_code += f"""\
-   assign m{i}_{signal}_o = merge_{i}_{signal};
+   assign m{i}_{wire}_o = merge_{i}_{wire};
 """
             else:  # Direction is output
                 snippet_code += f"""\
-   assign merge_{i}_{signal} = m{i}_{signal}_i;
+   assign merge_{i}_{wire} = m{i}_{wire}_i;
 """
-        # Connect address signals, ignoring most significant bits
+        # Connect address wires, ignoring most significant bits
         snippet_code += f"""\
    assign m{i}_axi_awaddr_o = {{ {{{M_SELECT_NBITS}{{1'b0}}}}, merge_{i}_axi_awaddr[{axi_python_params["addr_w"] - M_SELECT_NBITS}-1:0]}};
    assign m{i}_axi_araddr_o = {{ {{{M_SELECT_NBITS}{{1'b0}}}}, merge_{i}_axi_araddr[{axi_python_params["addr_w"] - M_SELECT_NBITS}-1:0]}};

@@ -13,13 +13,13 @@ module iob_ram_at2p_tb;
    reg                w_clk;
    reg                r_clk;
 
-   // Write signals
+   // Write wires
    reg                w_en;
    reg  [`DATA_W-1:0] w_data;
    reg  [`ADDR_W-1:0] w_addr;
 
 
-   // Read signals
+   // Read wires
    reg                r_en;
    reg  [`ADDR_W-1:0] r_addr;
    wire [`DATA_W-1:0] r_data;

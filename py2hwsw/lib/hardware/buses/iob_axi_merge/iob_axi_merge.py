@@ -43,7 +43,7 @@ def setup(py_params_dict):
 
     # Disble 'black' python formatter for this block
     # fmt: off
-    axi_signals = [
+    axi_wires = [
         # --------------------------------------------------------------------------
         # Name         |Direction|Width                        |Ch Type |Registered|
         #
@@ -140,15 +140,15 @@ def setup(py_params_dict):
     attributes_dict["ports"] = [
         {
             "name": "clk_en_rst_s",
-            "signals": {
+            "wires": {
                 "type": "iob_clk",
             },
             "descr": "Clock, clock enable and async reset",
         },
         {
             "name": "reset_i",
-            "descr": "Reset signal",
-            "signals": [
+            "descr": "Reset wire",
+            "wires": [
                 {
                     "name": "rst_i",
                     "width": "1",
@@ -157,7 +157,7 @@ def setup(py_params_dict):
         },
         {
             "name": "m_m",
-            "signals": {
+            "wires": {
                 "type": "axi",
                 "file_prefix": py_params_dict["name"] + "_m_",
                 "prefix": "m_",
@@ -180,7 +180,7 @@ def setup(py_params_dict):
         attributes_dict["ports"].append(
             {
                 "name": f"s_{port_idx}_s",
-                "signals": {
+                "wires": {
                     "type": "axi",
                     "file_prefix": f"{py_params_dict['name']}_s{port_idx}_",
                     "prefix": f"s{port_idx}_",
@@ -200,14 +200,14 @@ def setup(py_params_dict):
             },
         )
     #
-    # Wires
+    # Buses
     #
-    attributes_dict["wires"] = [
+    attributes_dict["buses"] = [
         # Busy read reg
         {
             "name": "busy_read_reg_en_rst",
-            "descr": "Enable and reset signal for busy_read_reg",
-            "signals": [
+            "descr": "Enable and reset wire for busy_read_reg",
+            "wires": [
                 {"name": "busy_read_reg_en", "width": 1},
                 {"name": "busy_read_reg_rst", "width": 1},
             ],
@@ -215,22 +215,22 @@ def setup(py_params_dict):
         {
             "name": "busy_read_reg_data_i",
             "descr": "Input of busy_read_reg",
-            "signals": [
+            "wires": [
                 {"name": "busy_read_reg_i", "width": 1},
             ],
         },
         {
             "name": "busy_read_reg_data_o",
             "descr": "Output of busy_read_reg",
-            "signals": [
+            "wires": [
                 {"name": "busy_read_reg_o", "width": 1},
             ],
         },
         # Active read transfer reg
         {
             "name": "active_transaction_read_reg_en_rst",
-            "descr": "Enable and reset signal for active_transaction_read_reg",
-            "signals": [
+            "descr": "Enable and reset wire for active_transaction_read_reg",
+            "wires": [
                 {"name": "active_transaction_read_reg_en", "width": 1},
                 {"name": "active_transaction_read_reg_rst", "width": 1},
             ],
@@ -238,58 +238,58 @@ def setup(py_params_dict):
         {
             "name": "active_transaction_read_reg_data_i",
             "descr": "Input of active_transaction_read_reg",
-            "signals": [
+            "wires": [
                 {"name": "active_transaction_read_reg_i", "width": 1},
             ],
         },
         {
             "name": "active_transaction_read_reg_data_o",
             "descr": "Output of active_transaction_read_reg",
-            "signals": [
+            "wires": [
                 {"name": "active_transaction_read_reg_o", "width": 1},
             ],
         },
-        # Read selection register signals
+        # Read selection register wires
         {
             "name": "read_sel_reg_rst",
-            "descr": "Enable and reset signal for read_sel_reg",
-            "signals": [
+            "descr": "Enable and reset wire for read_sel_reg",
+            "wires": [
                 {"name": "rst_i"},
             ],
         },
         {
             "name": "read_sel_reg_data_i",
             "descr": "Input of read_sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "read_sel", "width": NBITS},
             ],
         },
         {
             "name": "read_sel_reg_data_o",
             "descr": "Output of read_sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "read_sel_reg", "width": NBITS},
             ],
         },
         {
             "name": "s_read_sel",
             "descr": "Select subordinate interface",
-            "signals": [
+            "wires": [
                 {"name": "read_sel"},
             ],
         },
         {
             "name": "s_read_sel_reg",
             "descr": "Registered select subordinate interface",
-            "signals": [
+            "wires": [
                 {"name": "read_sel_reg"},
             ],
         },
         # Busy write reg
         {
             "name": "busy_write_reg_en_rst",
-            "descr": "Enable and reset signal for busy_write_reg",
-            "signals": [
+            "descr": "Enable and reset wire for busy_write_reg",
+            "wires": [
                 {"name": "busy_write_reg_en", "width": 1},
                 {"name": "busy_write_reg_rst", "width": 1},
             ],
@@ -297,22 +297,22 @@ def setup(py_params_dict):
         {
             "name": "busy_write_reg_data_i",
             "descr": "Input of busy_write_reg",
-            "signals": [
+            "wires": [
                 {"name": "busy_write_reg_i", "width": 1},
             ],
         },
         {
             "name": "busy_write_reg_data_o",
             "descr": "Output of busy_write_reg",
-            "signals": [
+            "wires": [
                 {"name": "busy_write_reg_o", "width": 1},
             ],
         },
-        # Allow write address signals
+        # Allow write address wires
         {
             "name": "allow_write_address",
-            "descr": "Signals to allow address valid/ready",
-            "signals": [
+            "descr": "Wires to allow address valid/ready",
+            "wires": [
                 {"name": "wants_change_write_sel", "width": 1},
                 {"name": "allow_write_address", "width": 1},
             ],
@@ -320,8 +320,8 @@ def setup(py_params_dict):
         # Active write transaction acc
         {
             "name": "active_write_transaction_acc_en_rst",
-            "descr": "Enable and reset signal for active_write_transaction_acc",
-            "signals": [
+            "descr": "Enable and reset wire for active_write_transaction_acc",
+            "wires": [
                 {"name": "active_write_transaction_acc_en", "width": 1},
                 {"name": "rst_i"},
             ],
@@ -329,7 +329,7 @@ def setup(py_params_dict):
         {
             "name": "active_write_transaction_acc_input",
             "descr": "Input of active_write_transaction_acc",
-            "signals": [
+            "wires": [
                 {
                     "name": "active_write_transaction_acc_input",
                     "width": TRANSFER_COUNTER_DATA_W,
@@ -339,7 +339,7 @@ def setup(py_params_dict):
         {
             "name": "active_write_transaction_count",
             "descr": "Output of active_write_transaction_acc",
-            "signals": [
+            "wires": [
                 {
                     "name": "active_write_transaction_count",
                     "width": TRANSFER_COUNTER_DATA_W,
@@ -349,14 +349,14 @@ def setup(py_params_dict):
         {
             "name": "active_write_transaction",
             "descr": "Check for any active write transactions",
-            "signals": [
+            "wires": [
                 {"name": "active_write_transaction", "width": 1},
             ],
         },
         {
             "name": "active_write_transaction_start_end",
-            "descr": "Start and end signals of active write transaction",
-            "signals": [
+            "descr": "Start and end wires of active write transaction",
+            "wires": [
                 {"name": "start_active_write_transaction", "width": 1},
                 {"name": "end_active_write_transaction", "width": 1},
             ],
@@ -364,23 +364,23 @@ def setup(py_params_dict):
         {
             "name": "full_active_write_transaction",
             "descr": "Check if active write accumulator is full",
-            "signals": [
+            "wires": [
                 {"name": "full_active_write_transaction", "width": 1},
             ],
         },
         # Allow write data
         {
             "name": "allow_write_data",
-            "descr": "Signal to allow data valid/ready",
-            "signals": [
+            "descr": "Wire to allow data valid/ready",
+            "wires": [
                 {"name": "allow_write_data", "width": 1},
             ],
         },
         # Pending write response acc
         {
             "name": "pending_write_response_acc_en_rst",
-            "descr": "Enable and reset signal for pending_write_response_acc",
-            "signals": [
+            "descr": "Enable and reset wire for pending_write_response_acc",
+            "wires": [
                 {"name": "pending_write_response_acc_en", "width": 1},
                 {"name": "rst_i"},
             ],
@@ -388,7 +388,7 @@ def setup(py_params_dict):
         {
             "name": "pending_write_response_acc_input",
             "descr": "Input of pending_write_response_acc",
-            "signals": [
+            "wires": [
                 {
                     "name": "pending_write_response_acc_input",
                     "width": TRANSFER_COUNTER_DATA_W,
@@ -398,7 +398,7 @@ def setup(py_params_dict):
         {
             "name": "pending_write_response_count",
             "descr": "Output of pending_write_response_acc",
-            "signals": [
+            "wires": [
                 {
                     "name": "pending_write_response_count",
                     "width": TRANSFER_COUNTER_DATA_W,
@@ -408,14 +408,14 @@ def setup(py_params_dict):
         {
             "name": "pending_write_response",
             "descr": "Check for any active write transactions",
-            "signals": [
+            "wires": [
                 {"name": "pending_write_response", "width": 1},
             ],
         },
         {
             "name": "pending_write_response_start_end",
-            "descr": "Start and end signals of active write transaction",
-            "signals": [
+            "descr": "Start and end wires of active write transaction",
+            "wires": [
                 {"name": "start_pending_write_response", "width": 1},
                 {"name": "end_pending_write_response", "width": 1},
             ],
@@ -423,76 +423,76 @@ def setup(py_params_dict):
         {
             "name": "full_pending_write_response",
             "descr": "Check if pending write accumulator is full",
-            "signals": [
+            "wires": [
                 {"name": "full_pending_write_response", "width": 1},
             ],
         },
-        # Write selection register signals
+        # Write selection register wires
         {
             "name": "write_sel_reg_rst",
-            "descr": "Enable and reset signal for write_sel_reg",
-            "signals": [
+            "descr": "Enable and reset wire for write_sel_reg",
+            "wires": [
                 {"name": "rst_i"},
             ],
         },
         {
             "name": "write_sel_reg_data_i",
             "descr": "Input of write_sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "write_sel", "width": NBITS},
             ],
         },
         {
             "name": "write_sel_reg_data_o",
             "descr": "Output of write_sel_reg",
-            "signals": [
+            "wires": [
                 {"name": "write_sel_reg", "width": NBITS},
             ],
         },
         {
             "name": "s_write_sel",
             "descr": "Select subordinate interface",
-            "signals": [
+            "wires": [
                 {"name": "write_sel"},
             ],
         },
         {
             "name": "s_write_sel_reg",
             "descr": "Registered select subordinate interface",
-            "signals": [
+            "wires": [
                 {"name": "write_sel_reg"},
             ],
         },
-        # Read priority encoder signals
+        # Read priority encoder wires
         {
             "name": "read_sel_prio_enc_i",
             "descr": "Input of read priority encoder",
-            "signals": [
+            "wires": [
                 {"name": "mux_axi_arvalid", "width": f"{NUM_SUBORDINATES} * 1"},
             ],
         },
         {
             "name": "read_sel_prio_enc_o",
             "descr": "Output of read priority encoder",
-            "signals": [
+            "wires": [
                 {
                     "name": "read_sel_prio_enc_o",
                     "width": f"$clog2({NUM_SUBORDINATES}+1)",
                 },
             ],
         },
-        # Write priority encoder signals
+        # Write priority encoder wires
         {
             "name": "write_sel_prio_enc_i",
             "descr": "Input of write priority encoder",
-            "signals": [
+            "wires": [
                 {"name": "mux_axi_awvalid", "width": f"{NUM_SUBORDINATES} * 1"},
             ],
         },
         {
             "name": "write_sel_prio_enc_o",
             "descr": "Output of write priority encoder",
-            "signals": [
+            "wires": [
                 {
                     "name": "write_sel_prio_enc_o",
                     "width": f"$clog2({NUM_SUBORDINATES}+1)",
@@ -500,29 +500,29 @@ def setup(py_params_dict):
             ],
         },
     ]
-    # Generate wires for muxers and demuxers
-    for signal, direction, width, _, _ in axi_signals:
+    # Generate buses for muxers and demuxers
+    for wire, direction, width, _, _ in axi_wires:
         if direction == "output":
             prefix = "m_"
-            if signal in ["axi_arready", "axi_awready", "axi_wready"]:
+            if wire in ["axi_arready", "axi_awready", "axi_wready"]:
                 prefix = "demux_"
-            # Demux signals
-            attributes_dict["wires"] += [
+            # Demux wires
+            attributes_dict["buses"] += [
                 {
-                    "name": "demux_" + signal + "_i",
-                    "descr": f"Input of {signal} demux",
-                    "signals": [
+                    "name": "demux_" + wire + "_i",
+                    "descr": f"Input of {wire} demux",
+                    "wires": [
                         {
-                            "name": prefix + signal + "_i",
+                            "name": prefix + wire + "_i",
                         },
                     ],
                 },
                 {
-                    "name": "demux_" + signal + "_o",
-                    "descr": f"Output of {signal} demux",
-                    "signals": [
+                    "name": "demux_" + wire + "_o",
+                    "descr": f"Output of {wire} demux",
+                    "wires": [
                         {
-                            "name": "demux_" + signal,
+                            "name": "demux_" + wire,
                             "width": f"{NUM_SUBORDINATES} * {width}",
                         },
                     ],
@@ -530,26 +530,26 @@ def setup(py_params_dict):
             ]
         else:  # input direction
             prefix = "m_"
-            if signal in ["axi_arvalid", "axi_awvalid", "axi_wvalid"]:
+            if wire in ["axi_arvalid", "axi_awvalid", "axi_wvalid"]:
                 prefix = "mux_"
-            # Mux signals
-            attributes_dict["wires"] += [
+            # Mux wires
+            attributes_dict["buses"] += [
                 {
-                    "name": "mux_" + signal + "_i",
-                    "descr": f"Input of {signal} demux",
-                    "signals": [
+                    "name": "mux_" + wire + "_i",
+                    "descr": f"Input of {wire} demux",
+                    "wires": [
                         {
-                            "name": "mux_" + signal,
+                            "name": "mux_" + wire,
                             "width": f"{NUM_SUBORDINATES} * {width}",
                         },
                     ],
                 },
                 {
-                    "name": "mux_" + signal + "_o",
-                    "descr": f"Output of {signal} demux",
-                    "signals": [
+                    "name": "mux_" + wire + "_o",
+                    "descr": f"Output of {wire} demux",
+                    "wires": [
                         {
-                            "name": prefix + signal + "_o",
+                            "name": prefix + wire + "_o",
                         },
                     ],
                 },
@@ -728,22 +728,22 @@ def setup(py_params_dict):
         },
     ]
     # Generate muxers and demuxers
-    for signal, direction, width, sig_type, registered in axi_signals:
-        sel_signal_suffix = "_reg" if registered else ""
+    for wire, direction, width, sig_type, registered in axi_wires:
+        sel_wire_suffix = "_reg" if registered else ""
         if direction == "output":
             # Demuxers
             attributes_dict["subblocks"].append(
                 {
                     "core_name": "iob_demux",
-                    "instance_name": "iob_demux_" + signal,
+                    "instance_name": "iob_demux_" + wire,
                     "parameters": {
                         "DATA_W": width,
                         "N": NUM_SUBORDINATES,
                     },
                     "connect": {
-                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
-                        "data_i": "demux_" + signal + "_i",
-                        "data_o": "demux_" + signal + "_o",
+                        "sel_i": f"s_{sig_type}_sel{sel_wire_suffix}",
+                        "data_i": "demux_" + wire + "_i",
+                        "data_o": "demux_" + wire + "_o",
                     },
                 },
             )
@@ -752,15 +752,15 @@ def setup(py_params_dict):
             attributes_dict["subblocks"].append(
                 {
                     "core_name": "iob_mux",
-                    "instance_name": "iob_mux_" + signal,
+                    "instance_name": "iob_mux_" + wire,
                     "parameters": {
                         "DATA_W": width,
                         "N": NUM_SUBORDINATES,
                     },
                     "connect": {
-                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
-                        "data_i": "mux_" + signal + "_i",
-                        "data_o": "mux_" + signal + "_o",
+                        "sel_i": f"s_{sig_type}_sel{sel_wire_suffix}",
+                        "data_i": "mux_" + wire + "_i",
+                        "data_o": "mux_" + wire + "_o",
                     },
                 },
             )
@@ -781,7 +781,7 @@ def setup(py_params_dict):
    assign busy_read_reg_rst = (m_axi_rlast_i & m_axi_rvalid_i & m_axi_rready_o) | rst_i;
    assign busy_read_reg_i = 1'b1;
 
-   // Block address valid/ready signals of current manager if there is still an active transaction
+   // Block address valid/ready wires of current manager if there is still an active transaction
    assign m_axi_arvalid_o = ~active_transaction_read_reg_o & mux_axi_arvalid_o;
    assign demux_axi_arready_i = ~active_transaction_read_reg_o & m_axi_arready_i;
 
@@ -803,7 +803,7 @@ def setup(py_params_dict):
    assign busy_write_reg_rst = end_pending_write_response;
    assign busy_write_reg_i = 1'b1;
 
-   // Block address valid/ready signals of current manager if accumulator full or if another manager wants to write
+   // Block address valid/ready wires of current manager if accumulator full or if another manager wants to write
    assign wants_change_write_sel = write_sel != write_sel_prio_enc_o;
    assign allow_write_address = ~(full_active_write_transaction | (active_write_transaction & wants_change_write_sel));
    assign m_axi_awvalid_o = allow_write_address & mux_axi_awvalid_o;
@@ -818,7 +818,7 @@ def setup(py_params_dict):
    assign active_write_transaction_acc_en = start_active_write_transaction ^ end_active_write_transaction;
    assign active_write_transaction_acc_input = start_active_write_transaction ? {TRANSFER_COUNTER_DATA_W}'d1 : -{TRANSFER_COUNTER_DATA_W}'d1;
 
-   // Block data valid/ready signals of current manager if accumulator full or if another manager wants to write
+   // Block data valid/ready wires of current manager if accumulator full or if another manager wants to write
    assign allow_write_data = ~(full_pending_write_response | (pending_write_response & wants_change_write_sel));
    assign m_axi_wvalid_o = allow_write_data & mux_axi_wvalid_o;
    assign demux_axi_wready_i = allow_write_data & m_axi_wready_i;
@@ -837,24 +837,24 @@ def setup(py_params_dict):
 
     verilog_code = ""
     # Connect muxer/demuxer inputs/outputs
-    for signal, direction, width, _, _ in axi_signals:
+    for wire, direction, width, _, _ in axi_wires:
         if direction == "output":
             # Connect demuxers outputs
             for port_idx in range(NUM_SUBORDINATES):
                 verilog_code += f"""
-   assign s{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
+   assign s{port_idx}_{wire}_o = demux_{wire}[{port_idx}*{width}+:{width}];
 """
-        elif signal in ["axi_araddr", "axi_awaddr"]:
+        elif wire in ["axi_araddr", "axi_awaddr"]:
             # Connect address muxer inputs
-            verilog_code += f"   assign mux_{signal} = {{"
+            verilog_code += f"   assign mux_{wire} = {{"
             for port_idx in range(NUM_SUBORDINATES - 1, -1, -1):
-                verilog_code += f"{{{NBITS}'d{port_idx}}}, s{port_idx}_{signal}_i, "
+                verilog_code += f"{{{NBITS}'d{port_idx}}}, s{port_idx}_{wire}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
         else:  # Input direction
             # Connect muxer inputs
-            verilog_code += f"   assign mux_{signal} = {{"
+            verilog_code += f"   assign mux_{wire} = {{"
             for port_idx in range(NUM_SUBORDINATES - 1, -1, -1):
-                verilog_code += f"s{port_idx}_{signal}_i, "
+                verilog_code += f"s{port_idx}_{wire}_i, "
             verilog_code = verilog_code[:-2] + "};\n"
     # Create snippet with muxer and demuxer connections
     attributes_dict["snippets"] += [

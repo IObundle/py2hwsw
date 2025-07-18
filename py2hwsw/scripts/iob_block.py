@@ -6,7 +6,7 @@ from iob_base import (
     str_to_kwargs,
     fail_with_msg,
     add_traceback_msg,
-    debug,
+    debug_print,
 )
 
 
@@ -68,7 +68,7 @@ def create_block(
             and kwargs["dest_dir"] != "hardware/src"
         )
     ):
-        debug(f"Not setting up submodule '{core_name}' of '{core.name}' core!", 1)
+        debug_print(f"Not setting up submodule '{core_name}' of '{core.name}' core!", 1)
         return
 
     assert core_name, fail_with_msg("Missing core_name argument", ValueError)

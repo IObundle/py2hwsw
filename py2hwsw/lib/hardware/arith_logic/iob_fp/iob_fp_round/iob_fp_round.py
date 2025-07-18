@@ -28,7 +28,7 @@ def setup(py_params_dict):
             {
                 "name": "exponent_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "exponent_i",
                         "width": "EXP_W",
@@ -38,7 +38,7 @@ def setup(py_params_dict):
             {
                 "name": "mantissa_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "mantissa_i",
                         "width": "DATA_W+3",
@@ -48,7 +48,7 @@ def setup(py_params_dict):
             {
                 "name": "exponent_rnd_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "exponent_rnd_o",
                         "width": "EXP_W",
@@ -58,7 +58,7 @@ def setup(py_params_dict):
             {
                 "name": "mantissa_rnd_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "mantissa_rnd_o",
                         "width": "DATA_W",
@@ -66,25 +66,25 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "round",
-                "descr": "round wire",
-                "signals": [
+                "descr": "round bus",
+                "wires": [
                     {"name": "round", "width": 1},
                 ],
             },
             {
                 "name": "mantissa_rnd_int",
-                "descr": "mantissa_rnd wire",
-                "signals": [
+                "descr": "mantissa_rnd bus",
+                "wires": [
                     {"name": "mantissa_rnd_int", "width": "DATA_W"},
                 ],
             },
             {
                 "name": "lzc",
-                "descr": "lzc wire",
-                "signals": [
+                "descr": "lzc bus",
+                "wires": [
                     {"name": "lzc", "width": "$clog2(DATA_W)"},
                 ],
             },

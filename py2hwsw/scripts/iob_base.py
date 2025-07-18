@@ -251,7 +251,7 @@ def add_traceback_msg(msg):
 debug_level = 0
 
 
-def debug(msg, level=0):
+def debug_print(msg, level=0):
     """Print a message if project debug_level >= level
     :param str msg: message to print
     :param int level: debug level
@@ -547,12 +547,14 @@ def import_python_module(module_path, module_name=None):
 
     # Don't import the same module twice
     if module_name in sys.modules:
-        return
+        return sys.modules[module_name]
 
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
+
+    return sys.modules[module_name]
 
 
 def nix_permission_hack(path):
@@ -656,30 +658,30 @@ def validate_verilog_const(value: str, direction: str):
     if direction == "input":
         assert (
             "'" in value
-        ), f"{iob_colors.FAIL}Invalid format for wire '{value}'! Expected <width>'<base><value>', got {value}.{iob_colors.ENDC}"
+        ), f"{iob_colors.FAIL}Invalid format for bus '{value}'! Expected <width>'<base><value>', got {value}.{iob_colors.ENDC}"
 
         _bases = {"b": "01", "d": "0123456789", "h": "0123456789abcdef"}
         _, _v = value.split("'")
         if _v[0] not in _bases:
             fail_with_msg(
-                f"Invalid base for wire '{value}'! Expected b, d or h, got {_v[0]}."
+                f"Invalid base for bus '{value}'! Expected b, d or h, got {_v[0]}."
             )
         elif not all(c in _bases[_v[0]] for c in _v[1:]):
             fail_with_msg(
-                f"Invalid value for wire '{value}'! Expected [{_bases[_v[0]]}], got {_v[1:]}."
+                f"Invalid value for bus '{value}'! Expected [{_bases[_v[0]]}], got {_v[1:]}."
             )
     elif direction == "output":
         assert (
             "z" in value.lower()
-        ), f"{iob_colors.FAIL}If not connected, output wire '{value}' must be a high impedance value (z)!{iob_colors.ENDC}"
+        ), f"{iob_colors.FAIL}If not connected, output bus '{value}' must be a high impedance value (z)!{iob_colors.ENDC}"
 
     else:
         fail_with_msg(
-            f"Invalid direction '{direction}' for wire '{value}'! Expected input or output."
+            f"Invalid direction '{direction}' for bus '{value}'! Expected input or output."
         )
 
 
-def update_obj_from_dict(obj, attributes_dict, key_attribute_mapping={}, preprocessor_functions={}, valid_attributes_list=[]):
+def update_obj_from_dict(obj, attributes_dict, preprocessor_functions={}, valid_attributes_list=[], key_attribute_mapping={}):
     """
     Update a given object's attributes with values from a dictionary.
     Supports mapping keys to different attribute names.
@@ -701,7 +703,7 @@ def update_obj_from_dict(obj, attributes_dict, key_attribute_mapping={}, preproc
                 preprocessor_functions = {
                     "attribute_name": preprocessor_function_name,
                     "ports": port_from_dict,
-                    "wires": wire_from_dict,
+                    "buses": bus_from_dict,
                     "snippets": snippet_from_dict,
                 }
         valid_attributes_list (list): List of valid attributes for the given object. All valid if empty. Normally used to specify public (API) attributes, preventing access to private ones.

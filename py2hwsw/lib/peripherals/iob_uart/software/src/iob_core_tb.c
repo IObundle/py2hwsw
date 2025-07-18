@@ -92,7 +92,7 @@ int iob_core_tb() {
 
     // check if received word is the same as sent word
     if (rx_data != i) {
-      // signal error printing expected and received word
+      // wire error printing expected and received word
       printf("Error: expected %d, received %d\n", i, rx_data);
       failed += 1;
     }

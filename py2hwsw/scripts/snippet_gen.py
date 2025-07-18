@@ -12,8 +12,8 @@ def generate_snippets(core):
     returns: Generated verilog code
     """
     code = ""
-    for snippet in core.snippets:
-        snippet = convert2internal(snippet)
+    for api_snippet in core.snippets:
+        snippet = convert2internal(api_snippet)
         code += snippet.verilog_code
         code += "\n"
 

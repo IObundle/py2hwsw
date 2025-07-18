@@ -18,12 +18,12 @@ module iob_axis_s_axi_m_read_int #(
    wire [(AXI_LEN_W+1)-1:0] length;
    wire [            2-1:0] state;
 
-   // Input saved signals
+   // Input saved wires
    wire [   AXI_DATA_W-1:0] axi_rdata_reg;
    wire                     axi_rvalid_reg;
 
    // Assignment to outputs
-   // Inputs mux in case of saved signals due to ready signal down
+   // Inputs mux in case of saved wires due to ready wire down
    assign axis_out_data_o  = axi_rready_o ? axi_rdata_i : axi_rdata_reg;
    assign axis_out_valid_o = axi_rready_o ? axi_rvalid_i : axi_rvalid_reg;
 
@@ -35,15 +35,15 @@ module iob_axis_s_axi_m_read_int #(
    assign axi_arcache_o    = 4'd2;
    assign axi_arqos_o      = 4'd0;
 
-   // AXI Stream ready signal
+   // AXI Stream ready wire
    wire axi_rready_nxt;
    assign axi_rready_nxt = axis_out_ready_i;
 
-   // Busy signal
+   // Busy wire
    assign r_busy_o = state != WAIT_START;  // Converter is busy if not waiting for a new transfer
 
-   // AXI Stream ready signal2axi
-   // FSM signals
+   // AXI Stream ready wire2axi
+   // FSM wires
    reg [             2-1:0] state_nxt;
    reg [    AXI_ADDR_W-1:0] axi_araddr_nxt;
    reg [ (AXI_LEN_W+1)-1:0] length_nxt;
@@ -83,7 +83,7 @@ module iob_axis_s_axi_m_read_int #(
             end
          end
 
-         START_BURST: begin  // Send burst address and length and wait for ready signal
+         START_BURST: begin  // Send burst address and length and wait for ready wire
             if (axi_arready_i) begin
                state_nxt = TRANSF_DATA;
             end else begin

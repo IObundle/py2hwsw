@@ -53,7 +53,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_en_rst_s",
                 "descr": "Clock and reset",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
             },

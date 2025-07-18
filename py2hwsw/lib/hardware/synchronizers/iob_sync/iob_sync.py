@@ -27,7 +27,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                     "params": "a",
                 },
@@ -36,7 +36,7 @@ def setup(py_params_dict):
             {
                 "name": "signal_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "signal_i",
                         "width": "DATA_W",
@@ -46,7 +46,7 @@ def setup(py_params_dict):
             {
                 "name": "signal_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "signal_o",
                         "width": "DATA_W",
@@ -54,11 +54,11 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "synchronizer",
-                "descr": "synchronizer wire",
-                "signals": [
+                "descr": "synchronizer bus",
+                "wires": [
                     {"name": "synchronizer", "width": "DATA_W"},
                 ],
             },

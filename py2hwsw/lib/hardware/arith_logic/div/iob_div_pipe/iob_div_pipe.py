@@ -28,7 +28,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Clock",
-                "signals": [
+                "wires": [
                     {
                         "name": "clk_i",
                         "width": 1,
@@ -39,7 +39,7 @@ def setup(py_params_dict):
             {
                 "name": "div_io",
                 "descr": "Division interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "dividend_i",
                         "width": "DATA_W",
@@ -63,25 +63,25 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "dividend_int",
-                "descr": "dividend_int wire",
-                "signals": [
+                "descr": "dividend_int bus",
+                "wires": [
                     {"name": "dividend_int", "width": "(DATA_W+1)*DATA_W"},
                 ],
             },
             {
                 "name": "divisor_int",
-                "descr": "divisor_int wire",
-                "signals": [
+                "descr": "divisor_int bus",
+                "wires": [
                     {"name": "divisor_int", "width": "(DATA_W+1)*DATA_W"},
                 ],
             },
             {
                 "name": "quotient_int",
-                "descr": "quotient_int wire",
-                "signals": [
+                "descr": "quotient_int bus",
+                "wires": [
                     {"name": "quotient_int", "width": "(DATA_W+1)*DATA_W"},
                 ],
             },

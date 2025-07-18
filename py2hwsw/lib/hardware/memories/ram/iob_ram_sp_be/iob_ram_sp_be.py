@@ -60,14 +60,14 @@ def setup(py_params_dict):
             {
                 "name": "clk_i",
                 "descr": "Clock",
-                "signals": [
+                "wires": [
                     {"name": "clk_i", "width": 1},
                 ],
             },
             {
                 "name": "mem_if_io",
                 "descr": "Memory interface",
-                "signals": [
+                "wires": [
                     {"name": "en_i", "width": 1},
                     {"name": "we_i", "width": "DATA_W/8"},
                     {"name": "addr_i", "width": "ADDR_W"},

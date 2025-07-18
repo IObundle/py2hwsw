@@ -13,7 +13,7 @@
 [treeopen] axis2fifo_tb.
 [treeopen] axis2fifo_tb.uut.
 [sst_width] 258
-[signals_width] 286
+[wires_width] 286
 [sst_expanded] 1
 [sst_vpaned_height] 289
 @28

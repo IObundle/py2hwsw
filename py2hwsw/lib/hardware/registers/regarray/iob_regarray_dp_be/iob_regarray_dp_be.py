@@ -36,7 +36,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
@@ -44,7 +44,7 @@ def setup(py_params_dict):
             {
                 "name": "port_a_io",
                 "descr": "Port A",
-                "signals": [
+                "wires": [
                     {"name": "enA_i", "width": 1},
                     {"name": "wstrbA_i", "width": "WSTRB_W"},
                     {"name": "addrA_i", "width": "ADDR_W"},
@@ -55,7 +55,7 @@ def setup(py_params_dict):
             {
                 "name": "port_b_io",
                 "descr": "Port B",
-                "signals": [
+                "wires": [
                     {"name": "enB_i", "width": 1},
                     {"name": "wstrbB_i", "width": "WSTRB_W"},
                     {"name": "addrB_i", "width": "ADDR_W"},
@@ -64,11 +64,11 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "regarray_2p_write_i",
                 "descr": "Write port",
-                "signals": [
+                "wires": [
                     {"name": "regarray_2p_w_en_i", "width": 1},
                     {"name": "regarray_2p_w_strb_i", "width": "WSTRB_W"},
                     {"name": "regarray_2p_w_addr_i", "width": "ADDR_W"},
@@ -78,7 +78,7 @@ def setup(py_params_dict):
             {
                 "name": "regarray_2p_read_io",
                 "descr": "read port",
-                "signals": [
+                "wires": [
                     {"name": "regarray_2p_r_addr_i", "width": "ADDR_W"},
                     {"name": "regarray_2p_r_data_o", "width": "DATA_W"},
                 ],

@@ -11,8 +11,8 @@ from iob_base import (
 )
 import iob_colors
 from iob_port import iob_port
-from iob_signal import get_real_signal, iob_signal_reference
-from iob_wire import iob_wire
+from iob_wire import get_real_wire, iob_wire_reference
+from iob_bus import iob_bus
 
 from api_base import internal_api_class, convert2internal
 
@@ -28,41 +28,41 @@ class iob_portmap:
         if not self.e_connect:
             fail_with_msg(f"Port '{self.port}' is not connected!", ValueError)
 
-        # TODO: validate if port and external wires really exist.
+        # TODO: validate if port and external buses really exist.
         pass
 
-    # NOTE: THis connect_external already performs validation (including search for external wire (that may be non-existent).
+    # NOTE: THis connect_external already performs validation (including search for external bus (that may be non-existent).
     # We should probably only call this with `validate_attributes()`
-    def connect_external(self, wire, bit_slices={}):
-        """Connects the port to an external wire
-        Verifies that the wire is compatible with the port
-        :param iob_wire wire: external wire
-        :param list bit_slices: bit slices of signals in wire
+    def connect_external(self, bus, bit_slices={}):
+        """Connects the port to an external bus
+        Verifies that the bus is compatible with the port
+        :param iob_bus bus: external bus
+        :param list bit_slices: bit slices of wires in bus
         """
-        # wire must be iob_wire or str
-        if isinstance(wire, str):
-            if len(self.port.signals) != 1:
+        # bus must be iob_bus or str
+        if isinstance(bus, str):
+            if len(self.port.wires) != 1:
                 fail_with_msg(
-                    f"{iob_colors.FAIL}Port '{self.port.name}' has more than one signal but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
+                    f"{iob_colors.FAIL}Port '{self.port.name}' has more than one wire but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
                     ValueError,
                 )
             else:
                 validate_verilog_const(
-                    value=wire, direction=self.port.signals[0].direction
+                    value=bus, direction=self.port.wires[0].direction
                 )
-        elif isinstance(wire, iob_wire):
-            if self.port.interface and wire.interface:
-                if type(self.port.interface) == type(wire.interface):
-                    for signal in self.port.signals:
-                        # If it is a signal reference, get the real signal
-                        if isinstance(signal, iob_signal_reference):
-                            signal = get_real_signal(signal)
-                        search_name = signal.name.replace(
-                            self.port.interface.prefix, wire.interface.prefix, 1
+        elif isinstance(bus, iob_bus):
+            if self.port.interface and bus.interface:
+                if type(self.port.interface) == type(bus.interface):
+                    for wire in self.port.wires:
+                        # If it is a wire reference, get the real wire
+                        if isinstance(wire, iob_wire_reference):
+                            wire = get_real_wire(wire)
+                        search_name = wire.name.replace(
+                            self.port.interface.prefix, bus.interface.prefix, 1
                         )
-                        if self.port.name[-2] != wire.name[-2]:
+                        if self.port.name[-2] != bus.name[-2]:
                             # Swap the suffixes if the port is a master/slave port
-                            if wire.name[-2:] in ["_s", "_m"]:
+                            if bus.name[-2:] in ["_s", "_m"]:
                                 if search_name[-2:] == "_i":
                                     search_name += search_name[:-2] + "_o"
                                 else:
@@ -70,57 +70,57 @@ class iob_portmap:
                             else:
                                 search_name = search_name[:-2]
 
-                        e_signal = find_obj_in_list(
-                            wire.signals, search_name, get_real_signal
+                        e_wire = find_obj_in_list(
+                            bus.wires, search_name, get_real_wire
                         )
-                        if not e_signal:
+                        if not e_wire:
                             if not any(
                                 [
-                                    f"{get_real_signal(signal).name}:" in bit_slice
+                                    f"{get_real_wire(wire).name}:" in bit_slice
                                     for bit_slice in bit_slices
                                 ]
                             ):
                                 newlinechar = "\n"
                                 fail_with_msg(
-                                    f"Port '{self.port.name}' signal '{signal.name}' not connected to external wire '{wire.name}'!\n"
-                                    f"Port '{self.port.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n"
-                                    f"External connection '{wire.name}' has the following signals:\n"
-                                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}\n",
+                                    f"Port '{self.port.name}' wire '{wire.name}' not connected to external bus '{bus.name}'!\n"
+                                    f"Port '{self.port.name}' has the following wires:\n"
+                                    f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in self.port.wires)}\n"
+                                    f"External connection '{bus.name}' has the following wires:\n"
+                                    f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in bus.wires)}\n",
                                     ValueError,
                                 )
-                elif len(self.port.signals) != len(wire.signals):
+                elif len(self.port.wires) != len(bus.wires):
                     newlinechar = "\n"
                     fail_with_msg(
-                        f"Port '{self.port.name}' has different number of signals compared to external connection '{wire.name}'!\n"
-                        f"Port '{self.port.name}' has the following signals:\n"
-                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n\n"
-                        f"External connection '{wire.name}' has the following signals:\n"
-                        f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}\n",
+                        f"Port '{self.port.name}' has different number of wires compared to external connection '{bus.name}'!\n"
+                        f"Port '{self.port.name}' has the following wires:\n"
+                        f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in self.port.wires)}\n\n"
+                        f"External connection '{bus.name}' has the following wires:\n"
+                        f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in bus.wires)}\n",
                         ValueError,
                     )
-            elif len(self.port.signals) != len(wire.signals):
+            elif len(self.port.wires) != len(bus.wires):
                 newlinechar = "\n"
                 fail_with_msg(
-                    f"Port '{self.port.name}' has different number of signals compared to external connection '{wire.name}'!\n"
-                    f"Port '{self.port.name}' has the following signals:\n"
-                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in self.port.signals)}\n\n"
-                    f"External connection '{wire.name}' has the following signals:\n"
-                    f"{newlinechar.join('- ' + get_real_signal(signal).name for signal in wire.signals)}",
+                    f"Port '{self.port.name}' has different number of wires compared to external connection '{bus.name}'!\n"
+                    f"Port '{self.port.name}' has the following wires:\n"
+                    f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in self.port.wires)}\n\n"
+                    f"External connection '{bus.name}' has the following wires:\n"
+                    f"{newlinechar.join('- ' + get_real_wire(wire).name for wire in bus.wires)}",
                     ValueError,
                 )
             else:
-                for p, w in zip(self.port.signals, wire.signals):
-                    w = get_real_signal(w)
+                for p, w in zip(self.port.wires, bus.wires):
+                    w = get_real_wire(w)
                     if "'" in w.name or w.name.lower() == "z":
                         validate_verilog_const(value=w.name, direction=p.direction)
         else:
             fail_with_msg(
-                f"Invalid wire type! {wire}. Must be iob_wire or str",
+                f"Invalid bus type! {bus}. Must be iob_bus or str",
                 TypeError,
             )
 
-        self.e_connect = wire
+        self.e_connect = bus
         self.e_connect_bit_slices = bit_slices
 
 
@@ -141,12 +141,12 @@ def portmap_from_dict(portmap_dict):
     portmap_list = []
     for port_name, connection in portmap_dict.items():
 
-        # Extract external wire and bit slices from connection
+        # Extract external bus and bit slices from connection
         bit_slices = []
         if type(connection) is str:
-            external_wire_name = connection
+            external_bus_name = connection
         elif type(connection) is tuple:
-            external_wire_name = connection[0]
+            external_bus_name = connection[0]
             bit_slices = connection[1]
             if type(bit_slices) is not list:
                 fail_with_msg(
@@ -158,7 +158,7 @@ def portmap_from_dict(portmap_dict):
         # Create portmap and add to list
         portmap = iob_portmap(
             port=port_name,
-            e_connect=external_wire_name,
+            e_connect=external_bus_name,
             e_connect_bit_slices=bit_slices,
         )
         portmap_list.append(portmap)

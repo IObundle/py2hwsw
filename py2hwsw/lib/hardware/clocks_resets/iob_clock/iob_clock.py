@@ -20,7 +20,7 @@ def setup(py_params_dict):
             {
                 "name": "clk_o",
                 "descr": "Output clock",
-                "signals": [
+                "wires": [
                     {"name": "clk_o", "width": "1"},
                 ],
             },

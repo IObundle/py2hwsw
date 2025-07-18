@@ -35,7 +35,7 @@ def setup(py_params_dict):
         "ports": [
             {
                 "name": "clk_en_rst_s",
-                "signals": {
+                "wires": {
                     "type": "iob_clk",
                 },
                 "descr": "clock, clock enable and reset",
@@ -43,7 +43,7 @@ def setup(py_params_dict):
             {
                 "name": "en_rst_i",
                 "descr": "Enable and Synchronous reset interface",
-                "signals": [
+                "wires": [
                     {
                         "name": "en_i",
                         "width": 1,
@@ -59,7 +59,7 @@ def setup(py_params_dict):
             {
                 "name": "incr_i",
                 "descr": "Input port",
-                "signals": [
+                "wires": [
                     {
                         "name": "incr_i",
                         "width": "INCR_W",
@@ -69,7 +69,7 @@ def setup(py_params_dict):
             {
                 "name": "data_o",
                 "descr": "Output port",
-                "signals": [
+                "wires": [
                     {
                         "name": "data_o",
                         "width": "DATA_W",
@@ -77,11 +77,11 @@ def setup(py_params_dict):
                 ],
             },
         ],
-        "wires": [
+        "buses": [
             {
                 "name": "data_nxt",
                 "descr": "Sum result",
-                "signals": [
+                "wires": [
                     {
                         "name": "data_nxt",
                         "width": "DATA_W+1",
@@ -90,8 +90,8 @@ def setup(py_params_dict):
             },
             {
                 "name": "data_int",
-                "descr": "data_int wire",
-                "signals": [
+                "descr": "data_int bus",
+                "wires": [
                     {"name": "data_int", "width": "DATA_W"},
                 ],
             },

@@ -7,7 +7,7 @@
 /*
    This unit breaks down an AXIS into multiple bursts of AXI.
    Address (and length) are set by using the write_ or read_ interfaces.
-   The busy signals can be used to probe the state of the transfer. When asserted,
+   The busy wires can be used to probe the state of the transfer. When asserted,
    they indicate that the unit is doing a data transfer.
    Both AXIS In and AXIS Out operate individually and can work simultaneously (these units can also
    be instantiated individually)
@@ -15,11 +15,11 @@
 
 AXIS Out:
    After configuring read_addr and read_length, the axis_out transfer can start by setting the
-   read_start_transfer signal. There is no limit to the amount of data that can be sent.
+   read_start_transfer wire. There is no limit to the amount of data that can be sent.
 
 AXIS In:
    After configuring write_addr and write_length, the axis_in transfer can start by setting the
-   write_start_transfer signal.
+   write_start_transfer wire.
    Length is given as the amount of dwords. A length of 1 means that one transfer is performed.
    If the axis_in interface is stalled permanently before completing the full transfer, the unit
    might block the entire system, as it will continue to keep the AXI connection alive.

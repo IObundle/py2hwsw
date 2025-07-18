@@ -19,7 +19,7 @@ Py2HWSW Python Shell
 
 To create IP cores using Py2HWSW refer to our exemples by typing:
 
->>> show(example_name)
+>>> show("example_name")
 
 Currently the following examples are available:
 

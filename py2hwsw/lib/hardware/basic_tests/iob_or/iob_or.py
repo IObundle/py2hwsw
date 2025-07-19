@@ -40,10 +40,10 @@ core_dictionary = {
     "confs": [
         {
             "name": "W",
-            "type": "P",
-            "val": "21",
-            "min": "1",
-            "max": "32",
+            "kind": "P",
+            "value": "21",
+            "min_value": "1",
+            "max_value": "32",
             "descr": "IO width",
         },
     ],
@@ -51,23 +51,17 @@ core_dictionary = {
         {
             "name": "a_i",
             "descr": "Input port a",
-            "wires": [
-                {"name": "a_i", "width": "W"},
-            ],
+            "width": "W",
         },
         {
             "name": "b_i",
             "descr": "Input port b",
-            "wires": [
-                {"name": "b_i", "width": "W"},
-            ],
+            "width": "W",
         },
         {
             "name": "y_o",
             "descr": "Output port y",
-            "wires": [
-                {"name": "y_o", "width": "W"},
-            ],
+            "width": "W",
         },
     ],
     "snippets": [{"verilog_code": "   assign y_o = a_i | b_i;"}],
@@ -75,7 +69,9 @@ core_dictionary = {
 
 
 class iob_or(py2hwsw.iob_core):
-    def __init__(self):
+    def __init__(self, width=None):
+        if width:
+            core_dictionary["confs"][0]["value"] = str(width)
         super().__init__(core_dictionary)
 
 

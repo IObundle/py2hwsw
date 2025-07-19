@@ -18,6 +18,7 @@ from iob_portmap import iob_portmap, get_portmap_port
 from iob_wire import remove_wire_direction_suffixes
 from api_base import internal_api_class, convert2internal
 from iob_core import core_from_dict, find_module_setup_dir
+from iob_portmap import portmap_from_dict
 
 
 @internal_api_class("user_api.draft_api", "iob_instance")
@@ -368,11 +369,17 @@ def instance_from_dict(instance_dict):
     #     )
     # If 'core' key is given, find corresponding core and instantiate it. Ignore other non-instance attributes.
 
-    # instantiate_block(core_dict["core"], core_dict.get("python_parameters", {}), core_dict)
+    # instantiate_block(instance_dict["core"], instance_dict.get("python_parameters", {}), instance_dict)
 
     # instance_dict_with_objects["portmap_connections"] = portmap_from_dict(instance_dictionary.get("portmap_connections", {}))
+    # return iob_instance(**instance_dict)
 
-    return iob_instance(**instance_dict)
+    # remove non-attribute keys
+    core = instance_dict.pop("core", "")
+    python_parameters = instance_dict.pop("python_parameters", {})
+    portmap_connections = instance_dict.pop("portmap_connections", {})
+    instance_dict.update({"portmap_connections": portmap_from_dict(portmap_connections)})
+    return instantiate_block(core, python_parameters, instance_dict)
 
 
 def instance_from_text(instance_text):

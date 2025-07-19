@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from iob_base import (
     fail_with_msg,
@@ -10,11 +10,10 @@ from iob_base import (
     validate_verilog_const,
 )
 import iob_colors
-from iob_port import iob_port
 from iob_wire import get_real_wire, iob_wire_reference
 from iob_bus import iob_bus
 
-from api_base import internal_api_class, convert2internal
+from api_base import internal_api_class
 
 
 @internal_api_class("user_api.draft_api", "iob_portmap")

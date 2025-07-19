@@ -11,10 +11,10 @@ core_dictionary = {
     "confs": [
         {
             "name": "W",
-            "type": "P",
-            "val": "21",
-            "min": "1",
-            "max": "32",
+            "kind": "P",
+            "value": "21",
+            "min_value": "1",
+            "max_value": "32",
             "descr": "IO width",
         },
     ],
@@ -22,16 +22,12 @@ core_dictionary = {
         {
             "name": "a_i",
             "descr": "Input port",
-            "wires": [
-                {"name": "a_i", "width": "W"},
-            ],
+            "width": "W",
         },
         {
             "name": "y_o",
             "descr": "Output port",
-            "wires": [
-                {"name": "y_o", "width": "W"},
-            ],
+            "width": "W",
         },
     ],
     "snippets": [{"verilog_code": "   assign y_o = ~a_i;"}],

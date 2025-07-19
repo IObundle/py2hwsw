@@ -24,8 +24,9 @@ def generate_buses(core):
         for api_wire in bus.wires:
             wire = convert2internal(api_wire)
             if isinstance(wire, iob_wire):
-                if wire.get_verilog_bus():
-                    wires_code += "    " + wire.get_verilog_bus()
+                global_wire = convert2internal(wire.global_wire)
+                if global_wire:
+                    wires_code += "    " + global_wire.get_verilog_bus()
         if wires_code:
             # Add description for the bus if it is not the default one
             if bus.descr != "" and bus.descr != "Default description":

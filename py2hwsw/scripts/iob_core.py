@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import importlib
 import os
 import shutil
 from pathlib import Path
@@ -44,7 +45,6 @@ from iob_port import port_from_dict
 from iob_bus import bus_from_dict
 from iob_snippet import snippet_from_dict
 from iob_python_parameter import python_parameter_group_from_dict
-from iob_portmap import portmap_from_dict
 
 
 @internal_api_class("user_api.api", "iob_core", allow_unknown_args=True)
@@ -96,16 +96,21 @@ class iob_core(iob_module):
 
         # Update current core's attributes with values from given core_dictionary
         if core_dictionary:
+            # Lazy import instance to avoid circular dependecy
+            instance_from_dict = getattr(importlib.import_module('iob_instance'), 'instance_from_dict')
             # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
             if "core" in core_dictionary or "python_parameters" in core_dictionary:
                 fail_with_msg("The 'core' and 'python_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
             # Convert core dictionary elements to objects
             core_dict_with_objects = core_dictionary.copy()
+            for c in core_dictionary.get("confs", []):
+                if "type" in c:
+                    breakpoint()
             core_dict_with_objects["confs"] = [conf_from_dict(i) for i in core_dictionary.get("confs", [])]
             core_dict_with_objects["ports"] = [port_from_dict(i) for i in core_dictionary.get("ports", [])]
             core_dict_with_objects["buses"] = [bus_from_dict(i) for i in core_dictionary.get("buses", [])]
             core_dict_with_objects["snippets"] = [snippet_from_dict(i) for i in core_dictionary.get("snippets", [])]
-            # core_dict_with_objects["subblocks"] = [instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
+            core_dict_with_objects["subblocks"] = [instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
             core_dict_with_objects["superblocks"] = [core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
             core_dict_with_objects["sw_modules"] = [core_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
             core_dict_with_objects["python_parameters"] = [python_parameter_group_from_dict(i) for i in core_dictionary.get("python_parameters", [])]
@@ -148,7 +153,7 @@ class iob_core(iob_module):
                 if subblock.original_name == self.issuer.original_name:
                     # skip build dir generation for issuer subblocks
                     continue
-            subblock.generate_build_dir()
+            subblock.get_core().generate_build_dir()
 
         # Generate build dir of superblocks. Ensure superblocks are set up only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
@@ -450,6 +455,7 @@ def clean_build_dir(build_dir):
 
 def core_from_dict(core_dict):
     return iob_core(core_dict)
+
 
 def core_text2dict(core_text):
     core_flags = [

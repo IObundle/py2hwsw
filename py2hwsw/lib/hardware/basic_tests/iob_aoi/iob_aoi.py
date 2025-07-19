@@ -75,7 +75,7 @@ import py2hwsw_api as py2hwsw
 #         # Tester
 #         {
 #             "core_name": "iob_aoi_tester",
-#             "instance_name": "iob_tester",
+#             "name": "iob_tester",
 #             "dest_dir": "tester",
 #         },
 #     ],
@@ -146,43 +146,43 @@ core_dictionary = {
     "subblocks": [
         {
             "core": "iob_and",
-            "instance_name": "iob_and_ab",
-            "instance_description": "First and gate",
+            "name": "iob_and_ab",
+            "description": "First and gate",
             "parameters": {
                 "W": "W",
             },
-            "connect": {
+            "portmap_connections": {
                 "a_i": "a_i",
                 "b_i": "b_i",
                 "y_o": "and_ab_out",
             },
             # Elements from 'python_parameters' dictionary will be expanded and passed to the constructor of the iob_and class, like so:
             # iob_and(**python_parameters)
-            "python_parameters": {
-                "my_custom_py_param1": None,
-                "my_initialization_paramter": 123,
-                # Init attributes via short notation
-                "short_notation": "--noautoaddr --rw_overlap --csr_if iob",
-                # Init attributes via dictionary interface
-                "dictionary_interface": {
-                    "auto": False,
-                    "rw_overlap": True,
-                    "csr_if": "iob",
-                },
-                # Init attributes via arguments
-                "auto": False,
-                "rw_overlap": True,
-                "csr_if": "iob",
-            },
+            # "python_parameters": {
+            #     "my_custom_py_param1": None,
+            #     "my_initialization_paramter": 123,
+            #     # Init attributes via short notation
+            #     "short_notation": "--noautoaddr --rw_overlap --csr_if iob",
+            #     # Init attributes via dictionary interface
+            #     "dictionary_interface": {
+            #         "auto": False,
+            #         "rw_overlap": True,
+            #         "csr_if": "iob",
+            #     },
+            #     # Init attributes via arguments
+            #     "auto": False,
+            #     "rw_overlap": True,
+            #     "csr_if": "iob",
+            # },
         },
         {
             "core": "iob_and",
-            "instance_name": "io_and_cd",
-            "instance_description": "Second and gate",
+            "name": "io_and_cd",
+            "description": "Second and gate",
             "parameters": {
                 "W": "W",
             },
-            "connect": {
+            "portmap_connections": {
                 "a_i": "c_i",
                 "b_i": "d_i",
                 "y_o": "and_cd_out",
@@ -190,12 +190,12 @@ core_dictionary = {
         },
         {
             "core": "iob_or",
-            "instance_name": "iob_or_abcd",
-            "instance_description": "Or gate",
+            "name": "iob_or_abcd",
+            "description": "Or gate",
             "parameters": {
                 "W": "W",
             },
-            "connect": {
+            "portmap_connections": {
                 "a_i": "and_ab_out",
                 "b_i": "and_cd_out",
                 "y_o": "or_out",
@@ -203,12 +203,12 @@ core_dictionary = {
         },
         {
             "core": "iob_inv",
-            "instance_name": "iob_inv_out",
-            "instance_description": "Inverter",
+            "name": "iob_inv_out",
+            "description": "Inverter",
             "parameters": {
                 "W": "W",
             },
-            "connect": {
+            "portmap_connections": {
                 "a_i": "or_out",
                 "y_o": "y_o",
             },
@@ -218,7 +218,7 @@ core_dictionary = {
         # Tester
         # {
         #     "core": "iob_aoi_tester",
-        #     "instance_name": "iob_tester",
+        #     "name": "iob_tester",
         #     # "dest_dir": "tester",
         # },
     ],

@@ -51,12 +51,12 @@ def generate_params(core):
     return "".join(lines)
 
 
-def generate_inst_params(core):
+def generate_inst_params(instance):
     """Generate verilog code with assignment of values for the verilog parameters of this instance.
     returns: Generated verilog code
     """
-    validate_params(core)
-    instance_parameters = core.parameters
+    validate_params(instance)
+    instance_parameters = instance.parameters
     lines = []
     for p_name, p_value in instance_parameters.items():
         lines.append(f"        .{p_name}({p_value}),\n")
@@ -83,10 +83,10 @@ def generate_params_snippets(core):
     #     f.write(code)
 
 
-def validate_params(core):
+def validate_params(instance):
     """Check if all parameters are within the allowed range"""
-    core_parameters = get_core_params(core.confs)
-    for p_name, p_value in core.parameters.items():
+    core_parameters = get_core_params(convert2internal(instance.core).confs)
+    for p_name, p_value in instance.parameters.items():
         if isinstance(p_value, str):
             continue
         conf = find_obj_in_list(core_parameters, p_name)

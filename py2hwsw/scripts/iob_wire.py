@@ -35,6 +35,13 @@ class iob_wire:
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
         return f"{bus_type} {width_str}{self.name};\n"
 
+    def get_width_int(self):
+        width_v = self.width
+        try:
+            return int(width_v)
+        except ValueError:
+            return width_v
+
 
 @dataclass
 class iob_wire_reference:

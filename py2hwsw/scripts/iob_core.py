@@ -38,13 +38,15 @@ import sw_tools
 import verilog_format
 import verilog_lint
 from manage_headers import generate_headers
+from iob_license import iob_license
 
 from iob_conf import conf_from_dict
-from iob_wire import iob_global_wire
+from iob_wire import iob_wire
 from iob_port import port_from_dict
 from iob_bus import bus_from_dict
 from iob_snippet import snippet_from_dict
 from iob_python_parameter import python_parameter_group_from_dict
+
 
 
 @internal_api_class("user_api.api", "iob_core", allow_unknown_args=True)
@@ -52,7 +54,7 @@ class iob_core(iob_module):
     """Generic class to describe how to generate a base IOb IP core"""
 
     # List of global wires. Similar concept to 'netlist' in HDL terminology: https://vhdlwhiz.com/terminology/net/#net
-    global_wires: list[iob_global_wire] = []
+    global_wires: list = []
     # Project settings
     global_build_dir: str = ""
     global_project_root: str = "."
@@ -80,6 +82,31 @@ class iob_core(iob_module):
         # For debug:
         # print("Iob-core: called")
         # print("Iob-core attributes:", self.__class__.__annotations__)
+
+        # FIXME: Temporary local attributes. Remove them as they get added to the API.
+        self.reset_polarity: str = "positive"
+        self.buses: list = []
+        self.interfaces: list = []
+        self.comb = None
+        self.fsm = None
+        self.subblocks: list = []
+        self.superblocks: list = []
+        self.sw_modules: list = []
+        self.version: str = PY2HWSW_VERSION
+        self.previous_version: str = PY2HWSW_VERSION
+        self.use_netlist: bool = False
+        self.is_system: bool = False
+        self.board_list: list[str] = []
+        self.ignore_snippets: list[str] = []
+        self.is_tester: bool = False
+        self.python_parameters: list = []
+        self.license: iob_license = iob_license()
+        self.doc_conf: str = ""
+        self.title: str = ""
+        self.dest_dir: str = "hardware/src"
+
+
+
 
         # Set internal attributes
         "Selects if core is top module."
@@ -114,7 +141,7 @@ class iob_core(iob_module):
             core_dict_with_objects["superblocks"] = [core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
             core_dict_with_objects["sw_modules"] = [core_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
             core_dict_with_objects["python_parameters"] = [python_parameter_group_from_dict(i) for i in core_dictionary.get("python_parameters", [])]
-            update_obj_from_dict(self, core_dict_with_objects, valid_attributes_list=self.get_api_obj().get_supported_attributes().keys())
+            update_obj_from_dict(self, core_dict_with_objects) #, valid_attributes_list=self.get_api_obj().get_supported_attributes().keys())
 
         # Set global build directory
         if self.is_top_module:

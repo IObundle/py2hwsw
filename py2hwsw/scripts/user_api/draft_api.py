@@ -13,9 +13,6 @@ import sys
 from datetime import date
 from dataclasses import field
 
-# Import some modules that are already in the production-ready API
-from api import iob_conf, iob_port, iob_wire, iob_snippet, iob_core
-
 sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 )
@@ -33,6 +30,9 @@ import iob_portmap as py2hwsw_portmap
 import iob_python_parameter as py2hwsw_python_parameter
 import iob_instance as py2hwsw_instance
 import iob_core as py2hwsw_core
+
+# Import some modules that are already in the production-ready API
+from user_api.api import iob_conf, iob_port, iob_wire, iob_snippet, iob_core
 
 
 #

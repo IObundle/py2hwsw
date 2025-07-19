@@ -9,7 +9,7 @@ from iob_snippet import iob_snippet
 from iob_base import fail_with_msg, assert_attributes, parse_short_notation_text
 from iob_bus import find_wire_in_buses
 from iob_wire import get_real_wire
-from interfaces import iobClkInterface
+from iob_interface import iobClkInterface
 from api_base import internal_api_class
 
 

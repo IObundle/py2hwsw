@@ -20,7 +20,7 @@ class iob_wire:
     reg_wires: list[str] = field(default_factory=list)
 
     def __post_init__(self):
-        print("DEBUG: Creating wire")
+        # print("DEBUG: Creating wire")
         pass
 
     def validate_attributes(self):

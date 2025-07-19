@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass
 
-import interfaces
+import iob_interface
 from iob_base import (
     find_obj_in_list,
     convert_dict2obj_list,
@@ -24,7 +24,7 @@ from iob_wire import (
 from api_base import internal_api_class
 
 
-@internal_api_class("user_api.api", "iob_bus")
+@internal_api_class("user_api.draft_api", "iob_bus")
 @dataclass
 class iob_bus:
     """Py2HWSW's internal implementation of 'iob_bus' API class."""
@@ -222,7 +222,7 @@ def dict2interface(name, interface_dict):
         ]
     }
 
-    interface = interfaces.create_interface(
+    interface = iob_interface.create_interface(
         genre=genre,
         if_direction=if_direction,
         mult=mult,

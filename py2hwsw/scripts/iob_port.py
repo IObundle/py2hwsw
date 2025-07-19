@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from iob_base import fail_with_msg, parse_short_notation_text
 from api_base import internal_api_class, convert2internal
-from iob_wire import iob_global_wire
+from iob_wire import iob_wire
 
 
 @internal_api_class("user_api.api", "iob_port")
@@ -15,17 +15,17 @@ class iob_port:
     """Py2HWSW's internal implementation of 'iob_port' API class."""
 
     def validate_attributes(self):
-        if not self.global_wire:
-            fail_with_msg("Port not associated to global wire!")
+        if not self.wire:
+            fail_with_msg("Port not associated to wire!")
         if self.direction not in ["input", "output", "inout"]:
-            fail_with_msg(f"Missing direction for port {self.global_wire.name}!")
+            fail_with_msg(f"Missing direction for port {self.wire.name}!")
 
     def get_verilog_port(self, comma=True):
         """Generate a verilog port string from this wire"""
         self.validate_attributes()
-        port_name = convert2internal(self.global_wire).name
-        port_width = convert2internal(self.global_wire).width
-        port_isvar = convert2internal(self.global_wire).isvar
+        port_name = convert2internal(self.wire).name
+        port_width = convert2internal(self.wire).width
+        port_isvar = convert2internal(self.wire).isvar
         if "'" in port_name or port_name.lower() == "z":
             return None
         comma_char = "," if comma else ""
@@ -34,7 +34,7 @@ class iob_port:
         return f"{self.direction}{port_type} {width_str}{port_name}{comma_char}\n"
 
     def get_width_int(self):
-        port_width = convert2internal(self.global_wire).width
+        port_width = convert2internal(self.wire).width
         try:
             return int(port_width)
         except ValueError:
@@ -43,7 +43,7 @@ class iob_port:
 
 def port_obj_list_process(port):
     """Process ports for `find_obj_in_list()`"""
-    return convert2internal(port.global_wire)
+    return convert2internal(port.wire)
 
 
 #
@@ -52,16 +52,14 @@ def port_obj_list_process(port):
 
 
 def port_from_dict(port_dict):
-    # Create a global wire for this port
-    api_iob_global_wire = iob_global_wire(
-        name=port_dict["name"], width=port_dict["width"]
-    )
+    # Create a wire for this port
+    api_iob_wire = iob_wire(name=port_dict["name"], width=port_dict["width"])
 
     # Get port direction form name suffix
     dir_suffix = port_dict["name"].split("_")[-1]
     dirs = {"i": "input", "o": "output", "io": "inout"}
 
-    return iob_port(global_wire=api_iob_global_wire, direction=dirs[dir_suffix])
+    return iob_port(wire=api_iob_wire, direction=dirs[dir_suffix])
 
 
 def port_text2dict(port_text):

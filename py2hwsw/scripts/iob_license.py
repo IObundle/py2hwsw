@@ -9,7 +9,7 @@ from iob_base import fail_with_msg, parse_short_notation_text
 from api_base import internal_api_class
 
 
-@internal_api_class("user_api.api", "iob_license")
+@internal_api_class("user_api.draft_api", "iob_license")
 @dataclass
 class iob_license:
     """Class that represents a license attribute"""

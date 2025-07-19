@@ -36,6 +36,5 @@ class iob_and(py2hwsw.iob_core):
 
 
 if __name__ == "__main__":
-
     iob_and_obj = iob_and(width=8)
     iob_and_obj.generate_build_dir()

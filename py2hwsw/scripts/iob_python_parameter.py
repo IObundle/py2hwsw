@@ -17,7 +17,7 @@ from iob_base import (
 from api_base import internal_api_class
 
 
-@internal_api_class("user_api.api", "iob_python_parameter")
+@internal_api_class("user_api.draft_api", "iob_python_parameter")
 @dataclass
 class iob_python_parameter:
     """Class to represent a Python Parameter option."""
@@ -27,7 +27,7 @@ class iob_python_parameter:
             fail_with_msg("Every Python Parameter must have a name!")
 
 
-@internal_api_class("user_api.api", "iob_python_parameter_group")
+@internal_api_class("user_api.draft_api", "iob_python_parameter_group")
 @dataclass
 class iob_python_parameter_group:
     """Class to represent a Group of Python Parameters."""

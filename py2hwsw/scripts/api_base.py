@@ -200,7 +200,7 @@ def api_class_for(internal_cls):
         cls.__init__ = new_init
 
         # Local utility functions
-        def _generate_setter(attribute_name):
+        def _generate_setter(attribute_name, datatype):
             """
             Function to generate setter for a given attribute.
             Setter will pass the given value to the corresponding attribute in the internal object.
@@ -210,9 +210,15 @@ def api_class_for(internal_cls):
                 # print("Setter called for attribute: ", attribute_name)
                 setattr(self.__internal_obj, attribute_name, value)
 
+            setter.__doc__ = f"""\
+            Setter for the '{attribute_name}' attribute.
+            Args:
+                {attribute_name} ({datatype}): Value to set for '{attribute_name}'.
+            """
+
             return setter
 
-        def _generate_getter(attribute_name):
+        def _generate_getter(attribute_name, datatype):
             """
             Function to generate getter for a given attribute.
             Getter will get value from the corresponding attribute in the internal object.
@@ -221,6 +227,12 @@ def api_class_for(internal_cls):
             def getter(self):
                 # print("Getter called for attribute: ", attribute_name)
                 return getattr(self.__internal_obj, attribute_name)
+
+            getter.__doc__ = f"""\
+                Getter for the '{attribute_name}' attribute.
+                Returns:
+                    {datatype}: Value of '{attribute_name}'.
+                """
 
             return getter
 
@@ -239,9 +251,12 @@ def api_class_for(internal_cls):
             return wrapper
 
         # Generate and add setters/getters for each attribute of API class, referencing values from corresponding attribute in internal object
-        for name in cls.__annotations__:
-            setattr(cls, f"set_{name}", _generate_setter(name))
-            setattr(cls, f"get_{name}", _generate_getter(name))
+        for name, datatype in cls.__annotations__.items():
+            datatype_name = (
+                datatype.__name__ if hasattr(datatype, "__name__") else datatype
+            )
+            setattr(cls, f"set_{name}", _generate_setter(name, datatype_name))
+            setattr(cls, f"get_{name}", _generate_getter(name, datatype_name))
 
         # Replace API methods by calls to the internal methods
         for name in local_methods:

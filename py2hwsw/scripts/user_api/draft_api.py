@@ -27,7 +27,7 @@ import iob_comb as py2hwsw_comb
 import iob_fsm as py2hwsw_fsm
 import iob_license as py2hwsw_license
 import iob_portmap as py2hwsw_portmap
-import iob_python_parameter as py2hwsw_python_parameter
+import iob_parameter as py2hwsw_parameter
 import iob_instance as py2hwsw_instance
 import iob_core as py2hwsw_core
 
@@ -612,20 +612,19 @@ def create_portmap_from_text(portmap_text):
 
 
 #
-# Python Parameter
+# IOb Parameter
 #
 
 
-# TODO: Rename iob_python_parameter_group --> iob_configuration
-@api_for(py2hwsw_python_parameter.iob_python_parameter)
-class iob_python_parameter:
+@api_for(py2hwsw_parameter.iob_parameter)
+class iob_parameter:
     """
-    Class that represents a python parameter attribute.
+    Class that represents a IOb parameter attribute.
 
     Attributes:
-        name (str): Identifier name for the Python Parameter option.
-        val (Any): Value of the Python Parameter option.
-        descr (str): Description of the Python Parameter option.
+        name (str): Identifier name for the IOb Parameter option.
+        val (Any): Value of the IOb Parameter option.
+        descr (str): Description of the IOb Parameter option.
     """
 
     name: str = ""
@@ -633,101 +632,101 @@ class iob_python_parameter:
     descr: str = "Default description"
 
 
-@api_for(py2hwsw_python_parameter.python_parameter_from_dict)
-def create_python_parameter_from_dict(python_parameter_dict):
+@api_for(py2hwsw_parameter.iob_parameter_from_dict)
+def create_iob_parameter_from_dict(iob_parameter_dict):
     """
-    Function to create iob_python_parameter object from dictionary attributes.
+    Function to create iob_iob_parameter object from dictionary attributes.
 
     Attributes:
-        python_parameter_dict (dict): dictionary with values to initialize attributes of iob_python_parameter object.
-            This dictionary supports the following keys corresponding to the iob_python_parameter attributes:
-            - name -> iob_python_parameter.name
-            - val -> iob_python_parameter.val
-            - descr -> iob_python_parameter.descr
+        iob_parameter_dict (dict): dictionary with values to initialize attributes of iob_iob_parameter object.
+            This dictionary supports the following keys corresponding to the iob_parameter attributes:
+            - name -> iob_parameter.name
+            - val -> iob_parameter.val
+            - descr -> iob_parameter.descr
 
     Returns:
-        iob_python_parameter: iob_python_parameter object
+        iob_parameter: iob_parameter object
     """
     pass
 
 
-@api_for(py2hwsw_python_parameter.python_parameter_text2dict)
-def python_parameter_text2dict(python_parameter_text):
-    """Convert python_parameter short notation text to dictionary.
+@api_for(py2hwsw_parameter.iob_parameter_text2dict)
+def iob_parameter_text2dict(iob_parameter_text):
+    """Convert iob_parameter short notation text to dictionary.
     Atributes:
-        python_parameter_text (str): Short notation text. See `create_python_parameter_from_text` for format.
+        iob_parameter_text (str): Short notation text. See `create_iob_parameter_from_text` for format.
 
     Returns:
-        dict: Dictionary with python_parameter attributes.
+        dict: Dictionary with iob_parameter attributes.
     """
     pass
 
 
-@api_for(py2hwsw_python_parameter.python_parameter_from_text)
-def create_python_parameter_from_text(python_parameter_text):
+@api_for(py2hwsw_parameter.iob_parameter_from_text)
+def create_iob_parameter_from_text(iob_parameter_text):
     """
-    Function to create iob_python_parameter object from short notation text.
+    Function to create iob_parameter object from short notation text.
 
     Attributes:
-        python_parameter_text (str): Short notation text. Object attributes are specified using the following format:
+        iob_parameter_text (str): Short notation text. Object attributes are specified using the following format:
             [name] [-v value] [-d descr]
             Example:
                 my_param -v 42 -d 'My parameter description'
 
     Returns:
-        iob_python_parameter: iob_python_parameter object
+        iob_parameter: iob_parameter object
     """
     pass
 
 
-@api_for(py2hwsw_python_parameter.iob_python_parameter_group)
-class iob_python_parameter_group:
+@api_for(py2hwsw_parameter.iob_parameter_group)
+class iob_parameter_group:
     """
-    Class that represents a group of Python Parameters.
+    Class that represents a group of IOb Parameters.
 
     Attributes:
-        name (str): Identifier name for the group of Python Parameters.
-        descr (str): Description of the Python Parameter group.
-        python_parameters (list): List of Python Parameter objects.
+        name (str): Identifier name for the group of IOb Parameters.
+        descr (str): Description of the IOb Parameter group.
+        iob_parameters (list): List of IOb Parameter objects.
         doc_clearpage (bool): If enabled, the documentation table for this group will be terminated by a TeX '\clearpage' command.
     """
 
     name: str = ""
     descr: str = "Default description"
-    python_parameters: list = empty_list()
+    iob_parameters: list = empty_list()
     doc_clearpage: bool = False
 
 
-@api_for(py2hwsw_python_parameter.python_parameter_group_from_dict)
-def create_python_parameter_group_from_dict(python_parameter_group_dict):
+@api_for(py2hwsw_parameter.iob_parameter_group_from_dict)
+def create_iob_parameter_group_from_dict(iob_parameter_group_dict):
     """
-    Function to create iob_python_parameter_group object from dictionary attributes.
+    Function to create iob_parameter_group object from dictionary attributes.
 
     Attributes:
-        python_parameter_group_dict (dict): dictionary with values to initialize attributes of iob_python_parameter_group object.
-            This dictionary supports the following keys corresponding to the iob_python_parameter_group attributes:
-            - name -> iob_python_parameter_group.name
-            - descr -> iob_python_parameter_group.descr
-            - python_parameters -> iob_python_parameter_group.python_parameters
-            - doc_clearpage -> iob_python_parameter_group.doc_clearpage
+        iob_parameter_group_dict (dict): dictionary with values to initialize attributes of iob_parameter_group object.
+            This dictionary supports the following keys corresponding to the iob_parameter_group attributes:
+            - name -> iob_parameter_group.name
+            - descr -> iob_parameter_group.descr
+            - iob_parameters -> iob_parameter_group.iob_parameters
+            - doc_clearpage -> iob_parameter_group.doc_clearpage
 
     Returns:
-        iob_python_parameter_group: iob_python_parameter_group object
+        iob_parameter_group: iob_parameter_group object
     """
     pass
 
 
-@api_for(py2hwsw_python_parameter.python_parameter_group_from_text)
-def create_python_parameter_group_from_text(python_parameter_group_text):
+@api_for(py2hwsw_parameter.iob_parameter_group_from_text)
+def create_iob_parameter_group_from_text(iob_parameter_group_text):
     """
-    Function to create iob_python_parameter_group object from short notation text.
+    Function to create iob_parameter_group object from short notation text.
 
     Attributes:
-        python_parameter_group_text (str): Short notation text. Object attributes are specified using the following format:
+        iob_parameter_group_text (str): Short notation text. Object attributes are specified using the following format:
             TODO
 
     Returns:
-        iob_python_parameter_group: iob_python_parameter_group object
+        iob_parameter_group: iob_parameter_group object
     """
     pass
 
@@ -782,13 +781,13 @@ def create_instance_from_dict(instance_dict):
             - instantiate -> iob_instance.instantiate
             # Non-attribute instance keys
             - core (str): Optional. The name of the core to instantiate. Will search for <core>.py or <core>.json files.
-                          If this key is set, all other keys will be ignored! (Except 'python_parameters' key).
+                          If this key is set, all other keys will be ignored! (Except 'iob_parameters' key).
                           If <core>.py is found, it must contain a class called <core> that extends iob_core. This class will be used to instantiate the core.
                           If <core>.json is found, its contents will be read and parsed by the create_core_from_dict(<json_contents>) function.
-            - python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated core.
+            - iob_parameters (dict): Optional. Dictionary of iob parameters to pass to the instantiated core.
                                         This key should be used in conjunction with the 'core' key.
                                         Elements from this dictionary will be passed as **kwargs to the instantiated core's constructor.
-                                        Only applicable if instantiated core has a constructor that accepts python parameters (excludes cores defined in JSON or purely by dictionary).
+                                        Only applicable if instantiated core has a constructor that accepts IOb parameters (excludes cores defined in JSON or purely by dictionary).
 
 
     Returns:

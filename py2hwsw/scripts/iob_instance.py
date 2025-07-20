@@ -307,7 +307,7 @@ class iob_instance(iob_base):
 
 
 def instantiate_block(
-    block_name: str, python_parameters: dict = {}, block_dict: dict = {}
+    block_name: str, iob_parameters: dict = {}, block_dict: dict = {}
 ):
     """
     Find a block based on given block_name and instatiate it.
@@ -316,9 +316,9 @@ def instantiate_block(
         block (str): The name of the block to instantiate. Will search for <block>.py or <block>.json files.
                     If <block>.py is found, it must contain a class called <block> that extends iob_block. This class will be used to instantiate the block.
                     If <block>.json is found, its contents will be read and parsed by the block_from_dict(<json_contents>) function.
-        python_parameters (dict): Optional. Dictionary of python parameters to pass to the instantiated block.
+        iob_parameters (dict): Optional. Dictionary of IOb parameters to pass to the instantiated block.
                                   Elements from this dictionary will be passed as **kwargs to the instantiated block's constructor.
-                                  Only applicable if instantiated block has a constructor that accepts python parameters (excludes blocks defined in JSON or purely by dictionary).
+                                  Only applicable if instantiated block has a constructor that accepts IOb parameters (excludes blocks defined in JSON or purely by dictionary).
         block_dict (dict): Dictionary of instance attributes to set on the instantiated block.
     Returns:
         iob_instance: The instantiated block object
@@ -333,7 +333,7 @@ def instantiate_block(
 
         # Instantiate block (call constructor from class defined inside the .py file)
         block_class = getattr(block_module, block_name)
-        api_block_obj = block_class(**python_parameters)
+        api_block_obj = block_class(**iob_parameters)
 
     elif file_ext == ".json":
         debug_print(f"Loading {block_name}.json", 1)
@@ -364,22 +364,22 @@ def instance_from_dict(instance_dict):
     # if instance_dict.get("instance", None):
     #     return instantiate_block(
     #         instance_dict["instance"],
-    #         instance_dict.get("python_parameters", {}),
+    #         instance_dict.get("iob_parameters", {}),
     #         instance_dict,
     #     )
     # If 'core' key is given, find corresponding core and instantiate it. Ignore other non-instance attributes.
 
-    # instantiate_block(instance_dict["core"], instance_dict.get("python_parameters", {}), instance_dict)
+    # instantiate_block(instance_dict["core"], instance_dict.get("iob_parameters", {}), instance_dict)
 
     # instance_dict_with_objects["portmap_connections"] = portmap_from_dict(instance_dictionary.get("portmap_connections", {}))
     # return iob_instance(**instance_dict)
 
     # remove non-attribute keys
     core = instance_dict.pop("core", "")
-    python_parameters = instance_dict.pop("python_parameters", {})
+    iob_parameters = instance_dict.pop("iob_parameters", {})
     portmap_connections = instance_dict.pop("portmap_connections", {})
     instance_dict.update({"portmap_connections": portmap_from_dict(portmap_connections)})
-    return instantiate_block(core, python_parameters, instance_dict)
+    return instantiate_block(core, iob_parameters, instance_dict)
 
 
 def instance_from_text(instance_text):

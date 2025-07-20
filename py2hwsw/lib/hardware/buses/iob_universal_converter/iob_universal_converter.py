@@ -4,7 +4,7 @@
 
 
 def setup(py_params_dict):
-    """Universal converter. Convert interface of subordinate port into interface of manager port, based on interface types given in python parameters"""
+    """Universal converter. Convert interface of subordinate port into interface of manager port, based on interface types given in IOb parameters"""
     params = {
         # Type of interfaces
         "manager_if": "iob",
@@ -16,7 +16,7 @@ def setup(py_params_dict):
         if param in params:
             params[param] = py_params_dict[param]
 
-    # Set a default name for generated verilog if name was not provided by python parameters
+    # Set a default name for generated verilog if name was not provided by IOb parameters
     if "name" not in params:
         params["name"] = (
             f"iob_universal_converter_{params['subordinate_if']}_{params['manager_if']}"

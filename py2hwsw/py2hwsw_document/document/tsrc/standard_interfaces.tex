@@ -4,23 +4,23 @@
 
 The Py2HWSW framework provides the following two standard interfaces:
 \begin{enumerate}
-  \item \textbf{Python Parameters}: Core "setup" function receives information from Py2HWSW via a dictionary in its first argument, referred to as \textit{Python Parameters}.
+  \item \textbf{IOb Parameters}: Core "setup" function receives information from Py2HWSW via a dictionary in its first argument, referred to as \textit{IOb Parameters}.
   \item \textbf{Core Dictionary}: Core "setup" function returns a core description dictionary to Py2HWSW, referred to as \textit{Core Dictionary}.
 \end{enumerate}
 
 The core's "setup" function is the python function defined by the user in the <core\_name>.py file.
 
-If the core is described by a JSON file, then the \textit{Python Parameters} interface is not available.
+If the core is described by a JSON file, then the \textit{IOb Parameters} interface is not available.
 The JSON file gives a dictionary to Py2HWSW, similar to the python dictionary of the "setup" function.
 This allows the user to use external tools to generate cores in JSON format.
 
 %
-% Python parameters
+% IOb parameters
 %
 
-The \textit{Python Parameters} received by the core's "setup" function is a dictionary containing both parameters passed by its issuer and standard parameters passed by Py2HWSW.
-Each key, value pair in the dictionary is a \textit{Python Parameter}.
-The value of the python parameter may be of any data type.
+The \textit{IOb Parameters} received by the core's "setup" function is a dictionary containing both parameters passed by its issuer and standard parameters passed by Py2HWSW.
+Each key, value pair in the dictionary is a \textit{IOb Parameter}.
+The value of the IOb parameter may be of any data type.
 
 \begin{xltabular}{\textwidth}{|l|l|X|}
 
@@ -28,15 +28,15 @@ The value of the python parameter may be of any data type.
   \rowcolor{iob-green}
   {\bf Name} & {\bf Data Type} & {\bf Description}  \\ \hline \hline
 
-  \input py2hwsw_py_params_tab
+  \input py2hwsw_iob_params_tab
 
-  \caption{Standard \textit{Python Parameters} passed by Py2HWSW to every core's "setup" function.}
+  \caption{Standard \textit{IOb Parameters} passed by Py2HWSW to every core's "setup" function.}
 \end{xltabular}
-\label{py2hwsw_py_params_tab}
+\label{py2hwsw_iob_params_tab}
 
-The standard python parameters passed by Py2HWSW are listed in Table~\ref{py2hwsw_py_params_tab}.
+The standard IOb parameters passed by Py2HWSW are listed in Table~\ref{py2hwsw_iob_params_tab}.
 
-The python parameters supported by each core is available in the respective core's user guide, as long as they have the \textit{Python Parameters} attribute defined.
+The IOb parameters supported by each core is available in the respective core's user guide, as long as they have the \textit{IOb Parameters} attribute defined.
 Instructions on how to build a core's user guide can be found in Section~\ref{sec:core_lib}. 
 
 

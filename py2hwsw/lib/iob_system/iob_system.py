@@ -42,10 +42,10 @@ def setup(py_params_dict):
     }
 
     # Converts dictionary tuple values into single values without description
-    # And creates "python_parameters" list attribute for py2hwsw documentation
-    python_parameters_attribute = convert_params_dict(params)
+    # And creates "iob_parameters" list attribute for py2hwsw documentation
+    iob_parameters_attribute = convert_params_dict(params)
 
-    # Update parameters values with ones given in python parameters
+    # Update parameters values with ones given in IOb parameters
     update_params(params, py_params_dict)
 
     if params["cpu"] == "none":
@@ -64,7 +64,7 @@ def setup(py_params_dict):
         "generate_hw": True,
         "is_system": True,
         "board_list": ["iob_aes_ku040_db_g", "iob_zybo_z7", "iob_cyclonev_gt_dk"],
-        "python_parameters": python_parameters_attribute,
+        "iob_parameters": iob_parameters_attribute,
         "title": "IOb-System",
         "description": "System-on-Chip (SoC) template",
         "confs": [

@@ -48,7 +48,7 @@ AXI_OUT_SIGNAL_NAMES = [
 
 def setup(py_params_dict):
     """Wrapper for `axi_interconnect` core.
-    Python parameters:
+    IOb parameters:
     - num_subordinates: number of subordinate interfaces
     - managers: dictionary with name and address width of each manager
     """

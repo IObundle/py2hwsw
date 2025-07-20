@@ -11,15 +11,15 @@ import os
 
 def convert_params_dict(params):
     """Convert values of given parameters dictionary from tuple to single value;
-    Also creates new "python_parameters" list to use as attribute of core (for py2 documentation).
+    Also creates new "iob_parameters" list to use as attribute of core (for py2 documentation).
     :param dict params: dictionary to convert. Each value has original format: (default_val, description). New format: default_val
-    :returns: "python_parameters" list attribute
+    :returns: "iob_parameters" list attribute
     """
-    attribute_python_parametes = []
+    attribute_iob_parametes = []
     for name, tuple_item in params.items():
         default_val, description = tuple_item
-        # Create entries in "python_parameters" list attribute (used by py2 for documentation)
-        attribute_python_parametes.append(
+        # Create entries in "iob_parameters" list attribute (used by py2 for documentation)
+        attribute_iob_parametes.append(
             {
                 "name": name,
                 "val": default_val,
@@ -29,7 +29,7 @@ def convert_params_dict(params):
         # Covert values from original dicitonary from tuple into single value
         params[name] = default_val
 
-    return attribute_python_parametes
+    return attribute_iob_parametes
 
 
 def update_params(params, py_params):
@@ -51,8 +51,8 @@ def update_params(params, py_params):
 def iob_system_scripts(attributes_dict, params, py_params):
     """IOb-SoC automatic setup scripts.
     :param dict attributes_dict: iob_system attributes
-    :param dict params: iob_system python parameters
-    :param dict py_params: iob_system argument python parameters
+    :param dict params: iob_system IOb parameters
+    :param dict py_params: iob_system argument IOb parameters
     """
     assert_block_attributes(attributes_dict, py_params)
     handle_system_overrides(attributes_dict, py_params)
@@ -87,7 +87,7 @@ def assert_block_attributes(attributes_dict, py_params):
 def append_board_wrappers(attributes_dict, params):
     """Append board wrappers to superblocks list based on boards_list.
     :param dict attributes_dict: iob_system attributes
-    :param dict params: iob_system python parameters
+    :param dict params: iob_system IOb parameters
     """
     # FIXME: We should have a way for child cores to specify their board's tool (assuming child cores may add new unknown boards)
 
@@ -111,9 +111,9 @@ def append_board_wrappers(attributes_dict, params):
 
 
 def handle_system_overrides(attributes_dict, py_params):
-    """Override/append attributes given in `system_attributes` python parameter (usually by child core).
+    """Override/append attributes given in `system_attributes` IOb parameter (usually by child core).
     :param dict attributes_dict: iob_system attributes
-    :param dict py_params: Dictionary containing `system_attributes` python parameter
+    :param dict py_params: Dictionary containing `system_attributes` IOb parameter
     """
     child_attributes = py_params.get("system_attributes")
     if not child_attributes:
@@ -161,7 +161,7 @@ def handle_system_overrides(attributes_dict, py_params):
 def set_build_dir(attributes_dict, py_params):
     """If build_dir not given in py_params, set a default one.
     :param dict attributes_dict: iob_system attributes
-    :param dict py_params: iob_system argument python parameters
+    :param dict py_params: iob_system argument IOb parameters
     """
     if "build_dir" in py_params and py_params["build_dir"]:
         build_dir = py_params["build_dir"]
@@ -190,7 +190,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
     """Update given attributes_dict to connect peripherals cbus to system's pbus_split.
     :param dict attributes_dict: iob_system attributes
     :param list peripherals: list of peripheral subblocks
-    :param dict params: iob_system python parameters
+    :param dict params: iob_system IOb parameters
     """
     # Find pbus_split
     pbus_split = None
@@ -255,8 +255,8 @@ def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
     """Create C header file containing system memory map.
     :param dict attributes_dict: iob_system attributes
     :param list peripherals_list: list of peripheral subblocks
-    :param dict params: iob_system python parameters
-    :param dict py_params: iob_system argument python parameters
+    :param dict params: iob_system IOb parameters
+    :param dict py_params: iob_system argument IOb parameters
     """
 
     # Don't create files for other targets (like clean)
@@ -322,7 +322,7 @@ def generate_memory_map(attributes_dict, peripherals_list, params, py_params):
                 cpu_subblock = subblock
                 break
 
-        # Update reset address and uncached region passed via python parameters to the CPU
+        # Update reset address and uncached region passed via IOb parameters to the CPU
         bootrom_addr = memory_map.get("bootrom", None)
         if bootrom_addr is not None:
             cpu_subblock["reset_addr"] = bootrom_addr
@@ -338,8 +338,8 @@ def generate_peripheral_base_addresses(
     """Create C header file containing peripheral base addresses.
     :param dict attributes_dict: iob_system attributes
     :param list peripherals_list: list of peripheral subblocks
-    :param dict params: iob_system python parameters
-    :param dict py_params: iob_system argument python parameters
+    :param dict params: iob_system IOb parameters
+    :param dict py_params: iob_system argument IOb parameters
     :param int region_width: width of the peripheral region
     :returns dict: peripheral base addresses. Format: {peripheral_name: address}
     """
@@ -364,8 +364,8 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
     """Generate automatic makefile segments for iob_system.
     :param dict attributes_dict: iob_system attributes
     :param list peripherals: list of peripheral subblocks
-    :param dict params: iob_system python parameters
-    :param dict py_params: iob_system argument python parameters
+    :param dict params: iob_system IOb parameters
+    :param dict py_params: iob_system argument IOb parameters
     """
     name = attributes_dict["name"]
     build_dir = attributes_dict["build_dir"]

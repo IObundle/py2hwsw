@@ -54,8 +54,8 @@ if __name__ == "__main__":
         help="The project root directory",
     )
     parser.add_argument(
-        "--py_params",
-        dest="py_params",
+        "--iob_params",
+        dest="iob_params",
         type=str,
         help="Parameters to pass to the `setup` function of the core's python module. "
         "Parameters will be passed as a dictionary to the `setup` function. "
@@ -196,24 +196,24 @@ if __name__ == "__main__":
         parser.print_usage(sys.stderr)
         exit(1)
 
-    py_params = {}
-    if args.py_params:
-        for param in args.py_params.split(":"):
+    iob_params = {}
+    if args.iob_params:
+        for param in args.iob_params.split(":"):
             k, v = param.split("=")
-            py_params[k] = v
+            iob_params[k] = v
 
     if args.target == "setup":
-        instance = iob_core.get_core_obj(args.core_name, **py_params)
+        instance = iob_core.get_core_obj(args.core_name, **iob_params)
         instance.generate_build_dir()
     elif args.target == "clean":
         iob_core.clean_build_dir(args.core_name)
     elif args.target == "print_build_dir":
-        iob_core.print_build_dir(args.core_name, **py_params)
+        iob_core.print_build_dir(args.core_name, **iob_params)
     elif args.target == "print_core_name":
-        iob_core.print_core_name(args.core_name, **py_params)
+        iob_core.print_core_name(args.core_name, **iob_params)
     elif args.target == "print_core_version":
-        iob_core.print_core_version(args.core_name, **py_params)
+        iob_core.print_core_version(args.core_name, **iob_params)
     elif args.target == "print_core_dict":
-        iob_core.print_core_dict(args.core_name, **py_params)
+        iob_core.print_core_dict(args.core_name, **iob_params)
     elif args.target == "deliver":
-        iob_core.deliver_core(args.core_name, **py_params)
+        iob_core.deliver_core(args.core_name, **iob_params)

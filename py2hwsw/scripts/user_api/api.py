@@ -248,7 +248,7 @@ class iob_core:
         ignore_snippets (list): List of `.vs` file includes in verilog to ignore.
         generate_hw (bool): Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.
         is_tester (bool): Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).
-        supported_python_parameters (list): List of core Python Parameters. Used for documentation.
+        supported_iob_parameters (list): List of core IOb Parameters. Used for documentation.
         license (iob_license): License for the core.
         doc_conf (str): CSR Configuration to use.
         title (str): Title of this core. Used for documentation.
@@ -290,7 +290,7 @@ class iob_core:
     # ignore_snippets: list[str] = empty_list()
     generate_hw: bool = False
     # is_tester: bool = False
-    # python_parameters: list[iob_python_parameter_group] = empty_list()
+    # iob_parameters: list[iob_parameter_group] = empty_list()
     # license: iob_license = field(default_factory=iob_license)
     # doc_conf: str = ""
     # title: str = ""
@@ -350,7 +350,7 @@ def create_core_from_dict(core_dict):
             - ignore_snippets -> iob_core.ignore_snippets
             - generate_hw -> iob_core.generate_hw
             - is_tester -> iob_core.is_tester
-            - python_parameters -> iob_core.python_parameters  # FIXME: Cant have two keys with the same name
+            - iob_parameters -> iob_core.iob_parameters  # FIXME: Cant have two keys with the same name
             - license -> iob_core.license
             - doc_conf -> iob_core.doc_conf
             - title -> iob_core.title

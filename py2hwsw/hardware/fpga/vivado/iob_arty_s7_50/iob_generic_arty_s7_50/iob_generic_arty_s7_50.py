@@ -3,9 +3,9 @@
 # SPDX-License-Identifier: MIT
 
 
-def setup(py_params_dict):
+def setup(iob_params_dict):
     attributes_dict = {
-        "name": py_params_dict["issuer"]["name"] + "_iob_arty_s7_50",
+        "name": iob_params_dict["issuer"]["name"] + "_iob_arty_s7_50",
         "generate_hw": False,
         "confs": [
             {

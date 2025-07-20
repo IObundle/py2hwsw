@@ -472,7 +472,7 @@ def csrs_text2dict(csrs_text):
                 "
 
     Returns:
-        list: with csrs attributes / python parameters list
+        list: with csrs attributes / IOb parameters list
     """
     csrs_flags = [
         ["--csr_if", {"dest": "csr_if"}],

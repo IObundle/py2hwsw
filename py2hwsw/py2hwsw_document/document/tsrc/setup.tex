@@ -8,7 +8,7 @@ Next, navigate to the Py2HWSW directory and run the command \texttt{nix-shell} t
 
 To set up a core, you can use the command:
 \begin{lstlisting}[language=bash]
-nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params 'param1=param1_val:param2=param2_val'"
+nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --iob_params 'param1=param1_val:param2=param2_val'"
 \end{lstlisting}
 
 This command will generate the necessary files and directories for your core in the specified build directory.
@@ -27,11 +27,11 @@ In this example, the \texttt{mycore.py} file contains the core description, and 
 
 In some cases, the Verilog source file (\texttt{mycore.v}) may not be necessary, as the \texttt{mycore.py} file can describe the entire core, including its ports, buses, components, and even custom Verilog code. This allows for a high degree of flexibility and customization, as users can define their core's architecture and behavior entirely within the Python description file.
 
-The Python description is particularly useful because it enables the creation of higher-level abstractions, making it easier to design and work with complex hardware components. Additionally, the use of Python parameters allows for dynamic modification of cores, enabling users to easily customize and adapt their designs to different use cases and applications.
+The Python description is particularly useful because it enables the creation of higher-level abstractions, making it easier to design and work with complex hardware components. Additionally, the use of IOb parameters allows for dynamic modification of cores, enabling users to easily customize and adapt their designs to different use cases and applications.
 
 To set up this core, you would run the command:
 \begin{lstlisting}[language=bash]
-nix-shell --run "py2hwsw mycore setup --build_dir './build' --py_params 'param1=param1_val:param2=param2_val'"
+nix-shell --run "py2hwsw mycore setup --build_dir './build' --iob_params 'param1=param1_val:param2=param2_val'"
 \end{lstlisting}
 
 This would generate the necessary files and directories for the core in the \texttt{./build} directory.

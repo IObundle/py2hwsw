@@ -26,8 +26,8 @@ def generate_docs(core):
         block_gen.generate_subblocks_tex(
             [convert2internal(i) for i in core.subblocks], core.build_dir + "/document/tsrc"
         )
-        generate_py_params_tex(
-            [convert2internal(i) for i in core.python_parameters], core.build_dir + "/document/tsrc"
+        generate_iob_params_tex(
+            [convert2internal(i) for i in core.iob_parameters], core.build_dir + "/document/tsrc"
         )
         generate_tex_file(
             core.build_dir + "/document/tsrc/rn_overview.tex", core.description
@@ -67,10 +67,10 @@ def generate_tex_py2hwsw_attributes(iob_core_instance, out_dir):
     write_table(f"{out_dir}/py2hwsw_attributes", tex_table)
 
 
-def generate_tex_py2hwsw_standard_py_params(out_dir):
-    """Generate TeX table of standard Python Parameters given by py2hwsw to every core.
-    The Python Parameters listed are always received in the argument of the core's setup() function.
-    :param iob_core_instance: Dummy instance of the iob_core class. Used to obtain python parameters of iob_core.
+def generate_tex_py2hwsw_standard_iob_params(out_dir):
+    """Generate TeX table of standard IOb Parameters given by py2hwsw to every core.
+    The IOb Parameters listed are always received in the argument of the core's setup() function.
+    :param iob_core_instance: Dummy instance of the iob_core class. Used to obtain IOb parameters of iob_core.
     :param out_dir: Path to the output directory
     """
 
@@ -102,7 +102,7 @@ def generate_tex_py2hwsw_standard_py_params(out_dir):
         ],
     ]
 
-    write_table(f"{out_dir}/py2hwsw_py_params", tex_table)
+    write_table(f"{out_dir}/py2hwsw_iob_params", tex_table)
 
 
 def generate_tex_core_lib(out_dir):
@@ -121,27 +121,27 @@ def generate_tex_core_lib(out_dir):
     write_table(f"{out_dir}/py2hwsw_core_lib", tex_table)
 
 
-def generate_py_params_tex(python_parameters, out_dir):
-    """Generate TeX section for python parameters of given core.
-    :param list python_parameters: list of python parameter groups
+def generate_iob_params_tex(iob_parameters, out_dir):
+    """Generate TeX section for IOb parameters of given core.
+    :param list iob_parameters: list of IOb parameter groups
     :param str out_dir: path to output directory
     """
 
-    py_params_file = open(f"{out_dir}/py_params.tex", "w")
+    iob_params_file = open(f"{out_dir}/iob_params.tex", "w")
 
-    # FIXME: These python parameters are only used during the setup process. So from the point of view of the build directory, they are not needed.
+    # FIXME: These IOb parameters are only used during the setup process. So from the point of view of the build directory, they are not needed.
     # Maybe we should have a user guide specific for the setup stage?
-    py_params_file.write(
+    iob_params_file.write(
         """
-The following tables describe the supported \\textit{Python Parameters} for the setup of this IP core.
-Note that these \\textit{Python Parameters} are not used during the build process of this core from this build directory.
+The following tables describe the supported \\textit{IOb Parameters} for the setup of this IP core.
+Note that these \\textit{IOb Parameters} are not used during the build process of this core from this build directory.
 They only serve a purpose during the setup process, to configure how the core build directory will be generated.
-See the \\textit{Python Parameters} section of the \\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/py2hwsw_document/document/ug.pdf}{Py2HWSW User Guide} for more details.
+See the \\textit{IOb Parameters} section of the \\href{https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/py2hwsw_document/document/ug.pdf}{Py2HWSW User Guide} for more details.
 """
     )
 
-    for group in python_parameters:
-        py_params_file.write(
+    for group in iob_parameters:
+        iob_params_file.write(
             """
 \\begin{xltabular}{\\textwidth}{|l|c|X|}
 
@@ -151,7 +151,7 @@ See the \\textit{Python Parameters} section of the \\href{https://github.com/IOb
 
   \\input """
             + group.name
-            + """_py_params_tab
+            + """_iob_params_tab
 
   \\caption{"""
             + group.descr.replace("_", "\\_")
@@ -159,26 +159,26 @@ See the \\textit{Python Parameters} section of the \\href{https://github.com/IOb
 \\end{xltabular}
 \\label{"""
             + group.name
-            + """_py_params_tab:is}
+            + """_iob_params_tab:is}
 """
         )
         if group.doc_clearpage:
-            py_params_file.write("\\clearpage")
+            iob_params_file.write("\\clearpage")
 
-    py_params_file.close()
+    iob_params_file.close()
 
-    generate_py_params_tex_table(python_parameters, out_dir)
+    generate_iob_params_tex_table(iob_parameters, out_dir)
 
 
-def generate_py_params_tex_table(python_parameters, out_dir):
-    """Create TeX table for each python parameter group in given list.
-    :param list python_parameters: list of python parameter groups
+def generate_iob_params_tex_table(iob_parameters, out_dir):
+    """Create TeX table for each IOb parameter group in given list.
+    :param list iob_parameters: list of IOb parameter groups
     :param str out_dir: path to output directory
     """
 
-    for group in python_parameters:
+    for group in iob_parameters:
         tex_table = []
-        for param in group.python_parameters:
+        for param in group.iob_parameters:
             tex_table.append(
                 [
                     param.name,
@@ -188,7 +188,7 @@ def generate_py_params_tex_table(python_parameters, out_dir):
             )
 
         # Write table with true parameters and macros
-        write_table(f"{out_dir}/{group.name}_py_params", tex_table)
+        write_table(f"{out_dir}/{group.name}_iob_params", tex_table)
 
 
 def process_tex_macros(tex_src_dir):

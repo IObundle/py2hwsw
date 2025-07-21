@@ -47,8 +47,8 @@ class iob_conf:
 
     Attributes:
         name (str): Configuration identifier name.
-        kind (str): Configuration type, either M (Verilog macro), P (Verilog parameter), C (Constant) or D (Derived Parameter).
-                    False-parameters are the same as verilog parameters except that the its value must not be overriden.
+        kind (str): Configuration type, either M (Verilog macro), P (Verilog parameter), C (Constant), D (Derived Parameter), or L (Local Parameter).
+                    Derived-parameters are the same as verilog parameters except that the its value must not be overriden.
         value (str | int | bool): Configuration value.
         min_value (str | int): Minimum value supported by the configuration option (NA if not applicable).
         max_value (str | int): Maximum value supported by the configuration option (NA if not applicable).

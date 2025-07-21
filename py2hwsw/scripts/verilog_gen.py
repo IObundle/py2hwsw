@@ -198,6 +198,11 @@ def generate_verilog(core):
         params_line = "("
 
     module_body_lines = ""
+
+    local_params = param_gen.generate_localparams(core)
+    if local_params:
+        module_body_lines += local_params + "\n"
+
     if core.buses:
         module_body_lines += bus_gen.generate_buses(core) + "\n"
 

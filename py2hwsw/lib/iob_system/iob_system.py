@@ -191,7 +191,7 @@ def setup(py_params_dict):
                 "max": "4",
             },
             #
-            # False-parameters for generated memories
+            # Derived-parameters for generated memories
             #
             # BOOTROM
             {

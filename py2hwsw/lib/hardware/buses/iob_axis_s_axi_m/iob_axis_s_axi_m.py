@@ -56,7 +56,7 @@ def setup(py_params_dict):
                 "descr": "Read length width",
             },
             #
-            # False-parameters for external memories
+            # Derived-parameters for external memories
             #
             {
                 "name": "WRITE_HEXFILE",

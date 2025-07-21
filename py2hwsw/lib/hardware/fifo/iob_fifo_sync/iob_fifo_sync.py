@@ -263,6 +263,23 @@ def setup(py_params_dict):
                 ],
             },
             {
+                "name": "sync_clk_en_rst_s",
+                "signals": [
+                    {
+                        "name": "clk_i",
+                        "width": 1,
+                    },
+                    {
+                        "name": "cke_i",
+                        "width": 1,
+                    },
+                    {
+                        "name": "arst_i",
+                        "width": 1,
+                    },
+                ],
+            },
+            {
                 "name": "sync_rst",
                 "descr": "Synchronous reset",
                 "signals": [
@@ -379,7 +396,7 @@ def setup(py_params_dict):
                     "RST_VAL": "{W_ADDR_W{1'd0}}",
                 },
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
+                    "clk_en_rst_s": "sync_clk_en_rst_s",
                     "counter_rst_i": "sync_rst",
                     "counter_en_i": "w_en_int",
                     "data_o": "w_addr",
@@ -393,7 +410,7 @@ def setup(py_params_dict):
                     "RST_VAL": "{R_ADDR_W{1'd0}}",
                 },
                 "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
+                    "clk_en_rst_s": "sync_clk_en_rst_s",
                     "counter_rst_i": "sync_rst",
                     "counter_en_i": "r_en_int",
                     "data_o": "r_addr",

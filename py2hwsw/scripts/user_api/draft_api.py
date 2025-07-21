@@ -545,14 +545,14 @@ class iob_portmap:
     Class that represents a portmap attribute.
 
     Attributes:
-        e_connect (iob_bus): Identifier name of external bus that connects this port
+        e_connect (iob_wire | str): External connection.
         e_connect_bit_slices (list): List of bit slices for external connections.
-        port (str): IDentifier name of port associated with portmap
+        port_name (str): Name of port associated with portmap.
     """
 
-    e_connect: iob_bus | None = None
+    e_connect: iob_wire | str = None
     e_connect_bit_slices: list[str] = empty_list()
-    port: str = None
+    port_name: str = None
 
 
 @api_for(py2hwsw_portmap.portmap_from_dict)

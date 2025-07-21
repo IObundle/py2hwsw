@@ -22,10 +22,10 @@ class iob_portmap:
     """Describes an IO portmap connection."""
 
     def validate_attributes(self):
-        if not self.port:
+        if not self.port_name:
             fail_with_msg("Port is not specified", ValueError)
         if not self.e_connect:
-            fail_with_msg(f"Port '{self.port}' is not connected!", ValueError)
+            fail_with_msg(f"Port '{self.port_name}' is not connected!", ValueError)
 
         # TODO: validate if port and external buses really exist.
         pass
@@ -154,7 +154,7 @@ def portmap_from_dict(portmap_dict):
 
         # Create portmap and add to list
         portmap = iob_portmap(
-            port=port_name,
+            port_name=port_name,
             e_connect=external_bus_name,
             e_connect_bit_slices=bit_slices,
         )

@@ -23,6 +23,7 @@ import snippet_gen
 import doc_gen
 import verilog_gen
 import ipxact_gen
+import wire_gen
 
 from iob_base import (
     fail_with_msg,
@@ -41,9 +42,8 @@ from manage_headers import generate_headers
 from iob_license import iob_license
 
 from iob_conf import conf_from_dict
-from iob_wire import iob_wire
+from iob_wire import wire_from_dict
 from iob_port import port_from_dict
-from iob_bus import bus_from_dict
 from iob_snippet import snippet_from_dict
 from iob_parameter import iob_parameter_group_from_dict
 
@@ -135,7 +135,7 @@ class iob_core(iob_module):
                     breakpoint()
             core_dict_with_objects["confs"] = [conf_from_dict(i) for i in core_dictionary.get("confs", [])]
             core_dict_with_objects["ports"] = [port_from_dict(i) for i in core_dictionary.get("ports", [])]
-            core_dict_with_objects["buses"] = [bus_from_dict(i) for i in core_dictionary.get("buses", [])]
+            core_dict_with_objects["wires"] = [wire_from_dict(i) for i in core_dictionary.get("wires", [])]
             core_dict_with_objects["snippets"] = [snippet_from_dict(i) for i in core_dictionary.get("snippets", [])]
             core_dict_with_objects["subblocks"] = [instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
             core_dict_with_objects["superblocks"] = [core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
@@ -215,8 +215,11 @@ class iob_core(iob_module):
         # Generate ios
         io_gen.generate_ports_snippet(self)
 
+        # Generate wires
+        wire_gen.generate_wires_snippet(self)
+
         # Generate buses
-        bus_gen.generate_buses_snippet(self)
+        # bus_gen.generate_buses_snippet(self)
 
         # Generate instances
         if self.generate_hw:

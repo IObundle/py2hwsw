@@ -120,27 +120,21 @@ core_dictionary = {
             "width": "W",
         },
     ],
-    "buses": [
+    "wires": [
         {
-            "name": "and_ab_out",
+            "name": "aab",
             "descr": "and ab output",
-            "wires": [
-                {"name": "aab", "width": "W"},
-            ],
+            "width": "W",
         },
         {
-            "name": "and_cd_out",
+            "name": "cad",
             "descr": "and cd output",
-            "wires": [
-                {"name": "cad", "width": "W"},
-            ],
+            "width": "W",
         },
         {
-            "name": "or_out",
+            "name": "oab",
             "descr": "or output",
-            "wires": [
-                {"name": "oab", "width": "1"},
-            ],
+            "width": "W",
         },
     ],
     "subblocks": [
@@ -154,7 +148,7 @@ core_dictionary = {
             "portmap_connections": {
                 "a_i": "a_i",
                 "b_i": "b_i",
-                "y_o": "and_ab_out",
+                "y_o": "aab",
             },
             # Elements from 'iob_parameters' dictionary will be expanded and passed to the constructor of the iob_and class, like so:
             # iob_and(**iob_parameters)
@@ -185,7 +179,7 @@ core_dictionary = {
             "portmap_connections": {
                 "a_i": "c_i",
                 "b_i": "d_i",
-                "y_o": "and_cd_out",
+                "y_o": "cad",
             },
         },
         {
@@ -196,9 +190,9 @@ core_dictionary = {
                 "W": "W",
             },
             "portmap_connections": {
-                "a_i": "and_ab_out",
-                "b_i": "and_cd_out",
-                "y_o": "or_out",
+                "a_i": "aab",
+                "b_i": "cad",
+                "y_o": "oab",
             },
         },
         {
@@ -209,7 +203,7 @@ core_dictionary = {
                 "W": "W",
             },
             "portmap_connections": {
-                "a_i": "or_out",
+                "a_i": "oab",
                 "y_o": "y_o",
             },
         },
@@ -248,7 +242,7 @@ if __name__ == "__main__":
     print(">>> Ports of iob_aoi: ", iob_aoi_obj.get_ports())
     print(
         ">>> Names of ports of iob_aoi: ",
-        [i.get_global_wire().get_name() for i in iob_aoi_obj.get_ports()],
+        [i.get_wire().get_name() for i in iob_aoi_obj.get_ports()],
     )
 
     iob_aoi_obj.generate_build_dir()

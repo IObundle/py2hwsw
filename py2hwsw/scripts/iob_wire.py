@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 import copy
 
 from iob_base import fail_with_msg, parse_short_notation_text
-from api_base import internal_api_class
+from api_base import internal_api_class, convert2internal
 
 
 @internal_api_class("user_api.api", "iob_wire")
@@ -58,6 +58,8 @@ def get_real_wire(wire):
     """
     while isinstance(wire, iob_wire_reference):
         wire = wire.wire
+    if 'iob_wire' not in wire.__module__:
+        wire = convert2internal(wire)
     return wire
 
 

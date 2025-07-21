@@ -410,11 +410,20 @@ class _interface:
         """Write a single wire to the file."""
         if isinstance(wire, iob_signal_reference):
             return
-        wire_name = self.prefix + wire.name
+        # Avoid prefix duplication: signals from get_signals() already include prefix
+        if self.prefix and wire.name.startswith(self.prefix):
+            wire_name = wire.name
+        else:
+            wire_name = self.prefix + wire.name
         # Remove suffix from wire name if it is already present
         suffix = self.__get_suffix(wire.direction)
         if wire_name.endswith(suffix):
             wire_name = wire_name[: -len(suffix)]
+        
+        # Special handling for iob_clk interface: always use _i suffix for wires
+        if isinstance(self, iobClkInterface) and not for_tb:
+            wire_name = wire_name + "_i"
+        
         wtype = "wire"
         # If this is a testbench wire, add the suffix and change the type
         if for_tb:

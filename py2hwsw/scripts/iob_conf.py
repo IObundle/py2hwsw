@@ -16,9 +16,9 @@ class iob_conf:
     def validate_attributes(self):
         if not self.name:
             fail_with_msg("Every conf must have a name!")
-        if self.kind not in ["P", "M", "C", "D"]:
+        if self.kind not in ["P", "M", "C", "D", "L"]:
             fail_with_msg(
-                f"Conf '{self.name}' type must be either P (Parameter), M (Macro), C (Constant) or D (Derived Parameter)!"
+                f"Conf '{self.name}' type must be either P (Parameter), M (Macro), C (Constant), D (Derived Parameter), or L (Local Parameter)!"
             )
 
         try:

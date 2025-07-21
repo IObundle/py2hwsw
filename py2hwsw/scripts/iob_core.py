@@ -209,8 +209,9 @@ class iob_core(iob_module):
         # Generate configuration files
         config_gen.generate_confs(self)
 
-        # Generate parameters
+        # Generate parameters and local parameters
         param_gen.generate_params_snippets(self)
+        param_gen.generate_localparams_snippets(self)
 
         # Generate ios
         io_gen.generate_ports_snippet(self)

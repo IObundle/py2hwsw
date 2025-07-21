@@ -202,6 +202,10 @@ def generate_verilog(core):
     if core.wires:
         module_body_lines += wire_gen.generate_wires(core) + "\n"
 
+    local_params = param_gen.generate_localparams(core)
+    if local_params:
+        module_body_lines += local_params + "\n"
+
     if core.buses:
         module_body_lines += bus_gen.generate_buses(core) + "\n"
 

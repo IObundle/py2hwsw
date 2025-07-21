@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import iob_interface
 from iob_base import (
     find_obj_in_list,
-    convert_dict2obj_list,
+    create_obj_list,
     fail_with_msg,
     add_traceback_msg,
     str_to_kwargs,
@@ -74,7 +74,7 @@ def create_bus(core, *args, wires=[], **kwargs):
         if type(wires) is list:
             # Convert user wire dictionaries into 'iob_wire' objects
             replace_duplicate_wires_by_references(core.buses + core.ports, wires)
-            sig_obj_list = convert_dict2obj_list(wires, iob_wire)
+            sig_obj_list = create_obj_list(wires, iob_wire)
         elif type(wires) is dict:
             # Convert user interface dictionary into '_interface' object
             interface_obj = dict2interface(

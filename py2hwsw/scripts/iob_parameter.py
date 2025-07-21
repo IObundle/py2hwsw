@@ -5,7 +5,7 @@
 from dataclasses import dataclass
 
 from iob_base import (
-    convert_dict2obj_list,
+    create_obj_list,
     fail_with_msg,
     add_traceback_msg,
     str_to_kwargs,
@@ -71,9 +71,7 @@ def create_iob_parameter_group(core, *args, **kwargs):
         iob_parameters_obj_list = []
         if type(iob_parameters) is list:
             # Convert user iob_parameters dictionaries into 'iob_parameter' objects
-            iob_parameters_obj_list = convert_dict2obj_list(
-                iob_parameters, iob_parameter
-            )
+            iob_parameters_obj_list = create_obj_list(iob_parameters, iob_parameter)
         else:
             fail_with_msg(
                 f"'iob_parameters' attribute must be a list. Error at iob_parameters group \"{group_kwargs.get('name', '')}\".\n{iob_parameters}",

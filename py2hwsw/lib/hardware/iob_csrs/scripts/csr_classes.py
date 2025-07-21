@@ -76,7 +76,7 @@ class iob_csr:
             ]
             # fail_with_msg(f"CSR '{self.name}' has no bit fields", ValueError)
         else:  # Convert fields to objects
-            self.fields = convert_dict2obj_list(self.fields, csr_field)
+            self.fields = create_obj_list(self.fields, csr_field)
 
         # Check if fields properties match CSR properties
         for _field in self.fields:
@@ -194,7 +194,7 @@ def fail_with_msg(msg, exception_type=Exception):
     raise exception_type(FAIL + msg + ENDC)
 
 
-def convert_dict2obj_list(dict_list: dict, obj_class):
+def create_obj_list(dict_list: dict, obj_class):
     """Convert a list of dictionaries to a list of objects
     If list contains elements that are not dictionaries, they are left as is
     param dict_list: list of dictionaries
@@ -239,7 +239,7 @@ def create_csr_group(*args, **kwargs):
         }
 
     # Convert user reg dictionaries into 'iob_csr' objects
-    csr_obj_list = convert_dict2obj_list(regs, iob_csr)
+    csr_obj_list = create_obj_list(regs, iob_csr)
     csr_group = iob_csr_group(regs=csr_obj_list, **group_kwargs)
     return csr_group
 

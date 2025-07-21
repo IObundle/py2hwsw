@@ -188,7 +188,7 @@ def find_obj_in_list(obj_list, obj_name, process_func=lambda o: o):
     return None
 
 
-def convert_dict2obj_list(dict_list: dict, obj_class):
+def create_obj_list(dict_list: dict, obj_class):
     """Convert a list of dictionaries to a list of objects
     If list contains elements that are not dictionaries, they are left as is
     param dict_list: list of dictionaries

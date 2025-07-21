@@ -108,6 +108,16 @@ headers = {
 {{ custom_header_suffix }}
 {% endif %}
 """,
+    "commercial": """\
+------------------------------------------------------------------------
+Copyright (c) 2014-{{ copyright_year }} {{ copyright_holder }}.
+                                                                     
+Please review the terms of the license agreement before using this file.
+{%- if custom_header_suffix %}
+
+{{ custom_header_suffix }}
+{% endif %}
+""",
     # NOTE: Add other header templates here
 }
 
@@ -251,6 +261,10 @@ def generate_headers(
         print("\n".join(files))
         return
 
+    # Override header template for commercial license
+    if license_name.lower() == "commercial":
+        header_template = "commercial"
+
     template_context = {
         "copyright_lines": [
             f"SPDX-FileCopyrightText: {copyright_year} {copyright_holder}",
@@ -258,6 +272,8 @@ def generate_headers(
         "contributor_lines": [],
         "spdx_expressions": [license_name],
         "custom_header_suffix": custom_header_suffix,
+        "copyright_holder": copyright_holder,
+        "copyright_year": copyright_year,
         # Note: spdx_prefix is only needed because otherwise the `reuse` tool has a bug that would miss identify the template line as legitimate SPDX header for this file.
         "spdx_prefix": "SPDX",
     }

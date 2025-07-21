@@ -342,7 +342,7 @@ class iob_core(iob_module, iob_instance):
         print(
             f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
         )
-        # Add SPDX license headers to every file in build dir
+        # Add license headers to every file in build dir
         custom_header = f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
         generate_headers(
             root=self.build_dir,

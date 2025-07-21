@@ -89,7 +89,6 @@ def setup(py_params_dict):
                 },
                 "descr": "Clock, clock enable and reset",
             },
-           
             {
                 "name": "w_en_i",
                 "descr": "Write enable input",
@@ -252,13 +251,16 @@ def setup(py_params_dict):
                     },
                 ],
             },
-
             {
-                "name": "sync_clk_en_rst_s",
-                "signals": {
-                    "type": "iob_clk",
-                },
-                "descr": "Clock, clock enable and reset",
+                "name": "level_incr",
+                "descr": "Internal FIFO level wire",
+                "signals": [
+                    {
+                        "name": "level_incr",
+                        "width": "ADDR_W+1",
+                        "descr": "Internal FIFO level",
+                    },
+                ],
             },
             {
                 "name": "sync_rst",
@@ -267,8 +269,6 @@ def setup(py_params_dict):
                     {
                         "name": "rst_i",
                     },
-
-
                 ],
             },
             {
@@ -276,37 +276,29 @@ def setup(py_params_dict):
                 "descr": "Synchronous external memory interface",
                 "signals": [
                     {
-                         "name": "ext_mem_w_en_o",
-                         "width": "R",
-
+                        "name": "ext_mem_w_en_o",
+                        "width": "R",
                     },
                     {
-                        "name": "ext_mem_r_addr_o",
+                        "name": "ext_mem_w_addr_o",
                         "width": "MINADDR_W",
-
                     },
                     {
                         "name": "ext_mem_w_data_o",
                         "width": "MAXDATA_W",
-
                     },
                     {
                         "name": "ext_mem_r_en_o",
                         "width": "R",
-
                     },
                     {
                         "name": "ext_mem_r_addr_o",
                         "width": "MINADDR_W",
-
                     },
                     {
                         "name": "ext_mem_r_data_i",
                         "width": "MAXDATA_W",
-
                     },
-
-
                 ],
             },
             {
@@ -314,19 +306,16 @@ def setup(py_params_dict):
                 "descr": "Synchronous write",
                 "signals": [
                     {
-                         "name": "w_addr",
-                         "width": "W_ADDR_W",
-
-                    },
-                    {
                         "name": "w_en_int",
                         "width": "1",
-
+                    },
+                    {
+                        "name": "w_addr",
+                        "width": "W_ADDR_W",
                     },
                     {
                         "name": "w_data_i",
                         "width": "W_DATA_W",
-
                     },
                 ],
             },
@@ -335,42 +324,21 @@ def setup(py_params_dict):
                 "descr": "Synchronous read",
                 "signals": [
                     {
-                         "name": "r_addr",
-                         "width": "R_ADDR_W",
-
-                    },
-                    {
                         "name": "r_en_int",
                         "width": "1",
-
+                    },
+                    {
+                        "name": "r_addr",
+                        "width": "R_ADDR_W",
                     },
                     {
                         "name": "r_data_o",
                         "width": "R_DATA_W",
-
                     },
                 ],
             },
-            
-                    
-            ],
+        ],
         "subblocks": [
-            {
-                "core_name": "iob_reg",
-                "instance_name": "level_reg0",
-                "port_params": {
-                    "clk_en_rst_s": "c_a_r",
-                },
-                "parameters": {
-                    "DATA_W": "(ADDR_W + 1)",
-                    "RST_VAL": "({(ADDR_W + 1) {1'd0}})",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "data_i": "level_nxt",
-                    "data_o": "level",
-                },
-            },
             {
                 "core_name": "iob_reg",
                 "instance_name": "r_empty_reg0",
@@ -434,10 +402,10 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_asym_converter",
                 "instance_name": "asym_converter",
-                 "parameters": {
+                "parameters": {
                     "W_DATA_W": "W_DATA_W",
                     "R_DATA_W": "R_DATA_W",
-                    "ADDR_W": "ADDR_W", 
+                    "ADDR_W": "ADDR_W",
                 },
                 "connect": {
                     "extmem_io": "sync_ext_mem",
@@ -445,12 +413,10 @@ def setup(py_params_dict):
                     "write_i": "sync_write",
                     "read_io": "sync_read",
                 },
-
-
             },
             {
                 "core_name": "iob_functions",
-                "instantiate":False,
+                "instantiate": False,
             },
             # For simulation
             {
@@ -458,10 +424,11 @@ def setup(py_params_dict):
                 "instantiate": False,
             },
         ],
-         "comb": {
+        "comb": {
             "code": """
                 level_incr = level + W_INCR;
                 level_nxt  = level;
+                level_rst=rst_i;
                 if (w_en_int && (!r_en_int))  //write only
                     level_nxt = level_incr;
                 else if (w_en_int && r_en_int)  //write and read
@@ -483,8 +450,6 @@ def setup(py_params_dict):
                   {{ADDR_W-1{1'd0}},{1'd1}} << ADDR_W_DIFF : {{ADDR_W-1{1'd0}},{1'd1}};
                 localparam [ADDR_W-1:0] R_INCR = (R_DATA_W > W_DATA_W) ?
                   {{ADDR_W-1{1'd0}},{1'd1}} << ADDR_W_DIFF : {{ADDR_W-1{1'd0}},{1'd1}};
-                reg  [ADDR_W:0] level_nxt;
-                reg [(ADDR_W+1)-1:0] level_incr;
                 assign level_o = level;
                 assign r_empty_nxt = level_nxt < {1'b0, R_INCR};
                 assign w_full_nxt = level_nxt > (FIFO_SIZE - W_INCR);

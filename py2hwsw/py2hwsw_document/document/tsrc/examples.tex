@@ -36,7 +36,7 @@ nix-shell --run "py2hwsw iob_pulse_gen setup --build_dir '$(BUILD_DIR)'"
 
 \subsubsection{iob\_soc Example}
 
-The iob\_soc core is a more complex example used to create a system on chip. The core's attributes are defined in the iob\_soc.py file, available at \url{https://github.com/IObundle/iob-soc}. The iob\_soc.py file supports high-level Python parameters that allow configuring main SoC components like the CPU, memories, and peripherals. To generate the iob\_soc core, follow these steps:
+The iob\_soc core is a more complex example used to create a system on chip. The core's attributes are defined in the iob\_soc.py file, available at \url{https://github.com/IObundle/iob-soc}. The iob\_soc.py file supports high-level IOb parameters that allow configuring main SoC components like the CPU, memories, and peripherals. To generate the iob\_soc core, follow these steps:
 
 \begin{enumerate}
 \item Create or modify the iob\_soc.py file to set the attributes of the core, describing how it should be generated using the Py2HWSW standard core dictionary interface.

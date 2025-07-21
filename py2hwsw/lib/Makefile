@@ -25,7 +25,7 @@ CORE ?=iob_ctls
 
 CSR_IF?=iob
 
-PY_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM):csr_if=$(CSR_IF):mem_addr_w=$(MEM_ADDR_W):fw_addr_w=$(FW_ADDR_W)"
+IOB_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM):csr_if=$(CSR_IF):mem_addr_w=$(MEM_ADDR_W):fw_addr_w=$(FW_ADDR_W)"
 
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi
@@ -42,7 +42,7 @@ py2shell:
 
 
 setup:
-	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params '$(PY_PARAMS)' $(SETUP_ARGS)"
+	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --iob_params '$(IOB_PARAMS)' $(SETUP_ARGS)"
 
 sim-build:
 	nix-shell --run "scripts/test.sh build $(CORE)"

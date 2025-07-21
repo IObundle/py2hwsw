@@ -12,7 +12,7 @@ from iob_base import assert_attributes, parse_short_notation_text
 from api_base import internal_api_class
 
 
-@internal_api_class("user_api.api", "iob_fsm")
+@internal_api_class("user_api.draft_api", "iob_fsm")
 @dataclass
 class iob_fsm(iob_comb):
     """Class to represent a Verilog finite state machine in an iob module"""
@@ -132,9 +132,9 @@ def fsm_from_dict(fsm_dict):
 
 def fsm_text2dict(fsm_text):
     fsm_flags = [
-        ['-t', {"dest": "kind", "choices": ["prog", "fsm"]}],
-        ['-d', {"dest": "default_assignments"}],
-        ['-s', {"dest": "state_descriptions"}],
+        ["-t", {"dest": "kind", "choices": ["prog", "fsm"]}],
+        ["-d", {"dest": "default_assignments"}],
+        ["-s", {"dest": "state_descriptions"}],
     ]
     return parse_short_notation_text(fsm_text, fsm_flags)
 

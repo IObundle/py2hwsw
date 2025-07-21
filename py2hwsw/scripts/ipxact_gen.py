@@ -723,8 +723,8 @@ def generate_ipxact_xml(core, dest_dir):
 
     # Add the CSR IF,
     core_name = core.name
-    if csr_block and "csr_if" in core.received_python_parameters:
-        core_name += "_" + core.received_python_parameters["csr_if"]
+    if csr_block and "csr_if" in core.received_iob_parameters:
+        core_name += "_" + core.received_iob_parameters["csr_if"]
     # core_name += += "_" + core.data_if
 
     # Core name to be displayed in the xml file

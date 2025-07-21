@@ -89,7 +89,7 @@ ug.pdf: debug results figs ugtop.tex
 
 #ug top file containing the definition of sections to include
 ugtop.tex:
-	if ls *_py_params_tab.tex > /dev/null 2>&1; then echo "\def\PYPARAMS{Y}" >> $@; fi
+	if ls *_iob_params_tab.tex > /dev/null 2>&1; then echo "\def\IOBPARAMS{Y}" >> $@; fi
 	if ls *_confs_tab.tex > /dev/null 2>&1; then echo "\def\CONFS{Y}" >> $@; fi
 	if [ -f td.tex ]; then echo "\def\TD{Y}" >> $@; fi
 	if ls *_csrs_tab.tex > /dev/null 2>&1; then echo "\def\CSRS{Y}" >> $@; fi

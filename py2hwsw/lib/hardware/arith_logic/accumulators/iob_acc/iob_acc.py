@@ -97,7 +97,7 @@ def setup(py_params_dict):
             },
         ],
         "subblocks": [
-            # FIXME: iob_reg_re no longer exists, but short notation does not seem to support python parameters (like "port_params")
+            # FIXME: iob_reg_re no longer exists, but short notation does not seem to support IOb parameters (like "port_params")
             # """
             # iob_reg_re reg0 -p DATA_W:DATA_W RST_VAL:RST_VAL -c
             # clk_en_rst_s:clk_en_rst_s

@@ -79,7 +79,7 @@ class iob_reg(py2hwsw.iob_core):
             "name": reg_name,
             "generate_hw": True,
             "description": f"Generated register module.",
-            "python_parameters": [
+            "iob_parameters": [
                 {
                     "name": "port_params",
                     "val": port_params,

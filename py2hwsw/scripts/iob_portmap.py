@@ -16,7 +16,7 @@ from iob_bus import iob_bus
 from api_base import internal_api_class
 
 
-@internal_api_class("user_api.api", "iob_portmap")
+@internal_api_class("user_api.draft_api", "iob_portmap")
 @dataclass
 class iob_portmap:
     """Describes an IO portmap connection."""
@@ -69,9 +69,7 @@ class iob_portmap:
                             else:
                                 search_name = search_name[:-2]
 
-                        e_wire = find_obj_in_list(
-                            bus.wires, search_name, get_real_wire
-                        )
+                        e_wire = find_obj_in_list(bus.wires, search_name, get_real_wire)
                         if not e_wire:
                             if not any(
                                 [

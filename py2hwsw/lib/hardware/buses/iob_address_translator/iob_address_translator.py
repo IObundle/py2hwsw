@@ -101,7 +101,7 @@ def setup(py_params_dict):
     assert MEMORY_ZONES, f"""
 {os.path.basename(__file__)} error:
 No memory zones defined for address translation!
-Memory zones must be configured via the 'memory_zones' python parameter.
+Memory zones must be configured via the 'memory_zones' IOb parameter.
 Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), Offset to add (for translation))
 """
 

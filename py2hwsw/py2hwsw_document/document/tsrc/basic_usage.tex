@@ -4,9 +4,9 @@
 
 To use Py2HWSW, you can run the following command:
 \begin{lstlisting}[language=bash]
-nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --py_params 'param1=param1_val:param2=param2_val"
+nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --iob_params 'param1=param1_val:param2=param2_val"
 \end{lstlisting}
-This command sets up a core using Py2HWSW, where (CORE) is the name of the core, (BUILD DIR) is the directory where the build files will be generated, and (param1=param1\_val:param2=param2\_val) are optional Python parameters that can be used to customize the core.
+This command sets up a core using Py2HWSW, where (CORE) is the name of the core, (BUILD DIR) is the directory where the build files will be generated, and (param1=param1\_val:param2=param2\_val) are optional IOb parameters that can be used to customize the core.
 
 The --build\_dir option allows you to specify the location of the generated build directory. If not specified, the build directory will be generated in the parent directory of where the Py2HWSW command is called.
 

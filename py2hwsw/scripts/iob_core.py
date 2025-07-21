@@ -38,22 +38,23 @@ import sw_tools
 import verilog_format
 import verilog_lint
 from manage_headers import generate_headers
+from iob_license import iob_license
 
 from iob_conf import conf_from_dict
-from iob_wire import iob_global_wire
+from iob_wire import iob_wire
 from iob_port import port_from_dict
 from iob_bus import bus_from_dict
 from iob_snippet import snippet_from_dict
-from iob_python_parameter import python_parameter_group_from_dict
+from iob_parameter import iob_parameter_group_from_dict
+
 
 
 @internal_api_class("user_api.api", "iob_core", allow_unknown_args=True)
 class iob_core(iob_module):
     """Generic class to describe how to generate a base IOb IP core"""
 
-    # List of global wires (netlist)
-    # See 'TODO' in iob_core.py for more info: https://github.com/IObundle/py2hwsw/blob/a1e2e2ee12ca6e6ad81cc2f8f0f1c1d585aaee73/py2hwsw/scripts/iob_core.py#L251-L259
-    global_wires: list[iob_global_wire] = []
+    # List of global wires. Similar concept to 'netlist' in HDL terminology: https://vhdlwhiz.com/terminology/net/#net
+    global_wires: list = []
     # Project settings
     global_build_dir: str = ""
     global_project_root: str = "."
@@ -72,7 +73,7 @@ class iob_core(iob_module):
 
         Attributes:
             core_dictionary (dict): Dictionary to initialize core attributes.
-                                    Supports the same keys as the ones supported by the API's `create_core_from_dict()` method, except for `core` and `python_parameters`. The `core` and `python_parameters` keys are only used to instantiate other user-defined/lib cores (not iob_core directly).
+                                    Supports the same keys as the ones supported by the API's `create_core_from_dict()` method, except for `core` and `iob_parameters`. The `core` and `iob_parameters` keys are only used to instantiate other user-defined/lib cores (not iob_core directly).
         """
 
         # Inherit attributes from superclasses
@@ -81,6 +82,31 @@ class iob_core(iob_module):
         # For debug:
         # print("Iob-core: called")
         # print("Iob-core attributes:", self.__class__.__annotations__)
+
+        # FIXME: Temporary local attributes. Remove them as they get added to the API.
+        self.reset_polarity: str = "positive"
+        self.buses: list = []
+        self.interfaces: list = []
+        self.comb = None
+        self.fsm = None
+        self.subblocks: list = []
+        self.superblocks: list = []
+        self.sw_modules: list = []
+        self.version: str = PY2HWSW_VERSION
+        self.previous_version: str = PY2HWSW_VERSION
+        self.use_netlist: bool = False
+        self.is_system: bool = False
+        self.board_list: list[str] = []
+        self.ignore_snippets: list[str] = []
+        self.is_tester: bool = False
+        self.iob_parameters: list = []
+        self.license: iob_license = iob_license()
+        self.doc_conf: str = ""
+        self.title: str = ""
+        self.dest_dir: str = "hardware/src"
+
+
+
 
         # Set internal attributes
         "Selects if core is top module."
@@ -100,8 +126,8 @@ class iob_core(iob_module):
             # Lazy import instance to avoid circular dependecy
             instance_from_dict = getattr(importlib.import_module('iob_instance'), 'instance_from_dict')
             # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
-            if "core" in core_dictionary or "python_parameters" in core_dictionary:
-                fail_with_msg("The 'core' and 'python_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
+            if "core" in core_dictionary or "iob_parameters" in core_dictionary:
+                fail_with_msg("The 'core' and 'iob_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
             # Convert core dictionary elements to objects
             core_dict_with_objects = core_dictionary.copy()
             for c in core_dictionary.get("confs", []):
@@ -114,8 +140,8 @@ class iob_core(iob_module):
             core_dict_with_objects["subblocks"] = [instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
             core_dict_with_objects["superblocks"] = [core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
             core_dict_with_objects["sw_modules"] = [core_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
-            core_dict_with_objects["python_parameters"] = [python_parameter_group_from_dict(i) for i in core_dictionary.get("python_parameters", [])]
-            update_obj_from_dict(self, core_dict_with_objects, valid_attributes_list=self.get_api_obj().get_supported_attributes().keys())
+            core_dict_with_objects["iob_parameters"] = [iob_parameter_group_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
+            update_obj_from_dict(self, core_dict_with_objects) #, valid_attributes_list=self.get_api_obj().get_supported_attributes().keys())
 
         # Set global build directory
         if self.is_top_module:
@@ -493,7 +519,7 @@ def core_text2dict(core_text):
         ['--gen_hw', {'dest': 'generate_hw', 'action': 'store_true'}],
         ['--parent', {'dest': 'parent'}],
         ['--tester', {'dest': 'is_tester', 'action': 'store_true'}],
-        ['--py_param', {'dest': 'python_parameters', 'action': 'append'}],
+        ['--iob_param', {'dest': 'iob_parameters', 'action': 'append'}],
         ['--lic', {'dest': 'license'}],
         ['--doc_conf', {'dest': 'doc_conf'}],
         ['--title', {'dest': 'title'}],
@@ -503,7 +529,7 @@ def core_text2dict(core_text):
     #   - confs, ports, buses, snippets, comb, fsm,
     #   - subblocks, superblocks, sw_modules
     #   - connect -> portmap_connections, parameters, ignore_snippets?
-    #   - parent?, python_parameters
+    #   - parent?, iob_parameters
     return core_dict
 
 

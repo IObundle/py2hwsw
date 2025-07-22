@@ -12,7 +12,6 @@ import iob_colors
 from iob_wire import get_real_wire
 from iob_port import port_obj_list_process
 import param_gen
-from api_base import convert2internal
 from iob_base import fail_with_msg, find_obj_in_list
 
 
@@ -72,8 +71,7 @@ def generate_subblocks(core):
     returns: Generated verilog code
     """
     code = ""
-    for api_instance in core.subblocks:
-        instance = convert2internal(api_instance)
+    for instance in core.subblocks:
         if not instance.instantiate:
             continue
 
@@ -111,23 +109,24 @@ def get_instance_port_connections(core, instance):
     instance_portmap = ""
 
     # Iterate over all ports of the instance
-    for api_portmap in instance.portmap_connections:
-        portmap = convert2internal(api_portmap)
+    for portmap in instance.portmap_connections:
 
         portmap.validate_attributes()
 
         port = find_obj_in_list(
-            [convert2internal(i) for i in core.ports], portmap.port, process_func=port_obj_list_process
+            core.ports,
+            portmap.port,
+            process_func=port_obj_list_process,
         )
         if not port:
             fail_with_msg(
                 f"Port '{portmap.port}' not found in instance '{instance.name}'!"
             )
 
-        e_connect = find_obj_in_list(
-            [convert2internal(i) for i in core.buses], portmap.e_connect
-        ) or find_obj_in_list(
-            [convert2internal(i) for i in core.ports], portmap.e_connect, process_func=port_obj_list_process
+        e_connect = find_obj_in_list(core.buses, portmap.e_connect) or find_obj_in_list(
+            core.ports,
+            portmap.e_connect,
+            process_func=port_obj_list_process,
         )
         if not e_connect:
             fail_with_msg(
@@ -170,8 +169,7 @@ External connection '{get_real_wire(e_connect).name}' has the following wires:
             continue
 
         # Connect individual wires
-        for idx, api_port_wire in enumerate(port.wires):
-            port_wire = convert2internal(api_port_wire)
+        for idx, port_wire in enumerate(port.wires):
             # Is this still possible? Port should only contain iob_wires objects
             # # Skip wires that are not iob_wires
             # if not isinstance(port_wire, iob_wire):
@@ -182,8 +180,7 @@ External connection '{get_real_wire(e_connect).name}' has the following wires:
             if port.interface and e_connect.interface:
                 # Remove prefix and suffix from port name
                 port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
-                for api_e_wire in e_connect.wires:
-                    e_wire = convert2internal(api_e_wire)
+                for e_wire in e_connect.wires:
                     real_e_wire = get_real_wire(e_wire)
                     e_wire_name = real_e_wire.name
                     # Remove prefix and suffix from external wire name
@@ -197,7 +194,7 @@ External connection '{get_real_wire(e_connect).name}' has the following wires:
                 port_name = port_wire.name
             else:
                 # If both ports are not standard interfaces, connect by index
-                real_e_wire = get_real_wire(convert2internal(e_connect.wires[idx]))
+                real_e_wire = get_real_wire(e_connect.wires[idx])
                 e_wire_name = real_e_wire.name
 
             # If the wire is a bit slice, get the name of the bit slice

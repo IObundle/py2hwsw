@@ -30,8 +30,8 @@ from iob_base import (
     nix_permission_hack,
     update_obj_from_dict,
     parse_short_notation_text,
+    empty_list,
 )
-from api_base import internal_api_class, convert2internal
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_module import iob_module
 import sw_tools
@@ -40,18 +40,64 @@ import verilog_lint
 from manage_headers import generate_headers
 from iob_license import iob_license
 
-from iob_conf import conf_from_dict
-from iob_wire import iob_wire
-from iob_port import port_from_dict
-from iob_bus import bus_from_dict
-from iob_snippet import snippet_from_dict
-from iob_parameter import iob_parameter_group_from_dict
+from iob_conf import create_conf_from_dict
+from iob_wire import create_wire_from_dict
+from iob_port import create_port_from_dict
+from iob_bus import create_bus_from_dict
+from iob_snippet import create_snippet_from_dict
+from iob_parameter import create_iob_parameter_group_from_dict
 
 
 
-@internal_api_class("user_api.api", "iob_core", allow_unknown_args=True)
 class iob_core(iob_module):
-    """Generic class to describe how to generate a base IOb IP core"""
+    """
+    Generic class to describe how to generate a base IOb IP core.
+
+    Attributes:
+        # Module attributes
+        original_name (str): Original name of the module. Usually auto-filled by Py2HWSW.
+                             Must match name of the core's .py file and its class (if any);
+                             Must match name of the core's .json file (if any).
+                             Only manually needed if core is built directly from iob_core (like `my_core = iob_core(<core_attributes>)`).
+        name (str): Name of the generated module. Usually the same as 'original_name' attribute.
+                    The core's generated verilog module, sources, and files will have this name.
+                    If the core has files in its setup directory, containing strings matching the 'original_name', they will all be renamed to this 'name' when copied to the build directory.
+        description (str): Description of the module.
+        reset_polarity (str): Global reset polarity of the module. Can be 'positive' or 'negative'. (Will override all subblocks' reset polarities).
+        confs (list): List of module macros and Verilog (false-)parameters
+        wires (list): List of module wires
+        ports (list): List of module ports
+        buses (list): List of module buses
+        interfaces (list): List of module interfaces
+        snippets (list): List of Verilog code snippets
+        comb (iob_comb): Combinational circuit
+        fsm (iob_fsm): Finite state machine
+        subblocks (list): List of instances of other cores inside this core.
+        superblocks (list): List of wrappers for this core. Will only be setup if this core is a top module, or a wrapper of the top module.
+        sw_modules (list): List of software modules required by this core.
+
+        # Core attributes
+        version (str): Core version. By default is the same as Py2HWSW version.
+        previous_version (str): Core previous version.
+        setup_dir (str): Path to root folder (setup directory) of the core. Usually auto-filled by Py2HWSW.
+                         By default this directory matches the directory of the core's .py/.json file.
+        build_dir (str): Path to folder of build directory to be generated for this project.
+        use_netlist (bool): Copy `<SETUP_DIR>/CORE.v` netlist instead of `<SETUP_DIR>/hardware/src/*`
+        is_system (bool): Sets `IS_FPGA=1` in config_build.mk
+        board_list (list): List of FPGAs supported by this core. A standard folder will be created for each board in this list.
+        ignore_snippets (list): List of `.vs` file includes in verilog to ignore.
+        generate_hw (bool): Select if should try to generate `<corename>.v` from py2hwsw dictionary. Otherwise, only generate `.vs` files.
+        is_tester (bool): Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).
+        supported_iob_parameters (list): List of core IOb Parameters. Used for documentation.
+        license (iob_license): License for the core.
+        doc_conf (str): CSR Configuration to use.
+        title (str): Title of this core. Used for documentation.
+        dest_dir (str): Relative path to the destination inside build directory to copy sources of this core (from this core's hardware/src/ folder).
+                        Only applicable to subblocks/superblocks. Never the top module.
+                        For example, if this core contains dest_dir="hardware/simulation/src", this core's sources (from the hardware/src/ folder) will be copied to <build_dir>/hardware/simulation/src, during the build directory generation process.
+                        Note: Even though this is a core attribute (each instantiated core only has one copy of it), it is usually specified by the instantiator/issuer of this core.
+
+    """
 
     # List of global wires. Similar concept to 'netlist' in HDL terminology: https://vhdlwhiz.com/terminology/net/#net
     global_wires: list = []
@@ -69,11 +115,10 @@ class iob_core(iob_module):
 
     def __init__(self, core_dictionary: dict = {}):
         """
-        Constructor of IP core.
+        Constructor for cores.
 
         Attributes:
-            core_dictionary (dict): Dictionary to initialize core attributes.
-                                    Supports the same keys as the ones supported by the API's `create_core_from_dict()` method, except for `core` and `iob_parameters`. The `core` and `iob_parameters` keys are only used to instantiate other user-defined/lib cores (not iob_core directly).
+            core_dictionary (dict): Optional dictionary to initialize core attributes.
         """
 
         # Inherit attributes from superclasses
@@ -83,24 +128,39 @@ class iob_core(iob_module):
         # print("Iob-core: called")
         # print("Iob-core attributes:", self.__class__.__annotations__)
 
-        # FIXME: Temporary local attributes. Remove them as they get added to the API.
+        # Module attributes
+        # FIXME: Remove original_name attribute. Create py2hwsw `get_original_name()` method that obtains class name dynamically.
+        # The lack of this attribute may cause some issues for .json cores, or cores created with iob_core(core_dict).
+        # But we can probably work around this by creating dynamic subclasses of iob_core with the correct name.
+        self.original_name: str = None
+        self.name: str = ""
+        self.description: str = "Default description"
         self.reset_polarity: str = "positive"
-        self.buses: list = []
-        self.interfaces: list = []
-        self.comb = None
-        self.fsm = None
-        self.subblocks: list = []
-        self.superblocks: list = []
-        self.sw_modules: list = []
+        self.confs: list[iob_conf] = empty_list()
+        self.wires: list[iob_wire] = empty_list()
+        self.ports: list[iob_port] = empty_list()
+        self.buses: list[iob_bus] = empty_list()
+        self.interfaces: list[iob_interface] = empty_list()
+        self.snippets: list[iob_snippet] = empty_list()
+        self.comb: iob_comb | None = None
+        self.fsm: iob_fsm | None = None
+        self.subblocks: list[iob_instance] = empty_list()
+        self.superblocks: list[iob_core] = empty_list()
+        self.sw_modules: list[iob_core] = empty_list()
+
+        # Core attributes
         self.version: str = PY2HWSW_VERSION
         self.previous_version: str = PY2HWSW_VERSION
+        self.setup_dir: str = None
+        self.build_dir: str = "build"
         self.use_netlist: bool = False
         self.is_system: bool = False
-        self.board_list: list[str] = []
-        self.ignore_snippets: list[str] = []
+        self.board_list: list[str] = empty_list()
+        self.ignore_snippets: list[str] = empty_list()
+        self.generate_hw: bool = False
         self.is_tester: bool = False
-        self.iob_parameters: list = []
-        self.license: iob_license = iob_license()
+        self.iob_parameters: list[iob_parameter_group] = empty_list()
+        self.license: iob_license = field(default_factory=iob_license)
         self.doc_conf: str = ""
         self.title: str = ""
         self.dest_dir: str = "hardware/src"
@@ -118,13 +178,13 @@ class iob_core(iob_module):
         "Selects if core is parent of another."
         self.is_parent = False # FIXME: Do we still need this?
 
-        # API attributes with automatic default values
+        # Attributes with automatic default values
         # self.previous_version = self.version # FIXME: Should this be updated later? (For example, if version is changed afterwards?)
 
         # Update current core's attributes with values from given core_dictionary
         if core_dictionary:
             # Lazy import instance to avoid circular dependecy
-            instance_from_dict = getattr(importlib.import_module('iob_instance'), 'instance_from_dict')
+            create_instance_from_dict = getattr(importlib.import_module('iob_instance'), 'create_instance_from_dict')
             # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
             if "core" in core_dictionary or "iob_parameters" in core_dictionary:
                 fail_with_msg("The 'core' and 'iob_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
@@ -133,15 +193,15 @@ class iob_core(iob_module):
             for c in core_dictionary.get("confs", []):
                 if "type" in c:
                     breakpoint()
-            core_dict_with_objects["confs"] = [conf_from_dict(i) for i in core_dictionary.get("confs", [])]
-            core_dict_with_objects["ports"] = [port_from_dict(i) for i in core_dictionary.get("ports", [])]
-            core_dict_with_objects["buses"] = [bus_from_dict(i) for i in core_dictionary.get("buses", [])]
-            core_dict_with_objects["snippets"] = [snippet_from_dict(i) for i in core_dictionary.get("snippets", [])]
-            core_dict_with_objects["subblocks"] = [instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
-            core_dict_with_objects["superblocks"] = [core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
-            core_dict_with_objects["sw_modules"] = [core_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
-            core_dict_with_objects["iob_parameters"] = [iob_parameter_group_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
-            update_obj_from_dict(self, core_dict_with_objects) #, valid_attributes_list=self.get_api_obj().get_supported_attributes().keys())
+            core_dict_with_objects["confs"] = [create_conf_from_dict(i) for i in core_dictionary.get("confs", [])]
+            core_dict_with_objects["ports"] = [create_port_from_dict(i) for i in core_dictionary.get("ports", [])]
+            core_dict_with_objects["buses"] = [create_bus_from_dict(i) for i in core_dictionary.get("buses", [])]
+            core_dict_with_objects["snippets"] = [create_snippet_from_dict(i) for i in core_dictionary.get("snippets", [])]
+            core_dict_with_objects["subblocks"] = [create_instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
+            core_dict_with_objects["superblocks"] = [create_core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
+            core_dict_with_objects["sw_modules"] = [create_core_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
+            core_dict_with_objects["iob_parameters"] = [create_iob_parameter_group_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
+            update_obj_from_dict(self, core_dict_with_objects) #, valid_attributes_list=...)
 
         # Set global build directory
         if self.is_top_module:
@@ -149,7 +209,8 @@ class iob_core(iob_module):
             __class__.global_build_dir = self.build_dir
 
         # Get name of (user's) subclass that is inheriting from iob_core
-        subclass_name=type(self.get_api_obj()).__name__
+        # FIXME: subclass_name=type(self.get_api_obj()).__name__
+
         # Auto-fill original_name based on user subclass's name (if any). May not have subclass if defined via JSON or direct constructor call.
         if not self.original_name and subclass_name != "iob_core":
             self.original_name = subclass_name
@@ -166,6 +227,10 @@ class iob_core(iob_module):
         return
 
     def generate_build_dir(self, **kwargs):
+        """
+        Standard method to generate build directory.
+        May be overridden by user subclasses to generate custom files or run scripts during the build directory generation process.
+        """
         self.validate_attributes()
 
         # Delete existing old build directory
@@ -239,12 +304,6 @@ class iob_core(iob_module):
         if (self.is_top_module and not self.is_parent) or self.is_tester:
             self.post_setup()
 
-    ##############################################################################
-    #
-    # Other non-API methods
-    #
-    ##############################################################################
-
     def validate_attributes(self):
         if not self.original_name:
             fail_with_msg(f"Original name is not defined for core {self}", ValueError)
@@ -297,12 +356,11 @@ class iob_core(iob_module):
         )
         # Add SPDX license headers to every file in build dir
         custom_header = f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
-        lic = convert2internal(self.license)
         generate_headers(
             root=self.build_dir,
-            copyright_holder=lic.author,
-            copyright_year=lic.year,
-            license_name=lic.name,
+            copyright_holder=self.license.author,
+            copyright_year=self.license.year,
+            license_name=self.license.name,
             header_template="spdx",
             custom_header_suffix=custom_header,
             skip_existing_headers=True,
@@ -477,15 +535,66 @@ def clean_build_dir(build_dir):
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def core_from_dict(core_dict):
+def create_core_from_dict(core_dict):
+    """
+    Function to create iob_core object from dictionary attributes.
+
+    Attributes:
+        core_dict (dict): dictionary with values to initialize attributes of iob_core object.
+            This dictionary supports the following keys corresponding to the iob_core attributes:
+
+            # Module keys
+            - original_name -> iob_module.original_name
+            - name -> iob_module.name
+            - description -> iob_module.description
+            - reset_polarity -> iob_module.reset_polarity
+            - confs -> iob_module.confs
+            - wires -> iob_module.wires
+            - ports -> iob_module.ports
+            - buses -> iob_module.buses
+            - interfaces -> iob_module.interfaces
+            - snippets -> iob_module.snippets
+            - comb -> iob_module.comb
+            - fsm -> iob_module.fsm
+            - subblocks -> iob_module.subblocks = [create_core_from_dict(i) for i in subblocks]
+            - superblocks -> iob_module.superblocks = [create_core_from_dict(i) for i in superblocks]
+            - sw_modules -> iob_module.sw_modules = [create_core_from_dict(i) for i in sw_modules]
+
+            # Core keys
+            - version -> iob_core.version
+            - previous_version -> iob_core.previous_version
+            - setup_dir -> iob_core.setup_dir
+            - build_dir -> iob_core.build_dir
+            - use_netlist -> iob_core.use_netlist
+            - is_system -> iob_core.is_system
+            - board_list -> iob_core.board_list
+            - ignore_snippets -> iob_core.ignore_snippets
+            - generate_hw -> iob_core.generate_hw
+            - is_tester -> iob_core.is_tester
+            - iob_parameters -> iob_core.iob_parameters  # FIXME: Cant have two keys with the same name
+            - license -> iob_core.license
+            - doc_conf -> iob_core.doc_conf
+            - title -> iob_core.title
+            - dest_dir -> iob_core.dest_dir
+
+    Returns:
+        iob_core: iob_core object
+    """
     return iob_core(core_dict)
 
 
 def core_text2dict(core_text):
+    """Convert core short notation text to dictionary.
+    Atributes:
+        core_text (str): Short notation text. See `create_core_from_text` for format.
+
+    Returns:
+        dict: Dictionary with core attributes.
+    """
     core_flags = [
         # iob_module attributes
         "original_name",
@@ -534,8 +643,30 @@ def core_text2dict(core_text):
     return core_dict
 
 
-def core_from_text(core_text):
-    return core_from_dict(core_text2dict(core_text))
+def create_core_from_text(core_text):
+    """
+    Function to create iob_core object from short notation text.
+
+    Attributes:
+        core_text (str): Short notation text. Object attributes are specified using the following format:
+            # Notation specific to modules
+            original_name
+
+            # Notation specific to cores
+            # TODO
+
+            # Below are parameters specific to the 'iob_csrs' module. They should probably not belong in the Py2HWSW code
+            [--no_autoaddr]
+            [--rw_overlap]
+            [--csr_if csr_if]
+                [--csr-group csr_group_name]
+                    [-r reg_name:n_bits]
+                        [-t type] [-m mode] [--rst_val rst_val] [--addr addr] [--log2n_items log2n_items]
+
+    Returns:
+        iob_core: iob_core object
+    """
+    return create_core_from_dict(core_text2dict(core_text))
 
 
 def get_global_wires_list():

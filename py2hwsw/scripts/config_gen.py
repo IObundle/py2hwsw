@@ -8,7 +8,6 @@ import os
 import re
 
 from latex import write_table
-from api_base import convert2internal
 
 
 def conf_vh(macros, top_module, out_dir):
@@ -287,7 +286,7 @@ def generate_confs(core):
     """Generate Verilog and software macros based on the core's 'confs' list.
     :param core: core object
     """
-    confs = [convert2internal(i) for i in core.confs]
+    confs = core.confs
     conf_vh(
         confs,
         core.name,

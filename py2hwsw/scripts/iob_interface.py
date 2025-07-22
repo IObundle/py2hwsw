@@ -12,7 +12,6 @@ from dataclasses import dataclass, field
 
 from iob_wire import iob_wire, iob_wire_reference
 from iob_globals import iob_globals
-from api_base import internal_api_class
 from iob_base import parse_short_notation_text
 
 mem_if_details = [
@@ -276,10 +275,24 @@ if_types = [
 ]
 
 
-@internal_api_class("user_api.draft_api", "interface")
 @dataclass
 class iob_interface:
-    """Class to represent an interface for generation"""
+    """
+    Class to represent an interface for generation.
+
+    Attributes:
+        if_direction (str): Interface direction. Examples: '' (unspecified), 'manager', 'subordinate', ...
+        prefix (str): Prefix for wires of the interface.
+        mult (str or int): Width multiplier. Used when concatenating multiple instances of the interface.
+        file_prefix (str): Prefix for generated "Verilog Snippets" of this interface.
+        portmap_port_prefix (str): Prefix for "Verilog snippets" of portmaps of this interface:
+    """
+
+    if_direction: str = ""
+    prefix: str = ""
+    mult: str | int = 1
+    file_prefix: str = ""
+    portmap_port_prefix: str = ""
 
     # List of wires for this interface (Internal, used for generation)
     _wires: list = field(default_factory=list)
@@ -2166,15 +2179,37 @@ if __name__ == "__main__":
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def interface_from_dict(interface_dict):
+def create_interface_from_dict(interface_dict):
+    """
+    Function to create interface object from dictionary attributes.
+
+    Attributes:
+        interface_dict (dict): dictionary with values to initialize attributes of interface object.
+            This dictionary supports the following keys corresponding to the interface attributes:
+            - if_direction        -> interface.if_direction
+            - prefix              -> interface.prefix
+            - mult                -> interface.mult
+            - file_prefix         -> interface.file_prefix
+            - portmap_port_prefix -> interface.portmap_port_prefix
+
+    Returns:
+        interface: interface object
+    """
     return create_interface(**interface_dict)
 
 
 def interface_text2dict(interface_text):
+    """Convert interface short notation text to dictionary.
+    Atributes:
+        interface_text (str): Short notation text. See `create_interface_from_text` for format.
+
+    Returns:
+        dict: Dictionary with interface attributes.
+    """
     interface_flags = [
         "genre",
         ["-d", {"dest": "if_direction", "choices": ["", "manager", "subordinate"]}],
@@ -2197,5 +2232,21 @@ def interface_text2dict(interface_text):
     interface_dict.update({"widths": width_dict})
     return interface_dict
 
-def interface_from_text(interface_text):
-    return interface_from_dict(interface_text2dict(interface_text))
+def create_interface_from_text(interface_text):
+    """
+    Function to create interface object from short notation text.
+
+    Attributes:
+        interface_text (str): Short notation text. Object attributes are specified using the following format:
+            genre [-d direction] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
+            Examples:
+                axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
+
+                rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32
+
+                axis -p output_ -P 'has_tlast'
+
+    Returns:
+        interface: interface object
+    """
+    return create_interface_from_dict(interface_text2dict(interface_text))

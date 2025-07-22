@@ -3,16 +3,25 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
+from datetime import date
 
 from iob_base import fail_with_msg, parse_short_notation_text
 
-from api_base import internal_api_class
 
-
-@internal_api_class("user_api.draft_api", "iob_license")
 @dataclass
 class iob_license:
-    """Class that represents a license attribute"""
+    """
+    Class that represents a license attribute.
+
+    Attributes:
+        name (str): Name of the license.
+        year (int): Year of the license.
+        author (str): Author of the license.
+    """
+
+    name: str = "MIT"
+    year: int = date.today().year
+    author: str = "IObundle, Lda"
 
 
 def update_license(core, *args, **kwargs):
@@ -27,15 +36,35 @@ def update_license(core, *args, **kwargs):
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def license_from_dict(license_dict):
+def create_license_from_dict(license_dict):
+    """
+    Function to create iob_license object from dictionary attributes.
+
+    Attributes:
+        license_dict (dict): dictionary with values to initialize attributes of iob_license object.
+            This dictionary supports the following keys corresponding to the iob_license attributes:
+            - name -> iob_license.name
+            - year -> iob_license.year
+            - author -> iob_license.author
+
+    Returns:
+        iob_license: iob_license object
+    """
     return iob_license(**license_dict)
 
 
 def license_text2dict(license_text):
+    """Convert license short notation text to dictionary.
+    Atributes:
+        license_text (str): Short notation text. See `create_license_from_text` for format.
+
+    Returns:
+        dict: Dictionary with license attributes.
+    """
     license_flags = [
         "name",
         ["-y", {"dest": "year", "type": int}],
@@ -44,5 +73,17 @@ def license_text2dict(license_text):
     return parse_short_notation_text(license_text, license_flags)
 
 
-def license_from_text(license_text):
-    return license_from_dict(license_text2dict(license_text))
+def create_license_from_text(license_text):
+    """
+    Function to create iob_license object from short notation text.
+
+    Attributes:
+        license_text (str): Short notation text. Object attributes are specified using the following format:
+            [name] [-y year] [-a author]
+            Example:
+                MIT -y 2025 -a 'IObundle, Lda'
+
+    Returns:
+        iob_license: iob_license object
+    """
+    return create_license_from_dict(license_text2dict(license_text))

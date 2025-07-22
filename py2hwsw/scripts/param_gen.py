@@ -7,7 +7,6 @@
 import os
 
 from iob_base import find_obj_in_list, fail_with_msg
-from api_base import convert2internal
 
 
 def get_core_params(confs, kinds=["P", "D"]):
@@ -15,8 +14,7 @@ def get_core_params(confs, kinds=["P", "D"]):
     Returns a new filtered list containing only parameters of specified 'kinds'.
     """
     core_parameters = []
-    for api_conf in confs:
-        conf = convert2internal(api_conf)
+    for conf in confs:
         if conf.kind in kinds:
             core_parameters.append(conf)
     return core_parameters
@@ -114,7 +112,7 @@ def generate_localparams_snippets(core):
 
 def validate_params(instance):
     """Check if all parameters are within the allowed range"""
-    core_parameters = get_core_params(convert2internal(instance.core).confs)
+    core_parameters = get_core_params(instance.core.confs)
     for p_name, p_value in instance.parameters.items():
         if isinstance(p_value, str):
             continue

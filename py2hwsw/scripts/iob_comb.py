@@ -10,13 +10,38 @@ from iob_base import fail_with_msg, assert_attributes, parse_short_notation_text
 from iob_bus import find_wire_in_buses
 from iob_wire import get_real_wire
 from iob_interface import iobClkInterface
-from api_base import internal_api_class
 
 
-@internal_api_class("user_api.draft_api", "iob_comb")
 @dataclass
 class iob_comb(iob_snippet):
-    """Class to represent a Verilog combinatory circuit in an iob module"""
+    """
+    Class to represent a Verilog combinatory circuit in an iob module.
+
+    Attributes:
+        code (str): Verilog body code of the @always block.
+                    This string will be parsed to automatically identify and infer registers.
+                    The `iob_reg` Py2HWSW lib module will be automatically instantiated in the core for each wire '<name>' if the following conditions are met:
+                    - The bus '<name>' with single wire '<name>' exists in the core;
+                    - The wire '<name>_nxt' is used in the iob_comb's code. The bus '<name>_nxt' will be automatically created if it does not exist;
+
+                    The infered register will have the instance name '<name>_reg'. It will automatically connect it's input to the '<name>_nxt' wire, and it's output to the '<name>' wire.
+
+                    If the following wires are found in the iob_comb's code, their buses are automatically created and the corresponding register will be updated:
+                    - The '<name>_rst' wire will cause the register to have a reset port, and be connected to this bus;
+                    - The '<name>_en' wire will cause the register to have an enable port, and be connected to this bus;
+
+                    For example, if we define the 'reg_wire' bus in the core, and the iob_comb has the following code:
+                    '''
+                    reg_wire_nxt = reg_wire + 1;
+                    '''
+                    then the 'reg_wire_nxt' bus will be automatically created, and the 'reg_wire_reg' register will be instantiated.
+        clk_if (str): Clock interface
+        clk_prefix (str): Clock interface prefix
+    """
+
+    code: str = ""
+    clk_if: str = "c_a"
+    clk_prefix: str = ""
 
     def validate_attributes(self):
         pass
@@ -265,15 +290,34 @@ def create_comb(core, *args, **kwargs):
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def comb_from_dict(comb_dict):
+def create_comb_from_dict(comb_dict):
+    """
+    Function to create iob_comb object from dictionary attributes.
+
+    Attributes:
+        comb_dict (dict): dictionary with values to initialize attributes of iob_comb object.
+            This dictionary supports the following keys corresponding to the iob_comb attributes:
+            - code -> iob_comb.code
+            - clk_if -> iob_comb.clk_if
+
+    Returns:
+        iob_comb: iob_comb object
+    """
     return iob_comb(**comb_dict)
 
 
 def comb_text2dict(comb_text):
+    """Convert comb short notation text to dictionary.
+    Atributes:
+        comb_text (str): Short notation text. See `create_comb_from_text` for format.
+
+    Returns:
+        dict: Dictionary with comb attributes.
+    """
     comb_flags = [
         ["-c", {"dest": "code"}],
         ["-clk_if", {"dest": "clk_if"}],
@@ -283,5 +327,23 @@ def comb_text2dict(comb_text):
     return parse_short_notation_text(comb_text, comb_flags)
 
 
-def comb_from_text(comb_text):
-    return comb_from_dict(comb_text2dict(comb_text))
+def create_comb_from_text(comb_text):
+    """
+    Function to create iob_comb object from short notation text.
+
+    Attributes:
+        comb_text (str): Short notation text. Object attributes are specified using the following format:
+            [-c code] [-clk_if clk_if] [-clk_p clk_prefix]
+            Example:
+                -c
+                {{
+                    // Register data
+                    data_nxt = data;
+                }}
+                -clk_if c_a_r
+                -clk_p data_
+
+    Returns:
+        iob_comb: iob_comb object
+    """
+    return create_comb_from_dict(comb_text2dict(comb_text))

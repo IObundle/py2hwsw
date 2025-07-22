@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from dataclasses import field
 import importlib
 import os
 import shutil
@@ -156,18 +157,15 @@ class iob_core(iob_module):
         self.build_dir: str = "build"
         self.use_netlist: bool = False
         self.is_system: bool = False
-        self.board_list: list[str] = empty_list()
-        self.ignore_snippets: list[str] = empty_list()
+        self.board_list: list[str] = []
+        self.ignore_snippets: list[str] = []
         self.generate_hw: bool = False
         self.is_tester: bool = False
-        self.iob_parameters: list[iob_parameter_group] = empty_list()
-        self.license: iob_license = field(default_factory=iob_license)
+        self.iob_parameters: list[iob_parameter_group] = []
+        self.license: iob_license = iob_license()
         self.doc_conf: str = ""
         self.title: str = ""
         self.dest_dir: str = "hardware/src"
-
-
-
 
         # Set internal attributes
         "Selects if core is top module."
@@ -212,6 +210,8 @@ class iob_core(iob_module):
 
         # Get name of (user's) subclass that is inheriting from iob_core
         # FIXME: subclass_name=type(self.get_api_obj()).__name__
+        # TEMPFIX:
+        subclass_name = self.__class__.__name__
 
         # Auto-fill original_name based on user subclass's name (if any). May not have subclass if defined via JSON or direct constructor call.
         if not self.original_name and subclass_name != "iob_core":

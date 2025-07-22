@@ -18,8 +18,7 @@ from iob_base import (
 )
 from iob_portmap import iob_portmap, get_portmap_port
 from iob_wire import remove_wire_direction_suffixes
-from iob_core import create_core_from_dict, find_module_setup_dir
-from iob_portmap import portmap_from_dict
+from iob_core import iob_core, find_module_setup_dir
 
 
 class iob_instance(iob_base):

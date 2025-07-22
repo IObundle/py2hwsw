@@ -14,7 +14,7 @@ from iob_globals import iob_globals, create_globals
 from iob_block import create_block
 
 
-@prevent_instantiation
+# @prevent_instantiation
 class iob_module(iob_base):
     """Class to describe a (Verilog) module"""
 

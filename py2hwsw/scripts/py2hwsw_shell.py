@@ -59,12 +59,21 @@ class CustomFunction:
 
 # Create a custom shell class
 class Py2hwswShell(code.InteractiveConsole):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, interactive=sys.stdin.isatty(), **kwargs):
         super().__init__(*args, **kwargs)
+        # Print help message on startup
         self.print_help_message()
+        self.interactive = interactive
 
     def print_help_message(self):
         print(HELP_MSG)
+
+    def raw_input(self, prompt):
+        line = super().raw_input(prompt)  # Reads from stdin
+        if not self.interactive:
+            # Not interactive: Echo input line to stdout
+            print(line)
+        return line
 
 
 def import_py2hwsw_modules():
@@ -92,7 +101,7 @@ def import_py2hwsw_modules():
         # Import the module
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         module = importlib.util.module_from_spec(spec)
-        sys.modules[module_name] = module  # Include module in current namespace
+        sys.modules[module_name] = module  # Include module in global namespace
         py2_modules[module_name] = module
         spec.loader.exec_module(module)
 
@@ -129,8 +138,6 @@ def import_lib_cores(py2_modules: dict):
         imported_module = import_python_module(
             path, module_name=module_name, extra_namespace_objs=py2_modules
         )
-        # Include module in current namespace
-        sys.modules[module_name] = imported_module
         # Import only the class defined in that module
         lib_modules[module_name] = imported_module.__dict__[module_name]
 
@@ -167,6 +174,13 @@ def list_modules_msg(header: str, modules: dict):
 
 # Create an instance of the custom shell
 def main():
+    if sys.stdin.isatty():
+        print("DEBUG: Running interactively (terminal input)")
+        interactive = True
+    else:
+        print("DEBUG: Running non-interactively (e.g., input from file or pipe)")
+        interactive = False
+
     sys.ps1 = ">>> "
     # Import py2 modules and lib cores
     py2_modules = import_py2hwsw_modules()
@@ -185,7 +199,7 @@ def main():
     local_vars["list_lib_modules"] = CustomFunction(
         None, list_modules_msg("List of Py2HWSW lib modules:", lib_modules)
     )
-    shell = Py2hwswShell(locals=local_vars)
+    shell = Py2hwswShell(locals=local_vars, interactive=interactive)
     shell.interact()
 
 

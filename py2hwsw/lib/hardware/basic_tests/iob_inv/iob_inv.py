@@ -32,7 +32,7 @@ core_dictionary = {
 }
 
 
-class iob_inv(iob_core):
+class iob_inv(iob_core.iob_core):
     def __init__(self):
         super().__init__(core_dictionary)
 

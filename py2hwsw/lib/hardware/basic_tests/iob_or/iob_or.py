@@ -66,7 +66,7 @@ core_dictionary = {
 }
 
 
-class iob_or(iob_core):
+class iob_or(iob_core.iob_core):
     def __init__(self, width=None):
         if width:
             core_dictionary["confs"][0]["value"] = str(width)

@@ -24,7 +24,6 @@ And this script overrides existing headers (does not keep old license headers).
 """
 
 import os
-import argparse
 from datetime import datetime
 from jinja2 import Template
 

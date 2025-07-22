@@ -223,7 +223,7 @@ core_dictionary = {
 }
 
 
-class iob_aoi(iob_core):
+class iob_aoi(iob_core.iob_core):
     def __init__(self):
         print("iob_aoi constructor called.")
         super().__init__(core_dictionary)

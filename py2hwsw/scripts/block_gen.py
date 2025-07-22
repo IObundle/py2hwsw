@@ -132,9 +132,9 @@ def get_instance_port_connections(core, instance):
         if isinstance(e_connect, iob_port):
             e_connect = e_connect.wire
         # e_connect = find_obj_in_list(
-        #     [convert2internal(i) for i in core.buses], portmap.e_connect
+        #     core.buses, portmap.e_connect
         # ) or find_obj_in_list(
-        #     [convert2internal(i) for i in core.ports], portmap.e_connect, process_func=port_obj_list_process
+        #     core.ports, portmap.e_connect, process_func=port_obj_list_process
         # )
         if not e_connect:
             fail_with_msg(
@@ -179,8 +179,7 @@ def get_instance_port_connections(core, instance):
 
         # Connect individual wires
         # TODO: add support for bus/interfaces
-        # for idx, api_port_wire in enumerate(port.wires):
-        # port_wire = convert2internal(port_wire)
+        # for idx, port_wire in enumerate(port.wires):
         # Is this still possible? Port should only contain iob_wires objects
         # # Skip wires that are not iob_wires
         # if not isinstance(port_wire, iob_wire):
@@ -190,8 +189,7 @@ def get_instance_port_connections(core, instance):
         # if port.interface and e_connect.interface:
         #     # Remove prefix and suffix from port name
         #     port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
-        #     for api_e_wire in e_connect.wires:
-        #         e_wire = convert2internal(api_e_wire)
+        #     for e_wire in e_connect.wires:
         #         real_e_wire = get_real_wire(e_wire)
         #         e_wire_name = real_e_wire.name
         #         # Remove prefix and suffix from external wire name

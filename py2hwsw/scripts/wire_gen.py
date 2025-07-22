@@ -8,7 +8,6 @@
 #    bus_gen.py: build Verilog module buses
 #
 from iob_wire import iob_wire
-from api_base import convert2internal
 
 
 def generate_wires(core):
@@ -16,9 +15,8 @@ def generate_wires(core):
     returns: Generated verilog code
     """
     code = ""
-    for api_wire in core.wires:
+    for wire in core.wires:
         wires_code = ""
-        wire = convert2internal(api_wire)
         if isinstance(wire, iob_wire):
             if wire:
                 wires_code += "    " + wire.get_verilog_bus()

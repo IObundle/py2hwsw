@@ -362,7 +362,6 @@ def instantiate_block(
     # Create instance of block
     instance_obj = iob_instance(**block_dict, core=block_obj)
 
-    # block_obj = convert2internal(block_obj)
     # # Auto-set block attributes
     # if not block_obj.original_name:
     #     block_obj.original_name = block_name

@@ -69,8 +69,6 @@ def get_real_wire(wire):
     """
     while isinstance(wire, iob_wire_reference):
         wire = wire.wire
-    if 'iob_wire' not in wire.__module__:
-        wire = convert2internal(wire)
     return wire
 
 

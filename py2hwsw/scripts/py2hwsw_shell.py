@@ -182,13 +182,6 @@ def list_modules_msg(header: str, modules: dict):
 
 # Create an instance of the custom shell
 def main():
-    if sys.stdin.isatty():
-        print("DEBUG: Running interactively (terminal input)")
-        interactive = True
-    else:
-        print("DEBUG: Running non-interactively (e.g., input from file or pipe)")
-        interactive = False
-
     sys.ps1 = ">>> "
     # Import py2 modules and lib cores
     py2_modules = import_py2hwsw_modules()
@@ -207,7 +200,7 @@ def main():
     local_vars["list_lib_modules"] = CustomFunction(
         None, list_modules_msg("List of Py2HWSW lib modules:", lib_modules)
     )
-    shell = Py2hwswShell(locals=local_vars, interactive=interactive)
+    shell = Py2hwswShell(locals=local_vars)
     shell.interact()
 
 

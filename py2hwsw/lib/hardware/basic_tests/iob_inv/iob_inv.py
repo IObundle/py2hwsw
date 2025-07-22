@@ -4,7 +4,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-import py2hwsw_api as py2hwsw
+import os
+import sys
+
+path_sufix = "../../../../scripts"
+sys.path.insert(
+    0,
+    os.path.abspath(
+        os.path.join(os.path.dirname(os.path.realpath(__file__)), path_sufix)
+    ),
+)
+
+from iob_core import iob_core
 
 core_dictionary = {
     "generate_hw": True,
@@ -34,11 +45,13 @@ core_dictionary = {
 }
 
 
-class iob_inv(py2hwsw.iob_core):
-    def __init__(self):
+class iob_inv(iob_core):
+    def __init__(self, width=None):
+        if width:
+            core_dictionary["confs"][0]["value"] = str(width)
         super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
-    iob_inv_obj = iob_inv()
+    iob_inv_obj = iob_inv(width=6)
     iob_inv_obj.generate_build_dir()

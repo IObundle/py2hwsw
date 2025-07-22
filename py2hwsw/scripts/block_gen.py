@@ -84,7 +84,7 @@ def generate_subblocks(core):
 
         code += f"""\
         // {instance.description}
-        {instance.core.get_name()} {params_str}{instance.name} (
+        {instance.core.name} {params_str}{instance.name} (
     {get_instance_port_connections(core, instance)}\
         );
 
@@ -112,34 +112,32 @@ def get_instance_port_connections(core, instance):
     # Iterate over all ports of the instance
     for portmap in instance.portmap_connections:
 
-        portmap.validate_attributes()
+        # connect portmap port_name name to matching core port
+        portmap.connect_port(core.ports)
 
-        port = find_obj_in_list(
-            core.ports,
-            portmap.port,
-            process_func=port_obj_list_process,
-        )
+        portmap.validate_attributes()
+        port = portmap.port
         if not port:
             fail_with_msg(
                 f"Port '{portmap.port}' not found in instance '{instance.name}'!"
             )
 
-        e_connect = find_obj_in_list(core.wires, portmap.e_connect) or find_obj_in_list(
-            core.ports,
-            portmap.e_connect,
-            process_func=port_obj_list_process,
+        # search for matching connection in core wires, buses and ports
+        e_connect = (
+            find_obj_in_list(core.wires, portmap.e_connect)
+            or find_obj_in_list(core.buses, portmap.e_connect)
+            or find_obj_in_list(
+                core.ports,
+                portmap.e_connect,
+                process_func=port_obj_list_process,
+            )
         )
-        if isinstance(e_connect, iob_port):
-            e_connect = e_connect.wire
-        # e_connect = find_obj_in_list(
-        #     core.buses, portmap.e_connect
-        # ) or find_obj_in_list(
-        #     core.ports, portmap.e_connect, process_func=port_obj_list_process
-        # )
         if not e_connect:
             fail_with_msg(
                 f"Bus/Port '{portmap.e_connect}' not found in core '{core.name}'!"
             )
+        if isinstance(e_connect, iob_port):
+            e_connect = e_connect.wire
 
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
@@ -147,18 +145,18 @@ def get_instance_port_connections(core, instance):
 
         # If one of the ports is not a standard inferface, check if the number of wires is the same
         # TODO: interface/bus support
-#         if not port.interface or not e_connect.interface:
-#             newlinechar = "\n"
-#             assert len(port.wires) == len(
-#                 e_connect.wires
-#             ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of wires compared to external connection '{port.e_connect.name}'!
-# Port '{port.name}' has the following wires:
-# {newlinechar.join("- " + get_real_wire(port).name for port in port.wires)}
-#
-# External connection '{get_real_wire(e_connect).name}' has the following wires:
-# {newlinechar.join("- " + get_real_wire(port).name for port in e_connect.wires)}
-# {iob_colors.ENDC}
-# """
+        #         if not port.interface or not e_connect.interface:
+        #             newlinechar = "\n"
+        #             assert len(port.wires) == len(
+        #                 e_connect.wires
+        #             ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of wires compared to external connection '{port.e_connect.name}'!
+        # Port '{port.name}' has the following wires:
+        # {newlinechar.join("- " + get_real_wire(port).name for port in port.wires)}
+        #
+        # External connection '{get_real_wire(e_connect).name}' has the following wires:
+        # {newlinechar.join("- " + get_real_wire(port).name for port in e_connect.wires)}
+        # {iob_colors.ENDC}
+        # """
 
         # Is this still possible? I think iob_port.wires may only contain iob_wire objects
         # # If port has only non-iob wires, skip it

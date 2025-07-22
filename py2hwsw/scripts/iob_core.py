@@ -50,7 +50,6 @@ from iob_snippet import create_snippet_from_dict
 from iob_parameter import create_iob_parameter_group_from_dict
 
 
-
 class iob_core(iob_module):
     """
     Generic class to describe how to generate a base IOb IP core.
@@ -247,7 +246,7 @@ class iob_core(iob_module):
                 if subblock.original_name == self.issuer.original_name:
                     # skip build dir generation for issuer subblocks
                     continue
-            subblock.get_core().generate_build_dir()
+            subblock.core.generate_build_dir()
 
         # Generate build dir of superblocks. Ensure superblocks are set up only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:

@@ -33,6 +33,10 @@ class iob_portmap:
     port_name: str = ""
     port: iob_port = None
 
+    def __post_init__(self):
+        if not self.port_name and self.port:
+            self.port_name = self.port.wire.name
+
     def validate_attributes(self):
         if not self.port_name:
             fail_with_msg("Port is not specified", ValueError)
@@ -46,9 +50,10 @@ class iob_portmap:
         """Connect the portmap to an iob_port object
         Use the port_name to find the matching port in the list of ports
         """
-        for p in ports:
-            if p.wire.name == self.port_name:
-                self.port = p
+        if not self.port:
+            for p in ports:
+                if p.wire.name == self.port_name:
+                    self.port = p
 
     # NOTE: THis connect_external already performs validation (including search for external bus (that may be non-existent).
     # We should probably only call this with `validate_attributes()`

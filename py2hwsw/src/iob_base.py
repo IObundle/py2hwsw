@@ -475,7 +475,7 @@ def prevent_instantiation(cls):
         def __new__(cls, *args, **kwargs):
             if cls is Wrapper:
                 raise RuntimeError(f"Cannot instantiate {cls.__name__} directly.")
-            return super().__new__(cls, *args, **kwargs)
+            return super().__new__(cls)
     return Wrapper
 
 #

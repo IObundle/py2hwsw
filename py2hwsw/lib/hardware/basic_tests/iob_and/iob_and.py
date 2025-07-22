@@ -4,7 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-import py2hwsw_api as py2hwsw
+# FIXME: API no longer exists
+# import py2hwsw_api as py2hwsw
 
 core_dictionary = {
     "generate_hw": True,

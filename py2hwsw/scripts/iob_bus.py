@@ -7,27 +7,49 @@ from dataclasses import dataclass
 import iob_interface
 from iob_base import (
     find_obj_in_list,
-    convert_dict2obj_list,
+    create_obj_list,
     fail_with_msg,
     add_traceback_msg,
     str_to_kwargs,
     assert_attributes,
     parse_short_notation_text,
+    empty_list,
 )
 from iob_wire import (
     iob_wire,
     iob_wire_reference,
     get_real_wire,
-    wire_from_dict,
+    create_wire_from_dict,
 )
 
-from api_base import internal_api_class
 
-
-@internal_api_class("user_api.draft_api", "iob_bus")
 @dataclass
 class iob_bus:
-    """Py2HWSW's internal implementation of 'iob_bus' API class."""
+    """
+    Class to represent a bus in an iob module.
+
+    Attributes:
+        name (str): Identifier name for the bus.
+        descr (str): Description of the bus.
+        wires (list): List of wires belonging to this bus
+                        (each wire represents a hardware Verilog bus).
+    """
+
+    name: str = ""
+    descr: str = "Default description"
+    wires: list[iob_wire] = empty_list()
+
+    def get_wire(self, wire_name: str) -> iob_wire:
+        """
+        Find a wire by name and return it.
+
+        Args:
+            wire_name (str): Name of the wire to find
+
+        Returns:
+            iob_wire: The found wire.
+        """
+        pass
 
     def create_wires_from_interface(self):
         if not self.interface:
@@ -74,7 +96,7 @@ def create_bus(core, *args, wires=[], **kwargs):
         if type(wires) is list:
             # Convert user wire dictionaries into 'iob_wire' objects
             replace_duplicate_wires_by_references(core.buses + core.ports, wires)
-            sig_obj_list = convert_dict2obj_list(wires, iob_wire)
+            sig_obj_list = create_obj_list(wires, iob_wire)
         elif type(wires) is dict:
             # Convert user interface dictionary into '_interface' object
             interface_obj = dict2interface(
@@ -237,14 +259,27 @@ def dict2interface(name, interface_dict):
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def bus_from_dict(bus_dict):
+def create_bus_from_dict(bus_dict):
+    """
+    Function to create iob_bus object from dictionary attributes.
+
+    Attributes:
+        bus_dict (dict): dictionary with values to initialize attributes of iob_bus object.
+            This dictionary supports the following keys corresponding to the iob_bus attributes:
+            - name           -> iob_bus.name
+            - descr          -> iob_bus.descr
+            - wires        -> iob_bus.wires
+
+    Returns:
+        iob_bus: iob_bus object
+    """
     # Convert dictionary elements to objects
     kwargs = bus_dict.copy()
-    kwargs["wires"] = [wire_from_dict(i) for i in bus_dict.get("wires", [])]
+    kwargs["wires"] = [create_wire_from_dict(i) for i in bus_dict.get("wires", [])]
     return iob_bus(**kwargs)
 
 
@@ -270,5 +305,17 @@ def bus_text2dict(bus_text):
     return bus_dict
 
 
-def bus_from_text(bus_text):
-    return bus_from_dict(bus_text2dict(bus_text))
+def create_bus_from_text(bus_text):
+    """
+    Function to create iob_bus object from short notation text.
+
+    Attributes:
+        bus_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-d descr] [-s wire_name1:width1] [-s wire_name2:width2]+
+            Examples:
+                dbus -d 'data bus' -s wdata:32 -s wstrb:4
+
+    Returns:
+        iob_bus: iob_bus object
+    """
+    return create_bus_from_dict(bus_text2dict(bus_text))

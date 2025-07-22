@@ -7,17 +7,15 @@
 import os
 
 from iob_base import find_obj_in_list, fail_with_msg
-from api_base import convert2internal
 
 
-def get_core_params(confs):
-    """Filter given 'confs' list for 'P' and 'D' parameters.
-    Returns a new filtered list containing only 'P' and 'D' parameters.
+def get_core_params(confs, kinds=["P", "D"]):
+    """Filter given 'confs' list for parameters of specified 'kinds'.
+    Returns a new filtered list containing only parameters of specified 'kinds'.
     """
     core_parameters = []
-    for api_conf in confs:
-        conf = convert2internal(api_conf)
-        if conf.kind in ["P", "D"]:
+    for conf in confs:
+        if conf.kind in kinds:
             core_parameters.append(conf)
     return core_parameters
 
@@ -51,6 +49,20 @@ def generate_params(core):
     return "".join(lines)
 
 
+def generate_localparams(core):
+    """Generate verilog code with verilog local parameters of this module.
+    returns: Generated verilog code
+    """
+    localparams = get_core_params(core.confs, kinds=["L"])
+    if not localparams:
+        return ""
+    lines = []
+    for parameter in localparams:
+        p_name = parameter.name.upper()
+        lines.append(f"   localparam {p_name} = {parameter.value};")
+    return "".join(lines)
+
+
 def generate_inst_params(instance):
     """Generate verilog code with assignment of values for the verilog parameters of this instance.
     returns: Generated verilog code
@@ -70,7 +82,9 @@ def generate_params_snippets(core):
     """Write verilog snippets ('.vs' files) with verilog parameters of this core.
     These snippets may be included manually in verilog modules if needed.
     """
+    # Generate verilog code
     code = generate_params(core)
+    # Write verilog snippet
     out_dir = core.build_dir + "/hardware/src"
     os.makedirs(out_dir, exist_ok=True)
     with open(f"{out_dir}/{core.name}_params.vs", "w") as f:
@@ -83,9 +97,22 @@ def generate_params_snippets(core):
     #     f.write(code)
 
 
+def generate_localparams_snippets(core):
+    """Write verilog snippets ('.vs' files) with verilog local parameters of this core.
+    These snippets may be included manually in verilog modules if needed.
+    """
+    # Generate verilog code
+    code = generate_localparams(core)
+    # Write verilog snippet
+    out_dir = core.build_dir + "/hardware/src"
+    os.makedirs(out_dir, exist_ok=True)
+    with open(f"{out_dir}/{core.name}_localparams.vs", "w") as f:
+        f.write(code)
+
+
 def validate_params(instance):
     """Check if all parameters are within the allowed range"""
-    core_parameters = get_core_params(convert2internal(instance.core).confs)
+    core_parameters = get_core_params(instance.core.confs)
     for p_name, p_value in instance.parameters.items():
         if isinstance(p_value, str):
             continue

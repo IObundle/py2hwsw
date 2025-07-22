@@ -1,0 +1,1 @@
+../scripts/verilog_lint.py

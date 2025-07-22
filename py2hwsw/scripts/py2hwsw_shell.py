@@ -64,12 +64,20 @@ class Py2hwswShell(code.InteractiveConsole):
         # Print help message on startup
         self.print_help_message()
         self.interactive = interactive
+        self.evaluated_last_line = False
 
     def print_help_message(self):
         print(HELP_MSG)
 
     def raw_input(self, prompt):
-        line = super().raw_input(prompt)  # Reads from stdin
+        try:
+            line = super().raw_input(prompt)  # Reads from stdin
+        except EOFError:
+            # Evaluate last line of file, if running non-interactively
+            if not self.interactive and not self.evaluated_last_line:
+                self.evaluated_last_line = True
+                return ""
+            raise
         if not self.interactive:
             # Not interactive: Echo input line to stdout
             print(line)

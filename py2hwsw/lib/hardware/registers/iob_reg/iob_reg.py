@@ -4,15 +4,8 @@
 #
 # SPDX-License-Identifier: MIT
 
-import sys
 
-import py2hwsw_api as py2hwsw
-
-sys.path.append("../../../scripts")
-from iob_globals import iob_globals
-
-
-class iob_reg(py2hwsw.iob_core):
+class iob_reg(iob_core):
     def __init__(self, **py_params_dict):
         port_params = (
             py_params_dict["port_params"]

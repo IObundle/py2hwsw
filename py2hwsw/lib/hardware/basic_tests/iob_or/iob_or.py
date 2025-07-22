@@ -5,8 +5,6 @@
 # SPDX-License-Identifier: MIT
 
 
-import py2hwsw_api as py2hwsw
-
 # Short notation with API is WIP
 # core_dictionary = {
 #     "generate_hw": True,
@@ -68,7 +66,7 @@ core_dictionary = {
 }
 
 
-class iob_or(py2hwsw.iob_core):
+class iob_or(iob_core):
     def __init__(self, width=None):
         if width:
             core_dictionary["confs"][0]["value"] = str(width)

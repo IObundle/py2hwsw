@@ -4,9 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-# FIXME: API no longer exists
-# import py2hwsw_api as py2hwsw
-
 core_dictionary = {
     "generate_hw": True,
     "confs": [
@@ -28,7 +25,7 @@ core_dictionary = {
 }
 
 
-class iob_and(py2hwsw.iob_core):
+class iob_and(iob_core):
     def __init__(self, width=None):
         if width:
             core_dictionary["confs"][0]["value"] = str(width)

@@ -538,10 +538,16 @@ def find_path(search_directory, path):
     return None
 
 
-def import_python_module(module_path, module_name=None):
-    """Import a python module from a given filepath
-    param module_path: path of the module's python file
-    param module_name: optinal name of the module. By default equal to file name.
+def import_python_module(module_path: str, module_name: str = None, extra_namespace_objs: dict = {}):
+    """
+    Import a python module from a given filepath.
+
+    Args:
+        module_path (str): path of the module's python file
+        module_name (str): optinal name of the module. By default equal to file name.
+        extra_namespace_objs (dict): optional extra objects to include in module's namespace
+    Returns:
+        module: the imported module
     """
     if not module_name:
         module_name = os.path.splitext(os.path.basename(module_path))[0]
@@ -553,6 +559,12 @@ def import_python_module(module_path, module_name=None):
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
+
+    # Add extra objects to module's namespace
+    if extra_namespace_objs:
+        for key, value in extra_namespace_objs.items():
+            vars(module)[key] = value
+
     spec.loader.exec_module(module)
 
     return sys.modules[module_name]

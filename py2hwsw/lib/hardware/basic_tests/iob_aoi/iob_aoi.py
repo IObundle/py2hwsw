@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import py2hwsw_api as py2hwsw
-
 # Short notation with API is WIP
 # core_dictionary = {
 #     "generate_hw": True,
@@ -225,7 +223,7 @@ core_dictionary = {
 }
 
 
-class iob_aoi(py2hwsw.iob_core):
+class iob_aoi(iob_core):
     def __init__(self):
         print("iob_aoi constructor called.")
         super().__init__(core_dictionary)

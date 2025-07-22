@@ -9,6 +9,7 @@
 import code
 import sys
 import os
+import importlib
 
 # Do NOT remove this 'import readline'. It looks like its not used, but it is!
 # It allows arrow_up and arrow_down keys to work for previous/next commands
@@ -63,15 +64,55 @@ class Py2hwswShell(code.InteractiveConsole):
         print(HELP_MSG)
 
 
-def import_lib_cores(namespace: dict):
-    """Import lib cores into given python namespace"""
+def import_py2hwsw_scripts():
+    """
+    Returns a dictionary with all imported py2hwsw scripts.
+    Note: This function also includes imported modules into the current namespace.
+    Returns:
+        dict: Dictionary with imported py2hwsw scripts.
+    """
+    # List all scripts in scripts/
+    scripts_dir = os.path.dirname(os.path.realpath(__file__))
+    py2_scripts_paths = [os.path.join(scripts_dir, f) for f in os.listdir(scripts_dir)]
+    py2_scripts = {}
+    for module_path in py2_scripts_paths:
+        if not module_path.endswith(".py"):
+            continue
+
+        module_name = os.path.basename(module_path).split(".")[0]
+
+        print(module_name, module_path)
+        # Don't import the same module twice
+        if module_name in sys.modules:
+            py2_scripts[module_name] = sys.modules[module_name]
+            continue
+
+        # Import the module
+        spec = importlib.util.spec_from_file_location(module_name, module_path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module  # Include module in current namespace
+        py2_scripts[module_name] = module
+        spec.loader.exec_module(module)
+
+    return py2_scripts
+
+
+def import_lib_cores(namespace: dict, py2_scripts: dict):
+    """Import lib cores into given python namespace
+    Args:
+        namespace (dict): python namespace to include the imported modules in
+        py2_scripts (dict): objects to include in the namespace of each imported module
+    """
     cores_paths = get_lib_cores()
     for path in cores_paths:
         module_name, file_extension = os.path.basename(path).split(".")
-        # Convert dictionaries from .json cores into dynamic subclass of iob_core
+        # Skip .json cores
+        # TODO: Instead of skipping, Convert dictionaries from .json cores into dynamic subclass of iob_core
         if file_extension == "json":
             continue
-        imported_module = import_python_module(path, module_name=module_name)
+        imported_module = import_python_module(
+            path, module_name=module_name, extra_namespace_objs=py2_scripts
+        )
 
         # FIXME: Temporarily only import a few modules (the ones that have a class defined inside)
         if module_name not in ["iob_and", "iob_aoi"]:
@@ -105,11 +146,16 @@ def show_lib_core_code(core_name: str = None):
 # Create an instance of the custom shell
 def main():
     sys.ps1 = ">>> "
+    # Import py2 scripts
+    py2_scripts = import_py2hwsw_scripts()
     # Create a custom namespace
     local_vars = globals().copy()
+    # Include py2_scripts in namespace
+    local_vars.update(py2_scripts)
+    # Include  py2hwsw lib cores in namespace
+    import_lib_cores(local_vars, py2_scripts)
     # Include custom functions in namespace
     local_vars["help"] = CustomFunction(help, HELP_MSG)
-    import_lib_cores(local_vars)
     local_vars["show"] = show_lib_core_code
     shell = Py2hwswShell(locals=local_vars)
     shell.interact()

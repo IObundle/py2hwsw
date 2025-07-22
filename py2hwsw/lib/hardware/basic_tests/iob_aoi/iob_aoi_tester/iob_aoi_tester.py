@@ -63,7 +63,7 @@ core_dictionary = {
             "instance_name": "uut_aoi",
             "instance_description": "Unit Under Test",
             "parameters": {
-                "W": "W",
+                "W": "1",
             },
             "connect": {
                 "a_i": "a",

@@ -221,11 +221,11 @@ core_dictionary = {
     ],
     "superblocks": [
         # Tester
-        # {
-        #     "core": "iob_aoi_tester",
-        #     "name": "iob_tester",
-        #     # "dest_dir": "tester",
-        # },
+        {
+            "core": "iob_aoi_tester",
+            "name": "iob_tester",
+            "dest_dir": "tester",
+        },
     ],
 }
 

@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from dataclasses import field
 import importlib
 import os
 import shutil
@@ -32,7 +31,6 @@ from iob_base import (
     nix_permission_hack,
     update_obj_from_dict,
     parse_short_notation_text,
-    empty_list,
 )
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_module import iob_module
@@ -42,11 +40,14 @@ import verilog_lint
 from manage_headers import generate_headers
 from iob_license import iob_license
 
-from iob_conf import create_conf_from_dict
-from iob_wire import create_wire_from_dict
-from iob_port import create_port_from_dict
-from iob_bus import create_bus_from_dict
-from iob_snippet import create_snippet_from_dict
+from iob_comb import iob_comb
+from iob_conf import iob_conf, create_conf_from_dict
+from iob_fsm import iob_fsm
+from iob_interface import iob_interface
+from iob_wire import iob_wire, create_wire_from_dict
+from iob_port import iob_port, create_port_from_dict
+from iob_bus import iob_bus, create_bus_from_dict
+from iob_snippet import iob_snippet, create_snippet_from_dict
 from iob_parameter import create_iob_parameter_group_from_dict
 
 
@@ -137,17 +138,17 @@ class iob_core(iob_module):
         self.name: str = ""
         self.description: str = "Default description"
         self.reset_polarity: str = "positive"
-        self.confs: list[iob_conf] = empty_list()
-        self.wires: list[iob_wire] = empty_list()
-        self.ports: list[iob_port] = empty_list()
-        self.buses: list[iob_bus] = empty_list()
-        self.interfaces: list[iob_interface] = empty_list()
-        self.snippets: list[iob_snippet] = empty_list()
+        self.confs: list[iob_conf] = []
+        self.wires: list[iob_wire] = []
+        self.ports: list[iob_port] = []
+        self.buses: list[iob_bus] = []
+        self.interfaces: list[iob_interface] = []
+        self.snippets: list[iob_snippet] = []
         self.comb: iob_comb | None = None
         self.fsm: iob_fsm | None = None
-        self.subblocks: list[iob_instance] = empty_list()
-        self.superblocks: list[iob_core] = empty_list()
-        self.sw_modules: list[iob_core] = empty_list()
+        self.subblocks: list[iob_instance] = []
+        self.superblocks: list[iob_core] = []
+        self.sw_modules: list[iob_core] = []
 
         # Core attributes
         self.version: str = PY2HWSW_VERSION

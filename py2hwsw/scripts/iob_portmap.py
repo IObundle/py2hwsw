@@ -8,18 +8,27 @@ from iob_base import (
     fail_with_msg,
     find_obj_in_list,
     validate_verilog_const,
+    empty_list,
 )
 import iob_colors
 from iob_wire import get_real_wire, iob_wire_reference
 from iob_bus import iob_bus
 
-from api_base import internal_api_class
 
-
-@internal_api_class("user_api.draft_api", "iob_portmap")
 @dataclass
 class iob_portmap:
-    """Describes an IO portmap connection."""
+    """
+    Class that represents a portmap attribute.
+
+    Attributes:
+        e_connect (iob_bus): Identifier name of external bus that connects this port
+        e_connect_bit_slices (list): List of bit slices for external connections.
+        port (str): IDentifier name of port associated with portmap
+    """
+
+    e_connect: iob_bus | None = None
+    e_connect_bit_slices: list[str] = empty_list()
+    port: str = None
 
     def validate_attributes(self):
         if not self.port:
@@ -130,11 +139,47 @@ def get_portmap_port(portmap):
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def portmap_from_dict(portmap_dict):
+def create_portmap_from_dict(portmap_dict):
+    """
+    Function to create iob_portmap object from dictionary attributes.
+
+    Attributes:
+        portmap_dict (dict): dictionary with values to initialize attributes of iob_portmap object.
+            Dictionary format:
+            {
+                "port1_name": "external_connection1_name",
+                "port2_name": "external_connection2_name",
+                "port3_name": ("external_connection3_name", ["bit_slice_1", "bit_slice_2", ...]),
+            }
+            Dictionary element to attribute mapping:
+            port1_name -> iob_portmap.port
+            external_connection1_name -> iob_portmap.e_connect
+            ["bit_slice_1", "bit_slice_2", ...] -> iob_portmap.e_connect_bit_slices
+
+            Bit slices may perform multiple functions:
+            - Slice bits from a wire that is being connected.
+              For example, if we have a wire (iob_addr_wire) with 32 bits, from a bus (iob_bus_bus), and we want to connect it to a port (iob_bus_port) that only accepts an address of 8 bits, we could use:
+              "iob_bus_port": ("iob_bus_bus", ["iob_addr_wire[7:0]"]),
+            - Connect extra wires that do not exist in the bus.
+              For example, if we have a wire (independent_iob_data_wire) that is not included in the bus (iob_bus_bus), but exists in the port (iob_bus_port), we could use:
+              "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: independent_iob_data_wire"]),
+              If we didn't have the independent_iob_data_wire, we could instead connect that port's wire to a constant value or high impedance, like so:
+              "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: 'b1"]),
+              "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: 'bz"]),
+
+              # FIXME: For some reason, connecting extra wires with bit slices only works for connections between ports and buses that have standard interfaces! Not sure why its implemented this way: https://github.com/IObundle/py2hwsw/blob/0679fc64576380c19be96567efb5093667eeb9fd/py2hwsw/scripts/block_gen.py#L121
+              # Also, I'm not sure we can connect them to constants/high impedance.
+              # It seems to be possible to connect ports to constants like so: https://github.com/IObundle/py2hwsw/pull/236
+
+
+
+    Returns:
+        list[iob_portmap]: List of iob_portmap objects
+    """
     portmap_list = []
     for port_name, connection in portmap_dict.items():
 
@@ -163,7 +208,17 @@ def portmap_from_dict(portmap_dict):
     return portmap_list
 
 
-def portmap_from_text(portmap_text):
+def create_portmap_from_text(portmap_text):
+    """
+    Function to create iob_portmap object from short notation text.
+
+    Attributes:
+        portmap_text (str): Short notation text. Object attributes are specified using the following format:
+            TODO
+
+    Returns:
+        iob_portmap: iob_portmap object
+    """
     portmap_dict = {}
     # TODO: parse short notation text
     return iob_portmap(**portmap_dict)

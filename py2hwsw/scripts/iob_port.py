@@ -5,14 +5,25 @@
 from dataclasses import dataclass
 
 from iob_base import fail_with_msg, parse_short_notation_text
-from api_base import internal_api_class, convert2internal
 from iob_wire import iob_wire
 
 
-@internal_api_class("user_api.api", "iob_port")
 @dataclass
 class iob_port:
-    """Py2HWSW's internal implementation of 'iob_port' API class."""
+    """
+    Describes an IO port.
+
+    Attributes:
+        wire (iob_wire): Reference to the wire that is connected to the port.
+        direction (str): Port direction
+        doc_only (bool): Only add to documentation
+        doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
+    """
+
+    wire: iob_wire = None
+    direction: str = ""
+    doc_only: bool = False
+    doc_clearpage: bool = False
 
     def validate_attributes(self):
         if not self.wire:
@@ -23,9 +34,9 @@ class iob_port:
     def get_verilog_port(self, comma=True):
         """Generate a verilog port string from this wire"""
         self.validate_attributes()
-        port_name = convert2internal(self.wire).name
-        port_width = convert2internal(self.wire).width
-        port_isvar = convert2internal(self.wire).isvar
+        port_name = self.wire.name
+        port_width = self.wire.width
+        port_isvar = self.wire.isvar
         if "'" in port_name or port_name.lower() == "z":
             return None
         comma_char = "," if comma else ""
@@ -34,7 +45,7 @@ class iob_port:
         return f"{self.direction}{port_type} {width_str}{port_name}{comma_char}\n"
 
     def get_width_int(self):
-        port_width = convert2internal(self.wire).width
+        port_width = self.wire.width
         try:
             return int(port_width)
         except ValueError:
@@ -43,26 +54,46 @@ class iob_port:
 
 def port_obj_list_process(port):
     """Process ports for `find_obj_in_list()`"""
-    return convert2internal(port.wire)
+    return port.wire
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def port_from_dict(port_dict):
+def create_port_from_dict(port_dict):
+    """
+    Function to create iob_port object from dictionary attributes.
+
+    Attributes:
+        port_dict (dict): dictionary with values to initialize attributes of iob_port object.
+            This dictionary supports the following keys corresponding to the iob_port attributes:
+            - wire -> iob_port.wire
+            - doc_only -> iob_port.doc_only
+            - doc_clearpage -> iob_port.doc_clearpage
+
+    Returns:
+        iob_port: iob_port object
+    """
     # Create a wire for this port
-    api_iob_wire = iob_wire(name=port_dict["name"], width=port_dict["width"])
+    iob_wire_obj = iob_wire(name=port_dict["name"], width=port_dict["width"])
 
     # Get port direction form name suffix
     dir_suffix = port_dict["name"].split("_")[-1]
     dirs = {"i": "input", "o": "output", "io": "inout"}
 
-    return iob_port(wire=api_iob_wire, direction=dirs[dir_suffix])
+    return iob_port(wire=iob_wire_obj, direction=dirs[dir_suffix])
 
 
 def port_text2dict(port_text):
+    """Convert port short notation text to dictionary.
+    Atributes:
+        port_text (str): Short notation text. See `create_port_from_text` for format.
+
+    Returns:
+        dict: Dictionary with port attributes.
+    """
     port_flags = [
         "name",
         ["-i", {"dest": "interface"}],
@@ -86,5 +117,17 @@ def port_text2dict(port_text):
     return port_dict
 
 
-def port_from_text(port_text):
-    return port_from_dict(port_text2dict(port_text))
+def create_port_from_text(port_text):
+    """
+    Function to create iob_port object from short notation text.
+
+    Attributes:
+        port_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-i interface] [-d descr] [-s wire_name:width]+ [-doc] [-doc_clearpage]
+            Example:
+                control -d 'control bus' -s start_i:1 -s done_o:1 -s cmd_i:CMD_W -doc
+
+    Returns:
+        iob_port: iob_port object
+    """
+    return create_port_from_dict(port_text2dict(port_text))

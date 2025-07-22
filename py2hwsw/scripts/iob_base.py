@@ -12,6 +12,7 @@ import traceback
 from functools import wraps
 import inspect
 import shutil
+from dataclasses import field
 
 import iob_colors
 
@@ -188,7 +189,7 @@ def find_obj_in_list(obj_list, obj_name, process_func=lambda o: o):
     return None
 
 
-def convert_dict2obj_list(dict_list: dict, obj_class):
+def create_obj_list(dict_list: dict, obj_class):
     """Convert a list of dictionaries to a list of objects
     If list contains elements that are not dictionaries, they are left as is
     param dict_list: list of dictionaries
@@ -706,7 +707,7 @@ def update_obj_from_dict(obj, attributes_dict, preprocessor_functions={}, valid_
                     "buses": bus_from_dict,
                     "snippets": snippet_from_dict,
                 }
-        valid_attributes_list (list): List of valid attributes for the given object. All valid if empty. Normally used to specify public (API) attributes, preventing access to private ones.
+        valid_attributes_list (list): List of valid attributes for the given object. All valid if empty.
     """
     # Fill attributes
     for key, value in attributes_dict.items():
@@ -812,3 +813,15 @@ def parse_short_notation_text(text: str, flags) -> dict:
     # filter out None values, no need to set default values for arguments
     filtered_dict = {k: v for k, v in parsed_dict.items() if v is not None}
     return filtered_dict
+
+#
+# Utility functions
+#
+
+
+def empty_list():
+    return field(default_factory=list)
+
+
+def empty_dict():
+    return field(default_factory=dict)

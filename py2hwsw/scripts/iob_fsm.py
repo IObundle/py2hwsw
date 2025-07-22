@@ -9,13 +9,20 @@ from iob_comb import iob_comb
 from iob_base import assert_attributes, parse_short_notation_text
 
 
-from api_base import internal_api_class
-
-
-@internal_api_class("user_api.draft_api", "iob_fsm")
 @dataclass
 class iob_fsm(iob_comb):
-    """Class to represent a Verilog finite state machine in an iob module"""
+    """
+    Class to represent a Verilog finite state machine in an iob module.
+
+    Attributes:
+        kind (str): Type of the finite state machine.
+        default_assignments (str): Verilog code string to be assigned to the state register on reset.
+        state_descriptions (str): Verilog code string to be used for state description
+    """
+
+    kind: str = "prog"
+    default_assignments: str = ""
+    state_descriptions: str = ""
 
     def validate_attributes(self):
         if self.kind not in ["prog", "fsm"]:
@@ -122,15 +129,35 @@ def create_fsm(core, *args, **kwargs):
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def fsm_from_dict(fsm_dict):
+def create_fsm_from_dict(fsm_dict):
+    """
+    Function to create iob_fsm object from dictionary attributes.
+
+    Attributes:
+        fsm_dict (dict): dictionary with values to initialize attributes of iob_fsm object.
+            This dictionary supports the following keys corresponding to the iob_fsm attributes:
+            - type -> iob_fsm.kind
+            - default_assignments -> iob_fsm.default_assignments
+            - state_descriptions -> iob_fsm.state_descriptions
+
+    Returns:
+        iob_fsm: iob_fsm object
+    """
     return iob_fsm(**fsm_dict)
 
 
 def fsm_text2dict(fsm_text):
+    """Convert fsm short notation text to dictionary.
+    Atributes:
+        fsm_text (str): Short notation text. See `create_fsm_from_text` for format.
+
+    Returns:
+        dict: Dictionary with fsm attributes.
+    """
     fsm_flags = [
         ["-t", {"dest": "kind", "choices": ["prog", "fsm"]}],
         ["-d", {"dest": "default_assignments"}],
@@ -139,5 +166,32 @@ def fsm_text2dict(fsm_text):
     return parse_short_notation_text(fsm_text, fsm_flags)
 
 
-def fsm_from_text(fsm_text):
-    return fsm_from_dict(fsm_text2dict(fsm_text))
+def create_fsm_from_text(fsm_text):
+    """
+    Function to create iob_fsm object from short notation text.
+
+    Attributes:
+        fsm_text (str): Short notation text. Object attributes are specified using the following format:
+            [-t kind] [-d default_assignments] [-s state_descriptions]
+            Example:
+                -t fsm
+                -d 'a_o = 10;'
+                -s
+                {{
+                    A: a_o = 0;
+                    B: a_o = 1;
+                    a_o = 2;
+                    if(a_o == 0)
+                    begin
+                        pcnt_nxt = A;
+                    end
+                    else
+                    begin
+                        pcnt_nxt = B;
+                    end
+                }}
+
+    Returns:
+        iob_fsm: iob_fsm object
+    """
+    return create_fsm_from_dict(fsm_text2dict(fsm_text))

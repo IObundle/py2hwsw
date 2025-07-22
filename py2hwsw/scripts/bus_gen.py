@@ -9,7 +9,6 @@
 #
 import os
 from iob_wire import iob_wire
-from api_base import convert2internal
 
 
 def generate_buses(core):
@@ -17,14 +16,12 @@ def generate_buses(core):
     returns: Generated verilog code
     """
     code = ""
-    for api_bus in core.buses:
-        bus = convert2internal(api_bus)
+    for bus in core.buses:
 
         wires_code = ""
-        for api_wire in bus.wires:
-            wire = convert2internal(api_wire)
+        for wire in bus.wires:
             if isinstance(wire, iob_wire):
-                global_wire = convert2internal(wire.global_wire)
+                global_wire = wire.global_wire
                 if global_wire:
                     wires_code += "    " + global_wire.get_verilog_bus()
         if wires_code:
@@ -45,8 +42,7 @@ def generate_buses_snippet(core):
     with open(f"{out_dir}/{core.name}_buses.vs", "w+") as f:
         f.write(code)
 
-    for api_bus in core.buses:
-        bus = convert2internal(api_bus)
+    for bus in core.buses:
         # Generate the specific interface snippet as well
         # Note: This is only used by manually written verilog modules.
         #       May not be needed in the future.

@@ -10,7 +10,6 @@
 from latex import write_table
 
 from iob_wire import iob_wire
-from api_base import convert2internal
 
 
 def reverse_port(port_type):
@@ -25,8 +24,7 @@ def generate_ports(core):
     returns: Generated verilog code
     """
     lines = []
-    for port_idx, api_port in enumerate(core.ports):
-        port = convert2internal(api_port)
+    for port_idx, port in enumerate(core.ports):
 
         # FIXME: This function was originaly written to handle interfaces (groups of ports)
         """
@@ -36,8 +34,7 @@ def generate_ports(core):
 
         lines.append(f"    // {interface.name}: {interface.descr}\n")
 
-        for wire_idx, api_wire in enumerate(interface.wires):
-            wire = convert2internal(api_wire)
+        for wire_idx, wire in enumerate(interface.wires):
             if isinstance(wire, iob_wire):
                 if wire.get_verilog_port():
                     lines.append("    " + wire.get_verilog_port())
@@ -65,8 +62,7 @@ def generate_ports_snippet(core):
 
     # FIXME: Port is no longer a group
     """
-    for port_idx, api_port in enumerate(core.ports):
-        port = convert2internal(api_port)
+    for port_idx, port in enumerate(core.ports):
         # If port has 'doc_only' attribute set to True, skip it
         if port.doc_only:
             continue
@@ -128,8 +124,7 @@ def generate_ios_tex(ports, out_dir):
     for port in ports:
         tex_table = []
         # Interface is not standard, read ports
-        for api_wire in port.wires:
-            wire = convert2internal(api_wire)
+        for wire in port.wires:
             if isinstance(wire, iob_wire):
                 tex_table.append(
                     [

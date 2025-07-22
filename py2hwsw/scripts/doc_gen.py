@@ -13,7 +13,6 @@ import block_gen
 
 from latex import write_table, escape_latex
 from iob_base import fail_with_msg, find_path, get_lib_cores
-from api_base import convert2internal
 
 
 def generate_docs(core):
@@ -21,14 +20,12 @@ def generate_docs(core):
     # FIXME: Docs disabled during wires/buses/global_wires/ports/interfaces rework
     return
     if core.is_top_module:
-        config_gen.generate_confs_tex([convert2internal(i) for i in core.confs], core.build_dir + "/document/tsrc")
-        io_gen.generate_ios_tex([convert2internal(i) for i in core.ports], core.build_dir + "/document/tsrc")
+        config_gen.generate_confs_tex(core.confs, core.build_dir + "/document/tsrc")
+        io_gen.generate_ios_tex(core.ports, core.build_dir + "/document/tsrc")
         block_gen.generate_subblocks_tex(
-            [convert2internal(i) for i in core.subblocks], core.build_dir + "/document/tsrc"
+            core.subblocks, core.build_dir + "/document/tsrc"
         )
-        generate_iob_params_tex(
-            [convert2internal(i) for i in core.iob_parameters], core.build_dir + "/document/tsrc"
-        )
+        generate_iob_params_tex(core.iob_parameters, core.build_dir + "/document/tsrc")
         generate_tex_file(
             core.build_dir + "/document/tsrc/rn_overview.tex", core.description
         )

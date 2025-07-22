@@ -10,7 +10,6 @@ import re
 import os
 import sys
 from iob_wire import iob_wire
-from api_base import convert2internal
 
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "../lib/hardware/iob_csrs")
@@ -317,8 +316,7 @@ def gen_ports_list(core):
 
     ports_list = []
 
-    for api_group in core.ports:
-        group = convert2internal(api_group)
+    for group in core.ports:
         # Skip doc_only interfaces
         if group.doc_only:
             continue
@@ -327,8 +325,7 @@ def gen_ports_list(core):
         if group.interface:
             tag = group.name
 
-        for api_wire in group.wires:
-            wire = convert2internal(api_wire)
+        for wire in group.wires:
             if not isinstance(wire, iob_wire):
                 continue
             n_bits = wire.width
@@ -357,8 +354,7 @@ def gen_bus_interfaces_list(core):
 
     bus_interfaces_list = []
 
-    for api_group in core.ports:
-        group = convert2internal(api_group)
+    for group in core.ports:
         # Skip doc_only interfaces
         if group.doc_only:
             continue
@@ -581,13 +577,11 @@ def gen_parameters_list(core):
     """
 
     parameters_list = []
-    for api_group in core.confs:
-        group = convert2internal(api_group)
+    for group in core.confs:
         # Skip doc_only groups
         if group.doc_only:
             continue
-        for api_conf in group.confs:
-            conf = convert2internal(api_conf)
+        for conf in group.confs:
             # Skip doc_only confs
             if conf.doc_only:
                 continue
@@ -715,8 +709,7 @@ def generate_ipxact_xml(core, dest_dir):
 
     csr_block = None
     # Find iob_csrs block in subblocks list
-    for api_block in core.subblocks:
-        block = convert2internal(api_block)
+    for block in core.subblocks:
         if block.original_name == "iob_csrs":
             csr_block = block
             break
@@ -777,8 +770,6 @@ def generate_ipxact_xml(core, dest_dir):
     # Create the xml file
     xml_file = open(dest_dir + "/" + core_name + ".xml", "w+")
 
-    core_license = convert2internal(core.license)
-
     # Write the xml header
     xml_text = f"""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <ipxact:component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2014" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd">
@@ -803,14 +794,14 @@ def generate_ipxact_xml(core, dest_dir):
 	<ipxact:description>{core.description}</ipxact:description>
 	{parameters_xml}
 	<ipxact:vendorExtensions>
-		<kactus2:author>{core_license.author}</kactus2:author>
+		<kactus2:author>{core.license.author}</kactus2:author>
 		<kactus2:version>3,10,15,0</kactus2:version>
 		<kactus2:kts_attributes>
 			<kactus2:kts_productHier>Flat</kactus2:kts_productHier>
 			<kactus2:kts_implementation>HW</kactus2:kts_implementation>
 			<kactus2:kts_firmness>Mutable</kactus2:kts_firmness>
 		</kactus2:kts_attributes>
-		<kactus2:license>{core_license.name} License, Copyright (c) {core_license.year}</kactus2:license>
+		<kactus2:license>{core.license.name} License, Copyright (c) {core.license.year}</kactus2:license>
 	</ipxact:vendorExtensions>
 </ipxact:component>"""
 

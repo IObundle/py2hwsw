@@ -6,17 +6,28 @@ from dataclasses import dataclass, field
 import copy
 
 from iob_base import fail_with_msg, parse_short_notation_text
-from api_base import internal_api_class, convert2internal
 
 
-@internal_api_class("user_api.api", "iob_wire")
 @dataclass
 class iob_wire:
-    """Py2HWSW's internal implementation of 'iob_wire' API class."""
+    """
+    Class that represents a core's py2hwsw wire.
 
-    # Used for `iob_comb`: If enabled, iob_comb will infer a register for this wire.
+    Attributes:
+        name (str): Name for the wire inside the core. Verilog wire will be generated with this name.
+        width (str or int): Number of bits in the wire.
+        descr (str): Description of the wire.
+        isvar (bool): If enabled, wire will be generated with type `reg` in Verilog.
+    """
+
+    name: str = ""
+    width: str or int = 1
+    descr: str = "Default description"
+    isvar: bool = False
+
+    # Undocumented. Used for `iob_comb`: If enabled, iob_comb will infer a register for this wire.
     isreg: bool = False
-    # Used for `iob_comb`: List of wires associated to the infered register.
+    # Undocumented. Used for `iob_comb`: List of wires associated to the infered register.
     reg_wires: list[str] = field(default_factory=list)
 
     def __post_init__(self):
@@ -73,11 +84,25 @@ def remove_wire_direction_suffixes(wire_list):
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def wire_from_dict(wire_dict):
+def create_wire_from_dict(wire_dict):
+    """
+    Function to create iob_wire object from dictionary attributes.
+
+    Attributes:
+        wire_dict (dict): dictionary with values to initialize attributes of iob_wire object.
+            This dictionary supports the following keys corresponding to the iob_wire attributes:
+            - name          -> iob_wire.name
+            - width         -> iob_wire.width
+            - descr         -> iob_wire.descr
+            - isvar         -> iob_wire.isvar
+
+    Returns:
+        iob_wire: iob_wire object
+    """
     return iob_wire(**wire_dict)
 
 
@@ -91,5 +116,17 @@ def wire_text2dict(wire_text):
     return parse_short_notation_text(wire_text, wire_flags)
 
 
-def wire_from_text(wire_text):
-    return wire_from_dict(wire_text2dict(wire_text))
+def create_wire_from_text(wire_text):
+    """
+    Function to create iob_wire object from short notation text.
+
+    Attributes:
+        wire_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-w width] [-d descr] [-v (enables isvar)]
+            Example:
+                en -w 1 -d 'Enable wire' -v
+
+    Returns:
+        iob_wire: iob_wire object
+    """
+    return create_wire_from_dict(wire_text2dict(wire_text))

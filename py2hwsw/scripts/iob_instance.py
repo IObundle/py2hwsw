@@ -13,17 +13,35 @@ from iob_base import (
     fail_with_msg,
     debug_print,
     import_python_module,
+    empty_list,
+    empty_dict,
 )
 from iob_portmap import iob_portmap, get_portmap_port
 from iob_wire import remove_wire_direction_suffixes
-from api_base import internal_api_class, convert2internal
-from iob_core import core_from_dict, find_module_setup_dir
+from iob_core import create_core_from_dict, find_module_setup_dir
 from iob_portmap import portmap_from_dict
 
 
-@internal_api_class("user_api.draft_api", "iob_instance")
 class iob_instance(iob_base):
-    """Class to describe a module's (Verilog) instance"""
+    """
+    Generic class to describe a module's instance.
+
+    Attributes:
+        core (str): Name of the core to instantiate.
+        instance_name (str): Name of the instance. (Will be used as the instance's name in the Verilog module).
+        instance_description (str): Description of the instance.
+        portmap_connections (list): Instance portmap connections.
+        parameters (dict): Verilog parameter values for this instance.
+        instantiate (bool): Select if should intantiate the module inside another Verilog module.
+    """
+
+    # TODO: Make a new iob_instance class, independent from the iob_core class. Subblocks will instantiate iob_instance objects. Each iob_instance will store a reference to an iob_core.
+    core: iob_core = None
+    name: str = None
+    description: str = "Default instance description"
+    portmap_connections: list[str] = empty_list()
+    parameters: dict[str, int | str] = empty_dict()
+    instantiate: bool = True
 
     def validate_attributes(self):
         """Validate instance attributes"""
@@ -333,33 +351,59 @@ def instantiate_block(
 
         # Instantiate block (call constructor from class defined inside the .py file)
         block_class = getattr(block_module, block_name)
-        api_block_obj = block_class(**iob_parameters)
+        block_obj = block_class(**iob_parameters)
 
     elif file_ext == ".json":
         debug_print(f"Loading {block_name}.json", 1)
-        api_block_obj = core_from_dict(
+        block_obj = core_from_dict(
             json.load(open(os.path.join(block_dir, f"{block_name}.json")))
         )
 
     # Create instance of block
-    api_instance_obj = iob_instance(**block_dict, core=api_block_obj)
+    instance_obj = iob_instance(**block_dict, core=block_obj)
 
-    # block_obj = convert2internal(api_block_obj)
+    # block_obj = convert2internal(block_obj)
     # # Auto-set block attributes
     # if not block_obj.original_name:
     #     block_obj.original_name = block_name
     # if not block_obj.setup_dir:
     #     block_obj.setup_dir = block_dir
 
-    return api_instance_obj
+    return instance_obj
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def instance_from_dict(instance_dict):
+def create_instance_from_dict(instance_dict):
+    """
+    Function to create iob_instance object from dictionary attributes.
+
+    Attributes:
+        instance_dict (dict): dictionary with values to initialize attributes of iob_instance object.
+            This dictionary supports the following keys corresponding to the iob_instance attributes:
+            - core -> iob_instance.core
+            - name -> iob_instance.name
+            - description -> iob_instance.description
+            - portmap_connections -> iob_instance.portmap_connections = create_portmap_from_dict(portmap_connections)
+            - parameters -> iob_instance.parameters
+            - instantiate -> iob_instance.instantiate
+            # Non-attribute instance keys
+            - core (str): Optional. The name of the core to instantiate. Will search for <core>.py or <core>.json files.
+                          If this key is set, all other keys will be ignored! (Except 'iob_parameters' key).
+                          If <core>.py is found, it must contain a class called <core> that extends iob_core. This class will be used to instantiate the core.
+                          If <core>.json is found, its contents will be read and parsed by the create_core_from_dict(<json_contents>) function.
+            - iob_parameters (dict): Optional. Dictionary of iob parameters to pass to the instantiated core.
+                                        This key should be used in conjunction with the 'core' key.
+                                        Elements from this dictionary will be passed as **kwargs to the instantiated core's constructor.
+                                        Only applicable if instantiated core has a constructor that accepts IOb parameters (excludes cores defined in JSON or purely by dictionary).
+
+
+    Returns:
+        iob_instance: iob_instance object
+    """
     # If 'instance' key is given, find corresponding instance and instantiate it. Ignore other non-instance attributes.
     # if instance_dict.get("instance", None):
     #     return instantiate_block(
@@ -378,11 +422,24 @@ def instance_from_dict(instance_dict):
     core = instance_dict.pop("core", "")
     iob_parameters = instance_dict.pop("iob_parameters", {})
     portmap_connections = instance_dict.pop("portmap_connections", {})
-    instance_dict.update({"portmap_connections": portmap_from_dict(portmap_connections)})
+    instance_dict.update(
+        {"portmap_connections": portmap_from_dict(portmap_connections)}
+    )
     return instantiate_block(core, iob_parameters, instance_dict)
 
 
-def instance_from_text(instance_text):
+def create_instance_from_text(instance_text):
+    """
+    Function to create iob_instance object from short notation text.
+
+    Attributes:
+        instance_text (str): Short notation text. Object attributes are specified using the following format:
+            name [-p parameter_name:parameter_value]+ [-c port_name:wire_name]+ [--no_instance]
+
+
+    Returns:
+        iob_instance: iob_instance object
+    """
     instance_dict = {}
     # TODO: parse short notation text
     return iob_instance(**instance_dict)

@@ -4,29 +4,61 @@
 
 from dataclasses import dataclass
 
-from api_base import internal_api_class
 
-
-@internal_api_class("user_api.api", "iob_snippet")
 @dataclass
 class iob_snippet:
-    """Py2HWSW's internal implementation of 'iob_snippet' API class."""
+    """
+    Class to represent a Verilog snippet in an iob module.
+
+    Attributes:
+        verilog_code (str): Verilog code string
+    """
+
+    verilog_code: str = ""
 
     pass
 
 
 #
-# API methods
+# Other Py2HWSW interface methods
 #
 
 
-def snippet_from_dict(snippet_dict):
+def create_snippet_from_dict(snippet_dict):
+    """
+    Function to create iob_snippet object from dictionary attributes.
+
+    Attributes:
+        snippet_dict (dict): dictionary with values to initialize attributes of iob_snippet object.
+            This dictionary supports the following keys corresponding to the iob_snippet attributes:
+            - verilog_code -> iob_snippet.verilog_code
+
+    Returns:
+        iob_snippet: iob_snippet object
+    """
     return iob_snippet(**snippet_dict)
 
 
 def snippet_text2dict(snippet_text):
+    """Convert snippet short notation text to dictionary.
+    Atributes:
+        snippet_text (str): Short notation text. See `create_snippet_from_text` for format.
+
+    Returns:
+        dict: Dictionary with snippet attributes.
+    """
     return {"verilog_code": snippet_text}
 
 
-def snippet_from_text(snippet_text):
-    return snippet_from_dict(snippet_text2dict(snippet_text))
+def create_snippet_from_text(snippet_text):
+    """
+    Function to create iob_snippet object from short notation text.
+
+    Attributes:
+        snippet_text (str): Short notation text. Object attributes are specified using the following format:
+            [snippet_text]
+
+    Returns:
+        iob_snippet: iob_snippet object
+    """
+    return create_snippet_from_dict(snippet_text2dict(snippet_text))

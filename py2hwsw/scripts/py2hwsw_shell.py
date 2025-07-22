@@ -105,11 +105,9 @@ def show_lib_core_code(core_name: str = None):
 # Create an instance of the custom shell
 def main():
     sys.ps1 = ">>> "
-    # Create a custom namespace and include the py2hwsw API
+    # Create a custom namespace
     local_vars = globals().copy()
-    # Import api and everything from py2hwsw_api into local_vars
-    exec("import py2hwsw_api as api", local_vars)
-    exec("from py2hwsw_api import *", local_vars)
+    # Include custom functions in namespace
     local_vars["help"] = CustomFunction(help, HELP_MSG)
     import_lib_cores(local_vars)
     local_vars["show"] = show_lib_core_code

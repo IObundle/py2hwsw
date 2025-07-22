@@ -12,7 +12,6 @@ import iob_colors
 from iob_wire import get_real_wire
 from iob_port import port_obj_list_process
 import param_gen
-from api_base import convert2internal
 from iob_base import fail_with_msg, find_obj_in_list
 from iob_port import iob_port
 
@@ -73,8 +72,7 @@ def generate_subblocks(core):
     returns: Generated verilog code
     """
     code = ""
-    for api_instance in core.subblocks:
-        instance = convert2internal(api_instance)
+    for instance in core.subblocks:
         if not instance.instantiate:
             continue
 
@@ -112,23 +110,24 @@ def get_instance_port_connections(core, instance):
     instance_portmap = ""
 
     # Iterate over all ports of the instance
-    for api_portmap in instance.portmap_connections:
-        portmap = convert2internal(api_portmap)
+    for portmap in instance.portmap_connections:
 
         portmap.validate_attributes()
 
         port = find_obj_in_list(
-            [convert2internal(i) for i in core.ports], portmap.port_name, process_func=port_obj_list_process
+            core.ports,
+            portmap.port,
+            process_func=port_obj_list_process,
         )
         if not port:
             fail_with_msg(
                 f"Port '{portmap.port}' not found in instance '{instance.name}'!"
             )
 
-        e_connect = find_obj_in_list(
-            [convert2internal(i) for i in core.wires], portmap.e_connect,
-        ) or find_obj_in_list(
-            [convert2internal(i) for i in core.ports], portmap.e_connect, process_func=port_obj_list_process
+        e_connect = find_obj_in_list(core.wires, portmap.e_connect) or find_obj_in_list(
+            core.ports,
+            portmap.e_connect,
+            process_func=port_obj_list_process,
         )
         if isinstance(e_connect, iob_port):
             e_connect = e_connect.wire
@@ -167,16 +166,15 @@ def get_instance_port_connections(core, instance):
         #     continue
 
         # If port has a description, add it to the portmap
-        port_wire = convert2internal(port.wire)
-        if port_wire.descr and not port.doc_only:
-            instance_portmap += f"        // {port_wire.name} port: {port_wire.descr}\n"
+        if port.wire.descr and not port.doc_only:
+            instance_portmap += f"        // {port.wire.name} port: {port.wire.descr}\n"
 
         # Handle ports connected to constants
         if isinstance(e_connect, str):
             if "z" in e_connect.lower():
-                instance_portmap += f"        .{port.wires[0].name}(),\n"
+                instance_portmap += f"        .{port.wire.name}(),\n"
             else:
-                instance_portmap += f"        .{port.wires[0].name}({e_connect}),\n"
+                instance_portmap += f"        .{port.wire.name}({e_connect}),\n"
             continue
 
         # Connect individual wires
@@ -187,7 +185,6 @@ def get_instance_port_connections(core, instance):
         # # Skip wires that are not iob_wires
         # if not isinstance(port_wire, iob_wire):
         #     continue
-        port_name = port_wire.name
 
         # # If both ports are standard interfaces, connect by name
         # if port.interface and e_connect.interface:
@@ -216,18 +213,16 @@ def get_instance_port_connections(core, instance):
         for bit_slice in portmap.e_connect_bit_slices:
             if e_wire_name in bit_slice:
                 # Connection is not a bit_slice
-                if f"{port_wire.name}:" in bit_slice:
+                if f"{port.wire.name}:" in bit_slice:
                     e_wire_name = bit_slice.split(":")[1]
-                    port_name = port_wire.name
                 else:
                     # Connection is a bit slice
                     e_wire_name = bit_slice
                 break
-            elif port_wire.name in bit_slice:
+            elif port.wire.name in bit_slice:
                 # Connection is not a bit_slice
-                if f"{port_wire.name}:" in bit_slice:
+                if f"{port.wire.name}:" in bit_slice:
                     e_wire_name = bit_slice.split(":")[1]
-                    port_name = port_wire.name
                 else:
                     # Connection is a bit slice
                     e_wire_name = bit_slice
@@ -235,9 +230,9 @@ def get_instance_port_connections(core, instance):
 
         if e_wire_name.lower() == "z":
             # If the external wire is 'z', do not connect it
-            instance_portmap += f"        .{port_name}(),\n"
+            instance_portmap += f"        .{port.wire.name}(),\n"
         else:
-            instance_portmap += f"        .{port_name}({e_wire_name}),\n"
+            instance_portmap += f"        .{port.wire.name}({e_wire_name}),\n"
 
     instance_portmap = instance_portmap[:-2] + "\n"  # Remove last comma
 

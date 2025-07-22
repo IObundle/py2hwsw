@@ -110,7 +110,7 @@ headers = {
 """,
     "commercial": """\
 ------------------------------------------------------------------------
-Copyright (c) 2014-{{ copyright_year }} {{ copyright_holder }}.
+Copyright (c) 2018-{{ copyright_year }} {{ copyright_holder }}.
                                                                      
 Please review the terms of the license agreement before using this file.
 {%- if custom_header_suffix %}

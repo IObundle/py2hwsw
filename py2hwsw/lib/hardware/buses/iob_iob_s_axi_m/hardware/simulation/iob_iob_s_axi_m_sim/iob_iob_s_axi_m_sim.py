@@ -224,7 +224,7 @@ def setup(py_params_dict):
                     "clk_en_rst_s": (
                     "clk_en_rst_s",
                     [
-                        "rst_i": "soft_reset",
+                        "rst_i: soft_reset",
                     ],
                 ),
                     "iob_s": "uut_access",

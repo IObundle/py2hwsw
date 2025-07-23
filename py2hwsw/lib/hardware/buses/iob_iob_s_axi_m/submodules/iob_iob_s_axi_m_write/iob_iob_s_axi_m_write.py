@@ -51,17 +51,14 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_en_rst_s",
-                "signals": {
-                    "type": "iob_clk",
-                },
-                "descr": "Clock, clock enable and reset",
+            "name": "clk_en_rst_s",
+            "signals": {
+                "type": "iob_clk",
+                "params": "c_a_r",
             },
-            {
-                "name": "rst_i",
-                "descr": "Reset signal",
-                "signals": [{"name": "rst_i"}],
+            "descr": "Clock, clock enable and reset",
             },
+            
             {
                 "name": "start_addr_i",
                 "descr": "Burst start address",
@@ -194,7 +191,6 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "rst_i": "rst_i",
                     "w_en_i": "fifo_wen",
                     "w_data_i": "write_data_i",
                     "w_full_o": "fifo_w_full",

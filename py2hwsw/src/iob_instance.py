@@ -19,7 +19,7 @@ from iob_base import (
 )
 from iob_portmap import iob_portmap, get_portmap_port, create_portmap_from_dict
 from iob_wire import remove_wire_direction_suffixes
-from iob_core import iob_core, find_module_setup_dir
+from iob_core import iob_core, create_core_from_dict, find_module_setup_dir
 
 
 @dataclass
@@ -356,7 +356,7 @@ def instantiate_block(
 
     elif file_ext == ".json":
         debug_print(f"Loading {block_name}.json", 1)
-        block_obj = core_from_dict(
+        block_obj = create_core_from_dict(
             json.load(open(os.path.join(block_dir, f"{block_name}.json")))
         )
 

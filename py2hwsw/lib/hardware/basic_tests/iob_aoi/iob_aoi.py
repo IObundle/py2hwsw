@@ -4,17 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
-import sys
-
-path_sufix = "../../../../scripts"
-sys.path.insert(
-    0,
-    os.path.abspath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), path_sufix)
-    ),
-)
-
 from iob_core import iob_core
 
 # Short notation with API is WIP
@@ -221,11 +210,11 @@ core_dictionary = {
     ],
     "superblocks": [
         # Tester
-        {
-            "core": "iob_aoi_tester",
-            "name": "iob_tester",
-            "dest_dir": "tester",
-        },
+        # {
+        #     "core": "iob_aoi_tester",
+        #     "name": "iob_tester",
+        #     "dest_dir": "tester",
+        # },
     ],
 }
 
@@ -239,5 +228,5 @@ class iob_aoi(iob_core):
 
 
 if __name__ == "__main__":
-    iob_aoi_obj = iob_aoi(width=7)
+    iob_aoi_obj = iob_aoi(width=1)
     iob_aoi_obj.generate_build_dir()

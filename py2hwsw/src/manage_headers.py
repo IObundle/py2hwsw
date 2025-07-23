@@ -24,7 +24,6 @@ And this script overrides existing headers (does not keep old license headers).
 """
 
 import os
-import argparse
 from datetime import datetime
 from jinja2 import Template
 
@@ -113,86 +112,6 @@ headers = {
 
 DEBUG = 0
 VERBOSE = 0
-
-
-def main():
-    # Create the parser
-    parser = argparse.ArgumentParser(description="File Header Comment Manager")
-
-    # Add arguments
-    parser.add_argument(
-        "--header",
-        choices=headers.keys(),
-        default="spdx",
-        help="The header template to use (default: spdx)",
-    )
-    parser.add_argument(
-        "--path",
-        default=".",
-        help="Path to search for files (default: .)",
-    )
-    parser.add_argument(
-        "--list-files-only",
-        default=False,
-        help="List the files that would be modified without modifying them",
-    )
-    parser.add_argument(
-        "--delete-only",
-        default=False,
-        help="Only delete headers from files",
-    )
-    parser.add_argument(
-        "--verbose",
-        default=True,
-        help="Enable verbose mode",
-    )
-    parser.add_argument(
-        "--debug",
-        default=False,
-        help="Enable debug mode",
-    )
-    parser.add_argument(
-        "--ignore-paths",
-        nargs="+",
-        help="List of paths to ignore",
-    )
-    parser.add_argument(
-        "--skip-existing-headers",
-        default=False,
-        help="Skip files with existing headers",
-    )
-
-    # SPDX header template arguments
-    parser.add_argument(
-        "--license",
-        default="MIT",
-        help="SPDX license identifier (default: MIT)",
-    )
-    parser.add_argument(
-        "--copyright-holder",
-        default="IObundle",
-        help="SPDX copyright holder (default: IObundle)",
-    )
-    parser.add_argument(
-        "--no-copyright-year",
-        default=False,
-        help="Do not include copyright year in header",
-    )
-
-    # Parse the arguments
-    args = parser.parse_args()
-    generate_headers(
-        root=args.path,
-        ignore_paths=args.ignore_paths,
-        copyright_holder=args.copyright_holder,
-        license_name=args.license,
-        header_template=args.header,
-        list_files_only=args.list_files_only,
-        delete_only=args.delete_only,
-        skip_existing_headers=args.skip_existing_headers,
-        verbose=args.verbose,
-        debug=args.debug,
-    )
 
 
 def generate_headers(
@@ -477,7 +396,3 @@ def render_jinja_template(template_string, context):
     rendered_output = template.render(context)
 
     return rendered_output
-
-
-if __name__ == "__main__":
-    main()

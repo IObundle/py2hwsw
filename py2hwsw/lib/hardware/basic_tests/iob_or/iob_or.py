@@ -4,17 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import os
-import sys
-
-path_sufix = "../../../../scripts"
-sys.path.insert(
-    0,
-    os.path.abspath(
-        os.path.join(os.path.dirname(os.path.realpath(__file__)), path_sufix)
-    ),
-)
-
 from iob_core import iob_core
 
 # Short notation with API is WIP

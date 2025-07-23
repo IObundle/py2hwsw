@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import py2hwsw_api as py2hwsw
-
 core_dictionary = {
     "generate_hw": True,
     "confs": [
@@ -101,7 +99,7 @@ core_dictionary = {
 }
 
 
-class iob_counter(py2hwsw.iob_core):
+class iob_counter(iob_core):
     def __init__(self):
         super().__init__(core_dictionary)
 

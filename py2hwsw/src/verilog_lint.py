@@ -90,8 +90,3 @@ def lint_files(files_list):
     #    print("Parent dirs: "+directories_to_lint[directory], file=sys.stderr)
     #    print("Files from dirs:"+files, file=sys.stderr)
     #    print("\n", file=sys.stderr)
-
-
-if __name__ == "__main__":
-    files_list = sys.argv[1:]
-    lint_files(files_list)

@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+from dataclasses import dataclass
 import os
 import copy
 import json
@@ -16,12 +17,12 @@ from iob_base import (
     empty_list,
     empty_dict,
 )
-from iob_portmap import iob_portmap, get_portmap_port
+from iob_portmap import iob_portmap, get_portmap_port, create_portmap_from_dict
 from iob_wire import remove_wire_direction_suffixes
-from iob_core import create_core_from_dict, find_module_setup_dir
-from iob_portmap import portmap_from_dict
+from iob_core import iob_core, create_core_from_dict, find_module_setup_dir
 
 
+@dataclass
 class iob_instance(iob_base):
     """
     Generic class to describe a module's instance.
@@ -113,8 +114,8 @@ class iob_instance(iob_base):
 
         # Copy class iob_instance attributes by value (deep copy)
         instance_attributes = {
-            "instance_name",
-            "instance_description",
+            "name",
+            "description",
             "portmap_connections",
             "parameters",
             "instantiate",
@@ -355,14 +356,13 @@ def instantiate_block(
 
     elif file_ext == ".json":
         debug_print(f"Loading {block_name}.json", 1)
-        block_obj = core_from_dict(
+        block_obj = create_core_from_dict(
             json.load(open(os.path.join(block_dir, f"{block_name}.json")))
         )
 
     # Create instance of block
     instance_obj = iob_instance(**block_dict, core=block_obj)
 
-    # block_obj = convert2internal(block_obj)
     # # Auto-set block attributes
     # if not block_obj.original_name:
     #     block_obj.original_name = block_name
@@ -415,7 +415,7 @@ def create_instance_from_dict(instance_dict):
 
     # instantiate_block(instance_dict["core"], instance_dict.get("iob_parameters", {}), instance_dict)
 
-    # instance_dict_with_objects["portmap_connections"] = portmap_from_dict(instance_dictionary.get("portmap_connections", {}))
+    # instance_dict_with_objects["portmap_connections"] = create_portmap_from_dict(instance_dictionary.get("portmap_connections", {}))
     # return iob_instance(**instance_dict)
 
     # remove non-attribute keys
@@ -423,7 +423,7 @@ def create_instance_from_dict(instance_dict):
     iob_parameters = instance_dict.pop("iob_parameters", {})
     portmap_connections = instance_dict.pop("portmap_connections", {})
     instance_dict.update(
-        {"portmap_connections": portmap_from_dict(portmap_connections)}
+        {"portmap_connections": create_portmap_from_dict(portmap_connections)}
     )
     return instantiate_block(core, iob_parameters, instance_dict)
 

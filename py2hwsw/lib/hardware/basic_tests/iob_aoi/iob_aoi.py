@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-import py2hwsw_api as py2hwsw
+from iob_core import iob_core
 
 # Short notation with API is WIP
 # core_dictionary = {
@@ -120,27 +120,21 @@ core_dictionary = {
             "width": "W",
         },
     ],
-    "buses": [
+    "wires": [
         {
-            "name": "and_ab_out",
+            "name": "aab",
             "descr": "and ab output",
-            "wires": [
-                {"name": "aab", "width": "W"},
-            ],
+            "width": "W",
         },
         {
-            "name": "and_cd_out",
+            "name": "cad",
             "descr": "and cd output",
-            "wires": [
-                {"name": "cad", "width": "W"},
-            ],
+            "width": "W",
         },
         {
-            "name": "or_out",
+            "name": "aob",
             "descr": "or output",
-            "wires": [
-                {"name": "oab", "width": "1"},
-            ],
+            "width": "W",
         },
     ],
     "subblocks": [
@@ -154,7 +148,7 @@ core_dictionary = {
             "portmap_connections": {
                 "a_i": "a_i",
                 "b_i": "b_i",
-                "y_o": "and_ab_out",
+                "y_o": "aab",
             },
             # Elements from 'iob_parameters' dictionary will be expanded and passed to the constructor of the iob_and class, like so:
             # iob_and(**iob_parameters)
@@ -185,7 +179,7 @@ core_dictionary = {
             "portmap_connections": {
                 "a_i": "c_i",
                 "b_i": "d_i",
-                "y_o": "and_cd_out",
+                "y_o": "cad",
             },
         },
         {
@@ -196,9 +190,9 @@ core_dictionary = {
                 "W": "W",
             },
             "portmap_connections": {
-                "a_i": "and_ab_out",
-                "b_i": "and_cd_out",
-                "y_o": "or_out",
+                "a_i": "aab",
+                "b_i": "cad",
+                "y_o": "aob",
             },
         },
         {
@@ -209,7 +203,7 @@ core_dictionary = {
                 "W": "W",
             },
             "portmap_connections": {
-                "a_i": "or_out",
+                "a_i": "aob",
                 "y_o": "y_o",
             },
         },
@@ -219,36 +213,20 @@ core_dictionary = {
         # {
         #     "core": "iob_aoi_tester",
         #     "name": "iob_tester",
-        #     # "dest_dir": "tester",
+        #     "dest_dir": "tester",
         # },
     ],
 }
 
 
-class iob_aoi(py2hwsw.iob_core):
-    def __init__(self):
+class iob_aoi(iob_core):
+    def __init__(self, width=None):
+        if width:
+            core_dictionary["confs"][0]["value"] = str(width)
         print("iob_aoi constructor called.")
         super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
-    # core_obj = py2hwsw.create_core_from_dict(core_dictionary)
-    # print(">>> Generate_hw of core_obj: ", core_obj.get_generate_hw())
-    # print(">>> Ports of core_obj: ", [i.get_name() for i in core_obj.get_ports()])
-    # print(
-    #     ">>> Subblocks of core_obj: ",
-    #     [i.get_name() for i in core_obj.get_subblocks()],
-    # )
-    # print(
-    #     ">>> Ports of iob_and subblock: ",
-    #     core_obj.get_subblocks()[0].get_ports(),
-    # )
-
-    iob_aoi_obj = iob_aoi()
-    print(">>> Ports of iob_aoi: ", iob_aoi_obj.get_ports())
-    print(
-        ">>> Names of ports of iob_aoi: ",
-        [i.get_global_wire().get_name() for i in iob_aoi_obj.get_ports()],
-    )
-
+    iob_aoi_obj = iob_aoi(width=1)
     iob_aoi_obj.generate_build_dir()

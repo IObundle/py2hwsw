@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-import py2hwsw_api as py2hwsw
-
 core_dictionary = {
     # Set "is_tester" attribute to generate Makefile and flows allowing to run this core as top module
     "generate_hw": True,
@@ -63,7 +61,7 @@ core_dictionary = {
             "instance_name": "uut_aoi",
             "instance_description": "Unit Under Test",
             "parameters": {
-                "W": "W",
+                "W": "1",
             },
             "connect": {
                 "a_i": "a",
@@ -113,7 +111,7 @@ core_dictionary = {
 }
 
 
-class iob_aoi_tester(py2hwsw.iob_core):
+class iob_aoi_tester(iob_core):
     def __init__(self):
         super().__init__(core_dictionary)
 

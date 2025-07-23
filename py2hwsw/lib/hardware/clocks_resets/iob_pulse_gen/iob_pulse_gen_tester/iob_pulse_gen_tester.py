@@ -5,8 +5,6 @@
 # SPDX-License-Identifier: MIT
 
 
-import py2hwsw_api as py2hwsw
-
 core_dictionary = {
     "parent": {
         # Tester is a child core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
@@ -80,7 +78,7 @@ core_dictionary = {
 }
 
 
-class iob_pulse_gen_tester(py2hwsw.iob_core):
+class iob_pulse_gen_tester(iob_core):
     def __init__(self):
         super().__init__(core_dictionary)
 

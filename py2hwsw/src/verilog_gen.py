@@ -15,6 +15,7 @@ import block_gen
 import comb_gen
 import fsm_gen
 import snippet_gen
+import wire_gen
 from iob_base import debug_print
 
 
@@ -198,6 +199,8 @@ def generate_verilog(core):
         params_line = "("
 
     module_body_lines = ""
+    if core.wires:
+        module_body_lines += wire_gen.generate_wires(core) + "\n"
 
     local_params = param_gen.generate_localparams(core)
     if local_params:

@@ -43,12 +43,12 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-            "name": "clk_en_rst_s",
-            "signals": {
-                "type": "iob_clk",
-                "params": "c_a_r",
-            },
-            "descr": "Clock, clock enable and reset",
+                "name": "clk_en_rst_s",
+                "signals": {
+                    "type": "iob_clk",
+                    "params": "c_a_r",
+                },
+                "descr": "Clock, clock enable and reset",
             },
             {
                 "name": "start_addr_i",

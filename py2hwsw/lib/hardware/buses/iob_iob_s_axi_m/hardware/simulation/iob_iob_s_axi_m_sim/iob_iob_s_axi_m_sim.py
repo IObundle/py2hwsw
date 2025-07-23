@@ -222,11 +222,11 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": (
-                    "clk_en_rst_s",
-                    [
-                        "rst_i: soft_reset",
-                    ],
-                ),
+                        "clk_en_rst_s",
+                        [
+                            "rst_i: soft_reset",
+                        ],
+                    ),
                     "iob_s": "uut_access",
                     "axi_m": "axi_access",
                     "control_io": "iob_s_axi_m_control",

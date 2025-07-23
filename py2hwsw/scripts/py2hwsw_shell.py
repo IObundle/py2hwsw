@@ -107,7 +107,7 @@ def import_py2hwsw_modules():
 
         # Don't import the same module twice
         if module_name in sys.modules:
-            # Only import the class defined inside that module
+            # Only return the class defined inside that module
             py2_modules[module_name] = sys.modules[module_name].__dict__[module_name]
             continue
 
@@ -117,7 +117,7 @@ def import_py2hwsw_modules():
         sys.modules[module_name] = module  # Include module in global namespace
         spec.loader.exec_module(module)
 
-        # Only import the class defined inside that module
+        # Only return the class defined inside that module
         py2_modules[module_name] = module.__dict__[module_name]
 
     return py2_modules
@@ -142,7 +142,7 @@ def import_lib_cores(py2_modules: dict):
 
         # Don't import the same module twice
         if module_name in sys.modules:
-            # Only import the class defined inside that module
+            # Only return the class defined inside that module
             lib_modules[module_name] = sys.modules[module_name].__dict__[module_name]
             continue
 
@@ -154,7 +154,7 @@ def import_lib_cores(py2_modules: dict):
         imported_module = import_python_module(
             path, module_name=module_name, extra_namespace_objs=py2_modules
         )
-        # Only import the class defined inside that module
+        # Only return the class defined inside that module
         lib_modules[module_name] = imported_module.__dict__[module_name]
 
     return lib_modules

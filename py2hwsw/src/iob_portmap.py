@@ -13,6 +13,7 @@ from iob_base import (
 import iob_colors
 from iob_wire import get_real_wire, iob_wire_reference
 from iob_bus import iob_bus
+from iob_port import iob_port
 
 
 @dataclass
@@ -21,23 +22,38 @@ class iob_portmap:
     Class that represents a portmap attribute.
 
     Attributes:
-        e_connect (iob_bus): Identifier name of external bus that connects this port
+        e_connect (str): Identifier name of external wire or bus that connects this port
         e_connect_bit_slices (list): List of bit slices for external connections.
-        port (str): IDentifier name of port associated with portmap
+        port_name (str): Identifier name of port or interface associated with portmap
+        port (iob_port): Port associated with portmap
     """
 
-    e_connect: iob_bus | None = None
+    e_connect: str = ""
     e_connect_bit_slices: list[str] = empty_list()
-    port: str = None
+    port_name: str = ""
+    port: iob_port = None
+
+    def __post_init__(self):
+        if not self.port_name and self.port:
+            self.port_name = self.port.wire.name
 
     def validate_attributes(self):
-        if not self.port:
+        if not self.port_name:
             fail_with_msg("Port is not specified", ValueError)
         if not self.e_connect:
-            fail_with_msg(f"Port '{self.port}' is not connected!", ValueError)
+            fail_with_msg(f"Port '{self.port_name}' is not connected!", ValueError)
 
         # TODO: validate if port and external buses really exist.
         pass
+
+    def connect_port(self, ports: list[iob_port]):
+        """Connect the portmap to an iob_port object
+        Use the port_name to find the matching port in the list of ports
+        """
+        if not self.port:
+            for p in ports:
+                if p.wire.name == self.port_name:
+                    self.port = p
 
     # NOTE: THis connect_external already performs validation (including search for external bus (that may be non-existent).
     # We should probably only call this with `validate_attributes()`
@@ -199,7 +215,7 @@ def create_portmap_from_dict(portmap_dict):
 
         # Create portmap and add to list
         portmap = iob_portmap(
-            port=port_name,
+            port_name=port_name,
             e_connect=external_bus_name,
             e_connect_bit_slices=bit_slices,
         )

@@ -33,10 +33,12 @@ core_dictionary = {
 
 
 class iob_inv(iob_core):
-    def __init__(self):
+    def __init__(self, width=None):
+        if width:
+            core_dictionary["confs"][0]["value"] = str(width)
         super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
-    iob_inv_obj = iob_inv()
+    iob_inv_obj = iob_inv(width=6)
     iob_inv_obj.generate_build_dir()

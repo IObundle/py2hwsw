@@ -23,6 +23,7 @@ import snippet_gen
 import doc_gen
 import verilog_gen
 import ipxact_gen
+import wire_gen
 
 from iob_base import (
     fail_with_msg,
@@ -30,7 +31,6 @@ from iob_base import (
     nix_permission_hack,
     update_obj_from_dict,
     parse_short_notation_text,
-    empty_list,
 )
 from py2hwsw_version import PY2HWSW_VERSION
 from iob_module import iob_module
@@ -40,13 +40,15 @@ import verilog_lint
 from manage_headers import generate_headers
 from iob_license import iob_license
 
-from iob_conf import create_conf_from_dict
-from iob_wire import create_wire_from_dict
-from iob_port import create_port_from_dict
-from iob_bus import create_bus_from_dict
-from iob_snippet import create_snippet_from_dict
+from iob_comb import iob_comb
+from iob_conf import iob_conf, create_conf_from_dict
+from iob_fsm import iob_fsm
+from iob_interface import iob_interface
+from iob_wire import iob_wire, create_wire_from_dict
+from iob_port import iob_port, create_port_from_dict
+from iob_bus import iob_bus, create_bus_from_dict
+from iob_snippet import iob_snippet, create_snippet_from_dict
 from iob_parameter import create_iob_parameter_group_from_dict
-
 
 
 class iob_core(iob_module):
@@ -136,17 +138,17 @@ class iob_core(iob_module):
         self.name: str = ""
         self.description: str = "Default description"
         self.reset_polarity: str = "positive"
-        self.confs: list[iob_conf] = empty_list()
-        self.wires: list[iob_wire] = empty_list()
-        self.ports: list[iob_port] = empty_list()
-        self.buses: list[iob_bus] = empty_list()
-        self.interfaces: list[iob_interface] = empty_list()
-        self.snippets: list[iob_snippet] = empty_list()
+        self.confs: list[iob_conf] = []
+        self.wires: list[iob_wire] = []
+        self.ports: list[iob_port] = []
+        self.buses: list[iob_bus] = []
+        self.interfaces: list[iob_interface] = []
+        self.snippets: list[iob_snippet] = []
         self.comb: iob_comb | None = None
         self.fsm: iob_fsm | None = None
-        self.subblocks: list[iob_instance] = empty_list()
-        self.superblocks: list[iob_core] = empty_list()
-        self.sw_modules: list[iob_core] = empty_list()
+        self.subblocks: list[iob_instance] = []
+        self.superblocks: list[iob_core] = []
+        self.sw_modules: list[iob_core] = []
 
         # Core attributes
         self.version: str = PY2HWSW_VERSION
@@ -155,18 +157,15 @@ class iob_core(iob_module):
         self.build_dir: str = "build"
         self.use_netlist: bool = False
         self.is_system: bool = False
-        self.board_list: list[str] = empty_list()
-        self.ignore_snippets: list[str] = empty_list()
+        self.board_list: list[str] = []
+        self.ignore_snippets: list[str] = []
         self.generate_hw: bool = False
         self.is_tester: bool = False
-        self.iob_parameters: list[iob_parameter_group] = empty_list()
-        self.license: iob_license = field(default_factory=iob_license)
+        self.iob_parameters: list[iob_parameter_group] = []
+        self.license: iob_license = iob_license()
         self.doc_conf: str = ""
         self.title: str = ""
         self.dest_dir: str = "hardware/src"
-
-
-
 
         # Set internal attributes
         "Selects if core is top module."
@@ -195,13 +194,14 @@ class iob_core(iob_module):
                     breakpoint()
             core_dict_with_objects["confs"] = [create_conf_from_dict(i) for i in core_dictionary.get("confs", [])]
             core_dict_with_objects["ports"] = [create_port_from_dict(i) for i in core_dictionary.get("ports", [])]
+            core_dict_with_objects["wires"] = [create_wire_from_dict(i) for i in core_dictionary.get("wires", [])]
             core_dict_with_objects["buses"] = [create_bus_from_dict(i) for i in core_dictionary.get("buses", [])]
             core_dict_with_objects["snippets"] = [create_snippet_from_dict(i) for i in core_dictionary.get("snippets", [])]
             core_dict_with_objects["subblocks"] = [create_instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
             core_dict_with_objects["superblocks"] = [create_core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
             core_dict_with_objects["sw_modules"] = [create_core_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
             core_dict_with_objects["iob_parameters"] = [create_iob_parameter_group_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
-            update_obj_from_dict(self, core_dict_with_objects) #, valid_attributes_list=...)
+            update_obj_from_dict(self, core_dict_with_objects)  # valid_attributes_list=...)
 
         # Set global build directory
         if self.is_top_module:
@@ -210,6 +210,8 @@ class iob_core(iob_module):
 
         # Get name of (user's) subclass that is inheriting from iob_core
         # FIXME: subclass_name=type(self.get_api_obj()).__name__
+        # TEMPFIX:
+        subclass_name = self.__class__.__name__
 
         # Auto-fill original_name based on user subclass's name (if any). May not have subclass if defined via JSON or direct constructor call.
         if not self.original_name and subclass_name != "iob_core":
@@ -245,7 +247,7 @@ class iob_core(iob_module):
                 if subblock.original_name == self.issuer.original_name:
                     # skip build dir generation for issuer subblocks
                     continue
-            subblock.get_core().generate_build_dir()
+            subblock.core.generate_build_dir()
 
         # Generate build dir of superblocks. Ensure superblocks are set up only for top module (or wrappers of it)
         if self.is_top_module or self.is_superblock:
@@ -281,8 +283,11 @@ class iob_core(iob_module):
         # Generate ios
         io_gen.generate_ports_snippet(self)
 
+        # Generate wires
+        wire_gen.generate_wires_snippet(self)
+
         # Generate buses
-        bus_gen.generate_buses_snippet(self)
+        # bus_gen.generate_buses_snippet(self)
 
         # Generate instances
         if self.generate_hw:

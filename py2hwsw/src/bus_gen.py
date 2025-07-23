@@ -21,9 +21,8 @@ def generate_buses(core):
         wires_code = ""
         for wire in bus.wires:
             if isinstance(wire, iob_wire):
-                global_wire = wire.global_wire
-                if global_wire:
-                    wires_code += "    " + global_wire.get_verilog_bus()
+                if wire:
+                    wires_code += "    " + wire.get_verilog_bus()
         if wires_code:
             # Add description for the bus if it is not the default one
             if bus.descr != "" and bus.descr != "Default description":

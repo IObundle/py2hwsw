@@ -4,7 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-
 # Short notation with API is WIP
 # core_dictionary = {
 #     "generate_hw": True,
@@ -74,5 +73,5 @@ class iob_or(iob_core):
 
 
 if __name__ == "__main__":
-    iob_or_obj = iob_or()
+    iob_or_obj = iob_or(width=3)
     iob_or_obj.generate_build_dir()

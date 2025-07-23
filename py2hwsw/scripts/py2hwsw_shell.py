@@ -101,17 +101,24 @@ def import_py2hwsw_modules():
 
         module_name = os.path.basename(module_path).split(".")[0]
 
+        # FIXME: Temporarily only import a few py2 modules (the ones that are really used in iob_aoi.py and its dependencies)
+        if module_name not in ["iob_core"]:
+            continue
+
         # Don't import the same module twice
         if module_name in sys.modules:
-            py2_modules[module_name] = sys.modules[module_name]
+            # Only return the class defined inside that module
+            py2_modules[module_name] = sys.modules[module_name].__dict__[module_name]
             continue
 
         # Import the module
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module  # Include module in global namespace
-        py2_modules[module_name] = module
         spec.loader.exec_module(module)
+
+        # Only return the class defined inside that module
+        py2_modules[module_name] = module.__dict__[module_name]
 
     return py2_modules
 
@@ -129,9 +136,14 @@ def import_lib_cores(py2_modules: dict):
     for path in cores_paths:
         module_name, file_extension = os.path.basename(path).split(".")
 
+        # FIXME: Temporarily only import a few modules (iob_aoi and its dependencies)
+        if module_name not in ["iob_and", "iob_inv", "iob_or", "iob_aoi"]:
+            continue
+
         # Don't import the same module twice
         if module_name in sys.modules:
-            lib_modules[module_name] = sys.modules[module_name]
+            # Only return the class defined inside that module
+            lib_modules[module_name] = sys.modules[module_name].__dict__[module_name]
             continue
 
         # Skip .json cores
@@ -139,14 +151,10 @@ def import_lib_cores(py2_modules: dict):
         if file_extension == "json":
             continue
 
-        # FIXME: Temporarily only import a few modules (the ones that have a class defined inside)
-        if module_name not in ["iob_and", "iob_aoi"]:
-            continue
-
         imported_module = import_python_module(
             path, module_name=module_name, extra_namespace_objs=py2_modules
         )
-        # Import only the class defined in that module
+        # Only return the class defined inside that module
         lib_modules[module_name] = imported_module.__dict__[module_name]
 
     return lib_modules

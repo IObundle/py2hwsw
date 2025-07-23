@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 
-from iob_core import iob_core
-
 core_dictionary = {
     "generate_hw": True,
     "confs": [

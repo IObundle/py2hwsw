@@ -136,8 +136,8 @@ def import_lib_cores(py2_modules: dict):
     for path in cores_paths:
         module_name, file_extension = os.path.basename(path).split(".")
 
-        # FIXME: Temporarily only import a few modules (the ones that have a class defined inside)
-        if module_name not in ["iob_and", "iob_aoi"]:
+        # FIXME: Temporarily only import a few modules (iob_aoi and its dependencies)
+        if module_name not in ["iob_and", "iob_inv", "iob_or", "iob_aoi"]:
             continue
 
         # Don't import the same module twice

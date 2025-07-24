@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "MODE",
-                "descr": "Mode",
+                "descr": "trailing (0), leading (1)",
                 "type": "P",
                 "val": "0",
                 "min": "NA",

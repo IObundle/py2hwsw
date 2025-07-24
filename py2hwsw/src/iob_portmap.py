@@ -160,7 +160,7 @@ class iob_portmap:
     #
 
     @staticmethod
-    def create_portmap_from_dict(portmap_dict):
+    def create_from_dict(portmap_dict):
         """
         Function to create iob_portmap object from dictionary attributes.
 
@@ -225,7 +225,7 @@ class iob_portmap:
         return portmap_list
 
     @staticmethod
-    def create_portmap_from_text(portmap_text):
+    def create_from_text(portmap_text):
         """
         Function to create iob_portmap object from short notation text.
 

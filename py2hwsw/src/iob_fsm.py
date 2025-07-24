@@ -132,7 +132,7 @@ end
     #
 
     @staticmethod
-    def create_fsm_from_dict(fsm_dict):
+    def create_from_dict(fsm_dict):
         """
         Function to create iob_fsm object from dictionary attributes.
 
@@ -152,7 +152,7 @@ end
     def fsm_text2dict(fsm_text):
         """Convert fsm short notation text to dictionary.
         Atributes:
-            fsm_text (str): Short notation text. See `create_fsm_from_text` for format.
+            fsm_text (str): Short notation text. See `create_from_text` for format.
 
         Returns:
             dict: Dictionary with fsm attributes.
@@ -165,7 +165,7 @@ end
         return parse_short_notation_text(fsm_text, fsm_flags)
 
     @staticmethod
-    def create_fsm_from_text(fsm_text):
+    def create_from_text(fsm_text):
         """
         Function to create iob_fsm object from short notation text.
 
@@ -193,4 +193,4 @@ end
         Returns:
             iob_fsm: iob_fsm object
         """
-        return __class__.create_fsm_from_dict(__class__.fsm_text2dict(fsm_text))
+        return __class__.create_from_dict(__class__.fsm_text2dict(fsm_text))

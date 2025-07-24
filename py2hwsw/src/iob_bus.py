@@ -17,7 +17,6 @@ from iob_base import (
 from iob_wire import iob_wire, iob_wire_reference
 
 get_real_wire = iob_wire.get_real_wire
-create_wire_from_dict = iob_wire.create_wire_from_dict
 
 
 @dataclass
@@ -265,7 +264,7 @@ class iob_bus:
     #
 
     @staticmethod
-    def create_bus_from_dict(bus_dict):
+    def create_from_dict(bus_dict):
         """
         Function to create iob_bus object from dictionary attributes.
 
@@ -281,7 +280,9 @@ class iob_bus:
         """
         # Convert dictionary elements to objects
         kwargs = bus_dict.copy()
-        kwargs["wires"] = [create_wire_from_dict(i) for i in bus_dict.get("wires", [])]
+        kwargs["wires"] = [
+            iob_wire.create_from_dict(i) for i in bus_dict.get("wires", [])
+        ]
         return iob_bus(**kwargs)
 
     @staticmethod
@@ -307,7 +308,7 @@ class iob_bus:
         return bus_dict
 
     @staticmethod
-    def create_bus_from_text(bus_text):
+    def create_from_text(bus_text):
         """
         Function to create iob_bus object from short notation text.
 
@@ -320,4 +321,4 @@ class iob_bus:
         Returns:
             iob_bus: iob_bus object
         """
-        return __class__.create_bus_from_dict(__class__.bus_text2dict(bus_text))
+        return __class__.create_from_dict(__class__.bus_text2dict(bus_text))

@@ -296,7 +296,7 @@ class iob_comb(iob_snippet):
     #
 
     @staticmethod
-    def create_comb_from_dict(comb_dict):
+    def create_from_dict(comb_dict):
         """
         Function to create iob_comb object from dictionary attributes.
 
@@ -315,7 +315,7 @@ class iob_comb(iob_snippet):
     def comb_text2dict(comb_text):
         """Convert comb short notation text to dictionary.
         Atributes:
-            comb_text (str): Short notation text. See `create_comb_from_text` for format.
+            comb_text (str): Short notation text. See `create_from_text` for format.
 
         Returns:
             dict: Dictionary with comb attributes.
@@ -329,7 +329,7 @@ class iob_comb(iob_snippet):
         return parse_short_notation_text(comb_text, comb_flags)
 
     @staticmethod
-    def create_comb_from_text(comb_text):
+    def create_from_text(comb_text):
         """
         Function to create iob_comb object from short notation text.
 
@@ -348,4 +348,4 @@ class iob_comb(iob_snippet):
         Returns:
             iob_comb: iob_comb object
         """
-        return __class__.create_comb_from_dict(__class__.comb_text2dict(comb_text))
+        return __class__.create_from_dict(__class__.comb_text2dict(comb_text))

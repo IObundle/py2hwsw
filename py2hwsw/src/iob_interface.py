@@ -562,7 +562,7 @@ class iob_interface:
     #
 
     @staticmethod
-    def create_interface_from_dict(interface_dict):
+    def create_from_dict(interface_dict):
         """
         Function to create interface object from dictionary attributes.
 
@@ -584,7 +584,7 @@ class iob_interface:
     def interface_text2dict(interface_text):
         """Convert interface short notation text to dictionary.
         Atributes:
-            interface_text (str): Short notation text. See `create_interface_from_text` for format.
+            interface_text (str): Short notation text. See `create_from_text` for format.
 
         Returns:
             dict: Dictionary with interface attributes.
@@ -612,7 +612,7 @@ class iob_interface:
         return interface_dict
 
     @staticmethod
-    def create_interface_from_text(interface_text):
+    def create_from_text(interface_text):
         """
         Function to create interface object from short notation text.
 
@@ -629,7 +629,7 @@ class iob_interface:
         Returns:
             interface: interface object
         """
-        return __class__.create_interface_from_dict(__class__.interface_text2dict(interface_text))
+        return __class__.create_from_dict(__class__.interface_text2dict(interface_text))
 
 
 #

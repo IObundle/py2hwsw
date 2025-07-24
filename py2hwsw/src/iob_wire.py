@@ -76,7 +76,7 @@ class iob_wire:
     #
 
     @staticmethod
-    def create_wire_from_dict(wire_dict):
+    def create_from_dict(wire_dict):
         """
         Function to create iob_wire object from dictionary attributes.
 
@@ -104,7 +104,7 @@ class iob_wire:
         return parse_short_notation_text(wire_text, wire_flags)
 
     @staticmethod
-    def create_wire_from_text(wire_text):
+    def create_from_text(wire_text):
         """
         Function to create iob_wire object from short notation text.
 
@@ -117,7 +117,7 @@ class iob_wire:
         Returns:
             iob_wire: iob_wire object
         """
-        return __class__.create_wire_from_dict(__class__.wire_text2dict(wire_text))
+        return __class__.create_from_dict(__class__.wire_text2dict(wire_text))
 
 
 @dataclass

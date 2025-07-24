@@ -22,9 +22,7 @@ from iob_wire import iob_wire
 from iob_core import iob_core
 
 get_portmap_port = iob_portmap.get_portmap_port
-create_portmap_from_dict = iob_portmap.create_portmap_from_dict
 remove_direction_suffixes = iob_wire.remove_wire_direction_suffixes
-create_core_from_dict = iob_core.create_core_from_dict
 find_module_setup_dir = iob_core.find_module_setup_dir
 
 
@@ -362,7 +360,7 @@ class iob_instance(iob_base):
 
         elif file_ext == ".json":
             debug_print(f"Loading {block_name}.json", 1)
-            block_obj = create_core_from_dict(
+            block_obj = iob_core.create_from_dict(
                 json.load(open(os.path.join(block_dir, f"{block_name}.json")))
             )
 
@@ -382,7 +380,7 @@ class iob_instance(iob_base):
     #
 
     @staticmethod
-    def create_instance_from_dict(instance_dict):
+    def create_from_dict(instance_dict):
         """
         Function to create iob_instance object from dictionary attributes.
 
@@ -392,14 +390,14 @@ class iob_instance(iob_base):
                 - core -> iob_instance.core
                 - name -> iob_instance.name
                 - description -> iob_instance.description
-                - portmap_connections -> iob_instance.portmap_connections = create_portmap_from_dict(portmap_connections)
+                - portmap_connections -> iob_instance.portmap_connections = iob_portmap.create_from_dict(portmap_connections)
                 - parameters -> iob_instance.parameters
                 - instantiate -> iob_instance.instantiate
                 # Non-attribute instance keys
                 - core (str): Optional. The name of the core to instantiate. Will search for <core>.py or <core>.json files.
                               If this key is set, all other keys will be ignored! (Except 'iob_parameters' key).
                               If <core>.py is found, it must contain a class called <core> that extends iob_core. This class will be used to instantiate the core.
-                              If <core>.json is found, its contents will be read and parsed by the create_core_from_dict(<json_contents>) function.
+                              If <core>.json is found, its contents will be read and parsed by the iob_core.create_from_dict(<json_contents>) function.
                 - iob_parameters (dict): Optional. Dictionary of iob parameters to pass to the instantiated core.
                                             This key should be used in conjunction with the 'core' key.
                                             Elements from this dictionary will be passed as **kwargs to the instantiated core's constructor.
@@ -420,7 +418,7 @@ class iob_instance(iob_base):
 
         # instantiate_block(instance_dict["core"], instance_dict.get("iob_parameters", {}), instance_dict)
 
-        # instance_dict_with_objects["portmap_connections"] = create_portmap_from_dict(instance_dictionary.get("portmap_connections", {}))
+        # instance_dict_with_objects["portmap_connections"] = iob_portmap.create_from_dict(instance_dictionary.get("portmap_connections", {}))
         # return iob_instance(**instance_dict)
 
         # remove non-attribute keys
@@ -428,12 +426,12 @@ class iob_instance(iob_base):
         iob_parameters = instance_dict.pop("iob_parameters", {})
         portmap_connections = instance_dict.pop("portmap_connections", {})
         instance_dict.update(
-            {"portmap_connections": create_portmap_from_dict(portmap_connections)}
+            {"portmap_connections": iob_portmap.create_from_dict(portmap_connections)}
         )
         return __class__.instantiate_block(core, iob_parameters, instance_dict)
 
     @staticmethod
-    def create_instance_from_text(instance_text):
+    def create_from_text(instance_text):
         """
         Function to create iob_instance object from short notation text.
 

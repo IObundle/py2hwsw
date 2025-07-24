@@ -51,13 +51,6 @@ from iob_snippet import iob_snippet
 from iob_license import iob_license
 from iob_parameter import iob_parameter_group
 
-create_conf_from_dict = iob_conf.create_conf_from_dict
-create_wire_from_dict = iob_wire.create_wire_from_dict
-create_port_from_dict = iob_port.create_port_from_dict
-create_bus_from_dict = iob_bus.create_bus_from_dict
-create_snippet_from_dict = iob_snippet.create_snippet_from_dict
-create_iob_parameter_group_from_dict = iob_parameter_group.create_iob_parameter_group_from_dict
-
 
 class iob_core(iob_module):
     """
@@ -65,12 +58,12 @@ class iob_core(iob_module):
 
     This class may be instantiated using 3 different interfaces:
     - Object interface:          by calling the `__init__()` constructor.
-    - Dictionary/JSON interface: by calling the `create_core_from_dict()` method.
-    - Short Notation interface:  by calling the `create_core_from_text()` method.
+    - Dictionary/JSON interface: by calling the `create_from_dict()` method.
+    - Short Notation interface:  by calling the `create_from_text()` method.
 
     To see the arguments supported by the constructor that initializes this class, refer to the `__init__()` method of this class.
-    To see the keys supported by the dictionary that initializes this class, refer to the `create_core_from_dict()` method of this class.
-    To see the syntax supported by the short notation that initializes this class, refer to the `create_core_from_text()` method of this class.
+    To see the keys supported by the dictionary that initializes this class, refer to the `create_from_dict()` method of this class.
+    To see the syntax supported by the short notation that initializes this class, refer to the `create_from_text()` method of this class.
 
     Attributes:
         # Module attributes
@@ -138,7 +131,7 @@ class iob_core(iob_module):
 
         Attributes:
             core_dictionary (dict): Optional dictionary to initialize core attributes.
-                                    The format of this dictionary is the same as the dictionary received by the `create_core_from_dict` method.
+                                    The format of this dictionary is the same as the dictionary received by the `create_from_dict` method.
         """
 
         # Inherit attributes from superclasses
@@ -201,7 +194,7 @@ class iob_core(iob_module):
         # Update current core's attributes with values from given core_dictionary
         if core_dictionary:
             # Lazy import instance to avoid circular dependecy
-            create_instance_from_dict = getattr(importlib.import_module('iob_instance'), 'iob_instance').create_instance_from_dict
+            iob_instance = getattr(importlib.import_module('iob_instance'), 'iob_instance')
             # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
             if "core" in core_dictionary or "iob_parameters" in core_dictionary:
                 fail_with_msg("The 'core' and 'iob_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
@@ -210,15 +203,15 @@ class iob_core(iob_module):
             for c in core_dictionary.get("confs", []):
                 if "type" in c:
                     breakpoint()
-            core_dict_with_objects["confs"] = [create_conf_from_dict(i) for i in core_dictionary.get("confs", [])]
-            core_dict_with_objects["ports"] = [create_port_from_dict(i) for i in core_dictionary.get("ports", [])]
-            core_dict_with_objects["wires"] = [create_wire_from_dict(i) for i in core_dictionary.get("wires", [])]
-            core_dict_with_objects["buses"] = [create_bus_from_dict(i) for i in core_dictionary.get("buses", [])]
-            core_dict_with_objects["snippets"] = [create_snippet_from_dict(i) for i in core_dictionary.get("snippets", [])]
-            core_dict_with_objects["subblocks"] = [create_instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
-            core_dict_with_objects["superblocks"] = [__class__.create_core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
-            core_dict_with_objects["sw_modules"] = [__class__.create_core_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
-            core_dict_with_objects["iob_parameters"] = [create_iob_parameter_group_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
+            core_dict_with_objects["confs"] = [iob_conf.create_from_dict(i) for i in core_dictionary.get("confs", [])]
+            core_dict_with_objects["ports"] = [iob_port.create_from_dict(i) for i in core_dictionary.get("ports", [])]
+            core_dict_with_objects["wires"] = [iob_wire.create_from_dict(i) for i in core_dictionary.get("wires", [])]
+            core_dict_with_objects["buses"] = [iob_bus.create_from_dict(i) for i in core_dictionary.get("buses", [])]
+            core_dict_with_objects["snippets"] = [iob_snippet.create_from_dict(i) for i in core_dictionary.get("snippets", [])]
+            core_dict_with_objects["subblocks"] = [iob_instance.create_from_dict(i) for i in core_dictionary.get("subblocks", [])]
+            core_dict_with_objects["superblocks"] = [__class__.create_from_dict(i) for i in core_dictionary.get("superblocks", [])]
+            core_dict_with_objects["sw_modules"] = [__class__.create_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
+            core_dict_with_objects["iob_parameters"] = [iob_parameter_group.create_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
             update_obj_from_dict(self, core_dict_with_objects)  # valid_attributes_list=...)
 
         # Set global build directory
@@ -542,7 +535,7 @@ class iob_core(iob_module):
     #
 
     @staticmethod
-    def create_core_from_dict(core_dict):
+    def create_from_dict(core_dict):
         """
         Function to create iob_core object from dictionary attributes.
 
@@ -555,17 +548,17 @@ class iob_core(iob_module):
                 - name -> iob_module.name
                 - description -> iob_module.description
                 - reset_polarity -> iob_module.reset_polarity
-                - confs -> iob_module.confs = [iob_conf.create_conf_from_dict(i) for i in confs]
-                - wires -> iob_module.wires = [iob_wire.create_wire_from_dict(i) for i in wires]
-                - ports -> iob_module.ports = [iob_port.create_port_from_dict(i) for i in ports]
-                - buses -> iob_module.buses = [iob_bus.create_bus_from_dict(i) for i in buses]
-                - interfaces -> iob_module.interfaces = [iob_interface.create_interface_from_dict(i) for i in interfaces]
-                - snippets -> iob_module.snippets = [iob_snippet.create_snippet_from_dict(i) for i in snippets]
-                - comb -> iob_module.comb = create_comb_from_dict(comb)
-                - fsm -> iob_module.fsm = create_fsm_from_dict(fsm)
-                - subblocks -> iob_module.subblocks = [iob_instance.create_instance_from_dict(i) for i in subblocks]
-                - superblocks -> iob_module.superblocks = [iob_core.create_core_from_dict(i) for i in superblocks]
-                - sw_modules -> iob_module.sw_modules = [iob_core.create_core_from_dict(i) for i in sw_modules]
+                - confs -> iob_module.confs = [iob_conf.create_from_dict(i) for i in confs]
+                - wires -> iob_module.wires = [iob_wire.create_from_dict(i) for i in wires]
+                - ports -> iob_module.ports = [iob_port.create_from_dict(i) for i in ports]
+                - buses -> iob_module.buses = [iob_bus.create_from_dict(i) for i in buses]
+                - interfaces -> iob_module.interfaces = [iob_interface.create_from_dict(i) for i in interfaces]
+                - snippets -> iob_module.snippets = [iob_snippet.create_from_dict(i) for i in snippets]
+                - comb -> iob_module.comb = iob_comb.create_from_dict(comb)
+                - fsm -> iob_module.fsm = iob_fsm.create_from_dict(fsm)
+                - subblocks -> iob_module.subblocks = [iob_instance.create_from_dict(i) for i in subblocks]
+                - superblocks -> iob_module.superblocks = [iob_core.create_from_dict(i) for i in superblocks]
+                - sw_modules -> iob_module.sw_modules = [iob_core.create_from_dict(i) for i in sw_modules]
 
                 # Core keys
                 - version -> iob_core.version
@@ -585,8 +578,8 @@ class iob_core(iob_module):
                 - dest_dir -> iob_core.dest_dir
 
                 Some keys (like confs) may contain (sub-)dictionaries as values.
-                Refer to the corresponding `<class_name>.create_*_from_dict()` methods for info about the format and supported keys of these dictionaries.
-                For example, type `help(iob_conf.create_conf_from_dict)` to view the keys supported by the dictionary that initializes the iob_conf object.
+                Refer to the corresponding `<class_name>.create_from_dict()` methods for info about the format and supported keys of these dictionaries.
+                For example, type `help(iob_conf.create_from_dict)` to view the keys supported by the dictionary that initializes the iob_conf object.
 
         Returns:
             iob_core: iob_core object
@@ -597,7 +590,7 @@ class iob_core(iob_module):
     def core_text2dict(core_text):
         """Convert core short notation text to dictionary.
         Atributes:
-            core_text (str): Short notation text. See `create_core_from_text` for format.
+            core_text (str): Short notation text. See `create_from_text` for format.
 
         Returns:
             dict: Dictionary with core attributes.
@@ -650,7 +643,7 @@ class iob_core(iob_module):
         return core_dict
 
     @staticmethod
-    def create_core_from_text(core_text):
+    def create_from_text(core_text):
         """
         Function to create iob_core object from short notation text.
 
@@ -673,7 +666,7 @@ class iob_core(iob_module):
         Returns:
             iob_core: iob_core object
         """
-        return __class__.create_core_from_dict(__class__.core_text2dict(core_text))
+        return __class__.create_from_dict(__class__.core_text2dict(core_text))
 
     @staticmethod
     def get_global_wires_list():

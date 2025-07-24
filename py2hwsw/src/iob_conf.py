@@ -59,7 +59,7 @@ class iob_conf:
     #
 
     @staticmethod
-    def create_conf_from_dict(conf_dict):
+    def create_from_dict(conf_dict):
         """
         Function to create iob_conf object from dictionary attributes.
 
@@ -94,7 +94,7 @@ class iob_conf:
         return parse_short_notation_text(conf_text, conf_text_flags)
 
     @staticmethod
-    def create_conf_from_text(conf_text):
+    def create_from_text(conf_text):
         """
         Function to create iob_conf object from short notation text.
 
@@ -109,4 +109,4 @@ class iob_conf:
         Returns:
             iob_conf: iob_conf object
         """
-        return __class__.create_conf_from_dict(__class__.conf_text2dict(conf_text))
+        return __class__.create_from_dict(__class__.conf_text2dict(conf_text))

@@ -39,7 +39,7 @@ class iob_license:
     #
 
     @staticmethod
-    def create_license_from_dict(license_dict):
+    def create_from_dict(license_dict):
         """
         Function to create iob_license object from dictionary attributes.
 
@@ -59,7 +59,7 @@ class iob_license:
     def license_text2dict(license_text):
         """Convert license short notation text to dictionary.
         Atributes:
-            license_text (str): Short notation text. See `create_license_from_text` for format.
+            license_text (str): Short notation text. See `create_from_text` for format.
 
         Returns:
             dict: Dictionary with license attributes.
@@ -72,7 +72,7 @@ class iob_license:
         return parse_short_notation_text(license_text, license_flags)
 
     @staticmethod
-    def create_license_from_text(license_text):
+    def create_from_text(license_text):
         """
         Function to create iob_license object from short notation text.
 
@@ -85,6 +85,4 @@ class iob_license:
         Returns:
             iob_license: iob_license object
         """
-        return __class__.create_license_from_dict(
-            __class__.license_text2dict(license_text)
-        )
+        return __class__.create_from_dict(__class__.license_text2dict(license_text))

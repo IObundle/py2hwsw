@@ -61,7 +61,7 @@ class iob_port:
     #
 
     @staticmethod
-    def create_port_from_dict(port_dict):
+    def create_from_dict(port_dict):
         """
         Function to create iob_port object from dictionary attributes.
 
@@ -88,7 +88,7 @@ class iob_port:
     def port_text2dict(port_text):
         """Convert port short notation text to dictionary.
         Atributes:
-            port_text (str): Short notation text. See `create_port_from_text` for format.
+            port_text (str): Short notation text. See `create_from_text` for format.
 
         Returns:
             dict: Dictionary with port attributes.
@@ -116,7 +116,7 @@ class iob_port:
         return port_dict
 
     @staticmethod
-    def create_port_from_text(port_text):
+    def create_from_text(port_text):
         """
         Function to create iob_port object from short notation text.
 
@@ -129,4 +129,4 @@ class iob_port:
         Returns:
             iob_port: iob_port object
         """
-        return __class__.create_port_from_dict(__class__.port_text2dict(port_text))
+        return __class__.create_from_dict(__class__.port_text2dict(port_text))

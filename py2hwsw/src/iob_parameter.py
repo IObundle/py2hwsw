@@ -40,7 +40,7 @@ class iob_parameter:
     #
 
     @staticmethod
-    def create_iob_parameter_from_dict(iob_parameter_dict):
+    def create_from_dict(iob_parameter_dict):
         """
         Function to create iob_iob_parameter object from dictionary attributes.
 
@@ -60,7 +60,7 @@ class iob_parameter:
     def iob_parameter_text2dict(iob_parameter_text):
         """Convert iob_parameter short notation text to dictionary.
         Atributes:
-            iob_parameter_text (str): Short notation text. See `create_iob_parameter_from_text` for format.
+            iob_parameter_text (str): Short notation text. See `create_from_text` for format.
 
         Returns:
             dict: Dictionary with iob_parameter attributes.
@@ -73,7 +73,7 @@ class iob_parameter:
         return parse_short_notation_text(iob_parameter_text, iob_parameter_flags)
 
     @staticmethod
-    def create_iob_parameter_from_text(iob_parameter_text):
+    def create_from_text(iob_parameter_text):
         """
         Function to create iob_parameter object from short notation text.
 
@@ -86,7 +86,7 @@ class iob_parameter:
         Returns:
             iob_parameter: iob_parameter object
         """
-        return __class__.create_iob_parameter_from_dict(
+        return __class__.create_from_dict(
             __class__.iob_parameter_text2dict(iob_parameter_text)
         )
 
@@ -178,7 +178,7 @@ class iob_parameter_group:
     #
 
     @staticmethod
-    def create_iob_parameter_group_from_dict(iob_parameter_group_dict):
+    def create_from_dict(iob_parameter_group_dict):
         """
         Function to create iob_parameter_group object from dictionary attributes.
 
@@ -196,7 +196,7 @@ class iob_parameter_group:
         # Convert dictionary elements to objects
         kwargs = iob_parameter_group_dict.copy()
         kwargs["iob_parameters"] = [
-            __class__.create_iob_parameter_from_dict(i)
+            __class__.create_from_dict(i)
             for i in iob_parameter_group_dict["iob_parameters"]
         ]
         return iob_parameter_group(**kwargs)
@@ -221,7 +221,7 @@ class iob_parameter_group:
         return iob_parameter_group_dict
 
     @staticmethod
-    def create_iob_parameter_group_from_text(iob_parameter_group_text):
+    def create_from_text(iob_parameter_group_text):
         """
         Function to create iob_parameter_group object from short notation text.
 
@@ -232,6 +232,6 @@ class iob_parameter_group:
         Returns:
             iob_parameter_group: iob_parameter_group object
         """
-        return __class__.create_iob_parameter_group_from_dict(
+        return __class__.create_from_dict(
             __class__.iob_parameter_group_text2dict(iob_parameter_group_text)
         )

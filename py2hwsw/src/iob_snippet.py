@@ -23,7 +23,7 @@ class iob_snippet:
     #
 
     @staticmethod
-    def create_snippet_from_dict(snippet_dict):
+    def create_from_dict(snippet_dict):
         """
         Function to create iob_snippet object from dictionary attributes.
 
@@ -41,7 +41,7 @@ class iob_snippet:
     def snippet_text2dict(snippet_text):
         """Convert snippet short notation text to dictionary.
         Atributes:
-            snippet_text (str): Short notation text. See `create_snippet_from_text` for format.
+            snippet_text (str): Short notation text. See `create_from_text` for format.
 
         Returns:
             dict: Dictionary with snippet attributes.
@@ -49,7 +49,7 @@ class iob_snippet:
         return {"verilog_code": snippet_text}
 
     @staticmethod
-    def create_snippet_from_text(snippet_text):
+    def create_from_text(snippet_text):
         """
         Function to create iob_snippet object from short notation text.
 
@@ -60,6 +60,4 @@ class iob_snippet:
         Returns:
             iob_snippet: iob_snippet object
         """
-        return __class__.create_snippet_from_dict(
-            __class__.snippet_text2dict(snippet_text)
-        )
+        return __class__.create_from_dict(__class__.snippet_text2dict(snippet_text))

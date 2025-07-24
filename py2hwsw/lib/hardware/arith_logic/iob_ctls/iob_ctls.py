@@ -70,7 +70,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "data_int2",
-                "descr": "Internal write enable wire",
+                "descr": "Potentially reversed data signal",
                 "signals": [
                     {
                         "name": "data_int2",

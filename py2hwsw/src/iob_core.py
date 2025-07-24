@@ -189,10 +189,6 @@ class iob_core(iob_module):
                 fail_with_msg("The 'core' and 'iob_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
             # Convert core dictionary elements to objects
             core_dict_with_objects = core_dictionary.copy()
-            for c in core_dictionary.get("confs", []):
-                if "type" in c:
-                    # breakpoint()
-                    pass
             core_dict_with_objects["confs"] = [create_conf_from_dict(i) for i in core_dictionary.get("confs", [])]
             core_dict_with_objects["ports"] = [create_port_from_dict(i) for i in core_dictionary.get("ports", [])]
             core_dict_with_objects["wires"] = [create_wire_from_dict(i) for i in core_dictionary.get("wires", [])]

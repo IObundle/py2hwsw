@@ -63,6 +63,15 @@ class iob_core(iob_module):
     """
     Generic class to describe how to generate a base IOb IP core.
 
+    This class may be instantiated using 3 different interfaces:
+    - Object interface:          by calling the `__init__()` constructor.
+    - Dictionary/JSON interface: by calling the `create_core_from_dict()` method.
+    - Short Notation interface:  by calling the `create_core_from_text()` method.
+
+    To see the arguments supported by the constructor that initializes this class, refer to the `__init__()` method of this class.
+    To see the keys supported by the dictionary that initializes this class, refer to the `create_core_from_dict()` method of this class.
+    To see the syntax supported by the short notation that initializes this class, refer to the `create_core_from_text()` method of this class.
+
     Attributes:
         # Module attributes
         original_name (str): Original name of the module. Usually auto-filled by Py2HWSW.
@@ -129,6 +138,7 @@ class iob_core(iob_module):
 
         Attributes:
             core_dictionary (dict): Optional dictionary to initialize core attributes.
+                                    The format of this dictionary is the same as the dictionary received by the `create_core_from_dict` method.
         """
 
         # Inherit attributes from superclasses
@@ -545,17 +555,17 @@ class iob_core(iob_module):
                 - name -> iob_module.name
                 - description -> iob_module.description
                 - reset_polarity -> iob_module.reset_polarity
-                - confs -> iob_module.confs
-                - wires -> iob_module.wires
-                - ports -> iob_module.ports
-                - buses -> iob_module.buses
-                - interfaces -> iob_module.interfaces
-                - snippets -> iob_module.snippets
-                - comb -> iob_module.comb
-                - fsm -> iob_module.fsm
-                - subblocks -> iob_module.subblocks = [create_core_from_dict(i) for i in subblocks]
-                - superblocks -> iob_module.superblocks = [create_core_from_dict(i) for i in superblocks]
-                - sw_modules -> iob_module.sw_modules = [create_core_from_dict(i) for i in sw_modules]
+                - confs -> iob_module.confs = [iob_conf.create_conf_from_dict(i) for i in confs]
+                - wires -> iob_module.wires = [iob_wire.create_wire_from_dict(i) for i in wires]
+                - ports -> iob_module.ports = [iob_port.create_port_from_dict(i) for i in ports]
+                - buses -> iob_module.buses = [iob_bus.create_bus_from_dict(i) for i in buses]
+                - interfaces -> iob_module.interfaces = [iob_interface.create_interface_from_dict(i) for i in interfaces]
+                - snippets -> iob_module.snippets = [iob_snippet.create_snippet_from_dict(i) for i in snippets]
+                - comb -> iob_module.comb = create_comb_from_dict(comb)
+                - fsm -> iob_module.fsm = create_fsm_from_dict(fsm)
+                - subblocks -> iob_module.subblocks = [iob_instance.create_instance_from_dict(i) for i in subblocks]
+                - superblocks -> iob_module.superblocks = [iob_core.create_core_from_dict(i) for i in superblocks]
+                - sw_modules -> iob_module.sw_modules = [iob_core.create_core_from_dict(i) for i in sw_modules]
 
                 # Core keys
                 - version -> iob_core.version
@@ -573,6 +583,10 @@ class iob_core(iob_module):
                 - doc_conf -> iob_core.doc_conf
                 - title -> iob_core.title
                 - dest_dir -> iob_core.dest_dir
+
+                Some keys (like confs) may contain (sub-)dictionaries as values.
+                Refer to the corresponding `<class_name>.create_*_from_dict()` methods for info about the format and supported keys of these dictionaries.
+                For example, type `help(iob_conf.create_conf_from_dict)` to view the keys supported by the dictionary that initializes the iob_conf object.
 
         Returns:
             iob_core: iob_core object

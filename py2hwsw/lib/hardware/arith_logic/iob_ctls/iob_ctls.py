@@ -94,7 +94,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "unencoded_i": "data_int2",
-                    "encoded_o": "count_int",
+                    "encoded_o": "count_o",
                 },
             },
         ],

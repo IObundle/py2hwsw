@@ -54,60 +54,59 @@ class iob_conf:
         except ValueError:
             pass
 
+    #
+    # Other Py2HWSW interface methods
+    #
 
-#
-# Other Py2HWSW interface methods
-#
+    @staticmethod
+    def create_conf_from_dict(conf_dict):
+        """
+        Function to create iob_conf object from dictionary attributes.
 
+        Attributes:
+            conf_dict (dict): dictionary with values to initialize attributes of iob_conf object.
+                This dictionary supports the following keys corresponding to the iob_conf attributes:
+                - name           -> iob_conf.name
+                - kind           -> iob_conf.kind
+                - value          -> iob_conf.value
+                - min_value      -> iob_conf.min_value
+                - max_value      -> iob_conf.max_value
+                - descr          -> iob_conf.descr
+                - doc_only       -> iob_conf.doc_only
 
-def create_conf_from_dict(conf_dict):
-    """
-    Function to create iob_conf object from dictionary attributes.
+        Returns:
+            iob_conf: iob_conf object
+        """
+        return iob_conf(**conf_dict)
 
-    Attributes:
-        conf_dict (dict): dictionary with values to initialize attributes of iob_conf object.
-            This dictionary supports the following keys corresponding to the iob_conf attributes:
-            - name           -> iob_conf.name
-            - kind           -> iob_conf.kind
-            - value          -> iob_conf.value
-            - min_value      -> iob_conf.min_value
-            - max_value      -> iob_conf.max_value
-            - descr          -> iob_conf.descr
-            - doc_only       -> iob_conf.doc_only
+    @staticmethod
+    def conf_text2dict(conf_text: str) -> dict:
+        # parse conf text into a dictionary
+        conf_text_flags = [
+            "name",
+            ["-t", {"dest": "kind"}],
+            ["-v", {"dest": "value"}],
+            ["-m", {"dest": "min_value"}],
+            ["-M", {"dest": "max_value"}],
+            ["-d", {"dest": "descr", "nargs": "?"}],
+            ["-doc", {"dest": "doc_only", "action": "store_true"}],
+        ]
+        return parse_short_notation_text(conf_text, conf_text_flags)
 
-    Returns:
-        iob_conf: iob_conf object
-    """
-    return iob_conf(**conf_dict)
+    @staticmethod
+    def create_conf_from_text(conf_text):
+        """
+        Function to create iob_conf object from short notation text.
 
+        Attributes:
+            conf_text (str): Short notation text. Object attributes are specified using the following format:
+                name [-t kind] [-v value] [-m min_value] [-M max_value] [-doc]
+                [-d descr]
+                Example:
+                    DATA_W -t P -v 32 -m NA -M NA
+                    -d 'Data bus width'
 
-def conf_text2dict(conf_text: str) -> dict:
-    # parse conf text into a dictionary
-    conf_text_flags = [
-        "name",
-        ["-t", {"dest": "kind"}],
-        ["-v", {"dest": "value"}],
-        ["-m", {"dest": "min_value"}],
-        ["-M", {"dest": "max_value"}],
-        ["-d", {"dest": "descr", "nargs": "?"}],
-        ["-doc", {"dest": "doc_only", "action": "store_true"}],
-    ]
-    return parse_short_notation_text(conf_text, conf_text_flags)
-
-
-def create_conf_from_text(conf_text):
-    """
-    Function to create iob_conf object from short notation text.
-
-    Attributes:
-        conf_text (str): Short notation text. Object attributes are specified using the following format:
-            name [-t kind] [-v value] [-m min_value] [-M max_value] [-doc]
-            [-d descr]
-            Example:
-                DATA_W -t P -v 32 -m NA -M NA
-                -d 'Data bus width'
-
-    Returns:
-        iob_conf: iob_conf object
-    """
-    return create_conf_from_dict(conf_text2dict(conf_text))
+        Returns:
+            iob_conf: iob_conf object
+        """
+        return __class__.create_conf_from_dict(__class__.conf_text2dict(conf_text))

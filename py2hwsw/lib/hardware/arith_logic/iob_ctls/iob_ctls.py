@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "MODE",
-                "descr": "Mode",
+                "descr": "trailing (0), leading (1)",
                 "type": "P",
                 "val": "0",
                 "min": "NA",
@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "SYMBOL",
-                "descr": "Symbol",
+                "descr": "search zeros (0), search ones (1)",
                 "type": "P",
                 "val": "0",
                 "min": "NA",
@@ -40,7 +40,7 @@ def setup(py_params_dict):
                     {
                         "name": "data_i",
                         "width": "W",
-                        "descr": "Internal write address",
+                        "descr": "Input data",
                     },
                 ],
             },
@@ -59,32 +59,23 @@ def setup(py_params_dict):
         "wires": [
             {
                 "name": "data_int1",
-                "descr": "Internal write enable wire",
+                "descr": "Internal data",
                 "signals": [
                     {
                         "name": "data_int1",
                         "width": "W",
-                        "descr": "Internal write enable signal",
+                        "descr": "Data internal wire",
                     },
                 ],
             },
             {
                 "name": "data_int2",
-                "descr": "Internal write enable wire",
+                "descr": "Reversed data",
                 "signals": [
                     {
                         "name": "data_int2",
                         "width": "W",
-                        "descr": "Internal write enable signal",
-                    },
-                ],
-            },
-            {
-                "name": "count_int",
-                "descr": "Counter wire",
-                "signals": [
-                    {
-                        "name": "count_o",
+                        "descr": "Reversed data internal wire",
                     },
                 ],
             },
@@ -97,19 +88,21 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_prio_enc",
                 "instance_name": "prio_encoder0",
+                "instance_description": "count trailing zeros",
                 "parameters": {
                     "W": "W",
                     "MODE": '"LOW"',
                 },
                 "connect": {
                     "unencoded_i": "data_int2",
-                    "encoded_o": "count_int",
+                    "encoded_o": "count_o",
                 },
             },
         ],
         "snippets": [
             {
                 "verilog_code": r"""
+               // invert if searching zeros or not
                 generate
                    if (SYMBOL == 0) begin : g_zeros
                      assign data_int1 = data_i;
@@ -117,6 +110,7 @@ def setup(py_params_dict):
                      assign data_int1 = ~data_i;
                    end
                 endgenerate
+                // reverse if leading symbols or not
                 generate
                     if (MODE == 1) begin : g_reverse
                        iob_reverse #(W) reverse0 (

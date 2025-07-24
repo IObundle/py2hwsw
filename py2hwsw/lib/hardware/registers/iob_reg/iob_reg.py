@@ -6,12 +6,22 @@
 
 
 class iob_reg(iob_core):
-    def __init__(self, **py_params_dict):
-        port_params = (
-            py_params_dict["port_params"]
-            if "port_params" in py_params_dict
-            else {"clk_en_rst_s": "c_a"}
-        )
+    """
+    Class to represent a register module.
+    It is configurable via iob_parameters.
+    It supports the following control ports: clk, cke, arst, rst, en, anrst
+
+    The reset polarity used will be based on the project-wide global variable 'reset_polarity'.
+    """
+
+    def __init__(self, port_params: dict = {"clk_en_rst_s": "c_a"}):
+        """
+        Args:
+           port_params (dict): Dictionary of port parameters. Example format:
+                               {
+                                   "clk_en_rst_s": "c_a",
+                               },
+        """
         assert "clk_en_rst_s" in port_params, "clk_en_rst_s port is missing"
 
         reset_polarity = getattr(iob_globals(), "reset_polarity", "positive")
@@ -71,30 +81,32 @@ class iob_reg(iob_core):
         core_dictionary = {
             "name": reg_name,
             "generate_hw": True,
-            "description": f"Generated register module.",
-            "iob_parameters": [
-                {
-                    "name": "port_params",
-                    "val": port_params,
-                    "descr": "Port parameters are passed to interfaces to generate different interfaces.",
-                },
-            ],
+            "description": "Generated register module.",
+            # FIXME: Will this be deprecated?
+            # Should we store the values that we received via python parameters in this attribute? I think only use case would be for later reference or documentation.
+            # "iob_parameters": [
+            #     {
+            #         "name": "port_params",
+            #         "value": port_params,
+            #         "descr": "Port parameters are passed to interfaces to generate different interfaces.",
+            #     },
+            # ],
             "version": "0.1",
             "confs": [
                 {
                     "name": "DATA_W",
-                    "type": "P",
-                    "val": "1",
-                    "min": "NA",
-                    "max": "NA",
+                    "kind": "P",
+                    "value": "1",
+                    "min_value": "NA",
+                    "max_value": "NA",
                     "descr": "Data bus width",
                 },
                 {
                     "name": "RST_VAL",
-                    "type": "P",
-                    "val": "{DATA_W{1'b0}}",
-                    "min": "NA",
-                    "max": "NA",
+                    "kind": "P",
+                    "value": "{DATA_W{1'b0}}",
+                    "min_value": "NA",
+                    "max_value": "NA",
                     "descr": "Reset value.",
                 },
             ],
@@ -102,7 +114,7 @@ class iob_reg(iob_core):
                 {
                     "name": "clk_en_rst_s",
                     "wires": {
-                        "type": "iob_clk",
+                        "kind": "iob_clk",
                         "params": clk_port_params,
                     },
                     "descr": "Clock, clock enable and reset",

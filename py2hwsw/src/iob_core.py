@@ -191,7 +191,8 @@ class iob_core(iob_module):
             core_dict_with_objects = core_dictionary.copy()
             for c in core_dictionary.get("confs", []):
                 if "type" in c:
-                    breakpoint()
+                    # breakpoint()
+                    pass
             core_dict_with_objects["confs"] = [create_conf_from_dict(i) for i in core_dictionary.get("confs", [])]
             core_dict_with_objects["ports"] = [create_port_from_dict(i) for i in core_dictionary.get("ports", [])]
             core_dict_with_objects["wires"] = [create_wire_from_dict(i) for i in core_dictionary.get("wires", [])]

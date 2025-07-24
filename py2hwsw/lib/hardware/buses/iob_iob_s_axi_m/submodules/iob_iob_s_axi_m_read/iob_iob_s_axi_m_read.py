@@ -46,13 +46,9 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
+                    "params": "c_a_r",
                 },
                 "descr": "Clock, clock enable and reset",
-            },
-            {
-                "name": "rst_i",
-                "descr": "Reset signal",
-                "signals": [{"name": "rst_i"}],
             },
             {
                 "name": "start_addr_i",
@@ -209,7 +205,6 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "rst_i": "rst_i",
                     "w_en_i": "fifo_wen",
                     "w_data_i": "fifo_wdata",
                     "w_full_o": "fifo_full",

@@ -204,17 +204,8 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     "signals": {
                         "type": "iob_clk",
                         "prefix": "w_",
+                        "params": "c_a_r_e",
                     },
-                },
-                {
-                    "name": f"{fifo_name}_w_rst_i",
-                    "descr": "Write sync reset",
-                    "signals": [{"name": f"{fifo_name}_w_rst_i"}],
-                },
-                {
-                    "name": f"{fifo_name}_w_en_i",
-                    "descr": "Write enable",
-                    "signals": [{"name": f"{fifo_name}_w_en_i"}],
                 },
                 {
                     "name": f"{fifo_name}_w_data_i",
@@ -250,17 +241,8 @@ def create_fifo_instance(attributes_dict, csr_ref):
                     "signals": {
                         "type": "iob_clk",
                         "prefix": "r_",
+                        "params": "c_a_r_e",
                     },
-                },
-                {
-                    "name": f"{fifo_name}_r_rst_i",
-                    "descr": "Read sync reset",
-                    "signals": [{"name": f"{fifo_name}_r_rst_i"}],
-                },
-                {
-                    "name": f"{fifo_name}_r_en_i",
-                    "descr": "Read enable",
-                    "signals": [{"name": f"{fifo_name}_r_en_i"}],
                 },
                 {
                     "name": f"{fifo_name}_r_data_o",
@@ -596,16 +578,15 @@ def create_fifo_instance(attributes_dict, csr_ref):
         if mode == "W":
             # Connect write interface to CSR wires and read interface to ports
             fifo_connect = {
-                "w_clk_en_rst_s": "clk_en_rst_s",
-                "w_rst_i": "1'd0",
-                "w_en_i": f"{fifo_name}_data_wen",
+                "w_clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    ["w_rst_i:1'd0", f"w_en_i: {fifo_name}_data_wen"],
+                ),
                 "w_data_i": f"{fifo_name}_data_wdata",
                 "w_full_o": f"{fifo_name}_full",
                 "w_empty_o": f"{fifo_name}_empty",
                 "w_level_o": f"{fifo_name}_level",
                 "r_clk_en_rst_s": f"{fifo_name}_r_clk_en_rst_s",
-                "r_rst_i": f"{fifo_name}_r_rst_i",
-                "r_en_i": f"{fifo_name}_r_en_i",
                 "r_data_o": f"{fifo_name}_r_data_o",
                 "r_full_o": f"{fifo_name}_r_full_o",
                 "r_empty_o": f"{fifo_name}_r_empty_o",
@@ -615,16 +596,15 @@ def create_fifo_instance(attributes_dict, csr_ref):
         else:  # mode == "R"
             # Connect read interface to CSR wires and write interface to ports
             fifo_connect = {
-                "r_clk_en_rst_s": "clk_en_rst_s",
-                "r_rst_i": "1'd0",
-                "r_en_i": f"{fifo_name}_data_ren",
+                "r_clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    ["r_rst_i:1'd0", f"r_en_i: {fifo_name}_data_ren"],
+                ),
                 "r_data_o": f"{fifo_name}_data_rdata",
                 "r_full_o": f"{fifo_name}_full",
                 "r_empty_o": f"{fifo_name}_empty",
                 "r_level_o": f"{fifo_name}_level",
                 "w_clk_en_rst_s": f"{fifo_name}_w_clk_en_rst_s",
-                "w_rst_i": f"{fifo_name}_w_rst_i",
-                "w_en_i": f"{fifo_name}_w_en_i",
                 "w_data_i": f"{fifo_name}_w_data_i",
                 "w_full_o": f"{fifo_name}_w_full_o",
                 "w_empty_o": f"{fifo_name}_w_empty_o",
@@ -650,9 +630,10 @@ def create_fifo_instance(attributes_dict, csr_ref):
         if mode == "W":
             # Connect write interface to CSR wires and read interface to ports
             fifo_connect = {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": f"{fifo_name}_rst_i",
-                "w_en_i": f"{fifo_name}_data_wen",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [f"rst_i: {fifo_name}_rst_i", f"w_en_i: {fifo_name}_data_wen"],
+                ),
                 "w_data_i": f"{fifo_name}_data_wdata",
                 "w_full_o": f"{fifo_name}_full",
                 "r_en_i": f"{fifo_name}_r_en_i",
@@ -664,9 +645,10 @@ def create_fifo_instance(attributes_dict, csr_ref):
         else:  # mode == "R"
             # Connect read interface to CSR wires and write interface to ports
             fifo_connect = {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "rst_i": f"{fifo_name}_rst_i",
-                "r_en_i": f"{fifo_name}_data_ren",
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [f"rst_i: {fifo_name}_rst_i", f"r_en_i: {fifo_name}_data_ren"],
+                ),
                 "r_data_o": f"{fifo_name}_data_rdata",
                 "r_empty_o": f"{fifo_name}_empty",
                 "w_en_i": f"{fifo_name}_w_en_i",
@@ -708,7 +690,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
             {
                 "verilog_code": f"""
    // Generate interrupt signal
-   assign {fifo_name}_interrupt_o ={fifo_name}_current_level_o >= {fifo_name}_thresh_rdata;
+   assign {fifo_name}_interrupt_o = {fifo_name}_current_level_o >= {fifo_name}_thresh_rdata;
 """,
             }
         )

@@ -288,19 +288,7 @@ def setup(py_params_dict):
                     {"name": "async_fifo_write_r_clk_i"},
                     {"name": "async_fifo_write_r_cke_i"},
                     {"name": "async_fifo_write_r_arst_i"},
-                ],
-            },
-            {
-                "name": "async_fifo_write_r_rst_i",
-                "descr": "Read sync reset",
-                "signals": [
                     {"name": "async_fifo_write_r_rst_i"},
-                ],
-            },
-            {
-                "name": "async_fifo_write_r_en_i",
-                "descr": "Read enable",
-                "signals": [
                     {"name": "async_fifo_write_r_en_i"},
                 ],
             },
@@ -379,25 +367,13 @@ def setup(py_params_dict):
             },
             # Async read FIFO
             {
-                "name": "async_fifo_read_r_clk_en_rst",
+                "name": "async_fifo_read_w_clk_en_rst",
                 "descr": "Read clock, clock enable and async reset",
                 "signals": [
                     {"name": "async_fifo_read_w_clk_i"},
                     {"name": "async_fifo_read_w_cke_i"},
                     {"name": "async_fifo_read_w_arst_i"},
-                ],
-            },
-            {
-                "name": "async_fifo_read_w_rst_i",
-                "descr": "Read sync reset",
-                "signals": [
                     {"name": "async_fifo_read_w_rst_i"},
-                ],
-            },
-            {
-                "name": "async_fifo_read_w_en_i",
-                "descr": "Read enable",
-                "signals": [
                     {"name": "async_fifo_read_w_en_i"},
                 ],
             },
@@ -829,8 +805,6 @@ def setup(py_params_dict):
                     "fifo_read_current_level_o": "fifo_read_current_level",
                     # Async FIFO write
                     "async_fifo_write_r_clk_en_rst_s": "async_fifo_write_r_clk_en_rst",
-                    "async_fifo_write_r_rst_i": "async_fifo_write_r_rst_i",
-                    "async_fifo_write_r_en_i": "async_fifo_write_r_en_i",
                     "async_fifo_write_r_data_o": "async_fifo_write_r_data_o",
                     "async_fifo_write_r_full_o": "async_fifo_write_r_full_o",
                     "async_fifo_write_r_empty_o": "async_fifo_write_r_empty_o",
@@ -838,8 +812,6 @@ def setup(py_params_dict):
                     "async_fifo_write_extmem_io": "async_fifo_write_extmem",
                     # Async FIFO read
                     "async_fifo_read_w_clk_en_rst_s": "async_fifo_read_w_clk_en_rst",
-                    "async_fifo_read_w_rst_i": "async_fifo_read_w_rst_i",
-                    "async_fifo_read_w_en_i": "async_fifo_read_w_en_i",
                     "async_fifo_read_w_data_i": "async_fifo_read_w_data_i",
                     "async_fifo_read_w_full_o": "async_fifo_read_w_full_o",
                     "async_fifo_read_w_empty_o": "async_fifo_read_w_empty_o",

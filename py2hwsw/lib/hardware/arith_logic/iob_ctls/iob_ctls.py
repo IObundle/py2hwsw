@@ -102,6 +102,7 @@ def setup(py_params_dict):
         "snippets": [
             {
                 "verilog_code": r"""
+                // invert if searching zeros or not
                 generate
                    if (SYMBOL == 0) begin : g_zeros
                      assign data_int1 = data_i;
@@ -109,6 +110,7 @@ def setup(py_params_dict):
                      assign data_int1 = ~data_i;
                    end
                 endgenerate
+                // reverse if leading symbols or not
                 generate
                     if (MODE == 1) begin : g_reverse
                        iob_reverse #(W) reverse0 (

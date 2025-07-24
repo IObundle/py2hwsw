@@ -64,7 +64,7 @@ def setup(py_params_dict):
                     {
                         "name": "data_int1",
                         "width": "W",
-                        "descr": "Internal write enable signal",
+                        "descr": "Potentially inverted data signal derived from data_i",
                     },
                 ],
             },

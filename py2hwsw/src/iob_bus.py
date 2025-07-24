@@ -13,7 +13,6 @@ from iob_base import (
     str_to_kwargs,
     assert_attributes,
     parse_short_notation_text,
-    empty_list,
 )
 from iob_wire import (
     iob_wire,
@@ -30,14 +29,17 @@ class iob_bus:
 
     Attributes:
         name (str): Identifier name for the bus.
-        descr (str): Description of the bus.
-        wires (list): List of wires belonging to this bus
-                        (each wire represents a hardware Verilog bus).
+        interface (iob_interface): The interface of the bus
     """
 
     name: str = ""
-    descr: str = "Default description"
-    wires: list[iob_wire] = empty_list()
+    interface: iob_interface.iob_interface = None
+
+    def validate_attributes(self):
+        if not self.name:
+            fail_with_msg("All buses must have a name!", ValueError)
+        if not self.interface:
+            fail_with_msg(f"Missing interface for bus '{self.name}'!", ValueError)
 
     def get_wire(self, wire_name: str) -> iob_wire:
         """
@@ -55,9 +57,12 @@ class iob_bus:
         if not self.interface:
             fail_with_msg(f"Bus '{self.name}' has no interface!", ValueError)
 
+        # FIXME: Should this class store a wires attribute?
+        # Maybe they should always be dynamically generated with a `get_wires` method.
         self.wires += self.interface.get_wires()
 
         # Remove wire direction information
+        # FIXME: interface.get_wires() should probably already return wires without direction
         for wire in self.wires:
             # Skip wire references
             if isinstance(wire, iob_wire_reference):
@@ -69,10 +74,6 @@ class iob_bus:
                 elif wire.name.endswith("_io"):
                     wire.name = wire.name[:-3]
                 wire.direction = ""
-
-    def validate_attributes(self):
-        if not self.name:
-            fail_with_msg("All buses must have a name!", ValueError)
 
 
 attrs = [

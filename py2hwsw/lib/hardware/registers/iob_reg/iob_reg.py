@@ -113,32 +113,22 @@ class iob_reg(iob_core):
             "ports": [
                 {
                     "name": "clk_en_rst_s",
-                    "wires": {
+                    "descr": "Clock, clock enable and reset",
+                    "interface": {
                         "kind": "iob_clk",
                         "params": clk_port_params,
                     },
-                    "descr": "Clock, clock enable and reset",
                 },
                 {
                     "name": "data_i",
                     "descr": "Data input",
-                    "wires": [
-                        {
-                            "name": "data_i",
-                            "width": "DATA_W",
-                        },
-                    ],
+                    "width": "DATA_W",
                 },
                 {
                     "name": "data_o",
                     "descr": "Data output",
-                    "wires": [
-                        {
-                            "name": "data_o",
-                            "width": "DATA_W",
-                            "isvar": True,
-                        },
-                    ],
+                    "width": "DATA_W",
+                    "isvar": True,
                 },
             ],
             "snippets": [

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from iob_base import fail_with_msg, parse_short_notation_text
 from iob_wire import iob_wire
+from iob_bus import iob_bus
 
 
 @dataclass
@@ -14,22 +15,32 @@ class iob_port:
     Describes an IO port.
 
     Attributes:
-        wire (iob_wire): Reference to the wire that is connected to the port.
-        direction (str): Port direction
+        wire (iob_wire | iob_bus): Reference to the wire or bus that is connected to the port.
+        direction (str): Port direction.
+                         Either 'input', 'output', or 'inout' if the port references a single wire.
+                         Either 'manager' or 'subordinate' if the port references a bus.
+        descr (str): Description of the port.
         doc_only (bool): Only add to documentation
         doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     """
 
-    wire: iob_wire = None
+    wire: iob_wire | iob_bus = None
     direction: str = ""
+    descr: str = "Default description"
     doc_only: bool = False
     doc_clearpage: bool = False
 
     def validate_attributes(self):
         if not self.wire:
-            fail_with_msg("Port not associated to wire!")
-        if self.direction not in ["input", "output", "inout"]:
-            fail_with_msg(f"Missing direction for port {self.wire.name}!")
+            fail_with_msg("Port not associated to a wire or bus!")
+        if isinstance(self.wire, iob_wire):
+            if self.direction not in ["input", "output", "inout"]:
+                fail_with_msg(f"Missing direction for port {self.wire.name}!")
+        elif isinstance(self.wire, iob_bus):
+            if self.direction not in ["manager", "subordinate"]:
+                fail_with_msg(f"Missing direction for port {self.wire.name}!")
+        else:
+            fail_with_msg("Unknown type for wire associated to port!")
 
     def get_verilog_port(self, comma=True):
         """Generate a verilog port string from this wire"""

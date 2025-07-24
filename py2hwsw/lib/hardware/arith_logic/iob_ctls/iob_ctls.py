@@ -59,7 +59,7 @@ def setup(py_params_dict):
         "wires": [
             {
                 "name": "data_int1",
-                "descr": "Internal write enable wire",
+                "descr": "Potentially inverted data signal, based on SYMBOL parameter",
                 "signals": [
                     {
                         "name": "data_int1",

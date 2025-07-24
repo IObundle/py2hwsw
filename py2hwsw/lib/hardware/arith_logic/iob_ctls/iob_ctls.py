@@ -25,7 +25,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "SYMBOL",
-                "descr": "Symbol",
+                "descr": "search zeros (0), search ones (1)",
                 "type": "P",
                 "val": "0",
                 "min": "NA",

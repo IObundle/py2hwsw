@@ -8,12 +8,13 @@
 
 from latex import write_table
 
-import iob_colors
-from iob_wire import get_real_wire
-from iob_port import port_obj_list_process
+from iob_wire import iob_wire
+from iob_port import iob_port
 import param_gen
 from iob_base import fail_with_msg, find_obj_in_list
-from iob_port import iob_port
+
+get_real_wire = iob_wire.get_real_wire
+port_obj_list_process = iob_port.port_obj_list_process
 
 
 # Generate subblocks.tex file with TeX table of subblocks (Verilog modules instances)

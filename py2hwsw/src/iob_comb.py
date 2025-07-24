@@ -6,10 +6,13 @@ import re
 
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
-from iob_base import fail_with_msg, assert_attributes, parse_short_notation_text
-from iob_bus import find_wire_in_buses
-from iob_wire import get_real_wire
+from iob_wire import iob_wire
+from iob_bus import iob_bus
 from iob_interface import iobClkInterface
+from iob_base import fail_with_msg, assert_attributes, parse_short_notation_text
+
+find_wire_in_buses = iob_bus.find_wire_in_buses
+get_real_wire = iob_wire.get_real_wire
 
 
 @dataclass
@@ -82,14 +85,14 @@ class iob_comb(iob_snippet):
                 wire = find_wire_in_buses(
                     core.ports,
                     wire_name,
-                    process_func=generate_direction_process_func("output"),
+                    process_func=__class__.generate_direction_process_func("output"),
                 )
                 wire.isvar = True
             elif wire_name.endswith("_io"):
                 wire = find_wire_in_buses(
                     core.ports,
                     wire_name,
-                    process_func=generate_direction_process_func("inout"),
+                    process_func=__class__.generate_direction_process_func("inout"),
                 )
                 wire.isvar = True
             elif wire_name.endswith("_nxt"):
@@ -254,96 +257,95 @@ class iob_comb(iob_snippet):
                             instance_description=f"{wire.name} register",
                         )
 
+    @staticmethod
+    def generate_direction_process_func(direction):
+        """Generates a process function that returns a wire if it matches the direction"""
 
-def generate_direction_process_func(direction):
-    """Generates a process function that returns a wire if it matches the direction"""
+        def filter_wire(wire):
+            wire = get_real_wire(wire)
+            if wire.direction == direction:
+                return wire
+            # Return empty object if not correct wire direction
+            return None
 
-    def filter_wire(wire):
-        wire = get_real_wire(wire)
-        if wire.direction == direction:
-            return wire
-        # Return empty object if not correct wire direction
-        return None
+        return filter_wire
 
-    return filter_wire
-
-
-def create_comb(core, *args, **kwargs):
-    """Create a Verilog combinatory circuit to insert in a given core."""
-    if core.fsm is not None:
-        raise ValueError(
-            "Comb circuits and FSMs are mutually exclusive. Use separate submodules."
+    @staticmethod
+    def create_comb(core, *args, **kwargs):
+        """Create a Verilog combinatory circuit to insert in a given core."""
+        if core.fsm is not None:
+            raise ValueError(
+                "Comb circuits and FSMs are mutually exclusive. Use separate submodules."
+            )
+        core.set_default_attribute("comb", None)
+        assert_attributes(
+            iob_comb,
+            kwargs,
+            error_msg=f"Invalid {kwargs.get('name', '')} comb attribute '[arg]'!",
         )
-    core.set_default_attribute("comb", None)
-    assert_attributes(
-        iob_comb,
-        kwargs,
-        error_msg=f"Invalid {kwargs.get('name', '')} comb attribute '[arg]'!",
-    )
-    # Get attributes from kwargs or use default from iob_comb
-    code = kwargs.get("code", "")
-    clk_if = kwargs.get("clk_if", "c_a")
-    comb = iob_comb(code=code, clk_if=clk_if)
-    comb.set_needed_reg(core)
-    comb.infer_registers(core)
-    core.comb = comb
+        # Get attributes from kwargs or use default from iob_comb
+        code = kwargs.get("code", "")
+        clk_if = kwargs.get("clk_if", "c_a")
+        comb = iob_comb(code=code, clk_if=clk_if)
+        comb.set_needed_reg(core)
+        comb.infer_registers(core)
+        core.comb = comb
 
+    #
+    # Other Py2HWSW interface methods
+    #
 
-#
-# Other Py2HWSW interface methods
-#
+    @staticmethod
+    def create_from_dict(comb_dict):
+        """
+        Function to create iob_comb object from dictionary attributes.
 
+        Attributes:
+            comb_dict (dict): dictionary with values to initialize attributes of iob_comb object.
+                This dictionary supports the following keys corresponding to the iob_comb attributes:
+                - code -> iob_comb.code
+                - clk_if -> iob_comb.clk_if
 
-def create_comb_from_dict(comb_dict):
-    """
-    Function to create iob_comb object from dictionary attributes.
+        Returns:
+            iob_comb: iob_comb object
+        """
+        return iob_comb(**comb_dict)
 
-    Attributes:
-        comb_dict (dict): dictionary with values to initialize attributes of iob_comb object.
-            This dictionary supports the following keys corresponding to the iob_comb attributes:
-            - code -> iob_comb.code
-            - clk_if -> iob_comb.clk_if
+    @staticmethod
+    def comb_text2dict(comb_text):
+        """Convert comb short notation text to dictionary.
+        Atributes:
+            comb_text (str): Short notation text. See `create_from_text` for format.
 
-    Returns:
-        iob_comb: iob_comb object
-    """
-    return iob_comb(**comb_dict)
+        Returns:
+            dict: Dictionary with comb attributes.
+        """
+        comb_flags = [
+            ["-c", {"dest": "code"}],
+            ["-clk_if", {"dest": "clk_if"}],
+            ["-clk_p", {"dest": "clk_prefix"}],
+        ]
+        # Parse comb text into a dictionary
+        return parse_short_notation_text(comb_text, comb_flags)
 
+    @staticmethod
+    def create_from_text(comb_text):
+        """
+        Function to create iob_comb object from short notation text.
 
-def comb_text2dict(comb_text):
-    """Convert comb short notation text to dictionary.
-    Atributes:
-        comb_text (str): Short notation text. See `create_comb_from_text` for format.
+        Attributes:
+            comb_text (str): Short notation text. Object attributes are specified using the following format:
+                [-c code] [-clk_if clk_if] [-clk_p clk_prefix]
+                Example:
+                    -c
+                    {{
+                        // Register data
+                        data_nxt = data;
+                    }}
+                    -clk_if c_a_r
+                    -clk_p data_
 
-    Returns:
-        dict: Dictionary with comb attributes.
-    """
-    comb_flags = [
-        ["-c", {"dest": "code"}],
-        ["-clk_if", {"dest": "clk_if"}],
-        ["-clk_p", {"dest": "clk_prefix"}],
-    ]
-    # Parse comb text into a dictionary
-    return parse_short_notation_text(comb_text, comb_flags)
-
-
-def create_comb_from_text(comb_text):
-    """
-    Function to create iob_comb object from short notation text.
-
-    Attributes:
-        comb_text (str): Short notation text. Object attributes are specified using the following format:
-            [-c code] [-clk_if clk_if] [-clk_p clk_prefix]
-            Example:
-                -c
-                {{
-                    // Register data
-                    data_nxt = data;
-                }}
-                -clk_if c_a_r
-                -clk_p data_
-
-    Returns:
-        iob_comb: iob_comb object
-    """
-    return create_comb_from_dict(comb_text2dict(comb_text))
+        Returns:
+            iob_comb: iob_comb object
+        """
+        return __class__.create_from_dict(__class__.comb_text2dict(comb_text))

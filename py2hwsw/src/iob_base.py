@@ -826,6 +826,24 @@ def parse_short_notation_text(text: str, flags) -> dict:
     filtered_dict = {k: v for k, v in parsed_dict.items() if v is not None}
     return filtered_dict
 
+def find_common_deep(path1, path2):
+    """Find common files (recursively) inside two given directories
+    Taken from: https://stackoverflow.com/a/51625515
+    :param str path1: Directory path 1
+    :param str path2: Directory path 2
+    """
+    return set.intersection(
+        *(
+            set(
+                os.path.relpath(os.path.join(root, file), path)
+                for root, _, files in os.walk(path)
+                for file in files
+            )
+            for path in (path1, path2)
+        )
+    )
+
+
 #
 # Utility functions
 #

@@ -96,21 +96,6 @@ def create_port_from_dict(port_dict):
     if "name" not in port_dict:
         fail_with_msg("Missing port name!")
 
-    # Create kwargs to pass to the wire/bus constructor
-    ref_obj_kwargs = port_dict.copy()
-    # Extract port specific keys
-    descr = ref_obj_kwargs.pop("descr", None)
-    doc_only = ref_obj_kwargs.pop("doc_only", False)
-    doc_clearpage = ref_obj_kwargs.pop("doc_clearpage", False)
-    # From this point on, ref_obj_kwargs only contains wire/bus specific keys
-
-    if "interface" in ref_obj_kwargs:
-        # Create a bus for this port
-        reference_obj = iob_bus(**ref_obj_kwargs)
-    else:
-        # Create a wire for this port
-        reference_obj = iob_wire(**ref_obj_kwargs)
-
     # Get port direction form name suffix
     dir_suffix = port_dict["name"].split("_")[-1]
     dirs = {
@@ -122,6 +107,23 @@ def create_port_from_dict(port_dict):
     }
     if dir_suffix not in dirs:
         fail_with_msg(f"Unknown direction suffix for port '{port_dict['name']}'!")
+
+    # Create kwargs to pass to the wire/bus constructor
+    ref_obj_kwargs = port_dict.copy()
+    # Extract port specific keys
+    descr = ref_obj_kwargs.pop("descr", None)
+    doc_only = ref_obj_kwargs.pop("doc_only", False)
+    doc_clearpage = ref_obj_kwargs.pop("doc_clearpage", False)
+    # Remove the direction suffix from the name
+    ref_obj_kwargs["name"] = port_dict["name"].rsplit("_", 1)[0]
+    # From this point on, ref_obj_kwargs only contains wire/bus specific keys
+
+    if "interface" in ref_obj_kwargs:
+        # Create a bus for this port
+        reference_obj = iob_bus(**ref_obj_kwargs)
+    else:
+        # Create a wire for this port
+        reference_obj = iob_wire(**ref_obj_kwargs)
 
     return iob_port(
         wire=reference_obj,

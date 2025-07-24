@@ -19,7 +19,7 @@ class iob_port:
         direction (str): Port direction.
                          Either 'input', 'output', or 'inout' if the port references a single wire.
                          Either 'manager' or 'subordinate' if the port references a bus.
-        descr (str): Description of the port.
+        description (str): Description of the port.
         doc_only (bool): Only add to documentation
         doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     """
@@ -79,22 +79,50 @@ def create_port_from_dict(port_dict):
 
     Attributes:
         port_dict (dict): dictionary with values to initialize attributes of iob_port object.
-            This dictionary supports the following keys corresponding to the iob_port attributes:
-            - wire -> iob_port.wire
+            - name (str): Name of the wire/bus associated to the port. Use one of the available suffixes to indicate direction:
+                          Suffixes for wires: _i, _o, _io; Suffixes for buses: _m, _s.
+            - interface (dict): If this key is provided, a bus will be created instead of a wire.
+                                See `iob_bus.create_bus_from_dict` method for information about the format and supported keys of this dictionary.
+            - width (int | str): Width of the wire associated to the port. Only applicable for wires, not for buses.
+            This dictionary also supports the following keys corresponding to the iob_port attributes:
+            - descr -> iob_port.descr
             - doc_only -> iob_port.doc_only
             - doc_clearpage -> iob_port.doc_clearpage
 
     Returns:
         iob_port: iob_port object
     """
-    # Create a wire for this port
-    iob_wire_obj = iob_wire(name=port_dict["name"], width=port_dict["width"])
+
+    kwargs = port_dict.copy()
+
+    # Remove non-port attributes from kwargs
+    name = kwargs.pop("name")
+    interface = kwargs.pop("interface", None)
+    width = kwargs.pop("width", None)
+    # From this point on, kwargs only contains iob_port attributes
+
+    if interface and width:
+        fail_with_msg(
+            f"Interface and width cannot be specified together in port '{name}'!"
+        )
+    elif interface:
+        # Create a bus for this port
+        reference_obj = iob_bus(name=name, interface=interface)
+    else:
+        # Create a wire for this port
+        reference_obj = iob_wire(name=name, width=width)
 
     # Get port direction form name suffix
-    dir_suffix = port_dict["name"].split("_")[-1]
-    dirs = {"i": "input", "o": "output", "io": "inout"}
+    dir_suffix = name.split("_")[-1]
+    dirs = {
+        "i": "input",
+        "o": "output",
+        "io": "inout",
+        "s": "subordinate",
+        "m": "manager",
+    }
 
-    return iob_port(wire=iob_wire_obj, direction=dirs[dir_suffix])
+    return iob_port(wire=reference_obj, direction=dirs[dir_suffix], **kwargs)
 
 
 def port_text2dict(port_text):

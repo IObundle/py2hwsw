@@ -95,19 +95,19 @@ class iob_reg(iob_core):
             "confs": [
                 {
                     "name": "DATA_W",
+                    "descr": "Data bus width",
                     "kind": "P",
                     "value": "1",
                     "min_value": "NA",
                     "max_value": "NA",
-                    "descr": "Data bus width",
                 },
                 {
                     "name": "RST_VAL",
+                    "descr": "Reset value.",
                     "kind": "P",
                     "value": "{DATA_W{1'b0}}",
                     "min_value": "NA",
                     "max_value": "NA",
-                    "descr": "Reset value.",
                 },
             ],
             "ports": [

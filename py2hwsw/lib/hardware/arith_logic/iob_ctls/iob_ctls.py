@@ -74,7 +74,7 @@ def setup(py_params_dict):
                         "descr": "Potentially inverted data signal derived from data_i",
 >>>>>>> cdd911ba0eeb9efca298e98fdf3834aebde65719
                     },
-                ],
+                ],    
             },
             {
                 "name": "data_int2",

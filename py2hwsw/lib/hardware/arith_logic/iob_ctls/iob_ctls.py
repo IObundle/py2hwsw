@@ -88,6 +88,7 @@ def setup(py_params_dict):
             {
                 "core_name": "iob_prio_enc",
                 "instance_name": "prio_encoder0",
+                "instance_description": "count trailing zeros",
                 "parameters": {
                     "W": "W",
                     "MODE": '"LOW"',

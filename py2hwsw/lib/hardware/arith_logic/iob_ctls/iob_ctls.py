@@ -40,7 +40,7 @@ def setup(py_params_dict):
                     {
                         "name": "data_i",
                         "width": "W",
-                        "descr": "Internal write address",
+                        "descr": "Input data",
                     },
                 ],
             },

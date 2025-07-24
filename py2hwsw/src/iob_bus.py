@@ -32,6 +32,7 @@ class iob_bus:
         interface (iob_interface): The interface of the bus
     """
 
+    # NOTE: artur: iob_bus has so few attributes that it looks like it could be merged with the 'iob_interface' class
     name: str = ""
     interface: iob_interface.iob_interface = None
 
@@ -53,17 +54,20 @@ class iob_bus:
         """
         pass
 
-    def create_wires_from_interface(self):
-        if not self.interface:
-            fail_with_msg(f"Bus '{self.name}' has no interface!", ValueError)
+    def get_wires(self) -> list:
+        """
+        Return a list of newly dynamically generated wires of the bus.
 
-        # FIXME: Should this class store a wires attribute?
-        # Maybe they should always be dynamically generated with a `get_wires` method.
-        self.wires += self.interface.get_wires()
+        Returns:
+            list: List of iob_wire objects
+        """
+        if not self.interface:
+            fail_with_msg(f"Bus '{self.name}' has no interface specified!", ValueError)
+        wires = self.interface.get_wires()
 
         # Remove wire direction information
         # FIXME: interface.get_wires() should probably already return wires without direction
-        for wire in self.wires:
+        for wire in wires:
             # Skip wire references
             if isinstance(wire, iob_wire_reference):
                 continue
@@ -74,6 +78,8 @@ class iob_bus:
                 elif wire.name.endswith("_io"):
                     wire.name = wire.name[:-3]
                 wire.direction = ""
+
+        return wires
 
 
 attrs = [
@@ -271,16 +277,17 @@ def create_bus_from_dict(bus_dict):
     Attributes:
         bus_dict (dict): dictionary with values to initialize attributes of iob_bus object.
             This dictionary supports the following keys corresponding to the iob_bus attributes:
-            - name           -> iob_bus.name
-            - descr          -> iob_bus.descr
-            - wires        -> iob_bus.wires
+            - name      -> iob_bus.name
+            - interface -> iob_bus.interface = create_interface_from_dict(interface)
 
     Returns:
         iob_bus: iob_bus object
     """
     # Convert dictionary elements to objects
     kwargs = bus_dict.copy()
-    kwargs["wires"] = [create_wire_from_dict(i) for i in bus_dict.get("wires", [])]
+    kwargs["interface"] = iob_interface.create_interface_from_dict(
+        bus_dict["interface"]
+    )
     return iob_bus(**kwargs)
 
 

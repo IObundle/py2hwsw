@@ -5,8 +5,8 @@
 from dataclasses import dataclass
 
 from iob_base import fail_with_msg, parse_short_notation_text
-from iob_wire import iob_wire
-from iob_bus import iob_bus
+from iob_wire import iob_wire, create_wire_from_dict
+from iob_bus import iob_bus, create_bus_from_dict
 
 
 @dataclass
@@ -108,22 +108,22 @@ def create_port_from_dict(port_dict):
     if dir_suffix not in dirs:
         fail_with_msg(f"Unknown direction suffix for port '{port_dict['name']}'!")
 
-    # Create kwargs to pass to the wire/bus constructor
-    wire_bus_kwargs = port_dict.copy()
+    # Create dictionary to pass to the `create_[wire/bus]_from_dict` method
+    wire_bus_dict = port_dict.copy()
     # Remove the direction suffix from the name
-    wire_bus_kwargs["name"] = port_dict["name"].rsplit("_", 1)[0]
+    wire_bus_dict["name"] = port_dict["name"].rsplit("_", 1)[0]
     # Extract port specific keys
-    descr = wire_bus_kwargs.pop("descr", None)
-    doc_only = wire_bus_kwargs.pop("doc_only", False)
-    doc_clearpage = wire_bus_kwargs.pop("doc_clearpage", False)
-    # From this point on, wire_bus_kwargs only contains wire/bus specific keys
+    descr = wire_bus_dict.pop("descr", None)
+    doc_only = wire_bus_dict.pop("doc_only", False)
+    doc_clearpage = wire_bus_dict.pop("doc_clearpage", False)
+    # From this point on, wire_bus_dict only contains wire/bus specific keys
 
-    if "interface" in wire_bus_kwargs:
+    if "interface" in wire_bus_dict:
         # Create a bus for this port
-        wire_bus_obj = iob_bus(**wire_bus_kwargs)
+        wire_bus_obj = create_bus_from_dict(wire_bus_dict)
     else:
         # Create a wire for this port
-        wire_bus_obj = iob_wire(**wire_bus_kwargs)
+        wire_bus_obj = create_wire_from_dict(wire_bus_dict)
 
     return iob_port(
         wire=wire_bus_obj,

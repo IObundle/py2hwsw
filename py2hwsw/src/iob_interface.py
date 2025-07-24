@@ -2190,6 +2190,7 @@ def create_interface_from_dict(interface_dict):
     Attributes:
         interface_dict (dict): dictionary with values to initialize attributes of interface object.
             This dictionary supports the following keys corresponding to the interface attributes:
+            - kind (str): Generates interface of corresponding genre (subclass of iob_interface).
             - if_direction        -> interface.if_direction
             - prefix              -> interface.prefix
             - mult                -> interface.mult
@@ -2199,7 +2200,12 @@ def create_interface_from_dict(interface_dict):
     Returns:
         interface: interface object
     """
-    return create_interface(**interface_dict)
+    kwargs = interface_dict.copy()
+    # Rename "kind" to "genre"
+    kwargs["genre"] = kwargs.pop("kind", "")
+    # Split params string into list
+    kwargs["params"] = kwargs.pop("params", None).split("_")
+    return create_interface(**kwargs)
 
 
 def interface_text2dict(interface_text):

@@ -7,9 +7,11 @@
 #
 #    ios.py: build Verilog module IO and documentation
 #
+import os
 from latex import write_table
 
 from iob_wire import iob_wire
+from iob_bus import iob_bus
 
 
 def reverse_port(port_type):
@@ -21,25 +23,28 @@ def reverse_port(port_type):
 
 def generate_ports(core):
     """Generate verilog code with ports of this module.
-    returns: Generated verilog code
+    Returns:
+        str: Generated verilog code
     """
     lines = []
-    for port_idx, port in enumerate(core.ports):
+    for port in core.ports:
+        if isinstance(port.wire, iob_bus):
+            # Port references a bus
+            bus = port.wire
 
-        # FIXME: This function was originaly written to handle interfaces (groups of ports)
-        """
-        # If interface has 'doc_only' attribute set to True, skip it
-        if interface.doc_only:
-            continue
+            # If port has 'doc_only' attribute set to True, skip it
+            if port.doc_only:
+                continue
 
-        lines.append(f"    // {interface.name}: {interface.descr}\n")
+            lines.append(f"    // {bus.name}: {port.descr}\n")
 
-        for wire_idx, wire in enumerate(interface.wires):
-            if isinstance(wire, iob_wire):
-                if wire.get_verilog_port():
-                    lines.append("    " + wire.get_verilog_port())
-        """
-        lines.append("    " + port.get_verilog_port())
+            for wire_idx, wire in enumerate(bus.get_wires()):
+                if isinstance(wire, iob_wire):
+                    if wire.get_verilog_port():
+                        lines.append("    " + wire.get_verilog_port())
+        else:
+            # Port references a single wire
+            lines.append("    " + port.get_verilog_port())
 
     # Remove comma from last interface line
     if lines:
@@ -60,23 +65,23 @@ def generate_ports_snippet(core):
     with open(f"{out_dir}/{core.name}_io.vs", "w+") as f:
         f.write(code)
 
-    # FIXME: Port is no longer a group
-    """
+    # Generate snippets for all bus subtypes (portmaps, tb_portmaps, buses, ...)
+    # Note: This is only used by manually written verilog modules.
+    #       May not be needed in the future.
     for port_idx, port in enumerate(core.ports):
-        # If port has 'doc_only' attribute set to True, skip it
-        if port.doc_only:
-            continue
-        # Also generate snippets for all interface subtypes (portmaps, tb_portmaps, buses, ...)
-        # Note: This is only used by manually written verilog modules.
-        #       May not be needed in the future.
-        if port.interface:
-            port.interface.gen_all_vs_files()
+        if isinstance(port.wire, iob_bus):
+            bus = port.wire
+
+            # If port has 'doc_only' attribute set to True, skip it
+            if port.doc_only:
+                continue
+
+            bus.interface.gen_all_vs_files()
 
             # move all .vs files from current directory to out_dir
             for file in os.listdir("."):
                 if file.endswith(".vs"):
                     os.rename(file, f"{out_dir}/{file}")
-    """
 
 
 # Generate if.tex file with list TeX tables of IOs

@@ -79,15 +79,6 @@ def setup(py_params_dict):
                     },
                 ],
             },
-            {
-                "name": "count_int",
-                "descr": "Counter wire",
-                "signals": [
-                    {
-                        "name": "count_o",
-                    },
-                ],
-            },
         ],
         "subblocks": [
             {

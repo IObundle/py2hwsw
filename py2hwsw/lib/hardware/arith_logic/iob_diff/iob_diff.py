@@ -46,7 +46,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "data_o",
-                "descr": "Data input",
+                "descr": "Data output",
                 "signals": [
                     {
                         "name": "data_o",

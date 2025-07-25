@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from iob_base import fail_with_msg, parse_short_notation_text
 from iob_wire import iob_wire
+from iob_bus import iob_bus
 
 
 @dataclass
@@ -14,22 +15,76 @@ class iob_port:
     Describes an IO port.
 
     Attributes:
-        wire (iob_wire): Reference to the wire that is connected to the port.
-        direction (str): Port direction
+        wire (iob_wire | iob_bus): Reference to the wire or bus that is connected to the port.
+        direction (str): Port direction. Property infered from associated wire/bus name suffix.
+                         Either 'input', 'output', or 'inout' if the port references a single wire.
+                         Either 'manager' or 'subordinate' if the port references a bus.
+        description (str): Description of the port.
         doc_only (bool): Only add to documentation
         doc_clearpage (bool): If enabled, the documentation table for this port will be terminated by a TeX '\clearpage' command.
     """
 
-    wire: iob_wire = None
-    direction: str = ""
+    wire: iob_wire | iob_bus = None
+    descr: str = "Default description"
     doc_only: bool = False
     doc_clearpage: bool = False
 
+    @property
+    def direction(self):
+        """Get the direction of the port.
+        Automatically infered from the name suffix of the associated wire/bus.
+        Returns:
+            str: Port direction
+        """
+        dir_suffix = self.wire.name.split("_")[-1]
+        dirs = {
+            "i": "input",
+            "o": "output",
+            "io": "inout",
+            "s": "subordinate",
+            "m": "manager",
+        }
+        if dir_suffix not in dirs:
+            fail_with_msg(
+                f"Unable to determine direction port '{self.wire.name}' based on its name suffix!"
+            )
+        return dirs[dir_suffix]
+
+    @direction.setter
+    def direction(self, direction):
+        """Set the direction of the port.
+        Direction is changed by automatically replacing the suffix of the associated wire/bus.
+        Attributes:
+            direction (str): New port direction
+        """
+        name_without_suffix = self.wire.name.rsplit("_", 1)[0]
+        current_dir_suffix = self.wire.name.split("_")[-1]
+        dirs = {
+            "input": "i",
+            "output": "o",
+            "inout": "io",
+            "subordinate": "s",
+            "manager": "m",
+        }
+        # Check if wire had a suffix, and its is a valid direction suffix
+        if current_dir_suffix and current_dir_suffix in dirs.values():
+            # Wire had a direction suffix, replace old one by new
+            self.wire.name = f"{name_without_suffix}_{dirs[direction]}"
+        else:
+            # Wire did not have a direction suffix, append new
+            self.wire.name = f"{self.wire.name}_{dirs[direction]}"
+
     def validate_attributes(self):
         if not self.wire:
-            fail_with_msg("Port not associated to wire!")
-        if self.direction not in ["input", "output", "inout"]:
-            fail_with_msg(f"Missing direction for port {self.wire.name}!")
+            fail_with_msg("Port not associated to a wire or bus!")
+        if isinstance(self.wire, iob_wire):
+            if self.direction not in ["input", "output", "inout"]:
+                fail_with_msg(f"Missing direction for port {self.wire.name}!")
+        elif isinstance(self.wire, iob_bus):
+            if self.direction not in ["manager", "subordinate"]:
+                fail_with_msg(f"Missing direction for port {self.wire.name}!")
+        else:
+            fail_with_msg("Unknown type for wire associated to port!")
 
     def get_verilog_port(self, comma=True):
         """Generate a verilog port string from this wire"""
@@ -67,22 +122,55 @@ class iob_port:
 
         Attributes:
             port_dict (dict): dictionary with values to initialize attributes of iob_port object.
-                This dictionary supports the following keys corresponding to the iob_port attributes:
-                - wire -> iob_port.wire
+                - name (str): Name of the wire/bus associated to the port. Use one of the available suffixes to indicate direction:
+                              Suffixes for wires: _i, _o, _io; Suffixes for buses: _m, _s.
+                - interface (dict): If this key is provided, a bus will be created instead of a wire.
+                                    See `iob_bus.create_from_dict` method for information about the format and supported keys of this dictionary.
+                - Other keys from the `iob_wire.create_from_dict` method are also supported in this dictionary. Only applicable if the port references a wire.
+                This dictionary also supports the following keys corresponding to the iob_port attributes:
+                - descr -> iob_port.descr
                 - doc_only -> iob_port.doc_only
                 - doc_clearpage -> iob_port.doc_clearpage
 
         Returns:
             iob_port: iob_port object
         """
-        # Create a wire for this port
-        iob_wire_obj = iob_wire(name=port_dict["name"], width=port_dict["width"])
+        if "name" not in port_dict:
+            fail_with_msg("Missing port name!")
 
-        # Get port direction form name suffix
+        # Get port direction from name suffix for input validation
         dir_suffix = port_dict["name"].split("_")[-1]
-        dirs = {"i": "input", "o": "output", "io": "inout"}
+        dirs = {
+            "i": "input",
+            "o": "output",
+            "io": "inout",
+            "s": "subordinate",
+            "m": "manager",
+        }
+        if dir_suffix not in dirs:
+            fail_with_msg(f"Unknown direction suffix for port '{port_dict['name']}'!")
 
-        return iob_port(wire=iob_wire_obj, direction=dirs[dir_suffix])
+        # Create dictionary to pass to the `iob_<bus/wire>.create_from_dict` method
+        wire_bus_dict = port_dict.copy()
+        # Extract port specific keys
+        descr = wire_bus_dict.pop("descr", None)
+        doc_only = wire_bus_dict.pop("doc_only", False)
+        doc_clearpage = wire_bus_dict.pop("doc_clearpage", False)
+        # From this point on, wire_bus_dict only contains wire/bus specific keys
+
+        if "interface" in wire_bus_dict:
+            # Create a bus for this port
+            wire_bus_obj = iob_bus.create_from_dict(wire_bus_dict)
+        else:
+            # Create a wire for this port
+            wire_bus_obj = iob_wire.create_from_dict(wire_bus_dict)
+
+        return iob_port(
+            wire=wire_bus_obj,
+            descr=descr,
+            doc_only=doc_only,
+            doc_clearpage=doc_clearpage,
+        )
 
     @staticmethod
     def port_text2dict(port_text):

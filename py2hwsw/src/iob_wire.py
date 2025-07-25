@@ -16,13 +16,11 @@ class iob_wire:
     Attributes:
         name (str): Name for the wire inside the core. Verilog wire will be generated with this name.
         width (str or int): Number of bits in the wire.
-        descr (str): Description of the wire.
         isvar (bool): If enabled, wire will be generated with type `reg` in Verilog.
     """
 
     name: str = ""
     width: str or int = 1
-    descr: str = "Default description"
     isvar: bool = False
 
     # Undocumented. Used for `iob_comb`: If enabled, iob_comb will infer a register for this wire.

@@ -102,7 +102,7 @@ def import_py2hwsw_modules():
         module_name = os.path.basename(module_path).split(".")[0]
 
         # FIXME: Temporarily only import a few py2 modules (the ones that are really used in iob_aoi.py and its dependencies)
-        if module_name not in ["iob_core"]:
+        if module_name not in ["iob_core", "iob_globals"]:
             continue
 
         # Don't import the same module twice
@@ -209,7 +209,18 @@ def main():
         None, list_modules_msg("List of Py2HWSW lib modules:", lib_modules)
     )
     shell = Py2hwswShell(locals=local_vars)
-    shell.interact()
+
+    if len(sys.argv) > 1:
+        # Run interactive shell
+        # Example: py2hwsw_shell path/to/script.py
+        script_file = sys.argv[1]
+        with open(script_file) as f:
+            code = f.read()
+        shell.runcode(code)
+    else:
+        # Run non-interactive shell
+        # Example: py2hwsw_shell < path/to/script.py
+        shell.interact()
 
 
 if __name__ == "__main__":

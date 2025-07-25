@@ -16,7 +16,7 @@ class iob_port:
 
     Attributes:
         wire (iob_wire | iob_bus): Reference to the wire or bus that is connected to the port.
-        direction (str): Port direction.
+        direction (str): Port direction. Property infered from associated wire/bus name suffix.
                          Either 'input', 'output', or 'inout' if the port references a single wire.
                          Either 'manager' or 'subordinate' if the port references a bus.
         description (str): Description of the port.
@@ -25,10 +25,54 @@ class iob_port:
     """
 
     wire: iob_wire | iob_bus = None
-    direction: str = ""
     descr: str = "Default description"
     doc_only: bool = False
     doc_clearpage: bool = False
+
+    @property
+    def direction(self):
+        """Get the direction of the port.
+        Automatically infered from the name suffix of the associated wire/bus.
+        Returns:
+            str: Port direction
+        """
+        dir_suffix = self.wire.name.split("_")[-1]
+        dirs = {
+            "i": "input",
+            "o": "output",
+            "io": "inout",
+            "s": "subordinate",
+            "m": "manager",
+        }
+        if dir_suffix not in dirs:
+            fail_with_msg(
+                f"Unable to determine direction port '{self.wire.name}' based on its name suffix!"
+            )
+        return dirs[dir_suffix]
+
+    @direction.setter
+    def direction(self, direction):
+        """Set the direction of the port.
+        Direction is changed by automatically replacing the suffix of the associated wire/bus.
+        Attributes:
+            direction (str): New port direction
+        """
+        name_without_suffix = self.wire.name.rsplit("_", 1)[0]
+        current_dir_suffix = self.wire.name.split("_")[-1]
+        dirs = {
+            "input": "i",
+            "output": "o",
+            "inout": "io",
+            "subordinate": "s",
+            "manager": "m",
+        }
+        # Check if wire had a suffix, and its is a valid direction suffix
+        if current_dir_suffix and current_dir_suffix in dirs.values():
+            # Wire had a direction suffix, replace old one by new
+            self.wire.name = f"{name_without_suffix}_{dirs[direction]}"
+        else:
+            # Wire did not have a direction suffix, append new
+            self.wire.name = f"{self.wire.name}_{dirs[direction]}"
 
     def validate_attributes(self):
         if not self.wire:
@@ -94,7 +138,7 @@ class iob_port:
         if "name" not in port_dict:
             fail_with_msg("Missing port name!")
 
-        # Get port direction from name suffix
+        # Get port direction from name suffix for input validation
         dir_suffix = port_dict["name"].split("_")[-1]
         dirs = {
             "i": "input",
@@ -108,8 +152,6 @@ class iob_port:
 
         # Create dictionary to pass to the `iob_<bus/wire>.create_from_dict` method
         wire_bus_dict = port_dict.copy()
-        # Remove the direction suffix from the name
-        wire_bus_dict["name"] = port_dict["name"].rsplit("_", 1)[0]
         # Extract port specific keys
         descr = wire_bus_dict.pop("descr", None)
         doc_only = wire_bus_dict.pop("doc_only", False)
@@ -125,7 +167,6 @@ class iob_port:
 
         return iob_port(
             wire=wire_bus_obj,
-            direction=dirs[dir_suffix],
             descr=descr,
             doc_only=doc_only,
             doc_clearpage=doc_clearpage,

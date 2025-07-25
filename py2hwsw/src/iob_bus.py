@@ -4,7 +4,6 @@
 
 from dataclasses import dataclass
 
-import iob_interface
 from iob_base import (
     find_obj_in_list,
     create_obj_list,
@@ -25,18 +24,26 @@ class iob_bus:
 
     Attributes:
         name (str): Identifier name for the bus.
-        interface (iob_interface): The interface of the bus
+        prefix (str): Prefix for wires of the bus.
+        mult (str or int): Width multiplier. Used when concatenating multiple instances of the bus.
+        file_prefix (str): Prefix for generated "Verilog Snippets" files of this bus.
+        portmap_port_prefix (str): Prefix for "Verilog snippets" files of portmaps of this bus.
     """
 
-    # NOTE: artur: iob_bus has so few attributes that it looks like it could be merged with the 'iob_interface' class
     name: str = ""
-    interface: iob_interface.iob_interface = None
+    prefix: str = ""
+    mult: str | int = 1
+    file_prefix: str = ""
+    portmap_port_prefix: str = ""
 
     def validate_attributes(self):
         if not self.name:
             fail_with_msg("All buses must have a name!", ValueError)
         if not self.interface:
             fail_with_msg(f"Missing interface for bus '{self.name}'!", ValueError)
+        # Should this auto-fill be in validate_attributes?
+        if not self.file_prefix:
+            self.file_prefix = self.portmap_port_prefix + self.prefix
 
     def get_wire(self, wire_name: str) -> iob_wire:
         """
@@ -279,14 +286,21 @@ class iob_bus:
             bus_dict (dict): dictionary with values to initialize attributes of iob_bus object.
                 This dictionary supports the following keys corresponding to the iob_bus attributes:
                 - name      -> iob_bus.name
-                - interface -> iob_bus.interface = iob_interface.create_from_dict(interface)
+                - kind (str): Generates interface of corresponding genre (subclass of iob_interface).
+                - prefix              -> interface.prefix
+                - mult                -> interface.mult
+                - file_prefix         -> interface.file_prefix
+                - portmap_port_prefix -> interface.portmap_port_prefix
 
         Returns:
             iob_bus: iob_bus object
         """
-        # Convert dictionary elements to objects
+        # Create arguments to pass to iob_bus constructor
         kwargs = bus_dict.copy()
-        kwargs["interface"] = iob_interface.create_from_dict(bus_dict["interface"])
+        # Rename "kind" to "genre"
+        kwargs["genre"] = kwargs.pop("kind", "")
+        # Split params string into list
+        kwargs["params"] = kwargs.pop("params", None).split("_")
         return iob_bus(**kwargs)
 
     @staticmethod
@@ -326,6 +340,257 @@ class iob_bus:
             iob_bus: iob_bus object
         """
         return __class__.create_from_dict(__class__.bus_text2dict(bus_text))
+
+    #
+    # Methods inherited from old iob_interface
+    #
+
+    def __get_if_name(self):
+        """Get the name of the interface."""
+        if isinstance(self, iobClkInterface):
+            return "iob_clk"
+        elif isinstance(self, iobInterface):
+            return "iob"
+        elif isinstance(self, _memInterface):
+            return self.genre
+        elif isinstance(self, AXIStreamInterface):
+            return "axis"
+        elif isinstance(self, AXILiteInterface):
+            if self.has_read_if and self.has_write_if:
+                return "axil"
+            elif self.has_read_if:
+                return "axil_read"
+            elif self.has_write_if:
+                return "axil_write"
+        elif isinstance(self, AXIInterface):
+            if self.has_read_if and self.has_write_if:
+                return "axi"
+            elif self.has_read_if:
+                return "axi_read"
+            elif self.has_write_if:
+                return "axi_write"
+        elif isinstance(self, APBInterface):
+            return "apb"
+        elif isinstance(self, AHBInterface):
+            return "ahb"
+        elif isinstance(self, RS232Interface):
+            return "rs232"
+        elif isinstance(self, wishboneInterface):
+            if self.is_full:
+                return "wb_full"
+            else:
+                return "wb"
+        else:
+            print(f"ERROR: __get_if_name: unknown interface type {type(self)}.")
+            exit(1)
+
+    #
+    # Wire manipulation private methods
+    #
+    @staticmethod
+    def __reverse_name_direction(name):
+        """Reverse the direction of a wire name."""
+        if name.endswith("_i"):
+            return name[:-2] + "_o"
+        elif name.endswith("_o"):
+            return name[:-2] + "_i"
+        elif name.endswith("_io"):
+            return name
+        else:
+            print(f"ERROR: __reverse_name_direction: invalid argument {name}.")
+            exit(1)
+
+    @staticmethod
+    def __reverse_direction(direction):
+        """Reverse the direction of a wire."""
+        if direction == "input":
+            return "output"
+        elif direction == "output":
+            return "input"
+        else:
+            print(f"ERROR: __reverse_direction: invalid argument {direction}.")
+            exit(1)
+
+    @staticmethod
+    def __reverse_wires_direction(wires):
+        """Reverse the direction of all wires in a list."""
+        new_wires = deepcopy(wires)
+        for wire in new_wires:
+            wire.direction = iob_interface.__reverse_direction(wire.direction)
+            wire.name = iob_interface.__reverse_name_direction(wire.name)
+        return new_wires
+
+    @staticmethod
+    def __get_tbwire_type(direction):
+        """Get the genre of a wire for the testbench."""
+        if direction == "input":
+            return "wire"
+        elif direction == "output":
+            return "reg"
+        else:
+            print(f"ERROR: __get_tbwire_type: invalid argument {direction}.")
+            exit(1)
+
+    @staticmethod
+    def __get_suffix(direction):
+        """Get the suffix for a wire based on its direction."""
+        if direction == "input":
+            return "_i"
+        elif direction == "output":
+            return "_o"
+        elif direction == "inout":
+            return "_io"
+        else:
+            print(f"ERROR: __get_suffix: invalid argument {direction}.")
+            exit(1)
+
+    #
+    # Wire generation private methods
+    #
+    def __write_single_wire(self, fout, wire, for_tb):
+        """Write a single wire to the file."""
+        if isinstance(wire, iob_wire_reference):
+            return
+        wire_name = self.prefix + wire.name
+        # Remove suffix from wire name if it is already present
+        suffix = self.__get_suffix(wire.direction)
+        if wire_name.endswith(suffix):
+            wire_name = wire_name[: -len(suffix)]
+        wtype = "wire"
+        # If this is a testbench wire, add the suffix and change the type
+        if for_tb:
+            wire_name = wire_name + self.__get_suffix(
+                self.__reverse_direction(wire.direction)
+            )
+            wtype = self.__get_tbwire_type(wire.direction)
+        # If this is a variable wire, change the type to reg
+        if wire.isvar:
+            wtype = "reg"
+        # Write the wire to the file
+        width_str = f" [{wire.width}-1:0] "
+        fout.write(wtype + width_str + wire_name + ";\n")
+
+    def _write_bus(self, fout):
+        """Write buses to the file."""
+        for bus in self.get_wires():
+            self.__write_single_wire(fout, bus, False)
+
+    def __write_tb_bus(self, fout):
+        """Write testbench buses to the file."""
+        for bus in self.get_wires():
+            self.__write_single_wire(fout, bus, True)
+
+    def _write_m_tb_bus(self, fout):
+        """Write master testbench buses to the file."""
+        self.__write_tb_bus(fout)
+
+    def _write_s_tb_bus(self, fout):
+        """Write slave testbench buses to the file."""
+        self._write_m_tb_bus(fout)
+
+    #
+    # Port
+    #
+    def __write_single_port(self, fout, port):
+        """Write a single port to the file."""
+        direction = port.direction
+        name = self.prefix + port.name
+        width_str = f" [{port.width}-1:0] "
+        fout.write(direction + width_str + name + "," + "\n")
+
+    def _write_m_port(self, fout):
+        """Write master ports to the file."""
+        for port in self.get_wires():
+            self.__write_single_port(fout, port)
+
+    def _write_s_port(self, fout):
+        """Write slave ports to the file."""
+        self._write_m_port(fout)
+
+    #
+    # Portmap
+    #
+    def __write_single_portmap(self, fout, port, connect_to_port):
+        """Write a single portmap to the file."""
+        port_name = self.portmap_port_prefix + port.name
+        bus_name = self.prefix + port.name
+        # Remove suffix from bus name if it is present
+        if not connect_to_port:
+            suffix = self.__get_suffix(port.direction)
+            if bus_name.endswith(suffix):
+                bus_name = bus_name[: -len(suffix)]
+
+        fout.write(f".{port_name}({bus_name}),\n")
+
+    def _write_m_portmap(self, fout):
+        for port in self.get_wires():
+            self.__write_single_portmap(fout, port, False)
+
+    def _write_s_portmap(self, fout):
+        self._write_m_portmap(fout)
+
+    def _write_m_m_portmap(self, fout):
+        for port in self.get_wires():
+            self.__write_single_portmap(fout, port, True)
+
+    def _write_s_s_portmap(self, fout):
+        self._write_m_m_portmap(fout)
+
+    def get_wires(self):
+        """Get the wires of the interface."""
+        wires = deepcopy(self._wires)
+        # Set direction according to if_direction
+        if self.if_direction == "subordinate":
+            wires = self.__reverse_wires_direction(wires)
+
+        if self.mult != 1:
+            for wire in wires:
+                wire.width = f"({self.mult}*{wire.width})"
+
+        for wire in wires:
+            wire.name = self.prefix + wire.name
+
+        return wires
+
+    def gen_buses_vs_file(self):
+        """Generate buses snippet for given interface"""
+        file_name = self.__get_if_name()
+        file_prefix = self.file_prefix
+
+        fout = open(file_prefix + file_name + "_bus.vs", "w")
+        self._write_bus(fout)
+        fout.close()
+
+    def gen_all_vs_files(self):
+        """Generate verilog snippets for all possible subtypes of a given interface"""
+        name = self.__get_if_name()
+        file_prefix = self.file_prefix
+
+        for if_type in if_types:
+            temp_interface = deepcopy(self)
+            fout = open(file_prefix + name + "_" + if_type + ".vs", "w")
+
+            # get ports
+            if if_type.startswith("s"):
+                temp_interface.if_direction = "subordinate"
+            else:
+                temp_interface.if_direction = "manager"
+
+            if "portmap" in if_type:
+                eval_str = f"self._write_{if_type}(fout)"
+            else:
+                eval_str = f"self._write_{if_type}(fout)"
+            eval(eval_str)
+            fout.close()
+
+    def get_interface_details(self):
+        """Get the details of the interface."""
+        if_name = self.__get_if_name()
+        for item in if_details:
+            if item["name"] == if_name:
+                return item
+        print(f"ERROR: get_interface_details: unknown interface {if_name}.")
+        exit(1)
 
 
 #
@@ -603,6 +868,7 @@ if_types = [
 ]
 
 
+# TODO: DELETE THIS CLASS AFTER MERGING INTO iob_bus
 @dataclass
 class iob_interface:
     """
@@ -638,252 +904,6 @@ class iob_interface:
             )
             exit(1)
 
-    def __get_if_name(self):
-        """Get the name of the interface."""
-        if isinstance(self, iobClkInterface):
-            return "iob_clk"
-        elif isinstance(self, iobInterface):
-            return "iob"
-        elif isinstance(self, _memInterface):
-            return self.genre
-        elif isinstance(self, AXIStreamInterface):
-            return "axis"
-        elif isinstance(self, AXILiteInterface):
-            if self.has_read_if and self.has_write_if:
-                return "axil"
-            elif self.has_read_if:
-                return "axil_read"
-            elif self.has_write_if:
-                return "axil_write"
-        elif isinstance(self, AXIInterface):
-            if self.has_read_if and self.has_write_if:
-                return "axi"
-            elif self.has_read_if:
-                return "axi_read"
-            elif self.has_write_if:
-                return "axi_write"
-        elif isinstance(self, APBInterface):
-            return "apb"
-        elif isinstance(self, AHBInterface):
-            return "ahb"
-        elif isinstance(self, RS232Interface):
-            return "rs232"
-        elif isinstance(self, wishboneInterface):
-            if self.is_full:
-                return "wb_full"
-            else:
-                return "wb"
-        else:
-            print(f"ERROR: __get_if_name: unknown interface type {type(self)}.")
-            exit(1)
-
-    #
-    # Wire manipulation private methods
-    #
-    @staticmethod
-    def __reverse_name_direction(name):
-        """Reverse the direction of a wire name."""
-        if name.endswith("_i"):
-            return name[:-2] + "_o"
-        elif name.endswith("_o"):
-            return name[:-2] + "_i"
-        elif name.endswith("_io"):
-            return name
-        else:
-            print(f"ERROR: __reverse_name_direction: invalid argument {name}.")
-            exit(1)
-
-    @staticmethod
-    def __reverse_direction(direction):
-        """Reverse the direction of a wire."""
-        if direction == "input":
-            return "output"
-        elif direction == "output":
-            return "input"
-        else:
-            print(f"ERROR: __reverse_direction: invalid argument {direction}.")
-            exit(1)
-
-    @staticmethod
-    def __reverse_wires_direction(wires):
-        """Reverse the direction of all wires in a list."""
-        new_wires = deepcopy(wires)
-        for wire in new_wires:
-            wire.direction = iob_interface.__reverse_direction(wire.direction)
-            wire.name = iob_interface.__reverse_name_direction(wire.name)
-        return new_wires
-
-    @staticmethod
-    def __get_tbwire_type(direction):
-        """Get the genre of a wire for the testbench."""
-        if direction == "input":
-            return "wire"
-        elif direction == "output":
-            return "reg"
-        else:
-            print(f"ERROR: __get_tbwire_type: invalid argument {direction}.")
-            exit(1)
-
-    @staticmethod
-    def __get_suffix(direction):
-        """Get the suffix for a wire based on its direction."""
-        if direction == "input":
-            return "_i"
-        elif direction == "output":
-            return "_o"
-        elif direction == "inout":
-            return "_io"
-        else:
-            print(f"ERROR: __get_suffix: invalid argument {direction}.")
-            exit(1)
-
-    #
-    # Wire generation private methods
-    #
-    def __write_single_wire(self, fout, wire, for_tb):
-        """Write a single wire to the file."""
-        if isinstance(wire, iob_wire_reference):
-            return
-        wire_name = self.prefix + wire.name
-        # Remove suffix from wire name if it is already present
-        suffix = self.__get_suffix(wire.direction)
-        if wire_name.endswith(suffix):
-            wire_name = wire_name[: -len(suffix)]
-        wtype = "wire"
-        # If this is a testbench wire, add the suffix and change the type
-        if for_tb:
-            wire_name = wire_name + self.__get_suffix(
-                self.__reverse_direction(wire.direction)
-            )
-            wtype = self.__get_tbwire_type(wire.direction)
-        # If this is a variable wire, change the type to reg
-        if wire.isvar:
-            wtype = "reg"
-        # Write the wire to the file
-        width_str = f" [{wire.width}-1:0] "
-        fout.write(wtype + width_str + wire_name + ";\n")
-
-    def _write_bus(self, fout):
-        """Write buses to the file."""
-        for bus in self.get_wires():
-            self.__write_single_wire(fout, bus, False)
-
-    def __write_tb_bus(self, fout):
-        """Write testbench buses to the file."""
-        for bus in self.get_wires():
-            self.__write_single_wire(fout, bus, True)
-
-    def _write_m_tb_bus(self, fout):
-        """Write master testbench buses to the file."""
-        self.__write_tb_bus(fout)
-
-    def _write_s_tb_bus(self, fout):
-        """Write slave testbench buses to the file."""
-        self._write_m_tb_bus(fout)
-
-    #
-    # Port
-    #
-    def __write_single_port(self, fout, port):
-        """Write a single port to the file."""
-        direction = port.direction
-        name = self.prefix + port.name
-        width_str = f" [{port.width}-1:0] "
-        fout.write(direction + width_str + name + "," + "\n")
-
-    def _write_m_port(self, fout):
-        """Write master ports to the file."""
-        for port in self.get_wires():
-            self.__write_single_port(fout, port)
-
-    def _write_s_port(self, fout):
-        """Write slave ports to the file."""
-        self._write_m_port(fout)
-
-    #
-    # Portmap
-    #
-    def __write_single_portmap(self, fout, port, connect_to_port):
-        """Write a single portmap to the file."""
-        port_name = self.portmap_port_prefix + port.name
-        bus_name = self.prefix + port.name
-        # Remove suffix from bus name if it is present
-        if not connect_to_port:
-            suffix = self.__get_suffix(port.direction)
-            if bus_name.endswith(suffix):
-                bus_name = bus_name[: -len(suffix)]
-
-        fout.write(f".{port_name}({bus_name}),\n")
-
-    def _write_m_portmap(self, fout):
-        for port in self.get_wires():
-            self.__write_single_portmap(fout, port, False)
-
-    def _write_s_portmap(self, fout):
-        self._write_m_portmap(fout)
-
-    def _write_m_m_portmap(self, fout):
-        for port in self.get_wires():
-            self.__write_single_portmap(fout, port, True)
-
-    def _write_s_s_portmap(self, fout):
-        self._write_m_m_portmap(fout)
-
-    def get_wires(self):
-        """Get the wires of the interface."""
-        wires = deepcopy(self._wires)
-        # Set direction according to if_direction
-        if self.if_direction == "subordinate":
-            wires = self.__reverse_wires_direction(wires)
-
-        if self.mult != 1:
-            for wire in wires:
-                wire.width = f"({self.mult}*{wire.width})"
-
-        for wire in wires:
-            wire.name = self.prefix + wire.name
-
-        return wires
-
-    def gen_buses_vs_file(self):
-        """Generate buses snippet for given interface"""
-        file_name = self.__get_if_name()
-        file_prefix = self.file_prefix
-
-        fout = open(file_prefix + file_name + "_bus.vs", "w")
-        self._write_bus(fout)
-        fout.close()
-
-    def gen_all_vs_files(self):
-        """Generate verilog snippets for all possible subtypes of a given interface"""
-        name = self.__get_if_name()
-        file_prefix = self.file_prefix
-
-        for if_type in if_types:
-            temp_interface = deepcopy(self)
-            fout = open(file_prefix + name + "_" + if_type + ".vs", "w")
-
-            # get ports
-            if if_type.startswith("s"):
-                temp_interface.if_direction = "subordinate"
-            else:
-                temp_interface.if_direction = "manager"
-
-            if "portmap" in if_type:
-                eval_str = f"self._write_{if_type}(fout)"
-            else:
-                eval_str = f"self._write_{if_type}(fout)"
-            eval(eval_str)
-            fout.close()
-
-    def get_interface_details(self):
-        """Get the details of the interface."""
-        if_name = self.__get_if_name()
-        for item in if_details:
-            if item["name"] == if_name:
-                return item
-        print(f"ERROR: get_interface_details: unknown interface {if_name}.")
-        exit(1)
 
     #
     # Other Py2HWSW interface methods

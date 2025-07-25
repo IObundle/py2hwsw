@@ -11,9 +11,11 @@ from iob_base import (
     empty_list,
 )
 import iob_colors
-from iob_wire import get_real_wire, iob_wire_reference
+from iob_wire import iob_wire, iob_wire_reference
 from iob_bus import iob_bus
 from iob_port import iob_port
+
+get_real_wire = iob_wire.get_real_wire
 
 
 @dataclass
@@ -145,96 +147,95 @@ class iob_portmap:
         self.e_connect = bus
         self.e_connect_bit_slices = bit_slices
 
+    @staticmethod
+    def get_portmap_port(portmap):
+        """Given a portmap reference, return the associated port"""
+        port = None
+        if isinstance(portmap, iob_portmap):
+            port = portmap.port
+        return port
 
-def get_portmap_port(portmap):
-    """Given a portmap reference, return the associated port"""
-    port = None
-    if isinstance(portmap, iob_portmap):
-        port = portmap.port
-    return port
+    #
+    # Other Py2HWSW interface methods
+    #
 
+    @staticmethod
+    def create_from_dict(portmap_dict):
+        """
+        Function to create iob_portmap object from dictionary attributes.
 
-#
-# Other Py2HWSW interface methods
-#
+        Attributes:
+            portmap_dict (dict): dictionary with values to initialize attributes of iob_portmap object.
+                Dictionary format:
+                {
+                    "port1_name": "external_connection1_name",
+                    "port2_name": "external_connection2_name",
+                    "port3_name": ("external_connection3_name", ["bit_slice_1", "bit_slice_2", ...]),
+                }
+                Dictionary element to attribute mapping:
+                port1_name -> iob_portmap.port
+                external_connection1_name -> iob_portmap.e_connect
+                ["bit_slice_1", "bit_slice_2", ...] -> iob_portmap.e_connect_bit_slices
 
+                Bit slices may perform multiple functions:
+                - Slice bits from a wire that is being connected.
+                  For example, if we have a wire (iob_addr_wire) with 32 bits, from a bus (iob_bus_bus), and we want to connect it to a port (iob_bus_port) that only accepts an address of 8 bits, we could use:
+                  "iob_bus_port": ("iob_bus_bus", ["iob_addr_wire[7:0]"]),
+                - Connect extra wires that do not exist in the bus.
+                  For example, if we have a wire (independent_iob_data_wire) that is not included in the bus (iob_bus_bus), but exists in the port (iob_bus_port), we could use:
+                  "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: independent_iob_data_wire"]),
+                  If we didn't have the independent_iob_data_wire, we could instead connect that port's wire to a constant value or high impedance, like so:
+                  "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: 'b1"]),
+                  "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: 'bz"]),
 
-def create_portmap_from_dict(portmap_dict):
-    """
-    Function to create iob_portmap object from dictionary attributes.
-
-    Attributes:
-        portmap_dict (dict): dictionary with values to initialize attributes of iob_portmap object.
-            Dictionary format:
-            {
-                "port1_name": "external_connection1_name",
-                "port2_name": "external_connection2_name",
-                "port3_name": ("external_connection3_name", ["bit_slice_1", "bit_slice_2", ...]),
-            }
-            Dictionary element to attribute mapping:
-            port1_name -> iob_portmap.port
-            external_connection1_name -> iob_portmap.e_connect
-            ["bit_slice_1", "bit_slice_2", ...] -> iob_portmap.e_connect_bit_slices
-
-            Bit slices may perform multiple functions:
-            - Slice bits from a wire that is being connected.
-              For example, if we have a wire (iob_addr_wire) with 32 bits, from a bus (iob_bus_bus), and we want to connect it to a port (iob_bus_port) that only accepts an address of 8 bits, we could use:
-              "iob_bus_port": ("iob_bus_bus", ["iob_addr_wire[7:0]"]),
-            - Connect extra wires that do not exist in the bus.
-              For example, if we have a wire (independent_iob_data_wire) that is not included in the bus (iob_bus_bus), but exists in the port (iob_bus_port), we could use:
-              "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: independent_iob_data_wire"]),
-              If we didn't have the independent_iob_data_wire, we could instead connect that port's wire to a constant value or high impedance, like so:
-              "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: 'b1"]),
-              "iob_bus_port": ("iob_bus_bus", ["iob_data_wire_i: 'bz"]),
-
-              # FIXME: For some reason, connecting extra wires with bit slices only works for connections between ports and buses that have standard interfaces! Not sure why its implemented this way: https://github.com/IObundle/py2hwsw/blob/0679fc64576380c19be96567efb5093667eeb9fd/py2hwsw/scripts/block_gen.py#L121
-              # Also, I'm not sure we can connect them to constants/high impedance.
-              # It seems to be possible to connect ports to constants like so: https://github.com/IObundle/py2hwsw/pull/236
-
+                  # FIXME: For some reason, connecting extra wires with bit slices only works for connections between ports and buses that have standard interfaces! Not sure why its implemented this way: https://github.com/IObundle/py2hwsw/blob/0679fc64576380c19be96567efb5093667eeb9fd/py2hwsw/scripts/block_gen.py#L121
+                  # Also, I'm not sure we can connect them to constants/high impedance.
+                  # It seems to be possible to connect ports to constants like so: https://github.com/IObundle/py2hwsw/pull/236
 
 
-    Returns:
-        list[iob_portmap]: List of iob_portmap objects
-    """
-    portmap_list = []
-    for port_name, connection in portmap_dict.items():
 
-        # Extract external bus and bit slices from connection
-        bit_slices = []
-        if type(connection) is str:
-            external_bus_name = connection
-        elif type(connection) is tuple:
-            external_bus_name = connection[0]
-            bit_slices = connection[1]
-            if type(bit_slices) is not list:
-                fail_with_msg(
-                    f"Second element of tuple must be a list of bit slices/connections: {connection}"
-                )
-        else:
-            fail_with_msg(f"Invalid connection value: {connection}")
+        Returns:
+            list[iob_portmap]: List of iob_portmap objects
+        """
+        portmap_list = []
+        for port_name, connection in portmap_dict.items():
 
-        # Create portmap and add to list
-        portmap = iob_portmap(
-            port_name=port_name,
-            e_connect=external_bus_name,
-            e_connect_bit_slices=bit_slices,
-        )
-        portmap_list.append(portmap)
+            # Extract external bus and bit slices from connection
+            bit_slices = []
+            if type(connection) is str:
+                external_bus_name = connection
+            elif type(connection) is tuple:
+                external_bus_name = connection[0]
+                bit_slices = connection[1]
+                if type(bit_slices) is not list:
+                    fail_with_msg(
+                        f"Second element of tuple must be a list of bit slices/connections: {connection}"
+                    )
+            else:
+                fail_with_msg(f"Invalid connection value: {connection}")
 
-    return portmap_list
+            # Create portmap and add to list
+            portmap = iob_portmap(
+                port_name=port_name,
+                e_connect=external_bus_name,
+                e_connect_bit_slices=bit_slices,
+            )
+            portmap_list.append(portmap)
 
+        return portmap_list
 
-def create_portmap_from_text(portmap_text):
-    """
-    Function to create iob_portmap object from short notation text.
+    @staticmethod
+    def create_from_text(portmap_text):
+        """
+        Function to create iob_portmap object from short notation text.
 
-    Attributes:
-        portmap_text (str): Short notation text. Object attributes are specified using the following format:
-            TODO
+        Attributes:
+            portmap_text (str): Short notation text. Object attributes are specified using the following format:
+                TODO
 
-    Returns:
-        iob_portmap: iob_portmap object
-    """
-    portmap_dict = {}
-    # TODO: parse short notation text
-    return iob_portmap(**portmap_dict)
+        Returns:
+            iob_portmap: iob_portmap object
+        """
+        portmap_dict = {}
+        # TODO: parse short notation text
+        return iob_portmap(**portmap_dict)

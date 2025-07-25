@@ -557,6 +557,85 @@ class iob_interface:
         print(f"ERROR: get_interface_details: unknown interface {if_name}.")
         exit(1)
 
+    #
+    # Other Py2HWSW interface methods
+    #
+
+    @staticmethod
+    def create_from_dict(interface_dict):
+        """
+        Function to create interface object from dictionary attributes.
+
+        Attributes:
+            interface_dict (dict): dictionary with values to initialize attributes of interface object.
+                This dictionary supports the following keys corresponding to the interface attributes:
+                - kind (str): Generates interface of corresponding genre (subclass of iob_interface).
+                - if_direction        -> interface.if_direction
+                - prefix              -> interface.prefix
+                - mult                -> interface.mult
+                - file_prefix         -> interface.file_prefix
+                - portmap_port_prefix -> interface.portmap_port_prefix
+
+        Returns:
+            interface: interface object
+        """
+        kwargs = interface_dict.copy()
+        # Rename "kind" to "genre"
+        kwargs["genre"] = kwargs.pop("kind", "")
+        # Split params string into list
+        kwargs["params"] = kwargs.pop("params", None).split("_")
+        return create_interface(**kwargs)
+
+    @staticmethod
+    def interface_text2dict(interface_text):
+        """Convert interface short notation text to dictionary.
+        Atributes:
+            interface_text (str): Short notation text. See `create_from_text` for format.
+
+        Returns:
+            dict: Dictionary with interface attributes.
+        """
+        interface_flags = [
+            "genre",
+            ["-d", {"dest": "if_direction", "choices": ["", "manager", "subordinate"]}],
+            ["-m", {"dest": "mult"}],
+            ["-w", {"dest": "widths", "action": "append"}],  # create accepts dictionary
+            ["-P", {"dest": "params", "action": "append"}],
+            ["-p", {"dest": "prefix", "type": str}],
+            ["-pm", {"dest": "portmap_port_prefix", "type": str}],
+            ["-f", {"dest": "file_prefix", "type": str}],
+        ]
+        interface_dict = parse_short_notation_text(interface_text, interface_flags)
+        width_dict = {}
+        if "widths" in interface_dict and interface_dict["widths"]:
+            for width in interface_dict["widths"]:
+                if ":" in width:
+                    w_key, value = width.split(":", 1)
+                    width_dict[w_key] = value
+                else:
+                    raise ValueError(f"Invalid width specification: {width}")
+        interface_dict.update({"widths": width_dict})
+        return interface_dict
+
+    @staticmethod
+    def create_from_text(interface_text):
+        """
+        Function to create interface object from short notation text.
+
+        Attributes:
+            interface_text (str): Short notation text. Object attributes are specified using the following format:
+                genre [-d direction] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
+                Examples:
+                    axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
+
+                    rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32
+
+                    axis -p output_ -P 'has_tlast'
+
+        Returns:
+            interface: interface object
+        """
+        return __class__.create_from_dict(__class__.interface_text2dict(interface_text))
 
 #
 # IOb
@@ -2176,83 +2255,3 @@ if __name__ == "__main__":
             file_prefix="bla_",
         )
         interface.gen_all_vs_files()
-
-
-#
-# Other Py2HWSW interface methods
-#
-
-
-def create_interface_from_dict(interface_dict):
-    """
-    Function to create interface object from dictionary attributes.
-
-    Attributes:
-        interface_dict (dict): dictionary with values to initialize attributes of interface object.
-            This dictionary supports the following keys corresponding to the interface attributes:
-            - kind (str): Generates interface of corresponding genre (subclass of iob_interface).
-            - if_direction        -> interface.if_direction
-            - prefix              -> interface.prefix
-            - mult                -> interface.mult
-            - file_prefix         -> interface.file_prefix
-            - portmap_port_prefix -> interface.portmap_port_prefix
-
-    Returns:
-        interface: interface object
-    """
-    kwargs = interface_dict.copy()
-    # Rename "kind" to "genre"
-    kwargs["genre"] = kwargs.pop("kind", "")
-    # Split params string into list
-    kwargs["params"] = kwargs.pop("params", None).split("_")
-    return create_interface(**kwargs)
-
-
-def interface_text2dict(interface_text):
-    """Convert interface short notation text to dictionary.
-    Atributes:
-        interface_text (str): Short notation text. See `create_interface_from_text` for format.
-
-    Returns:
-        dict: Dictionary with interface attributes.
-    """
-    interface_flags = [
-        "genre",
-        ["-d", {"dest": "if_direction", "choices": ["", "manager", "subordinate"]}],
-        ["-m", {"dest": "mult"}],
-        ["-w", {"dest": "widths", "action": "append"}],  # create accepts dictionary
-        ["-P", {"dest": "params", "action": "append"}],
-        ["-p", {"dest": "prefix", "type": str}],
-        ["-pm", {"dest": "portmap_port_prefix", "type": str}],
-        ["-f", {"dest": "file_prefix", "type": str}],
-    ]
-    interface_dict = parse_short_notation_text(interface_text, interface_flags)
-    width_dict = {}
-    if "widths" in interface_dict and interface_dict["widths"]:
-        for width in interface_dict["widths"]:
-            if ":" in width:
-                w_key, value = width.split(":", 1)
-                width_dict[w_key] = value
-            else:
-                raise ValueError(f"Invalid width specification: {width}")
-    interface_dict.update({"widths": width_dict})
-    return interface_dict
-
-def create_interface_from_text(interface_text):
-    """
-    Function to create interface object from short notation text.
-
-    Attributes:
-        interface_text (str): Short notation text. Object attributes are specified using the following format:
-            genre [-d direction] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
-            Examples:
-                axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
-
-                rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32
-
-                axis -p output_ -P 'has_tlast'
-
-    Returns:
-        interface: interface object
-    """
-    return create_interface_from_dict(interface_text2dict(interface_text))

@@ -10,8 +10,10 @@ from iob_base import (
     fail_with_msg,
     prevent_instantiation,
 )
-from iob_globals import iob_globals, create_globals
+from iob_globals import iob_globals
 from iob_block import create_block
+
+create_globals = iob_globals.create_globals
 
 
 # @prevent_instantiation

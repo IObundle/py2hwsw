@@ -31,29 +31,39 @@ from iob_base import (
     nix_permission_hack,
     update_obj_from_dict,
     parse_short_notation_text,
+    find_common_deep,
 )
 from py2hwsw_version import PY2HWSW_VERSION
-from iob_module import iob_module
 import sw_tools
 import verilog_format
 import verilog_lint
 from manage_headers import generate_headers
-from iob_license import iob_license
 
+from iob_module import iob_module
 from iob_comb import iob_comb
-from iob_conf import iob_conf, create_conf_from_dict
+from iob_conf import iob_conf
 from iob_fsm import iob_fsm
 from iob_interface import iob_interface
-from iob_wire import iob_wire, create_wire_from_dict
-from iob_port import iob_port, create_port_from_dict
-from iob_bus import iob_bus, create_bus_from_dict
-from iob_snippet import iob_snippet, create_snippet_from_dict
-from iob_parameter import create_iob_parameter_group_from_dict
+from iob_wire import iob_wire
+from iob_port import iob_port
+from iob_bus import iob_bus
+from iob_snippet import iob_snippet
+from iob_license import iob_license
+from iob_parameter import iob_parameter_group
 
 
 class iob_core(iob_module):
     """
     Generic class to describe how to generate a base IOb IP core.
+
+    This class may be instantiated using 3 different interfaces:
+    - Object interface:          by calling the `__init__()` constructor.
+    - Dictionary/JSON interface: by calling the `create_from_dict()` method.
+    - Short Notation interface:  by calling the `create_from_text()` method.
+
+    To see the arguments supported by the constructor that initializes this class, refer to the `__init__()` method of this class.
+    To see the keys supported by the dictionary that initializes this class, refer to the `create_from_dict()` method of this class.
+    To see the syntax supported by the short notation that initializes this class, refer to the `create_from_text()` method of this class.
 
     Attributes:
         # Module attributes
@@ -121,6 +131,7 @@ class iob_core(iob_module):
 
         Attributes:
             core_dictionary (dict): Optional dictionary to initialize core attributes.
+                                    The format of this dictionary is the same as the dictionary received by the `create_from_dict` method.
         """
 
         # Inherit attributes from superclasses
@@ -183,21 +194,21 @@ class iob_core(iob_module):
         # Update current core's attributes with values from given core_dictionary
         if core_dictionary:
             # Lazy import instance to avoid circular dependecy
-            create_instance_from_dict = getattr(importlib.import_module('iob_instance'), 'create_instance_from_dict')
+            iob_instance = getattr(importlib.import_module('iob_instance'), 'iob_instance')
             # Sanity check. These keys are only used to instantiate other user-defined/lib cores. Not iob_core directly.
             if "core" in core_dictionary or "iob_parameters" in core_dictionary:
                 fail_with_msg("The 'core' and 'iob_parameters' keys cannot be used in core dictionaries passed directly to the core constructor!")
             # Convert core dictionary elements to objects
             core_dict_with_objects = core_dictionary.copy()
-            core_dict_with_objects["confs"] = [create_conf_from_dict(i) for i in core_dictionary.get("confs", [])]
-            core_dict_with_objects["ports"] = [create_port_from_dict(i) for i in core_dictionary.get("ports", [])]
-            core_dict_with_objects["wires"] = [create_wire_from_dict(i) for i in core_dictionary.get("wires", [])]
-            core_dict_with_objects["buses"] = [create_bus_from_dict(i) for i in core_dictionary.get("buses", [])]
-            core_dict_with_objects["snippets"] = [create_snippet_from_dict(i) for i in core_dictionary.get("snippets", [])]
-            core_dict_with_objects["subblocks"] = [create_instance_from_dict(i) for i in core_dictionary.get("subblocks", [])]
-            core_dict_with_objects["superblocks"] = [create_core_from_dict(i) for i in core_dictionary.get("superblocks", [])]
-            core_dict_with_objects["sw_modules"] = [create_core_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
-            core_dict_with_objects["iob_parameters"] = [create_iob_parameter_group_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
+            core_dict_with_objects["confs"] = [iob_conf.create_from_dict(i) for i in core_dictionary.get("confs", [])]
+            core_dict_with_objects["ports"] = [iob_port.create_from_dict(i) for i in core_dictionary.get("ports", [])]
+            core_dict_with_objects["wires"] = [iob_wire.create_from_dict(i) for i in core_dictionary.get("wires", [])]
+            core_dict_with_objects["buses"] = [iob_bus.create_from_dict(i) for i in core_dictionary.get("buses", [])]
+            core_dict_with_objects["snippets"] = [iob_snippet.create_from_dict(i) for i in core_dictionary.get("snippets", [])]
+            core_dict_with_objects["subblocks"] = [iob_instance.create_from_dict(i) for i in core_dictionary.get("subblocks", [])]
+            core_dict_with_objects["superblocks"] = [__class__.create_from_dict(i) for i in core_dictionary.get("superblocks", [])]
+            core_dict_with_objects["sw_modules"] = [__class__.create_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
+            core_dict_with_objects["iob_parameters"] = [iob_parameter_group.create_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
             update_obj_from_dict(self, core_dict_with_objects)  # valid_attributes_list=...)
 
         # Set global build directory
@@ -215,7 +226,7 @@ class iob_core(iob_module):
             self.original_name = subclass_name
 
         # Try to find core's setup directory based on original name (try to find .py and .json files for it)
-        core_dir, _ = find_module_setup_dir(self.original_name, error_on_not_found=False)
+        core_dir, _ = __class__.find_module_setup_dir(self.original_name, error_on_not_found=False)
         # Auto-fill setup_dir based on found core directory.
         if not self.setup_dir and core_dir:
             self.setup_dir = core_dir
@@ -234,7 +245,7 @@ class iob_core(iob_module):
 
         # Delete existing old build directory
         if self.is_top_module:
-            clean_build_dir(self.build_dir)
+            __class__.clean_build_dir(self.build_dir)
 
         self.__create_build_dir()
 
@@ -455,221 +466,205 @@ class iob_core(iob_module):
             rules_file_path=__class__.global_clang_format_rules_filepath,
         )
 
-#
-# Non iob_core methods
-#
-
-def find_common_deep(path1, path2):
-    """Find common files (recursively) inside two given directories
-    Taken from: https://stackoverflow.com/a/51625515
-    :param str path1: Directory path 1
-    :param str path2: Directory path 2
-    """
-    return set.intersection(
-        *(
-            set(
-                os.path.relpath(os.path.join(root, file), path)
-                for root, _, files in os.walk(path)
-                for file in files
-            )
-            for path in (path1, path2)
+    @staticmethod
+    def find_module_setup_dir(core_name, error_on_not_found=True):
+        """Searches for a core's setup directory
+        param core_name: The core_name object
+        returns: The path to the setup directory
+        returns: The file extension
+        """
+        file_path = find_file(
+            iob_core.global_project_root, core_name, [".py", ".json"]
+        ) or find_file(
+            os.path.join(os.path.dirname(__file__), ".."),
+            core_name,
+            [".py", ".json"],
         )
-    )
+        if not file_path:
+            if error_on_not_found:
+                fail_with_msg(
+                    f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!",
+                    ModuleNotFoundError,
+                )
+            else:
+                return None, None
 
-def find_module_setup_dir(core_name, error_on_not_found=True):
-    """Searches for a core's setup directory
-    param core_name: The core_name object
-    returns: The path to the setup directory
-    returns: The file extension
-    """
-    file_path = find_file(
-        iob_core.global_project_root, core_name, [".py", ".json"]
-    ) or find_file(
-        os.path.join(os.path.dirname(__file__), ".."),
-        core_name,
-        [".py", ".json"],
-    )
-    if not file_path:
-        if error_on_not_found:
+        file_ext = os.path.splitext(file_path)[1]
+
+        filepath = pathlib.Path(file_path)
+        # Force core file to be contained in a folder with the same name.
+        # Skip this check if we are the top module (no top defined) or trying to setup the top module again (same name as previous defined top)
+        if filepath.parent.resolve().name != core_name and (
+            iob_core.global_top_module
+            and core_name != iob_core.global_top_module.original_name
+        ):
             fail_with_msg(
-                f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!",
-                ModuleNotFoundError,
+                f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
+                f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
+                f"But found incorrect path:    '{filepath.resolve()}'."
             )
-        else:
-            return None, None
 
-    file_ext = os.path.splitext(file_path)[1]
+        # print("Found setup dir based on location of: " + file_path, file=sys.stderr)
+        if file_ext == ".py" or file_ext == ".json":
+            return os.path.dirname(file_path), file_ext
 
-    filepath = pathlib.Path(file_path)
-    # Force core file to be contained in a folder with the same name.
-    # Skip this check if we are the top module (no top defined) or trying to setup the top module again (same name as previous defined top)
-    if filepath.parent.resolve().name != core_name and (
-        iob_core.global_top_module
-        and core_name != iob_core.global_top_module.original_name
-    ):
-        fail_with_msg(
-            f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
-            f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
-            f"But found incorrect path:    '{filepath.resolve()}'."
+    @staticmethod
+    def clean_build_dir(build_dir):
+        """
+            Clean and delete given build directory
+
+            Attributes:
+                build_dir (str): Path to the build directory
+        """
+        if not os.path.exists(build_dir):
+            return
+        print(
+            f"{iob_colors.INFO}Cleaning build directory: '{build_dir}'.{iob_colors.ENDC}"
+        )
+        os.system(f"make -C {build_dir} clean")
+        shutil.rmtree(build_dir)
+        print(
+            f"{iob_colors.INFO}Cleaning complete. Removed: '{build_dir}'.{iob_colors.ENDC}"
         )
 
-    # print("Found setup dir based on location of: " + file_path, file=sys.stderr)
-    if file_ext == ".py" or file_ext == ".json":
-        return os.path.dirname(file_path), file_ext
+    #
+    # Other Py2HWSW interface methods
+    #
 
-def clean_build_dir(build_dir):
-    """
-        Clean and delete given build directory
+    @staticmethod
+    def create_from_dict(core_dict):
+        """
+        Function to create iob_core object from dictionary attributes.
 
         Attributes:
-            build_dir (str): Path to the build directory
-    """
-    if not os.path.exists(build_dir):
-        return
-    print(
-        f"{iob_colors.INFO}Cleaning build directory: '{build_dir}'.{iob_colors.ENDC}"
-    )
-    os.system(f"make -C {build_dir} clean")
-    shutil.rmtree(build_dir)
-    print(
-        f"{iob_colors.INFO}Cleaning complete. Removed: '{build_dir}'.{iob_colors.ENDC}"
-    )
+            core_dict (dict): dictionary with values to initialize attributes of iob_core object.
+                This dictionary supports the following keys corresponding to the iob_core attributes:
 
+                # Module keys
+                - original_name -> iob_module.original_name
+                - name -> iob_module.name
+                - description -> iob_module.description
+                - reset_polarity -> iob_module.reset_polarity
+                - confs -> iob_module.confs = [iob_conf.create_from_dict(i) for i in confs]
+                - wires -> iob_module.wires = [iob_wire.create_from_dict(i) for i in wires]
+                - ports -> iob_module.ports = [iob_port.create_from_dict(i) for i in ports]
+                - buses -> iob_module.buses = [iob_bus.create_from_dict(i) for i in buses]
+                - interfaces -> iob_module.interfaces = [iob_interface.create_from_dict(i) for i in interfaces]
+                - snippets -> iob_module.snippets = [iob_snippet.create_from_dict(i) for i in snippets]
+                - comb -> iob_module.comb = iob_comb.create_from_dict(comb)
+                - fsm -> iob_module.fsm = iob_fsm.create_from_dict(fsm)
+                - subblocks -> iob_module.subblocks = [iob_instance.create_from_dict(i) for i in subblocks]
+                - superblocks -> iob_module.superblocks = [iob_core.create_from_dict(i) for i in superblocks]
+                - sw_modules -> iob_module.sw_modules = [iob_core.create_from_dict(i) for i in sw_modules]
 
-#
-# Other Py2HWSW interface methods
-#
+                # Core keys
+                - version -> iob_core.version
+                - previous_version -> iob_core.previous_version
+                - setup_dir -> iob_core.setup_dir
+                - build_dir -> iob_core.build_dir
+                - use_netlist -> iob_core.use_netlist
+                - is_system -> iob_core.is_system
+                - board_list -> iob_core.board_list
+                - ignore_snippets -> iob_core.ignore_snippets
+                - generate_hw -> iob_core.generate_hw
+                - is_tester -> iob_core.is_tester
+                - iob_parameters -> iob_core.iob_parameters  # FIXME: Cant have two keys with the same name
+                - license -> iob_core.license
+                - doc_conf -> iob_core.doc_conf
+                - title -> iob_core.title
+                - dest_dir -> iob_core.dest_dir
 
+                Some keys (like confs) may contain (sub-)dictionaries as values.
+                Refer to the corresponding `<class_name>.create_from_dict()` methods for info about the format and supported keys of these dictionaries.
+                For example, type `help(iob_conf.create_from_dict)` to view the keys supported by the dictionary that initializes the iob_conf object.
 
-def create_core_from_dict(core_dict):
-    """
-    Function to create iob_core object from dictionary attributes.
+        Returns:
+            iob_core: iob_core object
+        """
+        return iob_core(core_dict)
 
-    Attributes:
-        core_dict (dict): dictionary with values to initialize attributes of iob_core object.
-            This dictionary supports the following keys corresponding to the iob_core attributes:
+    @staticmethod
+    def core_text2dict(core_text):
+        """Convert core short notation text to dictionary.
+        Atributes:
+            core_text (str): Short notation text. See `create_from_text` for format.
 
-            # Module keys
-            - original_name -> iob_module.original_name
-            - name -> iob_module.name
-            - description -> iob_module.description
-            - reset_polarity -> iob_module.reset_polarity
-            - confs -> iob_module.confs
-            - wires -> iob_module.wires
-            - ports -> iob_module.ports
-            - buses -> iob_module.buses
-            - interfaces -> iob_module.interfaces
-            - snippets -> iob_module.snippets
-            - comb -> iob_module.comb
-            - fsm -> iob_module.fsm
-            - subblocks -> iob_module.subblocks = [create_core_from_dict(i) for i in subblocks]
-            - superblocks -> iob_module.superblocks = [create_core_from_dict(i) for i in superblocks]
-            - sw_modules -> iob_module.sw_modules = [create_core_from_dict(i) for i in sw_modules]
+        Returns:
+            dict: Dictionary with core attributes.
+        """
+        core_flags = [
+            # iob_module attributes
+            "original_name",
+            "name",
+            ['-d', {'dest': 'descr'}],
+            ['--rst_pol', {'dest': 'rst_policy'}],
+            ['--conf', {'dest': 'confs', 'action': 'append'}],
+            ['--port', {'dest': 'ports', 'action': 'append'}],
+            ['--bus', {'dest': 'buses', 'action': 'append'}],
+            ['--snippet', {'dest': 'snippets', 'action': 'append'}],
+            ['--comb', {'dest': 'comb'}],
+            ['--fsm', {'dest': 'fsm'}],
+            ['--subblock', {'dest': 'subblocks', 'action': 'append'}],
+            ['--superblock', {'dest': 'superblocks', 'action': 'append'}],
+            ['--sw_module', {'dest': 'sw_modules', 'action': 'append'}],
+            # iob_instance attributes
+            ['--inst_name', {'dest': 'instance_name'}],
+            ['--inst_d', {'dest': 'instance_description'}],
+            ['-c', {'dest': 'connect', 'action': 'append'}],  # port:ext format
+            ['--param', {'dest': 'parameters', 'action': 'append'}],  # PARAM:VALUE format
+            ['--no-instantiate', {'dest': 'instantiate', 'action': 'store_false'}],
+            ['--dest_dir', {'dest': 'dest_dir'}],
+            # iob_core attributes
+            ['-v', {'dest': 'version'}],
+            ['--prev_v', {'dest': 'previous_version'}],
+            ['--setup_dir', {'dest': 'setup_dir'}],
+            ['--build_dir', {'dest': 'build_dir'}],
+            ['--use_netlist', {'dest': 'use_netlist', 'action': 'store_true'}],
+            ['--system', {'dest': 'is_system', 'action': 'store_true'}],
+            ['--board', {'dest': 'board_list', 'action': 'append'}],
+            ['--ignore_snippet', {'dest': 'ignore_snippets', 'action': 'append'}],
+            ['--gen_hw', {'dest': 'generate_hw', 'action': 'store_true'}],
+            ['--parent', {'dest': 'parent'}],
+            ['--tester', {'dest': 'is_tester', 'action': 'store_true'}],
+            ['--iob_param', {'dest': 'iob_parameters', 'action': 'append'}],
+            ['--lic', {'dest': 'license'}],
+            ['--doc_conf', {'dest': 'doc_conf'}],
+            ['--title', {'dest': 'title'}],
+        ]
+        core_dict = parse_short_notation_text(core_text, core_flags)
+        # TODO: process core_dict:
+        #   - confs, ports, buses, snippets, comb, fsm,
+        #   - subblocks, superblocks, sw_modules
+        #   - connect -> portmap_connections, parameters, ignore_snippets?
+        #   - parent?, iob_parameters
+        return core_dict
 
-            # Core keys
-            - version -> iob_core.version
-            - previous_version -> iob_core.previous_version
-            - setup_dir -> iob_core.setup_dir
-            - build_dir -> iob_core.build_dir
-            - use_netlist -> iob_core.use_netlist
-            - is_system -> iob_core.is_system
-            - board_list -> iob_core.board_list
-            - ignore_snippets -> iob_core.ignore_snippets
-            - generate_hw -> iob_core.generate_hw
-            - is_tester -> iob_core.is_tester
-            - iob_parameters -> iob_core.iob_parameters  # FIXME: Cant have two keys with the same name
-            - license -> iob_core.license
-            - doc_conf -> iob_core.doc_conf
-            - title -> iob_core.title
-            - dest_dir -> iob_core.dest_dir
+    @staticmethod
+    def create_from_text(core_text):
+        """
+        Function to create iob_core object from short notation text.
 
-    Returns:
-        iob_core: iob_core object
-    """
-    return iob_core(core_dict)
+        Attributes:
+            core_text (str): Short notation text. Object attributes are specified using the following format:
+                # Notation specific to modules
+                original_name
 
+                # Notation specific to cores
+                # TODO
 
-def core_text2dict(core_text):
-    """Convert core short notation text to dictionary.
-    Atributes:
-        core_text (str): Short notation text. See `create_core_from_text` for format.
+                # Below are parameters specific to the 'iob_csrs' module. They should probably not belong in the Py2HWSW code
+                [--no_autoaddr]
+                [--rw_overlap]
+                [--csr_if csr_if]
+                    [--csr-group csr_group_name]
+                        [-r reg_name:n_bits]
+                            [-t type] [-m mode] [--rst_val rst_val] [--addr addr] [--log2n_items log2n_items]
 
-    Returns:
-        dict: Dictionary with core attributes.
-    """
-    core_flags = [
-        # iob_module attributes
-        "original_name",
-        "name",
-        ['-d', {'dest': 'descr'}],
-        ['--rst_pol', {'dest': 'rst_policy'}],
-        ['--conf', {'dest': 'confs', 'action': 'append'}],
-        ['--port', {'dest': 'ports', 'action': 'append'}],
-        ['--bus', {'dest': 'buses', 'action': 'append'}],
-        ['--snippet', {'dest': 'snippets', 'action': 'append'}],
-        ['--comb', {'dest': 'comb'}],
-        ['--fsm', {'dest': 'fsm'}],
-        ['--subblock', {'dest': 'subblocks', 'action': 'append'}],
-        ['--superblock', {'dest': 'superblocks', 'action': 'append'}],
-        ['--sw_module', {'dest': 'sw_modules', 'action': 'append'}],
-        # iob_instance attributes
-        ['--inst_name', {'dest': 'instance_name'}],
-        ['--inst_d', {'dest': 'instance_description'}],
-        ['-c', {'dest': 'connect', 'action': 'append'}],  # port:ext format
-        ['--param', {'dest': 'parameters', 'action': 'append'}],  # PARAM:VALUE format
-        ['--no-instantiate', {'dest': 'instantiate', 'action': 'store_false'}],
-        ['--dest_dir', {'dest': 'dest_dir'}],
-        # iob_core attributes
-        ['-v', {'dest': 'version'}],
-        ['--prev_v', {'dest': 'previous_version'}],
-        ['--setup_dir', {'dest': 'setup_dir'}],
-        ['--build_dir', {'dest': 'build_dir'}],
-        ['--use_netlist', {'dest': 'use_netlist', 'action': 'store_true'}],
-        ['--system', {'dest': 'is_system', 'action': 'store_true'}],
-        ['--board', {'dest': 'board_list', 'action': 'append'}],
-        ['--ignore_snippet', {'dest': 'ignore_snippets', 'action': 'append'}],
-        ['--gen_hw', {'dest': 'generate_hw', 'action': 'store_true'}],
-        ['--parent', {'dest': 'parent'}],
-        ['--tester', {'dest': 'is_tester', 'action': 'store_true'}],
-        ['--iob_param', {'dest': 'iob_parameters', 'action': 'append'}],
-        ['--lic', {'dest': 'license'}],
-        ['--doc_conf', {'dest': 'doc_conf'}],
-        ['--title', {'dest': 'title'}],
-    ]
-    core_dict = parse_short_notation_text(core_text, core_flags)
-    # TODO: process core_dict:
-    #   - confs, ports, buses, snippets, comb, fsm,
-    #   - subblocks, superblocks, sw_modules
-    #   - connect -> portmap_connections, parameters, ignore_snippets?
-    #   - parent?, iob_parameters
-    return core_dict
+        Returns:
+            iob_core: iob_core object
+        """
+        return __class__.create_from_dict(__class__.core_text2dict(core_text))
 
-
-def create_core_from_text(core_text):
-    """
-    Function to create iob_core object from short notation text.
-
-    Attributes:
-        core_text (str): Short notation text. Object attributes are specified using the following format:
-            # Notation specific to modules
-            original_name
-
-            # Notation specific to cores
-            # TODO
-
-            # Below are parameters specific to the 'iob_csrs' module. They should probably not belong in the Py2HWSW code
-            [--no_autoaddr]
-            [--rw_overlap]
-            [--csr_if csr_if]
-                [--csr-group csr_group_name]
-                    [-r reg_name:n_bits]
-                        [-t type] [-m mode] [--rst_val rst_val] [--addr addr] [--log2n_items log2n_items]
-
-    Returns:
-        iob_core: iob_core object
-    """
-    return create_core_from_dict(core_text2dict(core_text))
-
-
-def get_global_wires_list():
-    return iob_core.global_wires
+    @staticmethod
+    def get_global_wires_list():
+        return iob_core.global_wires

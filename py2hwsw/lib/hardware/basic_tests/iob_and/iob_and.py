@@ -26,13 +26,10 @@ core_dictionary = {
 
 
 class iob_and(iob_core):
-    def __init__(self, width=None):
-        if width:
-            core_dictionary["confs"][0]["value"] = str(width)
-        print("[DEBUG]: iob_and constructor called.")
+    def __init__(self):
         super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
-    iob_and_obj = iob_and(width=8)
+    iob_and_obj = iob_and()
     iob_and_obj.generate_build_dir()

@@ -83,7 +83,7 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "data_i",
-                    "data_o": "data_o",
+                    "data_o": "data_i_reg",
                 },
             },
         ],

@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 from dataclasses import dataclass
+import importlib
 
 from iob_base import (
     find_obj_in_list,
@@ -80,6 +81,13 @@ class iob_bus:
         #         wire.direction = ""
 
         # return wires
+    @staticmethod
+    def _remove_dir_suffix(wires):
+        """
+        Removes direction suffix from name of each wire object in given wires list.
+        """
+        for i in wires:
+            i.name = i.name.rsplit("_", 1)[0]
 
     # # attrs = [
     # #     "name",
@@ -508,14 +516,11 @@ class iob_bus:
     #
     def __write_single_port(self, fout, port):
         """Write a single port to the file."""
-        direction = port.direction
-        name = self.prefix + port.name
-        width_str = f" [{port.width}-1:0] "
-        fout.write(direction + width_str + name + "," + "\n")
+        fout.write(port.get_verilog_port())
 
     def _write_m_port(self, fout):
         """Write master ports to the file."""
-        for port in self.get_wires():
+        for port in self.get_wires(direction="manager"):
             self.__write_single_port(fout, port)
 
     def _write_s_port(self, fout):
@@ -531,7 +536,7 @@ class iob_bus:
         bus_name = self.prefix + port.name
         # Remove suffix from bus name if it is present
         if not connect_to_port:
-            suffix = self.__get_suffix(port.direction)
+            suffix = port.name.split("_")[-1]
             if bus_name.endswith(suffix):
                 bus_name = bus_name[: -len(suffix)]
 
@@ -1013,34 +1018,50 @@ class iobClkInterface(iob_bus):
     has_rst: bool = False
     has_en: bool = False
 
-    def get_wires(self):
-        """Generate wires for the IOb clock interface."""
+    # NOTE: artur: should direction be auto-determined from bus name suffix?
+    def get_wires(self, direction: str = ""):
+        """Generate wires for the IOb clock interface.
+        Attributes:
+            direction (str): Direction of the interface (manager or subordinate).
+                             If provided, will return a list of ports instead of wires.
+        Returns:
+            list: List of wires or ports.
+        """
+        self.validate_attributes()
+
+        # Lazy import instance to avoid circular dependecy
+        iob_port = getattr(importlib.import_module('iob_port'), 'iob_port')
 
         arst_polarity = getattr(iob_globals(), "reset_polarity", "positive")
 
-        wires=[]
+        wires = []
+        ports = []
 
-        wires.append(iob_wire(name="clk_o", descr="Clock"))
+        wires.append(iob_wire(name="clk_o"))
+        ports.append(iob_port(wire=wires[-1], descr="Clock"))
 
         if self.has_cke:
-            wires.append(iob_wire(name="cke_o", descr="Clock enable"))
+            wires.append(iob_wire(name="cke_o"))
+            ports.append(iob_port(wire=wires[-1], descr="Clock enable"))
         if self.has_arst:
             if arst_polarity == "positive":
-                wires.append(
-                    iob_wire(name="arst_o", descr="Asynchronous active-high reset")
-                )
+                wires.append(iob_wire(name="arst_o"))
+                ports.append(iob_port(wire=wires[-1], descr="Asynchronous active-high reset"))
             else:
-                wires.append(
-                    iob_wire(name="arst_n_o", descr="Asynchronous active-low reset")
-                )
+                wires.append(iob_wire(name="arst_n_o"))
+                ports.append(iob_port(wire=wires[-1], descr="Asynchronous active-low reset"))
         if self.has_rst:
-            wires.append(
-                iob_wire(name="rst_o", descr="Synchronous active-high reset")
-            )
+            wires.append(iob_wire(name="rst_o"))
+            ports.append(iob_port(wire=wires[-1], descr="Synchronous active-high reset"))
         if self.has_en:
-            wires.append(iob_wire(name="en_o", descr="Enable"))
+            wires.append(iob_wire(name="en_o"))
+            ports.append(iob_port(wire=wires[-1], descr="Enable"))
 
-        return wires
+        if not direction:
+            self._remove_dir_suffix(wires)
+            return wires
+
+        return ports
 
 
 @dataclass
@@ -2254,7 +2275,8 @@ def create_bus(
 ):
     """Creates an interface with the given genre and parameters.
     Attributes:
-        genre (str): Name of the interface.
+        name (str): Name of the interface.
+        genre (str): Genre of interface. Used to select the correct class.
         mult (int|str): Multiplication factor for all wire widths.
         widths (dict): Dictionary for configuration of specific wire widths.
         params (list): List for configuration of specific parameters.
@@ -2299,7 +2321,7 @@ def create_bus(
 
     # Check if widths are integers or strings
     # TODO: except for addr_w, all should later be only an integer
-    for name, width in [
+    for width_name, width in [
         ("DATA_W", data_w),
         ("ADDR_W", addr_w),
         ("W_DATA_W", w_data_w),
@@ -2320,7 +2342,7 @@ def create_bus(
         ("N_PINS", n_pins)
     ]:
         if not isinstance(width, (int, str)):
-            raise ValueError(f"Width '{name}' must be an integer or string, got '{width}' of type {type(width)}.")
+            raise ValueError(f"Width '{width_name}' must be an integer or string, got '{width}' of type {type(width)}.")
 
     match genre:
         case "iob_clk":
@@ -2348,6 +2370,7 @@ def create_bus(
                     )
 
             interface = iobClkInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2359,6 +2382,7 @@ def create_bus(
             )
         case "iob":
             interface = iobInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2369,6 +2393,7 @@ def create_bus(
         case mem if mem in mem_if_names:
             if "W_DATA_W" in widths and "R_DATA_W" in widths:
                 interface = asymMemInterface(
+                    name=name,
                     prefix=prefix,
                     mult=mult,
                     file_prefix=file_prefix,
@@ -2381,6 +2406,7 @@ def create_bus(
             else:
                 # Symmetric memory interface
                 interface = symMemInterface(
+                    name=name,
                     prefix=prefix,
                     mult=mult,
                     file_prefix=file_prefix,
@@ -2391,6 +2417,7 @@ def create_bus(
                 )
         case "axis":
             interface = AXIStreamInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2400,6 +2427,7 @@ def create_bus(
             )
         case "axil_read":
             interface = AXILiteInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2413,6 +2441,7 @@ def create_bus(
             )
         case "axil_write":
             interface = AXIInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2426,6 +2455,7 @@ def create_bus(
             )
         case "axil":
             interface = AXILiteInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2437,6 +2467,7 @@ def create_bus(
             )
         case "axi_read":
             interface = AXIInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2457,6 +2488,7 @@ def create_bus(
             )
         case "axi_write":
             interface = AXIInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2477,6 +2509,7 @@ def create_bus(
             )
         case "axi":
             interface = AXIInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2496,6 +2529,7 @@ def create_bus(
             )
         case "apb":
             interface = APBInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2505,6 +2539,7 @@ def create_bus(
             )
         case "ahb":
             interface = AHBInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2518,6 +2553,7 @@ def create_bus(
             )
         case "rs232":
             interface = RS232Interface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2526,6 +2562,7 @@ def create_bus(
             )
         case "wb":
             interface = wishboneInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2535,6 +2572,7 @@ def create_bus(
             )
         case "wb_full":
             interface = wishboneInterface(
+                name=name,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,

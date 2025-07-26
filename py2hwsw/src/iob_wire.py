@@ -36,13 +36,13 @@ class iob_wire:
         if not self.name:
             fail_with_msg("Wire name is not set", ValueError)
 
-    def get_verilog_bus(self):
-        """Generate a verilog bus string from this wire"""
+    def get_verilog_wire(self):
+        """Generate a verilog wire string from this wire"""
         if "'" in self.name or self.name.lower() == "z":
             return None
-        bus_type = "reg" if self.isvar else "wire"
+        wire_type = "reg" if self.isvar else "wire"
         width_str = "" if self.get_width_int() == 1 else f"[{self.width}-1:0] "
-        return f"{bus_type} {width_str}{self.name};\n"
+        return f"{wire_type} {width_str}{self.name};\n"
 
     def get_width_int(self):
         width_v = self.width

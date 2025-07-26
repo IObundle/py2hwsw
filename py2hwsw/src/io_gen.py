@@ -38,10 +38,8 @@ def generate_ports(core):
 
             lines.append(f"    // {bus.name}: {port.descr}\n")
 
-            for wire_idx, wire in enumerate(bus.get_wires()):
-                if isinstance(wire, iob_wire):
-                    if wire.get_verilog_port():
-                        lines.append("    " + wire.get_verilog_port())
+            for wire_idx, wire in enumerate(bus.get_wires(direction=port.direction)):
+                lines.append("    " + wire.get_verilog_port())
         else:
             # Port references a single wire
             lines.append("    " + port.get_verilog_port())
@@ -65,23 +63,24 @@ def generate_ports_snippet(core):
     with open(f"{out_dir}/{core.name}_io.vs", "w+") as f:
         f.write(code)
 
-    # Generate snippets for all bus subtypes (portmaps, tb_portmaps, buses, ...)
-    # Note: This is only used by manually written verilog modules.
-    #       May not be needed in the future.
-    for port_idx, port in enumerate(core.ports):
-        if isinstance(port.wire, iob_bus):
-            bus = port.wire
+    # FIXME:
+    # # Generate snippets for all bus subtypes (portmaps, tb_portmaps, buses, ...)
+    # # Note: This is only used by manually written verilog modules.
+    # #       May not be needed in the future.
+    # for port_idx, port in enumerate(core.ports):
+    #     if isinstance(port.wire, iob_bus):
+    #         bus = port.wire
 
-            # If port has 'doc_only' attribute set to True, skip it
-            if port.doc_only:
-                continue
+    #         # If port has 'doc_only' attribute set to True, skip it
+    #         if port.doc_only:
+    #             continue
 
-            bus.interface.gen_all_vs_files()
+    #         bus.gen_all_vs_files()
 
-            # move all .vs files from current directory to out_dir
-            for file in os.listdir("."):
-                if file.endswith(".vs"):
-                    os.rename(file, f"{out_dir}/{file}")
+    #         # move all .vs files from current directory to out_dir
+    #         for file in os.listdir("."):
+    #             if file.endswith(".vs"):
+    #                 os.rename(file, f"{out_dir}/{file}")
 
 
 # Generate if.tex file with list TeX tables of IOs

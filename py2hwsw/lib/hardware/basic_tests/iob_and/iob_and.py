@@ -26,10 +26,10 @@ core_dictionary = {
 
 
 class iob_and(iob_core):
-    def __init__(self):
-        super().__init__(core_dictionary)
+    def __init__(self, core_dict):
+        super().__init__(core_dict)
 
 
 if __name__ == "__main__":
-    iob_and_obj = iob_and()
+    iob_and_obj = iob_and(core_dictionary)
     iob_and_obj.generate_build_dir()

@@ -162,7 +162,7 @@ class iob_port:
         doc_clearpage = wire_bus_dict.pop("doc_clearpage", False)
         # From this point on, wire_bus_dict only contains wire/bus specific keys
 
-        if "interface" in wire_bus_dict:
+        if "kind" in wire_bus_dict:
             # Create a bus for this port
             wire_bus_obj = iob_bus.create_from_dict(wire_bus_dict)
         else:

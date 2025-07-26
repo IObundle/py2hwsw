@@ -39,8 +39,6 @@ class iob_bus:
     def validate_attributes(self):
         if not self.name:
             fail_with_msg("All buses must have a name!", ValueError)
-        if not self.interface:
-            fail_with_msg(f"Missing interface for bus '{self.name}'!", ValueError)
         # Should this auto-fill be in validate_attributes?
         if not self.file_prefix:
             self.file_prefix = self.portmap_port_prefix + self.prefix
@@ -57,80 +55,79 @@ class iob_bus:
         """
         pass
 
-    def get_wires(self) -> list:
+    def get_wires(self, direction: str =  "") -> list:
         """
         Return a list of newly dynamically generated wires of the bus.
+
+        Attributes:
+            direction (str): Direction of the interface (when used in a port)
 
         Returns:
             list: List of iob_wire objects
         """
-        if not self.interface:
-            fail_with_msg(f"Bus '{self.name}' has no interface specified!", ValueError)
-        wires = self.interface.get_wires()
+        pass
+        # # Remove wire direction information
+        # for wire in wires:
+        #     # Skip wire references
+        #     if isinstance(wire, iob_wire_reference):
+        #         continue
+        #     if hasattr(wire, "direction"):
+        #         # Remove direction suffix from wire name
+        #         if wire.name.endswith("_i") or wire.name.endswith("_o"):
+        #             wire.name = wire.name[:-2]
+        #         elif wire.name.endswith("_io"):
+        #             wire.name = wire.name[:-3]
+        #         wire.direction = ""
 
-        # Remove wire direction information
-        # FIXME: interface.get_wires() should probably already return wires without direction
-        for wire in wires:
-            # Skip wire references
-            if isinstance(wire, iob_wire_reference):
-                continue
-            if hasattr(wire, "direction"):
-                # Remove direction suffix from wire name
-                if wire.name.endswith("_i") or wire.name.endswith("_o"):
-                    wire.name = wire.name[:-2]
-                elif wire.name.endswith("_io"):
-                    wire.name = wire.name[:-3]
-                wire.direction = ""
+        # return wires
 
-        return wires
-
-    # attrs = [
-    #     "name",
-    #     ["-i", "wires&i", {"nargs": 1}, ("type",)],
-    #     ["-s", "wires&s", {"nargs": "+"}, ["name:width"]],
-    # ]
-    #
-    #
-    #     @str_to_kwargs(attrs)
-    @staticmethod
-    def create_bus(core, *args, wires=[], **kwargs):
-        """Creates a new bus object and adds it to the core's bus list
-        param core: core object
-        """
-        try:
-            # Ensure 'buses' list exists
-            core.set_default_attribute("buses", [])
-            # Check if there are any references to wires in other buses/ports
-            sig_obj_list = []
-            interface_obj = None
-            if type(wires) is list:
-                # Convert user wire dictionaries into 'iob_wire' objects
-                __class__.replace_duplicate_wires_by_references(
-                    core.buses + core.ports, wires
-                )
-                sig_obj_list = create_obj_list(wires, iob_wire)
-            elif type(wires) is dict:
-                # Convert user interface dictionary into '_interface' object
-                interface_obj = __class__.dict2interface(
-                    name=kwargs.get("name", ""), interface_dict=wires
-                )
-                if interface_obj and not interface_obj.file_prefix:
-                    interface_obj.file_prefix = core.name + "_"
-            else:
-                fail_with_msg(f"Invalid wire type! {wires}", TypeError)
-            assert_attributes(
-                iob_bus,
-                kwargs,
-                error_msg=f"Invalid {kwargs.get('name', '')} bus attribute '[arg]'!",
-            )
-            bus = iob_bus(*args, wires=sig_obj_list, interface=interface_obj, **kwargs)
-            __class__.replace_duplicate_wires_by_references(
-                core.buses + core.ports, bus.wires
-            )
-            core.buses.append(bus)
-        except Exception:
-            add_traceback_msg(f"Failed to create bus '{kwargs['name']}'.")
-            raise
+    # # attrs = [
+    # #     "name",
+    # #     ["-i", "wires&i", {"nargs": 1}, ("type",)],
+    # #     ["-s", "wires&s", {"nargs": "+"}, ["name:width"]],
+    # # ]
+    # #
+    # #
+    # #     @str_to_kwargs(attrs)
+    # @staticmethod
+    # def create_bus(core, *args, wires=[], **kwargs):
+    #     """Creates a new bus object and adds it to the core's bus list
+    #     param core: core object
+    #     """
+    #     try:
+    #         # Ensure 'buses' list exists
+    #         core.set_default_attribute("buses", [])
+    #         # Check if there are any references to wires in other buses/ports
+    #         sig_obj_list = []
+    #         interface_obj = None
+    #         if type(wires) is list:
+    #             # Convert user wire dictionaries into 'iob_wire' objects
+    #             __class__.replace_duplicate_wires_by_references(
+    #                 core.buses + core.ports, wires
+    #             )
+    #             sig_obj_list = create_obj_list(wires, iob_wire)
+    #         elif type(wires) is dict:
+    #             # Convert user interface dictionary into '_interface' object
+    #             interface_obj = __class__.dict2interface(
+    #                 name=kwargs.get("name", ""), interface_dict=wires
+    #             )
+    #             if interface_obj and not interface_obj.file_prefix:
+    #                 interface_obj.file_prefix = core.name + "_"
+    #         else:
+    #             fail_with_msg(f"Invalid wire type! {wires}", TypeError)
+    #         assert_attributes(
+    #             iob_bus,
+    #             kwargs,
+    #             error_msg=f"Invalid {kwargs.get('name', '')} bus attribute '[arg]'!",
+    #         )
+    #         bus = iob_bus(*args, wires=sig_obj_list, interface=interface_obj, **kwargs)
+    #         __class__.replace_duplicate_wires_by_references(
+    #             core.buses + core.ports, bus.wires
+    #         )
+    #         core.buses.append(bus)
+    #     except Exception:
+    #         add_traceback_msg(f"Failed to create bus '{kwargs['name']}'.")
+    #         raise
 
     @staticmethod
     def get_bus_wire(core, bus_name: str, wire_name: str):
@@ -197,81 +194,81 @@ class iob_bus:
                 return wire
         return None
 
-    #
-    # Convert interface dictionary to an interface object
-    # Note: This function is to be deprecated in the future, since objects should be created directly for
-    # each interface type.
-    #
-    @staticmethod
-    def dict2interface(name, interface_dict):
-        """Convert dictionary to an interface.
-        Example interface dict:
-        {
-            "type": "iob",
-            # Generic string parameter
-            "params": "",
-            # Widths/Other parameters
-            "DATA_W": "DATA_W",
-            "ADDR_W": "ADDR_W",
-        }
-        To use an assymmetric memory interface, the dictionary should look like this:
-        {
-            "type": "ram_at2p",
-            # Generic string parameter
-            "params": "",
-            # Widths/Other parameters
-            "ADDR_W": "ADDR_W",
-            "W_DATA_W": "W_DATA_W",
-            "R_DATA_W": "R_DATA_W",
-        }
-        """
-        if not interface_dict:
-            return None
+    # #
+    # # Convert interface dictionary to an interface object
+    # # Note: This function is to be deprecated in the future, since objects should be created directly for
+    # # each interface type.
+    # #
+    # @staticmethod
+    # def dict2interface(name, interface_dict):
+    #     """Convert dictionary to an interface.
+    #     Example interface dict:
+    #     {
+    #         "type": "iob",
+    #         # Generic string parameter
+    #         "params": "",
+    #         # Widths/Other parameters
+    #         "DATA_W": "DATA_W",
+    #         "ADDR_W": "ADDR_W",
+    #     }
+    #     To use an assymmetric memory interface, the dictionary should look like this:
+    #     {
+    #         "type": "ram_at2p",
+    #         # Generic string parameter
+    #         "params": "",
+    #         # Widths/Other parameters
+    #         "ADDR_W": "ADDR_W",
+    #         "W_DATA_W": "W_DATA_W",
+    #         "R_DATA_W": "R_DATA_W",
+    #     }
+    #     """
+    #     if not interface_dict:
+    #         return None
 
-        genre = interface_dict.get("type", "")
+    #     genre = interface_dict.get("type", "")
 
-        if name.endswith("_m"):
-            if_direction = "manager"
-        elif name.endswith("_s"):
-            if_direction = "subordinate"
-        else:
-            if_direction = ""
+    #     if name.endswith("_m"):
+    #         if_direction = "manager"
+    #     elif name.endswith("_s"):
+    #         if_direction = "subordinate"
+    #     else:
+    #         if_direction = ""
 
-        prefix = interface_dict.get("prefix", "")
-        mult = interface_dict.get("mult", 1)
-        params = interface_dict.get("params", None)
-        if params is not None:
-            params = params.split("_")
-        file_prefix = interface_dict.get("file_prefix", "")
-        portmap_port_prefix = interface_dict.get("portmap_port_prefix", "")
+    #     prefix = interface_dict.get("prefix", "")
+    #     mult = interface_dict.get("mult", 1)
+    #     params = interface_dict.get("params", None)
+    #     if params is not None:
+    #         params = params.split("_")
+    #     file_prefix = interface_dict.get("file_prefix", "")
+    #     portmap_port_prefix = interface_dict.get("portmap_port_prefix", "")
 
-        # Remaining entries in the interface_dict (usually widths or other parameters)
-        remaining_entries = {
-            k: v
-            for k, v in interface_dict.items()
-            if k
-            not in [
-                "type",
-                "prefix",
-                "mult",
-                "params",
-                "file_prefix",
-                "portmap_port_prefix",
-            ]
-        }
+    #     # Remaining entries in the interface_dict (usually widths or other parameters)
+    #     remaining_entries = {
+    #         k: v
+    #         for k, v in interface_dict.items()
+    #         if k
+    #         not in [
+    #             "type",
+    #             "prefix",
+    #             "mult",
+    #             "params",
+    #             "file_prefix",
+    #             "portmap_port_prefix",
+    #         ]
+    #     }
 
-        interface = iob_interface.create_interface(
-            genre=genre,
-            if_direction=if_direction,
-            mult=mult,
-            widths=remaining_entries,
-            prefix=prefix,
-            params=params,
-            portmap_port_prefix=portmap_port_prefix,
-            file_prefix=file_prefix,
-        )
+    #     interface = iob_bus.create_interface(
+    #         genre=genre,
+    #         if_direction=if_direction,
+    #         mult=mult,
+    #         widths=remaining_entries,
+    #         prefix=prefix,
+    #         params=params,
+    #         portmap_port_prefix=portmap_port_prefix,
+    #         file_prefix=file_prefix,
+    #     )
 
-        return interface
+    #     return interface
 
     #
     # Other Py2HWSW interface methods
@@ -286,58 +283,76 @@ class iob_bus:
             bus_dict (dict): dictionary with values to initialize attributes of iob_bus object.
                 This dictionary supports the following keys corresponding to the iob_bus attributes:
                 - name      -> iob_bus.name
-                - kind (str): Generates interface of corresponding genre (subclass of iob_interface).
-                - prefix              -> interface.prefix
-                - mult                -> interface.mult
-                - file_prefix         -> interface.file_prefix
-                - portmap_port_prefix -> interface.portmap_port_prefix
+                - kind (str): Generates bus of corresponding genre (subclass of iob_bus).
+                - mult                -> bus.mult
+                - widths (dict): Dictionary for configuration of specific wire widths.
+                - params (list): List for configuration of specific parameters.
+                - prefix              -> bus.prefix
+                - portmap_port_prefix -> bus.portmap_port_prefix
+                - file_prefix         -> bus.file_prefix
 
         Returns:
             iob_bus: iob_bus object
         """
-        # Create arguments to pass to iob_bus constructor
+        # Create arguments to pass to create_bus() method
         kwargs = bus_dict.copy()
         # Rename "kind" to "genre"
         kwargs["genre"] = kwargs.pop("kind", "")
         # Split params string into list
-        kwargs["params"] = kwargs.pop("params", None).split("_")
-        return iob_bus(**kwargs)
+        kwargs["params"] = kwargs.pop("params", None)
+        if kwargs["params"] is not None:
+            kwargs["params"] = kwargs["params"].split("_")
+        return create_bus(**kwargs)
 
     @staticmethod
     def bus_text2dict(bus_text):
+        """Convert bus short notation text to dictionary.
+        Atributes:
+            bus_text (str): Short notation text. See `create_from_text` for format.
+
+        Returns:
+            dict: Dictionary with bus attributes.
+        """
         bus_flags = [
             "name",
-            ["-i", {"dest": "interface"}],
-            ["-s", {"dest": "wires", "action": "append"}],
+            "genre",
             ["-d", {"dest": "descr", "nargs": "?"}],
+            ["-m", {"dest": "mult"}],
+            ["-w", {"dest": "widths", "action": "append"}],  # create accepts dictionary
+            ["-P", {"dest": "params", "action": "append"}],
+            ["-p", {"dest": "prefix", "type": str}],
+            ["-pm", {"dest": "portmap_port_prefix", "type": str}],
+            ["-f", {"dest": "file_prefix", "type": str}],
         ]
         bus_dict = parse_short_notation_text(bus_text, bus_flags)
-        bus_wires = []
-        for s in bus_dict.get("wires", []):
-            try:
-                [s_name, s_width] = s.split(":")
-            except ValueError:
-                fail_with_msg(
-                    f"Invalid wire format '{s}'! Expected 'name:width' format.",
-                    ValueError,
-                )
-            bus_wires.append({"name": s_name, "width": s_width})
-        bus_dict.update({"wires": bus_wires})
+        width_dict = {}
+        if "widths" in bus_dict and bus_dict["widths"]:
+            for width in bus_dict["widths"]:
+                if ":" in width:
+                    w_key, value = width.split(":", 1)
+                    width_dict[w_key] = value
+                else:
+                    raise ValueError(f"Invalid width specification: {width}")
+        bus_dict.update({"widths": width_dict})
         return bus_dict
 
     @staticmethod
     def create_from_text(bus_text):
         """
-        Function to create iob_bus object from short notation text.
+        Function to create bus object from short notation text.
 
         Attributes:
             bus_text (str): Short notation text. Object attributes are specified using the following format:
-                name [-d descr] [-s wire_name1:width1] [-s wire_name2:width2]+
+                name genre [-d descr] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
                 Examples:
-                    dbus -d 'data bus' -s wdata:32 -s wstrb:4
+                    axi_bus axi -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
+
+                    rom_bus rom_sp -p boot_ -w ADDR_W:8 -w DATA_W:32
+
+                    axis_bus axis -p output_ -P 'has_tlast'
 
         Returns:
-            iob_bus: iob_bus object
+            iob_bus: bus object
         """
         return __class__.create_from_dict(__class__.bus_text2dict(bus_text))
 
@@ -416,8 +431,8 @@ class iob_bus:
         """Reverse the direction of all wires in a list."""
         new_wires = deepcopy(wires)
         for wire in new_wires:
-            wire.direction = iob_interface.__reverse_direction(wire.direction)
-            wire.name = iob_interface.__reverse_name_direction(wire.name)
+            wire.direction = iob_bus.__reverse_direction(wire.direction)
+            wire.name = iob_bus.__reverse_name_direction(wire.name)
         return new_wires
 
     @staticmethod
@@ -536,21 +551,22 @@ class iob_bus:
     def _write_s_s_portmap(self, fout):
         self._write_m_m_portmap(fout)
 
-    def get_wires(self):
-        """Get the wires of the interface."""
-        wires = deepcopy(self._wires)
-        # Set direction according to if_direction
-        if self.if_direction == "subordinate":
-            wires = self.__reverse_wires_direction(wires)
+    # TODO: Post-process wires?
+    # def get_wires(self):
+    #     """Get the wires of the interface."""
+    #     wires = deepcopy(self._wires)
+    #     # Set direction according to if_direction
+    #     if self.if_direction == "subordinate":
+    #         wires = self.__reverse_wires_direction(wires)
 
-        if self.mult != 1:
-            for wire in wires:
-                wire.width = f"({self.mult}*{wire.width})"
+    #     if self.mult != 1:
+    #         for wire in wires:
+    #             wire.width = f"({self.mult}*{wire.width})"
 
-        for wire in wires:
-            wire.name = self.prefix + wire.name
+    #     for wire in wires:
+    #         wire.name = self.prefix + wire.name
 
-        return wires
+    #     return wires
 
     def gen_buses_vs_file(self):
         """Generate buses snippet for given interface"""
@@ -881,109 +897,107 @@ class iob_interface:
         file_prefix (str): Prefix for generated "Verilog Snippets" of this interface.
         portmap_port_prefix (str): Prefix for "Verilog snippets" of portmaps of this interface:
     """
+    pass
 
-    if_direction: str = ""
-    prefix: str = ""
-    mult: str | int = 1
-    file_prefix: str = ""
-    portmap_port_prefix: str = ""
+    # if_direction: str = ""
+    # prefix: str = ""
+    # mult: str | int = 1
+    # file_prefix: str = ""
+    # portmap_port_prefix: str = ""
 
-    # List of wires for this interface (Internal, used for generation)
-    _wires: list = field(default_factory=list)
+    # # List of wires for this interface (Internal, used for generation)
+    # _wires: list = field(default_factory=list)
 
-    def __post_init__(self):
-        if not self.file_prefix:
-            self.file_prefix = self.portmap_port_prefix + self.prefix
+    # def __post_init__(self):
+    #     if not self.file_prefix:
+    #         self.file_prefix = self.portmap_port_prefix + self.prefix
 
-    def validate_attributes(self):
-        # Check if_direction is valid
-        if self.if_direction not in ["", "manager", "subordinate"]:
-            print(
-                f"ERROR: validate_attributes: invalid if_direction '{self.if_direction}'. "
-                "Valid values are '', 'manager', 'subordinate'."
-            )
-            exit(1)
-
-
+    # def validate_attributes(self):
+    #     # Check if_direction is valid
+    #     if self.if_direction not in ["", "manager", "subordinate"]:
+    #         print(
+    #             f"ERROR: validate_attributes: invalid if_direction '{self.if_direction}'. "
+    #             "Valid values are '', 'manager', 'subordinate'."
+    #         )
+    #         exit(1)
     #
     # Other Py2HWSW interface methods
     #
 
-    @staticmethod
-    def create_from_dict(interface_dict):
-        """
-        Function to create interface object from dictionary attributes.
+    # @staticmethod
+    # def create_from_dict(interface_dict):
+    #     """
+    #     Function to create interface object from dictionary attributes.
 
-        Attributes:
-            interface_dict (dict): dictionary with values to initialize attributes of interface object.
-                This dictionary supports the following keys corresponding to the interface attributes:
-                - kind (str): Generates interface of corresponding genre (subclass of iob_interface).
-                - if_direction        -> interface.if_direction
-                - prefix              -> interface.prefix
-                - mult                -> interface.mult
-                - file_prefix         -> interface.file_prefix
-                - portmap_port_prefix -> interface.portmap_port_prefix
+    #     Attributes:
+    #         interface_dict (dict): dictionary with values to initialize attributes of interface object.
+    #             This dictionary supports the following keys corresponding to the interface attributes:
+    #             - kind (str): Generates interface of corresponding genre (subclass of iob_interface).
+    #             - if_direction        -> interface.if_direction
+    #             - prefix              -> interface.prefix
+    #             - mult                -> interface.mult
+    #             - file_prefix         -> interface.file_prefix
+    #             - portmap_port_prefix -> interface.portmap_port_prefix
 
-        Returns:
-            interface: interface object
-        """
-        kwargs = interface_dict.copy()
-        # Rename "kind" to "genre"
-        kwargs["genre"] = kwargs.pop("kind", "")
-        # Split params string into list
-        kwargs["params"] = kwargs.pop("params", None).split("_")
-        return create_interface(**kwargs)
+    #     Returns:
+    #         interface: interface object
+    #     """
+    #     kwargs = interface_dict.copy()
+    #     # Rename "kind" to "genre"
+    #     kwargs["genre"] = kwargs.pop("kind", "")
+    #     # Split params string into list
+    #     kwargs["params"] = kwargs.pop("params", None).split("_")
+    #     return create_bus(**kwargs)
+    # @staticmethod
+    # def interface_text2dict(interface_text):
+    #     """Convert interface short notation text to dictionary.
+    #     Atributes:
+    #         interface_text (str): Short notation text. See `create_from_text` for format.
 
-    @staticmethod
-    def interface_text2dict(interface_text):
-        """Convert interface short notation text to dictionary.
-        Atributes:
-            interface_text (str): Short notation text. See `create_from_text` for format.
+    #     Returns:
+    #         dict: Dictionary with interface attributes.
+    #     """
+    #     interface_flags = [
+    #         "genre",
+    #         ["-d", {"dest": "if_direction", "choices": ["", "manager", "subordinate"]}],
+    #         ["-m", {"dest": "mult"}],
+    #         ["-w", {"dest": "widths", "action": "append"}],  # create accepts dictionary
+    #         ["-P", {"dest": "params", "action": "append"}],
+    #         ["-p", {"dest": "prefix", "type": str}],
+    #         ["-pm", {"dest": "portmap_port_prefix", "type": str}],
+    #         ["-f", {"dest": "file_prefix", "type": str}],
+    #     ]
+    #     interface_dict = parse_short_notation_text(interface_text, interface_flags)
+    #     width_dict = {}
+    #     if "widths" in interface_dict and interface_dict["widths"]:
+    #         for width in interface_dict["widths"]:
+    #             if ":" in width:
+    #                 w_key, value = width.split(":", 1)
+    #                 width_dict[w_key] = value
+    #             else:
+    #                 raise ValueError(f"Invalid width specification: {width}")
+    #     interface_dict.update({"widths": width_dict})
+    #     return interface_dict
 
-        Returns:
-            dict: Dictionary with interface attributes.
-        """
-        interface_flags = [
-            "genre",
-            ["-d", {"dest": "if_direction", "choices": ["", "manager", "subordinate"]}],
-            ["-m", {"dest": "mult"}],
-            ["-w", {"dest": "widths", "action": "append"}],  # create accepts dictionary
-            ["-P", {"dest": "params", "action": "append"}],
-            ["-p", {"dest": "prefix", "type": str}],
-            ["-pm", {"dest": "portmap_port_prefix", "type": str}],
-            ["-f", {"dest": "file_prefix", "type": str}],
-        ]
-        interface_dict = parse_short_notation_text(interface_text, interface_flags)
-        width_dict = {}
-        if "widths" in interface_dict and interface_dict["widths"]:
-            for width in interface_dict["widths"]:
-                if ":" in width:
-                    w_key, value = width.split(":", 1)
-                    width_dict[w_key] = value
-                else:
-                    raise ValueError(f"Invalid width specification: {width}")
-        interface_dict.update({"widths": width_dict})
-        return interface_dict
+    # @staticmethod
+    # def create_from_text(interface_text):
+    #     """
+    #     Function to create interface object from short notation text.
 
-    @staticmethod
-    def create_from_text(interface_text):
-        """
-        Function to create interface object from short notation text.
+    #     Attributes:
+    #         interface_text (str): Short notation text. Object attributes are specified using the following format:
+    #             genre [-d direction] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
+    #             Examples:
+    #                 axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
 
-        Attributes:
-            interface_text (str): Short notation text. Object attributes are specified using the following format:
-                genre [-d direction] [-p prefix] [-m mult] [-f file_prefix] [-pm portmap_port_prefix] [-w WIDTH_W:val]+ -[-P PARAM:val]+
-                Examples:
-                    axi -d manager -p cpu_ -m 1 -f ctrl_cpu_ -pm controller_
+    #                 rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32
 
-                    rom_sp -d subordinate -p boot_ -w ADDR_W:8 -w DATA_W:32
+    #                 axis -p output_ -P 'has_tlast'
 
-                    axis -p output_ -P 'has_tlast'
-
-        Returns:
-            interface: interface object
-        """
-        return __class__.create_from_dict(__class__.interface_text2dict(interface_text))
+    #     Returns:
+    #         interface: interface object
+    #     """
+    #     return __class__.create_from_dict(__class__.interface_text2dict(interface_text))
 
 #
 # IOb
@@ -991,7 +1005,7 @@ class iob_interface:
 
 
 @dataclass
-class iobClkInterface(iob_interface):
+class iobClkInterface(iob_bus):
     """Class to represent an IOb clock interface for generation"""
 
     has_cke: bool = True
@@ -999,38 +1013,38 @@ class iobClkInterface(iob_interface):
     has_rst: bool = False
     has_en: bool = False
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the IOb clock interface."""
+    def get_wires(self):
+        """Generate wires for the IOb clock interface."""
 
         arst_polarity = getattr(iob_globals(), "reset_polarity", "positive")
 
-        self._wires.append(iob_wire(name="clk_o", descr="Clock"))
+        wires=[]
+
+        wires.append(iob_wire(name="clk_o", descr="Clock"))
 
         if self.has_cke:
-            self._wires.append(iob_wire(name="cke_o", descr="Clock enable"))
+            wires.append(iob_wire(name="cke_o", descr="Clock enable"))
         if self.has_arst:
             if arst_polarity == "positive":
-                self._wires.append(
+                wires.append(
                     iob_wire(name="arst_o", descr="Asynchronous active-high reset")
                 )
             else:
-                self._wires.append(
+                wires.append(
                     iob_wire(name="arst_n_o", descr="Asynchronous active-low reset")
                 )
         if self.has_rst:
-            self._wires.append(
+            wires.append(
                 iob_wire(name="rst_o", descr="Synchronous active-high reset")
             )
         if self.has_en:
-            self._wires.append(iob_wire(name="en_o", descr="Enable"))
+            wires.append(iob_wire(name="en_o", descr="Enable"))
+
+        return wires
 
 
 @dataclass
-class iobInterface(iob_interface):
+class iobInterface(iob_bus):
     """Class to represent an IOb interface for generation"""
 
     # Widths for the IOb interface
@@ -1038,14 +1052,12 @@ class iobInterface(iob_interface):
     # Only address width is configurable, data width is fixed
     addr_w: str or int = 32
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
+    def get_wires(self):
+        """Generate wires for the IOb interface."""
 
-    def __set_wires(self):
-        """Set wires for the IOb interface."""
+        wire = []
 
-        self._wires = self._wires + [
+        wires = [
             iob_wire(name="iob_valid_o", descr="Request address is valid."),
             iob_wire(name="iob_addr_o", width=self.addr_w, descr="Byte address."),
             iob_wire(name="iob_wdata_o", width=self.data_w, descr="Write data."),
@@ -1074,7 +1086,7 @@ class iobInterface(iob_interface):
 
 
 @dataclass
-class _memInterface(iob_interface):
+class _memInterface(iob_bus):
     """Class to represent a memory interface for generation"""
 
     # Width for the memory interface
@@ -1084,25 +1096,27 @@ class _memInterface(iob_interface):
     # Memory genre
     genre: str = "ram_sp"
 
-    def _set_mem_wires(
+    def get_mem_wires(
         self, suffix: str, has_addr: bool = True, has_enable: bool = True
     ):
         """Get common wires for the memory interface."""
 
+        wires = [] 
+
         if suffix:
             clk_prefix = f"{suffix}_" if self._is_async else ""
             suffix = f"_{suffix}"
-            self._wires.append(
+            wires.append(
                 iob_wire(name=clk_prefix + "clk_o", descr=f"Clock port {suffix}")
             )
         else:
             suffix = ""
-            self._wires.append(
+            wires.append(
                 iob_wire(name="clk_o", descr="Clock")
             )
 
         if has_addr:
-            self._wires.append(
+            wires.append(
                 iob_wire(
                     name="addr" + suffix + "_o",
                     width=self.addr_w,
@@ -1110,18 +1124,20 @@ class _memInterface(iob_interface):
                 )
             )
         if has_enable:
-            self._wires.append(
+            wires.append(
                 iob_wire(name="en" + suffix + "_o", descr=f"Enable port {suffix}")
             )
 
-    def _remove_duplicate_wires(self):
+        return wires
+
+    def _remove_duplicate_wires(self, wires: list = []):
         """Remove duplicate wires from the interface."""
         result = []
-        for wire in self._wires:
+        for wire in wires:
             if wire not in result:
                 result.append(wire)
 
-        self._wires = result
+        return result
 
 
 @dataclass
@@ -1131,12 +1147,8 @@ class symMemInterface(_memInterface):
     # Data width for the memory interface
     data_w: int or str = 32
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the symmetric memory interface based on the memory genre."""
+    def get_wires(self):
+        """Generate wires for the symmetric memory interface based on the memory genre."""
 
         # Replace the long if-elif-else chain with a match-case statement (Python 3.10+)
         match self.genre:
@@ -1357,10 +1369,8 @@ class asymMemInterface(_memInterface):
         # Calculate address width based on the ratio (same as min_addr_w)
         self.__block_addr_w = self.addr_w - (ratio.bit_length() - 1)
 
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the asymmetric memory interface based on the memory genre."""
+    def get_wires(self):
+        """Generate wires for the asymmetric memory interface based on the memory genre."""
 
         match self.genre:
             case "rom_2p":
@@ -1512,7 +1522,7 @@ class asymMemInterface(_memInterface):
 
 
 @dataclass
-class AXIStreamInterface(iob_interface):
+class AXIStreamInterface(iob_bus):
     """Class to represent an AXI-Stream interface for generation"""
 
     # Data width for the AXI-Stream interface
@@ -1520,12 +1530,8 @@ class AXIStreamInterface(iob_interface):
     # Signal to indicate if the interface has a last wire
     has_tlast: bool = False
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the AXI-Stream interface."""
+    def get_wires(self):
+        """Generate wires for the AXI-Stream interface."""
         self._wires += [
             iob_wire(
                 name="axis_tdata_o",
@@ -1552,7 +1558,7 @@ class AXIStreamInterface(iob_interface):
 
 
 @dataclass
-class AXILiteInterface(iob_interface):
+class AXILiteInterface(iob_bus):
     """Class to represent an AXI-Lite interface for generation"""
 
     # Data width for the AXI-Lite interface
@@ -1567,12 +1573,8 @@ class AXILiteInterface(iob_interface):
     has_write_if: bool = True
     has_prot: bool = False
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the AXI-Lite interface."""
+    def get_wires(self):
+        """Generate wires for the AXI-Lite interface."""
 
         if self.has_read_if:
             self.__set_read_wires()
@@ -1686,7 +1688,7 @@ class AXILiteInterface(iob_interface):
 
 
 @dataclass
-class AXIInterface(iob_interface):
+class AXIInterface(iob_bus):
     """Class to represent an AXI interface for generation"""
 
     # Data width for the AXI interface
@@ -1708,12 +1710,8 @@ class AXIInterface(iob_interface):
     has_write_if: bool = True
     has_prot: bool = False
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the AXI interface."""
+    def get_wires(self):
+        """Generate wires for the AXI interface."""
 
         if self.has_read_if:
             self.__set_read_wires()
@@ -1932,7 +1930,7 @@ class AXIInterface(iob_interface):
 
 
 @dataclass
-class APBInterface(iob_interface):
+class APBInterface(iob_bus):
     """Class to represent an APB interface for generation"""
 
     # Data width for the APB interface
@@ -1940,12 +1938,8 @@ class APBInterface(iob_interface):
     # Address width for the APB interface
     addr_w: int or str = 32
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the APB interface."""
+    def get_wires(self):
+        """Generate wires for the APB interface."""
         self._wires += [
             iob_wire(
                 name="apb_addr_o",
@@ -1987,7 +1981,7 @@ class APBInterface(iob_interface):
 
 
 @dataclass
-class AHBInterface(iob_interface):
+class AHBInterface(iob_bus):
     """Class to represent an AHB interface for generation"""
 
     # Data width for the AHB interface
@@ -2000,12 +1994,8 @@ class AHBInterface(iob_interface):
     trans_w: int or str = 2
     size_w: int or str = 3
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the AHB interface."""
+    def get_wires(self):
+        """Generate wires for the AHB interface."""
         self._wires += [
             iob_wire(
                 name="ahb_addr_o",
@@ -2076,18 +2066,14 @@ class AHBInterface(iob_interface):
 
 
 @dataclass
-class RS232Interface(iob_interface):
+class RS232Interface(iob_bus):
     """Class to represent an RS232 interface for generation"""
 
     # Number of pins for the RS232 interface
     n_pins: int or str = 4
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the RS232 interface."""
+    def get_wires(self):
+        """Generate wires for the RS232 interface."""
         if self.n_pins not in [2, 4, 9]:
             raise ValueError("RS232 interface must have 2, 4, or 9 pins.")
 
@@ -2159,7 +2145,7 @@ class RS232Interface(iob_interface):
 
 
 @dataclass
-class wishboneInterface(iob_interface):
+class wishboneInterface(iob_bus):
     """Class to represent a Wishbone interface for generation"""
 
     # Data width for the Wishbone interface
@@ -2169,12 +2155,8 @@ class wishboneInterface(iob_interface):
     # Sets if it is a full Wishbone interface
     is_full: bool = False
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.__set_wires()
-
-    def __set_wires(self):
-        """Set wires for the Wishbone interface."""
+    def get_wires(self):
+        """Generate wires for the Wishbone interface."""
         self._wires += [
             iob_wire(
                 name="wb_dat_i",
@@ -2260,9 +2242,9 @@ class wishboneInterface(iob_interface):
 #
 
 
-def create_interface(
+def create_bus(
+    name: str,
     genre: str,
-    if_direction: str = "",
     mult: int | str = 1,
     widths: dict = {},
     params: list = None,
@@ -2273,8 +2255,6 @@ def create_interface(
     """Creates an interface with the given genre and parameters.
     Attributes:
         genre (str): Name of the interface.
-        if_direction (str): Direction of the interface.
-            Examples: '' (unspecified), 'manager', 'subordinate', ...
         mult (int|str): Multiplication factor for all wire widths.
         widths (dict): Dictionary for configuration of specific wire widths.
         params (list): List for configuration of specific parameters.
@@ -2368,7 +2348,6 @@ def create_interface(
                     )
 
             interface = iobClkInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2380,7 +2359,6 @@ def create_interface(
             )
         case "iob":
             interface = iobInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2391,7 +2369,6 @@ def create_interface(
         case mem if mem in mem_if_names:
             if "W_DATA_W" in widths and "R_DATA_W" in widths:
                 interface = asymMemInterface(
-                    if_direction=if_direction,
                     prefix=prefix,
                     mult=mult,
                     file_prefix=file_prefix,
@@ -2404,7 +2381,6 @@ def create_interface(
             else:
                 # Symmetric memory interface
                 interface = symMemInterface(
-                    if_direction=if_direction,
                     prefix=prefix,
                     mult=mult,
                     file_prefix=file_prefix,
@@ -2415,7 +2391,6 @@ def create_interface(
                 )
         case "axis":
             interface = AXIStreamInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2425,7 +2400,6 @@ def create_interface(
             )
         case "axil_read":
             interface = AXILiteInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2439,7 +2413,6 @@ def create_interface(
             )
         case "axil_write":
             interface = AXIInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2453,7 +2426,6 @@ def create_interface(
             )
         case "axil":
             interface = AXILiteInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2465,7 +2437,6 @@ def create_interface(
             )
         case "axi_read":
             interface = AXIInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2486,7 +2457,6 @@ def create_interface(
             )
         case "axi_write":
             interface = AXIInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2507,7 +2477,6 @@ def create_interface(
             )
         case "axi":
             interface = AXIInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2527,7 +2496,6 @@ def create_interface(
             )
         case "apb":
             interface = APBInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2537,7 +2505,6 @@ def create_interface(
             )
         case "ahb":
             interface = AHBInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2551,7 +2518,6 @@ def create_interface(
             )
         case "rs232":
             interface = RS232Interface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2560,7 +2526,6 @@ def create_interface(
             )
         case "wb":
             interface = wishboneInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2570,7 +2535,6 @@ def create_interface(
             )
         case "wb_full":
             interface = wishboneInterface(
-                if_direction=if_direction,
                 prefix=prefix,
                 mult=mult,
                 file_prefix=file_prefix,
@@ -2592,7 +2556,7 @@ def create_interface(
 #
 # if __name__ == "__main__":
 #     for if_name in if_names:
-#         interface = create_interface(
+#         interface = create_bus(
 #             genre=if_name,
 #             if_direction="",
 #             mult=1,

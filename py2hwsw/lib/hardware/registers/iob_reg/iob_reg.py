@@ -114,10 +114,8 @@ class iob_reg(iob_core):
                 {
                     "name": "clk_en_rst_s",
                     "descr": "Clock, clock enable and reset port (bus with multiple wires)",
-                    "interface": {
-                        "kind": "iob_clk",
-                        "params": clk_port_params,
-                    },
+                    "kind": "iob_clk",
+                    "params": clk_port_params,
                 },
                 {
                     "name": "data_i",

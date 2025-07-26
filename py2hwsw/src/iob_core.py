@@ -43,7 +43,6 @@ from iob_module import iob_module
 from iob_comb import iob_comb
 from iob_conf import iob_conf
 from iob_fsm import iob_fsm
-from iob_interface import iob_interface
 from iob_wire import iob_wire
 from iob_port import iob_port
 from iob_bus import iob_bus
@@ -153,7 +152,6 @@ class iob_core(iob_module):
         self.wires: list[iob_wire] = []
         self.ports: list[iob_port] = []
         self.buses: list[iob_bus] = []
-        self.interfaces: list[iob_interface] = []
         self.snippets: list[iob_snippet] = []
         self.comb: iob_comb | None = None
         self.fsm: iob_fsm | None = None
@@ -549,7 +547,6 @@ class iob_core(iob_module):
                 - wires -> iob_module.wires = [iob_wire.create_from_dict(i) for i in wires]
                 - ports -> iob_module.ports = [iob_port.create_from_dict(i) for i in ports]
                 - buses -> iob_module.buses = [iob_bus.create_from_dict(i) for i in buses]
-                - interfaces -> iob_module.interfaces = [iob_interface.create_from_dict(i) for i in interfaces]
                 - snippets -> iob_module.snippets = [iob_snippet.create_from_dict(i) for i in snippets]
                 - comb -> iob_module.comb = iob_comb.create_from_dict(comb)
                 - fsm -> iob_module.fsm = iob_fsm.create_from_dict(fsm)

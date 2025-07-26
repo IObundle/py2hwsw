@@ -7,8 +7,7 @@ import re
 from dataclasses import dataclass
 from iob_snippet import iob_snippet
 from iob_wire import iob_wire
-from iob_bus import iob_bus
-from iob_interface import iobClkInterface
+from iob_bus import iob_bus, iobClkInterface
 from iob_base import fail_with_msg, assert_attributes, parse_short_notation_text
 
 find_wire_in_buses = iob_bus.find_wire_in_buses

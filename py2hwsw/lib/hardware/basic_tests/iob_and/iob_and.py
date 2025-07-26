@@ -13,23 +13,35 @@ core_dictionary = {
             "value": "21",
             "min_value": "1",
             "max_value": "32",
-            "descr": "IO width",
+            "descr": "Data width",
         },
     ],
     "ports": [
-        {"name": "a_i", "width": "W"},
-        {"name": "b_i", "width": "W"},
-        {"name": "y_o", "width": "W"},
+        {
+            "name": "a_i",
+            "descr": "Input port a",
+            "width": "W",
+        },
+        {
+            "name": "b_i",
+            "descr": "Input port b",
+            "width": "W",
+        },
+        {
+            "name": "y_o",
+            "descr": "Output port y",
+            "width": "W",
+        },
     ],
     "snippets": [{"verilog_code": "   assign y_o = a_i & b_i;"}],
 }
 
 
 class iob_and(iob_core):
-    def __init__(self, core_dict):
-        super().__init__(core_dict)
+    def __init__(self):
+        super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
-    iob_and_obj = iob_and(core_dictionary)
+    iob_and_obj = iob_and()
     iob_and_obj.generate_build_dir()

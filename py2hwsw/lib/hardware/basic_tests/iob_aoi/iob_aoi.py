@@ -13,7 +13,7 @@ core_dictionary = {
             "value": "1",
             "min_value": "1",
             "max_value": "32",
-            "descr": "Ports width",
+            "descr": "Data width",
         },
     ],
     "ports": [
@@ -45,93 +45,79 @@ core_dictionary = {
     ],
     "wires": [
         {
-            "name": "aab",
-            "descr": "and ab output",
+            "name": "ab",
             "width": "W",
         },
         {
-            "name": "cad",
-            "descr": "and cd output",
+            "name": "cd",
             "width": "W",
         },
         {
-            "name": "aob",
-            "descr": "or output",
+            "name": "or_int",
             "width": "W",
         },
     ],
     "subblocks": [
         {
             "core": "iob_and",
-            "name": "iob_and_ab",
-            "description": "First and gate",
+            "name": "a_and_b",
+            "description": "AND gate for inputs a and b",
             "parameters": {
                 "W": "W",
             },
             "portmap_connections": {
                 "a_i": "a_i",
                 "b_i": "b_i",
-                "y_o": "aab",
+                "y_o": "ab",
             },
         },
         {
             "core": "iob_and",
-            "name": "io_and_cd",
-            "description": "Second and gate",
+            "name": "c_and_d",
+            "description": "AND gate for inputs c and d",
             "parameters": {
                 "W": "W",
             },
             "portmap_connections": {
                 "a_i": "c_i",
                 "b_i": "d_i",
-                "y_o": "cad",
+                "y_o": "cd",
             },
         },
         {
             "core": "iob_or",
-            "name": "iob_or_abcd",
-            "description": "Or gate",
+            "name": "ab_or_cd",
+            "description": "OR gate for inputs ab and cd",
             "parameters": {
                 "W": "W",
             },
             "portmap_connections": {
-                "a_i": "aab",
-                "b_i": "cad",
-                "y_o": "aob",
+                "a_i": "ab",
+                "b_i": "cd",
+                "y_o": "or_int",
             },
         },
         {
             "core": "iob_inv",
-            "name": "iob_inv_out",
-            "description": "Inverter",
+            "name": "ao_inv",
+            "description": "Inverter for the OR output",
             "parameters": {
                 "W": "W",
             },
             "portmap_connections": {
-                "a_i": "aob",
+                "x_i": "or_int",
                 "y_o": "y_o",
             },
         },
-    ],
-    "superblocks": [
-        # Tester
-        # {
-        #     "core": "iob_aoi_tester",
-        #     "name": "iob_tester",
-        #     "dest_dir": "tester",
-        # },
     ],
 }
 
 
 class iob_aoi(iob_core):
-    def __init__(self, width=None):
-        if width:
-            core_dictionary["confs"][0]["value"] = str(width)
-        print("iob_aoi constructor called.")
+    def __init__(self):
         super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
-    iob_aoi_obj = iob_aoi(width=1)
+    iob_aoi_obj = iob_aoi()
     iob_aoi_obj.generate_build_dir()

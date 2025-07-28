@@ -46,6 +46,7 @@ jobs:
           cd py2hwsw/lib;\
           nix-shell --run "py2hwsw_shell < ./hardware/basic_tests/iob_and/iob_and.py"
           nix-shell --run "py2hwsw_shell < ./hardware/basic_tests/iob_aoi/iob_aoi.py"
+          nix-shell --run "py2hwsw_shell ./hardware/basic_tests/iob_aoi/iob_reg.py"
 
   reuse:
     runs-on: self-hosted

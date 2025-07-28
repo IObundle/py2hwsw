@@ -51,6 +51,7 @@ def setup(py_params_dict):
                     {
                         "name": "data_o",
                         "width": "DATA_W",
+                        "isvar": True,
                         "descr": "Data output signal",
                     },
                 ],

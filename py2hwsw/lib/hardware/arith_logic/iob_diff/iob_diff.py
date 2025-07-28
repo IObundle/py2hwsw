@@ -46,7 +46,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "data_o",
-                "descr": "Data input",
+                "descr": "Data output",
                 "signals": [
                     {
                         "name": "data_o",
@@ -83,7 +83,11 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "data_i",
+<<<<<<< HEAD
                     "data_o": "data_int_reg",
+=======
+                    "data_o": "data_i_reg",
+>>>>>>> 0b744bc8bceb63c29d2f646ff731ce74c6917daa
                 },
             },
         ],

@@ -157,7 +157,7 @@ class iob_port:
         # Create dictionary to pass to the `iob_<bus/wire>.create_from_dict` method
         wire_bus_dict = port_dict.copy()
         # Extract port specific keys
-        descr = wire_bus_dict.pop("descr", None)
+        descr = wire_bus_dict.pop("descr", "")
         doc_only = wire_bus_dict.pop("doc_only", False)
         doc_clearpage = wire_bus_dict.pop("doc_clearpage", False)
         # From this point on, wire_bus_dict only contains wire/bus specific keys

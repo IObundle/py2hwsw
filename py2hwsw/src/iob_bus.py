@@ -89,6 +89,16 @@ class iob_bus:
         for i in wires:
             i.name = i.name.rsplit("_", 1)[0]
 
+    @staticmethod
+    def _reverse_dir_suffix(wires):
+        """
+        Reverses direction suffix from name of each wire object in given wires list.
+        """
+        reverse_suffix = {"i": "o", "o": "i", "io": "io"}
+        for i in wires:
+            no_suffix = i.name.rsplit("_", 1)[0]
+            i.name = f'{no_suffix}_{reverse_suffix[i.name.split("_")[-1]]}'
+
     # # attrs = [
     # #     "name",
     # #     ["-i", "wires&i", {"nargs": 1}, ("type",)],
@@ -1060,6 +1070,8 @@ class iobClkInterface(iob_bus):
         if not direction:
             self._remove_dir_suffix(wires)
             return wires
+        elif direction == "subordinate":
+            self._reverse_dir_suffix(wires)
 
         return ports
 

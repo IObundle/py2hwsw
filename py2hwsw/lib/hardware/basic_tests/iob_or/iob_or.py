@@ -1,37 +1,3 @@
-#!/usr/bin/env python3
-
-# SPDX-FileCopyrightText: 2025 IObundle
-#
-# SPDX-License-Identifier: MIT
-
-# Short notation with API is WIP
-# core_dictionary = {
-#     "generate_hw": True,
-#     "confs": [
-#         {
-#             "name": "W",
-#             "type": "P",
-#             "val": "21",
-#             "min": "1",
-#             "max": "32",
-#             "descr": "IO width",
-#         },
-#     ],
-#     "ports": [
-#         """
-#             a_i -s a_i:W
-#             -d 'Input port'
-#
-#             b_i -s b_i:W
-#             -d 'Input port'
-#
-#             y_o -s y_o:W
-#             -d 'Output port'
-#             """,
-#     ],
-#     "snippets": [{"verilog_code": "   assign y_o = a_i | b_i;"}],
-# }
-
 core_dictionary = {
     "generate_hw": True,
     "confs": [
@@ -41,7 +7,7 @@ core_dictionary = {
             "value": "21",
             "min_value": "1",
             "max_value": "32",
-            "descr": "IO width",
+            "descr": "Data width",
         },
     ],
     "ports": [
@@ -66,12 +32,10 @@ core_dictionary = {
 
 
 class iob_or(iob_core):
-    def __init__(self, width=None):
-        if width:
-            core_dictionary["confs"][0]["value"] = str(width)
+    def __init__(self):
         super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
-    iob_or_obj = iob_or(width=3)
+    iob_or_obj = iob_or()
     iob_or_obj.generate_build_dir()

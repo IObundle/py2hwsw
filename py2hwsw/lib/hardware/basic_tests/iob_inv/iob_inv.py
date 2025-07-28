@@ -13,12 +13,12 @@ core_dictionary = {
             "value": "21",
             "min_value": "1",
             "max_value": "32",
-            "descr": "IO width",
+            "descr": "Data width",
         },
     ],
     "ports": [
         {
-            "name": "a_i",
+            "name": "x_i",
             "descr": "Input port",
             "width": "W",
         },
@@ -28,17 +28,15 @@ core_dictionary = {
             "width": "W",
         },
     ],
-    "snippets": [{"verilog_code": "   assign y_o = ~a_i;"}],
+    "snippets": [{"verilog_code": "   assign y_o = ~x_i;"}],
 }
 
 
 class iob_inv(iob_core):
-    def __init__(self, width=None):
-        if width:
-            core_dictionary["confs"][0]["value"] = str(width)
+    def __init__(self):
         super().__init__(core_dictionary)
 
 
 if __name__ == "__main__":
-    iob_inv_obj = iob_inv(width=6)
+    iob_inv_obj = iob_inv()
     iob_inv_obj.generate_build_dir()

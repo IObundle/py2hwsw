@@ -4,7 +4,7 @@
 
 # (c) 2022-Present IObundle, Lda, all rights reserved
 #
-# This makefile simulates the hardware modules in this repo
+# This makefile runs the examples in the IObundle library.
 #
 
 BUILD_DIR ?=build
@@ -16,16 +16,8 @@ BOARD ?= iob_aes_ku040_db_g
 MEM_ADDR_W ?= 18
 FW_ADDR_W ?= 18
 
-# Used by test.sh
-LIB_DIR:=.
-export LIB_DIR
-
 # Default lib module to setup. Can be overriden by the user.
-CORE ?=iob_ctls
-
-CSR_IF?=iob
-
-IOB_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM):csr_if=$(CSR_IF):mem_addr_w=$(MEM_ADDR_W):fw_addr_w=$(FW_ADDR_W)"
+CORE ?= hardware/basic_tests/iob_and/iob_and.py
 
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi
@@ -40,51 +32,59 @@ all: sim-run
 py2shell:
 	nix-shell --run "py2hwsw_shell"
 
+$(BUILD_DIR):
+	nix-shell --run "py2hwsw_shell < $(CORE)"
 
-setup:
-	nix-shell --run "py2hwsw $(CORE) setup --build_dir '$(BUILD_DIR)' --iob_params '$(IOB_PARAMS)' $(SETUP_ARGS)"
+#
+# Simulation targets
+#
+sim-build: clean $(BUILD_DIR)
+	nix-shell --run "make -C $(BUILD_DIR) sim-build"
 
-sim-build:
-	nix-shell --run "scripts/test.sh build $(CORE)"
+sim-run: sim-build
+	nix-shell --run "VCD=$(VCD) make -C $(BUILD_DIR) sim-run"
 
-sim-run:
-	nix-shell --run "VCD=$(VCD) scripts/test.sh $(CORE)"
+# List of tests to run
+TESTS = hardware/basic_tests/iob_and/iob_and.py
 
-sim-test:
-	nix-shell --run "scripts/test.sh test"
+sim-test: (TESTS)
+
+$(TESTS):
+	nix-shell --run "make -C $(BUILD_DIR) sim-run"
 
 sim-clean:
-	nix-shell --run "scripts/test.sh clean"
+	nix-shell --run "make -C $(BUILD_DIR) sim-clean"
 
-fpga-build:
-	nix-shell --run "make clean setup CORE=$(CORE) INIT_MEM=$(INIT_MEM) USE_EXTMEM=$(USE_EXTMEM) && make -C $(BUILD_DIR) fpga-sw-build BOARD=$(BOARD)" && make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
+#
+# FPGA targets
+#
+
+fpga-build: clean $(BUILD_DIR)
+	nix-shell --run "make -C $(BUILD_DIR) fpga-build"
 
 fpga-run: fpga-build
 	make -C $(BUILD_DIR)/ fpga-run BOARD=$(BOARD)
 
+#
+# Documentation targets
+#
 
 doc-build: 
-	nix-shell --run "make clean setup CORE=$(CORE) && make -C $(BUILD_DIR) doc-build"
+	nix-shell --run "make clean setup -C $(BUILD_DIR) doc-build"
 
 py2-doc-build:
-	nix-shell --run "py2hwsw --py2hwsw_docs && make -C py2hwsw_generated_docs/document/ build"
 
 py2-doc-update:
-	cp py2hwsw_generated_docs/document/ug.pdf ../py2hwsw_document/document/ug.pdf
 
-
+#fix me
 delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
-
+#fix me
 lib-ipxact:
 	nix-shell --run "py2hwsw --browse"
 	./scripts/kactus2/import_library.py `realpath $(CURDIR)`/ipxact_lib
 	nix-shell --run "kactus2"
-
-
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery lib-ipxact
-
 
 # Install board server and client
 board_server_install:
@@ -108,8 +108,14 @@ board_server_status:
 
 
 clean:
-	nix-shell --run "py2hwsw $(CORE) clean --build_dir '$(BUILD_DIR)'"
-	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs
+	@if [ -d $(BUILD_DIR) ]; then \
+		make -C $(BUILD_DIR) clean; \
+		rm -rf $(BUILD_DIR); \
+	fi
 	@find . -name \*~ -delete
 
-.PHONY: clean
+
+.PHONY: all py2shell setup sim-build sim-run sim-test fpga-build fpga-run doc-build py2-doc-build py2-doc-update delivery lib-ipxact board_server_install board_server_uninstall board_server_status clean
+
+
+

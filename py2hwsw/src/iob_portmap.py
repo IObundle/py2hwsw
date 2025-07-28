@@ -12,7 +12,6 @@ from iob_base import (
 )
 import iob_colors
 from iob_wire import iob_wire, iob_wire_reference
-from iob_bus import iob_bus
 from iob_port import iob_port
 
 get_real_wire = iob_wire.get_real_wire
@@ -38,15 +37,6 @@ class iob_portmap:
     def __post_init__(self):
         if not self.port_name and self.port:
             self.port_name = self.port.wire.name
-
-    def validate_attributes(self):
-        if not self.port_name:
-            fail_with_msg("Port is not specified", ValueError)
-        if not self.e_connect:
-            fail_with_msg(f"Port '{self.port_name}' is not connected!", ValueError)
-
-        # TODO: validate if port and external buses really exist.
-        pass
 
     def connect_port(self, ports: list[iob_port]):
         """Connect the portmap to an iob_port object
@@ -156,7 +146,7 @@ class iob_portmap:
         return port
 
     #
-    # Other Py2HWSW interface methods
+    # Other Py2HWSW portmap methods
     #
 
     @staticmethod
@@ -223,19 +213,3 @@ class iob_portmap:
             portmap_list.append(portmap)
 
         return portmap_list
-
-    @staticmethod
-    def create_from_text(portmap_text):
-        """
-        Function to create iob_portmap object from short notation text.
-
-        Attributes:
-            portmap_text (str): Short notation text. Object attributes are specified using the following format:
-                TODO
-
-        Returns:
-            iob_portmap: iob_portmap object
-        """
-        portmap_dict = {}
-        # TODO: parse short notation text
-        return iob_portmap(**portmap_dict)

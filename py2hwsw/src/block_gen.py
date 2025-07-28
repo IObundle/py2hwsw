@@ -6,8 +6,6 @@
 #    subblocks_gen.py: instantiate Verilog modules and generate their documentation
 #
 
-from latex import write_table
-
 from iob_wire import iob_wire
 from iob_port import iob_port
 import param_gen
@@ -45,27 +43,6 @@ def generate_subblocks_table_tex(subblocks, out_dir):
 
     subblocks_file.write("\\clearpage")
     subblocks_file.close()
-
-
-# Generate TeX table of subblocks
-def generate_subblocks_tex(subblocks, out_dir):
-    # Create subblocks.tex file
-    generate_subblocks_table_tex(subblocks, out_dir)
-
-    # Create table for subblocks
-    tex_table = []
-    for block in subblocks:
-        if not block.instantiate:
-            continue
-        tex_table.append(
-            [
-                block.name,
-                block.name,
-                block.description,
-            ]
-        )
-
-    write_table(f"{out_dir}/subblocks", tex_table)
 
 
 def generate_subblocks(core):

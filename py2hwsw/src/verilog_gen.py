@@ -10,10 +10,7 @@ import re
 
 import param_gen
 import io_gen
-import bus_gen
 import block_gen
-import comb_gen
-import fsm_gen
 import snippet_gen
 import wire_gen
 from iob_base import debug_print
@@ -205,15 +202,6 @@ def generate_verilog(core):
     local_params = param_gen.generate_localparams(core)
     if local_params:
         module_body_lines += local_params + "\n"
-
-    if core.buses:
-        module_body_lines += bus_gen.generate_buses(core) + "\n"
-
-    if core.comb:
-        module_body_lines += comb_gen.generate_comb(core) + "\n"
-
-    if core.fsm:
-        module_body_lines += fsm_gen.generate_fsm(core) + "\n"
 
     if core.snippets:
         module_body_lines += snippet_gen.generate_snippets(core) + "\n"

@@ -1,7 +1,0 @@
-# SPDX-FileCopyrightText: 2025 IObundle
-#
-# SPDX-License-Identifier: MIT
-
-BOARD_SERVER=$(DE10_SERVER)
-BOARD_USER=$(DE10_USER)
-BOARD_SERIAL_PORT=$(DE10_SERIAL_PORT)

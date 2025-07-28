@@ -7,8 +7,6 @@
 #
 #    ios.py: build Verilog module IO and documentation
 #
-from latex import write_table
-
 from iob_wire import iob_wire
 
 
@@ -114,25 +112,3 @@ Note that the ouput wires are registered in the core, while the input wires are 
             if_file.write("\\clearpage")
 
     if_file.close()
-
-
-# Generate TeX tables of IOs
-def generate_ios_tex(ports, out_dir):
-    # Create if.tex file
-    generate_if_tex(ports, out_dir)
-
-    for port in ports:
-        tex_table = []
-        # Interface is not standard, read ports
-        for wire in port.wires:
-            if isinstance(wire, iob_wire):
-                tex_table.append(
-                    [
-                        wire.name,
-                        wire.direction,
-                        wire.width,
-                        wire.descr,
-                    ]
-                )
-
-        write_table(f"{out_dir}/{port.name}_if", tex_table)

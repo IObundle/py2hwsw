@@ -15,14 +15,9 @@ import copy_srcs
 import config_gen
 import param_gen
 import io_gen
-import bus_gen
 import block_gen
-import comb_gen
-import fsm_gen
 import snippet_gen
-import doc_gen
 import verilog_gen
-import ipxact_gen
 import wire_gen
 
 from iob_base import (
@@ -37,16 +32,11 @@ from py2hwsw_version import PY2HWSW_VERSION
 import sw_tools
 import verilog_format
 import verilog_lint
-from manage_headers import generate_headers
 
 from iob_module import iob_module
-from iob_comb import iob_comb
 from iob_conf import iob_conf
-from iob_fsm import iob_fsm
-from iob_interface import iob_interface
 from iob_wire import iob_wire
 from iob_port import iob_port
-from iob_bus import iob_bus
 from iob_snippet import iob_snippet
 from iob_license import iob_license
 from iob_parameter import iob_parameter_group
@@ -82,8 +72,6 @@ class iob_core(iob_module):
         buses (list): List of module buses
         interfaces (list): List of module interfaces
         snippets (list): List of Verilog code snippets
-        comb (iob_comb): Combinational circuit
-        fsm (iob_fsm): Finite state machine
         subblocks (list): List of instances of other cores inside this core.
         superblocks (list): List of wrappers for this core. Will only be setup if this core is a top module, or a wrapper of the top module.
         sw_modules (list): List of software modules required by this core.
@@ -153,10 +141,7 @@ class iob_core(iob_module):
         self.wires: list[iob_wire] = []
         self.ports: list[iob_port] = []
         self.buses: list[iob_bus] = []
-        self.interfaces: list[iob_interface] = []
         self.snippets: list[iob_snippet] = []
-        self.comb: iob_comb | None = None
-        self.fsm: iob_fsm | None = None
         self.subblocks: list[iob_instance] = []
         self.superblocks: list[iob_core] = []
         self.sw_modules: list[iob_core] = []
@@ -297,18 +282,9 @@ class iob_core(iob_module):
         # Generate wires
         wire_gen.generate_wires_snippet(self)
 
-        # Generate buses
-        # bus_gen.generate_buses_snippet(self)
-
         # Generate instances
         if self.generate_hw:
             block_gen.generate_subblocks_snippet(self)
-
-        # Generate comb
-        comb_gen.generate_comb_snippet(self)
-
-        # Generate fsm
-        fsm_gen.generate_fsm_snippet(self)
 
         # Generate snippets
         snippet_gen.generate_snippets_snippet(self)
@@ -354,33 +330,11 @@ class iob_core(iob_module):
             # Run post setup callbacks
             for callback in __class__.global_post_setup_callbacks:
                 callback()
-        # Generate docs
-        doc_gen.generate_docs(self)
-        # Generate ipxact file
 
-        # FIXME: IPXACT disabled during wires/buses/global_wires/ports/interfaces rework
-        #ipxact_gen.generate_ipxact_xml(self, self.build_dir + "/ipxact")
-
-        # Remove 'iob_v_tb.v' from build dir if 'iob_v_tb.vh' does not exist
-        sim_src_dir = "hardware/simulation/src"
-        if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
-            os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
         # Lint and format sources
         self.lint_and_format()
         print(
             f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
-        )
-        # Add SPDX license headers to every file in build dir
-        custom_header = f"Py2HWSW Version {PY2HWSW_VERSION} has generated this code (https://github.com/IObundle/py2hwsw)."
-        generate_headers(
-            root=self.build_dir,
-            copyright_holder=self.license.author,
-            copyright_year=self.license.year,
-            license_name=self.license.name,
-            header_template="spdx",
-            custom_header_suffix=custom_header,
-            skip_existing_headers=True,
-            verbose=False,
         )
 
     def __create_build_dir(self):
@@ -552,10 +506,7 @@ class iob_core(iob_module):
                 - wires -> iob_module.wires = [iob_wire.create_from_dict(i) for i in wires]
                 - ports -> iob_module.ports = [iob_port.create_from_dict(i) for i in ports]
                 - buses -> iob_module.buses = [iob_bus.create_from_dict(i) for i in buses]
-                - interfaces -> iob_module.interfaces = [iob_interface.create_from_dict(i) for i in interfaces]
                 - snippets -> iob_module.snippets = [iob_snippet.create_from_dict(i) for i in snippets]
-                - comb -> iob_module.comb = iob_comb.create_from_dict(comb)
-                - fsm -> iob_module.fsm = iob_fsm.create_from_dict(fsm)
                 - subblocks -> iob_module.subblocks = [iob_instance.create_from_dict(i) for i in subblocks]
                 - superblocks -> iob_module.superblocks = [iob_core.create_from_dict(i) for i in superblocks]
                 - sw_modules -> iob_module.sw_modules = [iob_core.create_from_dict(i) for i in sw_modules]

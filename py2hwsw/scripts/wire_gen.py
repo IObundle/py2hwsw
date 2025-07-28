@@ -19,11 +19,8 @@ def generate_wires(core):
         wires_code = ""
         if isinstance(wire, iob_wire):
             if wire:
-                wires_code += "    " + wire.get_verilog_bus()
+                wires_code += "    " + wire.get_verilog_wire()
         if wires_code:
-            # Add description for the wire if it is not the default one
-            if wire.descr != "" and wire.descr != "Default description":
-                code += f"// {wire.descr}\n"
             code += wires_code
 
     return code

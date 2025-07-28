@@ -46,17 +46,14 @@ core_dictionary = {
     "wires": [
         {
             "name": "aab",
-            "descr": "and ab output",
             "width": "W",
         },
         {
             "name": "cad",
-            "descr": "and cd output",
             "width": "W",
         },
         {
             "name": "aob",
-            "descr": "or output",
             "width": "W",
         },
     ],

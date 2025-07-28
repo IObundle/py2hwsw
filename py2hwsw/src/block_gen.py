@@ -165,8 +165,8 @@ def get_instance_port_connections(core, instance):
         #     continue
 
         # If port has a description, add it to the portmap
-        if port.wire.descr and not port.doc_only:
-            instance_portmap += f"        // {port.wire.name} port: {port.wire.descr}\n"
+        if port.descr and not port.doc_only:
+            instance_portmap += f"        // {port.wire.name} port: {port.descr}\n"
 
         # Handle ports connected to constants
         if isinstance(e_connect, str):

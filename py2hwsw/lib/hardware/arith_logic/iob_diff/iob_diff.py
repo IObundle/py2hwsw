@@ -58,11 +58,11 @@ def setup(py_params_dict):
         ],
         "wires": [
             {
-                "name": "data_i_reg",
+                "name": "data_int_reg",
                 "descr": "Data input register wire",
                 "signals": [
                     {
-                        "name": "data_i_reg",
+                        "name": "data_int_reg",
                         "width": "DATA_W",
                         "descr": "Registered data input signal",
                     },
@@ -83,17 +83,15 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "data_i",
-                    "data_o": "data_o",
+                    "data_o": "data_int_reg",
                 },
             },
         ],
-        "snippets": [
-            {
-                "verilog_code": r"""
-                assign data_o = data_i - data_i_reg;
-                """
-            }
-        ],
+        "comb": {
+            "code": """
+                data_o = data_i - data_i_reg;
+            """,
+        },
     }
 
     return attributes_dict

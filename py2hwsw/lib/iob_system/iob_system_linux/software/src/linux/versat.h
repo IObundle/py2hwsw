@@ -1,0 +1,1 @@
+#define VERSAT_ADDRESS 0xf8000000

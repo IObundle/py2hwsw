@@ -90,7 +90,7 @@ def setup(py_params_dict):
         ],
         "comb": {
             "code": """
-                data_o = data_i - data_i_reg;
+                data_o = data_i - data_int_reg;
             """,
         },
     }

@@ -188,6 +188,31 @@ def list_modules_msg(header: str, modules: dict):
     return msg
 
 
+def indent_code(code, indent="    "):
+    # Indent each non-empty line by the chosen number of spaces (default: 4)
+    return "\n".join(
+        indent + line if line.strip() != "" else "" for line in code.split("\n")
+    )
+
+
+def code_with_error_on_exit(code):
+    """Wrap given code in a try block that exits with non-zero status on error.
+    By default, shell exits with status 0 (success) even when exception is raised.
+    Using this wrapper, shell exits with non-zero status on error.
+    """
+
+    wrapped_code = f"""
+try:
+{indent_code(code)}
+except:
+    import sys
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
+"""
+    return wrapped_code
+
+
 # Create an instance of the custom shell
 def main():
     sys.ps1 = ">>> "
@@ -211,14 +236,15 @@ def main():
     shell = Py2hwswShell(locals=local_vars)
 
     if len(sys.argv) > 1:
-        # Run interactive shell
+        # Run non-interactive shell
         # Example: py2hwsw_shell path/to/script.py
         script_file = sys.argv[1]
         with open(script_file) as f:
             code = f.read()
+        code = code_with_error_on_exit(code)
         shell.runcode(code)
     else:
-        # Run non-interactive shell
+        # Run interactive shell
         # Example: py2hwsw_shell < path/to/script.py
         shell.interact()
 

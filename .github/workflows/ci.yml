@@ -43,9 +43,9 @@ jobs:
       #     nix-shell --run "make sim-test"
       - name: run LIB test
         run: |
-          cd py2hwsw/lib;\
-          nix-shell --run "py2hwsw_shell < ./hardware/basic_tests/iob_and/iob_and.py" &&\
-          nix-shell --run "py2hwsw_shell < ./hardware/basic_tests/iob_aoi/iob_aoi.py" &&\
+          cd py2hwsw/lib;
+          nix-shell --run "py2hwsw_shell ./hardware/basic_tests/iob_and/iob_and.py"
+          nix-shell --run "py2hwsw_shell ./hardware/basic_tests/iob_aoi/iob_aoi.py"
           nix-shell --run "py2hwsw_shell ./hardware/registers/iob_reg/iob_reg.py"
 
   reuse:

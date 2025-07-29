@@ -91,9 +91,8 @@ def get_instance_port_connections(core, instance):
     for portmap in instance.portmap_connections:
 
         # connect portmap port_name name to matching core port
-        portmap.connect_port(core.ports)
+        portmap.connect_port(instance.core.ports)
 
-        portmap.validate_attributes()
         port = portmap.port
         if not port:
             fail_with_msg(

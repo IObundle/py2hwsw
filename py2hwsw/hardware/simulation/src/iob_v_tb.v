@@ -50,14 +50,14 @@ module iob_v_tb;
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
-      iob_valid_i  = 0;
-      iob_wdata_i  = 0;
-      iob_addr_i   = 0;
-      iob_wstrb_i  = 0;
+      iob_valid_i = 0;
+      iob_wdata_i = 0;
+      iob_addr_i  = 0;
+      iob_wstrb_i = 0;
 
-      clk          = 0;
-      cke          = 1;
-      arst         = 0;
+      clk         = 0;
+      cke         = 1;
+      arst        = 0;
       #10;
       arst = 1;
       #10;
@@ -114,7 +114,6 @@ module iob_v_tb;
          end else begin  // if (fscanf_ret == 5)
             $fclose(c2v_read_fp);
          end  // if (fscanf_ret != 5)
-         @(posedge clk);  //advance clock
       end  // while (1)
       $fclose(v2c_write_fp);
    end  // initial begin

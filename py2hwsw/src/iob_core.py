@@ -264,23 +264,6 @@ class iob_core(iob_module):
         # Generate configuration files
         config_gen.generate_confs(self)
 
-        # Generate parameters and local parameters
-        param_gen.generate_params_snippets(self)
-        param_gen.generate_localparams_snippets(self)
-
-        # Generate ios
-        io_gen.generate_ports_snippet(self)
-
-        # Generate wires
-        wire_gen.generate_wires_snippet(self)
-
-        # Generate instances
-        if self.generate_hw:
-            block_gen.generate_subblocks_snippet(self)
-
-        # Generate snippets
-        snippet_gen.generate_snippets_snippet(self)
-
         # Generate main Verilog module
         if self.generate_hw:
             verilog_gen.generate_verilog(self)

@@ -39,16 +39,6 @@ def generate_subblocks(core):
     return code
 
 
-def generate_subblocks_snippet(core):
-    """Write verilog snippet ('.vs' file) with subblocks of this core.
-    This snippet may be included manually in verilog modules if needed.
-    """
-    code = generate_subblocks(core)
-    out_dir = core.build_dir + "/hardware/src"
-    with open(f"{out_dir}/{core.name}_subblocks.vs", "w+") as f:
-        f.write(code)
-
-
 def get_instance_port_connections(core, instance):
     """Returns a multi-line string with all port's wires connections
     for the given Verilog instance.

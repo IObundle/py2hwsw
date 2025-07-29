@@ -27,13 +27,3 @@ def generate_wires(core):
             code += wires_code
 
     return code
-
-
-def generate_wires_snippet(core):
-    """Write verilog snippet ('.vs' file) with wires of this core.
-    This snippet may be included manually in verilog modules if needed.
-    """
-    code = generate_wires(core)
-    out_dir = core.build_dir + "/hardware/src"
-    with open(f"{out_dir}/{core.name}_wires.vs", "w+") as f:
-        f.write(code)

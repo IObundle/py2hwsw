@@ -78,38 +78,6 @@ def generate_inst_params(instance):
     return "".join(lines)
 
 
-def generate_params_snippets(core):
-    """Write verilog snippets ('.vs' files) with verilog parameters of this core.
-    These snippets may be included manually in verilog modules if needed.
-    """
-    # Generate verilog code
-    code = generate_params(core)
-    # Write verilog snippet
-    out_dir = core.build_dir + "/hardware/src"
-    os.makedirs(out_dir, exist_ok=True)
-    with open(f"{out_dir}/{core.name}_params.vs", "w") as f:
-        f.write(code)
-
-    # FIXME: Make this work with new iob_instance
-    # code = generate_inst_params(core)
-    # out_dir = core.build_dir + "/hardware/src"
-    # with open(f"{out_dir}/{core.instance_name}_{id(core)}_inst_params.vs", "w") as f:
-    #     f.write(code)
-
-
-def generate_localparams_snippets(core):
-    """Write verilog snippets ('.vs' files) with verilog local parameters of this core.
-    These snippets may be included manually in verilog modules if needed.
-    """
-    # Generate verilog code
-    code = generate_localparams(core)
-    # Write verilog snippet
-    out_dir = core.build_dir + "/hardware/src"
-    os.makedirs(out_dir, exist_ok=True)
-    with open(f"{out_dir}/{core.name}_localparams.vs", "w") as f:
-        f.write(code)
-
-
 def validate_params(instance):
     """Check if all parameters are within the allowed range"""
     core_parameters = get_core_params(instance.core.confs)

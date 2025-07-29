@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 #
-#    bus_gen.py: build Verilog module buses
+#    wire_gen.py: build Verilog module wires
 #
 from iob_wire import iob_wire
 

@@ -42,7 +42,7 @@ setup(
     author_email="info@iobundle.com",
     license="MIT",
     packages=["py2hwsw"],
-    entry_points={"console_scripts": ["py2hwsw = py2hwsw.main:main"]},
+    entry_points={"console_scripts": ["py2hwsw_shell = py2hwsw.scripts.py2hwsw_shell:main"]},
     package_data={"py2hwsw": ["**/*", ".*"]},
     include_package_data=True,
     zip_safe=False,

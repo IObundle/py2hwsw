@@ -67,10 +67,9 @@ def get_instance_port_connections(core, instance):
                 f"Port '{portmap.port}' not found in instance '{instance.name}'!"
             )
 
-        # search for matching connection in core wires, buses and ports
+        # search for matching connection in core wires, and ports
         e_connect = (
             find_obj_in_list(core.wires, portmap.e_connect)
-            or find_obj_in_list(core.buses, portmap.e_connect)
             or find_obj_in_list(
                 core.ports,
                 portmap.e_connect,

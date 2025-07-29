@@ -8,7 +8,7 @@ import subprocess
 
 
 def format_files(
-    files_list, format_rules_file="./submodules/LIB/scripts/verible-format.rules"
+    files_list, format_rules_file="./verible-format.rules"
 ):
     """Run Verible formatter on given list of files.
     :param files_list: list of files to format.

@@ -64,7 +64,6 @@ class iob_core(iob_module):
                     The core's generated verilog module, sources, and files will have this name.
                     If the core has files in its setup directory, containing strings matching the 'original_name', they will all be renamed to this 'name' when copied to the build directory.
         description (str): Description of the module.
-        reset_polarity (str): Global reset polarity of the module. Can be 'positive' or 'negative'. (Will override all subblocks' reset polarities).
         confs (list): List of module macros and Verilog (false-)parameters
         wires (list): List of module wires
         ports (list): List of module ports
@@ -73,7 +72,6 @@ class iob_core(iob_module):
         snippets (list): List of Verilog code snippets
         subblocks (list): List of instances of other cores inside this core.
         superblocks (list): List of wrappers for this core. Will only be setup if this core is a top module, or a wrapper of the top module.
-        sw_modules (list): List of software modules required by this core.
 
         # Core attributes
         version (str): Core version. By default is the same as Py2HWSW version.
@@ -135,15 +133,12 @@ class iob_core(iob_module):
         self.original_name: str = None
         self.name: str = ""
         self.description: str = "Default description"
-        self.reset_polarity: str = "positive"
         self.confs: list[iob_conf] = []
         self.wires: list[iob_wire] = []
         self.ports: list[iob_port] = []
-        self.buses: list[iob_bus] = []
         self.snippets: list[iob_snippet] = []
         self.subblocks: list[iob_instance] = []
         self.superblocks: list[iob_core] = []
-        self.sw_modules: list[iob_core] = []
 
         # Core attributes
         self.version: str = PY2HWSW_VERSION
@@ -190,11 +185,9 @@ class iob_core(iob_module):
             core_dict_with_objects["confs"] = [iob_conf.create_from_dict(i) for i in core_dictionary.get("confs", [])]
             core_dict_with_objects["ports"] = [iob_port.create_from_dict(i) for i in core_dictionary.get("ports", [])]
             core_dict_with_objects["wires"] = [iob_wire.create_from_dict(i) for i in core_dictionary.get("wires", [])]
-            core_dict_with_objects["buses"] = [iob_bus.create_from_dict(i) for i in core_dictionary.get("buses", [])]
             core_dict_with_objects["snippets"] = [iob_snippet.create_from_dict(i) for i in core_dictionary.get("snippets", [])]
             core_dict_with_objects["subblocks"] = [iob_instance.create_from_dict(i) for i in core_dictionary.get("subblocks", [])]
             core_dict_with_objects["superblocks"] = [__class__.create_from_dict(i) for i in core_dictionary.get("superblocks", [])]
-            core_dict_with_objects["sw_modules"] = [__class__.create_from_dict(i) for i in core_dictionary.get("sw_modules", [])]
             core_dict_with_objects["iob_parameters"] = [iob_parameter_group.create_from_dict(i) for i in core_dictionary.get("iob_parameters", [])]
             update_obj_from_dict(self, core_dict_with_objects)  # valid_attributes_list=...)
 
@@ -308,8 +301,6 @@ class iob_core(iob_module):
 
     def post_setup(self):
         """Scripts to run at the end of the top module's setup"""
-        # Replace Verilog snippet includes
-        self.__replace_snippet_includes()
         # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
         self.__remove_duplicate_sources()
         if self.is_tester:
@@ -369,11 +360,6 @@ class iob_core(iob_module):
             for src in common_srcs:
                 os.remove(os.path.join(self.build_dir, subfolder, src))
                 # print(f'{iob_colors.INFO}Removed duplicate source: {os.path.join(subfolder, src)}{iob_colors.ENDC}')
-
-    def __replace_snippet_includes(self):
-        verilog_gen.replace_includes(
-            self.setup_dir, self.build_dir, self.ignore_snippets
-        )
 
     def lint_and_format(self):
         """Run Linters and Formatters in setup and build directories."""
@@ -500,15 +486,12 @@ class iob_core(iob_module):
                 - original_name -> iob_module.original_name
                 - name -> iob_module.name
                 - description -> iob_module.description
-                - reset_polarity -> iob_module.reset_polarity
                 - confs -> iob_module.confs = [iob_conf.create_from_dict(i) for i in confs]
                 - wires -> iob_module.wires = [iob_wire.create_from_dict(i) for i in wires]
                 - ports -> iob_module.ports = [iob_port.create_from_dict(i) for i in ports]
-                - buses -> iob_module.buses = [iob_bus.create_from_dict(i) for i in buses]
                 - snippets -> iob_module.snippets = [iob_snippet.create_from_dict(i) for i in snippets]
                 - subblocks -> iob_module.subblocks = [iob_instance.create_from_dict(i) for i in subblocks]
                 - superblocks -> iob_module.superblocks = [iob_core.create_from_dict(i) for i in superblocks]
-                - sw_modules -> iob_module.sw_modules = [iob_core.create_from_dict(i) for i in sw_modules]
 
                 # Core keys
                 - version -> iob_core.version

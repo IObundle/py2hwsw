@@ -35,13 +35,10 @@ def lint_files(files_list):
 
         dir_file_list[file_dir].append(file)
 
-    # print(dir_file_list, file=sys.stderr) #DEBUG
-
     files_to_lint = {}
     directories_to_lint = {}
     parent_dirs = []
     for child_dir in dir_file_list.keys():
-        # print(f"debug: {child_dir}", file=sys.stderr) #DEBUG
         files_to_lint[child_dir] = []
         directories_to_lint[child_dir] = []
 
@@ -60,11 +57,9 @@ def lint_files(files_list):
             ):
                 files_to_lint[child_dir] += file_list
                 directories_to_lint[child_dir].append(directory)
-                # print(f"   {directory}", file=sys.stderr) #DEBUG
 
                 # Add this directory to the list of parent directories if it is not the child
                 if directory not in parent_dirs and directory != child_dir:
-                    # print(f'PARENT: {directory}', file=sys.stderr)
                     parent_dirs.append(directory)
 
     # Remove parent directories from dictionary
@@ -84,9 +79,3 @@ def lint_files(files_list):
             if result.returncode != 0:
                 exit(result.returncode)
             print(f"{iob_colors.INFO}Lint successful!{iob_colors.ENDC}")
-
-    # DEBUG: Print child directories and files to lint
-    #    print("Base dir: "+directory, file=sys.stderr)
-    #    print("Parent dirs: "+directories_to_lint[directory], file=sys.stderr)
-    #    print("Files from dirs:"+files, file=sys.stderr)
-    #    print("\n", file=sys.stderr)

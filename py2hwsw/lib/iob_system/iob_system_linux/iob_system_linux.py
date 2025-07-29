@@ -4,24 +4,133 @@ import sys
 import shutil
 import math
 
-from iob_soc_opencryptolinux_create_periphs_tmp import (
-    create_periphs_tmp,
-    check_linux_build_macros,
-)
+# from iob_soc_opencryptolinux_create_periphs_tmp import (
+#     create_periphs_tmp,
+#     check_linux_build_macros,
+# )
+# 
+# from config_gen import append_str_config_build_mk
 
-from config_gen import append_str_config_build_mk
+# from iob_soc import iob_soc
+# from iob_vexriscv import iob_vexriscv
+# from iob_uart16550 import iob_uart16550
+# from iob_uart import iob_uart
+# from iob_spi_master import iob_spi_master
+# from iob_eth import iob_eth
+# from N25Qxxx import N25Qxxx
+# from axil2iob import axil2iob
+# from iob_reset_sync import iob_reset_sync
+# from iob_ram_sp import iob_ram_sp
+# from iob_versat import CreateVersatClass
 
-from iob_soc import iob_soc
-from iob_vexriscv import iob_vexriscv
-from iob_uart16550 import iob_uart16550
-from iob_uart import iob_uart
-from iob_spi_master import iob_spi_master
-from iob_eth import iob_eth
-from N25Qxxx import N25Qxxx
-from axil2iob import axil2iob
-from iob_reset_sync import iob_reset_sync
-from iob_ram_sp import iob_ram_sp
-from iob_versat import CreateVersatClass
+def setup(py_params_dict):
+    # Py2hwsw dictionary describing current core
+    core_dict = {
+        "version": "0.8",
+        "parent": {
+            # IOb-System-Linux is a child core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
+            # IOb-System-Linux will inherit all attributes/files from the iob_system core.
+            "core_name": "iob_system",
+            # Every parameter in the lines below will be passed to the iob_system parent core.
+            # Full list of parameters availabe here: https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/iob_system/iob_system.py
+            "cpu": "iob_vexriscv",
+            # Don't include iob_system's snippets. We will use our own.
+            "include_snippets": False,
+            # NOTE: Place other iob_system python parameters here
+            "system_attributes": {
+                # Every attribute in this dictionary will override/append to the ones of the iob_system parent core.
+                "board_list": [
+                    "iob_aes_ku040_db_g",
+                    "iob_cyclonev_gt_dk",
+                    "iob_zybo_z7",
+                ],
+                "ports": [
+                    {
+                        # Add new rs232 port for uart
+                        "name": "rs232_m",
+                        "descr": "iob-system uart interface",
+                        "signals": {
+                            "type": "rs232",
+                        },
+                    },
+                    # NOTE: Add other ports here.
+                ],
+                "wires": [
+                    # UART
+                    {
+                        "name": "uart_interrupt",
+                        "descr": "Uart interrupt",
+                        "signals": [
+                            {"name": "uart_interrupt", "width": 1},
+                        ],
+                    },
+                    # SPI master
+                    {
+                        "name": "spi_cache",
+                        "descr": "SPI cache bus",
+                        "signals": {
+                            "type": "iob",
+                            "prefix": "spi_",
+                        },
+                    },
+                    {
+                        "name": "spi_flash",
+                        "descr": "SPI flash bus",
+                        "signals": [
+                            {"name": "SS", "width": 1},
+                            {"name": "SCLK", "width": 1},
+                            {"name": "MISO", "width": 1},
+                            {"name": "MOSI", "width": 1},
+                            {"name": "WP_N", "width": 1},
+                            {"name": "HOLD_N", "width": 1},
+                        ],
+                    },
+                ],
+                "subblocks": [
+                    {
+                        # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
+                        "core_name": "iob_uart16550",
+                        "instance_name": "UART0", # Use same name as one inherited from iob_system to replace it
+                        "instance_description": "UART peripheral",
+                        "is_peripheral": True,
+                        "parameters": {},
+                        "connect": {
+                            "clk_en_rst_s": "clk_en_rst_s",
+                            # Cbus connected automatically
+                            "rs232_m": "rs232_m",
+                            "interrupt_o": "uart_interrupt",
+                        },
+                    },
+                    {
+                        # Instantiate a SPI master core from: https://github.com/IObundle/iob-spi
+                        "core_name": "iob_spi_master",
+                        "instance_name": "SPI",
+                        "instance_description": "SPI master peripheral",
+                        "is_peripheral": True,
+                        "parameters": {},
+                        "connect": {
+                            "clk_en_rst_s": "clk_en_rst_s",
+                            # Cbus connected automatically
+                            "cache_iob_s": "spi_cache",
+                            "flash_io": "spi_flash",
+                        },
+                    },
+                    # NOTE: Add other components/peripherals here.
+                ],
+                "snippets": [
+                    {
+                        "verilog_code": """
+   assign interrupts = {{30{1'b0}}, uart_interrupt, 1'b0};
+"""
+                    }
+                ],
+            },
+            **py_params_dict,
+        },
+    }
+
+    return core_dict
+
 
 DMA_DEMO = "OCL_DMA_DEMO" in sys.argv
 
@@ -34,20 +143,20 @@ if DMA_DEMO:
 
 
 class iob_soc_opencryptolinux(iob_soc):
-    name = "iob_soc_opencryptolinux"
-    version = "V0.70"
-    flows = "pc-emul emb sim doc fpga"
-    setup_dir = os.path.dirname(__file__)
-
-    @classmethod
-    def _create_instances(cls):
-        super()._create_instances()
-        # Verilog modules instances if we have them in the setup list (they may not be in the list if a subclass decided to remove them).
-        if iob_vexriscv in cls.submodule_list:
-            cls.cpu = iob_vexriscv("cpu_0")
-        # Instantiate OpenCryptoLinux peripherals
-        if iob_uart16550 in cls.submodule_list:
-            cls.peripherals.append(iob_uart16550("UART0", "Default UART interface"))
+#     name = "iob_soc_opencryptolinux"
+#     version = "V0.70"
+#     flows = "pc-emul emb sim doc fpga"
+#     setup_dir = os.path.dirname(__file__)
+# 
+#     @classmethod
+#     def _create_instances(cls):
+#         super()._create_instances()
+#         # Verilog modules instances if we have them in the setup list (they may not be in the list if a subclass decided to remove them).
+#         if iob_vexriscv in cls.submodule_list:
+#             cls.cpu = iob_vexriscv("cpu_0")
+#         # Instantiate OpenCryptoLinux peripherals
+#         if iob_uart16550 in cls.submodule_list:
+#             cls.peripherals.append(iob_uart16550("UART0", "Default UART interface"))
         if iob_spi_master in cls.submodule_list:
             cls.peripherals.append(iob_spi_master("SPI0", "SPI master peripheral"))
         # Instantiate versat
@@ -708,126 +817,6 @@ endif
                         "port": "",
                         "bits": [],
                     },
-                ),
-            ]
-        if iob_spi_master in cls.submodule_list:
-            cls.peripheral_portmap += [
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "iob_s_cache",
-                        "port": "avalid_cache",
-                        "bits": [],
-                    },
-                    {"corename": "internal", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "iob_s_cache",
-                        "port": "address_cache",
-                        "bits": [],
-                    },
-                    {"corename": "internal", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "iob_s_cache",
-                        "port": "wdata_cache",
-                        "bits": [],
-                    },
-                    {"corename": "internal", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "iob_s_cache",
-                        "port": "wstrb_cache",
-                        "bits": [],
-                    },
-                    {"corename": "internal", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "iob_s_cache",
-                        "port": "rdata_cache",
-                        "bits": [],
-                    },
-                    {"corename": "internal", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "iob_s_cache",
-                        "port": "rvalid_cache",
-                        "bits": [],
-                    },
-                    {"corename": "internal", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "iob_s_cache",
-                        "port": "ready_cache",
-                        "bits": [],
-                    },
-                    {"corename": "internal", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "flash_if",
-                        "port": "SS",
-                        "bits": [],
-                    },
-                    {"corename": "external", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "flash_if",
-                        "port": "SCLK",
-                        "bits": [],
-                    },
-                    {"corename": "external", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "flash_if",
-                        "port": "MISO",
-                        "bits": [],
-                    },
-                    {"corename": "external", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "flash_if",
-                        "port": "MOSI",
-                        "bits": [],
-                    },
-                    {"corename": "external", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "flash_if",
-                        "port": "WP_N",
-                        "bits": [],
-                    },
-                    {"corename": "external", "if_name": "spi", "port": "", "bits": []},
-                ),
-                (
-                    {
-                        "corename": "SPI0",
-                        "if_name": "flash_if",
-                        "port": "HOLD_N",
-                        "bits": [],
-                    },
-                    {"corename": "external", "if_name": "spi", "port": "", "bits": []},
                 ),
             ]
 

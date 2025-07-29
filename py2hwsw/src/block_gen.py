@@ -15,36 +15,6 @@ get_real_wire = iob_wire.get_real_wire
 port_obj_list_process = iob_port.port_obj_list_process
 
 
-# Generate subblocks.tex file with TeX table of subblocks (Verilog modules instances)
-def generate_subblocks_table_tex(subblocks, out_dir):
-    subblocks_file = open(f"{out_dir}/subblocks.tex", "w")
-
-    subblocks_file.write(
-        "The Verilog modules in the top-level entity of the core are \
-        described in the following tables. The table elements represent \
-        the subblocks in the Block Diagram.\n"
-    )
-
-    subblocks_file.write(
-        """
-\\begin{xltabular}{\\textwidth}{|l|l|X|}
-
-  \\hline
-  \\rowcolor{iob-green}
-  {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
-
-  \\input subblocks_tab
-
-  \\caption{Table of subblocks in the core.}
-\\end{xltabular}
-\\label{subblocks_tab:is}
-"""
-    )
-
-    subblocks_file.write("\\clearpage")
-    subblocks_file.close()
-
-
 def generate_subblocks(core):
     """Generate verilog code with verilog instances of this module.
     returns: Generated verilog code
@@ -120,26 +90,6 @@ def get_instance_port_connections(core, instance):
         if port.doc_only:
             continue
 
-        # If one of the ports is not a standard inferface, check if the number of wires is the same
-        # TODO: interface/bus support
-        #         if not port.interface or not e_connect.interface:
-        #             newlinechar = "\n"
-        #             assert len(port.wires) == len(
-        #                 e_connect.wires
-        #             ), f"""{iob_colors.FAIL}Port '{port.name}' of instance '{instance.name}' has different number of wires compared to external connection '{port.e_connect.name}'!
-        # Port '{port.name}' has the following wires:
-        # {newlinechar.join("- " + get_real_wire(port).name for port in port.wires)}
-        #
-        # External connection '{get_real_wire(e_connect).name}' has the following wires:
-        # {newlinechar.join("- " + get_real_wire(port).name for port in e_connect.wires)}
-        # {iob_colors.ENDC}
-        # """
-
-        # Is this still possible? I think iob_port.wires may only contain iob_wire objects
-        # # If port has only non-iob wires, skip it
-        # if not any(isinstance(port_wire, iob_wire) for port_wire in port.wires):
-        #     continue
-
         # If port has a description, add it to the portmap
         if port.wire.descr and not port.doc_only:
             instance_portmap += f"        // {port.wire.name} port: {port.wire.descr}\n"
@@ -152,32 +102,6 @@ def get_instance_port_connections(core, instance):
                 instance_portmap += f"        .{port.wire.name}({e_connect}),\n"
             continue
 
-        # Connect individual wires
-        # TODO: add support for bus/interfaces
-        # for idx, port_wire in enumerate(port.wires):
-        # Is this still possible? Port should only contain iob_wires objects
-        # # Skip wires that are not iob_wires
-        # if not isinstance(port_wire, iob_wire):
-        #     continue
-
-        # # If both ports are standard interfaces, connect by name
-        # if port.interface and e_connect.interface:
-        #     # Remove prefix and suffix from port name
-        #     port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
-        #     for e_wire in e_connect.wires:
-        #         real_e_wire = get_real_wire(e_wire)
-        #         e_wire_name = real_e_wire.name
-        #         # Remove prefix and suffix from external wire name
-        #         if e_wire_name[-2:] in ["_o", "_i"]:
-        #             e_wire_name = e_wire_name[:-2]
-        #         e_wire_name = e_wire_name.replace(e_connect.interface.prefix, "", 1)
-        #         if e_wire_name == port_name:
-        #             e_wire_name = real_e_wire.name
-        #             port_name = port_wire.name
-        #             break
-        #     port_name = port_wire.name
-        # else:
-        # If both ports are not standard interfaces, connect by index
         real_e_wire = get_real_wire(e_connect)
         e_wire_name = real_e_wire.name
 

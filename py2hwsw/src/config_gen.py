@@ -5,7 +5,6 @@
 # SPDX-License-Identifier: MIT
 
 import os
-import re
 
 
 def conf_vh(macros, top_module, out_dir):
@@ -69,41 +68,6 @@ def conf_vh(macros, top_module, out_dir):
             file2create.write(f"`define {core_prefix}{m_name} 1\n")
 
 
-def conf_h(macros, top_module, out_dir):
-    """Given a list with macros, generate a `*_conf.h` file with the software macro definitions.
-    :param macros: list with macros (iob_conf class).
-    :param top_module: top module name
-    :param out_dir: output directory
-    """
-    if len(macros) == 0:
-        return
-    os.makedirs(out_dir, exist_ok=True)
-    file2create = open(f"{out_dir}/{top_module}_conf.h", "w")
-    core_prefix = f"{top_module}_".upper()
-    fname = f"{core_prefix}CONF"
-    file2create.write(f"#ifndef H_{fname}_H\n")
-    file2create.write(f"#define H_{fname}_H\n\n")
-    for macro in macros:
-        # If macro has 'doc_only' attribute set to True, skip it
-        if macro.doc_only:
-            continue
-        # Only insert macro if its is not a bool define, and if so only insert it if it is true
-        if type(macro.value) is not bool:
-            m_name = macro.name.upper()
-            # Replace any Verilog specific syntax by equivalent C syntax
-            m_default_val = re.sub("\\d+'h", "0x", str(macro.value))
-            # Remove Verilog macros ('`')
-            file2create.write(
-                f"#define {core_prefix}{m_name} {str(m_default_val).replace('`', '')}\n"
-            )
-        elif macro.value:
-            m_name = macro.name.upper()
-            file2create.write(f"#define {core_prefix}{m_name} 1\n")
-    file2create.write(f"\n#endif // H_{fname}_H\n")
-
-    file2create.close()
-
-
 def config_build_mk(python_module, top_module):
     file2create = open(f"{python_module.build_dir}/config_build.mk", "w")
     file2create.write(f"NAME={python_module.name}\n")
@@ -127,13 +91,6 @@ endif
     file2create.close()
 
 
-# Append a string to the config_build.mk
-def append_str_config_build_mk(str_2_append, build_dir):
-    file = open(f"{build_dir}/config_build.mk", "a")
-    file.write(str_2_append)
-    file.close()
-
-
 def generate_confs(core):
     """Generate Verilog and software macros based on the core's 'confs' list.
     :param core: core object
@@ -144,4 +101,3 @@ def generate_confs(core):
         core.name,
         os.path.join(core.build_dir, core.dest_dir),
     )
-    conf_h(confs, core.name, core.build_dir + "/software/src")

@@ -4,11 +4,9 @@
 
 # This module copies sources to the build directory
 import os
-import sys
 import subprocess
 from pathlib import Path
 import shutil
-import importlib.util
 
 # IObundle scripts imported:
 import iob_colors
@@ -24,17 +22,8 @@ def flows_setup(python_module):
     # Setup simulation
     sim_setup(python_module)
 
-    # Setup harware
-    hw_setup(python_module)
-
     # Setup py2 scripts
     python_setup(python_module.build_dir)
-
-
-def hw_setup(python_module):
-    # Create module's version TeX file
-    if python_module.is_top_module:
-        version_file(python_module)
 
 
 # Setup simulation related files/modules
@@ -91,42 +80,6 @@ VLTINCLUDES+=-I../../{python_module.relative_path_to_UUT}/hardware/src
         )
 
 
-# Check if any *_setup.py modules exist (like sim_setup.py, fpga_setup.py, ...).
-# If so, get a function to execute them and run them
-# This will allow these modules to be executed during setup
-#    python_module: python module of *_setup.py of the core/system, should contain setup_dir
-#    **kwargs: set of objects that will be accessible from inside the modules when they are executed
-def run_setup_functions(python_module, module_type, **kwargs):
-    # Check if any *_setup.py modules exist. If so, get a function to execute them and add them to the 'modules' list
-    module_path = {
-        "sim_setup": "hardware/simulation/sim_setup.py",
-    }[module_type]
-    full_module_path = os.path.join(python_module.setup_dir, module_path)
-    if os.path.isfile(full_module_path):
-        # Get and run function of this file
-        get_module_function(full_module_path, **kwargs)()
-
-
-# Get an executable function to run a given python module
-#    module_path: python module path
-#    **kwargs: set of objects that will be accessible from inside the module when it is executed
-# Example: get_module_function("sim_setup.py",setup_module=python_module)
-def get_module_function(module_path, **kwargs):
-    # Create function to execute module if it exists
-    def module_function():
-        if os.path.isfile(module_path):
-            module_name = os.path.basename(module_path).split(".")[0]
-            spec = importlib.util.spec_from_file_location(module_name, module_path)
-            module = importlib.util.module_from_spec(spec)
-            sys.modules[module_name] = module
-            # Define module objects given via kwargs
-            for key, value in kwargs.items():
-                vars(module)[key] = value
-            spec.loader.exec_module(module)
-
-    return module_function
-
-
 def python_setup(build_dir):
     dest_dir = f"{build_dir}/scripts"
     if not os.path.exists(dest_dir):
@@ -171,69 +124,6 @@ def write_git_revision_short_hash(dst_dir):
         file.write(text)
 
 
-# Include headers and srcs from given python module (module_name)
-# headers: List of headers that will be appedend by the list of headers in the .py module.
-# srcs: List of srcs that will be appedend by the list of srcs in the .py module.
-# module_name: name of the python module to include. Can also be the name of a src module (with the same extension as passed in the module_extension parameter).
-# lib_dir: root directory of the LIB
-# add_sim_srcs: If True, then the list of simulation sources will be appended to the srcs list
-# add_fpga_srcs: If True, then the list of FPGA sources will be appended to the srcs list
-# module_parameters: optional argument. Allows passing an optional object with parameters to a hardware module.
-# module_extension: Select module file extension (.v for hardware, .c for software)
-def lib_module_setup(
-    headers,
-    srcs,
-    module_name,
-    lib_dir=get_lib_dir(),
-    add_sim_srcs=False,
-    add_fpga_srcs=False,
-    module_parameters=None,
-    module_extension=".v",
-):
-    module_path = None
-
-    # Search for module_name.py
-    for mod_path in Path(lib_dir).rglob(f"{module_name}.py"):
-        module_path = mod_path
-        break
-    # If module_name.py is not found, search for module_name.module_extension
-    if not module_path:
-        for mod_path in Path(lib_dir).rglob(f"{module_name}{module_extension}"):
-            module_path = mod_path
-            break
-    # Exit if module is not found
-    if not module_path:
-        sys.exit(
-            f"{iob_colors.FAIL} {module_name} is not a LIB module.{iob_colors.ENDC}"
-        )
-
-    extension = os.path.splitext(module_path)[1]
-    # If module_name.py is found, import the headers and srcs lists from it
-    if extension == ".py":
-        lib_module_name = os.path.basename(module_path).split(".")[0]
-        spec = importlib.util.spec_from_file_location(lib_module_name, module_path)
-        lib_module = importlib.util.module_from_spec(spec)
-        sys.modules[lib_module_name] = lib_module
-        if module_parameters:
-            lib_module.module_parameters = module_parameters
-        spec.loader.exec_module(lib_module)
-        headers.extend(lib_module.headers)
-        srcs.extend(lib_module.modules)
-        if add_sim_srcs and (
-            hasattr(lib_module, "sim_headers") and hasattr(lib_module, "sim_modules")
-        ):
-            headers.extend(lib_module.sim_headers)
-            srcs.extend(lib_module.sim_modules)
-        if add_fpga_srcs and (
-            hasattr(lib_module, "fpga_headers") and hasattr(lib_module, "fpga_modules")
-        ):
-            headers.extend(lib_module.fpga_headers)
-            srcs.extend(lib_module.fpga_modules)
-    # If module_name.module_extension is found, add it to the srcs list
-    elif extension == module_extension:
-        srcs.append(f"{module_name}{module_extension}")
-
-
 def copy_files(src_dir, dest_dir, sources=[], pattern="*", copy_all=False):
     files_copied = []
     print(src_dir)
@@ -266,28 +156,6 @@ def copy_files(src_dir, dest_dir, sources=[], pattern="*", copy_all=False):
     return files_copied
 
 
-# Create TeX files with the version of the core
-def version_file(
-    python_module,
-    create_version_header=True,
-):
-    core_name = python_module.name
-    core_version = python_module.version
-    core_previous_version = python_module.previous_version
-    build_dir = python_module.build_dir
-
-    tex_dir = f"{build_dir}/document/tsrc"
-    verilog_dir = f"{build_dir}/hardware/src"
-
-    os.makedirs(tex_dir, exist_ok=True)
-    tex_file = f"{tex_dir}/{core_name}_version.tex"
-    with open(tex_file, "w") as tex_f:
-        tex_f.write(core_version)
-    tex_file = f"{tex_dir}/{core_name}_previous_version.tex"
-    with open(tex_file, "w") as tex_f:
-        tex_f.write(core_previous_version)
-
-
 def copy_with_rename(old_core_name, new_core_name):
     """Creates a function that:
     - Renames any '<old_core_name>' string inside the src file and in its filename,
@@ -305,7 +173,6 @@ def copy_with_rename(old_core_name, new_core_name):
                 )
             ),
         )
-        # print(f"### DEBUG: {src} {dst}", file=sys.stderr)
         try:
             file_perms = os.stat(src).st_mode
             with open(src, "r") as file:

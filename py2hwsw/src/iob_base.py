@@ -7,7 +7,7 @@ import os
 import shlex
 import argparse
 from dataclasses import dataclass
-import importlib
+import importlib.util
 import traceback
 from functools import wraps
 import inspect

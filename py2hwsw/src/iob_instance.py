@@ -4,7 +4,6 @@
 
 from dataclasses import dataclass
 import os
-import copy
 import json
 
 from iob_base import (
@@ -39,100 +38,12 @@ class iob_instance(iob_base):
         instantiate (bool): Select if should intantiate the module inside another Verilog module.
     """
 
-    # TODO: Make a new iob_instance class, independent from the iob_core class. Subblocks will instantiate iob_instance objects. Each iob_instance will store a reference to an iob_core.
     core: iob_core = None
     name: str = None
     description: str = "Default instance description"
     portmap_connections: list[str] = empty_list()
     parameters: dict[str, int | str] = empty_dict()
     instantiate: bool = True
-
-    def validate_attributes(self):
-        """Validate instance attributes"""
-        if not self.name:
-            fail_with_msg("Instance must have a name!")
-        if not self.core:
-            fail_with_msg(f"Instance '{self.name}' has no core reference!")
-        pass
-
-    # def __init__(
-    #     self,
-    #     *args,
-    #     instance_name: str = None,
-    #     instance_description: str = None,
-    #     connect: Dict = {},
-    #     parameters: Dict = {},
-    #     instantiate: bool = True,
-    #     **kwargs,
-    # ):
-    #     """Build a (Verilog) instance
-    #     param parameters: Verilog parameter values for this instance
-    #                       Key: Verilog parameter name, Value: Verilog parameter value
-    #     """
-    #     self.set_default_attribute(
-    #         "instance_name",
-    #         instance_name or self.__class__.__name__ + "_inst",
-    #         str,
-    #         descr="Name of the instance",
-    #         copy_by_reference=False,
-    #     )
-    #     self.set_default_attribute(
-    #         "instance_description",
-    #         instance_description or "Default description",
-    #         str,
-    #         descr="Description of the instance",
-    #         copy_by_reference=False,
-    #     )
-    #     # Instance portmap connections
-    #     self.set_default_attribute(
-    #         "portmap_connections", [], list, descr="Instance portmap connections",
-    #         copy_by_reference=False,
-    #     )
-    #     # Verilog parameter values
-    #     self.set_default_attribute(
-    #         "parameters", parameters, Dict, descr="Verilog parameter values",
-    #         copy_by_reference=False,
-    #     )
-    #     # Select if should intantiate inside another Verilog module.
-    #     # May be False if this is a software only module.
-    #     self.set_default_attribute(
-    #         "instantiate",
-    #         instantiate,
-    #         bool,
-    #         descr="Select if should intantiate the module inside another Verilog module.",
-    #         copy_by_reference=False,
-    #     )
-
-    def __deepcopy__(self, memo):
-        """Create a deep copy of this instance:
-        - iob_instance attributes are copied by value
-        - super() attributes are copied by reference
-        """
-        # Create a new instance without calling __init__ to avoid side effects
-        cls = self.__class__
-        new_obj = cls.__new__(cls)
-
-        # Add to memo to handle circular references
-        memo[id(self)] = new_obj
-
-        # Copy class iob_instance attributes by value (deep copy)
-        instance_attributes = {
-            "name",
-            "description",
-            "portmap_connections",
-            "parameters",
-            "instantiate",
-        }
-
-        for attr_name, attr_value in self.__dict__.items():
-            if attr_name in instance_attributes:
-                # Deep copy iob_instance attributes
-                setattr(new_obj, attr_name, copy.deepcopy(attr_value, memo))
-            else:
-                # Copy inherited attributes by reference (shallow copy)
-                setattr(new_obj, attr_name, attr_value)
-
-        return new_obj
 
     def connect_instance_ports(self, connect, issuer):
         """
@@ -232,12 +143,6 @@ class iob_instance(iob_base):
         # Create instance of block
         instance_obj = iob_instance(**block_dict, core=block_obj)
 
-        # # Auto-set block attributes
-        # if not block_obj.original_name:
-        #     block_obj.original_name = block_name
-        # if not block_obj.setup_dir:
-        #     block_obj.setup_dir = block_dir
-
         return instance_obj
 
     #
@@ -272,19 +177,6 @@ class iob_instance(iob_base):
         Returns:
             iob_instance: iob_instance object
         """
-        # If 'instance' key is given, find corresponding instance and instantiate it. Ignore other non-instance attributes.
-        # if instance_dict.get("instance", None):
-        #     return instantiate_block(
-        #         instance_dict["instance"],
-        #         instance_dict.get("iob_parameters", {}),
-        #         instance_dict,
-        #     )
-        # If 'core' key is given, find corresponding core and instantiate it. Ignore other non-instance attributes.
-
-        # instantiate_block(instance_dict["core"], instance_dict.get("iob_parameters", {}), instance_dict)
-
-        # instance_dict_with_objects["portmap_connections"] = iob_portmap.create_from_dict(instance_dictionary.get("portmap_connections", {}))
-        # return iob_instance(**instance_dict)
 
         # remove non-attribute keys
         core = instance_dict.pop("core", "")

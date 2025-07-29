@@ -4,8 +4,6 @@
 
 from dataclasses import dataclass
 
-from iob_base import fail_with_msg, parse_short_notation_text
-
 
 @dataclass
 class iob_conf:
@@ -35,25 +33,6 @@ class iob_conf:
     descr: str = "Default description"
     doc_only: bool = False
 
-    def validate_attributes(self):
-        if not self.name:
-            fail_with_msg("Every conf must have a name!")
-        if self.kind not in ["P", "M", "C", "D", "L"]:
-            fail_with_msg(
-                f"Conf '{self.name}' type must be either P (Parameter), M (Macro), C (Constant), D (Derived Parameter), or L (Local Parameter)!"
-            )
-
-        try:
-            value = int(self.value)
-            min_value = int(self.min_value)
-            max_value = int(self.max_value)
-            if value < min_value or value > max_value:
-                fail_with_msg(
-                    f"Conf '{self.name}' value '{value}' must be between {min_value} and {max_value}!"
-                )
-        except ValueError:
-            pass
-
     #
     # Other Py2HWSW interface methods
     #
@@ -78,35 +57,3 @@ class iob_conf:
             iob_conf: iob_conf object
         """
         return iob_conf(**conf_dict)
-
-    @staticmethod
-    def conf_text2dict(conf_text: str) -> dict:
-        # parse conf text into a dictionary
-        conf_text_flags = [
-            "name",
-            ["-t", {"dest": "kind"}],
-            ["-v", {"dest": "value"}],
-            ["-m", {"dest": "min_value"}],
-            ["-M", {"dest": "max_value"}],
-            ["-d", {"dest": "descr", "nargs": "?"}],
-            ["-doc", {"dest": "doc_only", "action": "store_true"}],
-        ]
-        return parse_short_notation_text(conf_text, conf_text_flags)
-
-    @staticmethod
-    def create_from_text(conf_text):
-        """
-        Function to create iob_conf object from short notation text.
-
-        Attributes:
-            conf_text (str): Short notation text. Object attributes are specified using the following format:
-                name [-t kind] [-v value] [-m min_value] [-M max_value] [-doc]
-                [-d descr]
-                Example:
-                    DATA_W -t P -v 32 -m NA -M NA
-                    -d 'Data bus width'
-
-        Returns:
-            iob_conf: iob_conf object
-        """
-        return __class__.create_from_dict(__class__.conf_text2dict(conf_text))

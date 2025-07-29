@@ -6,12 +6,10 @@
 #    subblocks_gen.py: instantiate Verilog modules and generate their documentation
 #
 
-from iob_wire import iob_wire
 from iob_port import iob_port
 import param_gen
 from iob_base import fail_with_msg, find_obj_in_list
 
-get_real_wire = iob_wire.get_real_wire
 port_obj_list_process = iob_port.port_obj_list_process
 
 
@@ -102,8 +100,7 @@ def get_instance_port_connections(core, instance):
                 instance_portmap += f"        .{port.wire.name}({e_connect}),\n"
             continue
 
-        real_e_wire = get_real_wire(e_connect)
-        e_wire_name = real_e_wire.name
+        e_wire_name = e_connect.name
 
         # If the wire is a bit slice, get the name of the bit slice
         # and the name of the port (this overwrites the previous connection)

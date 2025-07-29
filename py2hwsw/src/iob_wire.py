@@ -5,7 +5,7 @@
 from dataclasses import dataclass, field
 import copy
 
-from iob_base import fail_with_msg, parse_short_notation_text
+from iob_base import fail_with_msg
 
 
 @dataclass
@@ -54,15 +54,6 @@ class iob_wire:
             return width_v
 
     @staticmethod
-    def get_real_wire(wire):
-        """Given a wire reference, follow the reference (recursively) and
-        return the real wire
-        """
-        while isinstance(wire, iob_wire_reference):
-            wire = wire.wire
-        return wire
-
-    @staticmethod
     def remove_wire_direction_suffixes(wire_list):
         """Given a wire list (usually from a port) that includes direction suffixes in their names (like _i, _o, _io),
         return a new list with the suffixes removed"""
@@ -92,38 +83,3 @@ class iob_wire:
             iob_wire: iob_wire object
         """
         return iob_wire(**wire_dict)
-
-    @staticmethod
-    def wire_text2dict(wire_text):
-        wire_flags = [
-            "name",
-            ["-w", {"dest": "width"}],
-            ["-v", {"dest": "isvar", "action": "store_true"}],
-            ["-d", {"dest": "descr", "nargs": "?"}],
-        ]
-        return parse_short_notation_text(wire_text, wire_flags)
-
-    @staticmethod
-    def create_from_text(wire_text):
-        """
-        Function to create iob_wire object from short notation text.
-
-        Attributes:
-            wire_text (str): Short notation text. Object attributes are specified using the following format:
-                name [-w width] [-d descr] [-v (enables isvar)]
-                Example:
-                    en -w 1 -d 'Enable wire' -v
-
-        Returns:
-            iob_wire: iob_wire object
-        """
-        return __class__.create_from_dict(__class__.wire_text2dict(wire_text))
-
-
-@dataclass
-class iob_wire_reference:
-    """Class that references another wire
-    Use to distinguish from a real wire (for generator scripts)
-    """
-
-    wire: iob_wire | None = None

@@ -8,10 +8,8 @@ from iob_base import (
     create_obj_list,
     fail_with_msg,
     add_traceback_msg,
-    str_to_kwargs,
     assert_attributes,
     find_obj_in_list,
-    parse_short_notation_text,
     empty_list,
 )
 
@@ -56,40 +54,6 @@ class iob_parameter:
         """
         return iob_parameter(**iob_parameter_dict)
 
-    @staticmethod
-    def iob_parameter_text2dict(iob_parameter_text):
-        """Convert iob_parameter short notation text to dictionary.
-        Atributes:
-            iob_parameter_text (str): Short notation text. See `create_from_text` for format.
-
-        Returns:
-            dict: Dictionary with iob_parameter attributes.
-        """
-        iob_parameter_flags = [
-            "name",
-            ["-v", {"dest": "val"}],
-            ["-d", {"dest": "descr"}],
-        ]
-        return parse_short_notation_text(iob_parameter_text, iob_parameter_flags)
-
-    @staticmethod
-    def create_from_text(iob_parameter_text):
-        """
-        Function to create iob_parameter object from short notation text.
-
-        Attributes:
-            iob_parameter_text (str): Short notation text. Object attributes are specified using the following format:
-                [name] [-v value] [-d descr]
-                Example:
-                    my_param -v 42 -d 'My parameter description'
-
-        Returns:
-            iob_parameter: iob_parameter object
-        """
-        return __class__.create_from_dict(
-            __class__.iob_parameter_text2dict(iob_parameter_text)
-        )
-
 
 @dataclass
 class iob_parameter_group:
@@ -112,13 +76,6 @@ class iob_parameter_group:
         if not self.name:
             fail_with_msg("IOb Parameter group name is not set", ValueError)
 
-    # attrs = [
-    #     "name",
-    #     ["-v", "val"],
-    #     ["-p", "iob_parameters", {"nargs": "+"}],
-    # ]
-    #
-    # @str_to_kwargs(attrs)
     @staticmethod
     def create_iob_parameter_group(core, *args, **kwargs):
         """Creates a new IOb parameter group object and adds it to the core's iob_parameters list
@@ -200,38 +157,3 @@ class iob_parameter_group:
             for i in iob_parameter_group_dict["iob_parameters"]
         ]
         return iob_parameter_group(**kwargs)
-
-    @staticmethod
-    def iob_parameter_group_text2dict(iob_parameter_group_text):
-        iob_parameter_group_flags = [
-            "name",
-            ["-d", {"dest": "descr"}],
-            ["-P", {"dest": "iob_parameters", "action": "append"}],
-            ["-doc_clearpage", {"dest": "doc_clearpage", "action": "store_true"}],
-        ]
-        iob_parameter_group_dict = parse_short_notation_text(
-            iob_parameter_group_text, iob_parameter_group_flags
-        )
-        # Special processing for iob_parameter subflags
-        params: list[iob_parameter] = []
-        for param_text in iob_parameter_group_dict.get("iob_parameters", []):
-            params.append(__class__.iob_parameter_text2dict(param_text))
-        # replace "iob_parameters" short notation text with list of IOb parameter dicts
-        iob_parameter_group_dict.update({"iob_parameters": params})
-        return iob_parameter_group_dict
-
-    @staticmethod
-    def create_from_text(iob_parameter_group_text):
-        """
-        Function to create iob_parameter_group object from short notation text.
-
-        Attributes:
-            iob_parameter_group_text (str): Short notation text. Object attributes are specified using the following format:
-                TODO
-
-        Returns:
-            iob_parameter_group: iob_parameter_group object
-        """
-        return __class__.create_from_dict(
-            __class__.iob_parameter_group_text2dict(iob_parameter_group_text)
-        )

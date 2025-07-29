@@ -5,7 +5,7 @@
 from dataclasses import dataclass
 from datetime import date
 
-from iob_base import fail_with_msg, parse_short_notation_text
+from iob_base import fail_with_msg
 
 
 @dataclass
@@ -54,35 +54,3 @@ class iob_license:
             iob_license: iob_license object
         """
         return iob_license(**license_dict)
-
-    @staticmethod
-    def license_text2dict(license_text):
-        """Convert license short notation text to dictionary.
-        Atributes:
-            license_text (str): Short notation text. See `create_from_text` for format.
-
-        Returns:
-            dict: Dictionary with license attributes.
-        """
-        license_flags = [
-            "name",
-            ["-y", {"dest": "year", "type": int}],
-            ["-a", {"dest": "author"}],
-        ]
-        return parse_short_notation_text(license_text, license_flags)
-
-    @staticmethod
-    def create_from_text(license_text):
-        """
-        Function to create iob_license object from short notation text.
-
-        Attributes:
-            license_text (str): Short notation text. Object attributes are specified using the following format:
-                [name] [-y year] [-a author]
-                Example:
-                    MIT -y 2025 -a 'IObundle, Lda'
-
-        Returns:
-            iob_license: iob_license object
-        """
-        return __class__.create_from_dict(__class__.license_text2dict(license_text))

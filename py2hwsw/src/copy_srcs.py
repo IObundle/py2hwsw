@@ -27,6 +27,9 @@ def flows_setup(python_module):
     # Setup harware
     hw_setup(python_module)
 
+    # Setup py2 scripts
+    python_setup(python_module.build_dir)
+
 
 def hw_setup(python_module):
     # Create module's version TeX file

@@ -1,6 +1,6 @@
 # Tutorial: Add New Device Driver
 
-This tutorial presents the steps required to create simple linux character device drivers for a device and use them in OpenCryptoLinux.
+This tutorial presents the steps required to create simple linux character device drivers for a device and use them in IOb-System-Linux.
 
 The [IOb-SPI](https://github.com/IObundle/iob-spi) device is used as an example.
 

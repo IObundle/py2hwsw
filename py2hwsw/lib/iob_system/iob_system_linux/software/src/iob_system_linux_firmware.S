@@ -1,5 +1,5 @@
-#include "iob_soc_opencryptolinux_system.h"
-#include "iob_soc_opencryptolinux_conf.h"
+#include "iob_system_linux_system.h"
+#include "iob_system_linux_conf.h"
 
 .section .init
 .globl _start
@@ -12,8 +12,8 @@ _start:
 .option pop
 
     //set stack pointer
-    lui sp, %hi(1<<IOB_SOC_OPENCRYPTOLINUX_MEM_ADDR_W)
-    addi sp, sp, %lo(1<<IOB_SOC_OPENCRYPTOLINUX_MEM_ADDR_W)
+    lui sp, %hi(1<<IOB_SYSTEM_LINUX_MEM_ADDR_W)
+    addi sp, sp, %lo(1<<IOB_SYSTEM_LINUX_MEM_ADDR_W)
 
     //call main
     call main

@@ -7,34 +7,34 @@
 #include "iob-axistream-out-user.h"
 #include "iob-dma-user.h"
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 // We should ideally receive the INIT_MEM information from the PC
 // However, since most of the time we run linux on the FPGA,
 // the INIT_MEM will be 0, therefore we hardcode it for now.
-#undef IOB_SOC_OPENCRYPTOLINUX_INIT_MEM
+#undef IOB_SYSTEM_LINUX_INIT_MEM
 
 void send_axistream();
 void receive_axistream();
 
 int main() {
-    // init axistream
-    iob_sysfs_write_file(IOB_AXISTREAM_IN_SYSFILE_ENABLE, 1);
-    iob_sysfs_write_file(IOB_AXISTREAM_OUT_SYSFILE_ENABLE, 1);
+  // init axistream
+  iob_sysfs_write_file(IOB_AXISTREAM_IN_SYSFILE_ENABLE, 1);
+  iob_sysfs_write_file(IOB_AXISTREAM_OUT_SYSFILE_ENABLE, 1);
 
-    // Send byte stream via AXI stream
-    send_axistream();
-    // Read byte stream via AXI stream
-    receive_axistream();
+  // Send byte stream via AXI stream
+  send_axistream();
+  // Read byte stream via AXI stream
+  receive_axistream();
 }
-
 
 void send_axistream() {
   uint8_t i;
   uint8_t words_in_byte_stream = 4;
   // Allocate memory for byte stream
-  uint32_t *byte_stream = (uint32_t *)malloc(words_in_byte_stream*sizeof(uint32_t));
+  uint32_t *byte_stream =
+      (uint32_t *)malloc(words_in_byte_stream * sizeof(uint32_t));
   // Fill byte stream to send
   byte_stream[0] = 0x03020100;
   byte_stream[1] = 0x07060504;
@@ -64,9 +64,10 @@ void receive_axistream() {
   iob_sysfs_read_file(IOB_AXISTREAM_IN_SYSFILE_NWORDS, &n_received_words);
 
   // Allocate memory for byte stream
-  volatile uint32_t *byte_stream = (volatile uint32_t *)malloc((n_received_words)*sizeof(uint32_t));
+  volatile uint32_t *byte_stream =
+      (volatile uint32_t *)malloc((n_received_words) * sizeof(uint32_t));
   for (i = 0; i < n_received_words; i++)
-      byte_stream[i] = 0;
+    byte_stream[i] = 0;
 
   // Transfer bytes from AXI stream input via DMA
   printf("Storing AXI words via DMA...\n");
@@ -76,7 +77,7 @@ void receive_axistream() {
   // clear_cache();
 
   // Print byte stream received
-  printf("Received AXI stream %d bytes: ", n_received_words*4);
+  printf("Received AXI stream %d bytes: ", n_received_words * 4);
   for (i = 0; i < n_received_words; i++)
     printf("0x%08x ", byte_stream[i]);
   printf("\n\n");

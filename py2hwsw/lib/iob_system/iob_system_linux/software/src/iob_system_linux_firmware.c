@@ -5,16 +5,16 @@
 #include "iob-spidefs.h"
 #include "iob-spiplatform.h"
 #include "iob-uart16550.h"
-#include "iob_soc_opencryptolinux_conf.h"
-#include "iob_soc_opencryptolinux_periphs.h"
-#include "iob_soc_opencryptolinux_system.h"
+#include "iob_system_linux_conf.h"
+#include "iob_system_linux_periphs.h"
+#include "iob_system_linux_system.h"
 #include "plic.h"
 #include "printf.h"
 #include <string.h>
-#ifdef IOB_SOC_OPENCRYPTOLINUX_DMA_DEMO
-#include "iob-dma.h"
+#ifdef IOB_SYSTEM_LINUX_DMA_DEMO
 #include "iob-axistream-in.h"
 #include "iob-axistream-out.h"
+#include "iob-dma.h"
 #endif
 
 #include "riscv-csr.h"
@@ -103,11 +103,9 @@ int compare_str(char *str1, char *str2, int str_size) {
 }
 
 // Needed by crypto side to time algorithms.
-// Does not need to return seconds or any time unit, we are comparing directly with the software implementation. 
-// Only care about the relative differences
-int GetTime(){
-  return clint_getTime(CLINT0_BASE);
-}
+// Does not need to return seconds or any time unit, we are comparing directly
+// with the software implementation. Only care about the relative differences
+int GetTime() { return clint_getTime(CLINT0_BASE); }
 
 int main() {
   char pass_string[] = "Test passed!";
@@ -123,7 +121,7 @@ int main() {
   eth_init(ETH0_BASE, &clear_cache);
   eth_wait_phy_rst();
 
-#ifdef IOB_SOC_OPENCRYPTOLINUX_DMA_DEMO
+#ifdef IOB_SYSTEM_LINUX_DMA_DEMO
   // init dma
   dma_init(DMA0_BASE);
   // init axistream
@@ -145,7 +143,7 @@ int main() {
 
   printf("\n\n\nHello world!\n\n\n");
 
-#ifdef IOB_SOC_OPENCRYPTOLINUX_DMA_DEMO
+#ifdef IOB_SYSTEM_LINUX_DMA_DEMO
   send_axistream();
   receive_axistream();
 #endif
@@ -177,8 +175,7 @@ int main() {
   // Read ID
   bytes = 4;
   readid = 0;
-  spiflash_executecommand(COMMANS, 0, 0, ((bytes * 8) << 8) | READ_ID,
-  &readid);
+  spiflash_executecommand(COMMANS, 0, 0, ((bytes * 8) << 8) | READ_ID, &readid);
 
   printf("\nREAD_ID: (%x)\n", readid);
   // Read from flash memory
@@ -194,21 +191,24 @@ int main() {
     test_result = 1;
   }
 
-
   address = 0x0;
   read_mem = 1;
   printf("\nTesting dual output fast read\n");
   read_mem = spiflash_readfastDualOutput(address, 0);
-  printf("\nRead from memory address (%x) the word: (%x)\n", address,
-  read_mem); word = read_mem;
+  printf("\nRead from memory address (%x) the word: (%x)\n", address, read_mem);
+  word = read_mem;
 
   read_mem = 2;
   printf("\nTesting quad output fast read\n");
   read_mem = spiflash_readfastQuadOutput(address, 0);
   if (read_mem == word) {
-    printf("\nQuadFastOutput Read (%x) got same word as Expected (%x)\nSuccess\n", address, read_mem);
+    printf(
+        "\nQuadFastOutput Read (%x) got same word as Expected (%x)\nSuccess\n",
+        address, read_mem);
   } else {
-    printf("\nQuadFastOutput Read (%x) Different word from memory\nRead: (%x), Read: (%x),Expected: (%x)\n", address, read_mem, word);
+    printf("\nQuadFastOutput Read (%x) Different word from memory\nRead: (%x), "
+           "Read: (%x),Expected: (%x)\n",
+           address, read_mem, word);
     test_result = 1;
   }
 
@@ -220,7 +220,9 @@ int main() {
            "(%x)\nSuccess\n",
            address, read_mem);
   } else {
-    printf( "\nDualFastInOutput Read (%x) Different word from memory\nRead: (%x), Read: (%x),Expected: (%x)\n", address, read_mem, word);
+    printf("\nDualFastInOutput Read (%x) Different word from memory\nRead: "
+           "(%x), Read: (%x),Expected: (%x)\n",
+           address, read_mem, word);
     test_result = 1;
   }
 
@@ -232,7 +234,9 @@ int main() {
            "(%x)\nSuccess\n",
            address, read_mem);
   } else {
-    printf("\nQuadFastInOutput Read (%x) Different word from memory\nRead: (%x), Read: (%x),Expected: (%x)\n", address, read_mem, word); 
+    printf("\nQuadFastInOutput Read (%x) Different word from memory\nRead: "
+           "(%x), Read: (%x),Expected: (%x)\n",
+           address, read_mem, word);
     test_result = 1;
   }
 
@@ -269,17 +273,23 @@ int main() {
 
   volconfigReg = 0;
   spiflash_readVolConfigReg(&volconfigReg);
-  printf("\nAfter xip bit write, Volatile Configuration Register (8 bits):(%x)\n", volconfigReg);
+  printf(
+      "\nAfter xip bit write, Volatile Configuration Register (8 bits):(%x)\n",
+      volconfigReg);
 
   // Confirmation bit 0
   read_mem = 1;
-  printf("\nTesting quad input output fast read with xip confirmation bit 0\n"); 
+  printf("\nTesting quad input output fast read with xip confirmation bit 0\n");
   read_mem = spiflash_readfastQuadInOutput(address, ACTIVEXIP);
-  printf("\nRead from memory address (%x) the word: (%x)\n", address,
-  read_mem); if (read_mem == word) {
-    printf("\nQuadFastInOutput XIP Read (%x) got same word as Expected (%x)\nSuccess\n", address, read_mem);
+  printf("\nRead from memory address (%x) the word: (%x)\n", address, read_mem);
+  if (read_mem == word) {
+    printf("\nQuadFastInOutput XIP Read (%x) got same word as Expected "
+           "(%x)\nSuccess\n",
+           address, read_mem);
   } else {
-    printf("\nQuadFastInOutput XIP Read (%x) Different word from memory\nRead: (%x), Read: (%x),Expected: (%x)\n", address, read_mem, word);
+    printf("\nQuadFastInOutput XIP Read (%x) Different word from memory\nRead: "
+           "(%x), Read: (%x),Expected: (%x)\n",
+           address, read_mem, word);
     test_result = 1;
   }
 
@@ -288,7 +298,9 @@ int main() {
   printf("\nAfter xip termination sequence: %d\n", xipEnabled);
   volconfigReg = 0;
   spiflash_readVolConfigReg(&volconfigReg);
-  printf("\nAfter xip termination sequence, Volatile Configuration Register (8 bits):(%x)\n", volconfigReg);
+  printf("\nAfter xip termination sequence, Volatile Configuration Register (8 "
+         "bits):(%x)\n",
+         volconfigReg);
 
   // XIP Bit 0 -> XIP ON
   if (((volconfigReg >> VOLCFG_XIP) & 0x1) == 0) {
@@ -309,13 +321,14 @@ int main() {
   }
   spiflash_memProgram(prog_data, NSAMPLES, 0x104);
   for (sample = 0; sample < NSAMPLES; sample = sample + 4) {
-    read_data[sample>>2] = spiflash_readmem(0x104 + sample);
+    read_data[sample >> 2] = spiflash_readmem(0x104 + sample);
   }
   // check prog vs read data
   char_data = (char *)read_data;
   for (sample = 0; sample < NSAMPLES; sample++) {
     if (prog_data[sample] != char_data[sample]) {
-      printf("Error: data[%x] = %08x != read_data[%x] = %08x\n", sample, prog_data[sample], sample, char_data[sample]);
+      printf("Error: data[%x] = %08x != read_data[%x] = %08x\n", sample,
+             prog_data[sample], sample, char_data[sample]);
       test_result = 1;
     }
   }
@@ -324,7 +337,8 @@ int main() {
 #endif // #ifdef SIMULATION
 
   // Tests are too big and slow to perform during simulation.
-  // Comment out the source files in sw_build.mk to also reduce binary size and speedup simulation.
+  // Comment out the source files in sw_build.mk to also reduce binary size and
+  // speedup simulation.
 #ifndef SIMULATION
   test_result |= VersatSHATests();
   test_result |= VersatAESTests();
@@ -367,13 +381,13 @@ static void irq_entry(void) {
 }
 #pragma GCC pop_options
 
-
-#ifdef IOB_SOC_OPENCRYPTOLINUX_DMA_DEMO
+#ifdef IOB_SYSTEM_LINUX_DMA_DEMO
 void send_axistream() {
   uint8_t i;
-  uint8_t words_in_byte_stream = 4; 
+  uint8_t words_in_byte_stream = 4;
   // Allocate memory for byte stream
-  uint32_t *byte_stream = (uint32_t *)malloc(words_in_byte_stream*sizeof(uint32_t));
+  uint32_t *byte_stream =
+      (uint32_t *)malloc(words_in_byte_stream * sizeof(uint32_t));
   // Fill byte stream to send
   byte_stream[0] = 0x03020100;
   byte_stream[1] = 0x07060504;
@@ -382,7 +396,7 @@ void send_axistream() {
 
   // Print byte stream to send
   uart16550_puts("Sending AXI stream bytes: ");
-  for (i = 0; i < words_in_byte_stream*4; i++)
+  for (i = 0; i < words_in_byte_stream * 4; i++)
     printf("0x%02x ", ((uint8_t *)byte_stream)[i]);
   uart16550_puts("\n");
 
@@ -400,9 +414,10 @@ void send_axistream() {
 void receive_axistream() {
   uint8_t i;
   uint8_t n_received_words = IOB_AXISTREAM_IN_GET_NWORDS();
-  
+
   // Allocate memory for byte stream
-  volatile uint32_t *byte_stream = (volatile uint32_t *)malloc((n_received_words)*sizeof(uint32_t));
+  volatile uint32_t *byte_stream =
+      (volatile uint32_t *)malloc((n_received_words) * sizeof(uint32_t));
 
   // Transfer bytes from AXI stream input via DMA
   uart16550_puts("Storing AXI words via DMA...\n");
@@ -413,10 +428,10 @@ void receive_axistream() {
 
   // Print byte stream received
   uart16550_puts("Received AXI stream bytes: ");
-  for (i = 0; i < n_received_words*4; i++)
+  for (i = 0; i < n_received_words * 4; i++)
     printf("0x%02x ", ((volatile uint8_t *)byte_stream)[i]);
   uart16550_puts("\n\n");
 
   free((uint32_t *)byte_stream);
 }
-#endif // IOB_SOC_OPENCRYPTOLINUX_DMA_DEMO
+#endif // IOB_SYSTEM_LINUX_DMA_DEMO

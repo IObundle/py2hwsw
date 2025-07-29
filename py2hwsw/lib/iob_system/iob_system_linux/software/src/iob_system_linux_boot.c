@@ -5,9 +5,9 @@
 #include "iob-spidefs.h"
 #include "iob-spiplatform.h"
 #include "iob-uart16550.h"
-#include "iob_soc_opencryptolinux_conf.h"
-#include "iob_soc_opencryptolinux_periphs.h"
-#include "iob_soc_opencryptolinux_system.h"
+#include "iob_system_linux_conf.h"
+#include "iob_system_linux_periphs.h"
+#include "iob_system_linux_system.h"
 #include "printf.h"
 #include <stdio.h>
 #include <string.h>
@@ -24,9 +24,10 @@
 // NOTE: These functions are not compatible with malloc() and free().
 //      These are specifically made for use with the current iob-eth.c drivers.
 //      (These assume that there is only one block allocated at a time)
-//      It allocates a block with required size at the end of the external memory region.
+//      It allocates a block with required size at the end of the external
+//      memory region.
 static void *mem_alloc(size_t size) {
-  return (void *)(EXT_MEM | (1 << IOB_SOC_OPENCRYPTOLINUX_MEM_ADDR_W)) - size;
+  return (void *)(EXT_MEM | (1 << IOB_SYSTEM_LINUX_MEM_ADDR_W)) - size;
 }
 static void mem_free(void *ptr) {}
 
@@ -137,14 +138,14 @@ void program_flash(int file_count, long int file_address_array[4],
   spiflash_memProgram(prog_data, 4 * file_count, flash_addr);
 
   for (i = 0; i < file_count; i++) {
-    flash_addr = FLASH_FIRMWARE_OFFSET + (next_subsector*SUBSECTOR_SIZE);
+    flash_addr = FLASH_FIRMWARE_OFFSET + (next_subsector * SUBSECTOR_SIZE);
     prog_data = file_start_addr + file_address_array[i];
     spiflash_erase_address_range(flash_addr, file_sizes[i]);
     printf("Program %d: addr: %p\tflash: %x\tsize: %d\n", i, prog_data,
            flash_addr, file_sizes[i]);
     spiflash_memProgram(prog_data, file_sizes[i], flash_addr);
     printf("Program %d: complete\n", i);
-    next_subsector += (((file_sizes[i]+SUBSECTOR_SIZE-1)/SUBSECTOR_SIZE));
+    next_subsector += (((file_sizes[i] + SUBSECTOR_SIZE - 1) / SUBSECTOR_SIZE));
   }
 }
 
@@ -166,7 +167,8 @@ void read_flash(int file_count, long int file_address_array[4],
 
   for (i = 0; i < file_count; i++) {
     read_array = (unsigned int *)(file_start_addr + file_address_array[i]);
-    flash_file_start = FLASH_FIRMWARE_OFFSET + (next_subsector*SUBSECTOR_SIZE);
+    flash_file_start =
+        FLASH_FIRMWARE_OFFSET + (next_subsector * SUBSECTOR_SIZE);
     read_total = file_sizes[i] / 4;
     read_cnt = 0;
 
@@ -180,7 +182,7 @@ void read_flash(int file_count, long int file_address_array[4],
       }
       read_cnt++;
     }
-    next_subsector += (((file_sizes[i]+SUBSECTOR_SIZE-1)/SUBSECTOR_SIZE));
+    next_subsector += (((file_sizes[i] + SUBSECTOR_SIZE - 1) / SUBSECTOR_SIZE));
   }
 }
 
@@ -213,7 +215,7 @@ int main() {
     uart16550_puts(": Waiting for Console ACK.\n");
   }
 
-#ifndef IOB_SOC_OPENCRYPTOLINUX_INIT_MEM
+#ifndef IOB_SYSTEM_LINUX_INIT_MEM
   // Init ethernet and printf (for ethernet)
   printf_init(&uart16550_putc);
 
@@ -232,8 +234,8 @@ int main() {
     return -1;
   }
 
-  file_size = uart16550_recvfile("../iob_soc_opencryptolinux_mem.config",
-                                 prog_start_addr);
+  file_size =
+      uart16550_recvfile("../iob_system_linux_mem.config", prog_start_addr);
 
   // compute_mem_load_txt
   char file_name_array[4][50];
@@ -278,7 +280,7 @@ int main() {
     }
   }
 #else // INIT_MEM = 1
-#ifdef IOB_SOC_OPENCRYPTOLINUX_RUN_LINUX
+#ifdef IOB_SYSTEM_LINUX_RUN_LINUX
   // Running Linux: setup required dependencies
   uart16550_sendfile("test.log", 12, "Test passed!");
   uart16550_putc((char)DC1);

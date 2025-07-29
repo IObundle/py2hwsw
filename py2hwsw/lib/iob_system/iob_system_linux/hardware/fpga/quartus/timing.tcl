@@ -1,1 +1,0 @@
-../../../submodules/IOBSOC/submodules/LIB/hardware/fpga/quartus/timing.tcl

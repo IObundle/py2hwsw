@@ -84,6 +84,7 @@ module iob_v_tb;
          if ($fscanf(
                  c2v_read_fp, "%08x %08x %08x %08x %08x\n", req, mode, address, data_w, data
              )) begin
+            cke= 1;  // Enable clock
             $fclose(c2v_read_fp);
             /*$display("V: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode,
                      address, data_w, data);*/  // DEBUG
@@ -113,6 +114,7 @@ module iob_v_tb;
             end  // if (req == ack)
          end else begin  // if (fscanf_ret == 5)
             $fclose(c2v_read_fp);
+            cke=0;  // Disable clock
          end  // if (fscanf_ret != 5)
          @(posedge clk);  //advance clock
       end  // while (1)
@@ -176,7 +178,6 @@ module iob_v_tb;
 
 
 
-   always #5 clk = ~clk;  // Clock generation
-
+   always if (cke) #5 clk = ~clk;  // Clock generation
 
 endmodule

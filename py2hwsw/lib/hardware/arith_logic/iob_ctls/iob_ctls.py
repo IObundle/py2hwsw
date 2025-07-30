@@ -66,7 +66,7 @@ def setup(py_params_dict):
                         "width": "W",
                         "descr": "Data internal wire",
                     },
-                ],
+                ],    
             },
             {
                 "name": "data_int2",

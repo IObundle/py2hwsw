@@ -24,6 +24,7 @@ def setup(py_params_dict):
                 "max": "NA",
             },
         ],
+        
         "ports": [
             {
                 "name": "clk_en_rst_s",

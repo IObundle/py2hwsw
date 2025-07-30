@@ -705,15 +705,15 @@ def setup(py_params_dict):
                 "iob_system_params": params,
                 "dest_dir": "tester",
             },
-            # Create second tester but without CPU
-            # This Tester's verification instruments will be controlled by testbench
-            {
-                "core_name": "iob_system_tester",
-                "instance_name": "iob_system_tester_no_cpu",
-                "cpu": "none",
-                "iob_system_params": params,
-                "dest_dir": "tester_no_cpu",
-            },
+            # # Create second tester but without CPU
+            # # This Tester's verification instruments will be controlled by testbench
+            # {
+            #     "core_name": "iob_system_tester",
+            #     "instance_name": "iob_system_tester_no_cpu",
+            #     "cpu": "none",
+            #     "iob_system_params": params,
+            #     "dest_dir": "tester_no_cpu",
+            # },
         ]
     attributes_dict["sw_modules"] = [
         # Software modules

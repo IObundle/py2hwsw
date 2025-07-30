@@ -17,7 +17,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "OUT_TYPE",
-                "descr": "Output type",
+                "descr": "Output type. Options: "step", "pulse"",
                 "type": "P",
                 "val": '"step"',
                 "min": "NA",

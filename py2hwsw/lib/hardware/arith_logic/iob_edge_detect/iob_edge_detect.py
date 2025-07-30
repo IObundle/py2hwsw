@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "confs": [
             {
                 "name": "EDGE_TYPE",
-                "descr": "Edge detection type",
+                "descr": "Edge detection type. Options: "rising", "falling", "both"",
                 "type": "P",
                 "val": '"rising"',
                 "min": "NA",

@@ -107,7 +107,6 @@ unsigned int iob_read(unsigned int address, unsigned int data_w) {
 
   unsigned int nbytes = data_w / 8 + (data_w % 8 ? 1 : 0);
   unsigned int data;
-  fprintf(log, "C: New Read requested: %08x\n", address);
 
   dut->iob_addr_i = address; // remove byte address
   dut->iob_valid_i = 1;

@@ -1,6 +1,6 @@
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <fcntl.h>
 #include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -14,5 +14,6 @@
  */
 #include "iob_dma.h"
 
-int dma_start_transfer(uint32_t *base_addr, uint32_t size, int direction, uint16_t interface_number);
+int dma_start_transfer(uint32_t *base_addr, uint32_t size, int direction,
+                       uint16_t interface_number);
 uint8_t dma_transfer_ready();

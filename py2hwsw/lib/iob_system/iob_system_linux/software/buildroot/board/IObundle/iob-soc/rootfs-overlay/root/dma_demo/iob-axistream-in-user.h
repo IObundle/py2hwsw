@@ -10,5 +10,5 @@
  */
 #include "iob_axistream_in.h"
 
-int iob_axis_in_reset(); 
+int iob_axis_in_reset();
 uint32_t iob_axis_read(uint32_t *value);

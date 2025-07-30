@@ -10,6 +10,7 @@
 
 #include "gf.h"
 
-int pk_gen(unsigned char *pk, unsigned char *sk, const uint32_t *perm, int16_t *pi);
+int pk_gen(unsigned char *pk, unsigned char *sk, const uint32_t *perm,
+           int16_t *pi);
 
 #endif

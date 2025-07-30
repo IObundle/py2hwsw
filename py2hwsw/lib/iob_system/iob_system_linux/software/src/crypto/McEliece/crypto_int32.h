@@ -15,16 +15,22 @@ crypto_int32 crypto_int32_zero_mask(crypto_int32 crypto_int32_x);
 #define crypto_int32_positive_mask CRYPTO_NAMESPACE(crypto_int32_positive_mask)
 crypto_int32 crypto_int32_positive_mask(crypto_int32 crypto_int32_x);
 #define crypto_int32_unequal_mask CRYPTO_NAMESPACE(crypto_int32_unequal_mask)
-crypto_int32 crypto_int32_unequal_mask(crypto_int32 crypto_int32_x, crypto_int32 crypto_int32_y);
+crypto_int32 crypto_int32_unequal_mask(crypto_int32 crypto_int32_x,
+                                       crypto_int32 crypto_int32_y);
 #define crypto_int32_equal_mask CRYPTO_NAMESPACE(crypto_int32_equal_mask)
-crypto_int32 crypto_int32_equal_mask(crypto_int32 crypto_int32_x, crypto_int32 crypto_int32_y);
+crypto_int32 crypto_int32_equal_mask(crypto_int32 crypto_int32_x,
+                                     crypto_int32 crypto_int32_y);
 #define crypto_int32_smaller_mask CRYPTO_NAMESPACE(crypto_int32_smaller_mask)
-crypto_int32 crypto_int32_smaller_mask(crypto_int32 crypto_int32_x, crypto_int32 crypto_int32_y);
+crypto_int32 crypto_int32_smaller_mask(crypto_int32 crypto_int32_x,
+                                       crypto_int32 crypto_int32_y);
 #define crypto_int32_min CRYPTO_NAMESPACE(crypto_int32_min)
-crypto_int32 crypto_int32_min(crypto_int32 crypto_int32_x, crypto_int32 crypto_int32_y);
+crypto_int32 crypto_int32_min(crypto_int32 crypto_int32_x,
+                              crypto_int32 crypto_int32_y);
 #define crypto_int32_max CRYPTO_NAMESPACE(crypto_int32_max)
-crypto_int32 crypto_int32_max(crypto_int32 crypto_int32_x, crypto_int32 crypto_int32_y);
+crypto_int32 crypto_int32_max(crypto_int32 crypto_int32_x,
+                              crypto_int32 crypto_int32_y);
 #define crypto_int32_minmax CRYPTO_NAMESPACE(crypto_int32_minmax)
-void crypto_int32_minmax(crypto_int32 *crypto_int32_a, crypto_int32 *crypto_int32_b);
+void crypto_int32_minmax(crypto_int32 *crypto_int32_a,
+                         crypto_int32 *crypto_int32_b);
 
 #endif

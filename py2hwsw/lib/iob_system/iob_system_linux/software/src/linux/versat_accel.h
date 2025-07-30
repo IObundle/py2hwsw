@@ -179,7 +179,7 @@ typedef struct {
 
 #define VERSAT_DEFINED_FullAESRounds
 typedef struct {
-  union{
+  union {
     AESFirstAddConfig AESFirstAdd;
     AESRoundConfig AESRound;
     AESLastRoundConfig AESLastRound;
@@ -223,7 +223,7 @@ typedef struct {
 
 #define VERSAT_DEFINED_FullAES
 typedef struct {
-  union{
+  union {
     RegFileConfig key_0;
     RegFileConfig key_1;
     RegFileConfig key_2;
@@ -241,7 +241,7 @@ typedef struct {
     RegFileConfig key_14;
     RegFileConfig key_15;
   };
-  union{
+  union {
     RegConfig state_0;
     RegConfig state_1;
     RegConfig state_2;
@@ -259,7 +259,7 @@ typedef struct {
     RegConfig state_14;
     RegConfig state_15;
   };
-  union{
+  union {
     RegConfig lastResult_0;
     RegConfig lastResult_1;
     RegConfig lastResult_2;
@@ -277,7 +277,7 @@ typedef struct {
     RegConfig lastResult_14;
     RegConfig lastResult_15;
   };
-  union{
+  union {
     RegConfig lastValToAdd_0;
     RegConfig lastValToAdd_1;
     RegConfig lastValToAdd_2;
@@ -311,17 +311,17 @@ typedef struct {
 
 #define VERSAT_DEFINED_RegFileAddr
 typedef struct {
-  void* addr;
+  void *addr;
 } RegFileAddr;
 
 #define VERSAT_DEFINED_RegAddr
 typedef struct {
-  void* addr;
+  void *addr;
 } RegAddr;
 
 #define VERSAT_DEFINED_LookupTableAddr
 typedef struct {
-  void* addr;
+  void *addr;
 } LookupTableAddr;
 
 #define VERSAT_DEFINED_DoRowAddr
@@ -346,7 +346,7 @@ typedef struct {
 
 #define VERSAT_DEFINED_OnlyOutputMemAddr
 typedef struct {
-  void* addr;
+  void *addr;
 } OnlyOutputMemAddr;
 
 #define VERSAT_DEFINED_ShaSingleStateAddr
@@ -356,7 +356,7 @@ typedef struct {
 
 #define VERSAT_DEFINED_ReadWriteMemAddr
 typedef struct {
-  void* addr;
+  void *addr;
 } ReadWriteMemAddr;
 
 #define VERSAT_DEFINED_GenericLineKeyAddr
@@ -500,8 +500,8 @@ typedef struct {
   McElieceAddr eliece;
 } CryptoAlgosAddr;
 
-typedef struct{
-  union{
+typedef struct {
+  union {
     iptr TOP_aes_key_0_selectedInput;
     iptr TOP_aes_key_1_selectedInput;
     iptr TOP_aes_key_2_selectedInput;
@@ -519,7 +519,7 @@ typedef struct{
     iptr TOP_aes_key_14_selectedInput;
     iptr TOP_aes_key_15_selectedInput;
   };
-  union{
+  union {
     iptr TOP_aes_key_0_selectedOutput0;
     iptr TOP_aes_key_1_selectedOutput0;
     iptr TOP_aes_key_2_selectedOutput0;
@@ -537,7 +537,7 @@ typedef struct{
     iptr TOP_aes_key_14_selectedOutput0;
     iptr TOP_aes_key_15_selectedOutput0;
   };
-  union{
+  union {
     iptr TOP_aes_key_0_selectedOutput1;
     iptr TOP_aes_key_1_selectedOutput1;
     iptr TOP_aes_key_2_selectedOutput1;
@@ -555,7 +555,7 @@ typedef struct{
     iptr TOP_aes_key_14_selectedOutput1;
     iptr TOP_aes_key_15_selectedOutput1;
   };
-  union{
+  union {
     iptr TOP_aes_key_0_disabled;
     iptr TOP_aes_key_1_disabled;
     iptr TOP_aes_key_2_disabled;
@@ -573,7 +573,7 @@ typedef struct{
     iptr TOP_aes_key_14_disabled;
     iptr TOP_aes_key_15_disabled;
   };
-  union{
+  union {
     iptr TOP_aes_state_0_disabled;
     iptr TOP_aes_state_1_disabled;
     iptr TOP_aes_state_2_disabled;
@@ -591,7 +591,7 @@ typedef struct{
     iptr TOP_aes_state_14_disabled;
     iptr TOP_aes_state_15_disabled;
   };
-  union{
+  union {
     iptr TOP_aes_lastResult_0_disabled;
     iptr TOP_aes_lastResult_1_disabled;
     iptr TOP_aes_lastResult_2_disabled;
@@ -609,7 +609,7 @@ typedef struct{
     iptr TOP_aes_lastResult_14_disabled;
     iptr TOP_aes_lastResult_15_disabled;
   };
-  union{
+  union {
     iptr TOP_aes_lastValToAdd_0_disabled;
     iptr TOP_aes_lastValToAdd_1_disabled;
     iptr TOP_aes_lastValToAdd_2_disabled;
@@ -632,7 +632,7 @@ typedef struct{
   iptr TOP_aes_schedule_s_mux_2_sel;
   iptr TOP_aes_schedule_s_mux_3_sel;
   iptr TOP_aes_rcon_constant;
-  union{
+  union {
     iptr TOP_aes_round_versat_merge_mux_0_sel;
     iptr TOP_aes_round_versat_merge_mux_1_sel;
     iptr TOP_aes_round_versat_merge_mux_2_sel;
@@ -814,8 +814,8 @@ typedef struct {
 } AcceleratorStatic;
 
 typedef struct {
-  union{
-    struct{
+  union {
+    struct {
       iptr TOP_Delay0;
       iptr TOP_Delay1;
       iptr TOP_Delay2;
@@ -904,11 +904,11 @@ typedef struct {
       iptr TOP_Delay85;
       iptr TOP_Delay86;
     };
-    iptr delays[87]; 
+    iptr delays[87];
   };
 } AcceleratorDelay;
 
-typedef struct{
+typedef struct {
   int TOP_aes_state_0_currentValue;
   int TOP_aes_state_1_currentValue;
   int TOP_aes_state_2_currentValue;
@@ -981,138 +981,326 @@ extern iptr versat_base;
 //       versat_base.
 
 // Base address for each memory mapped unit
-#define TOP_aes_key_0_addr ((void*) (versat_base + memMappedStart + 0x0))
-#define TOP_aes_key_1_addr ((void*) (versat_base + memMappedStart + 0x40))
-#define TOP_aes_key_2_addr ((void*) (versat_base + memMappedStart + 0x80))
-#define TOP_aes_key_3_addr ((void*) (versat_base + memMappedStart + 0xc0))
-#define TOP_aes_key_4_addr ((void*) (versat_base + memMappedStart + 0x100))
-#define TOP_aes_key_5_addr ((void*) (versat_base + memMappedStart + 0x140))
-#define TOP_aes_key_6_addr ((void*) (versat_base + memMappedStart + 0x180))
-#define TOP_aes_key_7_addr ((void*) (versat_base + memMappedStart + 0x1c0))
-#define TOP_aes_key_8_addr ((void*) (versat_base + memMappedStart + 0x200))
-#define TOP_aes_key_9_addr ((void*) (versat_base + memMappedStart + 0x240))
-#define TOP_aes_key_10_addr ((void*) (versat_base + memMappedStart + 0x280))
-#define TOP_aes_key_11_addr ((void*) (versat_base + memMappedStart + 0x2c0))
-#define TOP_aes_key_12_addr ((void*) (versat_base + memMappedStart + 0x300))
-#define TOP_aes_key_13_addr ((void*) (versat_base + memMappedStart + 0x340))
-#define TOP_aes_key_14_addr ((void*) (versat_base + memMappedStart + 0x380))
-#define TOP_aes_key_15_addr ((void*) (versat_base + memMappedStart + 0x3c0))
-#define TOP_aes_state_0_addr ((void*) (versat_base + memMappedStart + 0x400))
-#define TOP_aes_state_1_addr ((void*) (versat_base + memMappedStart + 0x404))
-#define TOP_aes_state_2_addr ((void*) (versat_base + memMappedStart + 0x408))
-#define TOP_aes_state_3_addr ((void*) (versat_base + memMappedStart + 0x40c))
-#define TOP_aes_state_4_addr ((void*) (versat_base + memMappedStart + 0x410))
-#define TOP_aes_state_5_addr ((void*) (versat_base + memMappedStart + 0x414))
-#define TOP_aes_state_6_addr ((void*) (versat_base + memMappedStart + 0x418))
-#define TOP_aes_state_7_addr ((void*) (versat_base + memMappedStart + 0x41c))
-#define TOP_aes_state_8_addr ((void*) (versat_base + memMappedStart + 0x420))
-#define TOP_aes_state_9_addr ((void*) (versat_base + memMappedStart + 0x424))
-#define TOP_aes_state_10_addr ((void*) (versat_base + memMappedStart + 0x428))
-#define TOP_aes_state_11_addr ((void*) (versat_base + memMappedStart + 0x42c))
-#define TOP_aes_state_12_addr ((void*) (versat_base + memMappedStart + 0x430))
-#define TOP_aes_state_13_addr ((void*) (versat_base + memMappedStart + 0x434))
-#define TOP_aes_state_14_addr ((void*) (versat_base + memMappedStart + 0x438))
-#define TOP_aes_state_15_addr ((void*) (versat_base + memMappedStart + 0x43c))
-#define TOP_aes_lastResult_0_addr ((void*) (versat_base + memMappedStart + 0x440))
-#define TOP_aes_lastResult_1_addr ((void*) (versat_base + memMappedStart + 0x444))
-#define TOP_aes_lastResult_2_addr ((void*) (versat_base + memMappedStart + 0x448))
-#define TOP_aes_lastResult_3_addr ((void*) (versat_base + memMappedStart + 0x44c))
-#define TOP_aes_lastResult_4_addr ((void*) (versat_base + memMappedStart + 0x450))
-#define TOP_aes_lastResult_5_addr ((void*) (versat_base + memMappedStart + 0x454))
-#define TOP_aes_lastResult_6_addr ((void*) (versat_base + memMappedStart + 0x458))
-#define TOP_aes_lastResult_7_addr ((void*) (versat_base + memMappedStart + 0x45c))
-#define TOP_aes_lastResult_8_addr ((void*) (versat_base + memMappedStart + 0x460))
-#define TOP_aes_lastResult_9_addr ((void*) (versat_base + memMappedStart + 0x464))
-#define TOP_aes_lastResult_10_addr ((void*) (versat_base + memMappedStart + 0x468))
-#define TOP_aes_lastResult_11_addr ((void*) (versat_base + memMappedStart + 0x46c))
-#define TOP_aes_lastResult_12_addr ((void*) (versat_base + memMappedStart + 0x470))
-#define TOP_aes_lastResult_13_addr ((void*) (versat_base + memMappedStart + 0x474))
-#define TOP_aes_lastResult_14_addr ((void*) (versat_base + memMappedStart + 0x478))
-#define TOP_aes_lastResult_15_addr ((void*) (versat_base + memMappedStart + 0x47c))
-#define TOP_aes_lastValToAdd_0_addr ((void*) (versat_base + memMappedStart + 0x480))
-#define TOP_aes_lastValToAdd_1_addr ((void*) (versat_base + memMappedStart + 0x484))
-#define TOP_aes_lastValToAdd_2_addr ((void*) (versat_base + memMappedStart + 0x488))
-#define TOP_aes_lastValToAdd_3_addr ((void*) (versat_base + memMappedStart + 0x48c))
-#define TOP_aes_lastValToAdd_4_addr ((void*) (versat_base + memMappedStart + 0x490))
-#define TOP_aes_lastValToAdd_5_addr ((void*) (versat_base + memMappedStart + 0x494))
-#define TOP_aes_lastValToAdd_6_addr ((void*) (versat_base + memMappedStart + 0x498))
-#define TOP_aes_lastValToAdd_7_addr ((void*) (versat_base + memMappedStart + 0x49c))
-#define TOP_aes_lastValToAdd_8_addr ((void*) (versat_base + memMappedStart + 0x4a0))
-#define TOP_aes_lastValToAdd_9_addr ((void*) (versat_base + memMappedStart + 0x4a4))
-#define TOP_aes_lastValToAdd_10_addr ((void*) (versat_base + memMappedStart + 0x4a8))
-#define TOP_aes_lastValToAdd_11_addr ((void*) (versat_base + memMappedStart + 0x4ac))
-#define TOP_aes_lastValToAdd_12_addr ((void*) (versat_base + memMappedStart + 0x4b0))
-#define TOP_aes_lastValToAdd_13_addr ((void*) (versat_base + memMappedStart + 0x4b4))
-#define TOP_aes_lastValToAdd_14_addr ((void*) (versat_base + memMappedStart + 0x4b8))
-#define TOP_aes_lastValToAdd_15_addr ((void*) (versat_base + memMappedStart + 0x4bc))
-#define TOP_aes_schedule_s_b_0_addr ((void*) (versat_base + memMappedStart + 0x600))
-#define TOP_aes_schedule_s_b_1_addr ((void*) (versat_base + memMappedStart + 0x700))
-#define TOP_aes_round_mixColumns_d_0_mul2_0_addr ((void*) (versat_base + memMappedStart + 0x4000))
-#define TOP_aes_round_mixColumns_d_0_mul2_1_addr ((void*) (versat_base + memMappedStart + 0x4100))
-#define TOP_aes_round_mixColumns_d_0_mul3_0_addr ((void*) (versat_base + memMappedStart + 0x4200))
-#define TOP_aes_round_mixColumns_d_0_mul3_1_addr ((void*) (versat_base + memMappedStart + 0x4300))
-#define TOP_aes_round_mixColumns_d_1_mul2_0_addr ((void*) (versat_base + memMappedStart + 0x4400))
-#define TOP_aes_round_mixColumns_d_1_mul2_1_addr ((void*) (versat_base + memMappedStart + 0x4500))
-#define TOP_aes_round_mixColumns_d_1_mul3_0_addr ((void*) (versat_base + memMappedStart + 0x4600))
-#define TOP_aes_round_mixColumns_d_1_mul3_1_addr ((void*) (versat_base + memMappedStart + 0x4700))
-#define TOP_aes_round_mixColumns_d_2_mul2_0_addr ((void*) (versat_base + memMappedStart + 0x4800))
-#define TOP_aes_round_mixColumns_d_2_mul2_1_addr ((void*) (versat_base + memMappedStart + 0x4900))
-#define TOP_aes_round_mixColumns_d_2_mul3_0_addr ((void*) (versat_base + memMappedStart + 0x4a00))
-#define TOP_aes_round_mixColumns_d_2_mul3_1_addr ((void*) (versat_base + memMappedStart + 0x4b00))
-#define TOP_aes_round_mixColumns_d_3_mul2_0_addr ((void*) (versat_base + memMappedStart + 0x4c00))
-#define TOP_aes_round_mixColumns_d_3_mul2_1_addr ((void*) (versat_base + memMappedStart + 0x4d00))
-#define TOP_aes_round_mixColumns_d_3_mul3_0_addr ((void*) (versat_base + memMappedStart + 0x4e00))
-#define TOP_aes_round_mixColumns_d_3_mul3_1_addr ((void*) (versat_base + memMappedStart + 0x4f00))
-#define TOP_aes_round_invMixColumns_d_0_mul9_0_addr ((void*) (versat_base + memMappedStart + 0x6000))
-#define TOP_aes_round_invMixColumns_d_0_mul9_1_addr ((void*) (versat_base + memMappedStart + 0x6100))
-#define TOP_aes_round_invMixColumns_d_0_mul11_0_addr ((void*) (versat_base + memMappedStart + 0x6200))
-#define TOP_aes_round_invMixColumns_d_0_mul11_1_addr ((void*) (versat_base + memMappedStart + 0x6300))
-#define TOP_aes_round_invMixColumns_d_0_mul13_0_addr ((void*) (versat_base + memMappedStart + 0x6400))
-#define TOP_aes_round_invMixColumns_d_0_mul13_1_addr ((void*) (versat_base + memMappedStart + 0x6500))
-#define TOP_aes_round_invMixColumns_d_0_mul14_0_addr ((void*) (versat_base + memMappedStart + 0x6600))
-#define TOP_aes_round_invMixColumns_d_0_mul14_1_addr ((void*) (versat_base + memMappedStart + 0x6700))
-#define TOP_aes_round_invMixColumns_d_1_mul9_0_addr ((void*) (versat_base + memMappedStart + 0x6800))
-#define TOP_aes_round_invMixColumns_d_1_mul9_1_addr ((void*) (versat_base + memMappedStart + 0x6900))
-#define TOP_aes_round_invMixColumns_d_1_mul11_0_addr ((void*) (versat_base + memMappedStart + 0x6a00))
-#define TOP_aes_round_invMixColumns_d_1_mul11_1_addr ((void*) (versat_base + memMappedStart + 0x6b00))
-#define TOP_aes_round_invMixColumns_d_1_mul13_0_addr ((void*) (versat_base + memMappedStart + 0x6c00))
-#define TOP_aes_round_invMixColumns_d_1_mul13_1_addr ((void*) (versat_base + memMappedStart + 0x6d00))
-#define TOP_aes_round_invMixColumns_d_1_mul14_0_addr ((void*) (versat_base + memMappedStart + 0x6e00))
-#define TOP_aes_round_invMixColumns_d_1_mul14_1_addr ((void*) (versat_base + memMappedStart + 0x6f00))
-#define TOP_aes_round_invMixColumns_d_2_mul9_0_addr ((void*) (versat_base + memMappedStart + 0x7000))
-#define TOP_aes_round_invMixColumns_d_2_mul9_1_addr ((void*) (versat_base + memMappedStart + 0x7100))
-#define TOP_aes_round_invMixColumns_d_2_mul11_0_addr ((void*) (versat_base + memMappedStart + 0x7200))
-#define TOP_aes_round_invMixColumns_d_2_mul11_1_addr ((void*) (versat_base + memMappedStart + 0x7300))
-#define TOP_aes_round_invMixColumns_d_2_mul13_0_addr ((void*) (versat_base + memMappedStart + 0x7400))
-#define TOP_aes_round_invMixColumns_d_2_mul13_1_addr ((void*) (versat_base + memMappedStart + 0x7500))
-#define TOP_aes_round_invMixColumns_d_2_mul14_0_addr ((void*) (versat_base + memMappedStart + 0x7600))
-#define TOP_aes_round_invMixColumns_d_2_mul14_1_addr ((void*) (versat_base + memMappedStart + 0x7700))
-#define TOP_aes_round_invMixColumns_d_3_mul9_0_addr ((void*) (versat_base + memMappedStart + 0x7800))
-#define TOP_aes_round_invMixColumns_d_3_mul9_1_addr ((void*) (versat_base + memMappedStart + 0x7900))
-#define TOP_aes_round_invMixColumns_d_3_mul11_0_addr ((void*) (versat_base + memMappedStart + 0x7a00))
-#define TOP_aes_round_invMixColumns_d_3_mul11_1_addr ((void*) (versat_base + memMappedStart + 0x7b00))
-#define TOP_aes_round_invMixColumns_d_3_mul13_0_addr ((void*) (versat_base + memMappedStart + 0x7c00))
-#define TOP_aes_round_invMixColumns_d_3_mul13_1_addr ((void*) (versat_base + memMappedStart + 0x7d00))
-#define TOP_aes_round_invMixColumns_d_3_mul14_0_addr ((void*) (versat_base + memMappedStart + 0x7e00))
-#define TOP_aes_round_invMixColumns_d_3_mul14_1_addr ((void*) (versat_base + memMappedStart + 0x7f00))
-#define TOP_sha_cMem0_mem_addr ((void*) (versat_base + memMappedStart + 0x8000))
-#define TOP_sha_cMem1_mem_addr ((void*) (versat_base + memMappedStart + 0x9000))
-#define TOP_sha_cMem2_mem_addr ((void*) (versat_base + memMappedStart + 0xa000))
-#define TOP_sha_cMem3_mem_addr ((void*) (versat_base + memMappedStart + 0xb000))
-#define TOP_sha_State_s_0_reg_addr ((void*) (versat_base + memMappedStart + 0xc000))
-#define TOP_sha_State_s_1_reg_addr ((void*) (versat_base + memMappedStart + 0xc004))
-#define TOP_sha_State_s_2_reg_addr ((void*) (versat_base + memMappedStart + 0xc008))
-#define TOP_sha_State_s_3_reg_addr ((void*) (versat_base + memMappedStart + 0xc00c))
-#define TOP_sha_State_s_4_reg_addr ((void*) (versat_base + memMappedStart + 0xc010))
-#define TOP_sha_State_s_5_reg_addr ((void*) (versat_base + memMappedStart + 0xc014))
-#define TOP_sha_State_s_6_reg_addr ((void*) (versat_base + memMappedStart + 0xc018))
-#define TOP_sha_State_s_7_reg_addr ((void*) (versat_base + memMappedStart + 0xc01c))
-#define TOP_eliece_mat_addr ((void*) (versat_base + memMappedStart + 0x10000))
+#define TOP_aes_key_0_addr ((void *)(versat_base + memMappedStart + 0x0))
+#define TOP_aes_key_1_addr ((void *)(versat_base + memMappedStart + 0x40))
+#define TOP_aes_key_2_addr ((void *)(versat_base + memMappedStart + 0x80))
+#define TOP_aes_key_3_addr ((void *)(versat_base + memMappedStart + 0xc0))
+#define TOP_aes_key_4_addr ((void *)(versat_base + memMappedStart + 0x100))
+#define TOP_aes_key_5_addr ((void *)(versat_base + memMappedStart + 0x140))
+#define TOP_aes_key_6_addr ((void *)(versat_base + memMappedStart + 0x180))
+#define TOP_aes_key_7_addr ((void *)(versat_base + memMappedStart + 0x1c0))
+#define TOP_aes_key_8_addr ((void *)(versat_base + memMappedStart + 0x200))
+#define TOP_aes_key_9_addr ((void *)(versat_base + memMappedStart + 0x240))
+#define TOP_aes_key_10_addr ((void *)(versat_base + memMappedStart + 0x280))
+#define TOP_aes_key_11_addr ((void *)(versat_base + memMappedStart + 0x2c0))
+#define TOP_aes_key_12_addr ((void *)(versat_base + memMappedStart + 0x300))
+#define TOP_aes_key_13_addr ((void *)(versat_base + memMappedStart + 0x340))
+#define TOP_aes_key_14_addr ((void *)(versat_base + memMappedStart + 0x380))
+#define TOP_aes_key_15_addr ((void *)(versat_base + memMappedStart + 0x3c0))
+#define TOP_aes_state_0_addr ((void *)(versat_base + memMappedStart + 0x400))
+#define TOP_aes_state_1_addr ((void *)(versat_base + memMappedStart + 0x404))
+#define TOP_aes_state_2_addr ((void *)(versat_base + memMappedStart + 0x408))
+#define TOP_aes_state_3_addr ((void *)(versat_base + memMappedStart + 0x40c))
+#define TOP_aes_state_4_addr ((void *)(versat_base + memMappedStart + 0x410))
+#define TOP_aes_state_5_addr ((void *)(versat_base + memMappedStart + 0x414))
+#define TOP_aes_state_6_addr ((void *)(versat_base + memMappedStart + 0x418))
+#define TOP_aes_state_7_addr ((void *)(versat_base + memMappedStart + 0x41c))
+#define TOP_aes_state_8_addr ((void *)(versat_base + memMappedStart + 0x420))
+#define TOP_aes_state_9_addr ((void *)(versat_base + memMappedStart + 0x424))
+#define TOP_aes_state_10_addr ((void *)(versat_base + memMappedStart + 0x428))
+#define TOP_aes_state_11_addr ((void *)(versat_base + memMappedStart + 0x42c))
+#define TOP_aes_state_12_addr ((void *)(versat_base + memMappedStart + 0x430))
+#define TOP_aes_state_13_addr ((void *)(versat_base + memMappedStart + 0x434))
+#define TOP_aes_state_14_addr ((void *)(versat_base + memMappedStart + 0x438))
+#define TOP_aes_state_15_addr ((void *)(versat_base + memMappedStart + 0x43c))
+#define TOP_aes_lastResult_0_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x440))
+#define TOP_aes_lastResult_1_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x444))
+#define TOP_aes_lastResult_2_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x448))
+#define TOP_aes_lastResult_3_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x44c))
+#define TOP_aes_lastResult_4_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x450))
+#define TOP_aes_lastResult_5_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x454))
+#define TOP_aes_lastResult_6_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x458))
+#define TOP_aes_lastResult_7_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x45c))
+#define TOP_aes_lastResult_8_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x460))
+#define TOP_aes_lastResult_9_addr                                              \
+  ((void *)(versat_base + memMappedStart + 0x464))
+#define TOP_aes_lastResult_10_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0x468))
+#define TOP_aes_lastResult_11_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0x46c))
+#define TOP_aes_lastResult_12_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0x470))
+#define TOP_aes_lastResult_13_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0x474))
+#define TOP_aes_lastResult_14_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0x478))
+#define TOP_aes_lastResult_15_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0x47c))
+#define TOP_aes_lastValToAdd_0_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x480))
+#define TOP_aes_lastValToAdd_1_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x484))
+#define TOP_aes_lastValToAdd_2_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x488))
+#define TOP_aes_lastValToAdd_3_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x48c))
+#define TOP_aes_lastValToAdd_4_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x490))
+#define TOP_aes_lastValToAdd_5_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x494))
+#define TOP_aes_lastValToAdd_6_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x498))
+#define TOP_aes_lastValToAdd_7_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x49c))
+#define TOP_aes_lastValToAdd_8_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x4a0))
+#define TOP_aes_lastValToAdd_9_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x4a4))
+#define TOP_aes_lastValToAdd_10_addr                                           \
+  ((void *)(versat_base + memMappedStart + 0x4a8))
+#define TOP_aes_lastValToAdd_11_addr                                           \
+  ((void *)(versat_base + memMappedStart + 0x4ac))
+#define TOP_aes_lastValToAdd_12_addr                                           \
+  ((void *)(versat_base + memMappedStart + 0x4b0))
+#define TOP_aes_lastValToAdd_13_addr                                           \
+  ((void *)(versat_base + memMappedStart + 0x4b4))
+#define TOP_aes_lastValToAdd_14_addr                                           \
+  ((void *)(versat_base + memMappedStart + 0x4b8))
+#define TOP_aes_lastValToAdd_15_addr                                           \
+  ((void *)(versat_base + memMappedStart + 0x4bc))
+#define TOP_aes_schedule_s_b_0_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x600))
+#define TOP_aes_schedule_s_b_1_addr                                            \
+  ((void *)(versat_base + memMappedStart + 0x700))
+#define TOP_aes_round_mixColumns_d_0_mul2_0_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4000))
+#define TOP_aes_round_mixColumns_d_0_mul2_1_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4100))
+#define TOP_aes_round_mixColumns_d_0_mul3_0_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4200))
+#define TOP_aes_round_mixColumns_d_0_mul3_1_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4300))
+#define TOP_aes_round_mixColumns_d_1_mul2_0_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4400))
+#define TOP_aes_round_mixColumns_d_1_mul2_1_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4500))
+#define TOP_aes_round_mixColumns_d_1_mul3_0_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4600))
+#define TOP_aes_round_mixColumns_d_1_mul3_1_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4700))
+#define TOP_aes_round_mixColumns_d_2_mul2_0_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4800))
+#define TOP_aes_round_mixColumns_d_2_mul2_1_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4900))
+#define TOP_aes_round_mixColumns_d_2_mul3_0_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4a00))
+#define TOP_aes_round_mixColumns_d_2_mul3_1_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4b00))
+#define TOP_aes_round_mixColumns_d_3_mul2_0_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4c00))
+#define TOP_aes_round_mixColumns_d_3_mul2_1_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4d00))
+#define TOP_aes_round_mixColumns_d_3_mul3_0_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4e00))
+#define TOP_aes_round_mixColumns_d_3_mul3_1_addr                               \
+  ((void *)(versat_base + memMappedStart + 0x4f00))
+#define TOP_aes_round_invMixColumns_d_0_mul9_0_addr                            \
+  ((void *)(versat_base + memMappedStart + 0x6000))
+#define TOP_aes_round_invMixColumns_d_0_mul9_1_addr                            \
+  ((void *)(versat_base + memMappedStart + 0x6100))
+#define TOP_aes_round_invMixColumns_d_0_mul11_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6200))
+#define TOP_aes_round_invMixColumns_d_0_mul11_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6300))
+#define TOP_aes_round_invMixColumns_d_0_mul13_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6400))
+#define TOP_aes_round_invMixColumns_d_0_mul13_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6500))
+#define TOP_aes_round_invMixColumns_d_0_mul14_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6600))
+#define TOP_aes_round_invMixColumns_d_0_mul14_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6700))
+#define TOP_aes_round_invMixColumns_d_1_mul9_0_addr                            \
+  ((void *)(versat_base + memMappedStart + 0x6800))
+#define TOP_aes_round_invMixColumns_d_1_mul9_1_addr                            \
+  ((void *)(versat_base + memMappedStart + 0x6900))
+#define TOP_aes_round_invMixColumns_d_1_mul11_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6a00))
+#define TOP_aes_round_invMixColumns_d_1_mul11_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6b00))
+#define TOP_aes_round_invMixColumns_d_1_mul13_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6c00))
+#define TOP_aes_round_invMixColumns_d_1_mul13_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6d00))
+#define TOP_aes_round_invMixColumns_d_1_mul14_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6e00))
+#define TOP_aes_round_invMixColumns_d_1_mul14_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x6f00))
+#define TOP_aes_round_invMixColumns_d_2_mul9_0_addr                            \
+  ((void *)(versat_base + memMappedStart + 0x7000))
+#define TOP_aes_round_invMixColumns_d_2_mul9_1_addr                            \
+  ((void *)(versat_base + memMappedStart + 0x7100))
+#define TOP_aes_round_invMixColumns_d_2_mul11_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7200))
+#define TOP_aes_round_invMixColumns_d_2_mul11_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7300))
+#define TOP_aes_round_invMixColumns_d_2_mul13_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7400))
+#define TOP_aes_round_invMixColumns_d_2_mul13_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7500))
+#define TOP_aes_round_invMixColumns_d_2_mul14_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7600))
+#define TOP_aes_round_invMixColumns_d_2_mul14_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7700))
+#define TOP_aes_round_invMixColumns_d_3_mul9_0_addr                            \
+  ((void *)(versat_base + memMappedStart + 0x7800))
+#define TOP_aes_round_invMixColumns_d_3_mul9_1_addr                            \
+  ((void *)(versat_base + memMappedStart + 0x7900))
+#define TOP_aes_round_invMixColumns_d_3_mul11_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7a00))
+#define TOP_aes_round_invMixColumns_d_3_mul11_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7b00))
+#define TOP_aes_round_invMixColumns_d_3_mul13_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7c00))
+#define TOP_aes_round_invMixColumns_d_3_mul13_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7d00))
+#define TOP_aes_round_invMixColumns_d_3_mul14_0_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7e00))
+#define TOP_aes_round_invMixColumns_d_3_mul14_1_addr                           \
+  ((void *)(versat_base + memMappedStart + 0x7f00))
+#define TOP_sha_cMem0_mem_addr ((void *)(versat_base + memMappedStart + 0x8000))
+#define TOP_sha_cMem1_mem_addr ((void *)(versat_base + memMappedStart + 0x9000))
+#define TOP_sha_cMem2_mem_addr ((void *)(versat_base + memMappedStart + 0xa000))
+#define TOP_sha_cMem3_mem_addr ((void *)(versat_base + memMappedStart + 0xb000))
+#define TOP_sha_State_s_0_reg_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0xc000))
+#define TOP_sha_State_s_1_reg_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0xc004))
+#define TOP_sha_State_s_2_reg_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0xc008))
+#define TOP_sha_State_s_3_reg_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0xc00c))
+#define TOP_sha_State_s_4_reg_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0xc010))
+#define TOP_sha_State_s_5_reg_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0xc014))
+#define TOP_sha_State_s_6_reg_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0xc018))
+#define TOP_sha_State_s_7_reg_addr                                             \
+  ((void *)(versat_base + memMappedStart + 0xc01c))
+#define TOP_eliece_mat_addr ((void *)(versat_base + memMappedStart + 0x10000))
 
-#define ACCELERATOR_TOP_ADDR_INIT {TOP_aes_key_0_addr,TOP_aes_key_1_addr,TOP_aes_key_2_addr,TOP_aes_key_3_addr,TOP_aes_key_4_addr,TOP_aes_key_5_addr,TOP_aes_key_6_addr,TOP_aes_key_7_addr,TOP_aes_key_8_addr,TOP_aes_key_9_addr,TOP_aes_key_10_addr,TOP_aes_key_11_addr,TOP_aes_key_12_addr,TOP_aes_key_13_addr,TOP_aes_key_14_addr,TOP_aes_key_15_addr,TOP_aes_state_0_addr,TOP_aes_state_1_addr,TOP_aes_state_2_addr,TOP_aes_state_3_addr,TOP_aes_state_4_addr,TOP_aes_state_5_addr,TOP_aes_state_6_addr,TOP_aes_state_7_addr,TOP_aes_state_8_addr,TOP_aes_state_9_addr,TOP_aes_state_10_addr,TOP_aes_state_11_addr,TOP_aes_state_12_addr,TOP_aes_state_13_addr,TOP_aes_state_14_addr,TOP_aes_state_15_addr,TOP_aes_lastResult_0_addr,TOP_aes_lastResult_1_addr,TOP_aes_lastResult_2_addr,TOP_aes_lastResult_3_addr,TOP_aes_lastResult_4_addr,TOP_aes_lastResult_5_addr,TOP_aes_lastResult_6_addr,TOP_aes_lastResult_7_addr,TOP_aes_lastResult_8_addr,TOP_aes_lastResult_9_addr,TOP_aes_lastResult_10_addr,TOP_aes_lastResult_11_addr,TOP_aes_lastResult_12_addr,TOP_aes_lastResult_13_addr,TOP_aes_lastResult_14_addr,TOP_aes_lastResult_15_addr,TOP_aes_lastValToAdd_0_addr,TOP_aes_lastValToAdd_1_addr,TOP_aes_lastValToAdd_2_addr,TOP_aes_lastValToAdd_3_addr,TOP_aes_lastValToAdd_4_addr,TOP_aes_lastValToAdd_5_addr,TOP_aes_lastValToAdd_6_addr,TOP_aes_lastValToAdd_7_addr,TOP_aes_lastValToAdd_8_addr,TOP_aes_lastValToAdd_9_addr,TOP_aes_lastValToAdd_10_addr,TOP_aes_lastValToAdd_11_addr,TOP_aes_lastValToAdd_12_addr,TOP_aes_lastValToAdd_13_addr,TOP_aes_lastValToAdd_14_addr,TOP_aes_lastValToAdd_15_addr,TOP_aes_schedule_s_b_0_addr,TOP_aes_schedule_s_b_1_addr,TOP_aes_round_mixColumns_d_0_mul2_0_addr,TOP_aes_round_mixColumns_d_0_mul2_1_addr,TOP_aes_round_mixColumns_d_0_mul3_0_addr,TOP_aes_round_mixColumns_d_0_mul3_1_addr,TOP_aes_round_mixColumns_d_1_mul2_0_addr,TOP_aes_round_mixColumns_d_1_mul2_1_addr,TOP_aes_round_mixColumns_d_1_mul3_0_addr,TOP_aes_round_mixColumns_d_1_mul3_1_addr,TOP_aes_round_mixColumns_d_2_mul2_0_addr,TOP_aes_round_mixColumns_d_2_mul2_1_addr,TOP_aes_round_mixColumns_d_2_mul3_0_addr,TOP_aes_round_mixColumns_d_2_mul3_1_addr,TOP_aes_round_mixColumns_d_3_mul2_0_addr,TOP_aes_round_mixColumns_d_3_mul2_1_addr,TOP_aes_round_mixColumns_d_3_mul3_0_addr,TOP_aes_round_mixColumns_d_3_mul3_1_addr,TOP_aes_round_invMixColumns_d_0_mul9_0_addr,TOP_aes_round_invMixColumns_d_0_mul9_1_addr,TOP_aes_round_invMixColumns_d_0_mul11_0_addr,TOP_aes_round_invMixColumns_d_0_mul11_1_addr,TOP_aes_round_invMixColumns_d_0_mul13_0_addr,TOP_aes_round_invMixColumns_d_0_mul13_1_addr,TOP_aes_round_invMixColumns_d_0_mul14_0_addr,TOP_aes_round_invMixColumns_d_0_mul14_1_addr,TOP_aes_round_invMixColumns_d_1_mul9_0_addr,TOP_aes_round_invMixColumns_d_1_mul9_1_addr,TOP_aes_round_invMixColumns_d_1_mul11_0_addr,TOP_aes_round_invMixColumns_d_1_mul11_1_addr,TOP_aes_round_invMixColumns_d_1_mul13_0_addr,TOP_aes_round_invMixColumns_d_1_mul13_1_addr,TOP_aes_round_invMixColumns_d_1_mul14_0_addr,TOP_aes_round_invMixColumns_d_1_mul14_1_addr,TOP_aes_round_invMixColumns_d_2_mul9_0_addr,TOP_aes_round_invMixColumns_d_2_mul9_1_addr,TOP_aes_round_invMixColumns_d_2_mul11_0_addr,TOP_aes_round_invMixColumns_d_2_mul11_1_addr,TOP_aes_round_invMixColumns_d_2_mul13_0_addr,TOP_aes_round_invMixColumns_d_2_mul13_1_addr,TOP_aes_round_invMixColumns_d_2_mul14_0_addr,TOP_aes_round_invMixColumns_d_2_mul14_1_addr,TOP_aes_round_invMixColumns_d_3_mul9_0_addr,TOP_aes_round_invMixColumns_d_3_mul9_1_addr,TOP_aes_round_invMixColumns_d_3_mul11_0_addr,TOP_aes_round_invMixColumns_d_3_mul11_1_addr,TOP_aes_round_invMixColumns_d_3_mul13_0_addr,TOP_aes_round_invMixColumns_d_3_mul13_1_addr,TOP_aes_round_invMixColumns_d_3_mul14_0_addr,TOP_aes_round_invMixColumns_d_3_mul14_1_addr,TOP_sha_cMem0_mem_addr,TOP_sha_cMem1_mem_addr,TOP_sha_cMem2_mem_addr,TOP_sha_cMem3_mem_addr,TOP_sha_State_s_0_reg_addr,TOP_sha_State_s_1_reg_addr,TOP_sha_State_s_2_reg_addr,TOP_sha_State_s_3_reg_addr,TOP_sha_State_s_4_reg_addr,TOP_sha_State_s_5_reg_addr,TOP_sha_State_s_6_reg_addr,TOP_sha_State_s_7_reg_addr,TOP_eliece_mat_addr}
+#define ACCELERATOR_TOP_ADDR_INIT                                              \
+  {                                                                            \
+    TOP_aes_key_0_addr, TOP_aes_key_1_addr, TOP_aes_key_2_addr,                \
+        TOP_aes_key_3_addr, TOP_aes_key_4_addr, TOP_aes_key_5_addr,            \
+        TOP_aes_key_6_addr, TOP_aes_key_7_addr, TOP_aes_key_8_addr,            \
+        TOP_aes_key_9_addr, TOP_aes_key_10_addr, TOP_aes_key_11_addr,          \
+        TOP_aes_key_12_addr, TOP_aes_key_13_addr, TOP_aes_key_14_addr,         \
+        TOP_aes_key_15_addr, TOP_aes_state_0_addr, TOP_aes_state_1_addr,       \
+        TOP_aes_state_2_addr, TOP_aes_state_3_addr, TOP_aes_state_4_addr,      \
+        TOP_aes_state_5_addr, TOP_aes_state_6_addr, TOP_aes_state_7_addr,      \
+        TOP_aes_state_8_addr, TOP_aes_state_9_addr, TOP_aes_state_10_addr,     \
+        TOP_aes_state_11_addr, TOP_aes_state_12_addr, TOP_aes_state_13_addr,   \
+        TOP_aes_state_14_addr, TOP_aes_state_15_addr,                          \
+        TOP_aes_lastResult_0_addr, TOP_aes_lastResult_1_addr,                  \
+        TOP_aes_lastResult_2_addr, TOP_aes_lastResult_3_addr,                  \
+        TOP_aes_lastResult_4_addr, TOP_aes_lastResult_5_addr,                  \
+        TOP_aes_lastResult_6_addr, TOP_aes_lastResult_7_addr,                  \
+        TOP_aes_lastResult_8_addr, TOP_aes_lastResult_9_addr,                  \
+        TOP_aes_lastResult_10_addr, TOP_aes_lastResult_11_addr,                \
+        TOP_aes_lastResult_12_addr, TOP_aes_lastResult_13_addr,                \
+        TOP_aes_lastResult_14_addr, TOP_aes_lastResult_15_addr,                \
+        TOP_aes_lastValToAdd_0_addr, TOP_aes_lastValToAdd_1_addr,              \
+        TOP_aes_lastValToAdd_2_addr, TOP_aes_lastValToAdd_3_addr,              \
+        TOP_aes_lastValToAdd_4_addr, TOP_aes_lastValToAdd_5_addr,              \
+        TOP_aes_lastValToAdd_6_addr, TOP_aes_lastValToAdd_7_addr,              \
+        TOP_aes_lastValToAdd_8_addr, TOP_aes_lastValToAdd_9_addr,              \
+        TOP_aes_lastValToAdd_10_addr, TOP_aes_lastValToAdd_11_addr,            \
+        TOP_aes_lastValToAdd_12_addr, TOP_aes_lastValToAdd_13_addr,            \
+        TOP_aes_lastValToAdd_14_addr, TOP_aes_lastValToAdd_15_addr,            \
+        TOP_aes_schedule_s_b_0_addr, TOP_aes_schedule_s_b_1_addr,              \
+        TOP_aes_round_mixColumns_d_0_mul2_0_addr,                              \
+        TOP_aes_round_mixColumns_d_0_mul2_1_addr,                              \
+        TOP_aes_round_mixColumns_d_0_mul3_0_addr,                              \
+        TOP_aes_round_mixColumns_d_0_mul3_1_addr,                              \
+        TOP_aes_round_mixColumns_d_1_mul2_0_addr,                              \
+        TOP_aes_round_mixColumns_d_1_mul2_1_addr,                              \
+        TOP_aes_round_mixColumns_d_1_mul3_0_addr,                              \
+        TOP_aes_round_mixColumns_d_1_mul3_1_addr,                              \
+        TOP_aes_round_mixColumns_d_2_mul2_0_addr,                              \
+        TOP_aes_round_mixColumns_d_2_mul2_1_addr,                              \
+        TOP_aes_round_mixColumns_d_2_mul3_0_addr,                              \
+        TOP_aes_round_mixColumns_d_2_mul3_1_addr,                              \
+        TOP_aes_round_mixColumns_d_3_mul2_0_addr,                              \
+        TOP_aes_round_mixColumns_d_3_mul2_1_addr,                              \
+        TOP_aes_round_mixColumns_d_3_mul3_0_addr,                              \
+        TOP_aes_round_mixColumns_d_3_mul3_1_addr,                              \
+        TOP_aes_round_invMixColumns_d_0_mul9_0_addr,                           \
+        TOP_aes_round_invMixColumns_d_0_mul9_1_addr,                           \
+        TOP_aes_round_invMixColumns_d_0_mul11_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_0_mul11_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_0_mul13_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_0_mul13_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_0_mul14_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_0_mul14_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_1_mul9_0_addr,                           \
+        TOP_aes_round_invMixColumns_d_1_mul9_1_addr,                           \
+        TOP_aes_round_invMixColumns_d_1_mul11_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_1_mul11_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_1_mul13_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_1_mul13_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_1_mul14_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_1_mul14_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_2_mul9_0_addr,                           \
+        TOP_aes_round_invMixColumns_d_2_mul9_1_addr,                           \
+        TOP_aes_round_invMixColumns_d_2_mul11_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_2_mul11_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_2_mul13_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_2_mul13_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_2_mul14_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_2_mul14_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_3_mul9_0_addr,                           \
+        TOP_aes_round_invMixColumns_d_3_mul9_1_addr,                           \
+        TOP_aes_round_invMixColumns_d_3_mul11_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_3_mul11_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_3_mul13_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_3_mul13_1_addr,                          \
+        TOP_aes_round_invMixColumns_d_3_mul14_0_addr,                          \
+        TOP_aes_round_invMixColumns_d_3_mul14_1_addr, TOP_sha_cMem0_mem_addr,  \
+        TOP_sha_cMem1_mem_addr, TOP_sha_cMem2_mem_addr,                        \
+        TOP_sha_cMem3_mem_addr, TOP_sha_State_s_0_reg_addr,                    \
+        TOP_sha_State_s_1_reg_addr, TOP_sha_State_s_2_reg_addr,                \
+        TOP_sha_State_s_3_reg_addr, TOP_sha_State_s_4_reg_addr,                \
+        TOP_sha_State_s_5_reg_addr, TOP_sha_State_s_6_reg_addr,                \
+        TOP_sha_State_s_7_reg_addr, TOP_eliece_mat_addr                        \
+  }
 
-static unsigned int delayBuffer[] = {0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x12,0x23,0x34,0x1,0x12,0x23,0x0,0x0,0x0,0x0,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x3,0x0,0x3};
-static AcceleratorDelay accelDelay = {0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x12,0x23,0x34,0x1,0x12,0x23,0x0,0x0,0x0,0x0,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x3,0x0,0x3};
+static unsigned int delayBuffer[] = {
+    0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6, 0x6, 0x6, 0x6, 0x6,  0x6,
+    0x6,  0x6,  0x6,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x0, 0x0, 0x0,  0x0,
+    0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0, 0x0,  0x0,
+    0x2,  0x12, 0x23, 0x34, 0x1,  0x12, 0x23, 0x0, 0x0, 0x0, 0x0, 0x44, 0x44,
+    0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x3,  0x0, 0x3};
+static AcceleratorDelay accelDelay = {
+    0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6, 0x6, 0x6, 0x6, 0x6,  0x6,
+    0x6,  0x6,  0x6,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x0, 0x0, 0x0,  0x0,
+    0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0, 0x0,  0x0,
+    0x2,  0x12, 0x23, 0x34, 0x1,  0x12, 0x23, 0x0, 0x0, 0x0, 0x0, 0x44, 0x44,
+    0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x3,  0x0, 0x3};
 
 #ifdef __cplusplus
 extern "C" {
@@ -1122,31 +1310,33 @@ extern "C" {
 void versat_init(int base);
 
 // In pc-emul provides a low bound on performance.
-// In sim-run refines the lower bound but still likely to be smaller than reality due to memory delays that are only present in real circuits.
+// In sim-run refines the lower bound but still likely to be smaller than
+// reality due to memory delays that are only present in real circuits.
 int GetAcceleratorCyclesElapsed();
 
 void RunAccelerator(int times);
 void StartAccelerator();
 void EndAccelerator();
-void VersatMemoryCopy(void* dest,const void* data,int size);
-void VersatUnitWrite(const void* baseaddr,int index,int val);
-int VersatUnitRead(const void* baseaddr,int index);
-float VersatUnitReadFloat(const void* baseaddr,int index);
+void VersatMemoryCopy(void *dest, const void *data, int size);
+void VersatUnitWrite(const void *baseaddr, int index, int val);
+int VersatUnitRead(const void *baseaddr, int index);
+float VersatUnitReadFloat(const void *baseaddr, int index);
 void SignalLoop();
-void VersatLoadDelay(const unsigned int* delayBuffer);
+void VersatLoadDelay(const unsigned int *delayBuffer);
 
-// PC-Emul side functions that allow to enable or disable certain portions of the emulation
-// Their embedded counterparts simply do nothing
+// PC-Emul side functions that allow to enable or disable certain portions of
+// the emulation Their embedded counterparts simply do nothing
 void ConfigEnableDMA(bool value);
 void ConfigCreateVCD(bool value);
-void ConfigSimulateDatabus(bool value); 
+void ConfigSimulateDatabus(bool value);
 
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-// Needed by PC-EMUL to correctly simulate the design, embedded compiler should remove these symbols from firmware because not used by them 
-static const char* acceleratorTypeName = "CryptoAlgos";
+// Needed by PC-EMUL to correctly simulate the design, embedded compiler should
+// remove these symbols from firmware because not used by them
+static const char *acceleratorTypeName = "CryptoAlgos";
 static bool isSimpleAccelerator = true;
 static bool acceleratorSupportsDMA = true;
 
@@ -1155,64 +1345,112 @@ static const int delayStart = 0x80 * sizeof(iptr);
 static const int configStart = 0x5 * sizeof(iptr);
 static const int stateStart = 0x5 * sizeof(int);
 
-extern volatile AcceleratorConfig* accelConfig;
-extern volatile AcceleratorState* accelState;
-extern volatile AcceleratorStatic* accelStatics;
+extern volatile AcceleratorConfig *accelConfig;
+extern volatile AcceleratorState *accelState;
+extern volatile AcceleratorStatic *accelStatics;
 
 // Simple input and output connection for simple accelerators
 #define NumberSimpleInputs 0
 #define NumberSimpleOutputs 0
-#define SimpleInputStart ((iptr*) accelConfig)
-#define SimpleOutputStart ((int*) accelState)
+#define SimpleInputStart ((iptr *)accelConfig)
+#define SimpleOutputStart ((int *)accelState)
 
-#define ACCEL_TOP_aes_key_0_selectedInput accelConfig->TOP_aes_key_0_selectedInput
-#define ACCEL_TOP_aes_key_1_selectedInput accelConfig->TOP_aes_key_1_selectedInput
-#define ACCEL_TOP_aes_key_2_selectedInput accelConfig->TOP_aes_key_2_selectedInput
-#define ACCEL_TOP_aes_key_3_selectedInput accelConfig->TOP_aes_key_3_selectedInput
-#define ACCEL_TOP_aes_key_4_selectedInput accelConfig->TOP_aes_key_4_selectedInput
-#define ACCEL_TOP_aes_key_5_selectedInput accelConfig->TOP_aes_key_5_selectedInput
-#define ACCEL_TOP_aes_key_6_selectedInput accelConfig->TOP_aes_key_6_selectedInput
-#define ACCEL_TOP_aes_key_7_selectedInput accelConfig->TOP_aes_key_7_selectedInput
-#define ACCEL_TOP_aes_key_8_selectedInput accelConfig->TOP_aes_key_8_selectedInput
-#define ACCEL_TOP_aes_key_9_selectedInput accelConfig->TOP_aes_key_9_selectedInput
-#define ACCEL_TOP_aes_key_10_selectedInput accelConfig->TOP_aes_key_10_selectedInput
-#define ACCEL_TOP_aes_key_11_selectedInput accelConfig->TOP_aes_key_11_selectedInput
-#define ACCEL_TOP_aes_key_12_selectedInput accelConfig->TOP_aes_key_12_selectedInput
-#define ACCEL_TOP_aes_key_13_selectedInput accelConfig->TOP_aes_key_13_selectedInput
-#define ACCEL_TOP_aes_key_14_selectedInput accelConfig->TOP_aes_key_14_selectedInput
-#define ACCEL_TOP_aes_key_15_selectedInput accelConfig->TOP_aes_key_15_selectedInput
-#define ACCEL_TOP_aes_key_0_selectedOutput0 accelConfig->TOP_aes_key_0_selectedOutput0
-#define ACCEL_TOP_aes_key_1_selectedOutput0 accelConfig->TOP_aes_key_1_selectedOutput0
-#define ACCEL_TOP_aes_key_2_selectedOutput0 accelConfig->TOP_aes_key_2_selectedOutput0
-#define ACCEL_TOP_aes_key_3_selectedOutput0 accelConfig->TOP_aes_key_3_selectedOutput0
-#define ACCEL_TOP_aes_key_4_selectedOutput0 accelConfig->TOP_aes_key_4_selectedOutput0
-#define ACCEL_TOP_aes_key_5_selectedOutput0 accelConfig->TOP_aes_key_5_selectedOutput0
-#define ACCEL_TOP_aes_key_6_selectedOutput0 accelConfig->TOP_aes_key_6_selectedOutput0
-#define ACCEL_TOP_aes_key_7_selectedOutput0 accelConfig->TOP_aes_key_7_selectedOutput0
-#define ACCEL_TOP_aes_key_8_selectedOutput0 accelConfig->TOP_aes_key_8_selectedOutput0
-#define ACCEL_TOP_aes_key_9_selectedOutput0 accelConfig->TOP_aes_key_9_selectedOutput0
-#define ACCEL_TOP_aes_key_10_selectedOutput0 accelConfig->TOP_aes_key_10_selectedOutput0
-#define ACCEL_TOP_aes_key_11_selectedOutput0 accelConfig->TOP_aes_key_11_selectedOutput0
-#define ACCEL_TOP_aes_key_12_selectedOutput0 accelConfig->TOP_aes_key_12_selectedOutput0
-#define ACCEL_TOP_aes_key_13_selectedOutput0 accelConfig->TOP_aes_key_13_selectedOutput0
-#define ACCEL_TOP_aes_key_14_selectedOutput0 accelConfig->TOP_aes_key_14_selectedOutput0
-#define ACCEL_TOP_aes_key_15_selectedOutput0 accelConfig->TOP_aes_key_15_selectedOutput0
-#define ACCEL_TOP_aes_key_0_selectedOutput1 accelConfig->TOP_aes_key_0_selectedOutput1
-#define ACCEL_TOP_aes_key_1_selectedOutput1 accelConfig->TOP_aes_key_1_selectedOutput1
-#define ACCEL_TOP_aes_key_2_selectedOutput1 accelConfig->TOP_aes_key_2_selectedOutput1
-#define ACCEL_TOP_aes_key_3_selectedOutput1 accelConfig->TOP_aes_key_3_selectedOutput1
-#define ACCEL_TOP_aes_key_4_selectedOutput1 accelConfig->TOP_aes_key_4_selectedOutput1
-#define ACCEL_TOP_aes_key_5_selectedOutput1 accelConfig->TOP_aes_key_5_selectedOutput1
-#define ACCEL_TOP_aes_key_6_selectedOutput1 accelConfig->TOP_aes_key_6_selectedOutput1
-#define ACCEL_TOP_aes_key_7_selectedOutput1 accelConfig->TOP_aes_key_7_selectedOutput1
-#define ACCEL_TOP_aes_key_8_selectedOutput1 accelConfig->TOP_aes_key_8_selectedOutput1
-#define ACCEL_TOP_aes_key_9_selectedOutput1 accelConfig->TOP_aes_key_9_selectedOutput1
-#define ACCEL_TOP_aes_key_10_selectedOutput1 accelConfig->TOP_aes_key_10_selectedOutput1
-#define ACCEL_TOP_aes_key_11_selectedOutput1 accelConfig->TOP_aes_key_11_selectedOutput1
-#define ACCEL_TOP_aes_key_12_selectedOutput1 accelConfig->TOP_aes_key_12_selectedOutput1
-#define ACCEL_TOP_aes_key_13_selectedOutput1 accelConfig->TOP_aes_key_13_selectedOutput1
-#define ACCEL_TOP_aes_key_14_selectedOutput1 accelConfig->TOP_aes_key_14_selectedOutput1
-#define ACCEL_TOP_aes_key_15_selectedOutput1 accelConfig->TOP_aes_key_15_selectedOutput1
+#define ACCEL_TOP_aes_key_0_selectedInput                                      \
+  accelConfig->TOP_aes_key_0_selectedInput
+#define ACCEL_TOP_aes_key_1_selectedInput                                      \
+  accelConfig->TOP_aes_key_1_selectedInput
+#define ACCEL_TOP_aes_key_2_selectedInput                                      \
+  accelConfig->TOP_aes_key_2_selectedInput
+#define ACCEL_TOP_aes_key_3_selectedInput                                      \
+  accelConfig->TOP_aes_key_3_selectedInput
+#define ACCEL_TOP_aes_key_4_selectedInput                                      \
+  accelConfig->TOP_aes_key_4_selectedInput
+#define ACCEL_TOP_aes_key_5_selectedInput                                      \
+  accelConfig->TOP_aes_key_5_selectedInput
+#define ACCEL_TOP_aes_key_6_selectedInput                                      \
+  accelConfig->TOP_aes_key_6_selectedInput
+#define ACCEL_TOP_aes_key_7_selectedInput                                      \
+  accelConfig->TOP_aes_key_7_selectedInput
+#define ACCEL_TOP_aes_key_8_selectedInput                                      \
+  accelConfig->TOP_aes_key_8_selectedInput
+#define ACCEL_TOP_aes_key_9_selectedInput                                      \
+  accelConfig->TOP_aes_key_9_selectedInput
+#define ACCEL_TOP_aes_key_10_selectedInput                                     \
+  accelConfig->TOP_aes_key_10_selectedInput
+#define ACCEL_TOP_aes_key_11_selectedInput                                     \
+  accelConfig->TOP_aes_key_11_selectedInput
+#define ACCEL_TOP_aes_key_12_selectedInput                                     \
+  accelConfig->TOP_aes_key_12_selectedInput
+#define ACCEL_TOP_aes_key_13_selectedInput                                     \
+  accelConfig->TOP_aes_key_13_selectedInput
+#define ACCEL_TOP_aes_key_14_selectedInput                                     \
+  accelConfig->TOP_aes_key_14_selectedInput
+#define ACCEL_TOP_aes_key_15_selectedInput                                     \
+  accelConfig->TOP_aes_key_15_selectedInput
+#define ACCEL_TOP_aes_key_0_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_0_selectedOutput0
+#define ACCEL_TOP_aes_key_1_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_1_selectedOutput0
+#define ACCEL_TOP_aes_key_2_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_2_selectedOutput0
+#define ACCEL_TOP_aes_key_3_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_3_selectedOutput0
+#define ACCEL_TOP_aes_key_4_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_4_selectedOutput0
+#define ACCEL_TOP_aes_key_5_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_5_selectedOutput0
+#define ACCEL_TOP_aes_key_6_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_6_selectedOutput0
+#define ACCEL_TOP_aes_key_7_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_7_selectedOutput0
+#define ACCEL_TOP_aes_key_8_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_8_selectedOutput0
+#define ACCEL_TOP_aes_key_9_selectedOutput0                                    \
+  accelConfig->TOP_aes_key_9_selectedOutput0
+#define ACCEL_TOP_aes_key_10_selectedOutput0                                   \
+  accelConfig->TOP_aes_key_10_selectedOutput0
+#define ACCEL_TOP_aes_key_11_selectedOutput0                                   \
+  accelConfig->TOP_aes_key_11_selectedOutput0
+#define ACCEL_TOP_aes_key_12_selectedOutput0                                   \
+  accelConfig->TOP_aes_key_12_selectedOutput0
+#define ACCEL_TOP_aes_key_13_selectedOutput0                                   \
+  accelConfig->TOP_aes_key_13_selectedOutput0
+#define ACCEL_TOP_aes_key_14_selectedOutput0                                   \
+  accelConfig->TOP_aes_key_14_selectedOutput0
+#define ACCEL_TOP_aes_key_15_selectedOutput0                                   \
+  accelConfig->TOP_aes_key_15_selectedOutput0
+#define ACCEL_TOP_aes_key_0_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_0_selectedOutput1
+#define ACCEL_TOP_aes_key_1_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_1_selectedOutput1
+#define ACCEL_TOP_aes_key_2_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_2_selectedOutput1
+#define ACCEL_TOP_aes_key_3_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_3_selectedOutput1
+#define ACCEL_TOP_aes_key_4_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_4_selectedOutput1
+#define ACCEL_TOP_aes_key_5_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_5_selectedOutput1
+#define ACCEL_TOP_aes_key_6_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_6_selectedOutput1
+#define ACCEL_TOP_aes_key_7_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_7_selectedOutput1
+#define ACCEL_TOP_aes_key_8_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_8_selectedOutput1
+#define ACCEL_TOP_aes_key_9_selectedOutput1                                    \
+  accelConfig->TOP_aes_key_9_selectedOutput1
+#define ACCEL_TOP_aes_key_10_selectedOutput1                                   \
+  accelConfig->TOP_aes_key_10_selectedOutput1
+#define ACCEL_TOP_aes_key_11_selectedOutput1                                   \
+  accelConfig->TOP_aes_key_11_selectedOutput1
+#define ACCEL_TOP_aes_key_12_selectedOutput1                                   \
+  accelConfig->TOP_aes_key_12_selectedOutput1
+#define ACCEL_TOP_aes_key_13_selectedOutput1                                   \
+  accelConfig->TOP_aes_key_13_selectedOutput1
+#define ACCEL_TOP_aes_key_14_selectedOutput1                                   \
+  accelConfig->TOP_aes_key_14_selectedOutput1
+#define ACCEL_TOP_aes_key_15_selectedOutput1                                   \
+  accelConfig->TOP_aes_key_15_selectedOutput1
 #define ACCEL_TOP_aes_key_0_disabled accelConfig->TOP_aes_key_0_disabled
 #define ACCEL_TOP_aes_key_1_disabled accelConfig->TOP_aes_key_1_disabled
 #define ACCEL_TOP_aes_key_2_disabled accelConfig->TOP_aes_key_2_disabled
@@ -1245,107 +1483,207 @@ extern volatile AcceleratorStatic* accelStatics;
 #define ACCEL_TOP_aes_state_13_disabled accelConfig->TOP_aes_state_13_disabled
 #define ACCEL_TOP_aes_state_14_disabled accelConfig->TOP_aes_state_14_disabled
 #define ACCEL_TOP_aes_state_15_disabled accelConfig->TOP_aes_state_15_disabled
-#define ACCEL_TOP_aes_lastResult_0_disabled accelConfig->TOP_aes_lastResult_0_disabled
-#define ACCEL_TOP_aes_lastResult_1_disabled accelConfig->TOP_aes_lastResult_1_disabled
-#define ACCEL_TOP_aes_lastResult_2_disabled accelConfig->TOP_aes_lastResult_2_disabled
-#define ACCEL_TOP_aes_lastResult_3_disabled accelConfig->TOP_aes_lastResult_3_disabled
-#define ACCEL_TOP_aes_lastResult_4_disabled accelConfig->TOP_aes_lastResult_4_disabled
-#define ACCEL_TOP_aes_lastResult_5_disabled accelConfig->TOP_aes_lastResult_5_disabled
-#define ACCEL_TOP_aes_lastResult_6_disabled accelConfig->TOP_aes_lastResult_6_disabled
-#define ACCEL_TOP_aes_lastResult_7_disabled accelConfig->TOP_aes_lastResult_7_disabled
-#define ACCEL_TOP_aes_lastResult_8_disabled accelConfig->TOP_aes_lastResult_8_disabled
-#define ACCEL_TOP_aes_lastResult_9_disabled accelConfig->TOP_aes_lastResult_9_disabled
-#define ACCEL_TOP_aes_lastResult_10_disabled accelConfig->TOP_aes_lastResult_10_disabled
-#define ACCEL_TOP_aes_lastResult_11_disabled accelConfig->TOP_aes_lastResult_11_disabled
-#define ACCEL_TOP_aes_lastResult_12_disabled accelConfig->TOP_aes_lastResult_12_disabled
-#define ACCEL_TOP_aes_lastResult_13_disabled accelConfig->TOP_aes_lastResult_13_disabled
-#define ACCEL_TOP_aes_lastResult_14_disabled accelConfig->TOP_aes_lastResult_14_disabled
-#define ACCEL_TOP_aes_lastResult_15_disabled accelConfig->TOP_aes_lastResult_15_disabled
-#define ACCEL_TOP_aes_lastValToAdd_0_disabled accelConfig->TOP_aes_lastValToAdd_0_disabled
-#define ACCEL_TOP_aes_lastValToAdd_1_disabled accelConfig->TOP_aes_lastValToAdd_1_disabled
-#define ACCEL_TOP_aes_lastValToAdd_2_disabled accelConfig->TOP_aes_lastValToAdd_2_disabled
-#define ACCEL_TOP_aes_lastValToAdd_3_disabled accelConfig->TOP_aes_lastValToAdd_3_disabled
-#define ACCEL_TOP_aes_lastValToAdd_4_disabled accelConfig->TOP_aes_lastValToAdd_4_disabled
-#define ACCEL_TOP_aes_lastValToAdd_5_disabled accelConfig->TOP_aes_lastValToAdd_5_disabled
-#define ACCEL_TOP_aes_lastValToAdd_6_disabled accelConfig->TOP_aes_lastValToAdd_6_disabled
-#define ACCEL_TOP_aes_lastValToAdd_7_disabled accelConfig->TOP_aes_lastValToAdd_7_disabled
-#define ACCEL_TOP_aes_lastValToAdd_8_disabled accelConfig->TOP_aes_lastValToAdd_8_disabled
-#define ACCEL_TOP_aes_lastValToAdd_9_disabled accelConfig->TOP_aes_lastValToAdd_9_disabled
-#define ACCEL_TOP_aes_lastValToAdd_10_disabled accelConfig->TOP_aes_lastValToAdd_10_disabled
-#define ACCEL_TOP_aes_lastValToAdd_11_disabled accelConfig->TOP_aes_lastValToAdd_11_disabled
-#define ACCEL_TOP_aes_lastValToAdd_12_disabled accelConfig->TOP_aes_lastValToAdd_12_disabled
-#define ACCEL_TOP_aes_lastValToAdd_13_disabled accelConfig->TOP_aes_lastValToAdd_13_disabled
-#define ACCEL_TOP_aes_lastValToAdd_14_disabled accelConfig->TOP_aes_lastValToAdd_14_disabled
-#define ACCEL_TOP_aes_lastValToAdd_15_disabled accelConfig->TOP_aes_lastValToAdd_15_disabled
-#define ACCEL_TOP_aes_schedule_s_mux_0_sel accelConfig->TOP_aes_schedule_s_mux_0_sel
-#define ACCEL_TOP_aes_schedule_s_mux_1_sel accelConfig->TOP_aes_schedule_s_mux_1_sel
-#define ACCEL_TOP_aes_schedule_s_mux_2_sel accelConfig->TOP_aes_schedule_s_mux_2_sel
-#define ACCEL_TOP_aes_schedule_s_mux_3_sel accelConfig->TOP_aes_schedule_s_mux_3_sel
+#define ACCEL_TOP_aes_lastResult_0_disabled                                    \
+  accelConfig->TOP_aes_lastResult_0_disabled
+#define ACCEL_TOP_aes_lastResult_1_disabled                                    \
+  accelConfig->TOP_aes_lastResult_1_disabled
+#define ACCEL_TOP_aes_lastResult_2_disabled                                    \
+  accelConfig->TOP_aes_lastResult_2_disabled
+#define ACCEL_TOP_aes_lastResult_3_disabled                                    \
+  accelConfig->TOP_aes_lastResult_3_disabled
+#define ACCEL_TOP_aes_lastResult_4_disabled                                    \
+  accelConfig->TOP_aes_lastResult_4_disabled
+#define ACCEL_TOP_aes_lastResult_5_disabled                                    \
+  accelConfig->TOP_aes_lastResult_5_disabled
+#define ACCEL_TOP_aes_lastResult_6_disabled                                    \
+  accelConfig->TOP_aes_lastResult_6_disabled
+#define ACCEL_TOP_aes_lastResult_7_disabled                                    \
+  accelConfig->TOP_aes_lastResult_7_disabled
+#define ACCEL_TOP_aes_lastResult_8_disabled                                    \
+  accelConfig->TOP_aes_lastResult_8_disabled
+#define ACCEL_TOP_aes_lastResult_9_disabled                                    \
+  accelConfig->TOP_aes_lastResult_9_disabled
+#define ACCEL_TOP_aes_lastResult_10_disabled                                   \
+  accelConfig->TOP_aes_lastResult_10_disabled
+#define ACCEL_TOP_aes_lastResult_11_disabled                                   \
+  accelConfig->TOP_aes_lastResult_11_disabled
+#define ACCEL_TOP_aes_lastResult_12_disabled                                   \
+  accelConfig->TOP_aes_lastResult_12_disabled
+#define ACCEL_TOP_aes_lastResult_13_disabled                                   \
+  accelConfig->TOP_aes_lastResult_13_disabled
+#define ACCEL_TOP_aes_lastResult_14_disabled                                   \
+  accelConfig->TOP_aes_lastResult_14_disabled
+#define ACCEL_TOP_aes_lastResult_15_disabled                                   \
+  accelConfig->TOP_aes_lastResult_15_disabled
+#define ACCEL_TOP_aes_lastValToAdd_0_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_0_disabled
+#define ACCEL_TOP_aes_lastValToAdd_1_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_1_disabled
+#define ACCEL_TOP_aes_lastValToAdd_2_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_2_disabled
+#define ACCEL_TOP_aes_lastValToAdd_3_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_3_disabled
+#define ACCEL_TOP_aes_lastValToAdd_4_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_4_disabled
+#define ACCEL_TOP_aes_lastValToAdd_5_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_5_disabled
+#define ACCEL_TOP_aes_lastValToAdd_6_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_6_disabled
+#define ACCEL_TOP_aes_lastValToAdd_7_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_7_disabled
+#define ACCEL_TOP_aes_lastValToAdd_8_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_8_disabled
+#define ACCEL_TOP_aes_lastValToAdd_9_disabled                                  \
+  accelConfig->TOP_aes_lastValToAdd_9_disabled
+#define ACCEL_TOP_aes_lastValToAdd_10_disabled                                 \
+  accelConfig->TOP_aes_lastValToAdd_10_disabled
+#define ACCEL_TOP_aes_lastValToAdd_11_disabled                                 \
+  accelConfig->TOP_aes_lastValToAdd_11_disabled
+#define ACCEL_TOP_aes_lastValToAdd_12_disabled                                 \
+  accelConfig->TOP_aes_lastValToAdd_12_disabled
+#define ACCEL_TOP_aes_lastValToAdd_13_disabled                                 \
+  accelConfig->TOP_aes_lastValToAdd_13_disabled
+#define ACCEL_TOP_aes_lastValToAdd_14_disabled                                 \
+  accelConfig->TOP_aes_lastValToAdd_14_disabled
+#define ACCEL_TOP_aes_lastValToAdd_15_disabled                                 \
+  accelConfig->TOP_aes_lastValToAdd_15_disabled
+#define ACCEL_TOP_aes_schedule_s_mux_0_sel                                     \
+  accelConfig->TOP_aes_schedule_s_mux_0_sel
+#define ACCEL_TOP_aes_schedule_s_mux_1_sel                                     \
+  accelConfig->TOP_aes_schedule_s_mux_1_sel
+#define ACCEL_TOP_aes_schedule_s_mux_2_sel                                     \
+  accelConfig->TOP_aes_schedule_s_mux_2_sel
+#define ACCEL_TOP_aes_schedule_s_mux_3_sel                                     \
+  accelConfig->TOP_aes_schedule_s_mux_3_sel
 #define ACCEL_TOP_aes_rcon_constant accelConfig->TOP_aes_rcon_constant
-#define ACCEL_TOP_aes_round_versat_merge_mux_0_sel accelConfig->TOP_aes_round_versat_merge_mux_0_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_1_sel accelConfig->TOP_aes_round_versat_merge_mux_1_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_2_sel accelConfig->TOP_aes_round_versat_merge_mux_2_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_3_sel accelConfig->TOP_aes_round_versat_merge_mux_3_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_4_sel accelConfig->TOP_aes_round_versat_merge_mux_4_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_5_sel accelConfig->TOP_aes_round_versat_merge_mux_5_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_6_sel accelConfig->TOP_aes_round_versat_merge_mux_6_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_7_sel accelConfig->TOP_aes_round_versat_merge_mux_7_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_8_sel accelConfig->TOP_aes_round_versat_merge_mux_8_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_9_sel accelConfig->TOP_aes_round_versat_merge_mux_9_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_10_sel accelConfig->TOP_aes_round_versat_merge_mux_10_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_11_sel accelConfig->TOP_aes_round_versat_merge_mux_11_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_12_sel accelConfig->TOP_aes_round_versat_merge_mux_12_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_13_sel accelConfig->TOP_aes_round_versat_merge_mux_13_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_14_sel accelConfig->TOP_aes_round_versat_merge_mux_14_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_15_sel accelConfig->TOP_aes_round_versat_merge_mux_15_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_16_sel accelConfig->TOP_aes_round_versat_merge_mux_16_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_17_sel accelConfig->TOP_aes_round_versat_merge_mux_17_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_18_sel accelConfig->TOP_aes_round_versat_merge_mux_18_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_19_sel accelConfig->TOP_aes_round_versat_merge_mux_19_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_20_sel accelConfig->TOP_aes_round_versat_merge_mux_20_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_21_sel accelConfig->TOP_aes_round_versat_merge_mux_21_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_22_sel accelConfig->TOP_aes_round_versat_merge_mux_22_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_23_sel accelConfig->TOP_aes_round_versat_merge_mux_23_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_24_sel accelConfig->TOP_aes_round_versat_merge_mux_24_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_25_sel accelConfig->TOP_aes_round_versat_merge_mux_25_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_26_sel accelConfig->TOP_aes_round_versat_merge_mux_26_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_27_sel accelConfig->TOP_aes_round_versat_merge_mux_27_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_28_sel accelConfig->TOP_aes_round_versat_merge_mux_28_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_29_sel accelConfig->TOP_aes_round_versat_merge_mux_29_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_30_sel accelConfig->TOP_aes_round_versat_merge_mux_30_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_31_sel accelConfig->TOP_aes_round_versat_merge_mux_31_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_32_sel accelConfig->TOP_aes_round_versat_merge_mux_32_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_33_sel accelConfig->TOP_aes_round_versat_merge_mux_33_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_34_sel accelConfig->TOP_aes_round_versat_merge_mux_34_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_35_sel accelConfig->TOP_aes_round_versat_merge_mux_35_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_36_sel accelConfig->TOP_aes_round_versat_merge_mux_36_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_37_sel accelConfig->TOP_aes_round_versat_merge_mux_37_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_38_sel accelConfig->TOP_aes_round_versat_merge_mux_38_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_39_sel accelConfig->TOP_aes_round_versat_merge_mux_39_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_40_sel accelConfig->TOP_aes_round_versat_merge_mux_40_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_41_sel accelConfig->TOP_aes_round_versat_merge_mux_41_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_42_sel accelConfig->TOP_aes_round_versat_merge_mux_42_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_43_sel accelConfig->TOP_aes_round_versat_merge_mux_43_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_44_sel accelConfig->TOP_aes_round_versat_merge_mux_44_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_45_sel accelConfig->TOP_aes_round_versat_merge_mux_45_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_46_sel accelConfig->TOP_aes_round_versat_merge_mux_46_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_47_sel accelConfig->TOP_aes_round_versat_merge_mux_47_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_48_sel accelConfig->TOP_aes_round_versat_merge_mux_48_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_49_sel accelConfig->TOP_aes_round_versat_merge_mux_49_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_50_sel accelConfig->TOP_aes_round_versat_merge_mux_50_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_51_sel accelConfig->TOP_aes_round_versat_merge_mux_51_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_52_sel accelConfig->TOP_aes_round_versat_merge_mux_52_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_53_sel accelConfig->TOP_aes_round_versat_merge_mux_53_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_54_sel accelConfig->TOP_aes_round_versat_merge_mux_54_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_55_sel accelConfig->TOP_aes_round_versat_merge_mux_55_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_56_sel accelConfig->TOP_aes_round_versat_merge_mux_56_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_57_sel accelConfig->TOP_aes_round_versat_merge_mux_57_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_58_sel accelConfig->TOP_aes_round_versat_merge_mux_58_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_59_sel accelConfig->TOP_aes_round_versat_merge_mux_59_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_60_sel accelConfig->TOP_aes_round_versat_merge_mux_60_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_61_sel accelConfig->TOP_aes_round_versat_merge_mux_61_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_62_sel accelConfig->TOP_aes_round_versat_merge_mux_62_sel
-#define ACCEL_TOP_aes_round_versat_merge_mux_63_sel accelConfig->TOP_aes_round_versat_merge_mux_63_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_0_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_0_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_1_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_1_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_2_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_2_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_3_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_3_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_4_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_4_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_5_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_5_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_6_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_6_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_7_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_7_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_8_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_8_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_9_sel                             \
+  accelConfig->TOP_aes_round_versat_merge_mux_9_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_10_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_10_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_11_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_11_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_12_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_12_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_13_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_13_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_14_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_14_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_15_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_15_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_16_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_16_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_17_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_17_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_18_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_18_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_19_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_19_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_20_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_20_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_21_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_21_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_22_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_22_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_23_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_23_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_24_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_24_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_25_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_25_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_26_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_26_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_27_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_27_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_28_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_28_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_29_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_29_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_30_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_30_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_31_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_31_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_32_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_32_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_33_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_33_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_34_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_34_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_35_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_35_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_36_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_36_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_37_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_37_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_38_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_38_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_39_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_39_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_40_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_40_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_41_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_41_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_42_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_42_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_43_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_43_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_44_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_44_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_45_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_45_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_46_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_46_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_47_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_47_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_48_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_48_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_49_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_49_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_50_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_50_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_51_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_51_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_52_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_52_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_53_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_53_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_54_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_54_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_55_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_55_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_56_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_56_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_57_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_57_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_58_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_58_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_59_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_59_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_60_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_60_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_61_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_61_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_62_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_62_sel
+#define ACCEL_TOP_aes_round_versat_merge_mux_63_sel                            \
+  accelConfig->TOP_aes_round_versat_merge_mux_63_sel
 #define ACCEL_TOP_sha_MemRead_ext_addr accelConfig->TOP_sha_MemRead_ext_addr
 #define ACCEL_TOP_sha_MemRead_perA accelConfig->TOP_sha_MemRead_perA
 #define ACCEL_TOP_sha_MemRead_incrA accelConfig->TOP_sha_MemRead_incrA
@@ -1365,14 +1703,22 @@ extern volatile AcceleratorStatic* accelStatics;
 #define ACCEL_TOP_sha_MemRead_incr2B accelConfig->TOP_sha_MemRead_incr2B
 #define ACCEL_TOP_sha_MemRead_enableRead accelConfig->TOP_sha_MemRead_enableRead
 #define ACCEL_TOP_sha_Swap_enabled accelConfig->TOP_sha_Swap_enabled
-#define ACCEL_TOP_sha_State_s_0_reg_disabled accelConfig->TOP_sha_State_s_0_reg_disabled
-#define ACCEL_TOP_sha_State_s_1_reg_disabled accelConfig->TOP_sha_State_s_1_reg_disabled
-#define ACCEL_TOP_sha_State_s_2_reg_disabled accelConfig->TOP_sha_State_s_2_reg_disabled
-#define ACCEL_TOP_sha_State_s_3_reg_disabled accelConfig->TOP_sha_State_s_3_reg_disabled
-#define ACCEL_TOP_sha_State_s_4_reg_disabled accelConfig->TOP_sha_State_s_4_reg_disabled
-#define ACCEL_TOP_sha_State_s_5_reg_disabled accelConfig->TOP_sha_State_s_5_reg_disabled
-#define ACCEL_TOP_sha_State_s_6_reg_disabled accelConfig->TOP_sha_State_s_6_reg_disabled
-#define ACCEL_TOP_sha_State_s_7_reg_disabled accelConfig->TOP_sha_State_s_7_reg_disabled
+#define ACCEL_TOP_sha_State_s_0_reg_disabled                                   \
+  accelConfig->TOP_sha_State_s_0_reg_disabled
+#define ACCEL_TOP_sha_State_s_1_reg_disabled                                   \
+  accelConfig->TOP_sha_State_s_1_reg_disabled
+#define ACCEL_TOP_sha_State_s_2_reg_disabled                                   \
+  accelConfig->TOP_sha_State_s_2_reg_disabled
+#define ACCEL_TOP_sha_State_s_3_reg_disabled                                   \
+  accelConfig->TOP_sha_State_s_3_reg_disabled
+#define ACCEL_TOP_sha_State_s_4_reg_disabled                                   \
+  accelConfig->TOP_sha_State_s_4_reg_disabled
+#define ACCEL_TOP_sha_State_s_5_reg_disabled                                   \
+  accelConfig->TOP_sha_State_s_5_reg_disabled
+#define ACCEL_TOP_sha_State_s_6_reg_disabled                                   \
+  accelConfig->TOP_sha_State_s_6_reg_disabled
+#define ACCEL_TOP_sha_State_s_7_reg_disabled                                   \
+  accelConfig->TOP_sha_State_s_7_reg_disabled
 #define ACCEL_TOP_eliece_mat_disabled accelConfig->TOP_eliece_mat_disabled
 #define ACCEL_TOP_eliece_mat_iterA accelConfig->TOP_eliece_mat_iterA
 #define ACCEL_TOP_eliece_mat_perA accelConfig->TOP_eliece_mat_perA
@@ -1425,25 +1771,42 @@ extern volatile AcceleratorStatic* accelStatics;
 #define ACCEL_TOP_eliece_writer_per2B accelConfig->TOP_eliece_writer_per2B
 #define ACCEL_TOP_eliece_writer_shift2B accelConfig->TOP_eliece_writer_shift2B
 #define ACCEL_TOP_eliece_writer_incr2B accelConfig->TOP_eliece_writer_incr2B
-#define ACCEL_TOP_eliece_writer_enableWrite accelConfig->TOP_eliece_writer_enableWrite
+#define ACCEL_TOP_eliece_writer_enableWrite                                    \
+  accelConfig->TOP_eliece_writer_enableWrite
 #define ACCEL_TOP_eliece_mask_constant accelConfig->TOP_eliece_mask_constant
 
-#define ACCEL_FullAESRounds_buffer0_1_1_amount accelStatics->FullAESRounds_buffer0_1_1_amount
-#define ACCEL_FullAESRounds_buffer1_1_1_amount accelStatics->FullAESRounds_buffer1_1_1_amount
-#define ACCEL_FullAESRounds_buffer2_1_1_amount accelStatics->FullAESRounds_buffer2_1_1_amount
-#define ACCEL_FullAESRounds_buffer3_1_1_amount accelStatics->FullAESRounds_buffer3_1_1_amount
-#define ACCEL_FullAESRounds_buffer4_1_1_amount accelStatics->FullAESRounds_buffer4_1_1_amount
-#define ACCEL_FullAESRounds_buffer5_1_1_amount accelStatics->FullAESRounds_buffer5_1_1_amount
-#define ACCEL_FullAESRounds_buffer6_1_1_amount accelStatics->FullAESRounds_buffer6_1_1_amount
-#define ACCEL_FullAESRounds_buffer7_1_1_amount accelStatics->FullAESRounds_buffer7_1_1_amount
-#define ACCEL_FullAESRounds_buffer8_1_1_amount accelStatics->FullAESRounds_buffer8_1_1_amount
-#define ACCEL_FullAESRounds_buffer9_1_1_amount accelStatics->FullAESRounds_buffer9_1_1_amount
-#define ACCEL_FullAESRounds_buffer10_1_1_amount accelStatics->FullAESRounds_buffer10_1_1_amount
-#define ACCEL_FullAESRounds_buffer11_1_1_amount accelStatics->FullAESRounds_buffer11_1_1_amount
-#define ACCEL_FullAESRounds_buffer12_1_1_amount accelStatics->FullAESRounds_buffer12_1_1_amount
-#define ACCEL_FullAESRounds_buffer13_1_1_amount accelStatics->FullAESRounds_buffer13_1_1_amount
-#define ACCEL_FullAESRounds_buffer14_1_1_amount accelStatics->FullAESRounds_buffer14_1_1_amount
-#define ACCEL_FullAESRounds_buffer15_1_1_amount accelStatics->FullAESRounds_buffer15_1_1_amount
+#define ACCEL_FullAESRounds_buffer0_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer0_1_1_amount
+#define ACCEL_FullAESRounds_buffer1_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer1_1_1_amount
+#define ACCEL_FullAESRounds_buffer2_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer2_1_1_amount
+#define ACCEL_FullAESRounds_buffer3_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer3_1_1_amount
+#define ACCEL_FullAESRounds_buffer4_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer4_1_1_amount
+#define ACCEL_FullAESRounds_buffer5_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer5_1_1_amount
+#define ACCEL_FullAESRounds_buffer6_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer6_1_1_amount
+#define ACCEL_FullAESRounds_buffer7_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer7_1_1_amount
+#define ACCEL_FullAESRounds_buffer8_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer8_1_1_amount
+#define ACCEL_FullAESRounds_buffer9_1_1_amount                                 \
+  accelStatics->FullAESRounds_buffer9_1_1_amount
+#define ACCEL_FullAESRounds_buffer10_1_1_amount                                \
+  accelStatics->FullAESRounds_buffer10_1_1_amount
+#define ACCEL_FullAESRounds_buffer11_1_1_amount                                \
+  accelStatics->FullAESRounds_buffer11_1_1_amount
+#define ACCEL_FullAESRounds_buffer12_1_1_amount                                \
+  accelStatics->FullAESRounds_buffer12_1_1_amount
+#define ACCEL_FullAESRounds_buffer13_1_1_amount                                \
+  accelStatics->FullAESRounds_buffer13_1_1_amount
+#define ACCEL_FullAESRounds_buffer14_1_1_amount                                \
+  accelStatics->FullAESRounds_buffer14_1_1_amount
+#define ACCEL_FullAESRounds_buffer15_1_1_amount                                \
+  accelStatics->FullAESRounds_buffer15_1_1_amount
 #define ACCEL_Constants_mem_disabled accelStatics->Constants_mem_disabled
 #define ACCEL_Constants_mem_iterA accelStatics->Constants_mem_iterA
 #define ACCEL_Constants_mem_perA accelStatics->Constants_mem_perA
@@ -1546,103 +1909,208 @@ extern volatile AcceleratorStatic* accelStatics;
 #define ACCEL_TOP_Delay85 accelConfig->TOP_Delay85
 #define ACCEL_TOP_Delay86 accelConfig->TOP_Delay86
 
-#define ACCEL_TOP_aes_state_0_currentValue accelState->TOP_aes_state_0_currentValue
-#define ACCEL_TOP_aes_state_1_currentValue accelState->TOP_aes_state_1_currentValue
-#define ACCEL_TOP_aes_state_2_currentValue accelState->TOP_aes_state_2_currentValue
-#define ACCEL_TOP_aes_state_3_currentValue accelState->TOP_aes_state_3_currentValue
-#define ACCEL_TOP_aes_state_4_currentValue accelState->TOP_aes_state_4_currentValue
-#define ACCEL_TOP_aes_state_5_currentValue accelState->TOP_aes_state_5_currentValue
-#define ACCEL_TOP_aes_state_6_currentValue accelState->TOP_aes_state_6_currentValue
-#define ACCEL_TOP_aes_state_7_currentValue accelState->TOP_aes_state_7_currentValue
-#define ACCEL_TOP_aes_state_8_currentValue accelState->TOP_aes_state_8_currentValue
-#define ACCEL_TOP_aes_state_9_currentValue accelState->TOP_aes_state_9_currentValue
-#define ACCEL_TOP_aes_state_10_currentValue accelState->TOP_aes_state_10_currentValue
-#define ACCEL_TOP_aes_state_11_currentValue accelState->TOP_aes_state_11_currentValue
-#define ACCEL_TOP_aes_state_12_currentValue accelState->TOP_aes_state_12_currentValue
-#define ACCEL_TOP_aes_state_13_currentValue accelState->TOP_aes_state_13_currentValue
-#define ACCEL_TOP_aes_state_14_currentValue accelState->TOP_aes_state_14_currentValue
-#define ACCEL_TOP_aes_state_15_currentValue accelState->TOP_aes_state_15_currentValue
-#define ACCEL_TOP_aes_lastResult_0_currentValue accelState->TOP_aes_lastResult_0_currentValue
-#define ACCEL_TOP_aes_lastResult_1_currentValue accelState->TOP_aes_lastResult_1_currentValue
-#define ACCEL_TOP_aes_lastResult_2_currentValue accelState->TOP_aes_lastResult_2_currentValue
-#define ACCEL_TOP_aes_lastResult_3_currentValue accelState->TOP_aes_lastResult_3_currentValue
-#define ACCEL_TOP_aes_lastResult_4_currentValue accelState->TOP_aes_lastResult_4_currentValue
-#define ACCEL_TOP_aes_lastResult_5_currentValue accelState->TOP_aes_lastResult_5_currentValue
-#define ACCEL_TOP_aes_lastResult_6_currentValue accelState->TOP_aes_lastResult_6_currentValue
-#define ACCEL_TOP_aes_lastResult_7_currentValue accelState->TOP_aes_lastResult_7_currentValue
-#define ACCEL_TOP_aes_lastResult_8_currentValue accelState->TOP_aes_lastResult_8_currentValue
-#define ACCEL_TOP_aes_lastResult_9_currentValue accelState->TOP_aes_lastResult_9_currentValue
-#define ACCEL_TOP_aes_lastResult_10_currentValue accelState->TOP_aes_lastResult_10_currentValue
-#define ACCEL_TOP_aes_lastResult_11_currentValue accelState->TOP_aes_lastResult_11_currentValue
-#define ACCEL_TOP_aes_lastResult_12_currentValue accelState->TOP_aes_lastResult_12_currentValue
-#define ACCEL_TOP_aes_lastResult_13_currentValue accelState->TOP_aes_lastResult_13_currentValue
-#define ACCEL_TOP_aes_lastResult_14_currentValue accelState->TOP_aes_lastResult_14_currentValue
-#define ACCEL_TOP_aes_lastResult_15_currentValue accelState->TOP_aes_lastResult_15_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_0_currentValue accelState->TOP_aes_lastValToAdd_0_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_1_currentValue accelState->TOP_aes_lastValToAdd_1_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_2_currentValue accelState->TOP_aes_lastValToAdd_2_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_3_currentValue accelState->TOP_aes_lastValToAdd_3_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_4_currentValue accelState->TOP_aes_lastValToAdd_4_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_5_currentValue accelState->TOP_aes_lastValToAdd_5_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_6_currentValue accelState->TOP_aes_lastValToAdd_6_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_7_currentValue accelState->TOP_aes_lastValToAdd_7_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_8_currentValue accelState->TOP_aes_lastValToAdd_8_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_9_currentValue accelState->TOP_aes_lastValToAdd_9_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_10_currentValue accelState->TOP_aes_lastValToAdd_10_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_11_currentValue accelState->TOP_aes_lastValToAdd_11_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_12_currentValue accelState->TOP_aes_lastValToAdd_12_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_13_currentValue accelState->TOP_aes_lastValToAdd_13_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_14_currentValue accelState->TOP_aes_lastValToAdd_14_currentValue
-#define ACCEL_TOP_aes_lastValToAdd_15_currentValue accelState->TOP_aes_lastValToAdd_15_currentValue
-#define ACCEL_TOP_sha_State_s_0_reg_currentValue accelState->TOP_sha_State_s_0_reg_currentValue
-#define ACCEL_TOP_sha_State_s_1_reg_currentValue accelState->TOP_sha_State_s_1_reg_currentValue
-#define ACCEL_TOP_sha_State_s_2_reg_currentValue accelState->TOP_sha_State_s_2_reg_currentValue
-#define ACCEL_TOP_sha_State_s_3_reg_currentValue accelState->TOP_sha_State_s_3_reg_currentValue
-#define ACCEL_TOP_sha_State_s_4_reg_currentValue accelState->TOP_sha_State_s_4_reg_currentValue
-#define ACCEL_TOP_sha_State_s_5_reg_currentValue accelState->TOP_sha_State_s_5_reg_currentValue
-#define ACCEL_TOP_sha_State_s_6_reg_currentValue accelState->TOP_sha_State_s_6_reg_currentValue
-#define ACCEL_TOP_sha_State_s_7_reg_currentValue accelState->TOP_sha_State_s_7_reg_currentValue
+#define ACCEL_TOP_aes_state_0_currentValue                                     \
+  accelState->TOP_aes_state_0_currentValue
+#define ACCEL_TOP_aes_state_1_currentValue                                     \
+  accelState->TOP_aes_state_1_currentValue
+#define ACCEL_TOP_aes_state_2_currentValue                                     \
+  accelState->TOP_aes_state_2_currentValue
+#define ACCEL_TOP_aes_state_3_currentValue                                     \
+  accelState->TOP_aes_state_3_currentValue
+#define ACCEL_TOP_aes_state_4_currentValue                                     \
+  accelState->TOP_aes_state_4_currentValue
+#define ACCEL_TOP_aes_state_5_currentValue                                     \
+  accelState->TOP_aes_state_5_currentValue
+#define ACCEL_TOP_aes_state_6_currentValue                                     \
+  accelState->TOP_aes_state_6_currentValue
+#define ACCEL_TOP_aes_state_7_currentValue                                     \
+  accelState->TOP_aes_state_7_currentValue
+#define ACCEL_TOP_aes_state_8_currentValue                                     \
+  accelState->TOP_aes_state_8_currentValue
+#define ACCEL_TOP_aes_state_9_currentValue                                     \
+  accelState->TOP_aes_state_9_currentValue
+#define ACCEL_TOP_aes_state_10_currentValue                                    \
+  accelState->TOP_aes_state_10_currentValue
+#define ACCEL_TOP_aes_state_11_currentValue                                    \
+  accelState->TOP_aes_state_11_currentValue
+#define ACCEL_TOP_aes_state_12_currentValue                                    \
+  accelState->TOP_aes_state_12_currentValue
+#define ACCEL_TOP_aes_state_13_currentValue                                    \
+  accelState->TOP_aes_state_13_currentValue
+#define ACCEL_TOP_aes_state_14_currentValue                                    \
+  accelState->TOP_aes_state_14_currentValue
+#define ACCEL_TOP_aes_state_15_currentValue                                    \
+  accelState->TOP_aes_state_15_currentValue
+#define ACCEL_TOP_aes_lastResult_0_currentValue                                \
+  accelState->TOP_aes_lastResult_0_currentValue
+#define ACCEL_TOP_aes_lastResult_1_currentValue                                \
+  accelState->TOP_aes_lastResult_1_currentValue
+#define ACCEL_TOP_aes_lastResult_2_currentValue                                \
+  accelState->TOP_aes_lastResult_2_currentValue
+#define ACCEL_TOP_aes_lastResult_3_currentValue                                \
+  accelState->TOP_aes_lastResult_3_currentValue
+#define ACCEL_TOP_aes_lastResult_4_currentValue                                \
+  accelState->TOP_aes_lastResult_4_currentValue
+#define ACCEL_TOP_aes_lastResult_5_currentValue                                \
+  accelState->TOP_aes_lastResult_5_currentValue
+#define ACCEL_TOP_aes_lastResult_6_currentValue                                \
+  accelState->TOP_aes_lastResult_6_currentValue
+#define ACCEL_TOP_aes_lastResult_7_currentValue                                \
+  accelState->TOP_aes_lastResult_7_currentValue
+#define ACCEL_TOP_aes_lastResult_8_currentValue                                \
+  accelState->TOP_aes_lastResult_8_currentValue
+#define ACCEL_TOP_aes_lastResult_9_currentValue                                \
+  accelState->TOP_aes_lastResult_9_currentValue
+#define ACCEL_TOP_aes_lastResult_10_currentValue                               \
+  accelState->TOP_aes_lastResult_10_currentValue
+#define ACCEL_TOP_aes_lastResult_11_currentValue                               \
+  accelState->TOP_aes_lastResult_11_currentValue
+#define ACCEL_TOP_aes_lastResult_12_currentValue                               \
+  accelState->TOP_aes_lastResult_12_currentValue
+#define ACCEL_TOP_aes_lastResult_13_currentValue                               \
+  accelState->TOP_aes_lastResult_13_currentValue
+#define ACCEL_TOP_aes_lastResult_14_currentValue                               \
+  accelState->TOP_aes_lastResult_14_currentValue
+#define ACCEL_TOP_aes_lastResult_15_currentValue                               \
+  accelState->TOP_aes_lastResult_15_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_0_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_0_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_1_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_1_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_2_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_2_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_3_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_3_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_4_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_4_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_5_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_5_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_6_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_6_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_7_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_7_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_8_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_8_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_9_currentValue                              \
+  accelState->TOP_aes_lastValToAdd_9_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_10_currentValue                             \
+  accelState->TOP_aes_lastValToAdd_10_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_11_currentValue                             \
+  accelState->TOP_aes_lastValToAdd_11_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_12_currentValue                             \
+  accelState->TOP_aes_lastValToAdd_12_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_13_currentValue                             \
+  accelState->TOP_aes_lastValToAdd_13_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_14_currentValue                             \
+  accelState->TOP_aes_lastValToAdd_14_currentValue
+#define ACCEL_TOP_aes_lastValToAdd_15_currentValue                             \
+  accelState->TOP_aes_lastValToAdd_15_currentValue
+#define ACCEL_TOP_sha_State_s_0_reg_currentValue                               \
+  accelState->TOP_sha_State_s_0_reg_currentValue
+#define ACCEL_TOP_sha_State_s_1_reg_currentValue                               \
+  accelState->TOP_sha_State_s_1_reg_currentValue
+#define ACCEL_TOP_sha_State_s_2_reg_currentValue                               \
+  accelState->TOP_sha_State_s_2_reg_currentValue
+#define ACCEL_TOP_sha_State_s_3_reg_currentValue                               \
+  accelState->TOP_sha_State_s_3_reg_currentValue
+#define ACCEL_TOP_sha_State_s_4_reg_currentValue                               \
+  accelState->TOP_sha_State_s_4_reg_currentValue
+#define ACCEL_TOP_sha_State_s_5_reg_currentValue                               \
+  accelState->TOP_sha_State_s_5_reg_currentValue
+#define ACCEL_TOP_sha_State_s_6_reg_currentValue                               \
+  accelState->TOP_sha_State_s_6_reg_currentValue
+#define ACCEL_TOP_sha_State_s_7_reg_currentValue                               \
+  accelState->TOP_sha_State_s_7_reg_currentValue
 
-static unsigned int delayBuffer_0[] = {0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x12,0x23,0x34,0x1,0x12,0x23,0x0,0x0,0x0,0x0,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x3,0x0,0x3};
-static unsigned int delayBuffer_1[] = {0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x12,0x23,0x34,0x1,0x12,0x23,0x0,0x0,0x0,0x0,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x3,0x0,0x3};
-static unsigned int delayBuffer_2[] = {0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x12,0x23,0x34,0x1,0x12,0x23,0x0,0x0,0x0,0x0,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x3,0x0,0x3};
-static unsigned int delayBuffer_3[] = {0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x12,0x23,0x34,0x1,0x12,0x23,0x0,0x0,0x0,0x0,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x3,0x0,0x3};
-static unsigned int delayBuffer_4[] = {0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x5,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x12,0x23,0x34,0x1,0x12,0x23,0x0,0x0,0x0,0x0,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x3,0x0,0x3};
-static unsigned int delayBuffer_5[] = {0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x6,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x2,0x12,0x23,0x34,0x1,0x12,0x23,0x0,0x0,0x0,0x0,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x44,0x3,0x0,0x3};
+static unsigned int delayBuffer_0[] = {
+    0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6, 0x6, 0x6, 0x6, 0x6,  0x6,
+    0x6,  0x6,  0x6,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x0, 0x0, 0x0,  0x0,
+    0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0, 0x0,  0x0,
+    0x2,  0x12, 0x23, 0x34, 0x1,  0x12, 0x23, 0x0, 0x0, 0x0, 0x0, 0x44, 0x44,
+    0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x3,  0x0, 0x3};
+static unsigned int delayBuffer_1[] = {
+    0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6, 0x6, 0x6, 0x6, 0x6,  0x6,
+    0x6,  0x6,  0x6,  0x5,  0x5,  0x5,  0x5,  0x5, 0x5, 0x5, 0x5, 0x5,  0x5,
+    0x5,  0x5,  0x5,  0x5,  0x5,  0x5,  0x5,  0x5, 0x5, 0x5, 0x5, 0x5,  0x5,
+    0x5,  0x5,  0x5,  0x5,  0x5,  0x5,  0x5,  0x5, 0x5, 0x0, 0x0, 0x0,  0x0,
+    0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0, 0x0,  0x0,
+    0x2,  0x12, 0x23, 0x34, 0x1,  0x12, 0x23, 0x0, 0x0, 0x0, 0x0, 0x44, 0x44,
+    0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x3,  0x0, 0x3};
+static unsigned int delayBuffer_2[] = {
+    0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6, 0x6, 0x6, 0x6, 0x6,  0x6,
+    0x6,  0x6,  0x6,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x0, 0x0, 0x0,  0x0,
+    0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0, 0x0,  0x0,
+    0x2,  0x12, 0x23, 0x34, 0x1,  0x12, 0x23, 0x0, 0x0, 0x0, 0x0, 0x44, 0x44,
+    0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x3,  0x0, 0x3};
+static unsigned int delayBuffer_3[] = {
+    0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6, 0x6, 0x6, 0x6, 0x6,  0x6,
+    0x6,  0x6,  0x6,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x0, 0x0, 0x0,  0x0,
+    0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0, 0x0,  0x0,
+    0x2,  0x12, 0x23, 0x34, 0x1,  0x12, 0x23, 0x0, 0x0, 0x0, 0x0, 0x44, 0x44,
+    0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x3,  0x0, 0x3};
+static unsigned int delayBuffer_4[] = {
+    0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6, 0x6, 0x6, 0x6, 0x6,  0x6,
+    0x6,  0x6,  0x6,  0x5,  0x5,  0x5,  0x5,  0x5, 0x5, 0x5, 0x5, 0x5,  0x5,
+    0x5,  0x5,  0x5,  0x5,  0x5,  0x5,  0x5,  0x5, 0x5, 0x5, 0x5, 0x5,  0x5,
+    0x5,  0x5,  0x5,  0x5,  0x5,  0x5,  0x5,  0x5, 0x5, 0x0, 0x0, 0x0,  0x0,
+    0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0, 0x0,  0x0,
+    0x2,  0x12, 0x23, 0x34, 0x1,  0x12, 0x23, 0x0, 0x0, 0x0, 0x0, 0x44, 0x44,
+    0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x3,  0x0, 0x3};
+static unsigned int delayBuffer_5[] = {
+    0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6,  0x6, 0x6, 0x6, 0x6, 0x6,  0x6,
+    0x6,  0x6,  0x6,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x2, 0x2, 0x2,  0x2,
+    0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2,  0x2, 0x2, 0x0, 0x0, 0x0,  0x0,
+    0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0,  0x0, 0x0, 0x0, 0x0, 0x0,  0x0,
+    0x2,  0x12, 0x23, 0x34, 0x1,  0x12, 0x23, 0x0, 0x0, 0x0, 0x0, 0x44, 0x44,
+    0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x3,  0x0, 0x3};
 
-static unsigned int* delayBuffers[] = {delayBuffer_0,delayBuffer_1,delayBuffer_2,delayBuffer_3,delayBuffer_4,delayBuffer_5};
+static unsigned int *delayBuffers[] = {delayBuffer_0, delayBuffer_1,
+                                       delayBuffer_2, delayBuffer_3,
+                                       delayBuffer_4, delayBuffer_5};
 
-typedef enum{
-    MergeType_AESFirstAdd = 0, MergeType_AESRound = 1, MergeType_AESLastRound = 2, MergeType_AESInvFirstAdd = 3, MergeType_AESInvRound = 4, MergeType_AESInvLastRound = 5  
+typedef enum {
+  MergeType_AESFirstAdd = 0,
+  MergeType_AESRound = 1,
+  MergeType_AESLastRound = 2,
+  MergeType_AESInvFirstAdd = 3,
+  MergeType_AESInvRound = 4,
+  MergeType_AESInvLastRound = 5
 } MergeType;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static inline void OnlyActivateMergedAccelerator(MergeType type){
-   static int lastLoaded = -1;
-   int asInt = (int) type;
-   
-   if(lastLoaded == asInt){
-     return;
-   }
-   lastLoaded = asInt;
-   
-   ACCEL_TOP_aes_round_versat_merge_mux_63_sel = asInt;
+static inline void OnlyActivateMergedAccelerator(MergeType type) {
+  static int lastLoaded = -1;
+  int asInt = (int)type;
+
+  if (lastLoaded == asInt) {
+    return;
+  }
+  lastLoaded = asInt;
+
+  ACCEL_TOP_aes_round_versat_merge_mux_63_sel = asInt;
 }
 
-static inline void ActivateMergedAccelerator(MergeType type){
-   static int lastLoaded = -1;
-   int asInt = (int) type;
-   
-   if(lastLoaded == asInt){
-     return;
-   }
-   lastLoaded = asInt;
-   
-   ACCEL_TOP_aes_round_versat_merge_mux_63_sel = asInt;
-   VersatLoadDelay(delayBuffers[asInt]);
+static inline void ActivateMergedAccelerator(MergeType type) {
+  static int lastLoaded = -1;
+  int asInt = (int)type;
+
+  if (lastLoaded == asInt) {
+    return;
+  }
+  lastLoaded = asInt;
+
+  ACCEL_TOP_aes_round_versat_merge_mux_63_sel = asInt;
+  VersatLoadDelay(delayBuffers[asInt]);
 }
 
 #ifdef __cplusplus
@@ -1650,4 +2118,3 @@ static inline void ActivateMergedAccelerator(MergeType type){
 #endif
 
 #endif // INCLUDED_VERSAT_ACCELERATOR_HEADER
-

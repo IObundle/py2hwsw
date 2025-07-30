@@ -4,33 +4,34 @@
 
 #include <stdio.h>
 
-//Arena globalArenaInst = {};
-Arena* globalArena = NULL;
+// Arena globalArenaInst = {};
+Arena *globalArena = NULL;
 
-Arena InitArena(int size){
+Arena InitArena(int size) {
   Arena arena = {};
-  arena.ptr = (char*) malloc(size * sizeof(char));
+  arena.ptr = (char *)malloc(size * sizeof(char));
   arena.allocated = size;
 
   return arena;
 }
 
-void* PushBytes(Arena* arena,int size){
-  char* ptr = &arena->ptr[arena->used];
+void *PushBytes(Arena *arena, int size) {
+  char *ptr = &arena->ptr[arena->used];
 
   size = (size + 3) & (~3); // Align to 4 byte boundary
   arena->used += size;
 
-  if(arena->used > arena->allocated){
+  if (arena->used > arena->allocated) {
     printf("Arena overflow\n");
-    printf("Size: %d,Used: %d, Allocated: %d\n",size,arena->used,arena->allocated);
+    printf("Size: %d,Used: %d, Allocated: %d\n", size, arena->used,
+           arena->allocated);
   }
 
   return ptr;
 }
 
-void* PushAndZeroBytes(Arena* arena,int size){
-  char* ptr = PushBytes(arena,size);
+void *PushAndZeroBytes(Arena *arena, int size) {
+  char *ptr = PushBytes(arena, size);
 
   for (int i = 0; i < size; i++) {
     ptr[i] = 0;
@@ -39,10 +40,6 @@ void* PushAndZeroBytes(Arena* arena,int size){
   return ptr;
 }
 
-int MarkArena(Arena* arena){
-  return arena->used;
-}
+int MarkArena(Arena *arena) { return arena->used; }
 
-void PopArena(Arena* arena,int mark){
-  arena->used = mark;
-}
+void PopArena(Arena *arena, int mark) { arena->used = mark; }

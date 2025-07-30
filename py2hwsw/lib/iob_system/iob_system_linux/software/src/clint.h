@@ -8,9 +8,9 @@
 #define CLINT_TIME_ADDR 0xBFF8
 
 readReg_u32(clint_getTimeLow, CLINT_TIME_ADDR)
-readReg_u32(clint_getTimeHigh, CLINT_TIME_ADDR + 4)
+    readReg_u32(clint_getTimeHigh, CLINT_TIME_ADDR + 4)
 
-static void clint_setCmp(u32 p, u64 cmp, u32 hart_id) {
+        static void clint_setCmp(u32 p, u64 cmp, u32 hart_id) {
   p += CLINT_CMP_ADDR + hart_id * 8;
   write_u32(0xFFFFFFFF, p + 4);
   write_u32(cmp, p + 0);

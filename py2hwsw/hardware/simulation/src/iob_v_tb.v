@@ -43,6 +43,7 @@ module iob_v_tb;
 
    // Variables
    integer req = -100, ack = 0, mode = -100, address = -100, data = -100, data_w = -100;
+   reg [8*45-1:0] buffer;  // array to hold 45 characters
 
    // Example test sequence (replace with your actual test logic)
    initial begin
@@ -50,14 +51,14 @@ module iob_v_tb;
       $dumpfile("uut.vcd");
       $dumpvars();
 `endif
-      iob_valid_i  = 0;
-      iob_wdata_i  = 0;
-      iob_addr_i   = 0;
-      iob_wstrb_i  = 0;
+      iob_valid_i = 0;
+      iob_wdata_i = 0;
+      iob_addr_i  = 0;
+      iob_wstrb_i = 0;
 
-      clk          = 0;
-      cke          = 1;
-      arst         = 0;
+      clk         = 0;
+      cke         = 1;
+      arst        = 0;
       #10;
       arst = 1;
       #10;
@@ -65,28 +66,25 @@ module iob_v_tb;
       #10;
 
       // Open IPC files
-      c2v_read_fp = $fopen("c2v.txt", "rb");
-      if (c2v_read_fp == 0) begin
-         $display("Error: Could not open c2v.txt");
-         $finish;
+      while (c2v_read_fp == 0) begin
+         c2v_read_fp = $fopen("c2v.txt", "rb");
       end
-      $fclose(c2v_read_fp);
       v2c_write_fp = $fopen("v2c.txt", "wb");
       if (v2c_write_fp == 0) begin
-         $display("Error: Could not open v2c.txt");
+         $display("V: Error: Could not open v2c.txt");
          $finish;
       end
 
       // Server loop
       while (1) begin
-         //read request
-         c2v_read_fp = $fopen("c2v.txt", "rb");
-         if ($fscanf(
-                 c2v_read_fp, "%08x %08x %08x %08x %08x\n", req, mode, address, data_w, data
-             )) begin
-            $fclose(c2v_read_fp);
-            /*$display("V: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode,
-                     address, data_w, data);*/  // DEBUG
+         //read request from named pipe: Will block simulation until request is available
+         if ($fread(buffer, c2v_read_fp, 0, 45) != 45) begin
+            $display("V: Error: did not read expected 45 bytes from c2v.txt");
+            $finish;
+         end
+         if ($sscanf(buffer, "%08x %08x %08x %08x %08x\n", req, mode, address, data_w, data)) begin
+            /* $display("V: req=%08x mode=%08x address=%08x data_w=%08x data=%08x", req, mode,
+                     address, data_w, data); */  // DEBUG
             //check if request number matches with ack number
             if (req == ack) begin
                //process request
@@ -100,23 +98,24 @@ module iob_v_tb;
                   $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w,
                             data);
                   $fflush(v2c_write_fp);
-                  //$display("V: read request: ack=%d adress=%08x data=%08x", ack, address, data); // DEBUG
+                  /* $display("V: read request: ack=%d adress=%08x data=%08x", ack, address,
+                           data); */  // DEBUG
                end else if (mode == `W) begin  //write request
                   iob_write(address, data, data_w);
                   //send ack
                   $fdisplay(v2c_write_fp, "%08x %08x %08x %08x %08x", ack, mode, address, data_w,
                             data);
                   $fflush(v2c_write_fp);
-                  // $display("V: write request: ack=%d adress=%08x data=%08x", ack, address, data); // DEBUG
+                  /* $display("V: write request: ack=%d adress=%08x data=%08x", ack, address,
+                           data); */  // DEBUG
                end
                ack = ack + 1;
+               @(posedge clk);  //sync
             end  // if (req == ack)
-         end else begin  // if (fscanf_ret == 5)
-            $fclose(c2v_read_fp);
-         end  // if (fscanf_ret != 5)
-         @(posedge clk);  //advance clock
+         end
       end  // while (1)
       $fclose(v2c_write_fp);
+      $fclose(c2v_read_fp);
    end  // initial begin
 
 

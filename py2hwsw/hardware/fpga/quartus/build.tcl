@@ -2,31 +2,27 @@
 #
 # SPDX-License-Identifier: MIT
 
-#extract cli args
-set NAME [lindex $argv 0]
-set CSR_IF [lindex $argv 1]
-set BOARD [lindex $argv 2]
-set VSRC [lindex $argv 3]
-set INCLUDE_DIRS [lindex $argv 4]
-set IS_FPGA [lindex $argv 5]
-set USE_EXTMEM [lindex $argv 6]
-set USE_ETHERNET [lindex $argv 7]
-set SEED [lindex $argv 8]
-set USE_QUARTUS_PRO [lindex $argv 9]
+#extract cli positional args
+set vars {NAME FPGA_TOP CSR_IF BOARD VSRC INCLUDE_DIRS IS_FPGA USE_EXTMEM USE_ETHERNET SEED USE_QUARTUS_PRO}
+foreach var $vars arg $argv {
+    set $var $arg
+    puts "$var = $arg"
+}
+
 
 load_package flow
 
-project_new $NAME -overwrite
+project_new $FPGA_TOP -overwrite
 
-if {[project_exists $NAME]} {
-    project_open $NAME -force
+if {[project_exists $FPGA_TOP]} {
+    project_open $FPGA_TOP -force
 } else {
-    project_new $NAME
+    project_new $FPGA_TOP
 }
 
 set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
 
-set_global_assignment -name TOP_LEVEL_ENTITY $NAME
+set_global_assignment -name TOP_LEVEL_ENTITY $FPGA_TOP
 
 #board data
 source quartus/$BOARD/board.tcl
@@ -147,7 +143,7 @@ if {[catch {execute_module -tool sta} result]} {
 }
 
 #rerun quartus sta to generate reports
-if [catch {qexec "[file join $::quartus(binpath) quartus_sta] -t quartus/timing.tcl $NAME"} result] {
+if [catch {qexec "[file join $::quartus(binpath) quartus_sta] -t quartus/timing.tcl $FPGA_TOP"} result] {
     puts "\nResult: $result\n"
     puts "ERROR: STA failed. See report files.\n"
     qexit -error
@@ -163,27 +159,27 @@ if {$IS_FPGA != "1"} {
             qexit -error
         }
     } else {
-        if {[catch {execute_module -tool cdb -args "--vqm=resynthesis/$NAME"} result]} {
+        if {[catch {execute_module -tool cdb -args "--vqm=resynthesis/$FPGA_TOP"} result]} {
             qexit -error
         }
     }
     
     #rename netlist
-    set netlist_file "$NAME\_netlist.v"
+    set netlist_file "$FPGA_TOP\_netlist.v"
     if {[file exists $netlist_file] == 1} {
         file delete $netlist_file
     }
-    file rename resynthesis/$NAME.vqm $netlist_file
+    file rename resynthesis/$FPGA_TOP.vqm $netlist_file
 } else {
     if {[catch {execute_module -tool asm} result]} {
         qexit -error
     }
     #Move bitstream out of the reports directory
-    file rename reports/$NAME.sof $NAME.sof
+    file rename reports/$FPGA_TOP.sof $FPGA_TOP.sof
 }
 
 project_close
 
 #rename report files
-file rename reports/$NAME.fit.summary reports/$NAME\_$PART.fit.summary
-file rename reports/$NAME.sta.summary reports/$NAME\_$PART.sta.summary
+file rename reports/$FPGA_TOP.fit.summary reports/$FPGA_TOP\_$PART.fit.summary
+file rename reports/$FPGA_TOP.sta.summary reports/$FPGA_TOP\_$PART.sta.summary

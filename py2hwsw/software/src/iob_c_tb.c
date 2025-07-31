@@ -40,15 +40,10 @@ void iob_write(uint32_t address, uint32_t data_w, uint32_t data) {
   char buf[45];
 
   // send request
-  fpw = fopen(C2V_FILE, "wb");
-  if (fpw == NULL) {
-    printf("C: Error opening file %s\n", C2V_FILE);
-    exit(1);
-  }
   fprintf(fpw, "%08x %08x %08x %08x %08x\n", req, W, address, data_w, data);
   fflush(fpw);
-  fclose(fpw);
-  // printf("C: New Write request %d: %08x %08x\n", req, address, data);
+  // printf("C: New Write request %d: %08x %08x\n", req, address, data); //
+  // DEBUG
   my_usleep(100);
 
   // wait for ack
@@ -66,7 +61,7 @@ void iob_write(uint32_t address, uint32_t data_w, uint32_t data) {
     exit(1);
   }
 
-  // printf("C: Written %d: %08x to %08x\n", req, data, address);
+  // printf("C: Written %d: %08x to %08x\n", req, data, address); // DEBUG
   req++;
 }
 
@@ -78,15 +73,9 @@ uint32_t iob_read(uint32_t address, uint32_t data_w) {
   char buf[45];
 
   // send request
-  fpw = fopen(C2V_FILE, "wb");
-  if (fpw == NULL) {
-    printf("C: Error opening file %s\n", C2V_FILE);
-    exit(1);
-  }
   fprintf(fpw, "%08x %08x %08x %08x %08x\n", req, R, address, data_w, 0);
   fflush(fpw);
-  fclose(fpw);
-  // printf("C: New Read requested %d: %08x\n", req, address);
+  // printf("C: New Read requested %d: %08x\n", req, address); // DEBUG
   my_usleep(100);
 
   // wait for ack
@@ -104,37 +93,32 @@ uint32_t iob_read(uint32_t address, uint32_t data_w) {
     exit(1);
   }
 
-  // printf("C: Read %d: %08x from %08x\n", req, dat, address);
+  // printf("C: Read %d: %08x from %08x\n", req, dat, address); // DEBUG
   req++;
   return dat;
 }
 
 void iob_start() {
   // Open IPC files
-  fpw = fopen(C2V_FILE, "wb");
-  if (fpw == NULL) {
-    printf("C: Error opening file %s\n", C2V_FILE);
-    exit(1);
-  }
-  fclose(fpw);
   // Create named pipe for responses (no need for polling)
   int result = mkfifo(V2C_FILE, 0666);
   if (result < 0) {
     printf("C: Error opening file %s\n", V2C_FILE);
     exit(1);
   }
+  // Create named pipe for requests (no need for polling)
+  result = mkfifo(C2V_FILE, 0666);
+  if (result < 0) {
+    printf("C: Error opening file %s\n", C2V_FILE);
+    exit(1);
+  }
+  fpw = fopen(C2V_FILE, "wb");
   fpr = fopen(V2C_FILE, "rb");
 }
 
 void iob_finish() {
-  fpw = fopen(C2V_FILE, "wb");
-  if (fpw == NULL) {
-    printf("C: Error opening file %s\n", C2V_FILE);
-    exit(1);
-  }
   fprintf(fpw, "%08x %08x %08x %08x %08x\n", req, F, 0, 0, 0);
   fflush(fpw);
-  fclose(fpw);
   fclose(fpr);
   my_usleep(1000);
 }

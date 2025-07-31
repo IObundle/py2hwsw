@@ -1,0 +1,24 @@
+`verilator_config
+
+//
+// enable rules that are disabled by default
+//
+
+lint_on -rule DECLFILENAME // matching file and module name
+lint_on -rule DEFPARAM // do not use `defparam` statement to specify parameters
+lint_on -rule GENUNNAMED // generate blocks must be named
+lint_on -rule INCABSPATH // no `includes with absolute paths
+lint_on -rule PINCONNECTEMPTY // warn about instance ports connected to nothing
+lint_on -rule PINNOCONNECT // warn about port not referenced in instantiation
+
+// net used as async and sync in different always statements
+lint_on -rule SYNCASYNCNET 
+
+lint_on -rule UNDRIVEN // signal without source.
+lint_on -rule UNUSEDGENVAR // specified genvar is never used
+lint_on -rule UNUSEDPARAM // specified parameter is never used
+lint_on -rule UNUSEDSIGNAL // specified signal is never used
+
+// inner scope variable has same name as another outer scope variable
+// this hides the outer scope variable.
+lint_on -rule VARHIDDEN

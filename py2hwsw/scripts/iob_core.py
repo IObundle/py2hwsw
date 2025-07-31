@@ -415,14 +415,17 @@ class iob_core(iob_module, iob_instance):
             parameters=kwargs.get("parameters", {}),
             is_superblock=kwargs.get("is_superblock", False),
         )
+        is_parent_backup = self.is_parent
+        # Copy (some) parent attributes to child
+        parent_module_dict = copy.deepcopy(parent_module.__dict__)
+        self.__dict__.update(parent_module_dict)
+        self.original_name = attributes["original_name"]
+        self.setup_dir = attributes["setup_dir"]
+        self.is_parent = is_parent_backup
 
         # Store reference to parent core
         self.parent_obj = parent_module
 
-        # Copy (some) parent attributes to child
-        self.__dict__.update(parent_module.__dict__)
-        self.original_name = attributes["original_name"]
-        self.setup_dir = attributes["setup_dir"]
 
         return True
 
@@ -433,7 +436,6 @@ class iob_core(iob_module, iob_instance):
         setup_srcs.copy_rename_setup_directory(self)
 
     def generate_build_dir(self, **kwargs):
-        # print(f"DEBUG: Generating build dir for '{self.original_name}'")
 
         if self.is_top_module:
             self.__create_build_dir()
@@ -507,7 +509,7 @@ class iob_core(iob_module, iob_instance):
         # TODO as well: Each module has a local `snippets` list.
         # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
-        if (self.is_top_module and not self.is_parent) or self.is_tester:
+        if self.is_top_module or self.is_tester:
             self.post_setup()
 
     @staticmethod

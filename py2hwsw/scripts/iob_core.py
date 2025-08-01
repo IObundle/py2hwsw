@@ -437,7 +437,7 @@ class iob_core(iob_module, iob_instance):
 
     def generate_build_dir(self, **kwargs):
 
-        if self.is_top_module:
+        if self.is_top_module or self.is_tester:
             self.__create_build_dir()
 
         # subblock setup process

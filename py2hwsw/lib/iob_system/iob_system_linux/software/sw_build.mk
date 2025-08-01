@@ -174,8 +174,11 @@ endif
 iob_bsp:
 	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h
 
-iob_system_linux_firmware: iob_bsp
+iob_system_linux_firmware: iob_bsp check_if_run_linux
 	make $@.elf INCLUDES="$(IOB_SYSTEM_LINUX_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LINUX_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_LINUX_FW_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"
+
+check_if_run_linux:
+	python3 $(ROOT_DIR)/scripts/check_if_run_linux.py $(ROOT_DIR) iob_system_linux $(RUN_LINUX)
 
 iob_system_linux_boot: iob_bsp
 	make $@.elf INCLUDES="$(IOB_SYSTEM_LINUX_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LINUX_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_LINUX_BOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"

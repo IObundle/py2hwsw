@@ -4,6 +4,7 @@
 
 import os
 import sys
+import shutil
 
 # Add iob-system scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../scripts"))
@@ -50,6 +51,14 @@ def setup(py_params_dict):
     #     super()._post_setup()
     #
     #     # Copy scripts to scripts build directory
+    if py_params_dict["build_dir"]:
+        for src_file in [
+            "scripts/check_if_run_linux.py",
+        ]:
+            src = os.path.join(os.path.dirname(__file__), src_file)
+            dst = os.path.join(py_params_dict["build_dir"], src_file)
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy2(src, dst)
     #     iob_soc_scripts = [
     #         "terminalMode",
     #         "makehex",

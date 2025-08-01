@@ -40,6 +40,7 @@ from iob_base import (
     add_traceback_msg,
     debug,
     get_lib_cores,
+    find_folder_by_name
 )
 from iob_license import iob_license, update_license
 import sw_tools
@@ -319,13 +320,11 @@ class iob_core(iob_module, iob_instance):
             # Add callback to: Remove duplicate sources from tester dirs, that already exist in UUT's `hardware/src` folder
             __class__.global_post_setup_callbacks.append(
                 lambda: self._remove_duplicate_sources(
-                    main_folder=os.path.join(self.relative_path_to_UUT, "hardware/src"),
-                    subfolders=[
-                        "hardware/src",
-                        "hardware/simulation/src",
-                        "hardware/fpga/src",
-                        "hardware/common_src",
-                    ],
+                    subfolders={
+                        os.path.join(self.relative_path_to_UUT, "hardware/src"): ["hardware/src"],
+                        "hardware/src": ["hardware/common_src", "hardware/simulation/src", "hardware/fpga/src"],
+                        "hardware/fpga/src": [], # Empty list will cause it to be auto-filled based on boards_list
+                    },
                 )
             )
         else:  # Not tester
@@ -620,17 +619,40 @@ class iob_core(iob_module, iob_instance):
         )
         nix_permission_hack(f"{self.build_dir}/Makefile")
 
-    def _remove_duplicate_sources(self, main_folder="hardware/src", subfolders=None):
-        """Remove sources in the build directory from subfolders that exist in `hardware/src`"""
+    def _remove_duplicate_sources(self, subfolders: dict = {}):
+        """Remove duplicate sources in the build directory from subfolders.
+        Args:
+            subfolders (dict): Each key is a folder, each value is a list of subfolders to check for duplicates sources and remove them.
+                               Example: {
+                                 "hardware/src": ["hardware/simulation/src", "hardware/fpga/src"],
+                                 "hardware/fpga/src": ["hardware/fpga/vivado/basys3"],
+                               }
+                               Sources of 'hardware/src' will be removed from 'hardware/simulation/src', 'hardware/fpga/src', and 'hardware/fpga/vivado/basys3' if they are duplicate.
+                               Sources of 'hardware/fpga/src' will be removed from 'hardware/fpga/vivado/basys3' if they are duplicate.
+        """
+        # Default value
         if not subfolders:
-            subfolders = [
-                "hardware/simulation/src",
-                "hardware/fpga/src",
-                "hardware/common_src",
-            ]
+            subfolders = {
+                "hardware/src": ["hardware/common_src", "hardware/simulation/src", "hardware/fpga/src"],
+                "hardware/fpga/src": [],
+            }
 
-        # Go through all subfolders that may contain duplicate sources
-        for subfolder in subfolders:
+        # Auto-append board folders from the boards_list to the 'subfolders' dict
+        # but only if the 'hardware/fpga/src' key is present and is empty
+        if "hardware/fpga/src" in subfolders and not subfolders["hardware/fpga/src"]:
+            # Find board directories in build_dir
+            build_dir_fpga = os.path.join(self.build_dir, "hardware/fpga")
+            for board in self.board_list:
+                board_folder = find_folder_by_name(build_dir_fpga, board)
+                if not board_folder:
+                    fail_with_msg(f"Board folder '{board}' not found inside '{build_dir_fpga}'.", ValueError)
+                # Get only the relative path
+                board_folder = os.path.relpath(board_folder, start=self.build_dir)
+                subfolders["hardware/fpga/src"].append(board_folder)
+
+        def remove_common_sources(main_folder, subfolder):
+            """Remove common sources between main_folder and subfolder"""
+            # print(f"DEBUG: Searching duplicates between '{main_folder}' and '{subfolder}'")
             # Get common srcs between main_folder and current subfolder
             common_srcs = find_common_deep(
                 os.path.join(self.build_dir, main_folder),
@@ -640,6 +662,19 @@ class iob_core(iob_module, iob_instance):
             for src in common_srcs:
                 os.remove(os.path.join(self.build_dir, subfolder, src))
                 # print(f'{iob_colors.INFO}Removed duplicate source: {os.path.join(subfolder, src)}{iob_colors.ENDC}')
+
+        def remove_common_sources_in_subfolders(main_folder, direct_subfolders):
+            """Given a single main_folder, remove common sources with all subfolders below it, recursively"""
+            for direct_subfolder in direct_subfolders:
+                remove_common_sources(main_folder, direct_subfolder)
+                # Also remove recursively from sub-subfolders
+                if direct_subfolder in subfolders:
+                    remove_common_sources_in_subfolders(main_folder, subfolders[direct_subfolder])
+
+        # Go through all folders as if they are main folders (order does not matter)
+        for folder, direct_subfolders in subfolders.items():
+            remove_common_sources_in_subfolders(folder, direct_subfolders)
+
 
     def _replace_snippet_includes(self):
         verilog_gen.replace_includes(

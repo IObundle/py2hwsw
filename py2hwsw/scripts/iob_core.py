@@ -437,7 +437,7 @@ class iob_core(iob_module, iob_instance):
 
     def generate_build_dir(self, **kwargs):
 
-        if self.is_top_module:
+        if self.is_top_module or self.is_tester:
             self.__create_build_dir()
 
         # subblock setup process
@@ -667,7 +667,7 @@ class iob_core(iob_module, iob_instance):
         # Find Verilog sources and headers from build dir
         verilog_headers = []
         verilog_sources = []
-        for path in Path(os.path.join(self.build_dir, "hardware")).rglob("*.vh"):
+        for path in Path(os.path.join(self.build_dir, "hardware/src")).rglob("*.vh"):
             # Skip specific Verilog headers
             if "test_" in path.name:
                 continue
@@ -676,7 +676,7 @@ class iob_core(iob_module, iob_instance):
                 continue
             verilog_headers.append(str(path))
             # print(str(path))
-        for path in Path(os.path.join(self.build_dir, "hardware")).rglob("*.v"):
+        for path in Path(os.path.join(self.build_dir, "hardware/src")).rglob("*.v"):
             # Skip synthesis directory # TODO: Support this?
             if "/syn/" in str(path):
                 continue
@@ -686,7 +686,12 @@ class iob_core(iob_module, iob_instance):
         # Run Verilog linter
         # FIXME: Don't run for tester since iob_system is still full of warnings (and we may not even need to lint tester files?)
         if __class__.global_project_vlint and not self.is_tester:
-            verilog_lint.lint_files(verilog_headers + verilog_sources)
+            lint_cfg_path = Path(os.path.join(self.build_dir, "hardware/lint"))
+            verilog_lint.lint_files(
+                verilog_headers + verilog_sources,
+                extra_flags=f"--top-module {self.name}",
+                config_path=lint_cfg_path,
+            )
 
         # Run Verilog formatter
         if __class__.global_project_vformat:
@@ -855,9 +860,7 @@ class iob_core(iob_module, iob_instance):
                     # "core_name": core_name,
                     "build_dir": __class__.global_build_dir,
                     "py2hwsw_target": __class__.global_special_target or "setup",
-                    "issuer": (
-                        issuer.attributes_dict if issuer else ""
-                    ),
+                    "issuer": (issuer.attributes_dict if issuer else ""),
                     "py2hwsw_version": PY2HWSW_VERSION,
                     **kwargs,
                 }

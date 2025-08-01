@@ -17,12 +17,22 @@ import subprocess
 import iob_colors
 
 linters = [
-    {"command": "verilator --lint-only -Wall --timing", "include_flag": "-I"},
-    #  {"command": "svlint", "include_flag": "-i"}
+    {
+        "command": "verilator --lint-only -Wall --timing",
+        "include_flag": "-I",
+        "config_command": "",
+        "config_file": "verilator_config.vlt",
+    },
+    # {
+    #     "command": "svlint",
+    #     "include_flag": "-i",
+    #     "config_command": "--config",
+    #     "config_file": ".svlint.toml",
+    # },
 ]
 
 
-def lint_files(files_list):
+def lint_files(files_list, extra_flags="", config_path="."):
     """Run Linter on given list of files, while grouping them according to their location in the IObundle standard directory structure."""
     print(f"Linting files: {files_list}", file=sys.stderr)  # DEBUG
     # Group files by their directories
@@ -78,7 +88,11 @@ def lint_files(files_list):
             print(
                 f'\n{iob_colors.INFO}Linting from base directory "{directory}"{iob_colors.ENDC}'
             )
-            linter_cmd = f"{linter['command']} {linter['include_flag']}{(' '+linter['include_flag']).join(directories_to_lint[directory])} {' '.join(files)}"
+            linter_cmd = f"{linter['command']}"
+            linter_cmd = f"{linter_cmd} {extra_flags}"
+            linter_cmd = f"{linter_cmd} {linter['include_flag']}{(' '+linter['include_flag']).join(directories_to_lint[directory])}"
+            linter_cmd = f"{linter_cmd} {linter['config_command']} {config_path}/{linter['config_file']}"
+            linter_cmd = f"{linter_cmd} {' '.join(files)}"
             print(linter_cmd)
             result = subprocess.run(linter_cmd, shell=True)
             if result.returncode != 0:

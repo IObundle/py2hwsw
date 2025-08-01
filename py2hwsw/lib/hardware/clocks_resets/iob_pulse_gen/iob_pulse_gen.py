@@ -10,7 +10,7 @@ def setup(py_params_dict):
             {
                 "name": "START",
                 "type": "P",
-                "val": "0",
+                "val": "2",
                 "min": "0",
                 "max": "NA",
                 "descr": "",
@@ -18,8 +18,8 @@ def setup(py_params_dict):
             {
                 "name": "DURATION",
                 "type": "P",
-                "val": "0",
-                "min": "0",
+                "val": "1",
+                "min": "1",
                 "max": "NA",
                 "descr": "",
             },

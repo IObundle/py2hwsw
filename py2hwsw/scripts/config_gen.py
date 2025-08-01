@@ -16,6 +16,7 @@ def conf_vh(macros, top_module, out_dir):
     :param top_module: top module name
     :param out_dir: output directory
     """
+    os.makedirs(out_dir, exist_ok=True)
     file2create = open(f"{out_dir}/{top_module}_conf.vh", "w")
     core_prefix = f"{top_module}_".upper()
 

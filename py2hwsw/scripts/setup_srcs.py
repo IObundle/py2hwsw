@@ -564,7 +564,7 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
             # copy SETUP_DIR/CORE.v netlist instead of
             # SETUP_DIR/hardware/src
             shutil.copyfile(
-                os.path.join(core.setup_dir, f"{core.name}.v"),
+                os.path.join(core.setup_dir, f"{core.original_name}.v"),
                 os.path.join(core.build_dir, dst_directory, f"{core.name}.v"),
             )
             nix_permission_hack(os.path.join(core.build_dir, dst_directory))
@@ -675,6 +675,7 @@ def copy_rename_setup_directory(core, exclude_file_list=["*.py"]):
             "hardware/lint",
             "document",
         ]
+
 
     # Copy sources
     for directory in dir_list:

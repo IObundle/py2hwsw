@@ -98,6 +98,9 @@ class iob_core(iob_module, iob_instance):
         # Store kwargs to allow access to python parameters after object has been created
         self.received_python_parameters = kwargs
 
+        # Reference to parent core
+        self.parent_obj = None
+
         # Create core based on 'parent' core (if applicable)
         if self.handle_parent(*args, **kwargs):
             return
@@ -307,7 +310,7 @@ class iob_core(iob_module, iob_instance):
             return
 
     def post_setup(self):
-        """Scripts to run at the end of the top module's setup"""
+        """Scripts to run at the end of the top module's build dir generation."""
         # Replace Verilog snippet includes
         self._replace_snippet_includes()
         # Clean duplicate sources in `hardware/src` and its subfolders (like `hardware/simulation/src`)
@@ -412,26 +415,30 @@ class iob_core(iob_module, iob_instance):
             parameters=kwargs.get("parameters", {}),
             is_superblock=kwargs.get("is_superblock", False),
         )
-
+        is_parent_backup = self.is_parent
         # Copy (some) parent attributes to child
-        self.__dict__.update(parent_module.__dict__)
+        parent_module_dict = copy.deepcopy(parent_module.__dict__)
+        self.__dict__.update(parent_module_dict)
         self.original_name = attributes["original_name"]
         self.setup_dir = attributes["setup_dir"]
+        self.is_parent = is_parent_backup
 
-        if self.abort_reason:
-            return True
+        # Store reference to parent core
+        self.parent_obj = parent_module
 
-        # Copy files from the module's setup dir
-        setup_srcs.copy_rename_setup_directory(self)
-
-        # Run post setup
-        if is_first_module_called:
-            self.post_setup()
 
         return True
 
+    def copy_files_current_and_parent_setup_dir(self):
+        """Copy files from parent setup dir recursively (if any), and the current core's setup dir"""
+        if self.parent_obj:
+            self.parent_obj.copy_files_current_and_parent_setup_dir()
+        setup_srcs.copy_rename_setup_directory(self)
+
     def generate_build_dir(self, **kwargs):
-        self.__create_build_dir()
+
+        if self.is_top_module or self.is_tester:
+            self.__create_build_dir()
 
         # subblock setup process
         for subblock in self.subblocks:
@@ -456,8 +463,8 @@ class iob_core(iob_module, iob_instance):
         if self.is_top_module or self.is_tester:
             setup_srcs.flows_setup(self)
 
-        # Copy files from the module's setup dir
-        setup_srcs.copy_rename_setup_directory(self)
+        # Copy files from the module's setup dir and its parents
+        self.copy_files_current_and_parent_setup_dir()
 
         # Generate config_build.mk
         if self.is_top_module or self.is_tester:
@@ -502,7 +509,7 @@ class iob_core(iob_module, iob_instance):
         # TODO as well: Each module has a local `snippets` list.
         # Note: The 'width' attribute of many module's signals are generaly not needed, because most of them will be connected to global wires (that already contain the width).
 
-        if (self.is_top_module and not self.is_parent) or self.is_tester:
+        if self.is_top_module or self.is_tester:
             self.post_setup()
 
     @staticmethod

@@ -98,5 +98,5 @@ if { $IS_FPGA == "1" } {
     write_bitstream -force $FPGA_TOP.bit
 } else {
     write_verilog -force $FPGA_TOP\_netlist.v
-    write_verilog -force -mode synth_stub ${NAME}_stub.v
+    write_verilog -force -mode synth_stub ${FPGA_TOP}_stub.v
 }

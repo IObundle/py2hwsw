@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "confs": [
             {
                 "name": "EDGE_TYPE",
-                "descr": "Edge detection type",
+                "descr":"Edge detection type. Options: 'rising', 'falling', 'both'",
                 "type": "P",
                 "val": '"rising"',
                 "min": "NA",
@@ -17,13 +17,14 @@ def setup(py_params_dict):
             },
             {
                 "name": "OUT_TYPE",
-                "descr": "Output type",
+                "descr": "Output type. Options: 'step', 'pulse'",
                 "type": "P",
                 "val": '"step"',
                 "min": "NA",
                 "max": "NA",
             },
         ],
+        
         "ports": [
             {
                 "name": "clk_en_rst_s",

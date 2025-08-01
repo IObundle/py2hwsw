@@ -95,17 +95,8 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob_clk",
                     "prefix": "w_",
+                    "params": "c_a_r_e",
                 },
-            },
-            {
-                "name": "w_rst_i",
-                "descr": "Write sync reset",
-                "signals": [{"name": "w_rst_i"}],
-            },
-            {
-                "name": "w_en_i",
-                "descr": "Write enable",
-                "signals": [{"name": "w_en_i"}],
             },
             {
                 "name": "w_data_i",
@@ -133,17 +124,8 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob_clk",
                     "prefix": "r_",
+                    "params": "c_a_r_e",
                 },
-            },
-            {
-                "name": "r_rst_i",
-                "descr": "Read sync reset",
-                "signals": [{"name": "r_rst_i"}],
-            },
-            {
-                "name": "r_en_i",
-                "descr": "Read enable",
-                "signals": [{"name": "r_en_i"}],
             },
             {
                 "name": "r_data_o",

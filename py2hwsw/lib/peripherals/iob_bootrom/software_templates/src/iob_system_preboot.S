@@ -5,7 +5,7 @@
 #include "iob_system_conf.h"
 #include "iob_system_mmap.h"
 
-// Can't include iob_bootrom_swreg.h because the assembler doesn't recognize stdint.h,
+// Can't include iob_bootrom_csrs.h because the assembler doesn't recognize stdint.h,
 // so define the constants here instead (these are address offsets).
 #define IOB_BOOTROM_ROM_ADDR 0x80
 

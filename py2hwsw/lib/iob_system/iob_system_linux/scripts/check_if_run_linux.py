@@ -38,18 +38,18 @@ with open(iob_mem_file, "w") as file:
         file.write(f"{SOC_NAME}_firmware.bin 0")
 
 
-# Fixes existing bsp.h and bsp.vh for Simulation
+# Fixes existing iob_bsp.h and iob_bsp.vh for Simulation
 
-bsp_file = f"{ROOT_DIR}/software/src/bsp.h"
+bsp_file = f"{ROOT_DIR}/software/src/iob_bsp.h"
 with open(bsp_file, "r") as file:
     content = file.read()
 
 if "define SIMULATION 1" in content:
     if RUN_LINUX == "1":
-        # bsp_file = f"{ROOT_DIR}/hardware/simulation/src/bsp.vh"
+        # bsp_file = f"{ROOT_DIR}/hardware/simulation/src/iob_bsp.vh"
         # replace_line(bsp_file, "`define BAUD", "`define BAUD 115200\n")
 
-        # bsp_file = f"{ROOT_DIR}/software/src/bsp.h"
+        # bsp_file = f"{ROOT_DIR}/software/src/iob_bsp.h"
         # replace_line(bsp_file, "#define BAUD", "#define BAUD 115200\n")
 
         conf_file = f"{ROOT_DIR}/hardware/src/{SOC_NAME}_conf.vh"
@@ -62,10 +62,10 @@ if "define SIMULATION 1" in content:
             "#define H_{SOC_NAME.upper()}_CONF_H\n#define {SOC_NAME.upper()}_RUN_LINUX 1\n",
         )
     else:
-        # bsp_file = f"{ROOT_DIR}/hardware/simulation/src/bsp.vh"
+        # bsp_file = f"{ROOT_DIR}/hardware/simulation/src/iob_bsp.vh"
         # replace_line(bsp_file, "`define BAUD", "`define BAUD 3000000\n")
 
-        # bsp_file = f"{ROOT_DIR}/software/src/bsp.h"
+        # bsp_file = f"{ROOT_DIR}/software/src/iob_bsp.h"
         # replace_line(bsp_file, "#define BAUD", "#define BAUD 3000000\n")
 
         conf_file = f"{ROOT_DIR}/hardware/src/{SOC_NAME}_conf.vh"

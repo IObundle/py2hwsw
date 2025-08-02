@@ -101,7 +101,7 @@ fw_jump.bin iob_soc.dtb:
 	make -C ../../ sw-build
 
 UTARGETS+=build_iob_system_linux_software tb
-CSRS=./src/iob_uart_csrs.c
+#CSRS=./src/iob_uart16550_csrs.c
 
 TEMPLATE_LDS=src/$@.lds
 
@@ -124,20 +124,29 @@ IOB_SYSTEM_LINUX_FW_SRC=src/iob_system_linux_firmware.S
 IOB_SYSTEM_LINUX_FW_SRC+=src/iob_system_linux_firmware.c
 IOB_SYSTEM_LINUX_FW_SRC+=src/iob_printf.c
 
-# NOTE: (Ruben) To speed up simulation, we do not include or simulate crypto code in simulation. It greatly increases binary size and some tests would take forever. Better to run all tests in fpga-run.
-IOB_SYSTEM_LINUX_FW_SRC+=src/versat_crypto.c
-IOB_SYSTEM_LINUX_FW_SRC+=src/crypto/aes.c
-IOB_SYSTEM_LINUX_FW_SRC+=src/versat_crypto_common_tests.c
-ifeq ($(SIMULATION),1)
-IOB_SYSTEM_LINUX_FW_SRC+=src/versat_simple_crypto_tests.c
-IOB_SYSTEM_LINUX_FW_SRC+=$(wildcard src/crypto/McEliece/arena.c)
-IOB_SYSTEM_LINUX_FW_SRC+=$(wildcard src/crypto/McEliece/common/sha2.c)
-else
-IOB_SYSTEM_LINUX_FW_SRC+=src/versat_crypto_tests.c
-IOB_SYSTEM_LINUX_FW_SRC+=src/versat_mceliece.c
-IOB_SYSTEM_LINUX_FW_SRC+=$(wildcard src/crypto/McEliece/*.c)
-IOB_SYSTEM_LINUX_FW_SRC+=$(wildcard src/crypto/McEliece/common/*.c)
-endif
+# # NOTE: (Ruben) To speed up simulation, we do not include or simulate crypto code in simulation. It greatly increases binary size and some tests would take forever. Better to run all tests in fpga-run.
+# IOB_SYSTEM_LINUX_FW_SRC+=src/versat_crypto.c
+# IOB_SYSTEM_LINUX_FW_SRC+=src/crypto/aes.c
+# IOB_SYSTEM_LINUX_FW_SRC+=src/versat_crypto_common_tests.c
+# ifeq ($(SIMULATION),1)
+# IOB_SYSTEM_LINUX_FW_SRC+=src/versat_simple_crypto_tests.c
+# IOB_SYSTEM_LINUX_FW_SRC+=$(wildcard src/crypto/McEliece/arena.c)
+# IOB_SYSTEM_LINUX_FW_SRC+=$(wildcard src/crypto/McEliece/common/sha2.c)
+# else
+# IOB_SYSTEM_LINUX_FW_SRC+=src/versat_crypto_tests.c
+# IOB_SYSTEM_LINUX_FW_SRC+=src/versat_mceliece.c
+# IOB_SYSTEM_LINUX_FW_SRC+=$(wildcard src/crypto/McEliece/*.c)
+# IOB_SYSTEM_LINUX_FW_SRC+=$(wildcard src/crypto/McEliece/common/*.c)
+# endif
+
+# CRYPTO_SRC := src/iob-versat.c $(wildcard src/linux/*.c) $(wildcard src/crypto/McEliece/*.c) $(wildcard src/crypto/McEliece/common/*.c)
+# CRYPTO_HDR := $(wildcard src/linux/*.h) $(wildcard src/crypto/McEliece/*.h)
+# UTARGETS+=crypto
+# 
+# crypto:
+# 	riscv64-unknown-linux-gnu-gcc -std=gnu99 -march=rv32imac -mabi=ilp32 -Wcast-align=strict -Os -s -ffunction-sections $(CRYPTO_SRC) -o crypto -Isrc/crypto/McEliece -Isrc/crypto/McEliece/common -Isrc/linux -Wl,-gc-sections -Wl,--strip-all
+# 
+# .PHONY: crypto
 
 
 # PERIPHERAL SOURCES
@@ -145,17 +154,19 @@ DRIVERS=$(addprefix src/,$(addsuffix .c,$(PERIPHERALS)))
 # Only add driver files if they exist
 IOB_SYSTEM_LINUX_FW_SRC+=$(foreach file,$(DRIVERS),$(wildcard $(file)*))
 IOB_SYSTEM_LINUX_FW_SRC+=$(addprefix src/,$(addsuffix _csrs.c,$(PERIPHERALS)))
+# Filter out iob_uart16550_csrs.c since it has no csrs
+IOB_SYSTEM_LINUX_FW_SRC:=$(filter-out src/iob_uart16550_csrs.c,$(IOB_SYSTEM_LINUX_FW_SRC))
 
 
 # BOOTLOADER SOURCES
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_system_linux_boot.S
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_system_linux_boot.c
-IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart.c
-IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart_csrs.c
+IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550.c
+#IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550_csrs.c # UART16550 does not have csrs file
 # IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth.c
 # IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth_csrs.c
 # IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spi.c
-# IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob__csrs.c
+# IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spi_csrs.c
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_printf.c
 
 
@@ -187,7 +198,7 @@ iob_system_linux_preboot:
 	make $@.elf INCLUDES="$(IOB_SYSTEM_LINUX_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LINUX_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_LINUX_PREBOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)" NO_HW_DRIVER=1
 
 
-.PHONY: build_iob_system_linux_software iob_bsp iob_system_linux_firmware iob_system_linux_boot iob_system_linux_preboot
+.PHONY: build_iob_system_linux_software iob_bsp iob_system_linux_firmware check_if_run_linux iob_system_linux_boot iob_system_linux_preboot
 
 #########################################
 #         PC emulation targets          #

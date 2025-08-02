@@ -1,15 +1,16 @@
-#include "bsp.h"
 #include "clint.h"
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
 #include "iob-eth.h"
-#include "iob-spi.h"
-#include "iob-spidefs.h"
-#include "iob-spiplatform.h"
-#include "iob-uart16550.h"
+#endif
+#include "iob_bsp.h"
+#include "iob_printf.h"
+#include "iob_spi.h"
+#include "iob_spidefs.h"
+#include "iob_spiplatform.h"
 #include "iob_system_linux_conf.h"
-#include "iob_system_linux_periphs.h"
-#include "iob_system_linux_system.h"
+#include "iob_system_linux_mmap.h"
+#include "iob_uart16550.h"
 #include "plic.h"
-#include "printf.h"
 #include <string.h>
 #ifdef IOB_SYSTEM_LINUX_DMA_DEMO
 #include "iob-axistream-in.h"
@@ -20,7 +21,10 @@
 #include "riscv-csr.h"
 #include "riscv-interrupts.h"
 
+// #define IOB_SYSTEM_LINUX_VERSAT_DEMO
+#ifdef IOB_SYSTEM_LINUX_VERSAT_DEMO
 #include "versat_crypto_tests.h"
+#endif
 
 #ifdef SIMULATION
 #define WAIT_TIME 0.001
@@ -28,7 +32,7 @@
 #define WAIT_TIME 1
 #endif
 
-#define MTIMER_SECONDS_TO_CLOCKS(SEC) ((uint64_t)(((SEC) * (FREQ))))
+#define MTIMER_SECONDS_TO_CLOCKS(SEC) ((uint64_t)(((SEC) * (IOB_BSP_FREQ))))
 
 #define NSAMPLES 16
 
@@ -49,6 +53,7 @@ void clear_cache() {
   asm volatile(".word 0x500F" ::: "memory");
 }
 
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
 // Send signal by uart to receive file by ethernet
 uint32_t uart_recvfile_ethernet(const char *file_name) {
 
@@ -73,6 +78,7 @@ uint32_t uart_recvfile_ethernet(const char *file_name) {
 
   return file_size;
 }
+#endif // IOB_SYSTEM_LINUX_USE_ETH
 
 // copy src to dst
 // return number of copied chars (excluding '\0')
@@ -114,12 +120,14 @@ int main() {
   int test_result = 0;
 
   // init uart
-  uart16550_init(UART0_BASE, FREQ / (16 * BAUD));
+  uart16550_init(UART0_BASE, IOB_BSP_FREQ / (16 * IOB_BSP_BAUD));
   clint_setCmp(CLINT0_BASE, 0xffffffffffffffff, 0);
   printf_init(&uart16550_putc);
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
   // init eth
   eth_init(ETH0_BASE, &clear_cache);
   eth_wait_phy_rst();
+#endif // IOB_SYSTEM_LINUX_USE_ETH
 
 #ifdef IOB_SYSTEM_LINUX_DMA_DEMO
   // init dma
@@ -132,14 +140,18 @@ int main() {
 #endif
 
   char buffer[5096];
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
   // Receive data from console via Ethernet
   uint32_t file_size = uart_recvfile_ethernet("../src/eth_example.txt");
   eth_rcv_file(buffer, file_size);
   uart16550_puts("\nFile received from console via ethernet:\n");
   for (i = 0; i < file_size; i++)
     uart16550_putc(buffer[i]);
+#endif // IOB_SYSTEM_LINUX_USE_ETH
 
+#ifdef IOB_SYSTEM_LINUX_VERSAT_DEMO
   InitializeCryptoSide(VERSAT0_BASE);
+#endif
 
   printf("\n\n\nHello world!\n\n\n");
 
@@ -336,6 +348,7 @@ int main() {
 #endif // #ifndef VERILATOR
 #endif // #ifdef SIMULATION
 
+#ifdef IOB_SYSTEM_LINUX_VERSAT_DEMO
   // Tests are too big and slow to perform during simulation.
   // Comment out the source files in sw_build.mk to also reduce binary size and
   // speedup simulation.
@@ -347,6 +360,7 @@ int main() {
   test_result |= VersatSimpleSHATests();
   test_result |= VersatSimpleAESTests();
 #endif
+#endif // IOB_SYSTEM_LINUX_VERSAT_DEMO
 
   if (test_result) {
     uart16550_sendfile("test.log", 12, "Test failed!");

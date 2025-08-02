@@ -291,27 +291,28 @@ def setup(py_params_dict):
                             {"name": "uart_interrupt", "width": 1},
                         ],
                     },
-                    # # SPI master
+                    # SPI master
                     # {
                     #     "name": "spi_cache",
                     #     "descr": "SPI cache bus",
+                    #     "if_defined": "RUN_FLASH",
                     #     "signals": {
                     #         "type": "iob",
                     #         "prefix": "spi_",
                     #     },
                     # },
-                    # {
-                    #     "name": "spi_flash",
-                    #     "descr": "SPI flash bus",
-                    #     "signals": [
-                    #         {"name": "SS", "width": 1},
-                    #         {"name": "SCLK", "width": 1},
-                    #         {"name": "MISO", "width": 1},
-                    #         {"name": "MOSI", "width": 1},
-                    #         {"name": "WP_N", "width": 1},
-                    #         {"name": "HOLD_N", "width": 1},
-                    #     ],
-                    # },
+                    {
+                        "name": "spi_flash",
+                        "descr": "SPI flash bus",
+                        "signals": [
+                            {"name": "ss", "width": 1},
+                            {"name": "sclk", "width": 1},
+                            {"name": "miso", "width": 1},
+                            {"name": "mosi", "width": 1},
+                            {"name": "wp_n", "width": 1},
+                            {"name": "hold_n", "width": 1},
+                        ],
+                    },
                 ],
                 "subblocks": [
                     {
@@ -367,20 +368,20 @@ def setup(py_params_dict):
                     #         # TODO:
                     #     },
                     # },
-                    # {
-                    #     # Instantiate a SPI master core from: https://github.com/IObundle/iob-spi
-                    #     "core_name": "iob_spi_master",
-                    #     "instance_name": "SPI",
-                    #     "instance_description": "SPI master peripheral",
-                    #     "is_peripheral": True,
-                    #     "parameters": {},
-                    #     "connect": {
-                    #         "clk_en_rst_s": "clk_en_rst_s",
-                    #         # Cbus connected automatically
-                    #         "cache_iob_s": "spi_cache",
-                    #         "flash_io": "spi_flash",
-                    #     },
-                    # },
+                    {
+                        # Instantiate a SPI master core from: https://github.com/IObundle/iob-spi
+                        "core_name": "iob_spi_master",
+                        "instance_name": "SPI",
+                        "instance_description": "SPI master peripheral",
+                        "is_peripheral": True,
+                        "parameters": {},
+                        "connect": {
+                            "clk_en_rst_s": "clk_en_rst_s",
+                            # Cbus connected automatically
+                            # "cache_iob_s": "spi_cache",
+                            "flash_io": "spi_flash",
+                        },
+                    },
                     #
                     # Peripherals for DMA demo
                     # {

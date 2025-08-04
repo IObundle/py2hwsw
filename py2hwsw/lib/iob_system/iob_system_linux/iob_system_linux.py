@@ -432,14 +432,6 @@ def setup(py_params_dict):
                     #     },
                     # },
                     # NOTE: Add other components/peripherals here.
-                    #
-                    # Simulation UART for vutb # FIXME: Should this inclusion be automated?
-                    {
-                        "core_name": "iob_uart",
-                        "instance_name": "vutb_uart",
-                        "instantiate": False,
-                        # "dest_dir": "hardware/simulation/src",
-                    },
                 ],
                 "snippets": [{"verilog_code": verilog_snippet}],
             },

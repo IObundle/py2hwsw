@@ -1,7 +1,13 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 SECTIONS {
   __stack_size = DEFINED(__stack_size) ? __stack_size : 2K;
   /* Program code */
-  . = 0x00000000;
+  INCLUDE auto_iob_system_linux_firmware.lds
   .init : { *(.init) }
   .text : { *(.text) }
 

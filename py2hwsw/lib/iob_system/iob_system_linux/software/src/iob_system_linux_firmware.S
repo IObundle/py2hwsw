@@ -5,6 +5,8 @@
 #include "iob_system_linux_conf.h"
 #include "iob_system_linux_mmap.h"
 
+#define STACK_ADDR (IOB_SYSTEM_LINUX_FW_BASEADDR + (1 << IOB_SYSTEM_LINUX_FW_ADDR_W))
+
 .section .init
 .globl _start
 .type _start,@function
@@ -16,15 +18,11 @@ _start:
 .option pop
 
     //set stack pointer
-    lui sp, %hi(1<<IOB_SYSTEM_LINUX_MEM_ADDR_W)
-    addi sp, sp, %lo(1<<IOB_SYSTEM_LINUX_MEM_ADDR_W)
+    lui sp, %hi(STACK_ADDR)
+    addi sp, sp, %lo(STACK_ADDR)
 
     //call main
-    call main
+    jal ra, main
 
-    //reboot to run bootloader
-    li s5, 3 //cpu_rst_req=1, boot=1
-    li s6, 0xf0000000
-    sw s5, 0(s6)//cpu_rst_req=1, boot=1
-
+    // Stop the processor
     ebreak

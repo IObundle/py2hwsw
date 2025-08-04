@@ -22,7 +22,6 @@
 #define PROGNAME "IOb-Bootloader"
 
 #define DC1 17 // Device Control 1 (used to indicate end of bootloader)
-#define EXT_MEM 0x80000000
 
 #define FLASH_FILE_SIZE_OFFSET 0x0   // sector 0, subsector 0
 #define FLASH_FIRMWARE_OFFSET 0x1000 // sector 0, subsector 1
@@ -34,7 +33,10 @@
 //      It allocates a block with required size at the end of the external
 //      memory region.
 static void *mem_alloc(size_t size) {
-  return (void *)(EXT_MEM | (1 << IOB_SYSTEM_LINUX_MEM_ADDR_W)) - size;
+  // FIXME: Use a memory region that is not allocated to bootloader
+  return (void *)(IOB_SYSTEM_LINUX_FW_BASEADDR +
+                  (1 << IOB_SYSTEM_LINUX_FW_ADDR_W)) -
+         size;
 }
 static void mem_free(void *ptr) {}
 
@@ -218,11 +220,13 @@ int main() {
   uart16550_puts(PROGNAME);
   uart16550_puts(": connected!\n");
 
+#ifdef IOB_SYSTEM_LINUX_USE_EXTMEM
   uart16550_puts(PROGNAME);
   uart16550_puts(": DDR in use and program runs from DDR\n");
+#endif
 
   // address to copy firmware to
-  prog_start_addr = (char *)(EXT_MEM);
+  prog_start_addr = (char *)(IOB_SYSTEM_LINUX_FW_BASEADDR);
 
   while (uart16550_getc() != ACK) {
     uart16550_puts(PROGNAME);
@@ -289,6 +293,8 @@ int main() {
 #ifdef SIMULATION
       // Running Linux: setup required dependencies
       uart16550_sendfile("test.log", 12, "Test passed!");
+      // Disable console exclusive message identifiers (avoids conflicts with
+      // chars sent by Linux boot process)
       uart16550_putc((char)DC1);
 #endif
       run_linux = 1;
@@ -299,9 +305,11 @@ int main() {
 #ifdef IOB_SYSTEM_LINUX_RUN_LINUX
   // Running Linux: setup required dependencies
   uart16550_sendfile("test.log", 12, "Test passed!");
+  // Disable console exclusive message identifiers (avoids conflicts with
+  // chars sent by Linux boot process)
   uart16550_putc((char)DC1);
 #endif
-#endif
+#endif // INIT_MEM
 
   // Clear CPU registers, to not pass arguments to the next
   asm volatile("li a0,0");
@@ -320,6 +328,7 @@ int main() {
 
 #ifndef SIMULATION
   // Terminate console if running Linux on FPGA
+  // We may want to use a different terminal emulator for Linux (like minicom)
   if (run_linux)
     uart16550_finish();
 #endif

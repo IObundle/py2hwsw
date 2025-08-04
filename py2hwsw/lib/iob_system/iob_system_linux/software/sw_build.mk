@@ -162,11 +162,12 @@ IOB_SYSTEM_LINUX_FW_SRC:=$(filter-out src/iob_uart16550_csrs.c,$(IOB_SYSTEM_LINU
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_system_linux_boot.S
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_system_linux_boot.c
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550.c
-#IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550_csrs.c # UART16550 does not have csrs file
+# IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550_csrs.c # UART16550 does not have csrs file
 # IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth.c
 # IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth_csrs.c
-# IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spi.c
-# IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spi_csrs.c
+IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spi.c
+IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spiplatform.c
+IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spi_master_csrs.c
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_printf.c
 
 

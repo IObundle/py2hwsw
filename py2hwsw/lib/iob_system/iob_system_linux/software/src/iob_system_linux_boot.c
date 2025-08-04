@@ -1,14 +1,21 @@
-#include "bsp.h"
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle, Lda
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "clint.h"
-#include "iob-eth.h"
-#include "iob-spi.h"
-#include "iob-spidefs.h"
-#include "iob-spiplatform.h"
-#include "iob-uart16550.h"
+#include "iob_bsp.h"
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#include "iob_eth.h"
+#endif
+#include "iob_printf.h"
+#include "iob_spi.h"
+#include "iob_spidefs.h"
+#include "iob_spiplatform.h"
 #include "iob_system_linux_conf.h"
-#include "iob_system_linux_periphs.h"
-#include "iob_system_linux_system.h"
-#include "printf.h"
+#include "iob_system_linux_mmap.h"
+#include "iob_uart16550.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -39,6 +46,7 @@ void clear_cache() {
   asm volatile(".word 0x500F" ::: "memory");
 }
 
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
 // Send signal by uart to receive file by ethernet
 uint32_t uart_recvfile_ethernet(char *file_name) {
   uart16550_puts(UART_PROGNAME);
@@ -62,6 +70,7 @@ uint32_t uart_recvfile_ethernet(char *file_name) {
 
   return file_size;
 }
+#endif // IOB_SYSTEM_LINUX_USE_ETH
 
 int compute_mem_load_txt(char file_name_array[4][50],
                          long int file_address_array[4], char *file_start_addr,
@@ -116,9 +125,14 @@ void console_get_files(int file_count, long int file_address_array[4],
   char *file_addr = NULL;
   for (i = 0; i < file_count; i++) {
     file_addr = (char *)(file_start_addr + file_address_array[i]);
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
     // Receive data from console via Ethernet
     file_sizes[i] = uart_recvfile_ethernet(file_name_array[i]);
     eth_rcv_file(file_addr, file_sizes[i]);
+#else  // NOT IOB_SYSTEM_LINUX_USE_ETH
+    // Receive data from console via UART
+    file_sizes[i] = uart16550_recvfile(file_name_array[i], file_addr);
+#endif // IOB_SYSTEM_LINUX_USE_ETH
   }
 }
 
@@ -192,7 +206,7 @@ int main() {
   char *prog_start_addr;
 
   // init uart
-  uart16550_init(UART0_BASE, FREQ / (16 * BAUD));
+  uart16550_init(UART0_BASE, IOB_BSP_FREQ / (16 * IOB_BSP_BAUD));
 
   // connect with console
   do {
@@ -216,6 +230,7 @@ int main() {
   }
 
 #ifndef IOB_SYSTEM_LINUX_INIT_MEM
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
   // Init ethernet and printf (for ethernet)
   printf_init(&uart16550_putc);
 
@@ -225,6 +240,7 @@ int main() {
   eth_init_mem_alloc(&mem_alloc, &mem_free);
   // Wait for PHY reset to finish
   eth_wait_phy_rst();
+#endif // IOB_SYSTEM_LINUX_USE_ETH
 
   char boot_flow[20] = {0};
 

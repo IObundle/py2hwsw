@@ -1,8 +1,14 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle, Lda
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "clint.h"
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
-#include "iob-eth.h"
-#endif
 #include "iob_bsp.h"
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#include "iob_eth.h"
+#endif
 #include "iob_printf.h"
 #include "iob_spi.h"
 #include "iob_spidefs.h"
@@ -13,9 +19,9 @@
 #include "plic.h"
 #include <string.h>
 #ifdef IOB_SYSTEM_LINUX_DMA_DEMO
-#include "iob-axistream-in.h"
-#include "iob-axistream-out.h"
-#include "iob-dma.h"
+#include "iob_axistream_in.h"
+#include "iob_axistream_out.h"
+#include "iob_dma.h"
 #endif
 
 #include "riscv-csr.h"

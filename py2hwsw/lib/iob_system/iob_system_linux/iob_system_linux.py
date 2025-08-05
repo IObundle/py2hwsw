@@ -248,6 +248,14 @@ def setup(py_params_dict):
                         "min": "1",
                         "max": "32",
                     },
+                    {  # For iob_spi_master
+                        "name": "FPGA_TOOL",
+                        "descr": "Use IPs from fpga tool. Avaliable options: 'XILINX', 'other'.",
+                        "type": "P",
+                        "val": '"other"',
+                        "min": "NA",
+                        "max": "NA",
+                    },
                     # Old opencrytolinux confs. Are they still needed?
                     # { # Used for software.
                     #     "name": "OS_ADDR_W",
@@ -385,7 +393,9 @@ def setup(py_params_dict):
                         "instance_name": "SPI",
                         "instance_description": "SPI master peripheral",
                         "is_peripheral": True,
-                        "parameters": {},
+                        "parameters": {
+                            "FPGA_TOOL": "FPGA_TOOL",
+                        },
                         "connect": {
                             "clk_en_rst_s": "clk_en_rst_s",
                             # Cbus connected automatically

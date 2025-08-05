@@ -73,7 +73,7 @@ endif
 
 # Common firmware targets
 iob_system_linux_firmware.hex: $(FIRMWARE)
-	../../scripts/makehex.py $(FIRM_ARGS) $(FIRM_ADDR_W) > $@
+	../../scripts/makehex.py $(FIRM_ARGS) $(FIRM_ADDR_W) $@
 #	../../scripts/hex_split.py iob_system_linux_firmware .
 	../../scripts/makehex.py --split $< $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,MEM_ADDR_W) $@
 

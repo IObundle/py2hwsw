@@ -69,7 +69,9 @@ def main():
             bindata[i] += b"0"
 
     for i in range(nFiles):
-        assert binaddr[i] + len(bindata[i]) <= mem_size
+        assert binaddr[i] + len(bindata[i]) <= mem_size, (
+            "File %d doesn't fit in memory" % i
+        )
         assert (binaddr[i] + len(bindata[i])) % 4 == 0
 
     lines = []

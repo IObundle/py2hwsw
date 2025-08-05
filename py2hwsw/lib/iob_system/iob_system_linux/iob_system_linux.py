@@ -16,8 +16,19 @@ def setup(py_params_dict):
     params = {
         "dma_demo": False,
     }
+    iob_system_default_params = {
+        "use_intmem": False,
+        "use_extmem": True,
+        "mem_addr_w": 26,
+        "bootrom_addr_w": 15,
+        "fw_baseaddr": 0,
+        "fw_addr_w": 26,
+    }
     # Update parameters values with ones given in python parameters
     update_params(params, py_params_dict)
+
+    # py_params_dict will be passed to iob_system. Merge with new default parameters.
+    py_params_dict = {**iob_system_default_params, **py_params_dict}
 
     #
     # Verilog snippets

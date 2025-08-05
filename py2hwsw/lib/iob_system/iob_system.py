@@ -17,7 +17,7 @@ def setup(py_params_dict):
         "init_mem": (True, "If should initialize memories from data in .hex files"),
         "use_intmem": (
             True,
-            "If should include an internal memory (instantiated externally, usually in memory wrapper).",
+            "If should include an internal memory (in memory wrapper).",
         ),
         "use_extmem": (False, "If should use external memory (usually DDR)"),
         "use_bootrom": (True, "If should include a bootrom"),
@@ -25,7 +25,10 @@ def setup(py_params_dict):
         "use_ethernet": (False, "If should setup ethernet ports and testbenches"),
         "addr_w": (32, "CPU address width"),
         "data_w": (32, "CPU data width"),
-        "mem_addr_w": (18, "Internal memory address width"),
+        "mem_addr_w": (
+            18,
+            "Internal memory address width. Also specifies default value for external memory address width.",
+        ),
         "bootrom_addr_w": (12, "Bootrom address width"),
         "fw_baseaddr": (0, "Firmware base address"),
         "fw_addr_w": (18, "Firmware address width"),

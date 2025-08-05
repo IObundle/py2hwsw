@@ -19,10 +19,12 @@ def setup(py_params_dict):
     iob_system_default_params = {
         "use_intmem": False,
         "use_extmem": True,
-        "mem_addr_w": 26,
+        "mem_addr_w": 17,  # FIXME: Temprorary lower value for speed up. Change to 26 for Linux.
         "bootrom_addr_w": 15,
         "fw_baseaddr": 0,
-        "fw_addr_w": 26,
+    }
+    iob_system_default_params |= {
+        "fw_addr_w": iob_system_default_params["mem_addr_w"],
     }
     # Update parameters values with ones given in python parameters
     update_params(params, py_params_dict)

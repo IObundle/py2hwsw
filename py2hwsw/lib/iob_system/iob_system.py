@@ -386,7 +386,7 @@ def setup(py_params_dict):
                 "descr": "AXI manager interface for internal memory",
                 "signals": {
                     "type": "axi",
-                    "prefix": "int_mem_axi_",
+                    "prefix": "int_mem_",
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": f"{params['mem_addr_w']}",
                     "DATA_W": "AXI_DATA_W",

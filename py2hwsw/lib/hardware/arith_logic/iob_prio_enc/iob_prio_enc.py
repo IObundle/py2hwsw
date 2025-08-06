@@ -69,7 +69,7 @@ def setup(py_params_dict):
             encoded_o = {$clog2(W+1){1'b0}};  //placeholder default value
             for (pos = W; pos != -1; pos = pos - 1) begin
                if (unencoded_int[pos]) begin
-                  encoded_o = pos[$clog2(W)-1:0];
+                  encoded_o = pos[$clog2(W+1)-1:0];
                end
             end
          end
@@ -78,12 +78,12 @@ def setup(py_params_dict):
             encoded_o = {$clog2(W+1){1'b0}};  //placeholder default value
             for (pos = {W{1'd0}}; pos < (W+1); pos = pos + 1) begin
                if (unencoded_int[pos]) begin
-                  encoded_o = pos[$clog2(W)-1:0];
+                  encoded_o = pos[$clog2(W+1)-1:0];
                end
             end
          end
       end
-   endgenerate    
+   endgenerate
          """,
             },
         ],

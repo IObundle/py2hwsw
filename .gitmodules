@@ -14,9 +14,9 @@
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_eth"]
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_eth
 	url = git@github.com:IObundle/iob-eth.git
-[submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi"]
-	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master
-	url = git@github.com:IObundle/iob-spi.git
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_linux"]
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_linux
 	url = git@github.com:IObundle/iob-linux.git
+[submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master"]
+	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master
+	url = git@github.com:IObundle/iob-spi.git

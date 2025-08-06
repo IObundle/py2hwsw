@@ -88,7 +88,7 @@ static void cbrecursion(unsigned char *out, long long pos, long long step,
 
       for (x = 0; x < n; ++x) {
         A[x] = ((uint32_t)A[x] << 20) | B[x];
-      } /* A = (p^{-1}<<20)+(p<<10)+c */
+      }                 /* A = (p^{-1}<<20)+(p<<10)+c */
       int32_sort(A, n); /* A = (id<<20)+(pp<<10)+cp */
 
       for (x = 0; x < n; ++x) {

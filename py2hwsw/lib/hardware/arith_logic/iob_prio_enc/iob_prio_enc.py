@@ -66,7 +66,7 @@ def setup(py_params_dict):
    generate
       if (MODE == "LOW") begin : gen_low_prio
          always @* begin
-            encoded_o = 1'b0;  //placeholder default value
+            encoded_o = {$clog2(W+1){1'b0}};  //placeholder default value
             for (pos = W; pos != -1; pos = pos - 1) begin
                if (unencoded_int[pos]) begin
                   encoded_o = pos[$clog2(W)-1:0];
@@ -75,7 +75,7 @@ def setup(py_params_dict):
          end
       end else begin : gen_highest_prio  //MODE == "HIGH"
          always @* begin
-            encoded_o = 1'b0;  //placeholder default value
+            encoded_o = {$clog2(W+1){1'b0}};  //placeholder default value
             for (pos = {W{1'd0}}; pos < (W+1); pos = pos + 1) begin
                if (unencoded_int[pos]) begin
                   encoded_o = pos[$clog2(W)-1:0];

@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef INCLUDED_UNIT_CONFIGURATION
 #define INCLUDED_UNIT_CONFIGURATION
 

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 # This Makefile can be used with GNU Make or BSD Make
 
 LIB = libmceliece348864_clean.a

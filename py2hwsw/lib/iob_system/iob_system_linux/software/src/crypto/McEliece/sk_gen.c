@@ -1,4 +1,10 @@
 /*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
   This file is for secret-key generation
 */
 
@@ -26,7 +32,7 @@ static inline crypto_uint16 gf_is_zero_declassify(gf t) {
 // Matrix Index
 
 #define MI(Y, X, ROWSIZE) ((Y) * (ROWSIZE) + (X))
-//#define MI(Y,X,ROWSIZE) Y ][ X
+// #define MI(Y,X,ROWSIZE) Y ][ X
 
 /* input: f, element in GF((2^m)^t) */
 /* output: out, minimal polynomial of f */

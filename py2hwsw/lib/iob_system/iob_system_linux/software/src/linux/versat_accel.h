@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 // This file has been auto-generated
 
 #ifndef INCLUDED_VERSAT_ACCELERATOR_HEADER

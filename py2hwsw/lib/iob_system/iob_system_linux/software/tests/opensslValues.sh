@@ -1,4 +1,9 @@
 #!/bin/sh 
+
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 #set -x
 
 # Simple script to generate testcases using a well known implementation (openssl).

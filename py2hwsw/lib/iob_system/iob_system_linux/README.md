@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 IObundle
+
+SPDX-License-Identifier: MIT
+-->
+
 # IOb-System-Linux
 
 [SoCLinux](https://nlnet.nl/project/SoCLinux/) is an open-source project that aims to configure and generate a Linux system for RISC-V processors, focusing on creating a robust and maintainable environment for designing and testing IP cores.

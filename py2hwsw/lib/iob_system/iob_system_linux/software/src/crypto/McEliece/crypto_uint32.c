@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "crypto_uint32.h"
 
 crypto_uint32_signed crypto_uint32_signed_negative_mask(

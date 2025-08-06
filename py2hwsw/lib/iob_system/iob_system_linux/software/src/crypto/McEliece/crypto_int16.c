@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "crypto_int16.h"
 
 crypto_int16 crypto_int16_negative_mask(crypto_int16 crypto_int16_x) {

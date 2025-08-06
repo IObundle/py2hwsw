@@ -1,9 +1,15 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /* This file is for implementing the Nassimi-Sahni algorithm */
 /* See David Nassimi, Sartaj Sahni "Parallel algorithms to set up the Benes
  * permutationnetwork" */
 /* See also https://cr.yp.to/papers/controlbits-20200923.pdf */
 
-//#include "compat.h"
+// #include "compat.h"
 #include "controlbits.h"
 #include "crypto_declassify.h"
 #include "int32_sort.h"
@@ -82,7 +88,7 @@ static void cbrecursion(unsigned char *out, long long pos, long long step,
 
       for (x = 0; x < n; ++x) {
         A[x] = ((uint32_t)A[x] << 20) | B[x];
-      }                 /* A = (p^{-1}<<20)+(p<<10)+c */
+      } /* A = (p^{-1}<<20)+(p<<10)+c */
       int32_sort(A, n); /* A = (id<<20)+(pp<<10)+cp */
 
       for (x = 0; x < n; ++x) {

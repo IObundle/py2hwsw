@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 LINUX_DIR := ../../../submodules/OS/submodules/linux-5.15.98
 PWD:=$(shell pwd)
 obj-m += versat.o

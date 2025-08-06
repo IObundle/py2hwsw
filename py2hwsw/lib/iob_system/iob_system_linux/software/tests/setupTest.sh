@@ -1,5 +1,10 @@
 #!/bin/sh 
 
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+
 insmod versat.ko
 
 # 3000 per block, 12000 total

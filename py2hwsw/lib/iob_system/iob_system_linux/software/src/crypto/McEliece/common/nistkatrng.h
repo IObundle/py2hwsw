@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef NIST_KAT_RNG_H
 #define NIST_KAT_RNG_H
 

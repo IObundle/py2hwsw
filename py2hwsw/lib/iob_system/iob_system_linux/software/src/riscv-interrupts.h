@@ -1,10 +1,8 @@
 /*
-   RISC-V machine interrupts.
-   SPDX-License-Identifier: Unlicense
-
-   https://five-embeddev.com/
-
-*/
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #ifndef RISCV_INTERRUPTS_H
 #define RISCV_INTERRUPTS_H

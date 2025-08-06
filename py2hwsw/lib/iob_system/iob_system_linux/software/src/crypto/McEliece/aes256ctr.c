@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #include "aes256ctr.h"
 
 void aes256ctr(uint8_t *out, size_t outlen,

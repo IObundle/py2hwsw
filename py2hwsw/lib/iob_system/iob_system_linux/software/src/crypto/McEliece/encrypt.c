@@ -1,5 +1,11 @@
 /*
-  This file is for Niederreiter encryption
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
+  This file is for Niederreiter decryption
 */
 
 #include "params.h"

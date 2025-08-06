@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef PQCLEAN_RANDOMBYTES_H
 #define PQCLEAN_RANDOMBYTES_H
 

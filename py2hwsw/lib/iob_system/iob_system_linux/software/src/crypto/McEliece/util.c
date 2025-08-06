@@ -1,4 +1,10 @@
 /*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
   This file is for loading/storing data in a little-endian fashion
 */
 

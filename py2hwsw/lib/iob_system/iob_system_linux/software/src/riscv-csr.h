@@ -1,10 +1,8 @@
 /*
-   Register access functions for RISC-V system registers.
-   SPDX-License-Identifier: Unlicense
-
-   https://five-embeddev.com/
-
-*/
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #ifndef RISCV_CSR_H
 #define RISCV_CSR_H

@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef SOC_H
 #define SOC_H
 #define SYSTEM_RAM_A_SIZE 4096

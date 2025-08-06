@@ -1,4 +1,11 @@
 /*
+ * SPDX-FileCopyrightText: 2016 Thomas Pornin <pornin@bolet.org>
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+/*
  * AES implementation based on code from BearSSL (https://bearssl.org/)
  * by Thomas Pornin.
  *

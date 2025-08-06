@@ -1,6 +1,11 @@
 /*
-  This file is for Benes network related functions
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
+/*
+  This file is for Benes network related functions
   For the implementation strategy, see
   https://eprint.iacr.org/2017/793.pdf
 */

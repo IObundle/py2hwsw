@@ -1,3 +1,11 @@
+/*
+ * SPDX-FileCopyrightText: 2017 Bassham, Lawrence E (Fed)
+ * SPDX-FileCopyrightText: 2017 Sebastian Verschoor
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 //
 //  rng.c
 //

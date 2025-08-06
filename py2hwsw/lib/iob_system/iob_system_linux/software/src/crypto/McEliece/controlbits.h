@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef CONTROLBITS_H
 #define CONTROLBITS_H
 /* This file is for implementing the Nassimi-Sahni algorithm */

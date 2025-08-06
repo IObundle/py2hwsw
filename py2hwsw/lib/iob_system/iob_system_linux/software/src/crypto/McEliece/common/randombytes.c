@@ -1,6 +1,12 @@
 /*
-The MIT License
+ * SPDX-FileCopyrightText: 2017 Daan Sprenkels <hello@dsprenkels.com>
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
+/*
+The MIT License
 Copyright (c) 2017 Daan Sprenkels <hello@dsprenkels.com>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

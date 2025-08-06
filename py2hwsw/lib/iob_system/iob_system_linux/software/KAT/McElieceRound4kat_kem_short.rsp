@@ -1,4 +1,8 @@
-# KEM/MCELIECE348864 - Shortened version in order to reduce file size. PK and PKL - first and last 1024 characters of PK. SK and SKL - first and last 1024 characters of SK.
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+# KEM/MCELIECE348864 - Shortened version in order to reduce file size. PK and PKL - first and last 1024 characters of PK. SK and SKL - first and last 1024 chara cters of SK.
 
 COUNT = 0
 SEED = 061550234D158C5EC95595FE04EF7A25767F2E24CC2BC479D09D86DC9ABCFDE7056A8C266F9EF97ED08541DBD2E1FFA1

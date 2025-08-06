@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 IObundle
+
+SPDX-License-Identifier: MIT
+-->
+
 # Tutorial: Add New Device Driver
 
 This tutorial presents the steps required to create simple linux character device drivers for a device and use them in IOb-System-Linux.
@@ -183,8 +189,9 @@ Include the device node in the Linux Device Tree.
 The `compatible` string must match with the `compatible` field in the driver source.
 
 ```
-// SPDX-License-Identifier: (GPL-2.0 OR MIT)
-/* Copyright (c) 2024 IObundle */
+// SPDX-FileCopyrightText: 2025 IObundle
+//
+// SPDX-License-Identifier: MIT
 
 /dts-v1/;
 

@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 #ifndef PQCLEAN_MCELIECE348864_CLEAN_crypto_uint64_h
 #define PQCLEAN_MCELIECE348864_CLEAN_crypto_uint64_h
 

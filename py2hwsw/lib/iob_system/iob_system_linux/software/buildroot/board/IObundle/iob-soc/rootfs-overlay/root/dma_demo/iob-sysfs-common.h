@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 IObundle
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
 /* iob-sysfs-common.h: common functions for SysFS access */
 
 int iob_sysfs_read_file(const char *filename, uint32_t *read_value);

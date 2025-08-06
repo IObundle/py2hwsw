@@ -709,6 +709,12 @@ class csr_gen:
                     all_reads_auto = False
                     break
 
+        converter_connect = {
+            "s_s": "control_if_s",
+            "m_m": "internal_iob",
+        }
+        if core_attributes["csr_if"] != "iob":
+            converter_connect["clk_en_rst_s"] = "clk_en_rst_s"
         subblocks.append(
             {
                 "core_name": "iob_universal_converter",
@@ -720,11 +726,7 @@ class csr_gen:
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "s_s": "control_if_s",
-                    "m_m": "internal_iob",
-                },
+                "connect": converter_connect,
             }
         )
         if core_attributes["csr_if"] == "axi":
@@ -749,7 +751,7 @@ class csr_gen:
                 snippet += """
 // Create a special readstrobe for "REG" (auto) CSRs.
 // LSBs 0 = read full word; LSBs 1 = read byte; LSBs 2 = read half word; LSBs 3 = read byte.
-   reg shift_amount;
+   reg [1:0] shift_amount;
    always @(*)
       case (internal_iob_addr_stable[1:0])
          // Access entire word

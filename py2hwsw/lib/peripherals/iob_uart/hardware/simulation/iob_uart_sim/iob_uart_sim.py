@@ -70,6 +70,13 @@ def setup(py_params_dict):
     #
     # Blocks
     #
+
+    converter_connect = {
+        "s_s": "uart_s",
+        "m_m": "uart_cbus",
+    }
+    if params["csr_if"] != "iob":
+        converter_connect["clk_en_rst_s"] = "clk_en_rst_s"
     attributes_dict["subblocks"] = [
         {
             "core_name": "iob_uart",
@@ -92,11 +99,7 @@ def setup(py_params_dict):
                 "ADDR_W": 3,
                 "DATA_W": "DATA_W",
             },
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "s_s": "uart_s",
-                "m_m": "uart_cbus",
-            },
+            "connect": converter_connect,
         },
     ]
     #

@@ -185,6 +185,15 @@ class csr_gen:
             else:
                 return f"{log2n_items}+{ceil(log(n_bytes, 2))}"
 
+    def __addr_cmp_str(self, addr_wire, addr):
+        """Auxiliar function to generate address wire comparison, only if addr > 0
+        Otherwise comparison: (wire >= addr) is always true
+        """
+        if isinstance(addr, int):
+            if addr == 0:
+                return ""
+        return f"({addr_wire} >= ({addr})) && "
+
     def gen_wr_reg(self, row):
         wires = []
         name = row.name
@@ -221,10 +230,11 @@ class csr_gen:
             lines += f"    wire {name}_addressed_w;\n"
 
             # test if addr and addr_w are int and substitute with their values
+            wstrb_addr_cmp = self.__addr_cmp_str("wstrb_addr", addr)
             if isinstance(addr, int) and isinstance(addr_w, int):
-                lines += f"    assign {name}_addressed_w = (wstrb_addr >= ({addr})) && (wstrb_addr < {addr+2**addr_w});\n"
+                lines += f"    assign {name}_addressed_w = {wstrb_addr_cmp} (wstrb_addr < {addr+2**addr_w});\n"
             else:
-                lines += f"    assign {name}_addressed_w = (wstrb_addr >= ({addr})) && (wstrb_addr < ({addr}+(2**({addr_w}))));\n"
+                lines += f"    assign {name}_addressed_w = {wstrb_addr_cmp} (wstrb_addr < ({addr}+(2**({addr_w}))));\n"
 
             n_items = 2 ** eval_param_expression_from_config(
                 log2n_items, self.config, "max"
@@ -323,10 +333,11 @@ class csr_gen:
 
             # test if addr and addr_w are int and substitute with their values
             # For non-auto, use normal address
+            int_addr_stable_cmp = self.__addr_cmp_str("internal_iob_addr_stable", addr)
             if isinstance(addr, int) and isinstance(addr_w, int):
-                lines += f"    assign {name}_addressed = (internal_iob_addr_stable >= ({addr})) && (internal_iob_addr_stable < {addr+2**addr_w});\n"
+                lines += f"    assign {name}_addressed = {int_addr_stable_cmp} (internal_iob_addr_stable < {addr+2**addr_w});\n"
             else:
-                lines += f"    assign {name}_addressed = (internal_iob_addr_stable >= ({addr})) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
+                lines += f"    assign {name}_addressed = {int_addr_stable_cmp} (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
 
             lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed;\n"
             if type(log2n_items) is not int or log2n_items > 0:
@@ -1013,7 +1024,8 @@ class csr_gen:
             if "W" in row.mode:
                 if not auto:
                     # get ready
-                    snippet += f"        if((wstrb_addr >= {addr}) && (wstrb_addr < {addr + 2**addr_w})) begin\n"
+                    wstrb_addr_cmp = self.__addr_cmp_str("wstrb_addr", addr)
+                    snippet += f"        if({wstrb_addr_cmp} (wstrb_addr < {addr + 2**addr_w})) begin\n"
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
                         "            if (internal_iob_valid & |internal_iob_wstrb) begin\n"

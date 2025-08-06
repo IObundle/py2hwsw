@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "confs": [
             {
                 "name": "EDGE_TYPE",
-                "descr":"Edge detection type. Options: 'rising', 'falling', 'both'",
+                "descr": "Edge detection type. Options: 'rising', 'falling', 'both'",
                 "type": "P",
                 "val": '"rising"',
                 "min": "NA",
@@ -24,7 +24,6 @@ def setup(py_params_dict):
                 "max": "NA",
             },
         ],
-        
         "ports": [
             {
                 "name": "clk_en_rst_s",

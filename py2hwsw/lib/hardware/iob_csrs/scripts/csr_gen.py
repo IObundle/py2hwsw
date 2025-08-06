@@ -444,21 +444,6 @@ class csr_gen:
 
         return lines, wires
 
-    # auxiliar read register case name
-    def aux_read_reg_case_name(self, row):
-        aux_read_reg_case_name = ""
-        if "R" in row.mode:
-            addr = row.addr
-            n_bits = row.n_bits
-            log2n_items = row.log2n_items
-            n_bytes = int(self.bceil(n_bits, 3) / 8)
-            if n_bytes == 3:
-                n_bytes = 4
-            addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            addr_w_base = max(log(self.cpu_n_bytes, 2), addr_w)
-            aux_read_reg_case_name = f"iob_addr_i_{self.bfloor(addr, addr_w_base)}_{self.boffset(addr, self.cpu_n_bytes)}"
-        return aux_read_reg_case_name
-
     # generate wires to connect instance in top module
     def gen_inst_wire(self, table, f):
         for row in table:
@@ -907,21 +892,6 @@ class csr_gen:
                 },
             },
         ]
-
-        # auxiliar read register cases
-        for row in table:
-            if "R" in row.mode:
-                aux_read_reg = self.aux_read_reg_case_name(row)
-                if aux_read_reg:
-                    wires.append(
-                        {
-                            "name": aux_read_reg,
-                            "descr": "",
-                            "signals": [
-                                {"name": aux_read_reg, "width": 1, "isvar": True},
-                            ],
-                        },
-                    )
 
         # Create byte aligned wires
         for row in table:

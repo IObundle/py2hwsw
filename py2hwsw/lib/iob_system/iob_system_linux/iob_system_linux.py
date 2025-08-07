@@ -392,7 +392,7 @@ def setup(py_params_dict):
                     {
                         # Instantiate a SPI master core from: https://github.com/IObundle/iob-spi
                         "core_name": "iob_spi_master",
-                        "instance_name": "SPI",
+                        "instance_name": "SPI0",
                         "instance_description": "SPI master peripheral",
                         "is_peripheral": True,
                         "parameters": {

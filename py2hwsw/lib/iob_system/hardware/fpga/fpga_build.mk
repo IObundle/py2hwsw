@@ -9,6 +9,15 @@ RUN_DEPS+=iob_system_bootrom.hex iob_system_firmware.hex
 # Don't add firmware to BUILD_DEPS if we are not initializing memory since we don't want to rebuild the bitstream when we modify it.
 BUILD_DEPS+=iob_system_bootrom.hex $(if $(filter $(INIT_MEM),1),iob_system_firmware.hex)
 
+# Throw error if user attempts to initialize external memory in FPGA
+ifeq ($(INIT_MEM), 1)
+    ifneq ($(USE_INTMEM), 1)
+        ifeq ($(USE_EXTMEM), 1)
+            $(error Error: FPGA board DDR memory cannot be initialized. Either use INIT_MEM=0 to avoid memory initialization or set USE_INTMEM=1 to use internal memory with initialization.)
+        endif
+    endif
+endif
+
 QUARTUS_SEED ?=5
 
 ROOT_DIR :=../..

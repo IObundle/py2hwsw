@@ -299,6 +299,8 @@ def setup(py_params_dict):
     attributes_dict["snippets"] = [
         {
             "verilog_code": """
+   localparam RB_MASK = {1'b0, {READ_BYTES{1'b1}}};
+
    // Logic
    assign wb_adr_o     = iob_valid_i ? iob_addr_i : iob_address_r;
    assign wb_cyc_o     = iob_valid_i ? iob_valid_i : iob_valid_r;
@@ -307,7 +309,7 @@ def setup(py_params_dict):
    assign wb_sel_o     = iob_valid_i ? wb_select : wb_select_r;
    assign wb_we_o      = iob_valid_i ? wb_we : wb_we_r;
 
-   assign wb_select    = wb_we ? iob_wstrb_i : {READ_BYTES{1'b1}};
+   assign wb_select    = wb_we ? iob_wstrb_i : (RB_MASK) << (iob_addr_i[1:0]);
    assign wb_we        = |iob_wstrb_i;
 
    assign iob_rvalid_o = wb_ack_i & (~wb_we_r);

@@ -14,7 +14,8 @@ ifeq ($(USE_ETHERNET),1)
 VSRC+=./src/iob_eth_csrs_emb_verilator.c ./src/iob_eth_driver_tb.cpp
 endif
 
-CSRS = ../../software/src/iob_uart_csrs.c
+VLT_SRC=../../software/simulation/src/iob_uart_csrs.c
+CPP_INCLUDES=-I../../../software/simulation/src
 
 CONSOLE_CMD ?=rm -f soc2cnsl cnsl2soc; ../../scripts/console.py -L
 

@@ -94,7 +94,7 @@ INCLUDE_DIRS+=../../{python_module.relative_path_to_UUT}/hardware/src
             "# verilator  flags",
             f"""\
 #include the UUT's headers
-VLTINCLUDES+=-I../../{python_module.relative_path_to_UUT}/hardware/src
+CPP_INCLUDES+=-I../../../{python_module.relative_path_to_UUT}/hardware/src
 
 # verilator  flags
 """,

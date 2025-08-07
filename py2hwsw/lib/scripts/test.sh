@@ -7,7 +7,7 @@
 set -e
 
 #find directories containing testbenches
-TBS=`find ${LIB_DIR} | grep _tb.v | grep -v include`
+TBS=`find ${LIB_DIR} | grep _tb.v | grep -v include | grep -v submodules`
 
 FILTER_OUT_TBS=""
 #for debug
@@ -15,6 +15,7 @@ FILTER_OUT_TBS=""
 
 TBS_FILTERED=""
 for i in $TBS; do
+    # Filter out testbenches from $FILTER_OUT_TBS list
     if ! echo $FILTER_OUT_TBS | grep -q `basename $i` ; then
         TBS_FILTERED+=" $i";
     fi

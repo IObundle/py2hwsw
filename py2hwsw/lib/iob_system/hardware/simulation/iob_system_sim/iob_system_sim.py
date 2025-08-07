@@ -294,7 +294,7 @@ def setup(py_params_dict):
         if params["init_mem"] and not params["use_intmem"]:
             attributes_dict["subblocks"][-1]["parameters"].update(
                 {
-                    "HEXFILE": f'"{params["name"]}_firmware.hex"',
+                    "HEXFILE": f'"{params["name"]}_firmware"',
                 }
             )
     if params["use_ethernet"]:

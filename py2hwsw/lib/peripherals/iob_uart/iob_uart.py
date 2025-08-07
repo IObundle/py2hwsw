@@ -110,14 +110,6 @@ def setup(py_params_dict):
             },
             # RXDATA reg
             {
-                "name": "iob_reg_rvalid_en_rst",
-                "descr": "",
-                "signals": [
-                    {"name": "rxdata_rvalid_en", "width": 1},
-                    {"name": "rxdata_rvalid_rst", "width": 1},
-                ],
-            },
-            {
                 "name": "iob_reg_rvalid_data_i",
                 "descr": "",
                 "signals": [

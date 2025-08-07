@@ -342,7 +342,20 @@ class csr_gen:
             lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed;\n"
             if type(log2n_items) is not int or log2n_items > 0:
                 lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
-            lines += f"   assign {name}_wstrb{suffix} = internal_iob_wstrb;\n"
+            wires.append(
+                {
+                    "name": f"{name}_wstrb",
+                    "descr": "",
+                    "signals": [
+                        {
+                            "name": f"{name}_wstrb",
+                            "width": self.verilog_max(f"{n_bits}/8", 1),
+                        },
+                    ],
+                },
+            )
+            lines += f"    assign {name}_wstrb = internal_iob_wstrb[{self.boffset(addr,self.cpu_n_bytes)}/8+:{self.verilog_max(f'{n_bits}/8',1)}];\n"
+            lines += f"   assign {name}_wstrb{suffix} = {name}_wstrb;\n"
             if suffix:
                 lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
 
@@ -911,6 +924,9 @@ class csr_gen:
             suffix = "" if row.internal_use else "_i"
             n_bits = row.n_bits
             n_bytes = int(self.bceil(n_bits, 3) / 8)
+            bit_padding = (8 * n_bytes) - eval_param_expression_from_config(
+                n_bits, self.config, "max"
+            )
             if n_bytes == 3:
                 n_bytes = 4
             if "R" in row.mode:
@@ -918,12 +934,16 @@ class csr_gen:
                     pass
                 elif auto:
                     snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name};\n"
-                    snippet += f"assign byte_aligned_{name} = {name}_rdata;\n"
+                    if bit_padding > 0:
+                        snippet += f"assign byte_aligned_{name} = {{{{{bit_padding}{{1'b0}}}}, {name}_rdata}};\n"
+                    else:
+                        snippet += f"assign byte_aligned_{name} = {name}_rdata;\n"
                 else:
                     snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata;\n"
-                    snippet += (
-                        f"assign byte_aligned_{name}_rdata = {name}_rdata{suffix};\n"
-                    )
+                    if bit_padding > 0:
+                        snippet += f"assign byte_aligned_{name}_rdata = {{{{{bit_padding}{{1'b0}}}}, {name}_rdata{suffix}}};\n"
+                    else:
+                        snippet += f"assign byte_aligned_{name}_rdata = {name}_rdata{suffix};\n"
 
         # Response signals switch logic
         if all_auto:

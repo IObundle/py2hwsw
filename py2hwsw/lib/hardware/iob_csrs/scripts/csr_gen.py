@@ -170,7 +170,7 @@ class csr_gen:
             )
         )
 
-    # Generate symbolic expression string to caluclate addr_w in verilog
+    # Generate symbolic expression string to calculate addr_w in verilog
     @staticmethod
     def calc_verilog_addr_w(log2n_items, n_bytes):
         n_bytes = int(n_bytes)
@@ -387,9 +387,18 @@ class csr_gen:
             # test if addr and addr_w are int and substitute with their values
             # For (auto) REG, use special read strobe based on 'shift_amount'
             if isinstance(addr, int) and isinstance(addr_w, int):
-                lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_max(1,{addr+2**addr_w}>>shift_amount));\n"
+                if addr == 0:
+                    lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount <= iob_max(1,{addr+2**addr_w-1}>>shift_amount));\n"
+                else:
+                    # addr > 0
+                    lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount <= iob_max(1,{addr+2**addr_w-1}>>shift_amount));\n"
+
             else:
-                lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_max(1,({addr}+(2**({addr_w})))>>shift_amount));\n"
+                if addr == 0:
+                    lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount <= iob_max(1,({addr}+(2**({addr_w}-1)))>>shift_amount));\n"
+                else:
+                    # addr > 0:
+                    lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount <= iob_max(1,({addr}+(2**({addr_w}-1)))>>shift_amount));\n"
 
             n_items = 2 ** eval_param_expression_from_config(
                 log2n_items, self.config, "max"

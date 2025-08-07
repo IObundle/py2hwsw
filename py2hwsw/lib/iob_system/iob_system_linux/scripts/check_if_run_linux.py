@@ -9,8 +9,9 @@ import sys
 
 ROOT_DIR = sys.argv[1]
 SOC_NAME = sys.argv[2]
-if len(sys.argv) > 3:
-    RUN_LINUX = sys.argv[3]
+FW_BASE_ADDR = sys.argv[3]
+if len(sys.argv) > 4:
+    RUN_LINUX = sys.argv[4]
 else:
     RUN_LINUX = "0"
 
@@ -40,7 +41,7 @@ with open(iob_mem_file, "w") as file:
             "fw_jump.bin 0\nImage 400000\niob_soc.dtb F80000\nrootfs.cpio.gz 1000000"
         )
     else:
-        file.write(f"{SOC_NAME}_firmware.bin 0")
+        file.write(f"{SOC_NAME}_firmware.bin {FW_BASE_ADDR}")
 
 
 # Fixes existing iob_bsp.h and iob_bsp.vh for Simulation

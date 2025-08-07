@@ -16,7 +16,8 @@ include $(ROOT_DIR)/software/auto_sw_build.mk
 # 2. CONSOLE_TO_FLASH: program flash with firmware
 # 3. FLASH_TO_EXTMEM: load firmware from flash to external memory 
 BOOT_FLOW ?= CONSOLE_TO_EXTMEM
-UTARGETS += boot_flow
+# Add boot_flow as dependency of simulation/fpga build process (currently called "HEX")
+HEX += boot_flow
 
 boot_flow:
 	echo -n "$(BOOT_FLOW)" > boot.flow
@@ -32,7 +33,7 @@ boot_flow:
 GET_MACRO = $(shell grep "define $(1)" $(2) | rev | cut -d" " -f1 | rev)
 
 #Function to obtain parameter named $(1) from iob_system_linux_conf.vh
-GET_IOB_SYSTEM_LINUX_CONF_MACRO = $(call GET_MACRO,IOB_SYSTEM_LINUX_$(1),../src/iob_system_linux_conf.vh)
+GET_IOB_SYSTEM_LINUX_CONF_MACRO = $(call GET_MACRO,IOB_SYSTEM_LINUX_$(1),$(ROOT_DIR)/hardware/src/iob_system_linux_conf.vh)
 
 ifeq ($(USE_FPGA),)
 SIMULATION=1
@@ -191,7 +192,7 @@ iob_system_linux_firmware: iob_bsp check_if_run_linux
 	make $@.elf INCLUDES="$(IOB_SYSTEM_LINUX_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LINUX_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_LINUX_FW_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"
 
 check_if_run_linux:
-	python3 $(ROOT_DIR)/scripts/check_if_run_linux.py $(ROOT_DIR) iob_system_linux $(RUN_LINUX)
+	python3 $(ROOT_DIR)/scripts/check_if_run_linux.py $(ROOT_DIR) iob_system_linux $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,FW_BASEADDR) $(RUN_LINUX)
 
 iob_system_linux_boot: iob_bsp
 	make $@.elf INCLUDES="$(IOB_SYSTEM_LINUX_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LINUX_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_LINUX_BOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"

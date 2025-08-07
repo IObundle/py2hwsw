@@ -29,7 +29,7 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
-                    "params": "c_a_r_e",
+                    "params": "c_a_r",
                 },
                 "descr": "Clock, clock enable and reset",
             },

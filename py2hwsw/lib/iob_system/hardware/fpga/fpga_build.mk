@@ -13,7 +13,7 @@ BUILD_DEPS+=iob_system_bootrom.hex $(if $(filter $(INIT_MEM),1),iob_system_firmw
 ifeq ($(INIT_MEM), 1)
     ifneq ($(USE_INTMEM), 1)
         ifeq ($(USE_EXTMEM), 1)
-            $(error Error: FPGA board DDR memory cannot be initialized. Either use INIT_MEM=0 to avoid memory initialization or set USE_INTMEM=1 to use internal memory with initialization.)
+            $(error Error: FPGA board's DDR memory cannot be initialized. Either use INIT_MEM=0 to avoid DDR memory initialization or set USE_INTMEM=1 to use internal memory instead)
         endif
     endif
 endif

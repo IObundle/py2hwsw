@@ -96,8 +96,9 @@ def lint_files(files_list, extra_flags="", config_path="."):
             linter_cmd = f"{linter_cmd} {extra_flags}"
             linter_cmd = f"{linter_cmd} {linter['include_flag']}{(' '+linter['include_flag']).join(directories_to_lint[directory])}"
             linter_cmd = f"{linter_cmd} {linter['config_command']} {config_path}/{linter['config_file']}"
-            if linter['waiver_file']:
-                linter_cmd = f"{linter_cmd} {linter['waiver_command']} {config_path}/{linter['waiver_file']}"
+            waiver_file = f"{config_path}/{linter['waiver_file']}"
+            if linter['waiver_file'] and os.path.exists(waiver_file):
+                linter_cmd = f"{linter_cmd} {linter['waiver_command']} {waiver_file}"
             linter_cmd = f"{linter_cmd} {' '.join(files)}"
             print(linter_cmd)
             result = subprocess.run(linter_cmd, shell=True)

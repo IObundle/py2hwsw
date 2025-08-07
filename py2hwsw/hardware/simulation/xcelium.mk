@@ -49,7 +49,7 @@ ifeq ($(SYN),1)
 VFLAGS+=-define SYN
 endif
 
-xmvlog.log: $(VHDR) $(VSRC) $(HEX)
+xmvlog.log: $(VHDR) $(VSRC) $(BUILD_DEPS)
 ifeq ($(TBTYPE),UVM)
 	xrun -compile -uvm -sv -uvmhome $(UVM_HOME) -sv_lib $(UVM_HOME)/src/dpi/uvm_dpi $(VFLAGS) $(VSRC) src/iob_uvm_tb.sv +UVM_TESTNAME=iob_test
 else

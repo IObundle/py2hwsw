@@ -16,8 +16,8 @@ include $(ROOT_DIR)/software/auto_sw_build.mk
 # 2. CONSOLE_TO_FLASH: program flash with firmware
 # 3. FLASH_TO_EXTMEM: load firmware from flash to external memory 
 BOOT_FLOW ?= CONSOLE_TO_EXTMEM
-# Add boot_flow as dependency of simulation/fpga build process (currently called "HEX")
-HEX += boot_flow
+# Add boot_flow as dependency of simulation/fpga build process
+BUILD_DEPS += boot_flow
 
 boot_flow:
 	echo -n "$(BOOT_FLOW)" > boot.flow

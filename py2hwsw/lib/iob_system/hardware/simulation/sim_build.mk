@@ -5,7 +5,7 @@
 include auto_sim_build.mk
 
 # Add iob-system software as a build dependency
-HEX+=iob_system_bootrom.hex iob_system_firmware.hex
+BUILD_DEPS+=iob_system_bootrom.hex iob_system_firmware.hex
 
 ROOT_DIR :=../..
 include $(ROOT_DIR)/software/sw_build.mk

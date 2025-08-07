@@ -4,6 +4,12 @@
 #
 # SPDX-License-Identifier: MIT
 
+"""
+This script checks if the SoC is running linux or not.
+It will create the "<soc_name>_mem.config" file that specifies which binaries and addresses to load to RAM when INIT_MEM=0.
+If running baremetal firmware, the config file will only specify the firmware file and its load address.
+If running linux, the config file will specify the bootloader, linux kernel, dtb and rootfs.
+"""
 
 import sys
 

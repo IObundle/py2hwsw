@@ -234,10 +234,10 @@ int main() {
   }
 
 #ifndef IOB_SYSTEM_LINUX_INIT_MEM
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
-  // Init ethernet and printf (for ethernet)
   printf_init(&uart16550_putc);
 
+#ifdef IOB_SYSTEM_LINUX_USE_ETH
+  // Init ethernet
   eth_init(ETH0_BASE, &clear_cache);
   // Use custom memory alloc/free functions to ensure it allocates in external
   // memory

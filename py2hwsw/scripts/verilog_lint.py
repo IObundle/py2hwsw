@@ -22,12 +22,16 @@ linters = [
         "include_flag": "-I",
         "config_command": "",
         "config_file": "verilator_config.vlt",
+        "waiver_command": "",
+        "waiver_file": "verilator_waiver.vlt",
     },
     # {
     #     "command": "svlint",
     #     "include_flag": "-i",
     #     "config_command": "--config",
     #     "config_file": ".svlint.toml",
+    #     "waiver_command": "",
+    #     "waiver_file": "", # svlint waivers in config file
     # },
 ]
 
@@ -92,6 +96,8 @@ def lint_files(files_list, extra_flags="", config_path="."):
             linter_cmd = f"{linter_cmd} {extra_flags}"
             linter_cmd = f"{linter_cmd} {linter['include_flag']}{(' '+linter['include_flag']).join(directories_to_lint[directory])}"
             linter_cmd = f"{linter_cmd} {linter['config_command']} {config_path}/{linter['config_file']}"
+            if linter['waiver_file']:
+                linter_cmd = f"{linter_cmd} {linter['waiver_command']} {config_path}/{linter['waiver_file']}"
             linter_cmd = f"{linter_cmd} {' '.join(files)}"
             print(linter_cmd)
             result = subprocess.run(linter_cmd, shell=True)

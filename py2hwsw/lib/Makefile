@@ -28,7 +28,7 @@ CSR_IF?=iob
 PY_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM):csr_if=$(CSR_IF):mem_addr_w=$(MEM_ADDR_W):fw_addr_w=$(FW_ADDR_W)"
 
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
-CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi
+CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer
 
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
 ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)

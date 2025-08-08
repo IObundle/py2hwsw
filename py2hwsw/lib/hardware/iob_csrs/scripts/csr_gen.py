@@ -737,7 +737,7 @@ class csr_gen:
             {
                 "core_name": "iob_universal_converter",
                 "instance_name": "iob_universal_converter",
-                "instance_description": "Convert IOb port from testbench into correct interface for UART CSRs bus",
+                "instance_description": "Convert CSR interface into internal IOb port",
                 "subordinate_if": core_attributes["csr_if"],
                 "manager_if": "iob",
                 "parameters": {
@@ -770,7 +770,7 @@ class csr_gen:
 // Create a special readstrobe for "REG" (auto) CSRs.
 // LSBs 0 = read full word; LSBs 1 = read byte; LSBs 2 = read half word; LSBs 3 = read byte.
    reg [1:0] shift_amount;
-   always @(*)
+   always @(*) begin
       case (internal_iob_addr_stable[1:0])
          // Access entire word
          2'b00: shift_amount = 2;
@@ -782,6 +782,7 @@ class csr_gen:
          2'b11: shift_amount = 0;
          default: shift_amount = 0;
       endcase
+    end
 """
                 break
 
@@ -978,7 +979,7 @@ class csr_gen:
         iob_rdata_nxt = {8*self.cpu_n_bytes}'d0;
 """
         if not all_auto:
-            snippet += f"""
+            snippet += """
         rvalid_int = 1'b1;
         ready_int = 1'b1;
         if (internal_iob_valid) begin
@@ -1031,7 +1032,7 @@ class csr_gen:
                 if not auto:
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
-                        "            if (internal_iob_valid & ~|internal_iob_wstrb) begin\n"
+                        "            if (internal_iob_valid & (~|internal_iob_wstrb)) begin\n"
                         "                auto_addressed = 1'b0;\n"
                         "            end\n"
                     )
@@ -1057,7 +1058,7 @@ class csr_gen:
                     snippet += f"        if({wstrb_addr_cmp} (wstrb_addr < {addr + 2**addr_w})) begin\n"
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
-                        "            if (internal_iob_valid & |internal_iob_wstrb) begin\n"
+                        "            if (internal_iob_valid & (|internal_iob_wstrb)) begin\n"
                         "                auto_addressed = 1'b0;\n"
                         "            end\n"
                     )
@@ -1099,7 +1100,6 @@ class csr_gen:
                 if (internal_iob_rvalid) begin // Transfer done
 """
         snippet += """
-                    iob_rvalid_nxt = 1'b0;
                     state_nxt = WAIT_REQ;
                 end else begin
 """

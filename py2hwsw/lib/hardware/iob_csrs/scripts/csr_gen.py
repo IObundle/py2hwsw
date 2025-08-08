@@ -14,7 +14,6 @@ from math import ceil, log, log2
 from latex import write_table
 import iob_colors
 import re
-from csr_classes import iob_csr, iob_csr_group
 
 
 def convert_int(value):
@@ -874,13 +873,6 @@ class csr_gen:
                         {"name": "ready_int", "width": 1, "isvar": True},
                     ],
                 },
-                {
-                    "name": "auto_addressed",
-                    "descr": "Flag if an auto-register is currently addressed",
-                    "signals": [
-                        {"name": "auto_addressed", "width": 1, "isvar": True},
-                    ],
-                },
             ]
         subblocks += [
             {
@@ -1018,20 +1010,7 @@ class csr_gen:
             n_bytes = int(self.bceil(n_bits, 3) / 8)
             if n_bytes == 3:
                 n_bytes = 4
-            addr_last = int(
-                addr
-                + (
-                    (
-                        2
-                        ** eval_param_expression_from_config(
-                            log2n_items, self.config, "max"
-                        )
-                    )
-                )
-                * n_bytes
-            )
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            addr_w_base = max(log(self.cpu_n_bytes, 2), addr_w)
             auto = row.type != "NOAUTO"
             suffix = "" if row.internal_use else "_i"
 
@@ -1494,14 +1473,14 @@ class csr_gen:
             """
 The software accessible registers of the core are described in the following
 tables. Each subsection corresponds to a specific configuration of the core, since
-different configurations have different registers available. 
-The tables give information on the name, read/write capability, address, hardware and software width, and a 
+different configurations have different registers available.
+The tables give information on the name, read/write capability, address, hardware and software width, and a
 textual description. The addresses are byte aligned and given in hexadecimal format.
 The hardware width is the number of bits that the register occupies in the hardware, while the
 software width is the number of bits that the register occupies in the software.
-In each address, the right-justified field having "Hw width" bits conveys the relevant information. 
-Each register has only one type of access, either read or write, meaning that reading from 
-a write-only register will produce invalid data or writing to a read-only register will 
+In each address, the right-justified field having "Hw width" bits conveys the relevant information.
+Each register has only one type of access, either read or write, meaning that reading from
+a write-only register will produce invalid data or writing to a read-only register will
 not have any effect.
 """
         )

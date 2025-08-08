@@ -152,10 +152,10 @@ def setup(py_params_dict):
         "subblocks": [
             # iob_csrs 'control_if_s' port is connected automatically by py2hwsw
             f"""iob_csrs iob_csrs
-                -d 'Control/Status Registers' 
-                --no_autoaddr 
-                --rw_overlap 
-                -c 
+                -d 'Control/Status Registers'
+                --no_autoaddr
+                --rw_overlap
+                -c
                     "clk_en_rst_s":"clk_en_rst_s"
                     "softreset_o":"softreset"
                     "div_o":"div"
@@ -166,8 +166,8 @@ def setup(py_params_dict):
                     "rxready_i":"rxready"
                     "rxdata_io":"rxdata"
                 --csr_if {CSR_IF}
-                --csr-group uart 
-                    -d 'UART software accessible registers' 
+                --csr-group uart
+                    -d 'UART software accessible registers'
                         -r softreset:1        -m W -d 'Soft reset'                           --rst_val 0 --addr 0 --log2n_items 0
                         -r div:16             -m W -d 'Bit duration in system clock cycles.' --rst_val 0 --addr 2 --log2n_items 0
                         -r txdata:8 -t NOAUTO -m W -d 'TX data.'                             --rst_val 0 --addr 4 --log2n_items 0

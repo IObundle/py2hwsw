@@ -58,15 +58,19 @@ with open(bsp_file, "r") as file:
 
 if "define SIMULATION 1" in content:
     if RUN_LINUX == "1":
+        # Change simulation baudrate
         # bsp_file = f"{ROOT_DIR}/hardware/simulation/src/iob_bsp.vh"
         # replace_line(bsp_file, "`define BAUD", "`define BAUD 115200\n")
 
+        # Change simulation baudrate
         # bsp_file = f"{ROOT_DIR}/software/src/iob_bsp.h"
         # replace_line(bsp_file, "#define BAUD", "#define BAUD 115200\n")
 
-        conf_file = f"{ROOT_DIR}/hardware/src/{SOC_NAME}_conf.vh"
-        replace_line(conf_file, "", "`define {SOC_NAME.upper()}_RUN_LINUX 1\n")
+        # Add RUN_LINUX macro to conf.vh
+        # conf_file = f"{ROOT_DIR}/hardware/src/{SOC_NAME}_conf.vh"
+        # replace_line(conf_file, "", "`define {SOC_NAME.upper()}_RUN_LINUX 1\n")
 
+        # Add RUN_LINUX macro to conf.h
         conf_file = f"{ROOT_DIR}/software/src/{SOC_NAME}_conf.h"
         replace_line(
             conf_file,
@@ -74,14 +78,18 @@ if "define SIMULATION 1" in content:
             "#define H_{SOC_NAME.upper()}_CONF_H\n#define {SOC_NAME.upper()}_RUN_LINUX 1\n",
         )
     else:
+        # Change simulation baudrate
         # bsp_file = f"{ROOT_DIR}/hardware/simulation/src/iob_bsp.vh"
         # replace_line(bsp_file, "`define BAUD", "`define BAUD 3000000\n")
 
+        # Change simulation baudrate
         # bsp_file = f"{ROOT_DIR}/software/src/iob_bsp.h"
         # replace_line(bsp_file, "#define BAUD", "#define BAUD 3000000\n")
 
-        conf_file = f"{ROOT_DIR}/hardware/src/{SOC_NAME}_conf.vh"
-        replace_line(conf_file, "`define {SOC_NAME.upper()}_RUN_LINUX", "")
+        # Remove RUN_LINUX macro from conf.vh
+        # conf_file = f"{ROOT_DIR}/hardware/src/{SOC_NAME}_conf.vh"
+        # replace_line(conf_file, "`define {SOC_NAME.upper()}_RUN_LINUX", "")
 
+        # Remove RUN_LINUX macro from conf.h
         conf_file = f"{ROOT_DIR}/software/src/{SOC_NAME}_conf.h"
         replace_line(conf_file, "#define {SOC_NAME.upper()}_RUN_LINUX", "")

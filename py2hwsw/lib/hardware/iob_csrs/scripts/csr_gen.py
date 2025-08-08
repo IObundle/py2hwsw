@@ -966,12 +966,33 @@ class csr_gen:
 """
         else:  # Not all auto
             snippet += """
+
+    wire auto_addressed;
+    wire auto_addressed_r;
+    reg auto_addressed_nxt;
+
     //RESPONSE SWITCH
 
     // Don't register response signals if accessing non-auto CSR
     assign internal_iob_rvalid = auto_addressed ? iob_rvalid_out : rvalid_int;
     assign internal_iob_rdata = auto_addressed ? iob_rdata_out : iob_rdata_nxt;
     assign internal_iob_ready = auto_addressed ? iob_ready_out : ready_int;
+
+   // auto_addressed register
+   assign auto_addressed = (state == WAIT_REQ) ? auto_addressed_nxt : auto_addressed_r;
+   iob_reg_ca #(
+      .DATA_W (1),
+      .RST_VAL(1'b0)
+   ) auto_addressed_reg (
+      // clk_en_rst_s port: Clock, clock enable and reset
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+      // data_i port: Data input
+      .data_i(auto_addressed_nxt),
+      // data_o port: Data output
+      .data_o(auto_addressed_r)
+   );
 """
 
         snippet += f"""
@@ -982,8 +1003,9 @@ class csr_gen:
             snippet += """
         rvalid_int = 1'b1;
         ready_int = 1'b1;
+        auto_addressed_nxt = auto_addressed_r;
         if (internal_iob_valid) begin
-            auto_addressed = 1'b1;
+            auto_addressed_nxt = 1'b1;
         end
 """
 
@@ -1033,7 +1055,7 @@ class csr_gen:
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
                         "            if (internal_iob_valid & (~|internal_iob_wstrb)) begin\n"
-                        "                auto_addressed = 1'b0;\n"
+                        "                auto_addressed_nxt = 1'b0;\n"
                         "            end\n"
                     )
                 snippet += "        end\n\n"
@@ -1059,7 +1081,7 @@ class csr_gen:
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
                         "            if (internal_iob_valid & (|internal_iob_wstrb)) begin\n"
-                        "                auto_addressed = 1'b0;\n"
+                        "                auto_addressed_nxt = 1'b0;\n"
                         "            end\n"
                     )
                     snippet += "        end\n\n"

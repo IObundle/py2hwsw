@@ -1078,14 +1078,15 @@ class csr_gen:
         //FSM state machine
         case(state)
             WAIT_REQ: begin
-                if(internal_iob_valid & (!internal_iob_ready)) begin // Wait for a valid request
 """
         if not all_auto:
             snippet += """
+                if(internal_iob_valid & (auto_addressed || (!ready_int)) ) begin // Wait for a valid request
                     iob_ready_nxt = ready_int;
 """
         else:
             snippet += """
+                if(internal_iob_valid) begin // Wait for a valid request
                     iob_ready_nxt = 1'b1;
 """
         snippet += """

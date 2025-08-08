@@ -1098,18 +1098,21 @@ class csr_gen:
             end
 
             default: begin  // WAIT_RVALID
-                if (internal_iob_rvalid) begin // Transfer done
-"""
-        snippet += """
-                    state_nxt = WAIT_REQ;
-                end else begin
 """
         if not all_reads_auto:
             snippet += """
+                if (auto_addressed & iob_rvalid_out) begin // Transfer done
+                    state_nxt = WAIT_REQ;
+                end else if ((!auto_addressed) & rvalid_int) begin // Transfer done
+                    state_nxt = WAIT_REQ;
+                end else begin
                     iob_rvalid_nxt = rvalid_int;
 """
         else:
             snippet += """
+                if (iob_rvalid_out) begin // Transfer done
+                    state_nxt = WAIT_REQ;
+                end else begin
                     iob_rvalid_nxt = 1'b1;
 """
         snippet += """

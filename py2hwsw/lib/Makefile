@@ -40,7 +40,7 @@ endif
 endif # ifndef PY_PARAMS
 
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
-CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer
+CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
 
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
 ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)

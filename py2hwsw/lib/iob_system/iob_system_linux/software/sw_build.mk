@@ -23,6 +23,8 @@ boot_flow:
 	echo -n "$(BOOT_FLOW)" > boot.flow
 	# -n to avoid newline
 
+# Set target as PHONY to ensure that it is built even if $(BOARD) is changed
+.PHONY: boot_flow
 
 #
 # Macros
@@ -37,6 +39,12 @@ GET_IOB_SYSTEM_LINUX_CONF_MACRO = $(call GET_MACRO,IOB_SYSTEM_LINUX_$(1),$(ROOT_
 
 ifeq ($(USE_FPGA),)
 SIMULATION=1
+endif
+
+ifeq ($(SIMULATION),)
+WRAPPER_CONFS_PREFIX=iob_system_linux_$(BOARD)
+else
+WRAPPER_CONFS_PREFIX=iob_uut
 endif
 
 #
@@ -98,7 +106,18 @@ endif
 fw_jump.bin iob_system_linux.dtb:
 	cp $(FLOW_DIR)/$@ .;\
 # Set targets as PHONY to ensure that they are copied even if $(BOARD) is changed
-.PHONY: fw_jump.bin iob_system_linux.dtb boot_flow
+.PHONY: fw_jump.bin iob_system_linux.dtb
+
+UTARGETS+=linux_build_macros.txt
+
+linux_build_macros.txt:
+	# Copy every line that starts with #define from conf.h, and remove the prefix
+	sed '/^#define $(WRAPPER_CONFS_PREFIX)_/I!d; s/#define $(WRAPPER_CONFS_PREFIX)_//Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > $@
+	# Include mmap.h info in linux_build_macros.txt
+	grep '^#define ' src/iob_system_linux_mmap.h | sed 's/^#define //; s/0x//g' >> $@
+
+# Set targets as PHONY to ensure that they are built even if $(BOARD) is changed
+.PHONY: linux_build_macros.txt
 
 #
 # Dependencies
@@ -184,12 +203,6 @@ IOB_SYSTEM_LINUX_PREBOOT_SRC=src/iob_system_linux_preboot.S
 
 
 build_iob_system_linux_software: iob_system_linux_firmware iob_system_linux_boot iob_system_linux_preboot
-
-ifeq ($(SIMULATION),)
-WRAPPER_CONFS_PREFIX=iob_system_linux_$(BOARD)
-else
-WRAPPER_CONFS_PREFIX=iob_uut
-endif
 
 iob_bsp:
 	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h

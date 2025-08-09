@@ -52,9 +52,9 @@ iob_system_linux_bootrom.hex: ../../software/iob_system_linux_preboot.bin ../../
 
 # OS sources and parameters
 ifeq ($(RUN_LINUX),1)
-OS_DIR = ../../software/src
+OS_DIR = $(ROOT_DIR)/software/OS_build
 OPENSBI_DIR = fw_jump.bin
-DTB_DIR = iob_soc.dtb
+DTB_DIR = iob_system_linux.dtb
 DTB_ADDR:=00F80000
 LINUX_DIR = Image
 LINUX_ADDR:=00400000
@@ -65,7 +65,7 @@ FIRM_ARGS += $(DTB_DIR) $(DTB_ADDR)
 FIRM_ARGS += $(LINUX_DIR) $(LINUX_ADDR)
 FIRM_ARGS += $(ROOTFS_DIR) $(ROOTFS_ADDR)
 FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,OS_ADDR_W)
-FIRMWARE := fw_jump.bin iob_soc.dtb Image rootfs.cpio.gz
+FIRMWARE := fw_jump.bin iob_system_linux.dtb Image rootfs.cpio.gz
 else
 FIRM_ARGS = $<
 FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,MEM_ADDR_W)
@@ -86,13 +86,19 @@ iob_system_linux_firmware.bin: ../../software/iob_system_linux_firmware.bin
 Image rootfs.cpio.gz:
 	cp $(OS_DIR)/$@ .
 
+ifeq ($(SIMULATION),1)
+FLOW_DIR = $(ROOT_DIR)/hardware/simulation
+else  # FPGA
+BOARD_DIR := $(shell find hardware/fpga -name $(BOARD) -type d -print -quit)
+FLOW_DIR = $(ROOT_DIR)/$(BOARD_DIR)
+endif
+
 # Copy files from correct board directory
-fw_jump.bin iob_soc.dtb:
-	if [ "$(FPGA_TOOL)" != "" ]; then\
-		cp $(FPGA_TOOL)/$(BOARD)/$@ .;\
-	fi
+# Each board has differente device tree and bootloader, since they have their own macros (BAUD, FREQ, etc)
+fw_jump.bin iob_system_linux.dtb:
+	cp $(FLOW_DIR)/$@ .;\
 # Set targets as PHONY to ensure that they are copied even if $(BOARD) is changed
-.PHONY: fw_jump.bin iob_soc.dtb boot_flow
+.PHONY: fw_jump.bin iob_system_linux.dtb boot_flow
 
 #
 # Dependencies

@@ -42,6 +42,7 @@ comment_char = {
     ".sh": "#",
     ".mk": "#",
     "Makefile": "#",
+    ".Microsoft_nmake": "#",
     ".nix": "#",
     ".tex": "%",
     ".cls": "%",
@@ -61,7 +62,9 @@ comment_char = {
     ".ccf": "#",
     ".service": "#",
     "Dockerfile": "#",
+    "Doxyfile": "#",
     ".xml": "<!--",
+    ".rsp": "#",
 }
 
 # File extensions with independent license headers
@@ -82,6 +85,9 @@ independent_lic_extensions = [
     ".lib",
     ".rules",
     ".tmp",
+    ".gz",
+    ".ko",
+    ".conf",
 ]
 
 # Strings used in multiline comments
@@ -295,8 +301,10 @@ def generate_headers(
     files = find_files_with_extensions(
         root,
         independent_lic_extensions,
+        ignore_extensions=comment_char.keys(),
         ignore_paths=ignore_paths,
         ignore_files=ignore_files,
+        include_files_without_extension=True,
     )
 
     for file in files:
@@ -446,12 +454,23 @@ def modify_file_header(
         raise (e)
 
 
-def find_files_with_extensions(directory, extensions, ignore_paths=[], ignore_files=[]):
+def find_files_with_extensions(
+    directory,
+    extensions,
+    ignore_extensions=[],
+    ignore_paths=[],
+    ignore_files=[],
+    include_files_without_extension=False,
+):
     """
     Search for files with specified extensions in a directory recursively.
 
     :param directory: The root directory to start the search.
     :param extensions: A list of file extensions to search for.
+    :param ignore_extensions: A list of file extensions to skip
+    :param ignore_paths: A list of paths to ignore.
+    :param ignore_files: A list of files to ignore.
+    :param include_files_without_extension: Whether to include files without extension.
     :return: A list of file paths that match the specified extensions.
     """
     matching_files = []
@@ -465,13 +484,23 @@ def find_files_with_extensions(directory, extensions, ignore_paths=[], ignore_fi
                 print(f"Ignoring path {root}")
             continue
         for file in files:
+            # Ignore files named 'LICENSE'
+            if file == "LICENSE":
+                continue
             # Ignore specified files
             if root + "/" + file in ignore_files:
                 if VERBOSE:
                     print(f"Ignoring file {root + '/' + file}")
                 continue
+            # Skip files with ignore_extensions
+            if any(file.endswith(ext) for ext in ignore_extensions):
+                continue
             # Check if the file has one of the specified extensions
             if any(file.endswith(ext) for ext in extensions):
+                # Construct the full file path and add it to the list
+                matching_files.append(os.path.join(root, file))
+            # Check if the file has no extension
+            if include_files_without_extension and "." not in file:
                 # Construct the full file path and add it to the list
                 matching_files.append(os.path.join(root, file))
 

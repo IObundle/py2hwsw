@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MIT
 
+./bin/py2hwsw
+
 ./py2hwsw/lib/hardware/buses/iob_axi_interconnect/hardware/src/iob_axi_interconnect.v
 ./py2hwsw/lib/hardware/buses/iob_arbiter/hardware/src/iob_arbiter.v
 ./py2hwsw/lib/hardware/buses/iob_arbiter/hardware/src/iob_priority_encoder.v
@@ -23,3 +25,11 @@
 ./py2hwsw/lib/iob_system/submodules/iob_vexriscv
 
 ./py2hwsw/lib/hardware/memories/iob_ahb_ram/hardware/src/AHB2MEM.v
+
+# iob_system_linux
+./py2hwsw/lib/iob_system/iob_system_linux/submodules
+./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/randombytes.c
+./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/aes.c
+./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistseedexpander.h
+./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistseedexpander.c
+./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistkatrng.c

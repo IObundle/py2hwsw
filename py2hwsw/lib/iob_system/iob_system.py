@@ -15,14 +15,20 @@ def setup(py_params_dict):
     params = {
         "name": ("iob_system", "Name of the generated System"),
         "init_mem": (True, "If should initialize memories from data in .hex files"),
-        "use_intmem": (True, "If should include an internal memory"),
+        "use_intmem": (
+            True,
+            "If should include an internal memory (in memory wrapper).",
+        ),
         "use_extmem": (False, "If should use external memory (usually DDR)"),
         "use_bootrom": (True, "If should include a bootrom"),
         "use_peripherals": (True, "If should include peripherals"),
         "use_ethernet": (False, "If should setup ethernet ports and testbenches"),
         "addr_w": (32, "CPU address width"),
         "data_w": (32, "CPU data width"),
-        "mem_addr_w": (18, "Memory address width"),
+        "mem_addr_w": (
+            18,
+            "Internal memory address width. Also specifies default value for external memory address width.",
+        ),
         "bootrom_addr_w": (12, "Bootrom address width"),
         "fw_baseaddr": (0, "Firmware base address"),
         "fw_addr_w": (18, "Firmware address width"),
@@ -119,7 +125,7 @@ def setup(py_params_dict):
             },
             {  # Needed for software and makefiles
                 "name": "MEM_ADDR_W",
-                "descr": "External memory bus address width.",
+                "descr": "Internal memory bus address width.",
                 "type": "M",
                 "val": params["mem_addr_w"],
                 "min": "0",
@@ -204,7 +210,7 @@ def setup(py_params_dict):
             },
             # INTERNAL MEMORY
             {
-                "name": "EXT_MEM_HEXFILE",
+                "name": "INT_MEM_HEXFILE",
                 "descr": "Firmware file name",
                 "type": "D",
                 "val": f'"{params["name"]}_firmware"',
@@ -238,11 +244,11 @@ def setup(py_params_dict):
     if params["use_intmem"]:
         attributes_dict["ports"] += [
             {
-                "name": "external_mem_bus_m",
-                "descr": "Port for connection to external 'iob_ram_t2p_be' memory",
+                "name": "int_mem_bus_m",
+                "descr": "Port for connection to 'iob_ram_t2p_be' memory",
                 "signals": {
                     "type": "ram_t2p_be",
-                    "prefix": "ext_mem_",
+                    "prefix": "int_mem_",
                     "ADDR_W": params["mem_addr_w"] - 2,
                     "DATA_W": params["data_w"],
                 },
@@ -580,7 +586,7 @@ def setup(py_params_dict):
                             "{1'b0, int_mem_axi_awlock}",
                         ],
                     ),
-                    "external_mem_bus_m": "external_mem_bus_m",
+                    "external_mem_bus_m": "int_mem_bus_m",
                 },
             },
         ]

@@ -32,7 +32,8 @@ iob_system_firmware.bin: ../../software/iob_system_firmware.bin
 	make -C ../../ sw-build
 
 UTARGETS+=build_iob_system_software tb
-CSRS=./src/iob_uart_csrs.c
+TB_SRC=./simulation/src/iob_uart_csrs.c
+TB_INCLUDES ?=-I./simulation/src
 
 TEMPLATE_LDS=src/$@.lds
 

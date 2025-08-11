@@ -174,7 +174,7 @@ def setup(py_params_dict):
                     {
                         "name": "r_data",
                         "width": "DATA_W",
-                        "descr": "Enable signal for the register array",
+                        "descr": "Internal read data output from the register array",
                     },
                 ],
             },

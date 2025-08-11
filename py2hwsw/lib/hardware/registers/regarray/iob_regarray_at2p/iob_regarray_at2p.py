@@ -26,14 +26,6 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-                "name": "clk_en_rst_s",
-                "signals": {
-                    "type": "iob_clk",
-                    "params": "c_a_r",
-                },
-                "descr": "Clock, clock enable and reset",
-            },
-            {
                 "name": "w_clk_i",
                 "descr": "Write clock input for the register array",
                 "signals": [

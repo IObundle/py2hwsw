@@ -111,11 +111,16 @@ def setup(py_params_dict):
                 "instantiate": False,
             },
         ],
+        "comb": {
+            "code": """
+    data_in = d_i << (addr_i * DATA_W);
+    d_o = data_out >> (addr_i * DATA_W);
+        """,
+        },
         "snippets": [
             {
                 "verilog_code": r"""
-    assign data_in = d_i << (addr_i * DATA_W);           
-    assign d_o = data_out >> (addr_i * DATA_W);
+
     genvar i;
     generate
       for (i = 0; i < 2 ** ADDR_W; i = i + 1) begin : g_regarray

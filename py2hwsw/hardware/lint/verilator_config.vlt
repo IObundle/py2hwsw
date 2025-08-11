@@ -22,6 +22,6 @@ lint_on -rule UNUSEDPARAM // specified parameter is never used
 lint_on -rule UNUSEDSIGNAL // specified signal is never used
 
 // inner scope variable has same name as another outer scope variable
-// this is hidding the outer scope variable.
+// this is hiding the outer scope variable.
 lint_on -rule VARHIDDEN
 

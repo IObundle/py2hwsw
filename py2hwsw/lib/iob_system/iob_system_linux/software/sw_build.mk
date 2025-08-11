@@ -60,7 +60,9 @@ iob_system_linux_bootrom.hex: ../../software/iob_system_linux_preboot.bin ../../
 
 # OS sources and parameters
 ifeq ($(RUN_LINUX),1)
-OS_DIR = $(ROOT_DIR)/software/OS_build
+OS_DIR = $(ROOT_DIR)/submodules/iob_linux
+# Relative path from OS directory to Root directory
+REL_OS2ROOT :=`realpath $(ROOT_DIR) --relative-to=$(OS_DIR)`
 OPENSBI_DIR = fw_jump.bin
 DTB_DIR = iob_system_linux.dtb
 DTB_ADDR:=00F80000
@@ -73,6 +75,7 @@ FIRM_ARGS += $(DTB_DIR) $(DTB_ADDR)
 FIRM_ARGS += $(LINUX_DIR) $(LINUX_ADDR)
 FIRM_ARGS += $(ROOTFS_DIR) $(ROOTFS_ADDR)
 FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,OS_ADDR_W)
+UTARGETS += compile_device_tree compile_bootloader
 FIRMWARE := fw_jump.bin iob_system_linux.dtb Image rootfs.cpio.gz
 else
 FIRM_ARGS = $<
@@ -91,8 +94,8 @@ iob_system_linux_firmware.bin: ../../software/iob_system_linux_firmware.bin
 
 
 # Linux specific targets
-Image rootfs.cpio.gz:
-	cp $(OS_DIR)/$@ .
+Image rootfs.cpio.gz fw_jump.bin iob_system_linux.dtb:
+	cp $(OS_DIR)/software/OS_build/$@ .
 
 ifeq ($(SIMULATION),1)
 FLOW_DIR = $(ROOT_DIR)/hardware/simulation
@@ -101,23 +104,27 @@ BOARD_DIR := $(shell find hardware/fpga -name $(BOARD) -type d -print -quit)
 FLOW_DIR = $(ROOT_DIR)/$(BOARD_DIR)
 endif
 
-# Copy files from correct board directory
-# Each board has differente device tree and bootloader, since they have their own macros (BAUD, FREQ, etc)
-fw_jump.bin iob_system_linux.dtb:
-	cp $(FLOW_DIR)/$@ .;\
-# Set targets as PHONY to ensure that they are copied even if $(BOARD) is changed
-.PHONY: fw_jump.bin iob_system_linux.dtb
-
-UTARGETS+=linux_build_macros.txt
-
+# Generate linux_build_macros.txt from conf.h and mmap.h files
 linux_build_macros.txt:
-	# Copy every line that starts with #define from conf.h, and remove the prefix
+	# Copy every line that starts with #define from <flow>_conf.h, and remove the prefix
 	sed '/^#define $(WRAPPER_CONFS_PREFIX)_/I!d; s/#define $(WRAPPER_CONFS_PREFIX)_//Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > $@
 	# Include mmap.h info in linux_build_macros.txt
 	grep '^#define ' src/iob_system_linux_mmap.h | sed 's/^#define //; s/0x//g' >> $@
+	# Include macros from iob_system_linux_conf
+	sed '/^#define IOB_SYSTEM_LINUX_/I!d; s/#define IOB_SYSTEM_LINUX_//Ig' src/iob_system_linux_conf.h >> $@
+	# Delete duplicate macros
+	awk '!seen[$$1]++' $@ > $@.tmp && mv $@.tmp $@
 
 # Set targets as PHONY to ensure that they are built even if $(BOARD) is changed
 .PHONY: linux_build_macros.txt
+
+compile_device_tree: linux_build_macros.txt
+	nix-shell $(OS_DIR)/default.nix --run 'make -C $(OS_DIR) build-dts MACROS_FILE=$(REL_OS2ROOT)/software/linux_build_macros.txt DTS_FILE=$(REL_OS2ROOT)/software/iob_system_linux.dts'
+
+compile_bootloader:
+	nix-shell $(OS_DIR)/default.nix --run 'make -C $(OS_DIR) build-opensbi MACROS_FILE=$(REL_OS2ROOT)/software/linux_build_macros.txt'
+
+.PHONY: compile_device_tree compile_bootloader
 
 #
 # Dependencies

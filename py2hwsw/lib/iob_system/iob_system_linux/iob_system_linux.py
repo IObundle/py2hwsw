@@ -242,11 +242,11 @@ def setup(py_params_dict):
                     "iob_zybo_z7",
                 ],
                 "confs": [
-                    {
-                        "name": "N_CORES",
-                        "descr": "Number of CPU cores used in the SoC.",
-                        "type": "P",
-                        "val": "1",
+                    {  # Used for software.
+                        "name": "OS_RANGE",
+                        "descr": "Linux OS address range in hex",
+                        "type": "M",
+                        "val": hex(1 << py_params_dict["mem_addr_w"]),
                         "min": "1",
                         "max": "32",
                     },
@@ -259,14 +259,14 @@ def setup(py_params_dict):
                         "max": "NA",
                     },
                     # Old opencrytolinux confs. Are they still needed?
-                    # { # Used for software.
-                    #     "name": "OS_ADDR_W",
-                    #     "descr": "Linux OS address width",
-                    #     "type": "M",
-                    #     "val": "25",
-                    #     "min": "1",
-                    #     "max": "32",
-                    # },
+                    {
+                        "name": "N_CORES",
+                        "descr": "Number of CPU cores used in the SoC.",
+                        "type": "P",
+                        "val": "1",
+                        "min": "1",
+                        "max": "32",
+                    },
                     # {
                     #     "name": "N_SOURCES",
                     #     "type": "P",

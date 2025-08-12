@@ -74,15 +74,14 @@ FIRM_ARGS = $(OPENSBI_DIR)
 FIRM_ARGS += $(DTB_DIR) $(DTB_ADDR)
 FIRM_ARGS += $(LINUX_DIR) $(LINUX_ADDR)
 FIRM_ARGS += $(ROOTFS_DIR) $(ROOTFS_ADDR)
-FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,OS_ADDR_W)
 UTARGETS += compile_device_tree compile_opensbi
 FIRMWARE := fw_jump.bin iob_system_linux.dtb Image rootfs.cpio.gz
 else
 FIRM_ARGS = $<
-FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,MEM_ADDR_W)
 UTARGETS += iob_system_linux_firmware 
 FIRMWARE := iob_system_linux_firmware.bin
 endif
+FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,MEM_ADDR_W)
 
 # Common firmware targets
 iob_system_linux_firmware.hex: $(FIRMWARE)
@@ -210,14 +209,14 @@ IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_printf.c
 IOB_SYSTEM_LINUX_PREBOOT_SRC=src/iob_system_linux_preboot.S
 
 
-UTARGETS +=iob_system_linux_baremetal_boot
+UTARGETS +=iob_system_linux_baremetal_boot check_if_run_linux
 
 iob_system_linux_baremetal_boot: iob_system_linux_boot iob_system_linux_preboot
 
 iob_bsp:
 	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h
 
-iob_system_linux_firmware: iob_bsp check_if_run_linux
+iob_system_linux_firmware: iob_bsp
 	make $@.elf INCLUDES="$(IOB_SYSTEM_LINUX_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LINUX_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_LINUX_FW_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"
 
 check_if_run_linux:

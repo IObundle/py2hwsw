@@ -747,6 +747,7 @@ class iob_core(iob_module, iob_instance):
             "clang",
             self.build_dir,
             rules_file_path=__class__.global_clang_format_rules_filepath,
+            ignore_paths=['submodules'], # FIXME: Make this configurable
         )
 
     @classmethod

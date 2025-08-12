@@ -1,0 +1,12 @@
+// SPDX-FileCopyrightText: 2025 IObundle
+//
+// SPDX-License-Identifier: MIT
+
+// iob_timer verilator waivers
+// Waivers generated with --waiver-output 
+// Edited for waiver comments and file path
+
+`verilator_config
+
+// Unused bits due to specific CSR mapping
+lint_off -rule UNUSEDSIGNAL -file "**/iob_timer_csrs.v" -match "Bits of signal are not used: 'internal_iob_wdata'[31:17,15:9,7:1]"

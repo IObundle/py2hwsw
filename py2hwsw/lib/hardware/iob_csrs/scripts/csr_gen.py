@@ -14,7 +14,6 @@ from math import ceil, log, log2
 from latex import write_table
 import iob_colors
 import re
-from csr_classes import iob_csr, iob_csr_group
 
 
 def convert_int(value):
@@ -170,7 +169,7 @@ class csr_gen:
             )
         )
 
-    # Generate symbolic expression string to caluclate addr_w in verilog
+    # Generate symbolic expression string to calculate addr_w in verilog
     @staticmethod
     def calc_verilog_addr_w(log2n_items, n_bytes):
         n_bytes = int(n_bytes)
@@ -184,6 +183,15 @@ class csr_gen:
                 return log2n_items
             else:
                 return f"{log2n_items}+{ceil(log(n_bytes, 2))}"
+
+    def __addr_cmp_str(self, addr_wire, addr):
+        """Auxiliar function to generate address wire comparison, only if addr > 0
+        Otherwise comparison: (wire >= addr) is always true
+        """
+        if isinstance(addr, int):
+            if addr == 0:
+                return ""
+        return f"({addr_wire} >= ({addr})) && "
 
     def gen_wr_reg(self, row):
         wires = []
@@ -221,10 +229,11 @@ class csr_gen:
             lines += f"    wire {name}_addressed_w;\n"
 
             # test if addr and addr_w are int and substitute with their values
+            wstrb_addr_cmp = self.__addr_cmp_str("wstrb_addr", addr)
             if isinstance(addr, int) and isinstance(addr_w, int):
-                lines += f"    assign {name}_addressed_w = (wstrb_addr >= ({addr})) && (wstrb_addr < {addr+2**addr_w});\n"
+                lines += f"    assign {name}_addressed_w = {wstrb_addr_cmp} (wstrb_addr < {addr+2**addr_w});\n"
             else:
-                lines += f"    assign {name}_addressed_w = (wstrb_addr >= ({addr})) && (wstrb_addr < ({addr}+(2**({addr_w}))));\n"
+                lines += f"    assign {name}_addressed_w = {wstrb_addr_cmp} (wstrb_addr < ({addr}+(2**({addr_w}))));\n"
 
             n_items = 2 ** eval_param_expression_from_config(
                 log2n_items, self.config, "max"
@@ -323,15 +332,29 @@ class csr_gen:
 
             # test if addr and addr_w are int and substitute with their values
             # For non-auto, use normal address
+            int_addr_stable_cmp = self.__addr_cmp_str("internal_iob_addr_stable", addr)
             if isinstance(addr, int) and isinstance(addr_w, int):
-                lines += f"    assign {name}_addressed = (internal_iob_addr_stable >= ({addr})) && (internal_iob_addr_stable < {addr+2**addr_w});\n"
+                lines += f"    assign {name}_addressed = {int_addr_stable_cmp} (internal_iob_addr_stable < {addr+2**addr_w});\n"
             else:
-                lines += f"    assign {name}_addressed = (internal_iob_addr_stable >= ({addr})) && (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
+                lines += f"    assign {name}_addressed = {int_addr_stable_cmp} (internal_iob_addr_stable < ({addr}+(2**({addr_w}))));\n"
 
             lines += f"   assign {name}_valid{suffix} = internal_iob_valid & {name}_addressed;\n"
             if type(log2n_items) is not int or log2n_items > 0:
                 lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
-            lines += f"   assign {name}_wstrb{suffix} = internal_iob_wstrb;\n"
+            wires.append(
+                {
+                    "name": f"{name}_wstrb",
+                    "descr": "",
+                    "signals": [
+                        {
+                            "name": f"{name}_wstrb",
+                            "width": self.verilog_max(f"{n_bits}/8", 1),
+                        },
+                    ],
+                },
+            )
+            lines += f"    assign {name}_wstrb = internal_iob_wstrb[{self.boffset(addr,self.cpu_n_bytes)}/8+:{self.verilog_max(f'{n_bits}/8',1)}];\n"
+            lines += f"   assign {name}_wstrb{suffix} = {name}_wstrb;\n"
             if suffix:
                 lines += f"    assign {name}_wdata{suffix} = {name}_wdata;\n"
 
@@ -363,9 +386,18 @@ class csr_gen:
             # test if addr and addr_w are int and substitute with their values
             # For (auto) REG, use special read strobe based on 'shift_amount'
             if isinstance(addr, int) and isinstance(addr_w, int):
-                lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_max(1,{addr+2**addr_w}>>shift_amount));\n"
+                if addr == 0:
+                    lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount <= iob_max(1,{addr+2**addr_w-1}>>shift_amount));\n"
+                else:
+                    # addr > 0
+                    lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount <= iob_max(1,{addr+2**addr_w-1}>>shift_amount));\n"
+
             else:
-                lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount < iob_max(1,({addr}+(2**({addr_w})))>>shift_amount));\n"
+                if addr == 0:
+                    lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount <= iob_max(1,({addr}+(2**({addr_w}-1)))>>shift_amount));\n"
+                else:
+                    # addr > 0:
+                    lines += f"    assign {name}_addressed_r = (internal_iob_addr_stable>>shift_amount >= ({addr}>>shift_amount)) && (internal_iob_addr_stable>>shift_amount <= iob_max(1,({addr}+(2**({addr_w}-1)))>>shift_amount));\n"
 
             n_items = 2 ** eval_param_expression_from_config(
                 log2n_items, self.config, "max"
@@ -443,21 +475,6 @@ class csr_gen:
                     lines += f"   assign {name}_addr{suffix} = internal_iob_addr_stable - {addr};\n"
 
         return lines, wires
-
-    # auxiliar read register case name
-    def aux_read_reg_case_name(self, row):
-        aux_read_reg_case_name = ""
-        if "R" in row.mode:
-            addr = row.addr
-            n_bits = row.n_bits
-            log2n_items = row.log2n_items
-            n_bytes = int(self.bceil(n_bits, 3) / 8)
-            if n_bytes == 3:
-                n_bytes = 4
-            addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            addr_w_base = max(log(self.cpu_n_bytes, 2), addr_w)
-            aux_read_reg_case_name = f"iob_addr_i_{self.bfloor(addr, addr_w_base)}_{self.boffset(addr, self.cpu_n_bytes)}"
-        return aux_read_reg_case_name
 
     # generate wires to connect instance in top module
     def gen_inst_wire(self, table, f):
@@ -709,22 +726,24 @@ class csr_gen:
                     all_reads_auto = False
                     break
 
+        converter_connect = {
+            "s_s": "control_if_s",
+            "m_m": "internal_iob",
+        }
+        if core_attributes["csr_if"] != "iob":
+            converter_connect["clk_en_rst_s"] = "clk_en_rst_s"
         subblocks.append(
             {
                 "core_name": "iob_universal_converter",
                 "instance_name": "iob_universal_converter",
-                "instance_description": "Convert IOb port from testbench into correct interface for UART CSRs bus",
+                "instance_description": "Convert CSR interface into internal IOb port",
                 "subordinate_if": core_attributes["csr_if"],
                 "manager_if": "iob",
                 "parameters": {
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                 },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "s_s": "control_if_s",
-                    "m_m": "internal_iob",
-                },
+                "connect": converter_connect,
             }
         )
         if core_attributes["csr_if"] == "axi":
@@ -749,8 +768,8 @@ class csr_gen:
                 snippet += """
 // Create a special readstrobe for "REG" (auto) CSRs.
 // LSBs 0 = read full word; LSBs 1 = read byte; LSBs 2 = read half word; LSBs 3 = read byte.
-   reg shift_amount;
-   always @(*)
+   reg [1:0] shift_amount;
+   always @(*) begin
       case (internal_iob_addr_stable[1:0])
          // Access entire word
          2'b00: shift_amount = 2;
@@ -762,6 +781,7 @@ class csr_gen:
          2'b11: shift_amount = 0;
          default: shift_amount = 0;
       endcase
+    end
 """
                 break
 
@@ -853,13 +873,6 @@ class csr_gen:
                         {"name": "ready_int", "width": 1, "isvar": True},
                     ],
                 },
-                {
-                    "name": "auto_addressed",
-                    "descr": "Flag if an auto-register is currently addressed",
-                    "signals": [
-                        {"name": "auto_addressed", "width": 1, "isvar": True},
-                    ],
-                },
             ]
         subblocks += [
             {
@@ -906,21 +919,6 @@ class csr_gen:
             },
         ]
 
-        # auxiliar read register cases
-        for row in table:
-            if "R" in row.mode:
-                aux_read_reg = self.aux_read_reg_case_name(row)
-                if aux_read_reg:
-                    wires.append(
-                        {
-                            "name": aux_read_reg,
-                            "descr": "",
-                            "signals": [
-                                {"name": aux_read_reg, "width": 1, "isvar": True},
-                            ],
-                        },
-                    )
-
         # Create byte aligned wires
         for row in table:
             name = row.name
@@ -928,6 +926,9 @@ class csr_gen:
             suffix = "" if row.internal_use else "_i"
             n_bits = row.n_bits
             n_bytes = int(self.bceil(n_bits, 3) / 8)
+            bit_padding = (8 * n_bytes) - eval_param_expression_from_config(
+                n_bits, self.config, "max"
+            )
             if n_bytes == 3:
                 n_bytes = 4
             if "R" in row.mode:
@@ -935,12 +936,16 @@ class csr_gen:
                     pass
                 elif auto:
                     snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name};\n"
-                    snippet += f"assign byte_aligned_{name} = {name}_rdata;\n"
+                    if bit_padding > 0:
+                        snippet += f"assign byte_aligned_{name} = {{{{{bit_padding}{{1'b0}}}}, {name}_rdata}};\n"
+                    else:
+                        snippet += f"assign byte_aligned_{name} = {name}_rdata;\n"
                 else:
                     snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata;\n"
-                    snippet += (
-                        f"assign byte_aligned_{name}_rdata = {name}_rdata{suffix};\n"
-                    )
+                    if bit_padding > 0:
+                        snippet += f"assign byte_aligned_{name}_rdata = {{{{{bit_padding}{{1'b0}}}}, {name}_rdata{suffix}}};\n"
+                    else:
+                        snippet += f"assign byte_aligned_{name}_rdata = {name}_rdata{suffix};\n"
 
         # Response signals switch logic
         if all_auto:
@@ -953,12 +958,33 @@ class csr_gen:
 """
         else:  # Not all auto
             snippet += """
+
+    wire auto_addressed;
+    wire auto_addressed_r;
+    reg auto_addressed_nxt;
+
     //RESPONSE SWITCH
 
     // Don't register response signals if accessing non-auto CSR
     assign internal_iob_rvalid = auto_addressed ? iob_rvalid_out : rvalid_int;
     assign internal_iob_rdata = auto_addressed ? iob_rdata_out : iob_rdata_nxt;
     assign internal_iob_ready = auto_addressed ? iob_ready_out : ready_int;
+
+   // auto_addressed register
+   assign auto_addressed = (state == WAIT_REQ) ? auto_addressed_nxt : auto_addressed_r;
+   iob_reg_ca #(
+      .DATA_W (1),
+      .RST_VAL(1'b0)
+   ) auto_addressed_reg (
+      // clk_en_rst_s port: Clock, clock enable and reset
+      .clk_i (clk_i),
+      .cke_i (cke_i),
+      .arst_i(arst_i),
+      // data_i port: Data input
+      .data_i(auto_addressed_nxt),
+      // data_o port: Data output
+      .data_o(auto_addressed_r)
+   );
 """
 
         snippet += f"""
@@ -966,11 +992,12 @@ class csr_gen:
         iob_rdata_nxt = {8*self.cpu_n_bytes}'d0;
 """
         if not all_auto:
-            snippet += f"""
+            snippet += """
         rvalid_int = 1'b1;
         ready_int = 1'b1;
+        auto_addressed_nxt = auto_addressed_r;
         if (internal_iob_valid) begin
-            auto_addressed = 1'b1;
+            auto_addressed_nxt = 1'b1;
         end
 """
 
@@ -983,20 +1010,7 @@ class csr_gen:
             n_bytes = int(self.bceil(n_bits, 3) / 8)
             if n_bytes == 3:
                 n_bytes = 4
-            addr_last = int(
-                addr
-                + (
-                    (
-                        2
-                        ** eval_param_expression_from_config(
-                            log2n_items, self.config, "max"
-                        )
-                    )
-                )
-                * n_bytes
-            )
             addr_w = self.calc_addr_w(log2n_items, n_bytes)
-            addr_w_base = max(log(self.cpu_n_bytes, 2), addr_w)
             auto = row.type != "NOAUTO"
             suffix = "" if row.internal_use else "_i"
 
@@ -1019,8 +1033,8 @@ class csr_gen:
                 if not auto:
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
-                        "            if (internal_iob_valid & ~|internal_iob_wstrb) begin\n"
-                        "                auto_addressed = 1'b0;\n"
+                        "            if (internal_iob_valid & (~|internal_iob_wstrb)) begin\n"
+                        "                auto_addressed_nxt = 1'b0;\n"
                         "            end\n"
                     )
                 snippet += "        end\n\n"
@@ -1041,11 +1055,12 @@ class csr_gen:
             if "W" in row.mode:
                 if not auto:
                     # get ready
-                    snippet += f"        if((wstrb_addr >= {addr}) && (wstrb_addr < {addr + 2**addr_w})) begin\n"
+                    wstrb_addr_cmp = self.__addr_cmp_str("wstrb_addr", addr)
+                    snippet += f"        if({wstrb_addr_cmp} (wstrb_addr < {addr + 2**addr_w})) begin\n"
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
-                        "            if (internal_iob_valid & |internal_iob_wstrb) begin\n"
-                        "                auto_addressed = 1'b0;\n"
+                        "            if (internal_iob_valid & (|internal_iob_wstrb)) begin\n"
+                        "                auto_addressed_nxt = 1'b0;\n"
                         "            end\n"
                     )
                     snippet += "        end\n\n"
@@ -1064,14 +1079,15 @@ class csr_gen:
         //FSM state machine
         case(state)
             WAIT_REQ: begin
-                if(internal_iob_valid & (!internal_iob_ready)) begin // Wait for a valid request
 """
         if not all_auto:
             snippet += """
+                if(internal_iob_valid & (auto_addressed || (!ready_int)) ) begin // Wait for a valid request
                     iob_ready_nxt = ready_int;
 """
         else:
             snippet += """
+                if(internal_iob_valid) begin // Wait for a valid request
                     iob_ready_nxt = 1'b1;
 """
         snippet += """
@@ -1083,19 +1099,21 @@ class csr_gen:
             end
 
             default: begin  // WAIT_RVALID
-                if (internal_iob_rvalid) begin // Transfer done
-"""
-        snippet += """
-                    iob_rvalid_nxt = 1'b0;
-                    state_nxt = WAIT_REQ;
-                end else begin
 """
         if not all_reads_auto:
             snippet += """
+                if (auto_addressed & iob_rvalid_out) begin // Transfer done
+                    state_nxt = WAIT_REQ;
+                end else if ((!auto_addressed) & rvalid_int) begin // Transfer done
+                    state_nxt = WAIT_REQ;
+                end else begin
                     iob_rvalid_nxt = rvalid_int;
 """
         else:
             snippet += """
+                if (iob_rvalid_out) begin // Transfer done
+                    state_nxt = WAIT_REQ;
+                end else begin
                     iob_rvalid_nxt = 1'b1;
 """
         snippet += """
@@ -1455,14 +1473,14 @@ class csr_gen:
             """
 The software accessible registers of the core are described in the following
 tables. Each subsection corresponds to a specific configuration of the core, since
-different configurations have different registers available. 
-The tables give information on the name, read/write capability, address, hardware and software width, and a 
+different configurations have different registers available.
+The tables give information on the name, read/write capability, address, hardware and software width, and a
 textual description. The addresses are byte aligned and given in hexadecimal format.
 The hardware width is the number of bits that the register occupies in the hardware, while the
 software width is the number of bits that the register occupies in the software.
-In each address, the right-justified field having "Hw width" bits conveys the relevant information. 
-Each register has only one type of access, either read or write, meaning that reading from 
-a write-only register will produce invalid data or writing to a read-only register will 
+In each address, the right-justified field having "Hw width" bits conveys the relevant information.
+Each register has only one type of access, either read or write, meaning that reading from
+a write-only register will produce invalid data or writing to a read-only register will
 not have any effect.
 """
         )

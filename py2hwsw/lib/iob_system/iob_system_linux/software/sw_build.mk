@@ -75,11 +75,12 @@ FIRM_ARGS += $(DTB_DIR) $(DTB_ADDR)
 FIRM_ARGS += $(LINUX_DIR) $(LINUX_ADDR)
 FIRM_ARGS += $(ROOTFS_DIR) $(ROOTFS_ADDR)
 FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,OS_ADDR_W)
-UTARGETS += compile_device_tree compile_bootloader
+UTARGETS += compile_device_tree compile_opensbi
 FIRMWARE := fw_jump.bin iob_system_linux.dtb Image rootfs.cpio.gz
 else
 FIRM_ARGS = $<
 FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,MEM_ADDR_W)
+UTARGETS += iob_system_linux_firmware 
 FIRMWARE := iob_system_linux_firmware.bin
 endif
 
@@ -121,10 +122,10 @@ linux_build_macros.txt:
 compile_device_tree: linux_build_macros.txt
 	nix-shell $(OS_DIR)/default.nix --run 'make -C $(OS_DIR) build-dts MACROS_FILE=$(REL_OS2ROOT)/software/linux_build_macros.txt DTS_FILE=$(REL_OS2ROOT)/software/iob_system_linux.dts'
 
-compile_bootloader:
-	nix-shell $(OS_DIR)/default.nix --run 'make -C $(OS_DIR) build-opensbi MACROS_FILE=$(REL_OS2ROOT)/software/linux_build_macros.txt'
+compile_opensbi:
+	nix-shell $(OS_DIR)/default.nix --run 'make -C $(OS_DIR) build-opensbi MACROS_FILE=$(REL_OS2ROOT)/software/linux_build_macros.txt OPENSBI_PLATFORM_DIR=$(REL_OS2ROOT)/software/opensbi_platform/iob_system_linux'
 
-.PHONY: compile_device_tree compile_bootloader
+.PHONY: compile_device_tree compile_opensbi
 
 #
 # Dependencies
@@ -133,7 +134,7 @@ compile_bootloader:
 ../../software/%.bin:
 	make -C ../../ sw-build
 
-UTARGETS+=build_iob_system_linux_software tb
+UTARGETS +=tb
 TB_SRC=./simulation/src/iob_uart_csrs.c
 TB_INCLUDES ?=-I./simulation/src
 
@@ -209,7 +210,9 @@ IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_printf.c
 IOB_SYSTEM_LINUX_PREBOOT_SRC=src/iob_system_linux_preboot.S
 
 
-build_iob_system_linux_software: iob_system_linux_firmware iob_system_linux_boot iob_system_linux_preboot
+UTARGETS +=iob_system_linux_baremetal_boot
+
+iob_system_linux_baremetal_boot: iob_system_linux_boot iob_system_linux_preboot
 
 iob_bsp:
 	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h
@@ -227,7 +230,7 @@ iob_system_linux_preboot:
 	make $@.elf INCLUDES="$(IOB_SYSTEM_LINUX_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LINUX_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_LINUX_PREBOOT_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)" NO_HW_DRIVER=1
 
 
-.PHONY: build_iob_system_linux_software iob_bsp iob_system_linux_firmware check_if_run_linux iob_system_linux_boot iob_system_linux_preboot
+.PHONY: iob_system_linux_baremetal_boot iob_bsp iob_system_linux_firmware check_if_run_linux iob_system_linux_boot iob_system_linux_preboot
 
 #########################################
 #         PC emulation targets          #

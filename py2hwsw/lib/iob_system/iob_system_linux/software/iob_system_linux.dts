@@ -40,9 +40,9 @@
             };
         };
     };
-    memory@00000000 {
+    memory@0 {
         device_type = "memory";
-        reg = <0x00000000 /*OS_RANGE_MACRO*/>;
+        reg = <0x0 /*OS_RANGE_MACRO*/>;
     };
     chosen {
         bootargs = "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init swiotlb=32 loglevel=8";

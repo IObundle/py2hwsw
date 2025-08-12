@@ -6,7 +6,6 @@ import sys
 import os
 import shutil
 import json
-from pathlib import Path
 import copy
 from types import SimpleNamespace
 import pathlib
@@ -340,7 +339,8 @@ class iob_core(iob_module, iob_instance):
         if "iob_v_tb.vh" not in os.listdir(os.path.join(self.build_dir, sim_src_dir)):
             os.remove(f"{self.build_dir}/{sim_src_dir}/iob_v_tb.v")
         # Lint and format sources
-        self.lint_and_format()
+        if self.is_top_module:
+            self.lint_and_format()
         print(
             f"{iob_colors.INFO}Setup of '{self.original_name}' core successful. Generated build directory: '{self.build_dir}'.{iob_colors.ENDC}"
         )
@@ -702,7 +702,7 @@ class iob_core(iob_module, iob_instance):
         # Find Verilog sources and headers from build dir
         verilog_headers = []
         verilog_sources = []
-        for path in Path(os.path.join(self.build_dir, "hardware/src")).rglob("*.vh"):
+        for path in pathlib.Path(os.path.join(self.build_dir, "hardware/src")).rglob("*.vh"):
             # Skip specific Verilog headers
             if "test_" in path.name:
                 continue
@@ -711,7 +711,7 @@ class iob_core(iob_module, iob_instance):
                 continue
             verilog_headers.append(str(path))
             # print(str(path))
-        for path in Path(os.path.join(self.build_dir, "hardware/src")).rglob("*.v"):
+        for path in pathlib.Path(os.path.join(self.build_dir, "hardware/src")).rglob("*.v"):
             # Skip synthesis directory # TODO: Support this?
             if "/syn/" in str(path):
                 continue
@@ -721,7 +721,7 @@ class iob_core(iob_module, iob_instance):
         # Run Verilog linter
         # FIXME: Don't run for tester since iob_system is still full of warnings (and we may not even need to lint tester files?)
         if __class__.global_project_vlint and not self.is_tester:
-            lint_cfg_path = Path(os.path.join(self.build_dir, "hardware/lint"))
+            lint_cfg_path = pathlib.Path(os.path.join(self.build_dir, "hardware/lint"))
             verilog_lint.lint_files(
                 verilog_headers + verilog_sources,
                 extra_flags=f"--top-module {self.name}",
@@ -735,13 +735,25 @@ class iob_core(iob_module, iob_instance):
                 os.path.join(os.path.dirname(__file__), "verible-format.rules"),
             )
 
+        # Check if build directory is inside current repo
+        # and if so, ingore that path when formatting current repo.
+        build_dir = pathlib.Path(self.build_dir).resolve()
+        current_dir = pathlib.Path(os.getcwd()).resolve()
+        repo_format_ignore_paths = []
+        if build_dir.is_relative_to(current_dir):
+            # Build dir (child) is inside py2hwsw dir (parent)
+            relative_path = build_dir.relative_to(current_dir)
+            repo_format_ignore_paths = [relative_path]
+
         # Run Python formatter
-        sw_tools.run_tool("black")
+        sw_tools.run_tool("black", ignore_paths=repo_format_ignore_paths)
         sw_tools.run_tool("black", self.build_dir)
 
         # Run C formatter
         sw_tools.run_tool(
-            "clang", rules_file_path=__class__.global_clang_format_rules_filepath
+            "clang",
+            rules_file_path=__class__.global_clang_format_rules_filepath,
+            ignore_paths=repo_format_ignore_paths,
         )
         sw_tools.run_tool(
             "clang",

@@ -1,8 +1,8 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 #
-# Copyright (C) 2019 FORTH-ICS/CARV
-#		Panagiotis Peristerakis <perister@ics.forth.gr>
+# SPDX-FileCopyrightText: 2019 FORTH-ICS/CARV, Panagiotis Peristerakis <perister@ics.forth.gr>
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 
 # Compiler flags

@@ -1,7 +1,8 @@
 /*
  * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+ * SPDX-FileCopyrightText: 2019 Western Digital Corporation or its affiliates.
+ * SPDX-FileCopyrightText: 2025 IObundle
  */
 
 #include <sbi/riscv_asm.h>

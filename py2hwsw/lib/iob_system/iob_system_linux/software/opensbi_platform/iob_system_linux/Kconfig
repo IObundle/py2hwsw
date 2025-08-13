@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
 # SPDX-License-Identifier: BSD-2-Clause
 
 config PLATFORM_IOB_SYSTEM_LINUX_FPGA

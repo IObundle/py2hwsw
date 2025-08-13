@@ -397,6 +397,8 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("connect", None)
         filtered_parent_py_params.pop("parameters", None)
         filtered_parent_py_params.pop("is_superblock", None)
+        filtered_parent_py_params.pop("is_parent", None)
+        filtered_parent_py_params.pop("child_attributes", None)
         if "name" not in filtered_parent_py_params:
             filtered_parent_py_params["name"] = name
 

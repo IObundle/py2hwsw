@@ -11,6 +11,9 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../scr
 
 from iob_system_utils import update_params
 
+# TODO: use the following to interact with linux
+#CONSOLE_CMD ?=$(PYTHON_DIR)/console.py -s $(BOARD_SERIAL_PORT); screen $(BOARD_SERIAL_PORT) 115200
+
 
 def setup(py_params_dict):
     params = {

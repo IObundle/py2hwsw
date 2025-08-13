@@ -44,7 +44,7 @@ iob_mem_file = f"{ROOT_DIR}/hardware/{SOC_NAME}_mem.config"
 with open(iob_mem_file, "w") as file:
     if RUN_LINUX == "1":
         file.write(
-            "fw_jump.bin 0\nImage 400000\niob_soc.dtb F80000\nrootfs.cpio.gz 1000000"
+            f"fw_jump.bin 0\nImage 400000\n{SOC_NAME}.dtb F80000\nrootfs.cpio.gz 1000000"
         )
     else:
         file.write(f"{SOC_NAME}_firmware.bin {FW_BASE_ADDR}")

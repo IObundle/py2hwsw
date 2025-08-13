@@ -16,6 +16,8 @@ include $(ROOT_DIR)/software/auto_sw_build.mk
 # 2. CONSOLE_TO_FLASH: program flash with firmware
 # 3. FLASH_TO_EXTMEM: load firmware from flash to external memory 
 BOOT_FLOW ?= CONSOLE_TO_EXTMEM
+# Set UFLAGS to pass flow option to remote machines
+UFLAGS +=BOOT_FLOW=$(BOOT_FLOW)
 # Add boot_flow as dependency of simulation/fpga build process
 BUILD_DEPS += boot_flow
 
@@ -58,6 +60,8 @@ iob_system_linux_bootrom.hex: ../../software/iob_system_linux_preboot.bin ../../
 # OS
 #
 
+# Set UFLAGS to pass RUN_LINUX option to remote machines
+UFLAGS +=RUN_LINUX=$(RUN_LINUX)
 # OS sources and parameters
 ifeq ($(RUN_LINUX),1)
 OS_DIR = $(ROOT_DIR)/submodules/iob_linux
@@ -76,6 +80,8 @@ FIRM_ARGS += $(LINUX_DIR) $(LINUX_ADDR)
 FIRM_ARGS += $(ROOTFS_DIR) $(ROOTFS_ADDR)
 UTARGETS += compile_device_tree compile_opensbi
 FIRMWARE := fw_jump.bin iob_system_linux.dtb Image rootfs.cpio.gz
+# Set simulation/FPGA board grab timeout to 1 hour
+GRAB_TIMEOUT ?= 3600
 else
 FIRM_ARGS = $<
 UTARGETS += iob_system_linux_firmware 

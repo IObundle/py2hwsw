@@ -173,6 +173,7 @@ def setup(py_params_dict):
                 },
             },
         ],
+        
         "comb": {
             "code": """
     r_data = regarray_in[r_addr_i*DATA_W+:DATA_W];

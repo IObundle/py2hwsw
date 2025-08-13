@@ -34,37 +34,22 @@ def setup(py_params_dict):
                 "descr": "Clock, clock enable and reset",
             },
             {
-                "name": "w_clk_i",
-                "descr": "Write clock input for the register array",
-                "signals": [
-                    {
-                        "name": "w_clk_i",
-                        "width": "1",
-                        "descr": "Write clock input signal",
-                    },
-                ],
+                "name": "w_clk_en_rst_s",
+                "signals": {
+                    "type": "iob_clk",
+                    "params": "c_a",
+                    "prefix": "w_",
+                },
+                "descr": "Write Clock, clock enable and reset",
             },
             {
-                "name": "w_cke_i",
-                "descr": "Write clock enable input for the register array",
-                "signals": [
-                    {
-                        "name": "w_cke_i",
-                        "width": "1",
-                        "descr": "Write clock enable input signal",
-                    },
-                ],
-            },
-            {
-                "name": "w_arst_i",
-                "descr": "Write asynchronous reset input for the register array",
-                "signals": [
-                    {
-                        "name": "w_arst_i",
-                        "width": "1",
-                        "descr": "Write asynchronous reset input signal",
-                    },
-                ],
+                "name": "r_clk_en_rst_s",
+                "signals": {
+                    "type": "iob_clk",
+                    "params": "c_a",
+                    "prefix": "r_",
+                },
+                "descr": " Read Clock, clock enable and reset",
             },
             {
                 "name": "w_addr_i",
@@ -85,39 +70,6 @@ def setup(py_params_dict):
                         "name": "w_data_i",
                         "width": "DATA_W",
                         "descr": "Write data input signal",
-                    },
-                ],
-            },
-            {
-                "name": "r_clk_i",
-                "descr": "Read clock input for the register array",
-                "signals": [
-                    {
-                        "name": "r_clk_i",
-                        "width": "1",
-                        "descr": "Read clock input signal",
-                    },
-                ],
-            },
-            {
-                "name": "r_cke_i",
-                "descr": "Read clock enable input for the register array",
-                "signals": [
-                    {
-                        "name": "r_cke_i",
-                        "width": "1",
-                        "descr": "Read clock enable input signal",
-                    },
-                ],
-            },
-            {
-                "name": "r_arst_i",
-                "descr": "Read asynchronous reset input for the register array",
-                "signals": [
-                    {
-                        "name": "r_arst_i",
-                        "width": "1",
-                        "descr": "Read asynchronous reset input signal",
                     },
                 ],
             },
@@ -175,24 +127,6 @@ def setup(py_params_dict):
                         "name": "r_data",
                         "width": "DATA_W",
                         "descr": "Enable signal for the register array",
-                    },
-                ],
-            },
-            {
-                "name": "r_clk_en_rst_s",
-                "descr": "Clock, clock enable and reset for read operations",
-                "signals": [
-                    {
-                        "name": "r_clk_i",
-                        "width": "1",
-                    },
-                    {
-                        "name": "r_cke_i",
-                        "width": "1",
-                    },
-                    {
-                        "name": "r_arst_i",
-                        "width": "1",
                     },
                 ],
             },

@@ -26,7 +26,6 @@ def setup(py_params_dict):
         ],
         "ports": [
             {
-<<<<<<< HEAD
                 "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
@@ -42,17 +41,6 @@ def setup(py_params_dict):
                     "prefix": "w_",
                 },
                 "descr": "Write Clock, clock enable and reset",
-=======
-                "name": "w_clk_i",
-                "descr": "Write clock input for the register array",
-                "signals": [
-                    {
-                        "name": "w_clk_i",
-                        "width": "1",
-                        "descr": "Write clock input signal",
-                    },
-                ],
->>>>>>> 1b3c6ff525edcb1becc4da63d85b4a0fcdfd384c
             },
             {
                 "name": "r_clk_en_rst_s",
@@ -96,6 +84,7 @@ def setup(py_params_dict):
                     },
                 ],
             },
+            
             {
                 "name": "r_data_o",
                 "descr": "Read data output from the register array",

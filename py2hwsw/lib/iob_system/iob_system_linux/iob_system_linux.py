@@ -11,6 +11,9 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../scr
 
 from iob_system_utils import update_params
 
+# TODO: use the following to interact with linux
+# CONSOLE_CMD ?=$(PYTHON_DIR)/console.py -s $(BOARD_SERIAL_PORT); screen $(BOARD_SERIAL_PORT) 115200
+
 
 def setup(py_params_dict):
     params = {
@@ -19,7 +22,7 @@ def setup(py_params_dict):
     iob_system_default_params = {
         "use_intmem": False,
         "use_extmem": True,
-        "mem_addr_w": 17,  # FIXME: Temprorary lower value for speed up. Change to 26 for Linux.
+        "mem_addr_w": 26,
         "bootrom_addr_w": 15,
         "fw_baseaddr": 0,
     }
@@ -232,7 +235,7 @@ def setup(py_params_dict):
             # Full list of parameters availabe here: https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/iob_system/iob_system.py
             "cpu": "iob_vexriscv",
             # Don't include iob_system's snippets. We will use our own.
-            "include_snippets": False,
+            "include_snippet": False,
             # NOTE: Place other iob_system python parameters here
             "system_attributes": {
                 # Every attribute in this dictionary will override/append to the ones of the iob_system parent core.
@@ -242,11 +245,11 @@ def setup(py_params_dict):
                     "iob_zybo_z7",
                 ],
                 "confs": [
-                    {
-                        "name": "N_CORES",
-                        "descr": "Number of CPU cores used in the SoC.",
-                        "type": "P",
-                        "val": "1",
+                    {  # Used for software.
+                        "name": "OS_RANGE",
+                        "descr": "Linux OS address range in hex",
+                        "type": "M",
+                        "val": hex(1 << py_params_dict["mem_addr_w"]),
                         "min": "1",
                         "max": "32",
                     },
@@ -259,14 +262,14 @@ def setup(py_params_dict):
                         "max": "NA",
                     },
                     # Old opencrytolinux confs. Are they still needed?
-                    # { # Used for software.
-                    #     "name": "OS_ADDR_W",
-                    #     "descr": "Linux OS address width",
-                    #     "type": "M",
-                    #     "val": "25",
-                    #     "min": "1",
-                    #     "max": "32",
-                    # },
+                    {
+                        "name": "N_CORES",
+                        "descr": "Number of CPU cores used in the SoC.",
+                        "type": "P",
+                        "val": "1",
+                        "min": "1",
+                        "max": "32",
+                    },
                     # {
                     #     "name": "N_SOURCES",
                     #     "type": "P",
@@ -392,7 +395,7 @@ def setup(py_params_dict):
                     {
                         # Instantiate a SPI master core from: https://github.com/IObundle/iob-spi
                         "core_name": "iob_spi_master",
-                        "instance_name": "SPI",
+                        "instance_name": "SPI0",
                         "instance_description": "SPI master peripheral",
                         "is_peripheral": True,
                         "parameters": {
@@ -455,6 +458,12 @@ def setup(py_params_dict):
                     #     },
                     # },
                     # NOTE: Add other components/peripherals here.
+                ],
+                "sw_modules": [
+                    {
+                        "core_name": "iob_linux",
+                        "instance_name": "iob_linux_inst",
+                    },
                 ],
                 "snippets": [{"verilog_code": verilog_snippet}],
             },

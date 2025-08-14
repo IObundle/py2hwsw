@@ -33,3 +33,8 @@
 ./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistseedexpander.h
 ./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistseedexpander.c
 ./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistkatrng.c
+# openspbi
+./py2hwsw/lib/iob_system/iob_system_linux/software/opensbi_platform/iob_system_linux/objects.mk
+./py2hwsw/lib/iob_system/iob_system_linux/software/opensbi_platform/iob_system_linux/platform.c
+./py2hwsw/lib/iob_system/iob_system_linux/software/opensbi_platform/iob_system_linux/Kconfig
+./py2hwsw/lib/iob_system/iob_system_linux/software/opensbi_platform/iob_system_linux/configs/defconfig

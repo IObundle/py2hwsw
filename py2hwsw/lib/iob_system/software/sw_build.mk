@@ -16,7 +16,7 @@ include $(ROOT_DIR)/software/auto_sw_build.mk
 GET_MACRO = $(shell grep "define $(1)" $(2) | rev | cut -d" " -f1 | rev)
 
 #Function to obtain parameter named $(1) from iob_system_conf.vh
-GET_IOB_SYSTEM_CONF_MACRO = $(call GET_MACRO,IOB_SYSTEM_$(1),../src/iob_system_conf.vh)
+GET_IOB_SYSTEM_CONF_MACRO = $(call GET_MACRO,IOB_SYSTEM_$(1),$(ROOT_DIR)/hardware/src/iob_system_conf.vh)
 
 iob_system_bootrom.hex: ../../software/iob_system_preboot.bin ../../software/iob_system_boot.bin
 	../../scripts/makehex.py $^ 00000080 $(call GET_IOB_SYSTEM_CONF_MACRO,BOOTROM_ADDR_W) $@
@@ -97,3 +97,8 @@ EMUL_SRC+=src/iob_printf.c
 EMUL_SRC+=$(addprefix src/,$(addsuffix .c,$(PERIPHERALS)))
 EMUL_SRC+=$(addprefix src/,$(addsuffix _csrs_pc_emul.c,$(PERIPHERALS)))
 
+# include software build segment of child systems
+# child systems can add their own child_sw_build.mk without having to override this one.
+ifneq ($(wildcard $(ROOT_DIR)/software/child_sw_build.mk),)
+include $(ROOT_DIR)/software/child_sw_build.mk
+endif

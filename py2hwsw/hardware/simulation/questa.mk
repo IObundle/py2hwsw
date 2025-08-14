@@ -17,7 +17,7 @@ ifeq ($(VCD),1)
 CFLAGS+=+define+VCD
 endif
 
-comp: $(VHDR) $(VSRC) $(HEX)
+comp: $(VHDR) $(VSRC) $(BUILD_DEPS)
 	vlog $(CFLAGS) $(VSRC)
 
 exec: comp

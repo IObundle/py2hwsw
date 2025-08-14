@@ -545,6 +545,48 @@ def copy_with_rename(old_core_name, new_core_name):
 
     return copy_func
 
+def copytree_with_rename(src, dst, original_name, new_name, ignore=None, symlinks=False):
+    """
+    Recursively copy a directory tree from src to dst, while renaming any 'original_name' strings to 'new_name'.
+    Any directories or files containing 'original_name' in their name will be renamed to 'new_name'.
+    Any strings inside the copied files containing 'original_name' will be replaced by 'new_name'.
+
+    Parameters:
+        src (str): Source directory path.
+        dst (str): Destination directory path.
+        original_name (str): The string to replace.
+        new_name (str): The replacement string.
+        ignore (callable): A function that takes a directory path and list of its contents,
+                           and returns a set of names to ignore (like shutil.ignore_patterns).
+                           Example: shutil.ignore_patterns('*.pyc', 'tmp*').
+        symlinks (bool): Whether to copy symlinks as symlinks (True) or file contents (False).
+    """
+    if not os.path.isdir(src):
+        raise ValueError(f"Source directory {src} does not exist or is not a directory")
+
+    # If dst folder contains the original_name, rename it to new_name
+    dst = os.path.join(os.path.dirname(dst), os.path.basename(dst).replace(original_name, new_name).replace(original_name.upper(), new_name.upper()))
+    os.makedirs(dst, exist_ok=True)
+
+    entries = os.listdir(src)
+    ignored_names = set()
+    if ignore:
+        ignored_names = set(ignore(src, entries))
+
+    for entry in entries:
+        if entry in ignored_names:
+            continue
+
+        s = os.path.join(src, entry)
+        d = os.path.join(dst, entry)
+
+        if symlinks and os.path.islink(s):
+            linkto = os.readlink(s)
+            os.symlink(linkto, d)
+        elif os.path.isdir(s):
+            copytree_with_rename(s, d, original_name, new_name, ignore=ignore, symlinks=symlinks)
+        else:
+            copy_with_rename(original_name, new_name)(s, d)
 
 def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
     """Copy and rename files from a given setup subdirectory to the build directory
@@ -577,11 +619,10 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
         tools_list = ["quartus", "vivado"]
 
         # Copy everything except the tools directories
-        shutil.copytree(
+        copytree_with_rename(
             os.path.join(core.setup_dir, directory),
             os.path.join(core.build_dir, directory),
-            dirs_exist_ok=True,
-            copy_function=copy_with_rename(core.original_name, core.name),
+            core.original_name, core.name,
             ignore=shutil.ignore_patterns(*exclude_file_list, *tools_list),
         )
 
@@ -606,11 +647,10 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
                                 os.path.join(build_tools_dir, file),
                             )
                     # Copy the fpga directory
-                    shutil.copytree(
+                    copytree_with_rename(
                         setup_fpga_dir,
                         build_fpga_dir,
-                        dirs_exist_ok=True,
-                        copy_function=copy_with_rename(core.original_name, core.name),
+                        core.original_name, core.name,
                         ignore=shutil.ignore_patterns(*exclude_file_list),
                     )
                     break
@@ -626,17 +666,11 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
     else:
         dst_directory = directory
 
-    # Copy tree of this directory, renaming files, and overriding destination ones.
-    # Note: The `copy_with_rename` may throw errors when
-    #       trying to rename binary files from the doc dir.
-    #       The main branch used a dedicated script to copy doc files
-    #       without renaming them. Maybe here we should try to
-    #       implement it with a try catch block.
-    shutil.copytree(
+    # Copy tree of this directory, renaming directories/files, and overriding destination ones.
+    copytree_with_rename(
         os.path.join(core.setup_dir, directory),
         os.path.join(core.build_dir, dst_directory),
-        dirs_exist_ok=True,
-        copy_function=copy_with_rename(core.original_name, core.name),
+        core.original_name, core.name,
         ignore=shutil.ignore_patterns(*exclude_file_list),
     )
     nix_permission_hack(os.path.join(core.build_dir, dst_directory))

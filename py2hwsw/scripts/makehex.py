@@ -48,7 +48,7 @@ def main():
     argv.remove(output_file)
 
     if len(argv) % 2 != 1:
-        print("Error: number of arguments must be odd")
+        print(f"Error: number of arguments must be odd. Got {len(argv)} arguments")
         print_usage()
         exit(1)
     nFiles = int((len(argv) - 3) / 2) + 1

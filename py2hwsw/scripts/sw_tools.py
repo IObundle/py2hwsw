@@ -33,7 +33,7 @@ def submodule_exceptions(path):
     return submodule_exceptions
 
 
-def build_find_cmd(path, file_extentions):
+def build_find_cmd(path, file_extentions, ignore_paths=[]):
     # 1. check if path is git repository:
     # 1.A. Is git repo: exclude submodule paths in find command
     # 1.B. Not git repo: search all subdirectories
@@ -52,6 +52,10 @@ def build_find_cmd(path, file_extentions):
     if is_git_repo == "true":
         find_flags = submodule_exceptions(path)
 
+    for ignore_path in ignore_paths:
+        full_ignore_path = os.path.join(path, ignore_path)
+        find_flags = f"{find_flags} -not -path '{full_ignore_path}/*'"
+
     find_cmd = f"find {path} {find_flags} -type f \\("
     first_extention = 1
     for extention in file_extentions.split(" "):
@@ -64,7 +68,7 @@ def build_find_cmd(path, file_extentions):
     return find_cmd
 
 
-def run_tool(tool, path=".", rules_file_path=None):
+def run_tool(tool, path=".", rules_file_path=None, ignore_paths=[]):
     match tool:
         case "black":
             cmd = "black"
@@ -88,7 +92,7 @@ def run_tool(tool, path=".", rules_file_path=None):
             file_extentions = ""
 
     # find all files and run tool
-    tool_cmd = f"{build_find_cmd(path, file_extentions)} | xargs -r {cmd} {flags}"
+    tool_cmd = f"{build_find_cmd(path, file_extentions, ignore_paths)} | xargs -r {cmd} {flags}"
     print(tool_cmd)
     subprocess.run(tool_cmd, shell=True, check=True)
 

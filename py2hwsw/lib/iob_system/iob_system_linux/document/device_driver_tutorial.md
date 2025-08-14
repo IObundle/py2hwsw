@@ -108,7 +108,7 @@ static ssize_t iob_spi_read(struct file *file, char __user *buf, size_t count,
 
 1.2.3. Update write function
 
-Update the `iob_spi_write()` function implementation according with the write registers of the device. SPI had the `FL_RESET`, `FL_DATAIN`, `FL_ADDRESS`, `FL_COMMAND`, `FL_COMMANDTP` and `FL_VALIDFLG` write registers:
+Update the `iob_spi_write()` function implementation according with the write registers of the device. SPI had the `FL_RESET`, `FL_DATAIN`, `FL_ADDRESS`, `FL_COMMAND`, `FL_COMMAND_TYPE` and `FL_VALIDFLG` write registers:
 
 ```C
 static ssize_t iob_spi_write(struct file *file, const char __user *buf,
@@ -136,8 +136,8 @@ static ssize_t iob_spi_write(struct file *file, const char __user *buf,
   case IOB_SPI_MASTER_FL_COMMAND_ADDR:
     // FL_COMMAND access implementation
     break;
-  case IOB_SPI_MASTER_FL_COMMANDTP_ADDR:
-    // FL_COMMANDTP access implementation
+  case IOB_SPI_MASTER_FL_COMMAND_TYPE_ADDR:
+    // FL_COMMAND_TYPE access implementation
     break;
   case IOB_SPI_MASTER_FL_VALIDFLG_ADDR:
     // FL_VALIDFLG access implementation

@@ -472,7 +472,7 @@ get_uut_run_deps:
             file.write(
                 """
 # Tester target to build and get UUT's hex files
-HEX+=get_uut_hex
+BUILD_DEPS+=get_uut_hex
 
 get_uut_hex:
 	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation build_hex

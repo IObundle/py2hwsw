@@ -65,14 +65,14 @@ sim-clean:
 	nix-shell --run "scripts/test.sh clean"
 
 fpga-build:
-	nix-shell --run "make clean setup CORE=$(CORE) INIT_MEM=$(INIT_MEM) USE_EXTMEM=$(USE_EXTMEM) && make -C $(BUILD_DIR) fpga-sw-build BOARD=$(BOARD)" && make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
+	nix-shell --run "make clean setup && make -C $(BUILD_DIR) fpga-sw-build BOARD=$(BOARD)" && make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
 
 fpga-run: fpga-build
 	make -C $(BUILD_DIR)/ fpga-run BOARD=$(BOARD)
 
 
 doc-build: 
-	nix-shell --run "make clean setup CORE=$(CORE) && make -C $(BUILD_DIR) doc-build"
+	nix-shell --run "make clean setup && make -C $(BUILD_DIR) doc-build"
 
 py2-doc-build:
 	nix-shell --run "py2hwsw --py2hwsw_docs && make -C py2hwsw_generated_docs/document/ build"

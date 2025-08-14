@@ -35,7 +35,7 @@ ifeq ($(SYN),1)
 VFLAGS+=-d SYN
 endif
 
-xvlog.log: $(VHDR) $(VSRC) $(HEX)
+xvlog.log: $(VHDR) $(VSRC) $(BUILD_DEPS)
 	xvlog $(VFLAGS) $(VSRC)
 
 xelab.log : xvlog.log 

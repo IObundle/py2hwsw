@@ -32,7 +32,7 @@ PLATFORM_RISCV_ISA = rv32imac
 # PLATFORM_RISCV_CODE_MODEL = medany
 
 # Firmware load address configuration. This is mandatory.
-FW_TEXT_START=0x80000000
+FW_TEXT_START=0x00000000
 
 # Optional parameter for path to external FDT
 # FW_FDT_PATH="path to platform flattened device tree file"
@@ -53,11 +53,11 @@ FW_JUMP=y
 # This needs to be 4MB aligned for 32-bit support
 # This needs to be 2MB aligned for 64-bit support
 ifeq ($(PLATFORM_RISCV_XLEN), 32)
-FW_JUMP_ADDR=0x80400000
+FW_JUMP_ADDR=0x00400000
 else
-FW_JUMP_ADDR=0x80200000
+FW_JUMP_ADDR=0x00200000
 endif
-FW_JUMP_FDT_ADDR=0x80F80000
+FW_JUMP_FDT_ADDR=0x00F80000
 
 #
 # Firmware with payload configuration.
@@ -67,11 +67,11 @@ FW_JUMP_FDT_ADDR=0x80F80000
 FW_PAYLOAD=n
 # This needs to be 4MB aligned for 32-bit support
 # This needs to be 2MB aligned for 64-bit support
-ifeq ($(PLATFORM_RISCV_XLEN), 32)
-FW_PAYLOAD_OFFSET=0x400000
-else
-FW_PAYLOAD_OFFSET=0x200000
-endif
+# ifeq ($(PLATFORM_RISCV_XLEN), 32)
+# FW_PAYLOAD_OFFSET=0x400000
+# else
+# FW_PAYLOAD_OFFSET=0x200000
+# endif
 # FW_PAYLOAD_ALIGN=0x1000
 # FW_PAYLOAD_PATH="path to next boot stage binary image file"
-FW_PAYLOAD_FDT_ADDR=0x80F80000
+# FW_PAYLOAD_FDT_ADDR=0x00F80000

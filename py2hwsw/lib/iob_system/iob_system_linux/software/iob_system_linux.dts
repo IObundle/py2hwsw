@@ -7,8 +7,8 @@
 / {
     #address-cells = <1>;
     #size-cells = <1>;
-    model = "IOb-SoC, VexRiscv";
-    compatible = "IOb-SoC, VexRiscv";
+    model = "IOb-System-Linux, VexRiscv";
+    compatible = "IOb-System-Linux, VexRiscv";
     cpus {
         #address-cells = <0x1>;
         #size-cells = <0x0>;
@@ -52,7 +52,7 @@
     soc {
         #address-cells = <1>;
         #size-cells = <1>;
-        compatible = "iobundle,iob-soc", "simple-bus";
+        compatible = "iobundle,iob-system-linux", "simple-bus";
         ranges;
         // Don't launch driver of UART0 because it's already used by OpenSBI
         //uart0: uart@/*UART0_BASE_MACRO*/ {

@@ -67,12 +67,18 @@ def setup(py_params_dict):
     #
     # Ports
     #
-    attributes_dict["ports"] = [
-        {
-            "name": "clk_en_rst_s",
-            "descr": "Clock, clock enable and reset",
-            "signals": {"type": "iob_clk"},
-        },
+    attributes_dict["ports"] = []
+    # IOb to IOb converter does not need clk interface
+    if params["subordinate_if"] != "iob" or params["manager_if"] != "iob":
+        attributes_dict["ports"].append(
+            {
+                "name": "clk_en_rst_s",
+                "descr": "Clock, clock enable and reset",
+                "signals": {"type": "iob_clk"},
+            }
+        )
+
+    attributes_dict["ports"] += [
         {
             "name": "s_s",
             "descr": "Subordinate port",

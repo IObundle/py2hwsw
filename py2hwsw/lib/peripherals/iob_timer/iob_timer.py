@@ -15,14 +15,6 @@ def setup(py_params_dict):
                 "max": "NA",
                 "descr": "Data bus width",
             },
-            {
-                "name": "WDATA_W",
-                "type": "P",
-                "val": "1",
-                "min": "NA",
-                "max": "8",
-                "descr": "",
-            },
         ],
         "ports": [
             {

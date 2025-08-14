@@ -63,6 +63,12 @@ def setup(py_params_dict):
     #
     # Blocks
     #
+    converter_connect = {
+        "s_s": "macc_s",
+        "m_m": "macc_cbus",
+    }
+    if params["csr_if"] != "iob":
+        converter_connect["clk_en_rst_s"] = "clk_en_rst_s"
     attributes_dict["subblocks"] = [
         {
             "core_name": "iob_macc",
@@ -84,11 +90,7 @@ def setup(py_params_dict):
                 "ADDR_W": 4,
                 "DATA_W": "DATA_W",
             },
-            "connect": {
-                "clk_en_rst_s": "clk_en_rst_s",
-                "s_s": "macc_s",
-                "m_m": "macc_cbus",
-            },
+            "connect": converter_connect,
         },
     ]
 

@@ -22,3 +22,9 @@ QUARTUS_SEED ?=5
 
 ROOT_DIR :=../..
 include $(ROOT_DIR)/software/sw_build.mk
+
+# include fpga build segment of child systems
+# child systems can add their own child_fpga_build.mk without having to override this one.
+ifneq ($(wildcard child_fpga_build.mk),)
+include child_fpga_build.mk
+endif

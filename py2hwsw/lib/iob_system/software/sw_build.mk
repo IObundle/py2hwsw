@@ -97,3 +97,8 @@ EMUL_SRC+=src/iob_printf.c
 EMUL_SRC+=$(addprefix src/,$(addsuffix .c,$(PERIPHERALS)))
 EMUL_SRC+=$(addprefix src/,$(addsuffix _csrs_pc_emul.c,$(PERIPHERALS)))
 
+# include software build segment of child systems
+# child systems can add their own child_sw_build.mk without having to override this one.
+ifneq ($(wildcard $(ROOT_DIR)/software/child_sw_build.mk),)
+include $(ROOT_DIR)/software/child_sw_build.mk
+endif

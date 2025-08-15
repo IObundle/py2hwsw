@@ -100,8 +100,11 @@ iob_system_linux_firmware.bin: ../../software/iob_system_linux_firmware.bin
 
 
 # Linux specific targets
-Image rootfs.cpio.gz fw_jump.bin iob_system_linux.dtb:
+fw_jump.bin iob_system_linux.dtb:
 	cp $(OS_DIR)/software/OS_build/$@ .
+
+Image rootfs.cpio.gz:
+	cp $(ROOT_DIR)/software/src/$@ .
 
 ifeq ($(SIMULATION),1)
 FLOW_DIR = $(ROOT_DIR)/hardware/simulation

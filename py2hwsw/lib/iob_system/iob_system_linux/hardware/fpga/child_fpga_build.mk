@@ -31,7 +31,7 @@ LOG_STR:=-C minicom_out.log $(FAKE_STDOUT) || cat minicom_out.log
 HOME_STR:=HOME=$$(pwd)
 # Append minicom to interact with linux after running console.
 # Always exit with code 0 (since linux is terminated with CTRL-C).
-CONSOLE_CMD += && (($(HOME_STR) $(TERM_STR) minicom iobundle.dfl $(SCRIPT_STR) $(LOG_STR) || (exit 0)) $(RUN_MINICOM_IN_BACKGROUND) )
+CONSOLE_CMD +=$(PYTHON_DIR)/console.py -s $(BOARD_SERIAL_PORT) && (($(HOME_STR) $(TERM_STR) minicom iobundle.dfl $(SCRIPT_STR) $(LOG_STR) || (exit 0)) $(RUN_MINICOM_IN_BACKGROUND) )
 endif # RUN_LINUX
 
 

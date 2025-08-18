@@ -11,9 +11,6 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../scr
 
 from iob_system_utils import update_params
 
-# TODO: use the following to interact with linux
-# CONSOLE_CMD ?=$(PYTHON_DIR)/console.py -s $(BOARD_SERIAL_PORT); screen $(BOARD_SERIAL_PORT) 115200
-
 
 def setup(py_params_dict):
     params = {
@@ -246,32 +243,6 @@ def setup(py_params_dict):
                             "interrupt_o": "uart_interrupt",
                         },
                     },
-                    # {
-                    #     "core_name": "iob_eth",
-                    #     "instance_name": "ETH0",
-                    #     "instance_description": "Ethernet interface",
-                    #     "peripheral_addr_w": 12,
-                    #     "parameters": {
-                    #         "AXI_ID_W": "AXI_ID_W",
-                    #         "AXI_LEN_W": "AXI_LEN_W",
-                    #         "AXI_ADDR_W": params["addr_w"],
-                    #         "AXI_DATA_W": params["data_w"],
-                    #     },
-                    #     "connect": {
-                    #         "clk_en_rst_s": "clk_en_rst_s",
-                    #         "axi_m": (
-                    #             "eth_axi",
-                    #             [
-                    #                 "eth_axi_arid[0]",
-                    #                 "eth_axi_rid[0]",
-                    #                 "eth_axi_awid[0]",
-                    #                 "eth_axi_bid[0]",
-                    #             ],
-                    #         ),
-                    #         "inta_o": "ethernet_interrupt",
-                    #         "phy_io": "phy_io",
-                    #     },
-                    # },
                     # {
                     #     # Instantiate a VERSAT core from: https://github.com/IObundle/iob-versat
                     #     "core_name": "iob_versat",

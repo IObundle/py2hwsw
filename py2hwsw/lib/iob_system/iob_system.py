@@ -281,6 +281,27 @@ def setup(py_params_dict):
             },
             # NOTE: Add ports for peripherals here
         ]
+        if params["use_ethernet"]:
+            attributes_dict["ports"] += [
+                {
+                    "name": "phy_rst_o",
+                    "descr": "",
+                    "signals": [
+                        {
+                            "name": "phy_rstn_o",
+                            "width": "1",
+                            "descr": "Ethernet reset signal for PHY.",
+                        },
+                    ],
+                },
+                {
+                    "name": "mii_io",
+                    "descr": "Ethernet MII interface",
+                    "signals": {
+                        "type": "mii",
+                    },
+                },
+            ]
     if params["cpu"] == "none":
         attributes_dict["ports"] += [
             {
@@ -450,6 +471,16 @@ def setup(py_params_dict):
             # Peripheral cbus wires added automatically
             # NOTE: Add other peripheral wires here
         ]
+        if params["use_ethernet"]:
+            attributes_dict["wires"] += [
+                {
+                    "name": "eth0_interrupt",
+                    "descr": "Ethernet interrupt",
+                    "signals": [
+                        {"name": "eth0_interrupt", "width": 1},
+                    ],
+                },
+            ]
     attributes_dict["subblocks"] = []
     if params["cpu"] != "none":
         attributes_dict["subblocks"] += [
@@ -685,6 +716,36 @@ def setup(py_params_dict):
             },
             # NOTE: Instantiate other peripherals here, using the 'is_peripheral' flag
         ]
+        if params["use_ethernet"]:
+            attributes_dict["subblocks"] += [
+                {
+                    "core_name": "iob_eth",
+                    "instance_name": "ETH0",
+                    "instance_description": "Ethernet interface",
+                    "is_peripheral": True,
+                    "parameters": {
+                        "AXI_ID_W": "AXI_ID_W",
+                        "AXI_LEN_W": "AXI_LEN_W",
+                        "AXI_ADDR_W": params["addr_w"],
+                        "AXI_DATA_W": params["data_w"],
+                    },
+                    "connect": {
+                        "clk_en_rst_s": "clk_en_rst_s",
+                        "axi_m": (
+                            "eth_axi",
+                            [
+                                "eth_axi_arid[0]",
+                                "eth_axi_rid[0]",
+                                "eth_axi_awid[0]",
+                                "eth_axi_bid[0]",
+                            ],
+                        ),
+                        "inta_o": "eth0_interrupt",
+                        "phy_rst_o": "phy_rst_o",
+                        "mii_io": "mii_io",
+                    },
+                },
+            ]
     attributes_dict["superblocks"] = [
         # Synthesis module (needed for macros)
         {

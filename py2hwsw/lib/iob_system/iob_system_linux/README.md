@@ -6,23 +6,12 @@ SPDX-License-Identifier: MIT
 
 # IOb-System-Linux
 
-[SoCLinux](https://nlnet.nl/project/SoCLinux/) is an open-source project that aims to configure and generate a Linux system for RISC-V processors, focusing on creating a robust and maintainable environment for designing and testing IP cores.
-The project builds upon the existing open-source Py2HWSW framework powering the IOb-SoC platform, enhancing the functionality and portability of IP cores, by using as examples the key IOb-Cache, IOb-Eth, and IOb-UART16550 open-source cores.
-By providing a Linux IP core testbed, SoCLinux enables developers to build and test Linux drivers for new IP cores quickly, accelerating the production of high-quality IP cores, open-source or otherwise. 
-The project aims to establish a widely adopted and maintainable ecosystem for IP core development, benefiting the broader community of IP core providers and users.
-SoCLinux will leverage the IP-XACT standard (IEEE 1685) for IP core packaging, and seamlessly exchange IP cores with FuseSoC, a well-known open-source IP core package manager.
+The IOb-System-Linux System-on-Chip (SoC) is a Linux system which builds upon the existing functionality of the [IOb-System](https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/iob_system) SoC. This IOb-System-Linux SoC is part of the wider [SoCLinux](https://nlnet.nl/project/SoCLinux/) project.
 
-IOb-System-Linux is based on the IOb-System System-on-Chip (SoC) template from the Py2HWSW library.
-This system was initially developed during for the [OpenCryptoLinux](https://nlnet.nl/project/OpenCryptoLinux/) project.
+For users looking to create Linux-compatible SoC designs, the [SoCLinux template](https://github.com/IObundle/soc-linux) is available.
+The SoCLinux template is a derivative system of the IOb-System-Linux, inheriting all of its components by default.
 
-## Differences to IOb-System
-This section outlines the distinctions between IOb-System and IOb-System-Linux.
-
-Compared to IOb-System, IOb-System-Linux features a distinct CPU and employs AXI in the internal signals, deviating from the IOb-bus used by IOb-System. Another significant difference is the placement of firmware, as the one in IOb-System-Linux always resides in external memory.
-
-Additionally, the bootloader in IOb-System-Linux differs from that in IOb-System. In IOb-System-Linux, the bootloader is directly loaded into internal RAM, whereas in IOb-System, the bootloader binary starts in ROM and is then copied to RAM.
-
-The boot control unit in IOb-System-Linux, unlike IOb-System, is a distinct module and exclusively manages the boot process state. On the software side, the IOb-System-Linux bootloader initially loads a file named iob_mem.config, which specifies the files and their respective memory addresses to be copied into external memory.
+The IOb-System-Linux SoC is based on the system developed during the [OpenCryptoLinux](https://nlnet.nl/project/OpenCryptoLinux/) project.
 
 <!--
 TODO: automate this in Makefile
@@ -87,18 +76,7 @@ Checkout [this tutorial](document/device_driver_tutorial.md) for more details on
 how to add a new device to be tested.
 
 # Acknowledgement
-This project is funded through [NGI Zero Core](https://nlnet.nl/core), a fund established by [NLnet](https://nlnet.nl) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu) program. Learn more at the [NLnet project page](https://nlnet.nl/project/SoCLinux).
+The SoCLinux project is funded through [NGI Zero Core](https://nlnet.nl/core), a fund established by [NLnet](https://nlnet.nl) with financial support from the European Commission's [Next Generation Internet](https://ngi.eu) program. Learn more at the [NLnet project page](https://nlnet.nl/project/SoCLinux).
 
 [<img src="https://nlnet.nl/logo/banner.png" alt="NLnet foundation logo" width="20%" />](https://nlnet.nl)
 [<img src="https://nlnet.nl/image/logos/NGI0_tag.svg" alt="NGI Zero Logo" width="20%" />](https://nlnet.nl/core)
-
-
-
-The [OpenCryptoLinux](https://nlnet.nl/project/OpenCryptoLinux/) project was funded through the NGI Assure Fund, a fund established by NLnet with financial support from the European Commission's Next Generation Internet programme, under the aegis of DG Communications Networks, Content and Technology under grant agreement No 957073.
-
-<table>
-    <tr>
-        <td align="center" width="50%"><img src="https://nlnet.nl/logo/banner.svg" alt="NLnet foundation logo" style="width:90%"></td>
-        <td align="center"><img src="https://nlnet.nl/image/logos/NGIAssure_tag.svg" alt="NGI Assure logo" style="width:90%"></td>
-    </tr>
-</table>

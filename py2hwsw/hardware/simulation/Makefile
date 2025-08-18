@@ -94,7 +94,7 @@ VSRC:=$(filter-out ./src/$(NAME)_tb.v, $(VSRC))
 endif
 
 
-build: $(VHDR) $(VSRC) $(HEX) remote_build_dir
+build: $(VHDR) $(VSRC) $(BUILD_DEPS) remote_build_dir
 ifeq ($(SIM_SERVER),)
 	make comp
 else
@@ -178,7 +178,7 @@ endif
 
 test: $(TEST_LIST)
 
-build_hex: $(HEX)
+build_deps: $(BUILD_DEPS)
 
 debug:
 	@echo NAME=$(NAME)

@@ -76,6 +76,8 @@ def setup(py_params_dict):
             dst = os.path.join(py_params_dict["build_dir"], src_file)
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             shutil.copy2(src, dst)
+            # Hack for Nix: Files copied from Nix's py2hwsw package do not contain write permissions
+            os.system("chmod -R ug+w " + dst)
     #     iob_soc_scripts = [
     #         "terminalMode",
     #         "makehex",

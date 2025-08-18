@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 IObundle, Lda
+# SPDX-FileCopyrightText: 2025 IObundle
 #
 # SPDX-License-Identifier: MIT
 

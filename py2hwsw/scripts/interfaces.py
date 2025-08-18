@@ -244,6 +244,13 @@ if_details = [
         "full_name": "RS232",
     },
     {
+        "name": "mii",
+        "vendor": "Generic",
+        "lib": "MII",
+        "version": "1.0",
+        "full_name": "Media Independent Interface",
+    },
+    {
         "name": "wb",
         "vendor": "OPENCORES",
         "lib": "Wishbone",
@@ -334,6 +341,8 @@ class _interface:
             return "ahb"
         elif isinstance(self, RS232Interface):
             return "rs232"
+        elif isinstance(self, MIIInterface):
+            return "mii"
         elif isinstance(self, wishboneInterface):
             if self.is_full:
                 return "wb_full"
@@ -1721,6 +1730,221 @@ class RS232Interface(_interface):
 
 
 #
+# MII
+#
+
+
+@dataclass
+class MIIInterface(_interface):
+    """Class to represent an Media Independent Interface (MII) for generation"""
+
+    variants = ["mii", "rmii", "gmii", "rgmii"]
+
+    # Variant of the MII interface
+    variant: str = "mii"
+    management_signals: bool = True
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.__set_signals()
+
+    def __set_signals(self):
+        """Set signals for the MII interface."""
+        if self.variant not in self.variants:
+            raise ValueError("MII interface variant must be one of: " + ", ".join(self.variants))
+        elif self.variant == "mii":
+            self._signals += [
+                iob_signal(
+                    name=f"{self.variant}_tx_clk_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} transmit clock",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_txd_o",
+                    width=4,
+                    descr=f"{self.variant.upper()} transmit data (lsb transmitted first)",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_tx_en_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} transmit enable",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_tx_er_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} transmit error (optional)",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rx_clk_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} receive clock",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rxd_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} receive data (lsb received first)",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rx_dv_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} receive data valid",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rx_er_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} receive error",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_crs_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} carrier sense",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_col_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} collision detect",
+                ),
+            ]
+        elif self.variant == "rmii":
+            self._signals += [
+                iob_signal(
+                    name=f"{self.variant}_ref_clk_io",
+                    width=1,
+                    descr=f"{self.variant.upper()} continuous 50 MHz reference clock. Direction varies, as it may be driven by PHY, MAC, or External clock source.",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_txd_o",
+                    width=2,
+                    descr=f"{self.variant.upper()} transmit data",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_tx_en_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} TX enable. When high, clock data on TXD to the transmitter",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rxd_i",
+                    width=2,
+                    descr=f"{self.variant.upper()} receive data",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_crs_dv_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} CSR and DV. Carrier Sense (CRS) and RX_Data Valid (RX_DV) multiplexed on alternate clock cycles. In 10 Mbit/s mode, it alternates every 10 clock cycles.",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rx_er_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} receive error (optional)",
+                ),
+            ]
+        elif self.variant == "gmii":
+            self._signals += [
+                iob_signal(
+                    name=f"{self.variant}_gtxclk_io",
+                    width=1,
+                    descr=f"{self.variant.upper()} clock signal for gigabit TX signals (125 MHz)",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_txclk_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} clock signal for 10/100 Mbit/s signals",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_txd_o",
+                    width=8,
+                    descr=f"{self.variant.upper()} data to be transmitted",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_txen_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} transmitter enable",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_txer_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} transmitter error (used to intentionally corrupt a packet, if necessary)",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rxclk_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} received clock signal (recovered from incoming received data)",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rxd_i",
+                    width=8,
+                    descr=f"{self.variant.upper()} received data",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rxdv_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} data received is valid",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rxer_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} data received has errors",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_cs_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} collision detect (half-duplex connections only)",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_col_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} carrier sense (half-duplex connections only)",
+                ),
+            ]
+        elif self.variant == "rgmii":
+            self._signals += [
+                iob_signal(
+                    name=f"{self.variant}_txc_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} transmit clock signal",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_txd_o",
+                    width=4,
+                    descr=f"{self.variant.upper()} data to be transmitted",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_tx_ctl_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} multiplexing of transmitter enable and transmitter error",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rxc_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} received clock signal (recovered from incoming received data)",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rxd_i",
+                    width=4,
+                    descr=f"{self.variant.upper()} received data",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_rx_ctl_i",
+                    width=1,
+                    descr=f"{self.variant.upper()} multiplexing of data received is valid and receiver error",
+                ),
+            ]
+
+        if self.management_signals:
+            self._signals += [
+                iob_signal(
+                    name=f"{self.variant}_mdio_io",
+                    width=1,
+                    descr=f"{self.variant.upper()} MDIO I/O.",
+                ),
+                iob_signal(
+                    name=f"{self.variant}_mdc_o",
+                    width=1,
+                    descr=f"{self.variant.upper()} MDC.",
+                ),
+            ]
+
+#
 # Wishbone
 #
 
@@ -1880,6 +2104,9 @@ def create_interface(
     ahb_size_w = widths.get("AHB_SIZE_W", 3)
     # rs232
     n_pins = widths.get("N_PINS", 4)
+    # mii
+    variant = widths.get("VARIANT", "mii")
+    management_signals = widths.get("MANAGEMENT_SIGNALS", True)
 
     # Check if widths are integers or strings
     # TODO: except for addr_w, all should later be only an integer
@@ -2121,6 +2348,16 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 n_pins=n_pins,
+            )
+        case "mii":
+            interface = MIIInterface(
+                if_direction=if_direction,
+                prefix=prefix,
+                mult=mult,
+                file_prefix=file_prefix,
+                portmap_port_prefix=portmap_port_prefix,
+                variant=variant,
+                management_signals=management_signals,
             )
         case "wb":
             interface = wishboneInterface(

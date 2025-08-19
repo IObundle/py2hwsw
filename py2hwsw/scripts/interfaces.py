@@ -375,6 +375,8 @@ class _interface:
             return "output"
         elif direction == "output":
             return "input"
+        elif direction == "inout":
+            return "inout"
         else:
             print(f"ERROR: __reverse_direction: invalid argument {direction}.")
             exit(1)
@@ -391,7 +393,7 @@ class _interface:
     @staticmethod
     def __get_tbsignal_type(direction):
         """Get the genre of a signal for the testbench."""
-        if direction == "input":
+        if direction == "input" or direction == "inout":
             return "wire"
         elif direction == "output":
             return "reg"

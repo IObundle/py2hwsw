@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 
+import sys
 from dataclasses import dataclass, field
 
 from iob_base import (
@@ -34,16 +35,21 @@ class iob_portmap:
         """
         # wire must be iob_wire or str
         if isinstance(wire, str):
+            # Port connects to a constant
             if len(self.port.signals) != 1:
                 fail_with_msg(
                     f"{iob_colors.FAIL}Port '{self.port.name}' has more than one signal but is connected to one constant value '{self.e_connect}'!{iob_colors.ENDC}",
                     ValueError,
                 )
             else:
-                validate_verilog_const(value=wire, direction=self.port.signals[0].direction)
+                validate_verilog_const(
+                    value=wire, direction=self.port.signals[0].direction
+                )
         elif isinstance(wire, iob_wire):
+            # Port connects to an external wire
             if self.port.interface and wire.interface:
                 if type(self.port.interface) == type(wire.interface):
+                    # Port and wire interfaces are the same
                     for signal in self.port.signals:
                         # If it is a signal reference, get the real signal
                         if isinstance(signal, iob_signal_reference):
@@ -51,15 +57,17 @@ class iob_portmap:
                         search_name = signal.name.replace(
                             self.port.interface.prefix, wire.interface.prefix, 1
                         )
-                        if self.port.name[-2] != wire.name[-2]:
+                        if self.port.name[-2:] != wire.name[-2:]:
                             # Swap the suffixes if the port is a master/slave port
                             if wire.name[-2:] in ["_s", "_m"]:
                                 if search_name[-2:] == "_i":
                                     search_name += search_name[:-2] + "_o"
-                                else:
+                                elif search_name[-2:] == "_o":
                                     search_name += search_name[:-2] + "_i"
+                                # _io stays the same
                             else:
-                                search_name = search_name[:-2]
+                                # Remove direction suffix
+                                search_name = search_name.rsplit("_", 1)[0]
 
                         e_signal = find_obj_in_list(
                             wire.signals, search_name, get_real_signal
@@ -116,8 +124,7 @@ class iob_portmap:
 
 
 def get_portmap_port(portmap):
-    """Given a portmap reference, return the associated port
-    """
+    """Given a portmap reference, return the associated port"""
     port = None
     if isinstance(portmap, iob_portmap):
         port = portmap.port

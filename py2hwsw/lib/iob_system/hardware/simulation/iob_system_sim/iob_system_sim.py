@@ -6,6 +6,16 @@
 def setup(py_params_dict):
     params = py_params_dict["iob_system_params"]
 
+    # Size of RAM for ethernet's dma
+    ETH_RAM_ADDR_W = 14
+
+    tb_peripherals = ["iob_uart"]
+    if params["use_ethernet"]:
+        tb_peripherals += ["iob_eth", "eth_ram"]
+
+    periph_sel_bits = (len(tb_peripherals) - 1).bit_length()
+    periph_addr_w = 32 - periph_sel_bits
+
     attributes_dict = {
         "name": "iob_uut",
         "generate_hw": True,
@@ -66,26 +76,14 @@ def setup(py_params_dict):
             },
         },
         {
-            "name": "uart_s",
-            "descr": "Testbench uart csrs interface",
+            "name": "tb_s",
+            "descr": "Testbench iob interface",
             "signals": {
                 "type": "iob",
-                "ADDR_W": 3,
+                "ADDR_W": 32,
             },
         },
     ]
-    if params["use_ethernet"]:
-        attributes_dict["ports"] += [
-            {
-                "name": "ethernet_s",
-                "descr": "Testbench ethernet csrs interface",
-                "signals": {
-                    "type": "iob",
-                    "prefix": "ethernet_",
-                    "ADDR_W": 12,
-                },
-            },
-        ]
     if params["cpu"] == "none":
         attributes_dict["ports"] += [
             {
@@ -134,6 +132,15 @@ def setup(py_params_dict):
                 {"name": "rs232_rts"},
             ],
         },
+        {
+            "name": "uart_cbus",
+            "descr": "UART CSR bus",
+            "signals": {
+                "type": "iob",
+                "prefix": "uart_",
+                "ADDR_W": periph_addr_w,
+            },
+        },
     ]
     if params["use_extmem"]:
         attributes_dict["wires"] += [
@@ -162,49 +169,88 @@ def setup(py_params_dict):
     if params["use_ethernet"]:
         attributes_dict["wires"] += [
             {
+                "name": "eth_cbus",
+                "descr": "Ethernet CSR bus",
+                "signals": {
+                    "type": "iob",
+                    "prefix": "eth_",
+                    "ADDR_W": periph_addr_w,
+                },
+            },
+            {
+                "name": "eth_ram_iob",
+                "descr": "IOB bus to access Ethernet's RAM",
+                "signals": {
+                    "type": "iob",
+                    "ADDR_W": ETH_RAM_ADDR_W,
+                },
+            },
+            {
+                "name": "eth_ram_axi",
+                "descr": "AXI bus to access Ethernet's RAM",
+                "signals": {
+                    "type": "axi",
+                    "prefix": "eth_ram_",
+                    "ADDR_W": ETH_RAM_ADDR_W,
+                    "LEN_W": "AXI_LEN_W",
+                },
+            },
+            {
                 "name": "eth_axi",
                 "descr": "Ethernet AXI bus",
                 "signals": {
                     "type": "axi",
                     "prefix": "eth_",
+                    "ADDR_W": ETH_RAM_ADDR_W,
+                    "LEN_W": "AXI_LEN_W",
                 },
             },
             {
-                "name": "phy",
-                "descr": "PHY Interface Ports",
+                "name": "phy_rstn",
+                "descr": "",
                 "signals": [
-                    {"name": "eth_MTxClk", "width": "1"},
-                    {"name": "MTxEn", "width": "1"},
-                    {"name": "MTxD", "width": "4"},
-                    {"name": "MTxErr", "width": "1"},
-                    {"name": "eth_MRxClk", "width": "1"},
-                    {"name": "MRxDv", "width": "1"},
-                    {"name": "MRxD", "width": "4"},
-                    {"name": "MRxErr", "width": "1"},
-                    {"name": "eth_MColl", "width": "1"},
-                    {"name": "eth_MCrS", "width": "1"},
-                    {"name": "MDC", "width": "1"},
-                    {"name": "MDIO", "width": "1"},
-                    {"name": "phy_rstn", "width": "1"},
+                    {
+                        "name": "phy_rstn",
+                        "width": "1",
+                        "descr": "Issuer ethernet reset signal for PHY.",
+                    },
                 ],
             },
             {
-                "name": "eth_phy_invert",
-                "descr": "Invert order of signals in ethernet MII bus",
+                "name": "tb_phy_rstn",
+                "descr": "",
                 "signals": [
-                    {"name": "eth_MTxClk"},
-                    {"name": "MRxDv"},
-                    {"name": "MRxD"},
-                    {"name": "MRxErr"},
-                    {"name": "eth_MRxClk"},
-                    {"name": "MTxEn"},
-                    {"name": "MTxD"},
-                    {"name": "MTxErr"},
-                    {"name": "eth_MColl"},
-                    {"name": "eth_MCrS"},
-                    {"name": "eth_MDC", "width": "1"},
-                    {"name": "eth_MDIO", "width": "1"},
-                    {"name": "eth_phy", "width": "1"},
+                    {
+                        "name": "tb_phy_rstn",
+                        "width": "1",
+                        "descr": "Testbench ethernet reset signal for PHY.",
+                    },
+                ],
+            },
+            {
+                "name": "mii",
+                "descr": "Ethernet MII interface",
+                "signals": {
+                    "type": "mii",
+                },
+            },
+            {
+                "name": "mii_invert",
+                "descr": "Invert RX and TX signals of ethernet MII bus",
+                "signals": [
+                    {"name": "mii_tx_clk"},
+                    {"name": "mii_rxd"},
+                    {"name": "mii_rx_dv"},
+                    {"name": "mii_rx_er"},
+                    {"name": "mii_rx_clk"},
+                    {"name": "mii_txd"},
+                    {"name": "mii_tx_en"},
+                    {"name": "mii_tx_er"},
+                    {"name": "mii_crs"},
+                    {"name": "mii_col"},
+                    # Create new management signals for testbench eth
+                    {"name": "tb_mii_mdio", "width": "1"},
+                    {"name": "tb_mii_mdc", "width": "1"},
                 ],
             },
             {
@@ -213,6 +259,42 @@ def setup(py_params_dict):
                 "signals": [
                     {"name": "eth_interrupt"},
                 ],
+            },
+            # Wires for AXI ram
+            {
+                "name": "merge_s_axi",
+                "descr": "AXI subordinate bus for merge",
+                "signals": {
+                    "type": "axi",
+                    "prefix": "intercon_s_",
+                    "mult": 2,
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": "AXI_ADDR_W",
+                    "DATA_W": "AXI_DATA_W",
+                    "LOCK_W": 2,
+                },
+            },
+            {
+                "name": "merge_m_axi",
+                "descr": "AXI manager bus for merge",
+                "signals": {
+                    "type": "axi",
+                    "prefix": "intercon_m_",
+                    "mult": 1,
+                    "ID_W": "AXI_ID_W",
+                    "ADDR_W": "AXI_ADDR_W",
+                    "DATA_W": "AXI_DATA_W",
+                    "LOCK_W": 2,
+                },
+            },
+            {
+                "name": "eth_ram_mem",
+                "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
+                "signals": {
+                    "type": "ram_t2p_be",
+                    "ADDR_W": "AXI_ADDR_W - 2",
+                    "prefix": "ext_mem_",
+                },
             },
         ]
     #
@@ -237,11 +319,38 @@ def setup(py_params_dict):
         },
     ]
     if params["use_ethernet"]:
-        attributes_dict["subblocks"][-1]["connect"].update({"phy_io": "phy"})
+        attributes_dict["subblocks"][-1]["connect"].update({"mii_io": "mii"})
+        attributes_dict["subblocks"][-1]["connect"].update({"phy_rstn_o": "phy_rstn"})
     if params["use_extmem"]:
         attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
     if params["cpu"] == "none":
         attributes_dict["subblocks"][-1]["connect"].update({"iob_s": "iob_s"})
+    # Only add tb pbus split if there are more than one peripheral
+    if len(tb_peripherals) > 1:
+        attributes_dict["subblocks"] += [
+            {
+                "core_name": "iob_split",
+                "name": "tb_pbus_split",
+                "instance_name": "iob_pbus_split",
+                "instance_description": "Split between testbench peripherals",
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "reset_i": "split_reset",
+                    "input_s": "tb_s",
+                    "output_0_m": "uart_cbus",
+                },
+                "num_outputs": 1,
+                "addr_w": 32,
+            },
+        ]
+    # Connect ethernet and its RAM to pbus
+    if params["use_ethernet"]:
+        subordinate_num = attributes_dict["subblocks"][-1]["num_outputs"]
+        attributes_dict["subblocks"][-1]["num_outputs"] += 2
+        attributes_dict["subblocks"][-1]["connect"] |= {
+            f"output_{subordinate_num}_m": "eth_cbus",
+            f"output_{subordinate_num+1}_m": "eth_ram_iob",
+        }
     attributes_dict["subblocks"] += [
         {
             "core_name": "iob_uart",
@@ -250,11 +359,16 @@ def setup(py_params_dict):
             "csr_if": "iob",
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "iob_csrs_cbus_s": "uart_s",
+                "iob_csrs_cbus_s": ("uart_cbus", ["uart_iob_addr[2:0]"]),
                 "rs232_m": "rs232_invert",
             },
         },
     ]
+    if len(tb_peripherals) == 1:
+        # Connect uart directly to tb_s port if there is no tb_pbus_split
+        attributes_dict["subblocks"][-1]["connect"].update(
+            {"iob_csrs_cbus_s": ("tb_s", ["iob_addr_i[2:0]"])}
+        )
     if params["use_extmem"]:
         attributes_dict["subblocks"] += [
             {
@@ -305,15 +419,77 @@ def setup(py_params_dict):
                 "parameters": {
                     "AXI_ID_W": "AXI_ID_W",
                     "AXI_LEN_W": "AXI_LEN_W",
-                    "AXI_ADDR_W": "AXI_ADDR_W",
-                    "AXI_DATA_W": "AXI_DATA_W",
+                    "AXI_ADDR_W": ETH_RAM_ADDR_W,
+                    "AXI_DATA_W": 32,
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_csrs_cbus_s": "ethernet_s",
+                    "iob_csrs_cbus_s": ("eth_cbus", ["eth_iob_addr[11:0]"]),
                     "axi_m": "eth_axi",
                     "inta_o": "eth_int",
-                    "phy_io": "eth_phy_invert",
+                    "phy_rstn_o": "phy_rstn",
+                    "mii_io": "mii_invert",
+                },
+            },
+            # Create AXI merge and RAM for ethernet
+            {
+                "core_name": "iob_iob2axi",
+                "instance_name": "eth_iob2axi",
+                "parameters": {
+                    "ADDR_W": ETH_RAM_ADDR_W,
+                    "DATA_W": 32,
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "iob_s": "eth_ram_iob",
+                    "axi_m": "eth_ram_axi",
+                },
+            },
+            {
+                "core_name": "iob_axi_merge",
+                "name": f"{params['name']}_eth_merge",
+                "instance_name": f"eth_axi_merge",
+                "instance_description": f"AXI merge for ETH RAM",
+                "parameters": {
+                    "ID_W": "AXI_ID_W",
+                    "LEN_W": "AXI_LEN_W",
+                },
+                "num_subordinates": 2,
+                "addr_w": ETH_RAM_ADDR_W,
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    "reset_i": "rst_i",
+                    "s_0_s": "eth_ram_axi",
+                    "s_1_s": "eth_axi",
+                    "m_m": f"eth_axi_ram",
+                },
+            },
+            {
+                "core_name": "iob_axi_ram",
+                "instance_name": "eth_axi_ram_inst",
+                "instance_description": "AXI RAM for ethernet",
+                "parameters": {
+                    "ID_WIDTH": "AXI_ID_W",
+                    "ADDR_WIDTH": ETH_RAM_ADDR_W,
+                    "DATA_WIDTH": 32,
+                },
+                "connect": {
+                    "clk_i": "clk",
+                    "rst_i": "rst",
+                    "axi_s": "eth_axi_ram",
+                    "external_mem_bus_m": "eth_ram_mem",
+                },
+            },
+            {
+                "core_name": "iob_ram_t2p_be",
+                "instance_name": "eth_ram_t2p_be_inst",
+                "instance_description": "ETH AXI RAM external memory",
+                "parameters": {
+                    "ADDR_W": ETH_RAM_ADDR_W - 2,
+                    "DATA_W": 32,
+                },
+                "connect": {
+                    "ram_t2p_be_s": "eth_ram_mem",
                 },
             },
         ]
@@ -356,5 +532,16 @@ def setup(py_params_dict):
 """,
             },
         ]
+
+    # Calculate and print testbench peripheral memory map
+    print("------------------------------------------------------")
+    print("Testbench memory map:")
+    current_addr = 0
+    for peripheral in tb_peripherals:
+        print(
+            f"[0x{current_addr:08x}-0x{(current_addr+(1<<periph_addr_w)-1):08x}]: {peripheral} ({periph_addr_w} bits)"
+        )
+        current_addr += 1 << periph_addr_w
+    print("------------------------------------------------------")
 
     return attributes_dict

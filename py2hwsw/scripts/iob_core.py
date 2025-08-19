@@ -262,7 +262,7 @@ class iob_core(iob_module, iob_instance):
 
         # Create memory wrapper for top module if any memory interfaces are used
         if self.is_top_module or self.is_tester:
-            # Check if any memory interfaces are used and are a master
+            # Check if any memory interfaces are used and are a manager
             found_mem_if = False
             for port in self.ports:
                 if (

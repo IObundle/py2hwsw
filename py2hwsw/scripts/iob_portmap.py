@@ -58,7 +58,7 @@ class iob_portmap:
                             self.port.interface.prefix, wire.interface.prefix, 1
                         )
                         if self.port.name[-2:] != wire.name[-2:]:
-                            # Swap the suffixes if the port is a master/slave port
+                            # Swap the suffixes if the port is a manager/subordinate port
                             if wire.name[-2:] in ["_s", "_m"]:
                                 if search_name[-2:] == "_i":
                                     search_name += search_name[:-2] + "_o"

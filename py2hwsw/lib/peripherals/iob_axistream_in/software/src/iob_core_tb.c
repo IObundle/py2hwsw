@@ -23,9 +23,9 @@ int iob_core_tb() {
   // print the reset message
   printf("Reset complete\n");
 
-  // axistream_in connected to first master of split
+  // axistream_in connected to first manager of split
   iob_axistream_in_csrs_init_baseaddr(0);
-  // axistream_out connected to second master of split
+  // axistream_out connected to second manager of split
   iob_axistream_out_csrs_init_baseaddr(1 << 5);
 
   printf("Configure AXIStream IN\n");

@@ -449,11 +449,11 @@ class _interface:
             self.__write_single_wire(fout, wire, True)
 
     def _write_m_tb_wire(self, fout):
-        """Write master testbench wires to the file."""
+        """Write manager testbench wires to the file."""
         self.__write_tb_wire(fout)
 
     def _write_s_tb_wire(self, fout):
-        """Write slave testbench wires to the file."""
+        """Write subordinate testbench wires to the file."""
         self._write_m_tb_wire(fout)
 
     #
@@ -467,12 +467,12 @@ class _interface:
         fout.write(direction + width_str + name + "," + "\n")
 
     def _write_m_port(self, fout):
-        """Write master ports to the file."""
+        """Write manager ports to the file."""
         for port in self.get_signals():
             self.__write_single_port(fout, port)
 
     def _write_s_port(self, fout):
-        """Write slave ports to the file."""
+        """Write subordinate ports to the file."""
         self._write_m_port(fout)
 
     #
@@ -1595,7 +1595,7 @@ class AHBInterface(_interface):
             ),
             iob_signal(
                 name="ahb_mastlock_o",
-                descr="AHB master lock signal.",
+                descr="AHB manager lock signal.",
             ),
             iob_signal(
                 name="ahb_prot_o",

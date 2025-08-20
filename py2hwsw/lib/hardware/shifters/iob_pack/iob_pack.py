@@ -174,18 +174,6 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "wrap_acc_nxt",
-                "descr": "Wrap next wire",
-                "signals": [
-                    {
-                        "name": "wrap_acc_nxt",
-                        "isvar": True,
-                        "width": "$clog2(DATA_W)+1",
-                        "descr": "Wrap Next Wire",
-                    },
-                ],
-            },
-            {
                 "name": "wrap_acc",
                 "descr": "Wrap current wire",
                 "signals": [
@@ -219,18 +207,6 @@ def setup(py_params_dict):
                     },
                 ],
             },
-            {
-                "name": "pcnt_nxt",
-                "descr": "Push count next wire",
-                "signals": [
-                    {
-                        "name": "pcnt_nxt",
-                        "isvar": True,
-                        "width": "2",
-                        "descr": "Push Count Next Wire",
-                    },
-                ],
-            },
         ],
         "subblocks": [
             {
@@ -261,46 +237,16 @@ def setup(py_params_dict):
                     ),
                 },
             },
-            {
-                "core_name": "iob_reg",
-                "instance_name": "wrap_acc_reg",
-                "port_params": {
-                    "clk_en_rst_s": "c_a_r",
-                },
-                "parameters": {
-                    "DATA_W": "$clog2(DATA_W)+1",
-                    "RST_VAL": "{$clog2(DATA_W) + 1{1'b0}}",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "data_i": "wrap_acc_nxt",
-                    "data_o": "wrap_acc",
-                },
-            },
-            {
-                "core_name": "iob_reg",
-                "instance_name": "pcnt_reg",
-                "port_params": {
-                    "clk_en_rst_s": "c_a_r",
-                },
-                "parameters": {
-                    "DATA_W": "2",
-                    "RST_VAL": "2'b0",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "data_i": "pcnt_nxt",
-                    "data_o": "pcnt",
-                },
-            },
         ],
         "comb": {
             "code": """
-                read_o  = read;
+
                 write_o = pop;
                   //control logic
     pop_width    = wrap_i ? wrap_acc : DATA_W;
     wrap_acc_int = {1'd0, wrap_acc} + {1'd0, width_i};
+    wrap_acc_rst = rst_i;
+    pcnt_rst     = rst_i;
 
     //defaults
     pop          = 1'b0;

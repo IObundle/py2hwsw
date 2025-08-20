@@ -19,6 +19,7 @@ def setup(py_params_dict):
     iob_system_default_params = {
         "use_intmem": False,
         "use_extmem": True,
+        "use_ethernet": True,
         "mem_addr_w": 26,
         "bootrom_addr_w": 15,
         "fw_baseaddr": 0,

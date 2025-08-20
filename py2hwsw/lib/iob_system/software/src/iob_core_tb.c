@@ -11,9 +11,13 @@
 
 #define FREQ 100000000
 #define BAUD 3000000
+#define UART0_BASE 0x0
 
 #ifdef IOB_SYSTEM_USE_ETHERNET
-#include "iob_eth_driver_tb.h"
+#include "iob_eth_tb_driver.h"
+// Configure testbench memory map
+#define ETH0_BASE 0x40000000
+#define ETH0_RAM_BASE 0x80000000
 #endif
 
 int iob_core_tb() {
@@ -22,6 +26,7 @@ int iob_core_tb() {
   printf("IOB SYSTEM testbench\n");
 
   // UART init
+  iob_uart_csrs_init_baseaddr(UART0_BASE);
   //  disable TX and RX
   iob_uart_csrs_set_txen(0);
   iob_uart_csrs_set_rxen(0);
@@ -56,7 +61,6 @@ int iob_core_tb() {
   FILE *soc2cnsl_fd;
   FILE *cnsl2soc_fd;
   char cpu_char = 0;
-  char rxread_reg = 0, txread_reg = 0;
   int able2write = 0, able2read = 0;
 
   while ((cnsl2soc_fd = fopen("./cnsl2soc", "rb")) == NULL)
@@ -68,23 +72,17 @@ int iob_core_tb() {
   soc2cnsl_fd = fopen("./soc2cnsl", "wb");
 
 #ifdef IOB_SYSTEM_USE_ETHERNET
-  eth_setup(&eth_if);
+  eth_setup(ETH0_BASE);
 #endif
 
   while (1) {
-    while (!rxread_reg && !txread_reg) {
-      rxread_reg = iob_uart_csrs_get_rxready();
-      txread_reg = iob_uart_csrs_get_txready();
-    }
-
-    if (rxread_reg) {
+    if (iob_uart_csrs_get_rxready()) {
       //      printf("RX ready\n");
       cpu_char = iob_uart_csrs_get_rxdata();
       fwrite(&cpu_char, sizeof(char), 1, soc2cnsl_fd);
       fflush(soc2cnsl_fd);
-      rxread_reg = 0;
     }
-    if (txread_reg) {
+    if (iob_uart_csrs_get_txready()) {
       if ((cnsl2soc_fd = fopen("./cnsl2soc", "rb")) == NULL) {
         fclose(soc2cnsl_fd);
         break;
@@ -96,11 +94,10 @@ int iob_core_tb() {
         cnsl2soc_fd = fopen("./cnsl2soc", "w");
       }
       fclose(cnsl2soc_fd);
-      txread_reg = 0;
     }
 
 #ifdef IOB_SYSTEM_USE_ETHERNET
-    eth_relay_frames(&eth_if);
+    eth_relay_frames();
 #endif
   }
 

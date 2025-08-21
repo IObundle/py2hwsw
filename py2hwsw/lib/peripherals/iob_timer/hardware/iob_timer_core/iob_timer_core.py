@@ -51,13 +51,6 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "rstrb_int",
-                "descr": "Reset strobe internal wire",
-                "signals": [
-                    {"name": "rstrb_i"},
-                ],
-            },
-            {
                 "name": "time_int",
                 "descr": "Time internal wire",
                 "signals": [

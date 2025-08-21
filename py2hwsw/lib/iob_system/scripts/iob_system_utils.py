@@ -477,6 +477,15 @@ PYRAWWRAPPER_PATH=../../scripts/pyRawWrapper/pyRawWrapper
 BUILD_DEPS+=$(PYRAWWRAPPER_PATH)
 $(PYRAWWRAPPER_PATH):
 	make -C $(dir $(PYRAWWRAPPER_PATH)) all
+
+PRIVILEGED_CMD = $(shell command -v doas > /dev/null 2>&1 && echo "doas" || command -v sudo > /dev/null 2>&1 && echo "sudo sh -c" || echo "su root -c")
+BUILD_DEPS+=virtual-network-if
+virtual-network-if:
+	$(PRIVILEGED_CMD) "modprobe dummy;\
+	ip link add $(ETH_IF) type dummy;\
+	ifconfig $(ETH_IF) up"
+
+.PHONY: virtual-network-if
 """
             )
         if attributes_dict.get("is_tester", False):

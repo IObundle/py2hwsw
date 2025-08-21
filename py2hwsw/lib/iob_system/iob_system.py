@@ -488,7 +488,7 @@ def setup(py_params_dict):
                         "ADDR_W": params["addr_w"],
                         "DATA_W": "AXI_DATA_W",
                         "LEN_W": "AXI_LEN_W",
-                        "LOCK_W": "1",
+                        "LOCK_W": "2",
                     },
                 },
             ]
@@ -622,7 +622,10 @@ def setup(py_params_dict):
             subordinate_if_number = attributes_dict["subblocks"][-1]["num_subordinates"]
             attributes_dict["subblocks"][-1]["num_subordinates"] += 1
             attributes_dict["subblocks"][-1]["connect"] |= {
-                f"s{subordinate_if_number}_axi_s": "eth_axi"
+                f"s{subordinate_if_number}_axi_s": (
+                    "eth_axi",
+                    ["eth_axi_awlock[0]", "eth_axi_arlock[0]"],
+                )
             }
 
     if params["use_intmem"]:
@@ -761,15 +764,7 @@ def setup(py_params_dict):
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
-                        "axi_m": (
-                            "eth_axi",
-                            [
-                                "eth_axi_arid[0]",
-                                "eth_axi_rid[0]",
-                                "eth_axi_awid[0]",
-                                "eth_axi_bid[0]",
-                            ],
-                        ),
+                        "axi_m": "eth_axi",
                         "inta_o": "eth_interrupt",
                         "phy_rstn_o": "phy_rstn_o",
                         "mii_io": "mii_io",

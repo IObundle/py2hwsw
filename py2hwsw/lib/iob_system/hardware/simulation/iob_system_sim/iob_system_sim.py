@@ -184,6 +184,7 @@ def setup(py_params_dict):
                     "type": "axi",
                     "prefix": "eth_",
                     "ADDR_W": ETH_RAM_ADDR_W,
+                    "ID_W": "AXI_ID_W",
                     "LEN_W": "AXI_LEN_W",
                 },
             },

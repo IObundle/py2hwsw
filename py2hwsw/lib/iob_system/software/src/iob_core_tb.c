@@ -16,8 +16,7 @@
 #ifdef IOB_SYSTEM_USE_ETHERNET
 #include "iob_eth_tb_driver.h"
 // Configure testbench memory map
-#define ETH0_BASE 0x40000000
-#define ETH0_RAM_BASE 0x80000000
+#define ETH0_BASE 0x80000000
 #endif
 
 int iob_core_tb() {

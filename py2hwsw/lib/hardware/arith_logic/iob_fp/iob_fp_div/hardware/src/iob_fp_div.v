@@ -159,8 +159,8 @@ module iob_fp_div #(
    ) div_subshift (
       .clk_i (clk_i),
       .cke_i (1'b1),
-      //.rst_i     (rst_i),
       .arst_i(1'b0),
+      .rst_i (rst_i),
 
       .start_i(start_i),
       .done_o (),

@@ -84,7 +84,6 @@ def setup(py_params_dict):
                     },
                 ],
             },
-            
             {
                 "name": "r_data_o",
                 "descr": "Read data output from the register array",
@@ -162,7 +161,6 @@ def setup(py_params_dict):
                 },
             },
         ],
-        
         "comb": {
             "code": """
     r_data = regarray_in[r_addr_i*DATA_W+:DATA_W];

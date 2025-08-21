@@ -481,6 +481,11 @@ $(PYRAWWRAPPER_PATH):
 PRIVILEGED_CMD = $(shell command -v doas > /dev/null 2>&1 && echo "doas" || command -v sudo > /dev/null 2>&1 && echo "sudo sh -c" || echo "su root -c")
 BUILD_DEPS+=virtual-network-if
 virtual-network-if:
+	@if ip link show $(ETH_IF) &> /dev/null; then \
+	    echo "Interface $(ETH_IF) exists, skipping interface creation"; \
+	    exit 0; \
+	fi
+	@echo "Creating dummy network interface: $(ETH_IF)"
 	$(PRIVILEGED_CMD) "modprobe dummy;\
 	ip link add $(ETH_IF) type dummy;\
 	ifconfig $(ETH_IF) up"

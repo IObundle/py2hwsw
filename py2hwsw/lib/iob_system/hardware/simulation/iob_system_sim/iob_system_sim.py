@@ -11,7 +11,7 @@ def setup(py_params_dict):
 
     tb_peripherals = ["iob_uart"]
     if params["use_ethernet"]:
-        tb_peripherals += ["iob_eth", "eth_ram"]
+        tb_peripherals += ["iob_eth"]
 
     periph_sel_bits = (len(tb_peripherals) - 1).bit_length()
     periph_addr_w = 32 - periph_sel_bits
@@ -178,26 +178,8 @@ def setup(py_params_dict):
                 },
             },
             {
-                "name": "eth_ram_iob",
-                "descr": "IOB bus to access Ethernet's RAM",
-                "signals": {
-                    "type": "iob",
-                    "ADDR_W": ETH_RAM_ADDR_W,
-                },
-            },
-            {
-                "name": "eth_ram_axi",
-                "descr": "AXI bus to access Ethernet's RAM",
-                "signals": {
-                    "type": "axi",
-                    "prefix": "eth_ram_",
-                    "ADDR_W": ETH_RAM_ADDR_W,
-                    "LEN_W": "AXI_LEN_W",
-                },
-            },
-            {
-                "name": "eth_axi",
-                "descr": "Ethernet AXI bus",
+                "name": "unused_eth_axi",
+                "descr": "Ethernet AXI bus (unused: tesbench uses eth without DMA)",
                 "signals": {
                     "type": "axi",
                     "prefix": "eth_",
@@ -260,40 +242,6 @@ def setup(py_params_dict):
                     {"name": "eth_interrupt"},
                 ],
             },
-            # Wires for AXI ram
-            {
-                "name": "merge_s_axi",
-                "descr": "AXI subordinate bus for merge",
-                "signals": {
-                    "type": "axi",
-                    "prefix": "intercon_s_",
-                    "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W",
-                    "DATA_W": "AXI_DATA_W",
-                    "LOCK_W": 2,
-                },
-            },
-            {
-                "name": "merge_m_axi",
-                "descr": "AXI manager bus for merge",
-                "signals": {
-                    "type": "axi",
-                    "prefix": "intercon_m_",
-                    "ID_W": "AXI_ID_W",
-                    "ADDR_W": "AXI_ADDR_W",
-                    "DATA_W": "AXI_DATA_W",
-                    "LOCK_W": 2,
-                },
-            },
-            {
-                "name": "eth_ram_mem",
-                "descr": "Connect axi_ram to 'iob_ram_t2p_be' memory",
-                "signals": {
-                    "type": "ram_t2p_be",
-                    "ADDR_W": "AXI_ADDR_W - 2",
-                    "prefix": "ext_mem_",
-                },
-            },
         ]
     #
     # Blocks
@@ -344,10 +292,9 @@ def setup(py_params_dict):
     # Connect ethernet and its RAM to pbus
     if params["use_ethernet"]:
         subordinate_num = attributes_dict["subblocks"][-1]["num_outputs"]
-        attributes_dict["subblocks"][-1]["num_outputs"] += 2
+        attributes_dict["subblocks"][-1]["num_outputs"] += 1
         attributes_dict["subblocks"][-1]["connect"] |= {
             f"output_{subordinate_num}_m": "eth_cbus",
-            f"output_{subordinate_num+1}_m": "eth_ram_iob",
         }
     attributes_dict["subblocks"] += [
         {
@@ -423,71 +370,10 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "iob_csrs_cbus_s": ("eth_cbus", ["eth_iob_addr[11:0]"]),
-                    "axi_m": "eth_axi",
+                    "axi_m": "unused_eth_axi",
                     "inta_o": "eth_int",
                     "phy_rstn_o": "phy_rstn",
                     "mii_io": "mii_invert",
-                },
-            },
-            # Create AXI merge and RAM for ethernet
-            {
-                "core_name": "iob_iob2axi",
-                "instance_name": "eth_iob2axi",
-                "parameters": {
-                    "ADDR_W": ETH_RAM_ADDR_W,
-                    "DATA_W": 32,
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_s": "eth_ram_iob",
-                    "axi_m": "eth_ram_axi",
-                },
-            },
-            {
-                "core_name": "iob_axi_merge",
-                "name": f"{params['name']}_eth_merge",
-                "instance_name": f"eth_axi_merge",
-                "instance_description": f"AXI merge for ETH RAM",
-                "parameters": {
-                    "ID_W": "AXI_ID_W",
-                    "LEN_W": "AXI_LEN_W",
-                },
-                "num_subordinates": 2,
-                "addr_w": ETH_RAM_ADDR_W,
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    "reset_i": "rst_i",
-                    "s_0_s": "eth_ram_axi",
-                    "s_1_s": "eth_axi",
-                    "m_m": f"eth_axi_ram",
-                },
-            },
-            {
-                "core_name": "iob_axi_ram",
-                "instance_name": "eth_axi_ram_inst",
-                "instance_description": "AXI RAM for ethernet",
-                "parameters": {
-                    "ID_WIDTH": "AXI_ID_W",
-                    "ADDR_WIDTH": ETH_RAM_ADDR_W,
-                    "DATA_WIDTH": 32,
-                },
-                "connect": {
-                    "clk_i": "clk",
-                    "rst_i": "rst",
-                    "axi_s": "eth_axi_ram",
-                    "external_mem_bus_m": "eth_ram_mem",
-                },
-            },
-            {
-                "core_name": "iob_ram_t2p_be",
-                "instance_name": "eth_ram_t2p_be_inst",
-                "instance_description": "ETH AXI RAM external memory",
-                "parameters": {
-                    "ADDR_W": ETH_RAM_ADDR_W - 2,
-                    "DATA_W": 32,
-                },
-                "connect": {
-                    "ram_t2p_be_s": "eth_ram_mem",
                 },
             },
         ]

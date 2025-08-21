@@ -21,6 +21,7 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
+                    "params": "c_a_r",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -145,6 +146,9 @@ def setup(py_params_dict):
                     "DATA_W": "DATA_W",
                     "RST_VAL": "1'b0",
                 },
+                "port_params": {
+                    "clk_en_rst_s": "c_a_r",
+                },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "data_i": "divisor_i",
@@ -170,6 +174,8 @@ def setup(py_params_dict):
     quotient_o  = quotient_int + incr;
     res_acc_nxt = res_acc + remainder_o;
     res_acc_en  = 1'b0;
+    pcnt_rst    = rst_i;
+    res_acc_rst = rst_i;
 """,
             "state_descriptions": """
     if (!start_i) begin //wait for div start

@@ -230,10 +230,6 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_functions",
-                "instantiate": False,
-            },
-            {
                 "core_name": "iob_reg",
                 "instance_name": "iob_reg_inst",
                 "instantiate": False,
@@ -292,7 +288,23 @@ def setup(py_params_dict):
             {
                 "verilog_code": """
     // Include iob_functions for use in parameters
-    `include "iob_functions.vs"
+    localparam IOB_MAX_W = ADDR_W;
+    function [IOB_MAX_W-1:0] iob_max;
+       input [IOB_MAX_W-1:0] a;
+       input [IOB_MAX_W-1:0] b;
+       begin
+          if (a > b) iob_max = a;
+          else iob_max = b;
+       end
+    endfunction
+
+    function integer iob_abs;
+       input integer a;
+       begin
+          iob_abs = (a >= 0) ? a : -a;
+       end
+    endfunction
+
     `define IOB_NBYTES (DATA_W/8)
     `define IOB_NBYTES_W $clog2(`IOB_NBYTES)
     `define IOB_WORD_ADDR(ADDR) ((ADDR>>`IOB_NBYTES_W)<<`IOB_NBYTES_W)\n

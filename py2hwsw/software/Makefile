@@ -100,12 +100,12 @@ run_emul: test.log
 #########################################
 
 ifneq ($(wildcard ./src/$(NAME)_csrs.c),)
-CSRS ?= ./src/$(NAME)_csrs.c
+TB_SRC ?= ./src/$(NAME)_csrs.c
 endif
 
 TB_INCLUDES ?=-I./src
 
-tb: ./src/iob_c_tb.c ./src/iob_core_tb.c $(CSRS)
+tb: ./src/iob_c_tb.c ./src/iob_core_tb.c $(TB_SRC)
 	gcc $(TB_INCLUDES) -g -o $@ $^
 
 

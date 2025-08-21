@@ -95,6 +95,7 @@ module iob_div_subshift_frac_tb;
       .clk_i(clk),
       .arst_i(arst),
       .cke_i(1'b1),
+      .rst_i(1'b0),
       .start_i(start),
       .done_o(done),
 

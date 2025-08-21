@@ -11,10 +11,10 @@ import os
 
 def print_usage():
     usage_str = """
-                Usage: ./makehex.py [--split] 1st_File 2nd_File 2nd_File_addr ... Firmware_Size output_file_name
-                The first file is the main file and its address is 0.
-                --split: Generate a separate hex file for each byte of memory words.
-                """
+Usage: ./makehex.py [--split] 1st_File 2nd_File 2nd_File_addr ... Firmware_Size output_file_name
+The first file is the main file and its address is 0.
+--split: Generate a separate hex file for each byte of memory words.
+"""
     print(usage_str, file=sys.stderr)
 
 
@@ -47,7 +47,10 @@ def main():
     output_file = argv[-1]
     argv.remove(output_file)
 
-    assert len(argv) % 2 == 1
+    if len(argv) % 2 != 1:
+        print(f"Error: number of arguments must be odd. Got {len(argv)} arguments")
+        print_usage()
+        exit(1)
     nFiles = int((len(argv) - 3) / 2) + 1
     mem_size = 2 ** (int(argv[-1]))
     binfile = [argv[1]]
@@ -69,7 +72,9 @@ def main():
             bindata[i] += b"0"
 
     for i in range(nFiles):
-        assert binaddr[i] + len(bindata[i]) <= mem_size
+        assert binaddr[i] + len(bindata[i]) <= mem_size, (
+            "File %d doesn't fit in memory" % i
+        )
         assert (binaddr[i] + len(bindata[i])) % 4 == 0
 
     lines = []

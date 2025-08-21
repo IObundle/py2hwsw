@@ -8,13 +8,8 @@
 #
 
 BUILD_DIR ?=build
-INIT_MEM ?= 1
-USE_EXTMEM ?= 0
 BOARD ?= iob_aes_ku040_db_g
 #BOARD_SERIAL_PORT ?= /dev/ttyUSB1
-
-MEM_ADDR_W ?= 18
-FW_ADDR_W ?= 18
 
 # Used by test.sh
 LIB_DIR:=.
@@ -25,10 +20,27 @@ CORE ?=iob_ctls
 
 CSR_IF?=iob
 
-PY_PARAMS ?="init_mem=$(INIT_MEM):use_extmem=$(USE_EXTMEM):csr_if=$(CSR_IF):mem_addr_w=$(MEM_ADDR_W):fw_addr_w=$(FW_ADDR_W)"
+# Fill PY_PARAMS if not defined
+ifeq ($(PY_PARAMS),)
+PY_PARAMS="csr_if=$(CSR_IF)"
+
+# IOb-System parameters
+ifneq ($(INIT_MEM),)
+PY_PARAMS +=":init_mem=$(INIT_MEM)"
+endif
+ifneq ($(USE_EXTMEM),)
+PY_PARAMS +=":use_extmem=$(USE_EXTMEM)"
+endif
+ifneq ($(MEM_ADDR_W),)
+PY_PARAMS +=":mem_addr_w=$(MEM_ADDR_W)"
+endif
+ifneq ($(FW_ADDR_W),)
+PY_PARAMS +=":fw_addr_w=$(FW_ADDR_W)"
+endif
+endif # ifndef PY_PARAMS
 
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
-CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi
+CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
 
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
 ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)
@@ -53,14 +65,14 @@ sim-clean:
 	nix-shell --run "scripts/test.sh clean"
 
 fpga-build:
-	nix-shell --run "make clean setup CORE=$(CORE) INIT_MEM=$(INIT_MEM) USE_EXTMEM=$(USE_EXTMEM) && make -C $(BUILD_DIR) fpga-sw-build BOARD=$(BOARD)" && make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
+	nix-shell --run "make clean setup && make -C $(BUILD_DIR) fpga-sw-build BOARD=$(BOARD)" && make -C $(BUILD_DIR)/ fpga-build BOARD=$(BOARD)
 
 fpga-run: fpga-build
 	make -C $(BUILD_DIR)/ fpga-run BOARD=$(BOARD)
 
 
 doc-build: 
-	nix-shell --run "make clean setup CORE=$(CORE) && make -C $(BUILD_DIR) doc-build"
+	nix-shell --run "make clean setup && make -C $(BUILD_DIR) doc-build"
 
 py2-doc-build:
 	nix-shell --run "py2hwsw --py2hwsw_docs && make -C py2hwsw_generated_docs/document/ build"

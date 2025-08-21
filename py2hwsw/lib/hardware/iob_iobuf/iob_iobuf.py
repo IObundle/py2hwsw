@@ -9,11 +9,11 @@ def setup(py_params_dict):
         "confs": [
             {
                 "name": "FPGA_TOOL",
+                "descr": "Use IPs from fpga tool. Avaliable options: 'XILINX', 'other'.",
                 "type": "P",
                 "val": '"XILINX"',
                 "min": "NA",
                 "max": "NA",
-                "descr": "Use IPs from fpga tool. Avaliable options: 'XILINX', 'other'.",
             },
         ],
         "ports": [
@@ -86,12 +86,12 @@ def setup(py_params_dict):
             .I (i_i),
             .T (t_i),
             .O (o_int),
-            .IO(io)
+            .IO(io_io)
          );
       end else begin : tool_other
          reg o_var;
-         assign io = t_i ? 1'bz : i_i;
-         always @* o_var = #1 io;
+         assign io_io = t_i ? 1'bz : i_i;
+         always @* o_var = #1 io_io;
          assign o_int = o_var;
       end
    endgenerate

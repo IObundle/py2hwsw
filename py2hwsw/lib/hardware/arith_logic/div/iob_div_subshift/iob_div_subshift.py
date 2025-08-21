@@ -46,6 +46,7 @@ def setup(py_params_dict):
                 "name": "clk_en_rst_s",
                 "signals": {
                     "type": "iob_clk",
+                    "params": "c_a_r",
                 },
                 "descr": "Clock, clock enable and reset",
             },
@@ -177,6 +178,9 @@ def setup(py_params_dict):
     dqr_reg_nxt     = dqr_reg;
     divisor_reg_nxt = divisor_reg;
     done_reg    = 1'b1;
+    pcnt_rst    = rst_i;
+    dqr_reg_rst     = rst_i;
+    divisor_reg_rst = rst_i;
 
     if (pcnt == 0) begin  //wait for start, load operands and do it
       if (!start_i) begin

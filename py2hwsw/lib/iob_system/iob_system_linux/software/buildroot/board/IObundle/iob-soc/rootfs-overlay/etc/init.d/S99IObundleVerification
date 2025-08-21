@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Load Linux Kernel Modules
+for i in /drivers/*.ko; do
+	insmod $i;
+done

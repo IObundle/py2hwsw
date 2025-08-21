@@ -12,17 +12,18 @@ SIM_OBJ=V$(VTOP)
 SW_DIR=../../software/src
 
 ifneq ($(wildcard $(SW_DIR)/$(NAME)_csrs.c),)
-CSRS ?= $(SW_DIR)/$(NAME)_csrs.c
+VLT_SRC ?= $(SW_DIR)/$(NAME)_csrs.c
 endif
 
 # filter out the verilog testbench
-VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) $(SW_DIR)/iob_core_tb.c $(SW_DIR)/iob_vlt_tb.cpp $(CSRS)
+VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) $(SW_DIR)/iob_core_tb.c $(SW_DIR)/iob_vlt_tb.cpp $(VLT_SRC)
 
 # include files
-VLTINCLUDES=$(addprefix -I, ./src ../src ../../software/src)
-CPPINCLUDES=$(addprefix -I, ../src ../../src ../../../software/src)
+VLT_INCLUDES+=$(addprefix -I, ./src ../src ../../software/src)
+# Note that cpp includes are one directory deeper than vlt includes
+CPP_INCLUDES+=$(addprefix -I, ../src ../../src ../../../software/src)
 
-VFLAGS+=$(VLTINCLUDES) -CFLAGS "$(CPPINCLUDES) -g"
+VFLAGS+=$(VLT_INCLUDES) -CFLAGS "$(CPP_INCLUDES) -g"
 
 # verilator  flags
 VFLAGS+=--cc --exe --top-module $(VTOP) #compile to C++, alow user C/C++ code, and set top module
@@ -32,7 +33,7 @@ ifeq ($(VCD),1)
 VFLAGS+=--trace -DVCD
 endif
 
-comp: $(VHDR) $(VSRC) $(HEX) $(COBJ)
+comp: $(VHDR) $(VSRC) $(BUILD_DEPS) $(COBJ)
 	verilator $(VFLAGS) $(VSRC)
 	cd ./obj_dir && make -f $(SIM_OBJ).mk
 

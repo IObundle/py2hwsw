@@ -2,15 +2,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-#extract cli args
-set NAME [lindex $argv 0]
-set CSR_IF [lindex $argv 1]
-set BOARD [lindex $argv 2]
-set VSRC [lindex $argv 3]
-set INCLUDE_DIRS [lindex $argv 4]
-set IS_FPGA [lindex $argv 5]
-set USE_EXTMEM [lindex $argv 6]
-set USE_ETHERNET [lindex $argv 7]
+#extract cli positional args
+set vars {NAME FPGA_TOP CSR_IF BOARD VSRC INCLUDE_DIRS IS_FPGA USE_EXTMEM USE_ETHERNET}
+foreach var $vars arg $argv {
+    set $var $arg
+    puts "$var = $arg"
+}
 
 #verilog sources, vivado IPs, use file extension
 foreach file [split $VSRC \ ] {
@@ -53,7 +50,7 @@ if { $IS_FPGA == "1" } {
     if {[file exists "vivado/$NAME\_tool.sdc"]} {
         read_xdc vivado/$NAME\_tool.sdc
     }
-    eval synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $NAME -verbose
+    eval synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $FPGA_TOP -verbose
 } else {
     #read design constraints
     puts "Out of context synthesis"
@@ -68,7 +65,7 @@ if { $IS_FPGA == "1" } {
     if {[file exists "vivado/$NAME\_tool.sdc"]} {
         read_xdc -mode out_of_context vivado/$NAME\_tool.sdc
     }
-    eval synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $NAME -mode out_of_context -flatten_hierarchy full -verbose
+    eval synth_design -include_dirs ../src -include_dirs ../common_src -include_dirs ./src -include_dirs ./vivado/$BOARD $SYNTH_FLAGS -part $PART -top $FPGA_TOP -mode out_of_context -flatten_hierarchy full -verbose
 }
 
 #set post-map custom assignments
@@ -87,19 +84,19 @@ report_clock_interaction
 report_cdc -details
 report_bus_skew
 
-report_clocks -file reports/$NAME\_$PART\_clocks.rpt
-report_clock_interaction -file reports/$NAME\_$PART\_clock_interaction.rpt
-report_cdc -details -file reports/$NAME\_$PART\_cdc.rpt
-report_synchronizer_mtbf -file reports/$NAME\_$PART\_synchronizer_mtbf.rpt
-report_utilization -file reports/$NAME\_$PART\_utilization.rpt
-report_timing -file reports/$NAME\_$PART\_timing.rpt
-report_timing_summary -file reports/$NAME\_$PART\_timing_summary.rpt
-report_timing -file reports/$NAME\_$PART\_timing_paths.rpt -max_paths 30
-report_bus_skew -file reports/$NAME\_$PART\_bus_skew.rpt
+report_clocks -file reports/$FPGA_TOP\_$PART\_clocks.rpt
+report_clock_interaction -file reports/$FPGA_TOP\_$PART\_clock_interaction.rpt
+report_cdc -details -file reports/$FPGA_TOP\_$PART\_cdc.rpt
+report_synchronizer_mtbf -file reports/$FPGA_TOP\_$PART\_synchronizer_mtbf.rpt
+report_utilization -file reports/$FPGA_TOP\_$PART\_utilization.rpt
+report_timing -file reports/$FPGA_TOP\_$PART\_timing.rpt
+report_timing_summary -file reports/$FPGA_TOP\_$PART\_timing_summary.rpt
+report_timing -file reports/$FPGA_TOP\_$PART\_timing_paths.rpt -max_paths 30
+report_bus_skew -file reports/$FPGA_TOP\_$PART\_bus_skew.rpt
 
 if { $IS_FPGA == "1" } {
-    write_bitstream -force $NAME.bit
+    write_bitstream -force $FPGA_TOP.bit
 } else {
-    write_verilog -force $NAME\_netlist.v
-    write_verilog -force -mode synth_stub ${NAME}_stub.v
+    write_verilog -force $FPGA_TOP\_netlist.v
+    write_verilog -force -mode synth_stub ${FPGA_TOP}_stub.v
 }

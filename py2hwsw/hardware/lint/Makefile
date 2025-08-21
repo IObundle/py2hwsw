@@ -19,16 +19,6 @@ INCLUDE_DIRS+=../src
 
 VSRC+=$(wildcard ../src/*.v)
 
-ifneq ($(BOARD_DIR),)
-INCLUDE_DIRS+=../../$(BOARD_DIR)
-VSRC+=$(wildcard ../../$(BOARD_DIR)/*.v)
-INCLUDE_DIRS+=../fpga/src
-VSRC+=$(wildcard ../fpga/src/*.v)
-else
-INCLUDE_DIRS+=../simulation/src
-VSRC+=$(wildcard ../simulation/src/*.v)
-endif
-
 #include local lint segment
 ifneq ($(wildcard lint_build.mk),)
 include lint_build.mk

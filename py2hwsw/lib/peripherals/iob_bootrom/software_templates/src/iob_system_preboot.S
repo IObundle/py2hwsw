@@ -5,13 +5,18 @@
 #include "iob_system_conf.h"
 #include "iob_system_mmap.h"
 
-// Can't include iob_bootrom_swreg.h because the assembler doesn't recognize stdint.h,
+// Can't include iob_bootrom_csrs.h because the assembler doesn't recognize stdint.h,
 // so define the constants here instead (these are address offsets).
-#define IOB_BOOTROM_ROM_ADDR 0x80
 
+// Bootloader start address within the ROM
+#define IOB_BOOTROM_ROM_ADDR 0x80
+// Bootloader size
 #define LENGTH ((1 << IOB_SYSTEM_BOOTROM_ADDR_W) - IOB_BOOTROM_ROM_ADDR)
+// Bootloader start address in system's memory map
 #define BOOTROM (BOOTROM_BASE + IOB_BOOTROM_ROM_ADDR)
-#define BOOTLDR_ADDR ((1 << IOB_SYSTEM_FW_ADDR_W) - (1 << IOB_SYSTEM_BOOTROM_ADDR_W))
+
+// Destination address for the bootloader: at the last addresses of the firmware region
+#define BOOTLDR_ADDR ((IOB_SYSTEM_FW_BASEADDR + (1 << IOB_SYSTEM_FW_ADDR_W)) - (1 << IOB_SYSTEM_BOOTROM_ADDR_W))
 
 .section .init
 .globl _start

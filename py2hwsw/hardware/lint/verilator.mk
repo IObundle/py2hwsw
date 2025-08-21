@@ -6,8 +6,10 @@
 
 VFLAGS+=$(addprefix -I,$(INCLUDE_DIRS))
 
+WAIVER_FILE ?= $(wildcard verilator_waiver.vlt)
+
 run-lint:
-	verilator --lint-only -Wall --timing $(VFLAGS) verilator_config.vlt $(VSRC)
+	verilator --lint-only -Wall --timing $(VFLAGS) verilator_config.vlt $(WAIVER_FILE) $(VSRC)
 
 clean-lint:
 

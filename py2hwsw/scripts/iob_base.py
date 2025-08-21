@@ -663,3 +663,20 @@ def validate_verilog_const(value: str, direction: str):
         fail_with_msg(
             f"Invalid direction '{direction}' for wire '{value}'! Expected input or output."
         )
+
+
+def find_folder_by_name(root_dir, folder_name):
+    """
+    Searches for a folder by name within a given root directory.
+
+    Args:
+        root_dir (str): The directory to start the search from.
+        folder_name (str): The name of the folder to search for.
+
+    Returns:
+        str: The full path to the found folder, or None if not found.
+    """
+    for root, dirs, files in os.walk(root_dir):
+        if folder_name in dirs:
+            return os.path.join(root, folder_name)
+    return None

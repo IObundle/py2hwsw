@@ -267,7 +267,6 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axi",
                     "prefix": "intercon_s_",
-                    "mult": 2,
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -280,7 +279,6 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "axi",
                     "prefix": "intercon_m_",
-                    "mult": 1,
                     "ID_W": "AXI_ID_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
@@ -524,10 +522,10 @@ def setup(py_params_dict):
     assign eth_axi_rvalid  = 1'b0;
 
     // Connect ethernet MII signals
-    assign eth_MTxClk       = eth_clk;
-    assign eth_MRxClk       = eth_clk;
-    assign eth_MColl        = 1'b0;
-    assign eth_MCrS         = 1'b0;
+    assign mii_tx_clk       = eth_clk;
+    assign mii_rx_clk       = eth_clk;
+    assign mii_col          = 1'b0;
+    assign mii_crs          = 1'b0;
 
 """,
             },

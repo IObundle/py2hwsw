@@ -121,7 +121,7 @@ def setup(py_params_dict):
    //
    // AW Channel
    assign axi_awaddr_o = axil_awaddr;
-   assign axi_awprot_o = axil_awprot;
+   // assign axi_awprot_o = axil_awprot;
    assign axi_awvalid_o = axil_awvalid;
    assign axil_awready = axi_awready_i;
    // W Channel
@@ -154,7 +154,7 @@ def setup(py_params_dict):
    //
    // AR Channel
    assign axi_araddr_o = axil_araddr;
-   assign axi_arprot_o = axil_arprot;
+   // assign axi_arprot_o = axil_arprot;
    assign axi_arvalid_o = axil_arvalid;
    assign axil_arready = axi_arready_i;
    // R Channel

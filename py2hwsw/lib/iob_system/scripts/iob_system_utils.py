@@ -398,6 +398,8 @@ UTARGETS+=iob_eth_rmac.h
 EMUL_HDR+=iob_eth_rmac.h
 iob_eth_rmac.h:
 	echo "#define ETH_RMAC_ADDR 0x$(RMAC_ADDR)" > $@\n
+
+TB_SRC+=./simulation/src/iob_eth_tb_driver.c ./simulation/src/iob_eth.c ./simulation/src/iob_eth_csrs.c 
 """,
             )
         if attributes_dict.get("is_tester", False):
@@ -466,6 +468,16 @@ get_uut_run_deps:
             file.write(
                 'ETH2FILE_SCRIPT="$(PYTHON_DIR)/eth2file.py"\n'
                 'CONSOLE_CMD=$(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -L -c $(PYTHON_DIR)/console.py -e $(ETH2FILE_SCRIPT) -m "$(RMAC_ADDR)" -i "$(ETH_IF)" -t 60\n',
+            )
+            # Compile and set permissions for pyRawWrapper
+            file.write(
+                """
+# Compile and set permissions for pyRawWrapper
+PYRAWWRAPPER_PATH=../../scripts/pyRawWrapper/pyRawWrapper
+BUILD_DEPS+=$(PYRAWWRAPPER_PATH)
+$(PYRAWWRAPPER_PATH):
+	make -C $(dir $(PYRAWWRAPPER_PATH)) all
+"""
             )
         if attributes_dict.get("is_tester", False):
             # Create target to copy UUT's hex files

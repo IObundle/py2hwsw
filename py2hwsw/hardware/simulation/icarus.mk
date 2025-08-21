@@ -20,7 +20,7 @@ SIM_OBJ=a.out
 
 comp: $(SIM_OBJ)
 
-$(SIM_OBJ): $(VHDR) $(VSRC) $(BUILD_DEPS)
+$(SIM_OBJ): $(VHDR) $(VSRC)
 	iverilog $(VFLAGS) $(VSRC)
 
 exec: comp

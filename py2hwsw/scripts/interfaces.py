@@ -1783,7 +1783,7 @@ class MIIInterface(_interface):
                 ),
                 iob_signal(
                     name=f"{self.variant}_rxd_i",
-                    width=1,
+                    width=4,
                     descr=f"{self.variant.upper()} receive data (lsb received first)",
                 ),
                 iob_signal(

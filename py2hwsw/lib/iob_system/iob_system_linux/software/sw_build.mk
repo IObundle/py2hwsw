@@ -143,7 +143,7 @@ compile_opensbi:
 	make -C ../../ sw-build
 
 UTARGETS +=tb
-TB_SRC=./simulation/src/iob_uart_csrs.c
+TB_SRC+=./simulation/src/iob_uart_csrs.c
 TB_INCLUDES ?=-I./simulation/src
 
 TEMPLATE_LDS=src/$@.lds

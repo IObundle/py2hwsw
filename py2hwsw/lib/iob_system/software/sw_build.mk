@@ -32,11 +32,7 @@ iob_system_firmware.bin: ../../software/iob_system_firmware.bin
 	make -C ../../ sw-build
 
 UTARGETS+=build_iob_system_software tb
-TB_SRC=./simulation/src/iob_uart_csrs.c
-ifneq ($(wildcard ./simulation/src/iob_eth.c),)
-TB_SRC+=./simulation/src/iob_eth_tb_driver.c ./simulation/src/iob_eth.c ./simulation/src/iob_eth_csrs.c 
-endif
-
+TB_SRC+=./simulation/src/iob_uart_csrs.c
 TB_INCLUDES ?=-I./simulation/src
 
 TEMPLATE_LDS=src/$@.lds

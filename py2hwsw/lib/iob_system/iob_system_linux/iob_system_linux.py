@@ -68,7 +68,10 @@ def setup(py_params_dict):
     #         shutil.copy2(src_file, dst)
     #
     # # Copy scripts to build directory
-    if py_params_dict["build_dir"]:
+    if (
+        py_params_dict.get("py2hwsw_target", "") == "setup"
+        and py_params_dict["build_dir"]
+    ):
         for src_file in [
             "scripts/check_if_run_linux.py",
         ]:
@@ -78,6 +81,16 @@ def setup(py_params_dict):
             shutil.copy2(src, dst)
             # Hack for Nix: Files copied from Nix's py2hwsw package do not contain write permissions
             os.system("chmod -R ug+w " + dst)
+
+        # Create symlink for minicom's .minirc.iobundle.dfl
+        # Note: Minicom only accepts configuration files starting with ".minirc", and python's setuptools does not copy dotfiles by default.
+        #       So, as a workaround, we named the file 'minirc.iobundle.dfl' in the repo, and create a symlink to it during setup.
+        fpga_dir = os.path.join(py_params_dict["build_dir"], "hardware/fpga")
+        os.makedirs(fpga_dir, exist_ok=True)
+        minirc_path = os.path.join(fpga_dir, ".minirc.iobundle.dfl")
+        if not os.path.exists(minirc_path):
+            os.symlink("minirc.iobundle.dfl", minirc_path)
+
     #     iob_soc_scripts = [
     #         "terminalMode",
     #         "makehex",

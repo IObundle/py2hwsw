@@ -6,7 +6,7 @@
 
 #include "clint.h"
 #include "iob_bsp.h"
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
 #include "iob_eth.h"
 #endif
 #include "iob_printf.h"
@@ -48,7 +48,7 @@ void clear_cache() {
   asm volatile(".word 0x500F" ::: "memory");
 }
 
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
 // Send signal by uart to receive file by ethernet
 uint32_t uart_recvfile_ethernet(char *file_name) {
   uart16550_puts(UART_PROGNAME);
@@ -72,7 +72,7 @@ uint32_t uart_recvfile_ethernet(char *file_name) {
 
   return file_size;
 }
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
 
 int compute_mem_load_txt(char file_name_array[4][50],
                          long int file_address_array[4], char *file_start_addr,
@@ -127,14 +127,14 @@ void console_get_files(int file_count, long int file_address_array[4],
   char *file_addr = NULL;
   for (i = 0; i < file_count; i++) {
     file_addr = (char *)(file_start_addr + file_address_array[i]);
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
     // Receive data from console via Ethernet
     file_sizes[i] = uart_recvfile_ethernet(file_name_array[i]);
     eth_rcv_file(file_addr, file_sizes[i]);
-#else  // NOT IOB_SYSTEM_LINUX_USE_ETH
+#else  // NOT IOB_SYSTEM_LINUX_USE_ETHERNET
     // Receive data from console via UART
     file_sizes[i] = uart16550_recvfile(file_name_array[i], file_addr);
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
   }
 }
 
@@ -236,7 +236,7 @@ int main() {
 #ifndef IOB_SYSTEM_LINUX_INIT_MEM
   printf_init(&uart16550_putc);
 
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
   // Init ethernet
   eth_init(ETH0_BASE, &clear_cache);
   // Use custom memory alloc/free functions to ensure it allocates in external
@@ -244,7 +244,7 @@ int main() {
   eth_init_mem_alloc(&mem_alloc, &mem_free);
   // Wait for PHY reset to finish
   eth_wait_phy_rst();
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
 
   char boot_flow[20] = {0};
 

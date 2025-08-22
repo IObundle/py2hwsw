@@ -6,7 +6,7 @@
 
 #include "clint.h"
 #include "iob_bsp.h"
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
 #include "iob_eth.h"
 #endif
 #include "iob_printf.h"
@@ -59,7 +59,7 @@ void clear_cache() {
   asm volatile(".word 0x500F" ::: "memory");
 }
 
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
 // Send signal by uart to receive file by ethernet
 uint32_t uart_recvfile_ethernet(const char *file_name) {
 
@@ -84,7 +84,7 @@ uint32_t uart_recvfile_ethernet(const char *file_name) {
 
   return file_size;
 }
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
 
 // copy src to dst
 // return number of copied chars (excluding '\0')
@@ -129,11 +129,11 @@ int main() {
   uart16550_init(UART0_BASE, IOB_BSP_FREQ / (16 * IOB_BSP_BAUD));
   clint_setCmp(CLINT0_BASE, 0xffffffffffffffff, 0);
   printf_init(&uart16550_putc);
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
   // init eth
   eth_init(ETH0_BASE, &clear_cache);
   eth_wait_phy_rst();
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
 
 #ifdef IOB_SYSTEM_LINUX_DMA_DEMO
   // init dma
@@ -146,14 +146,14 @@ int main() {
 #endif
 
   char buffer[5096];
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
   // Receive data from console via Ethernet
   uint32_t file_size = uart_recvfile_ethernet("../src/eth_example.txt");
   eth_rcv_file(buffer, file_size);
   uart16550_puts("\nFile received from console via ethernet:\n");
   for (i = 0; i < file_size; i++)
     uart16550_putc(buffer[i]);
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
 
 #ifdef IOB_SYSTEM_LINUX_VERSAT_DEMO
   InitializeCryptoSide(VERSAT0_BASE);

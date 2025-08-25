@@ -94,6 +94,7 @@ void iob_write(unsigned int address, unsigned data_w, unsigned int data) {
     dut->iob_wdata_i = data;
     break;
   }
+  dut->eval(); // Some cores may change ready when they receive valid
   while (dut->iob_ready_o == 0) {
     clk_tick();
   }
@@ -110,6 +111,7 @@ unsigned int iob_read(unsigned int address, unsigned int data_w) {
 
   dut->iob_addr_i = address; // remove byte address
   dut->iob_valid_i = 1;
+  dut->eval(); // Some cores may change ready when they receive valid
   while (dut->iob_ready_o == 0) {
     clk_tick();
   }

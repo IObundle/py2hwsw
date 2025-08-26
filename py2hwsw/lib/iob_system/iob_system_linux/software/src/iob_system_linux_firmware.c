@@ -6,9 +6,6 @@
 
 #include "clint.h"
 #include "iob_bsp.h"
-#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
-#include "iob_eth.h"
-#endif
 #include "iob_printf.h"
 #include "iob_spi.h"
 #include "iob_spidefs.h"
@@ -16,6 +13,9 @@
 #include "iob_system_linux_conf.h"
 #include "iob_system_linux_mmap.h"
 #include "iob_uart16550.h"
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
+#include "iob_eth.h"
+#endif
 #include "plic.h"
 #include <string.h>
 #ifdef IOB_SYSTEM_LINUX_DMA_DEMO

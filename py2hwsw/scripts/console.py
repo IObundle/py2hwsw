@@ -257,6 +257,12 @@ def init_serial():
 
 
 def init_files():
+    # Remove old files (if any)
+    if os.path.exists("./cnsl2soc"):
+        os.remove("./cnsl2soc")
+    if os.path.exists("./soc2cnsl"):
+        os.remove("./soc2cnsl")
+
     read = "./soc2cnsl"
     os.mkfifo(read)
     global tb_read

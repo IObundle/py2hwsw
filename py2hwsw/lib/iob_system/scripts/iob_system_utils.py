@@ -394,10 +394,13 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
             )
             file.write(
                 """
-UTARGETS+=iob_eth_rmac.h
-EMUL_HDR+=iob_eth_rmac.h
-iob_eth_rmac.h:
+UTARGETS+=src/iob_eth_rmac.h
+EMUL_HDR+=src/iob_eth_rmac.h
+src/iob_eth_rmac.h:
 	echo "#define ETH_RMAC_ADDR 0x$(RMAC_ADDR)" > $@\n
+	echo "#define ETH_RMAC_ADDR 0x$(RMAC_ADDR)" > simulation/$@\n
+
+.PHONY: src/iob_eth_rmac.h
 
 TB_SRC+=./simulation/src/iob_eth_tb_driver.c ./simulation/src/iob_eth.c ./simulation/src/iob_eth_csrs.c 
 """,

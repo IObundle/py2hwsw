@@ -11,6 +11,7 @@ export SYNTHESIZER ?= yosys
 export BOARD ?= iob_cyclonev_gt_dk
 export LINTER ?= spyglass
 
+ROOT_DIR :=.
 include config_build.mk
 
 SIM_DIR := hardware/simulation

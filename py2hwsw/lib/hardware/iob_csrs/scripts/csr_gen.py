@@ -1075,7 +1075,6 @@ class csr_gen:
         state_nxt = state;
 """
         snippet += """
-
         //FSM state machine
         case(state)
             WAIT_REQ: begin

@@ -35,6 +35,7 @@ Byte `i` is written if `wstrb_i[i]` is HIGH and not otherwise.
 ## Read Transaction
 For READ operations: when `valid_i` and `ready_o` are HIGH, address `addr_i` is
 read. The data on `rdata_o` is available when `rvalid_o` is HIGH. The transaction completes when `rvalid_o` is HIGH.
+The `rvalid_o` cannot be asserted on the same clock cycle as `valid_i` and `ready_o`, only on later clock cycles.
 
 ![Example Read Transaction](document/iob_if_read.png "Read Transaction")
 

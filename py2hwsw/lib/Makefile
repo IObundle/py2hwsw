@@ -22,23 +22,23 @@ CSR_IF?=iob
 
 # Fill PY_PARAMS if not defined
 ifeq ($(PY_PARAMS),)
-PY_PARAMS="csr_if=$(CSR_IF)"
+PY_PARAMS=csr_if=$(CSR_IF)
 
 # IOb-System parameters
 ifneq ($(INIT_MEM),)
-PY_PARAMS +=":init_mem=$(INIT_MEM)"
+PY_PARAMS:=$(PY_PARAMS):init_mem=$(INIT_MEM)
 endif
 ifneq ($(USE_EXTMEM),)
-PY_PARAMS +=":use_extmem=$(USE_EXTMEM)"
+PY_PARAMS:=$(PY_PARAMS):use_extmem=$(USE_EXTMEM)
 endif
 ifneq ($(USE_ETHERNET),)
-PY_PARAMS +=":use_ethernet=$(USE_ETHERNET)"
+PY_PARAMS:=$(PY_PARAMS):use_ethernet=$(USE_ETHERNET)
 endif
 ifneq ($(MEM_ADDR_W),)
-PY_PARAMS +=":mem_addr_w=$(MEM_ADDR_W)"
+PY_PARAMS:=$(PY_PARAMS):mem_addr_w=$(MEM_ADDR_W)
 endif
 ifneq ($(FW_ADDR_W),)
-PY_PARAMS +=":fw_addr_w=$(FW_ADDR_W)"
+PY_PARAMS:=$(PY_PARAMS):fw_addr_w=$(FW_ADDR_W)
 endif
 endif # ifndef PY_PARAMS
 

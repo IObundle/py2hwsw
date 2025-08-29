@@ -27,19 +27,6 @@
 #define FLASH_FIRMWARE_OFFSET 0x1000 // sector 0, subsector 1
 
 // Ethernet utility functions
-// NOTE: These functions are not compatible with malloc() and free().
-//      These are specifically made for use with the current iob-eth.c drivers.
-//      (These assume that there is only one block allocated at a time)
-//      It allocates a block with required size at the end of the external
-//      memory region.
-static void *mem_alloc(size_t size) {
-  // Alloc enough memory for one frame, just before start address of bootloader
-  return (void *)(IOB_SYSTEM_LINUX_FW_BASEADDR +
-                  (1 << IOB_SYSTEM_LINUX_FW_ADDR_W) -
-                  (1 << IOB_SYSTEM_LINUX_BOOTROM_ADDR_W) - size);
-}
-static void mem_free(void *ptr) {}
-
 void clear_cache() {
   // Delay to ensure all data is written to memory
   for (unsigned int i = 0; i < 10; i++)
@@ -239,9 +226,6 @@ int main() {
 #ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
   // Init ethernet
   eth_init(ETH0_BASE, &clear_cache);
-  // Use custom memory alloc/free functions to ensure it allocates in external
-  // memory
-  eth_init_mem_alloc(&mem_alloc, &mem_free);
   // Wait for PHY reset to finish
   eth_wait_phy_rst();
 #endif // IOB_SYSTEM_LINUX_USE_ETHERNET

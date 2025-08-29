@@ -22,7 +22,10 @@ def setup(py_params_dict):
         "use_extmem": (False, "If should use external memory (usually DDR)"),
         "use_bootrom": (True, "If should include a bootrom"),
         "use_peripherals": (True, "If should include peripherals"),
-        "use_ethernet": (False, "If should setup ethernet ports and testbenches"),
+        "use_ethernet": (
+            False,
+            "If should include ethernet peripheral, MII interface, and testbenches with ethernet support.",
+        ),
         "addr_w": (32, "CPU address width"),
         "data_w": (32, "CPU data width"),
         "mem_addr_w": (

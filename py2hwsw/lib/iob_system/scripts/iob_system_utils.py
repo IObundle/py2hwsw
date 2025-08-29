@@ -388,6 +388,8 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
         if peripherals:
             file.write("PERIPHERALS ?=" + " ".join(peripheral_name_list) + "\n")
         if params["use_ethernet"]:
+            # Set USE_ETHERNET variable
+            file.write("USE_ETHERNET=1\n")
             # Set custom ethernet CONSOLE_CMD
             file.write(
                 'CONSOLE_CMD ?=rm -f soc2cnsl cnsl2soc; $(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -L -c $(PYTHON_DIR)/console.py -m "$(RMAC_ADDR)" -i "$(ETH_IF)"\n',

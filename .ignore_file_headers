@@ -22,7 +22,7 @@
 ./py2hwsw/lib/hardware/memories/iob_axi_ram/hardware/src/iob_axi_ram.v
 
 ./py2hwsw/lib/scripts/yosys-abc.nix
-./py2hwsw/lib/iob_system/submodules/iob_vexriscv
+./py2hwsw/lib/iob_system/submodules
 
 ./py2hwsw/lib/hardware/memories/iob_ahb_ram/hardware/src/AHB2MEM.v
 

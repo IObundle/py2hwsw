@@ -20,3 +20,6 @@
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master"]
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master
 	url = git@github.com:IObundle/iob-spi.git
+[submodule "py2hwsw/lib/iob_system/submodules/iob_naxriscv"]
+	path = py2hwsw/lib/iob_system/submodules/iob_naxriscv
+	url = git@github.com:arturum1/iob-naxriscv.git

@@ -33,10 +33,10 @@
 //      It allocates a block with required size at the end of the external
 //      memory region.
 static void *mem_alloc(size_t size) {
-  // FIXME: Use a memory region that is not allocated to bootloader
+  // Alloc enough memory for one frame, just before start address of bootloader
   return (void *)(IOB_SYSTEM_LINUX_FW_BASEADDR +
-                  (1 << IOB_SYSTEM_LINUX_FW_ADDR_W)) -
-         size;
+                  (1 << IOB_SYSTEM_LINUX_FW_ADDR_W) -
+                  (1 << IOB_SYSTEM_LINUX_BOOTROM_ADDR_W) - size);
 }
 static void mem_free(void *ptr) {}
 

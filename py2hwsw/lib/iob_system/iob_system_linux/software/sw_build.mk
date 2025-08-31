@@ -208,7 +208,7 @@ IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_system_linux_boot.S
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_system_linux_boot.c
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550.c
 # IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550_csrs.c # UART16550 does not have csrs file
-ifneq ($(USE_ETHERNET),)
+ifeq ($(USE_ETHERNET),1)
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth.c
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth_csrs.c
 endif

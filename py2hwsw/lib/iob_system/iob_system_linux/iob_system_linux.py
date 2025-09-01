@@ -114,16 +114,6 @@ def setup(py_params_dict):
     #         f"{cls.build_dir}/hardware/src",
     #         dirs_exist_ok=True,
     #     )
-    #
-    #     # Override periphs_tmp.h of iob-soc with one specific for linux
-    #     create_periphs_tmp(
-    #         cls.name,
-    #         next(i["val"] for i in cls.confs if i["name"] == "ADDR_W"),
-    #         cls.peripherals,
-    #         f"{cls.build_dir}/software/{cls.name}_periphs.h",
-    #     )
-    #     check_linux_build_macros(cls, f"{setup_dir}/submodules/OS")
-    #
 
     #
     # Versat

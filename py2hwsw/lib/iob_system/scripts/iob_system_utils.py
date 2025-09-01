@@ -477,11 +477,13 @@ get_uut_run_deps:
             # Compile and set permissions for pyRawWrapper
             file.write(
                 """
-# Compile and set permissions for pyRawWrapper
+# Compile and set permissions for pyRawWrapper (if used)
 PYRAWWRAPPER_PATH=../../scripts/pyRawWrapper/pyRawWrapper
+ifeq ($(IOB_CONSOLE_PYTHON_ENV),$(ROOT_DIR)/scripts/pyRawWrapper/pyRawWrapper)
 BUILD_DEPS+=$(PYRAWWRAPPER_PATH)
 $(PYRAWWRAPPER_PATH):
 	make -C $(dir $(PYRAWWRAPPER_PATH)) all
+endif
 
 PRIVILEGED_CMD = $(shell command -v doas > /dev/null 2>&1 && echo "doas" || command -v sudo > /dev/null 2>&1 && echo "sudo sh -c" || echo "su root -c")
 BUILD_DEPS+=virtual-network-if

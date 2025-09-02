@@ -105,7 +105,7 @@ endif
 GRAB_TIMEOUT ?= 300
 BOARD_GRAB_CMD=../../scripts/board_client.py grab $(GRAB_TIMEOUT)
 
-run: test.log
+run: $(BUILD_DEPS) test.log
 	@if ! grep -q "Test passed!" test.log; then echo "Test failed!"; exit 1; fi
 
 SIM_CMD=make exec

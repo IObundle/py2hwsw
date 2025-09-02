@@ -45,8 +45,10 @@ endif
 
 ifeq ($(SIMULATION),)
 WRAPPER_CONFS_PREFIX=iob_system_linux_$(BOARD)
+WRAPPER_DIR=src
 else
 WRAPPER_CONFS_PREFIX=iob_uut
+WRAPPER_DIR=simulation/src
 endif
 
 #
@@ -116,7 +118,7 @@ endif
 # Generate linux_build_macros.txt from conf.h and mmap.h files
 linux_build_macros.txt:
 	# Copy every line that starts with #define from <flow>_conf.h, and remove the prefix
-	sed '/^#define $(WRAPPER_CONFS_PREFIX)_/I!d; s/#define $(WRAPPER_CONFS_PREFIX)_//Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > $@
+	sed '/^#define $(WRAPPER_CONFS_PREFIX)_/I!d; s/#define $(WRAPPER_CONFS_PREFIX)_//Ig' $(WRAPPER_DIR)/$(WRAPPER_CONFS_PREFIX)_conf.h > $@
 	# Include mmap.h info in linux_build_macros.txt
 	grep '^#define ' src/iob_system_linux_mmap.h | sed 's/^#define //; s/0x//g' >> $@
 	# Include macros from iob_system_linux_conf
@@ -143,7 +145,7 @@ compile_opensbi:
 	make -C ../../ sw-build
 
 UTARGETS +=tb
-TB_SRC=./simulation/src/iob_uart_csrs.c
+TB_SRC+=./simulation/src/iob_uart_csrs.c
 TB_INCLUDES ?=-I./simulation/src
 
 TEMPLATE_LDS=src/$@.lds
@@ -206,8 +208,10 @@ IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_system_linux_boot.S
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_system_linux_boot.c
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550.c
 # IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_uart16550_csrs.c # UART16550 does not have csrs file
-# IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth.c
-# IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth_csrs.c
+ifeq ($(USE_ETHERNET),1)
+IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth.c
+IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_eth_csrs.c
+endif
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spi.c
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spiplatform.c
 IOB_SYSTEM_LINUX_BOOT_SRC+=src/iob_spi_master_csrs.c
@@ -223,7 +227,7 @@ UTARGETS +=iob_system_linux_baremetal_boot check_if_run_linux
 iob_system_linux_baremetal_boot: iob_system_linux_boot iob_system_linux_preboot
 
 iob_bsp:
-	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h
+	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' $(WRAPPER_DIR)/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h
 
 iob_system_linux_firmware: iob_bsp
 	make $@.elf INCLUDES="$(IOB_SYSTEM_LINUX_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LINUX_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_LINUX_FW_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"

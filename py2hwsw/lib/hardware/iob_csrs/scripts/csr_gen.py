@@ -1056,7 +1056,7 @@ class csr_gen:
                 if not auto:
                     # get ready
                     wstrb_addr_cmp = self.__addr_cmp_str("wstrb_addr", addr)
-                    snippet += f"        if({wstrb_addr_cmp} (wstrb_addr < {addr + 2**addr_w})) begin\n"
+                    snippet += f"        if(write_en && {wstrb_addr_cmp} (wstrb_addr < {addr + 2**addr_w})) begin\n"
                     snippet += f"            ready_int = {name}_ready{suffix};\n"
                     snippet += (
                         "            if (internal_iob_valid & (|internal_iob_wstrb)) begin\n"
@@ -1075,19 +1075,17 @@ class csr_gen:
         state_nxt = state;
 """
         snippet += """
-
         //FSM state machine
         case(state)
             WAIT_REQ: begin
+                if(internal_iob_valid) begin // Wait for a valid request
 """
         if not all_auto:
             snippet += """
-                if(internal_iob_valid & (auto_addressed || (!ready_int)) ) begin // Wait for a valid request
                     iob_ready_nxt = ready_int;
 """
         else:
             snippet += """
-                if(internal_iob_valid) begin // Wait for a valid request
                     iob_ready_nxt = 1'b1;
 """
         snippet += """

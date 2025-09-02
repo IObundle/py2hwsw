@@ -52,7 +52,7 @@ if {$IS_FPGA == "1"} {
     set_instance_assignment -name IO_STANDARD "2.5-V" -to rxd_i
 
     if {$USE_ETHERNET == "1"} {
-        set_global_assignment -name SDC_FILE quartus/$BOARD/eth.sdc
+        set_global_assignment -name SDC_FILE quartus/$BOARD/iob_eth_dev.sdc
         set_location_assignment PIN_AN9 -to enet_resetn_o
         set_location_assignment PIN_AM10 -to enet_rx_clk_i
         set_location_assignment PIN_AP7 -to enet_gtx_clk_o

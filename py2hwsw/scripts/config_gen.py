@@ -318,4 +318,9 @@ def generate_confs(core):
         core.name,
         os.path.join(core.build_dir, core.dest_dir),
     )
-    conf_h(core.confs, core.name, core.build_dir + "/software/src")
+
+    sw_dest_dir = "software/src"
+    # Generate software sources in 'software/simulation/src' directory, if the core has a destination dir somewhere inside the hardware/simulation folder.
+    if core.dest_dir.startswith("hardware/simulation"):
+        sw_dest_dir = "software/simulation/src"
+    conf_h(core.confs, core.name, os.path.join(core.build_dir, sw_dest_dir))

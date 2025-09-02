@@ -25,11 +25,11 @@ int iob_core_tb() {
   printf("Reset complete\n");
 
   //
-  // axistream_in connected to first master of split
+  // axistream_in connected to first manager of split
   iob_axistream_in_csrs_init_baseaddr(0);
-  // axistream_out connected to second master of split
+  // axistream_out connected to second manager of split
   iob_axistream_out_csrs_init_baseaddr(1 << 5);
-  // dma connected to third master of split
+  // dma connected to third manager of split
   iob_dma_csrs_init_baseaddr(2 << 5);
 
   unsigned int version, major, minor;

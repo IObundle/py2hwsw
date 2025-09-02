@@ -95,7 +95,7 @@ def setup(py_params_dict):
             },
             {
                 "name": "axis_m",
-                "descr": "AXIS master interface",
+                "descr": "AXIS manager interface",
                 "signals": {
                     "type": "axis",
                     "DATA_W": "DATA_W",

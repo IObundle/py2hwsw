@@ -21,11 +21,11 @@ int iob_core_tb() {
   uint32_t i, word;
 
   // print welcome message
-  printf("IOb Slave to AXI master converter testbench\n");
+  printf("IOb Subordinate to AXI Manager converter testbench\n");
 
-  // Converter connected to first master of split
+  // Converter connected to first manager of split
   iob_s_axi_m_init_baseaddr(0);
-  // Converter controller connected to second master of split
+  // Converter controller connected to second manager of split
   iob_s_axi_m_controller_init_baseaddr(1 << 16);
 
   printf("Set burst length to %d\n", BURST_SIZE);

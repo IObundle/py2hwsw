@@ -312,11 +312,21 @@ def setup(py_params_dict):
    assign wb_select    = wb_we ? iob_wstrb_i : (RB_MASK) << (iob_addr_i[1:0]);
    assign wb_we        = |iob_wstrb_i;
 
-   assign iob_rvalid_o = wb_ack_i & (~wb_we_r);
    assign iob_rdata_o  = wb_ack_i ? wb_dat_i : wb_data_r;
    assign iob_ready_o  = wb_ack_i;
 """,
         },
     ]
+    #
+    # Combs
+    #
+    attributes_dict["comb"] = {
+        "code": """
+    // Set rvalid on next cycle if read successful
+    iob_rvalid_o_en = iob_valid_i & iob_ready_o & (~wb_we_r);
+    iob_rvalid_o_rst = iob_rvalid_o; // Enable for one clock cycle
+    iob_rvalid_o_nxt = 1'b1;
+"""
+    }
 
     return attributes_dict

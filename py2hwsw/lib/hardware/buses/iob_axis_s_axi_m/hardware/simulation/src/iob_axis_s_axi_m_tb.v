@@ -68,7 +68,7 @@ module iob_axis_s_axi_m_tb;
    wire [(DATA_W/8)-1:0] axi_ram_ext_mem_w_strb;
    wire [(ADDR_W-2)-1:0] axi_ram_ext_mem_w_addr;
 
-   // AXI-4 full master I/F
+   // AXI-4 full manager I/F
    wire ram_axi_awid;  //Address write channel ID
    wire [ADDR_W-1:0] ram_axi_awaddr;  //Address write channel address
    wire [8-1:0] ram_axi_awlen;  //Address write channel burst length
@@ -566,7 +566,7 @@ module iob_axis_s_axi_m_tb;
    //
    // Custom Tasks
    //
-   // Write data to AXIS IN IOb Native slave
+   // Write data to AXIS IN IOb Native subordinate
    task axis_in_iob_write;
       input [`IOB_AXISTREAM_IN_CSRS_ADDR_W-1:0] addr;
       input [31:0] data;
@@ -585,7 +585,7 @@ module iob_axis_s_axi_m_tb;
       end
    endtask
 
-   // Read data from AXIS IN IOb Native slave
+   // Read data from AXIS IN IOb Native subordinate
    task axis_in_iob_read;
       input [`IOB_AXISTREAM_IN_CSRS_ADDR_W-1:0] addr;
       output [31:0] data;
@@ -604,7 +604,7 @@ module iob_axis_s_axi_m_tb;
       end
    endtask
 
-   // Write data to AXIS OUT IOb Native slave
+   // Write data to AXIS OUT IOb Native subordinate
    task axis_out_iob_write;
       input [`IOB_AXISTREAM_OUT_CSRS_ADDR_W-1:0] addr;
       input [31:0] data;
@@ -623,7 +623,7 @@ module iob_axis_s_axi_m_tb;
       end
    endtask
 
-   // Read data from AXIS OUT IOb Native slave
+   // Read data from AXIS OUT IOb Native subordinate
    task axis_out_iob_read;
       input [`IOB_AXISTREAM_OUT_CSRS_ADDR_W-1:0] addr;
       output [31:0] data;

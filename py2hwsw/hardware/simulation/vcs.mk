@@ -20,7 +20,7 @@ EFLAGS=-debug_access+nomemcbk+dmptf -licqueue -debug_region+cell -notice +bidir+
 
 #+lint=all
 
-comp: $(VHDR) $(VSRC) $(BUILD_DEPS)
+comp: $(VHDR) $(VSRC)
 	vlogan $(SFLAGS) $(VSRC) && vcs $(EFLAGS) $(TB)
 
 exec: comp

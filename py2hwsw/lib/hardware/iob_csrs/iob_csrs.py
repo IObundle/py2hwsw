@@ -315,8 +315,8 @@ def setup(py_params_dict):
     localparam WAIT_RVALID = 1'd1;
 
 
-    assign internal_iob_addr_reg_en = (state == WAIT_REQ);
-    assign internal_iob_addr_stable = (state == WAIT_RVALID) ? internal_iob_addr_reg : internal_iob_addr;
+    assign internal_iob_addr_reg_en = internal_iob_valid;
+    assign internal_iob_addr_stable = internal_iob_valid ? internal_iob_addr : internal_iob_addr_reg;
 
     assign write_en = |internal_iob_wstrb;
 

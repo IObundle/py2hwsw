@@ -12,7 +12,7 @@
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_versat
 	url = git@github.com:IObundle/iob-versat.git
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_eth"]
-	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_eth
+	path = py2hwsw/lib/iob_system/submodules/iob_eth
 	url = git@github.com:IObundle/iob-eth.git
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_linux"]
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_linux

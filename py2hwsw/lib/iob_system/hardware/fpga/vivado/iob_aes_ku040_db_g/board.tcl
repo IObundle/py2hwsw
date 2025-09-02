@@ -94,7 +94,7 @@ if { $USE_ETHERNET > 0 } {
     read_verilog vivado/$BOARD/iob_xilinx_ibufg.v
     read_verilog vivado/$BOARD/iob_xilinx_oddre1.v
 
-    read_xdc vivado/$BOARD/eth.sdc
+    read_xdc vivado/$BOARD/iob_eth_dev.sdc
 }
 
 if {[file exists "vivado/$BOARD/auto_board.sdc"]} {

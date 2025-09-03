@@ -125,14 +125,6 @@ def setup(py_params_dict):
             },
             # uart core
             {
-                "name": "clk_rst",
-                "descr": "Clock and reset",
-                "signals": [
-                    {"name": "clk_i"},
-                    {"name": "arst_i"},
-                ],
-            },
-            {
                 "name": "iob_uart_core_reg_interface",
                 "descr": "",
                 "signals": [
@@ -196,7 +188,7 @@ def setup(py_params_dict):
                 "instance_name": "iob_uart_core_inst",
                 "instance_description": "UART core driver",
                 "connect": {
-                    "clk_rst_s": "clk_rst",
+                    "clk_en_rst_s": "clk_en_rst_s",
                     "reg_interface_io": "iob_uart_core_reg_interface",
                     "rs232_m": "rs232_m",
                 },

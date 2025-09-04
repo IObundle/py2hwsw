@@ -121,6 +121,19 @@ def setup(py_params_dict):
                     },
                 ],
             },
+            # manual wire for custom tx_pattern_reg
+            {
+                "name": "tx_pattern_nxt",
+                "descr": "TX Pattern internal wire next",
+                "signals": [
+                    {
+                        "name": "tx_pattern_nxt",
+                        "width": "10",
+                        "descr": "TX Pattern internal wire next value",
+                        "isvar": True,
+                    },
+                ],
+            },
             {
                 "name": "tx_bitcnt",
                 "descr": "TX Bit Count internal wire",
@@ -162,6 +175,19 @@ def setup(py_params_dict):
                         "name": "rx_cyclecnt",
                         "width": "16",
                         "descr": " RX Parity Check Internal Wire",
+                    },
+                ],
+            },
+            # manual wire for custom rx_cyclecnt_reg
+            {
+                "name": "rx_cyclecnt_nxt",
+                "descr": "RX Cycle Count internal wire next",
+                "signals": [
+                    {
+                        "name": "rx_cyclecnt_nxt",
+                        "width": "16",
+                        "descr": " RX Parity Check Internal Wire next value",
+                        "isvar": True,
                     },
                 ],
             },
@@ -240,6 +266,51 @@ def setup(py_params_dict):
                     "data_o": "tx_data_int",
                 },
             },
+            # manual register for custom RST_VAL
+            {
+                "core_name": "iob_reg",
+                "instance_name": "tx_pattern_reg",
+                "port_params": {
+                    "clk_en_rst_s": "c_a_r_e",
+                },
+                "parameters": {
+                    "DATA_W": "10",
+                    "RST_VAL": "{10{1'b1}}",
+                },
+                "connect": {
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "rst_i: tx_pattern_rst",
+                            "en_i: tx_pattern_en",
+                        ],
+                    ),
+                    "data_i": "tx_pattern_nxt",
+                    "data_o": "tx_pattern",
+                },
+            },
+            {
+                "core_name": "iob_reg",
+                "instance_name": "rx_cyclecnt_reg",
+                "port_params": {
+                    "clk_en_rst_s": "c_a_r_e",
+                },
+                "parameters": {
+                    "DATA_W": "16",
+                    "RST_VAL": "16'b1",
+                },
+                "connect": {
+                    "clk_en_rst_s": (
+                        "clk_en_rst_s",
+                        [
+                            "rst_i: rx_cyclecnt_rst",
+                            "en_i: rx_cyclecnt_en",
+                        ],
+                    ),
+                    "data_i": "rx_cyclecnt_nxt",
+                    "data_o": "rx_cyclecnt",
+                },
+            },
         ],
         "comb": {
             "code": """
@@ -266,10 +337,6 @@ def setup(py_params_dict):
       tx_ready_o_rst = rst_soft_i;
       tx_ready_o_en = txen;
 
-
-      
-
-
       case (tx_pc)
 
          0: begin  //wait for data to send
@@ -290,7 +357,7 @@ def setup(py_params_dict):
             tx_cyclecnt_nxt = tx_cyclecnt + 16'd1;  //increment cycle counter
             if (tx_cyclecnt == bit_duration_i)
                if (tx_bitcnt == 4'd9) begin  //stop bit sent sent
-                  tx_pc_nxt = 2'd0;  //restart program 
+                  tx_pc_nxt = 2'd0;  //restart program
                end else begin  //data bit sent
                   tx_pattern_nxt  = tx_pattern >> 1;
                   tx_bitcnt_nxt   = tx_bitcnt + 4'd1;  //send next bit
@@ -300,8 +367,6 @@ def setup(py_params_dict):
       endcase
 
 //RX
-
-     rx_ready_o_rst = rst_soft_i | data_read_en_i;
 
       rx_pc_nxt = rx_pc + 3'd1;  //increment pc by default
       rx_pc_rst = rst_soft_i;
@@ -318,9 +383,9 @@ def setup(py_params_dict):
       rx_pattern_nxt = rx_pattern;
       rx_pattern_rst = rst_soft_i;
       rx_pattern_en = rx_en_i;
-      
+
       rx_ready_o_nxt = rx_ready_o;
-      rx_ready_o_rst = rst_soft_i;
+      rx_ready_o_rst = rst_soft_i | data_read_en_i;
       rx_ready_o_en = rx_en_i;
 
       rs232_rts_o_nxt = rs232_rts_o;
@@ -360,7 +425,7 @@ def setup(py_params_dict):
             rx_cyclecnt_nxt = rx_cyclecnt + 16'd1;
             if (rx_cyclecnt != bit_duration_i / 2)  // wait half bit period
                rx_pc_nxt = rx_pc;
-            else if (rs232_rxd_i)  //error: line returned to high unexpectedly 
+            else if (rs232_rxd_i)  //error: line returned to high unexpectedly
                rx_pc_nxt = 3'd0;  //go back and resync
             else rx_cyclecnt_nxt = 16'd1;
          end
@@ -384,9 +449,6 @@ def setup(py_params_dict):
             end
          end
       endcase
-   
-
-
             """,
         },
     }

@@ -27,6 +27,7 @@ import os
 import argparse
 from datetime import datetime
 from jinja2 import Template
+import shutil
 
 FILE_WITH_IGNORE_INFO = ".ignore_file_headers"
 
@@ -185,6 +186,11 @@ def main():
         help="SPDX license identifier (default: MIT)",
     )
     parser.add_argument(
+        "--license-path",
+        default="./LICENSES",
+        help="Optional path to LICENSE files (default: ./LICENSES)",
+    )
+    parser.add_argument(
         "--copyright-holder",
         default="IObundle",
         help="SPDX copyright holder (default: IObundle)",
@@ -202,6 +208,7 @@ def main():
         ignore_paths=args.ignore_paths,
         copyright_holder=args.copyright_holder,
         license_name=args.license,
+        license_path=args.license_path,
         header_template=args.header,
         list_files_only=args.list_files_only,
         delete_only=args.delete_only,
@@ -217,6 +224,7 @@ def generate_headers(
     copyright_holder="IObundle",
     copyright_year=datetime.now().year,
     license_name="MIT",
+    license_path=".",
     header_template="spdx",
     custom_header_suffix="",
     list_files_only=False,
@@ -310,9 +318,19 @@ def generate_headers(
     for file in files:
         write_independent_lic_file(file, header)
 
-    # Download license using `reuse` tool
-    if not os.path.isfile(os.path.join(root, f"LICENSES/{license_name}.txt")):
-        os.system(f"reuse --root {root} download {license_name}")
+    license_src = os.path.join(license_path, f"{license_name}.txt")
+    license_dir = os.path.join(root, "LICENSES")
+    license_dst = os.path.join(license_dir, f"{license_name}.txt")
+    if not os.path.isfile(license_dst):
+        # try to copy LICENSE from license path
+        if os.path.isfile(license_src):
+            os.makedirs(license_dir, exist_ok=True)
+            shutil.copy(license_src, license_dst)
+        else:
+            breakpoint()
+            # fallback if LICENSE file not found:
+            # download license using `reuse` tool
+            os.system(f"reuse --root {root} download {license_name}")
 
 
 def write_independent_lic_file(file, header):

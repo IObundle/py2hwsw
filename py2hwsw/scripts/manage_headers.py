@@ -327,7 +327,6 @@ def generate_headers(
             os.makedirs(license_dir, exist_ok=True)
             shutil.copy(license_src, license_dst)
         else:
-            breakpoint()
             # fallback if LICENSE file not found:
             # download license using `reuse` tool
             os.system(f"reuse --root {root} download {license_name}")

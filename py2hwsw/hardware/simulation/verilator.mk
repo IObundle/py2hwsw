@@ -33,7 +33,7 @@ ifeq ($(VCD),1)
 VFLAGS+=--trace -DVCD
 endif
 
-comp: $(VHDR) $(VSRC) $(BUILD_DEPS) $(COBJ)
+comp: $(VHDR) $(VSRC) $(COBJ)
 	verilator $(VFLAGS) $(VSRC)
 	cd ./obj_dir && make -f $(SIM_OBJ).mk
 

@@ -32,7 +32,7 @@ iob_system_firmware.bin: ../../software/iob_system_firmware.bin
 	make -C ../../ sw-build
 
 UTARGETS+=build_iob_system_software tb
-TB_SRC=./simulation/src/iob_uart_csrs.c
+TB_SRC+=./simulation/src/iob_uart_csrs.c
 TB_INCLUDES ?=-I./simulation/src
 
 TEMPLATE_LDS=src/$@.lds
@@ -64,12 +64,14 @@ build_iob_system_software: iob_system_firmware iob_system_boot iob_system_preboo
 
 ifneq ($(USE_FPGA),)
 WRAPPER_CONFS_PREFIX=iob_system_$(BOARD)
+WRAPPER_DIR=src
 else
 WRAPPER_CONFS_PREFIX=iob_uut
+WRAPPER_DIR=simulation/src
 endif
 
 iob_bsp:
-	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' src/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h
+	sed 's/$(WRAPPER_CONFS_PREFIX)/IOB_BSP/Ig' $(WRAPPER_DIR)/$(WRAPPER_CONFS_PREFIX)_conf.h > src/iob_bsp.h
 
 iob_system_firmware: iob_bsp
 	make $@.elf INCLUDES="$(IOB_SYSTEM_INCLUDES)" LFLAGS="$(IOB_SYSTEM_LFLAGS) -Wl,-Map,$@.map" SRC="$(IOB_SYSTEM_FW_SRC)" TEMPLATE_LDS="$(TEMPLATE_LDS)"

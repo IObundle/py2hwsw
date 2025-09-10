@@ -4,6 +4,7 @@
 
 `timescale 1ns / 1ps
 
+// verilator coverage_off
 module iob_and_tb;
 
    reg     [1:0] data_i = 0;
@@ -14,7 +15,7 @@ module iob_and_tb;
 
    initial begin
 
-      for (i = 0; i < 4; i = i + 1) begin
+      for (i = 0; i < 5; i = i + 1) begin
          #10 data_i = i[1:0];
          #10 $display("data_i = %b, data_o = %b", data_i, data_o);
       end
@@ -37,3 +38,4 @@ module iob_and_tb;
    );
 
 endmodule
+// verilator coverage_on

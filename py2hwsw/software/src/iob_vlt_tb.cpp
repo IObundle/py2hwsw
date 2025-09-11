@@ -171,6 +171,13 @@ int main(int argc, char **argv) {
   delete tfp;
 #endif
 
+  // Coverage analysis
+#if VM_COVERAGE
+  // empty write() argument uses +verilator+coverage+file+[name] from args
+  // default: coverage.dat
+  Verilated::threadContextp()->coveragep()->write();
+#endif
+
   delete dut;
 
   exit(failed);

@@ -28,6 +28,12 @@ endif
 # filter out the verilog testbench
 ifeq ($(TBTYPE),C)
 VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) $(SW_DIR)/iob_core_tb.c $(SW_DIR)/iob_vlt_tb.cpp $(VLT_SRC)
+
+# set CUSTOM_COVERAGE_FLAGS in sim_build.mk for custom analysis script
+# NOTE: requires adding sw_module: iob_coverage_analyze
+ifneq ($(CUSTOM_COVERAGE_FLAGS),)
+CUSTOM_COVERAGE=./$(PYTHON_DIR)/iob_cov_analyze.py $(CUSTOM_COVERAGE_FLAGS)
+endif
 endif
 
 # include files
@@ -77,6 +83,7 @@ cov-analyze: $(COV_RPT)
 	# --annotate-all: write annotations for all modules, even if 100% covered
 	# more info: https://verilator.org/guide/latest/exe_verilator_coverage.html
 	verilator_coverage --annotate cov_annotated --annotate-min 2 --annotate-all $(COV_MERGE)
+	$(CUSTOM_COVERAGE)
 
 clean: gen-clean
 	@rm -rf obj_dir

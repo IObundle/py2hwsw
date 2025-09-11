@@ -65,7 +65,10 @@ void iob_hard_reset() {
   dut->clk_i = 1;
   dut->cke_i = 0;
   dut->arst_i = 0;
-  clk_tick(100);
+  clk_tick(50);
+  dut->cke_i = 1;
+  clk_tick(50);
+  dut->cke_i = 0;
   dut->arst_i = 1;
   clk_tick(100);
   dut->arst_i = 0;

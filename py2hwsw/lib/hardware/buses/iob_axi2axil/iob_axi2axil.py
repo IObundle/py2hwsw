@@ -43,6 +43,14 @@ def setup(py_params_dict):
                 "min": "1",
                 "max": "32",
             },
+            {
+                "name": "AXI_LOCK_W",
+                "descr": "AXI lock width",
+                "type": "P",
+                "val": "2",
+                "min": "1",
+                "max": "32",
+            },
         ],
         "ports": [
             {
@@ -54,6 +62,7 @@ def setup(py_params_dict):
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
                     "LEN_W": "AXI_LEN_W",
+                    "LOCK_W": "AXI_LOCK_W",
                 },
             },
             {

@@ -3,6 +3,7 @@
 import argparse
 from dataclasses import dataclass, field
 from pathlib import Path
+import re
 
 
 def parse_arguments():
@@ -30,6 +31,12 @@ def parse_arguments():
         default=[],
         action="append",
         help="List of waive files.",
+    )
+    parser.add_argument(
+        "-T",
+        "--waived-tag",
+        action="store_true",
+        help="Tag waived lines in verilog coverage annotations. Replaces annotation with `%waived`",
     )
     parser.add_argument(
         "-o",
@@ -109,6 +116,19 @@ class CovFile:
     def filename(self) -> str:
         return self.path.split("/")[-1]
 
+    @property
+    def waived_line_numbers(self) -> list[int]:
+        """
+        Returns:
+            list[str]: List of line number to waive.
+        """
+        excluded_lines = []
+        # get all waived lines
+        for rule in self.waive_rules:
+            excluded_lines += list(range(rule.line_start, rule.line_end + 1))
+        # remove repeated lines
+        return list(set(excluded_lines))
+
     def process(self) -> None:
         """Read and process coverage annotation file.
         Update the coverage data structures with information about coverage.
@@ -130,6 +150,23 @@ class CovFile:
                 elif annotation.startswith("~"):
                     self.mixed_lines += 1
 
+    def tag_waived_lines(self) -> None:
+        """Read and process coverage annotation file.
+        Update the coverage data structures with information about coverage.
+        Check: https://verilator.org/guide/latest/exe_verilator_coverage.html for
+        more details.
+        """
+        # read file lines
+        lines = []
+        with open(self.path, "r") as file:
+            lines = file.readlines()
+        waived_line_numbers = self.waived_line_numbers
+        for lnum in waived_line_numbers:
+            # replace waived line annotation with %waived
+            lines[lnum - 1] = re.sub(r"%([0-9]+)", "%waived", lines[lnum - 1], count=1)
+        with open(self.path, "w") as file:
+            file.writelines(lines)
+
     def exclude_waives(self, lines: list[str]) -> list[str]:
         """Exclude waived lines from coverage analysis.
         Args:
@@ -137,12 +174,7 @@ class CovFile:
         Returns:
             list[str]: List of lines excluding waived lines.
         """
-        excluded_lines = []
-        # get all waived lines
-        for rule in self.waive_rules:
-            excluded_lines += list(range(rule.line_start, rule.line_end + 1))
-        # remove repeated lines
-        excluded_lines = list(set(excluded_lines))
+        excluded_lines = self.waived_line_numbers
         # exclude waived lines
         filtered_lines = [
             line
@@ -198,16 +230,19 @@ def add_waive_rules(cov_files: list[CovFile], waive_files: list[str]):
     return rules
 
 
-def process_annotated_files(files: list[CovFile]) -> None:
+def process_annotated_files(files: list[CovFile], waived_tag: bool) -> None:
     """Read and process coverage annotation files.
     Update the coverage data structures with information about coverage.
     Check: https://verilator.org/guide/latest/exe_verilator_coverage.html for
     more details.
     Args:
         files list[CovFile]: List of coverage files to process.
+        waived_tag bool: Tag waived lines in verilog coverage annotations.
     """
     for f in files:
         f.process()
+        if waived_tag:
+            f.tag_waived_lines()
 
 
 def report_results(files: list[CovFile], output: str) -> None:
@@ -260,6 +295,6 @@ if __name__ == "__main__":
     # 2. Add waive rules to coverage files
     add_waive_rules(cov_files, args.waive)
     # 3. Process annotation files
-    process_annotated_files(cov_files)
+    process_annotated_files(cov_files, args.waived_tag)
     # 4. Report Results
     report_results(cov_files, args.output)

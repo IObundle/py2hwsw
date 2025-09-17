@@ -7,3 +7,13 @@
 // waiver structure:
 // waive filename:line[:line] [reason]
 waive iob_prio_enc.v:30:34 "Unused generate if branch"
+
+waive iob_universal_converter_iob_iob.v:21 "Some read data bits are unused/always 0"
+waive iob_universal_converter_iob_iob.v:29 "Some read data bits are unused/always 0"
+waive iob_universal_converter_iob_iob.v:39 "Some read data bits are unused/always 0"
+
+waive iob_uart_csrs.v:25 "Some read data bits are unused/always 0"
+waive iob_uart_csrs.v:57 "Some read data bits are unused/always 0"
+waive iob_uart_csrs.v:79:80 "Some read data bits are unused/always 0"
+
+waive iob_uart.v:29 "Some read data bits are unused/always 0"

@@ -217,11 +217,11 @@ def setup(py_params_dict):
             {
                 "verilog_code": """
     // txdata Manual logic
-    assign txdata_ready_wr = 1'b1;
+    assign txdata_ready_wr = (~softreset_wr);  // always ready, except on reset
     assign txdata_wen_wr = txdata_valid_wr & txdata_wstrb_wr;
 
     // rxdata Manual logic
-    assign rxdata_ready_rd = 1'b1;
+    assign rxdata_ready_rd = (~softreset_wr);  // always ready, except on reset
 
 """,
             },

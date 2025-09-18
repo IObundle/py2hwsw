@@ -15,7 +15,6 @@ ifeq ($(TBTYPE),V)
 # get 1st match in ./src/*_tb.v files
 # take filename without extention
 VTOP=$(basename $(notdir $(firstword $(wildcard ./src/*_tb.v))))
-# VTOP=$(patsubst %_tb,%,$(basename $(notdir $(firstword $(wildcard ./src/*_tb.v)))))
 endif
 
 SIM_OBJ=V$(VTOP)

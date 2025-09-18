@@ -68,7 +68,7 @@ def create_waive_rule(line: str) -> WaiveRule:
         waive filename:line_start[:line_end]] "reason"
     Example:
         waive reg.v:10 "Clock is always enabled"
-        waive prio_enc.v:30-34 "Unused Generate Block Configuration"
+        waive prio_enc.v:30:34 "Unused Generate Block Configuration"
 
     Args:
         line str: Line from waive file.
@@ -230,7 +230,7 @@ def add_waive_rules(cov_files: list[CovFile], waive_files: list[str]):
         for cov_file in cov_files:
             if cov_file.filename == rule.file:
                 cov_file.waive_rules.append(rule)
-                continue
+                break
     return rules
 
 
@@ -274,7 +274,10 @@ def report_results(files: list[CovFile], output: str) -> None:
         rpt.write(f"Covered Files: {covered_files}\n")
         rpt.write(f"Files Missing Coverage: {total_files - covered_files}\n\n")
         rpt.write(f"[Covered/Total] Lines: [{covered_lines}/{total_lines}]\n\n")
-        global_coverage = ((covered_lines + waived_lines) / total_lines) * 100
+        if total_lines == 0:
+            global_coverage = 100.0
+        else:
+            global_coverage = ((covered_lines + waived_lines) / total_lines) * 100
         rpt.write(f"Global Coverage: {global_coverage:.2f} %\n\n")
         rpt.write("=================\n")
         rpt.write("Covered File List\n")

@@ -28,11 +28,12 @@ endif
 ifeq ($(TBTYPE),C)
 VSRC:=$(filter-out $(wildcard ./src/*_tb.v), $(VSRC)) $(SW_DIR)/iob_core_tb.c $(SW_DIR)/iob_vlt_tb.cpp $(VLT_SRC)
 
+endif
+
 # set CUSTOM_COVERAGE_FLAGS in sim_build.mk for custom analysis script
 # NOTE: requires adding sw_module: iob_coverage_analyze
 ifneq ($(CUSTOM_COVERAGE_FLAGS),)
 CUSTOM_COVERAGE=./$(PYTHON_DIR)/iob_cov_analyze.py $(CUSTOM_COVERAGE_FLAGS)
-endif
 endif
 
 # include files

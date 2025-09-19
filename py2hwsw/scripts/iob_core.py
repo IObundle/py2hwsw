@@ -531,6 +531,10 @@ class iob_core(iob_module, iob_instance):
                 type(child_value) is list
             ), f"Invalid type for attribute '{child_attribute_name}': {type(child_value)}"
 
+            # Make sure parent has corresponding attribute
+            if child_attribute_name not in parent_attributes:
+                parent_attributes[child_attribute_name] = []
+
             # Select identifier attribute. Used to compare if should override each element.
             identifier = "name"
             if child_attribute_name in ["subblocks", "superblocks", "sw_modules"]:

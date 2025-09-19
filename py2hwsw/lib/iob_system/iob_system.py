@@ -11,7 +11,9 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "script
 from iob_system_utils import convert_params_dict, update_params, iob_system_scripts
 
 
-def setup(py_params_dict):
+def setup(py_params: dict):
+    # Dictionary of available python parameters for iob_system
+    # Format: [parameter name]: ([parameter default value], [parameter description])
     params = {
         "name": ("iob_system", "Name of the generated System"),
         "init_mem": (True, "If should initialize memories from data in .hex files"),
@@ -34,6 +36,7 @@ def setup(py_params_dict):
         "fw_addr_w": (18, "Firmware address width"),
         "include_tester": (True, "If should include a tester system"),
         "include_snippet": (True, "If should include default system snippet"),
+        # See notes at the end of this file for more info about custom CPU integration and available CPUs
         "cpu": (
             "iob_vexriscv",
             """CPU selection.
@@ -43,7 +46,7 @@ def setup(py_params_dict):
         ),
         "system_attributes": (
             {},
-            "Core dictionary with attributes to override/append to the ones of iob_system. Usually passed by child cores to add their own components.",
+            "Core dictionary with attributes to override/append to the ones of iob_system. Usually passed by derived cores to add their own components.",
         ),
     }
 
@@ -52,7 +55,7 @@ def setup(py_params_dict):
     python_parameters_attribute = convert_params_dict(params)
 
     # Update parameters values with ones given in python parameters
-    update_params(params, py_params_dict)
+    update_params(params, py_params)
 
     if params["cpu"] == "none":
         params["use_intmem"] = False
@@ -740,6 +743,27 @@ def setup(py_params_dict):
             }
         ]
 
-    iob_system_scripts(attributes_dict, params, py_params_dict)
+    iob_system_scripts(attributes_dict, params, py_params)
 
     return attributes_dict
+
+
+'''
+Notes about CPU integration:
+
+By default, iob_system uses the VexRiscv CPU
+In order to integrate new CPUs seamlessly with iob_system, the CPU interfaces should match the ones expected by the iob_system. This way we can easily switch the CPU's instance while maintaining the same connections and remaining system parameters.
+
+To adapt an existing CPU for compatibility with iob_system, we may create a wrapper module over the existing CPU, containing the expected interfaces, and any required interface conversion modules.
+
+The iob_vexriscv module, also included in the Py2HWSW's library, is a wrapper of the VexRiscv CPU that already contains the interfaces expected by iob_system. These interfaces are the ones specified in the ports list of the iob_vexriscv CPU wrapper: https://github.com/IObundle/iob-vexriscv/blob/main/iob_vexriscv.py#L63-L135
+
+In order to provide more CPU options, we have created the following CPU wrappers, making them compatible with iob_system:
+
+The VexRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexriscv
+The NaxRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-naxriscv
+The Picorv32 CPU compatible with iob_system is available at: https://github.com/IObundle/iob-picorv32
+
+To switch between CPUs, iob_system supports the `cpu` python parameter.
+The user may change this parameter's value to any of the supported CPUs.
+'''

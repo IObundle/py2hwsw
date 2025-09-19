@@ -83,7 +83,7 @@ def setup(py_params_dict):
         # AXIS Interface - without last
         {
             "name": "axis_s",
-            "descr": "AXIS slave interface",
+            "descr": "AXIS subordinate interface",
             "signals": {"type": "axis", "DATA_W": "DATA_W"},
         },
         {

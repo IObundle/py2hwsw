@@ -662,7 +662,9 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
         nix_permission_hack(os.path.join(core.build_dir, directory))
         # No need to copy any more files in this directory
         return
-
+    elif directory == "software" and core.dest_dir.startswith("hardware/simulation"):
+        # Copy software sources into 'software/simulation' directory, if the core has a destination dir somewhere inside the hardware/simulation folder.
+        dst_directory = "software/simulation"
     else:
         dst_directory = directory
 

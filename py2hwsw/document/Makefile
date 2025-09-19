@@ -7,6 +7,7 @@
 SHELL = bash
 
 # include core basic info
+ROOT_DIR :=..
 include ../config_build.mk
 
 #include local doc makefile segment

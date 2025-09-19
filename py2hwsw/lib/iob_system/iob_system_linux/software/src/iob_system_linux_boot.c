@@ -6,9 +6,6 @@
 
 #include "clint.h"
 #include "iob_bsp.h"
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
-#include "iob_eth.h"
-#endif
 #include "iob_printf.h"
 #include "iob_spi.h"
 #include "iob_spidefs.h"
@@ -16,6 +13,9 @@
 #include "iob_system_linux_conf.h"
 #include "iob_system_linux_mmap.h"
 #include "iob_uart16550.h"
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
+#include "iob_eth.h"
+#endif
 #include <stdio.h>
 #include <string.h>
 
@@ -27,19 +27,6 @@
 #define FLASH_FIRMWARE_OFFSET 0x1000 // sector 0, subsector 1
 
 // Ethernet utility functions
-// NOTE: These functions are not compatible with malloc() and free().
-//      These are specifically made for use with the current iob-eth.c drivers.
-//      (These assume that there is only one block allocated at a time)
-//      It allocates a block with required size at the end of the external
-//      memory region.
-static void *mem_alloc(size_t size) {
-  // FIXME: Use a memory region that is not allocated to bootloader
-  return (void *)(IOB_SYSTEM_LINUX_FW_BASEADDR +
-                  (1 << IOB_SYSTEM_LINUX_FW_ADDR_W)) -
-         size;
-}
-static void mem_free(void *ptr) {}
-
 void clear_cache() {
   // Delay to ensure all data is written to memory
   for (unsigned int i = 0; i < 10; i++)
@@ -48,7 +35,7 @@ void clear_cache() {
   asm volatile(".word 0x500F" ::: "memory");
 }
 
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
 // Send signal by uart to receive file by ethernet
 uint32_t uart_recvfile_ethernet(char *file_name) {
   uart16550_puts(UART_PROGNAME);
@@ -72,7 +59,7 @@ uint32_t uart_recvfile_ethernet(char *file_name) {
 
   return file_size;
 }
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
 
 int compute_mem_load_txt(char file_name_array[4][50],
                          long int file_address_array[4], char *file_start_addr,
@@ -127,14 +114,14 @@ void console_get_files(int file_count, long int file_address_array[4],
   char *file_addr = NULL;
   for (i = 0; i < file_count; i++) {
     file_addr = (char *)(file_start_addr + file_address_array[i]);
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
     // Receive data from console via Ethernet
     file_sizes[i] = uart_recvfile_ethernet(file_name_array[i]);
     eth_rcv_file(file_addr, file_sizes[i]);
-#else  // NOT IOB_SYSTEM_LINUX_USE_ETH
+#else  // NOT IOB_SYSTEM_LINUX_USE_ETHERNET
     // Receive data from console via UART
     file_sizes[i] = uart16550_recvfile(file_name_array[i], file_addr);
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
   }
 }
 
@@ -236,15 +223,12 @@ int main() {
 #ifndef IOB_SYSTEM_LINUX_INIT_MEM
   printf_init(&uart16550_putc);
 
-#ifdef IOB_SYSTEM_LINUX_USE_ETH
+#ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
   // Init ethernet
   eth_init(ETH0_BASE, &clear_cache);
-  // Use custom memory alloc/free functions to ensure it allocates in external
-  // memory
-  eth_init_mem_alloc(&mem_alloc, &mem_free);
   // Wait for PHY reset to finish
   eth_wait_phy_rst();
-#endif // IOB_SYSTEM_LINUX_USE_ETH
+#endif // IOB_SYSTEM_LINUX_USE_ETHERNET
 
   char boot_flow[20] = {0};
 

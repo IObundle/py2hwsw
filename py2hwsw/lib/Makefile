@@ -31,6 +31,9 @@ endif
 ifneq ($(USE_EXTMEM),)
 PY_PARAMS:=$(PY_PARAMS):use_extmem=$(USE_EXTMEM)
 endif
+ifneq ($(USE_ETHERNET),)
+PY_PARAMS:=$(PY_PARAMS):use_ethernet=$(USE_ETHERNET)
+endif
 ifneq ($(MEM_ADDR_W),)
 PY_PARAMS:=$(PY_PARAMS):mem_addr_w=$(MEM_ADDR_W)
 endif

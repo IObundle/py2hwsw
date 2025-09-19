@@ -388,16 +388,23 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
         if peripherals:
             file.write("PERIPHERALS ?=" + " ".join(peripheral_name_list) + "\n")
         if params["use_ethernet"]:
+            # Set USE_ETHERNET variable
+            file.write("USE_ETHERNET=1\n")
             # Set custom ethernet CONSOLE_CMD
             file.write(
                 'CONSOLE_CMD ?=rm -f soc2cnsl cnsl2soc; $(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -L -c $(PYTHON_DIR)/console.py -m "$(RMAC_ADDR)" -i "$(ETH_IF)"\n',
             )
             file.write(
                 """
-UTARGETS+=iob_eth_rmac.h
-EMUL_HDR+=iob_eth_rmac.h
-iob_eth_rmac.h:
+UTARGETS+=src/iob_eth_rmac.h
+EMUL_HDR+=src/iob_eth_rmac.h
+src/iob_eth_rmac.h:
 	echo "#define ETH_RMAC_ADDR 0x$(RMAC_ADDR)" > $@\n
+	echo "#define ETH_RMAC_ADDR 0x$(RMAC_ADDR)" > simulation/$@\n
+
+.PHONY: src/iob_eth_rmac.h
+
+TB_SRC+=./simulation/src/iob_eth_tb_driver.c ./simulation/src/iob_eth.c ./simulation/src/iob_eth_csrs.c 
 """,
             )
         if attributes_dict.get("is_tester", False):
@@ -466,6 +473,32 @@ get_uut_run_deps:
             file.write(
                 'ETH2FILE_SCRIPT="$(PYTHON_DIR)/eth2file.py"\n'
                 'CONSOLE_CMD=$(IOB_CONSOLE_PYTHON_ENV) $(PYTHON_DIR)/console_ethernet.py -L -c $(PYTHON_DIR)/console.py -e $(ETH2FILE_SCRIPT) -m "$(RMAC_ADDR)" -i "$(ETH_IF)" -t 60\n',
+            )
+            # Compile and set permissions for pyRawWrapper
+            file.write(
+                """
+# Compile and set permissions for pyRawWrapper (if used)
+PYRAWWRAPPER_PATH=../../scripts/pyRawWrapper/pyRawWrapper
+ifeq ($(IOB_CONSOLE_PYTHON_ENV),$(ROOT_DIR)/scripts/pyRawWrapper/pyRawWrapper)
+BUILD_DEPS+=$(PYRAWWRAPPER_PATH)
+$(PYRAWWRAPPER_PATH):
+	make -C $(dir $(PYRAWWRAPPER_PATH)) all
+endif
+
+PRIVILEGED_CMD = $(shell command -v doas > /dev/null 2>&1 && echo "doas" || command -v sudo > /dev/null 2>&1 && echo "sudo sh -c" || echo "su root -c")
+BUILD_DEPS+=virtual-network-if
+virtual-network-if:
+	@if ip link show $(ETH_IF) &> /dev/null; then \
+		echo "Interface $(ETH_IF) exists, skipping interface creation"; \
+	else \
+		echo "Creating dummy network interface: $(ETH_IF)"; \
+		$(PRIVILEGED_CMD) "modprobe dummy;\
+		ip link add $(ETH_IF) type dummy;\
+		ifconfig $(ETH_IF) up"; \
+	fi
+
+.PHONY: virtual-network-if
+"""
             )
         if attributes_dict.get("is_tester", False):
             # Create target to copy UUT's hex files

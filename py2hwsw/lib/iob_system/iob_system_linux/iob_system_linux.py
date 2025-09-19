@@ -25,8 +25,9 @@ def setup(py_params: dict):
     iob_system_default_overrides = {
         "use_intmem": False,
         "use_extmem": True,
+        "use_ethernet": True,
         "mem_addr_w": 26,
-        "bootrom_addr_w": 15,
+        "bootrom_addr_w": 16,
         "fw_baseaddr": 0,
         "cpu": "iob_vexriscv",
         "include_snippet": False,  # Don't include iob_system's snippets. We will use our own.
@@ -154,32 +155,6 @@ def setup(py_params: dict):
                     "interrupt_o": "uart_interrupt",
                 },
             },
-            # {
-            #     "core_name": "iob_eth",
-            #     "instance_name": "ETH0",
-            #     "instance_description": "Ethernet interface",
-            #     "peripheral_addr_w": 12,
-            #     "parameters": {
-            #         "AXI_ID_W": "AXI_ID_W",
-            #         "AXI_LEN_W": "AXI_LEN_W",
-            #         "AXI_ADDR_W": params["addr_w"],
-            #         "AXI_DATA_W": params["data_w"],
-            #     },
-            #     "connect": {
-            #         "clk_en_rst_s": "clk_en_rst_s",
-            #         "axi_m": (
-            #             "eth_axi",
-            #             [
-            #                 "eth_axi_arid[0]",
-            #                 "eth_axi_rid[0]",
-            #                 "eth_axi_awid[0]",
-            #                 "eth_axi_bid[0]",
-            #             ],
-            #         ),
-            #         "inta_o": "ethernet_interrupt",
-            #         "phy_io": "phy_io",
-            #     },
-            # },
             # {
             #     # Instantiate a VERSAT core from: https://github.com/IObundle/iob-versat
             #     "core_name": "iob_versat",
@@ -358,15 +333,6 @@ def setup(py_params: dict):
     #         f"{cls.build_dir}/hardware/src",
     #         dirs_exist_ok=True,
     #     )
-    #
-    #     # Override periphs_tmp.h of iob-soc with one specific for linux
-    #     create_periphs_tmp(
-    #         cls.name,
-    #         next(i["val"] for i in cls.confs if i["name"] == "ADDR_W"),
-    #         cls.peripherals,
-    #         f"{cls.build_dir}/software/{cls.name}_periphs.h",
-    #     )
-    #     check_linux_build_macros(cls, f"{setup_dir}/submodules/OS")
     #
 
     #

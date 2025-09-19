@@ -160,13 +160,17 @@ External connection '{get_real_signal(portmap.e_connect).name}' has the followin
             # If both ports are standard interfaces, connect by name
             if port.interface and portmap.e_connect.interface:
                 # Remove prefix and suffix from port name
-                port_name = port_name.replace(port.interface.prefix, "", 1)[:-2]
+                port_name = port_name.replace(port.interface.prefix, "", 1).rsplit(
+                    "_", 1
+                )[0]
                 for e_signal in portmap.e_connect.signals:
                     real_e_signal = get_real_signal(e_signal)
                     e_signal_name = real_e_signal.name
                     # Remove prefix and suffix from external signal name
-                    if e_signal_name[-2:] in ["_o", "_i"]:
-                        e_signal_name = e_signal_name[:-2]
+                    if any(
+                        e_signal_name.endswith(suffix) for suffix in ["_o", "_i", "_io"]
+                    ):
+                        e_signal_name = e_signal_name.rsplit("_", 1)[0]
                     e_signal_name = e_signal_name.replace(
                         portmap.e_connect.interface.prefix, "", 1
                     )

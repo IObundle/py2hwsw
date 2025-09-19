@@ -24,7 +24,10 @@ def setup(py_params: dict):
         "use_extmem": (False, "If should use external memory (usually DDR)"),
         "use_bootrom": (True, "If should include a bootrom"),
         "use_peripherals": (True, "If should include peripherals"),
-        "use_ethernet": (False, "If should setup ethernet ports and testbenches"),
+        "use_ethernet": (
+            False,
+            "If should include ethernet peripheral, MII interface, and testbenches with ethernet support.",
+        ),
         "addr_w": (32, "CPU address width"),
         "data_w": (32, "CPU data width"),
         "mem_addr_w": (
@@ -67,6 +70,11 @@ def setup(py_params: dict):
         if params[param_name]:
             num_xbar_managers += 1
     xbar_sel_w = (num_xbar_managers - 1).bit_length()
+
+    # Create list of interrupt signals
+    interrupt_signals = []
+    if params["use_ethernet"]:
+        interrupt_signals += ["eth_interrupt"]
 
     attributes_dict = {
         "name": params["name"],
@@ -284,6 +292,27 @@ def setup(py_params: dict):
             },
             # NOTE: Add ports for peripherals here
         ]
+        if params["use_ethernet"]:
+            attributes_dict["ports"] += [
+                {
+                    "name": "phy_rstn_o",
+                    "descr": "",
+                    "signals": [
+                        {
+                            "name": "phy_rstn_o",
+                            "width": "1",
+                            "descr": "Ethernet reset signal for PHY.",
+                        },
+                    ],
+                },
+                {
+                    "name": "mii_io",
+                    "descr": "Ethernet MII interface",
+                    "signals": {
+                        "type": "mii",
+                    },
+                },
+            ]
     if params["cpu"] == "none":
         attributes_dict["ports"] += [
             {
@@ -453,6 +482,34 @@ def setup(py_params: dict):
             # Peripheral cbus wires added automatically
             # NOTE: Add other peripheral wires here
         ]
+        if params["use_ethernet"]:
+            attributes_dict["wires"] += [
+                {
+                    "name": "eth_axi",
+                    "descr": "AXI bus for ethernet DMA",
+                    "signals": {
+                        "type": "axi",
+                        "prefix": "eth_",
+                        "ID_W": "AXI_ID_W",
+                        "ADDR_W": params["addr_w"],
+                        "DATA_W": "AXI_DATA_W",
+                        "LEN_W": "AXI_LEN_W",
+                        "LOCK_W": "2",
+                    },
+                },
+            ]
+    # Generate interrupt wires for each signal defined in 'interrupt_signals' list
+    for interrupt_signal in interrupt_signals:
+        attributes_dict["wires"] += [
+            {
+                "name": interrupt_signal,
+                "descr": "Interrupt signal",
+                "signals": [
+                    {"name": interrupt_signal, "width": 1},
+                ],
+            },
+        ]
+
     attributes_dict["subblocks"] = []
     if params["cpu"] != "none":
         attributes_dict["subblocks"] += [
@@ -566,6 +623,16 @@ def setup(py_params: dict):
                 }
                 num_managers += 1
         attributes_dict["subblocks"][-1]["num_managers"] = num_managers
+        # Connect ethernet to xbar subordinate interfaces
+        if params["use_ethernet"]:
+            subordinate_if_number = attributes_dict["subblocks"][-1]["num_subordinates"]
+            attributes_dict["subblocks"][-1]["num_subordinates"] += 1
+            attributes_dict["subblocks"][-1]["connect"] |= {
+                f"s{subordinate_if_number}_axi_s": (
+                    "eth_axi",
+                    ["eth_axi_awlock[0]", "eth_axi_arlock[0]"],
+                )
+            }
 
     if params["use_intmem"]:
         attributes_dict["subblocks"] += [
@@ -688,6 +755,28 @@ def setup(py_params: dict):
             },
             # NOTE: Instantiate other peripherals here, using the 'is_peripheral' flag
         ]
+        if params["use_ethernet"]:
+            attributes_dict["subblocks"] += [
+                {
+                    "core_name": "iob_eth",
+                    "instance_name": "ETH0",
+                    "instance_description": "Ethernet interface",
+                    "is_peripheral": True,
+                    "parameters": {
+                        "AXI_ID_W": "AXI_ID_W",
+                        "AXI_LEN_W": "AXI_LEN_W",
+                        "AXI_ADDR_W": params["addr_w"],
+                        "AXI_DATA_W": params["data_w"],
+                    },
+                    "connect": {
+                        "clk_en_rst_s": "clk_en_rst_s",
+                        "axi_m": "eth_axi",
+                        "inta_o": "eth_interrupt",
+                        "phy_rstn_o": "phy_rstn_o",
+                        "mii_io": "mii_io",
+                    },
+                },
+            ]
     attributes_dict["superblocks"] = [
         # Synthesis module (needed for macros)
         {
@@ -733,12 +822,18 @@ def setup(py_params: dict):
     ]
 
     attributes_dict["snippets"] = []
+
     if params["include_snippet"]:
+        # Calculate unused interrupts, and generate interrupts snippet
+        num_unused_interrupts = 31 - len(interrupt_signals)
+        interrupt_signals_str = ""
+        if len(interrupt_signals) > 0:
+            interrupt_signals_str = ",".join(interrupt_signals) + ","
+
         attributes_dict["snippets"] += [
             {
-                "verilog_code": """
-   //assign interrupts = {{30{1'b0}}, uart_interrupt_o, 1'b0};
-   assign interrupts = {{30{1'b0}}, 1'b0, 1'b0};
+                "verilog_code": f"""
+   assign interrupts = {{{{{num_unused_interrupts}{{1'b0}}}}, {interrupt_signals_str} 1'b0}};
 """
             }
         ]

@@ -748,7 +748,7 @@ def setup(py_params: dict):
     return attributes_dict
 
 
-'''
+"""
 Notes about CPU integration:
 
 By default, iob_system uses the VexRiscv CPU
@@ -766,4 +766,4 @@ The Picorv32 CPU compatible with iob_system is available at: https://github.com/
 
 To switch between CPUs, iob_system supports the `cpu` python parameter.
 The user may change this parameter's value to any of the supported CPUs.
-'''
+"""

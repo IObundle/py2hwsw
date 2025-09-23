@@ -119,7 +119,7 @@ endif
 endif
 
 
-test.log: remote_build_dir
+test.log: build
 ifneq ($(TB),none)
 
 ifeq ($(SIM_SERVER),) #is simulator in local machine?
@@ -177,8 +177,6 @@ endif
 
 
 test: $(TEST_LIST)
-
-build_deps: $(BUILD_DEPS)
 
 debug:
 	@echo NAME=$(NAME)

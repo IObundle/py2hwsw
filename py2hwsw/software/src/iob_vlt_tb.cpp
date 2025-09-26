@@ -65,7 +65,10 @@ void iob_hard_reset() {
   dut->clk_i = 1;
   dut->cke_i = 0;
   dut->arst_i = 0;
-  clk_tick(100);
+  clk_tick(50);
+  dut->cke_i = 1;
+  clk_tick(50);
+  dut->cke_i = 0;
   dut->arst_i = 1;
   clk_tick(100);
   dut->arst_i = 0;
@@ -169,6 +172,13 @@ int main(int argc, char **argv) {
   tfp->close(); // Close tracing file
   fprintf(stdout, "Trace file created: uut.vcd\n");
   delete tfp;
+#endif
+
+  // Coverage analysis
+#if VM_COVERAGE
+  // empty write() argument uses +verilator+coverage+file+[name] from args
+  // default: coverage.dat
+  Verilated::threadContextp()->coveragep()->write();
 #endif
 
   delete dut;

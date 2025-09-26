@@ -919,6 +919,10 @@ class csr_gen:
             },
         ]
 
+        # byte aligned words
+        # remove intermediate wire to remove coverage problems
+        byte_aligned = {}
+
         # Create byte aligned wires
         for row in table:
             name = row.name
@@ -935,17 +939,19 @@ class csr_gen:
                 if name == "version":
                     pass
                 elif auto:
-                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name};\n"
                     if bit_padding > 0:
-                        snippet += f"assign byte_aligned_{name} = {{{{{bit_padding}{{1'b0}}}}, {name}_rdata}};\n"
+                        byte_aligned[name] = (
+                            f"{{{{{bit_padding}{{1'b0}}}}, {name}_rdata}}"
+                        )
                     else:
-                        snippet += f"assign byte_aligned_{name} = {name}_rdata;\n"
+                        byte_aligned[name] = f"{name}_rdata"
                 else:
-                    snippet += f"wire [{8*n_bytes-1}:0] byte_aligned_{name}_rdata;\n"
                     if bit_padding > 0:
-                        snippet += f"assign byte_aligned_{name}_rdata = {{{{{bit_padding}{{1'b0}}}}, {name}_rdata{suffix}}};\n"
+                        byte_aligned[name] = (
+                            f"{{{{{bit_padding}{{1'b0}}}}, {name}_rdata{suffix}}}"
+                        )
                     else:
-                        snippet += f"assign byte_aligned_{name}_rdata = {name}_rdata{suffix};\n"
+                        byte_aligned[name] = f"{name}_rdata{suffix}"
 
         # Response signals switch logic
         if all_auto:
@@ -1024,10 +1030,10 @@ class csr_gen:
                     rst_val = row.rst_val
                     snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {8*n_bytes}'h{rst_val}|{8*n_bytes}'d0;\n"
                 elif auto:
-                    snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}|{8*n_bytes}'d0;\n"
+                    snippet += f"            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {byte_aligned[name]}|{8*n_bytes}'d0;\n"
                 else:
                     snippet += f"""
-            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = byte_aligned_{name}_rdata|{8*n_bytes}'d0;
+            iob_rdata_nxt[{self.boffset(addr, self.cpu_n_bytes)}+:{8*n_bytes}] = {byte_aligned[name]}|{8*n_bytes}'d0;
             rvalid_int = {name}_rvalid{suffix};
 """
                 if not auto:

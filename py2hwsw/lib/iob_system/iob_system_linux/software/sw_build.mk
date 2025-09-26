@@ -160,7 +160,8 @@ TEMPLATE_LDS=src/$@.lds
 #IOB_SYSTEM_LINUX_CFLAGS ?=-Os -nostdlib -march=rv32imac -mabi=ilp32 --specs=nano.specs -Wcast-align=strict $(SIM_DEFINE)
 IOB_SYSTEM_LINUX_CFLAGS ?=-Os -nostdlib -march=rv32imac -mabi=ilp32 --specs=nano.specs -Wcast-align=strict
 
-IOB_SYSTEM_LINUX_INCLUDES=-Isrc -Isrc/crypto/McEliece -Isrc/crypto/McEliece/common
+IOB_SYSTEM_LINUX_INCLUDES=-Isrc
+#IOB_SYSTEM_LINUX_INCLUDES=-Isrc -Isrc/crypto/McEliece -Isrc/crypto/McEliece/common
 
 IOB_SYSTEM_LINUX_LFLAGS=-Wl,-L,src,-Bstatic,-T,$(TEMPLATE_LDS),--strip-debug
 

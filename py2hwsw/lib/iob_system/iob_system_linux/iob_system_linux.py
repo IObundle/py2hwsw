@@ -252,7 +252,7 @@ def setup(py_params: dict):
             # IOb-System-Linux will inherit all attributes/files from the iob_system core.
             "core_name": "iob_system",
             # Every parameter in the lines below will be passed to the iob_system parent core.
-            # Full list of parameters availabe here: https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/iob_system/iob_system.py
+            # Full list of parameters available here: https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/iob_system/iob_system.py
             "system_attributes": attributes_dict,
             # NOTE: Place other iob_system python parameters here
             **py_params,

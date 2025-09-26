@@ -23,3 +23,6 @@
 [submodule "py2hwsw/lib/iob_system/submodules/iob_naxriscv"]
 	path = py2hwsw/lib/iob_system/submodules/iob_naxriscv
 	url = git@github.com:IObundle/iob-naxriscv.git
+[submodule "py2hwsw/lib/iob_system/submodules/iob_vexiiriscv"]
+	path = py2hwsw/lib/iob_system/submodules/iob_vexiiriscv
+	url = git@github.com:IObundle/iob-vexiiriscv.git

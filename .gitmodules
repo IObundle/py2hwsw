@@ -4,19 +4,19 @@
 
 [submodule "py2hwsw/lib/hardware/iob_system/submodules/VEXRISCV"]
 	path = py2hwsw/lib/iob_system/submodules/iob_vexriscv
-	url = git@github.com:IObundle/iob-vexriscv.git
+	url = https://github.com/IObundle/iob-vexriscv.git
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_uart16550"]
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_uart16550
-	url = git@github.com:IObundle/iob-uart16550.git
+	url = https://github.com/IObundle/iob-uart16550.git
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_eth"]
 	path = py2hwsw/lib/iob_system/submodules/iob_eth
-	url = git@github.com:IObundle/iob-eth.git
+	url = https://github.com/IObundle/iob-eth.git
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_linux"]
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_linux
-	url = git@github.com:IObundle/iob-linux.git
+	url = https://github.com/IObundle/iob-linux.git
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master"]
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master
-	url = git@github.com:IObundle/iob-spi.git
+	url = https://github.com/IObundle/iob-spi.git
 [submodule "py2hwsw/lib/iob_system/submodules/iob_vexiiriscv"]
 	path = py2hwsw/lib/iob_system/submodules/iob_vexiiriscv
-	url = git@github.com:IObundle/iob-vexiiriscv.git
+	url = https://github.com/IObundle/iob-vexiiriscv.git

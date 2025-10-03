@@ -224,7 +224,9 @@ def setup(py_params: dict):
                 "name": "INT_MEM_HEXFILE",
                 "descr": "Firmware file name",
                 "type": "D",
-                "val": f'"{params["name"]}_firmware"',
+                "val": (
+                    f'"{params["name"]}_firmware"' if params["init_mem"] else '"none"'
+                ),
                 "min": "NA",
                 "max": "NA",
             },

@@ -12,7 +12,7 @@
 # bash-interactive-5.2p37
 # gnumake-4.4.1
 # iverilog-12.0
-# verilator-5.034
+# verilator (custom version v5.040)
 # gtkwave-3.3.121
 # python3-3.12.10
 # python3 black-25.1.0
@@ -78,6 +78,8 @@ let
 
   yosys = import ./scripts/yosys.nix { inherit pkgs; };
 
+  verilator_v5_040 = import ./scripts/verilator.nix { inherit pkgs; };
+
   pythonEnv = pkgs.python3.withPackages (ps: with ps; [
     black
     mypy
@@ -95,7 +97,6 @@ let
     bash
     gnumake
     verilog
-    verilator
     gtkwave
     python3
     pythonEnv
@@ -120,6 +121,7 @@ let
     in import "${volareSrc}" {
       inherit pkgs;
     })
+    verilator_v5_040
     yosys
     gcc
     libcap # Allows setting POSIX capabilities

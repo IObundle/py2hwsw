@@ -37,28 +37,28 @@ pkgs.stdenv.mkDerivation {
 
   # build + run dependencies
   buildInputs = [ 
-     pkgs.perl
-     (pkgs.python3.withPackages (
-        pp: with pp; [
-            distro
-        ]
-     ))
+    pkgs.perl
+    (pkgs.python3.withPackages (
+      pp: with pp; [
+        distro
+      ]
+    ))
    ];
   # build only dependencies
   nativeBuildInputs = [
-     pkgs.makeWrapper
-     pkgs.flex
-     pkgs.bison
-     pkgs.autoconf
-     pkgs.help2man
-     pkgs.git
+    pkgs.makeWrapper
+    pkgs.flex
+    pkgs.bison
+    pkgs.autoconf
+    pkgs.help2man
+    pkgs.git
   ];
 
   nativeCheckInputs = [
-     pkgs.which
-     pkgs.coreutils
-     pkgs.python3
-     pkgs.numactl
+    pkgs.which
+    pkgs.coreutils
+    pkgs.python3
+    pkgs.numactl
   ];
 
   configurePhase = ''

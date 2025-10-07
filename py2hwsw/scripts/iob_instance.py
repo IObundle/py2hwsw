@@ -49,12 +49,18 @@ class iob_instance(iob_base):
         )
         # Instance portmap connections
         self.set_default_attribute(
-            "portmap_connections", [], list, descr="Instance portmap connections",
+            "portmap_connections",
+            [],
+            list,
+            descr="Instance portmap connections",
             copy_by_reference=False,
         )
         # Verilog parameter values
         self.set_default_attribute(
-            "parameters", parameters, Dict, descr="Verilog parameter values",
+            "parameters",
+            parameters,
+            Dict,
+            descr="Verilog parameter values",
             copy_by_reference=False,
         )
         # Select if should intantiate inside another Verilog module.
@@ -175,7 +181,7 @@ class iob_instance(iob_base):
                         self.__connect_clk_interface(port, issuer)
 
         # iob_csrs specific code
-        if self.original_name == "iob_csrs" and issuer:
+        if self.original_name == "iob_csrs" and issuer and self.instantiate:
             self.__connect_cbus_port(issuer)
 
     def __connect_memory(self, port, issuer):

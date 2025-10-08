@@ -858,9 +858,15 @@ The iob_vexriscv module, also included in the Py2HWSW's library, is a wrapper of
 In order to provide more CPU options, we have created the following CPU wrappers, making them compatible with iob_system:
 
 The VexRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexriscv
-The NaxRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-naxriscv
-The Picorv32 CPU compatible with iob_system is available at: https://github.com/IObundle/iob-picorv32
 
 To switch between CPUs, iob_system supports the `cpu` python parameter.
 The user may change this parameter's value to any of the supported CPUs.
+
+Other untested/WIP compatible CPUs:
+The untested Picorv32 CPU compatible with iob_system is available at: https://github.com/IObundle/iob-picorv32
+The untested NaxRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-naxriscv
+The untested Ibex CPU compatible with iob_system is available at: https://github.com/IObundle/iob-ibex
+The untested VexiiRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexiiriscv
+
+These untested CPUs are not included in the Py2HWSW library. To use them, include them as git submodules of your project.
 """

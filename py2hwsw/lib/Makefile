@@ -28,6 +28,9 @@ endif
 ifneq ($(INIT_MEM),)
 PY_PARAMS:=$(PY_PARAMS):init_mem=$(INIT_MEM)
 endif
+ifneq ($(USE_INTMEM),)
+PY_PARAMS:=$(PY_PARAMS):use_intmem=$(USE_INTMEM)
+endif
 ifneq ($(USE_EXTMEM),)
 PY_PARAMS:=$(PY_PARAMS):use_extmem=$(USE_EXTMEM)
 endif

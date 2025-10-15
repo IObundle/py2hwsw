@@ -734,7 +734,7 @@ def generate_ipxact_xml(core, dest_dir):
     # Genererate the memory map xml code
     memory_map_xml = ""
     if csr_block:
-        sw_regs = static_reg_tables[core.name + "_csrs"]
+        sw_regs = static_reg_tables[csr_block.name]
         memory_map_xml = gen_memory_map_xml(sw_regs, parameters_list)
 
     # Generate instantiations xml code

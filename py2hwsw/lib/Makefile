@@ -20,10 +20,10 @@ CORE ?=iob_ctls
 
 CSR_IF?=iob
 
-# Fill PY_PARAMS if not defined
-ifeq ($(PY_PARAMS),)
-PY_PARAMS=csr_if=$(CSR_IF)
-
+# Fill PY_PARAMS
+ifneq ($(CSR_IF),)
+PY_PARAMS:=$(PY_PARAMS):csr_if=$(CSR_IF)
+endif
 # IOb-System parameters
 ifneq ($(INIT_MEM),)
 PY_PARAMS:=$(PY_PARAMS):init_mem=$(INIT_MEM)
@@ -40,7 +40,11 @@ endif
 ifneq ($(FW_ADDR_W),)
 PY_PARAMS:=$(PY_PARAMS):fw_addr_w=$(FW_ADDR_W)
 endif
-endif # ifndef PY_PARAMS
+ifneq ($(CPU),)
+PY_PARAMS:=$(PY_PARAMS):cpu=$(CPU)
+endif
+# Remove first char (:) from PY_PARAMS
+PY_PARAMS:=$(shell echo $(PY_PARAMS) | cut -c2-)
 
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart

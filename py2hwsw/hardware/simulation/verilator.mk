@@ -82,7 +82,7 @@ cov-analyze: $(COV_RPT)
 	# --annotate-min <count>: set minimum threshold for toggle for sufficient coverage
 	# --annotate-all: write annotations for all modules, even if 100% covered
 	# more info: https://verilator.org/guide/latest/exe_verilator_coverage.html
-	verilator_coverage --annotate cov_annotated --annotate-min 2 --annotate-all $(COV_MERGE)
+	verilator_coverage --annotate cov_annotated --annotate-min 1 --annotate-all $(COV_MERGE)
 	$(CUSTOM_COVERAGE)
 
 clean: gen-clean

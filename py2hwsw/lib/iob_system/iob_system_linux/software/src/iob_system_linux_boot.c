@@ -197,6 +197,7 @@ void read_flash(int file_count, long int file_address_array[4],
   }
 }
 
+#ifdef IOB_SYSTEM_LINUX_TRAP_HANDLER
 //
 // Trap handler
 //
@@ -235,6 +236,7 @@ void set_trap_vector(void (*handler)(void)) {
   uintptr_t addr = (uintptr_t)handler;
   asm volatile("csrw mtvec, %0" : : "r"(addr));
 }
+#endif
 
 //
 // Main
@@ -254,7 +256,9 @@ int main() {
       uart16550_putc((char)ENQ);
   } while (!uart16550_rxready());
 
+#ifdef IOB_SYSTEM_LINUX_TRAP_HANDLER
   set_trap_vector(trap_handler);
+#endif
 
   // welcome message
   uart16550_puts(PROGNAME);

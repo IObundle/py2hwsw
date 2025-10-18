@@ -222,7 +222,7 @@ def setup(py_params_dict):
             "name": "prio_enc_o",
             "descr": "Output of priority encoder",
             "signals": [
-                {"name": "sel"},
+                {"name": "prio_enc_o", "width": NUM_INPUTS.bit_length()},
             ],
         },
     ]
@@ -357,8 +357,12 @@ def setup(py_params_dict):
         },
     ]
 
+    verilog_code = f"""
+   // Priority encoder may have 1 more bit to signal 'no input', but we don't use it for selection.
+   assign sel = prio_enc_o[{NBITS}-1:0];
+"""
+
     # Connect demuxer outputs
-    verilog_code = ""
     verilog_outputs = []
     for port_idx in range(NUM_INPUTS):
         verilog_code += f"""

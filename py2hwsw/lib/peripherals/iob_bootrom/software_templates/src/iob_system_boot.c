@@ -11,10 +11,10 @@
 
 #define PROGNAME "IOb-Bootloader"
 
+#ifdef IOB_SYSTEM_TRAP_HANDLER
 //
 // Trap handler
 //
-
 // Simple hex conversion for 32-bit integer into a buffer (without stdlib)
 void uint32_to_hex_str(uint32_t value, char *buffer) {
   const char hex_chars[] = "0123456789ABCDEF";
@@ -45,10 +45,13 @@ void trap_handler(void) {
   asm volatile("ebreak"); // halt for debugger, optional
 }
 
+// Set trap vector using the mtvec CSR
+// Not compatible with PicoRV32
 void set_trap_vector(void (*handler)(void)) {
   uintptr_t addr = (uintptr_t)handler;
   asm volatile("csrw mtvec, %0" : : "r"(addr));
 }
+#endif
 
 //
 // Main
@@ -65,7 +68,9 @@ int main() {
       uart_putc((char)ENQ);
   } while (!iob_uart_csrs_get_rxready());
 
+#ifdef IOB_SYSTEM_TRAP_HANDLER
   set_trap_vector(trap_handler);
+#endif
 
   // welcome message
   uart_puts(PROGNAME);

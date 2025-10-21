@@ -736,12 +736,10 @@ def setup(py_params: dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": (
-                        "iob_periphs_cbus" if params["cpu"] != "none" else "iob_s"
-                    ),
+                    "s_s": ("iob_periphs_cbus" if params["cpu"] != "none" else "iob_s"),
                     # Peripherals cbus connections added automatically
                 },
-                "num_outputs": 0,  # Num outputs configured automatically
+                "num_managers": 0,  # Num managers configured automatically
                 "addr_w": params["addr_w"] - xbar_sel_w,
             },
             # Peripherals

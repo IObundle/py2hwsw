@@ -343,12 +343,12 @@ def setup(py_params_dict):
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "reset_i": "split_reset",
-                "input_s": "pbus_s",
-                "output_0_m": "axistream_in_csrs",
-                "output_1_m": "axistream_out_csrs",
-                "output_2_m": "dma_csrs",
+                "s_s": "pbus_s",
+                "m_0_m": "axistream_in_csrs",
+                "m_1_m": "axistream_out_csrs",
+                "m_2_m": "dma_csrs",
             },
-            "num_outputs": 3,
+            "num_managers": 3,
             "addr_w": 7,
         },
         {

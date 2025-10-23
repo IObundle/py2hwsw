@@ -107,7 +107,7 @@ class CovFile:
         )
 
     def is_covered(self) -> bool:
-        return self.total_lines == self.covered_lines
+        return self.total_lines == (self.covered_lines + self.waived_lines)
 
     @property
     def coverage_level(self) -> float:

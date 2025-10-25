@@ -91,6 +91,8 @@ py2-doc-update:
 delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
+export_fusesoc:
+	nix-shell --run "py2hwsw $(CORE) export_fusesoc"
 
 lib-ipxact:
 	nix-shell --run "py2hwsw --browse"
@@ -98,7 +100,7 @@ lib-ipxact:
 	nix-shell --run "kactus2"
 
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery lib-ipxact
+.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery export_fusesoc lib-ipxact
 
 
 # Install board server and client

@@ -871,6 +871,7 @@ In order to provide more CPU options, we have created the following CPU wrappers
 
 The VexRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexriscv
 The Picorv32 CPU compatible with iob_system is available at: https://github.com/IObundle/iob-picorv32
+The VexiiRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexiiriscv
 
 To switch between CPUs, iob_system supports the `cpu` python parameter.
 The user may change this parameter's value to any of the supported CPUs.
@@ -878,7 +879,6 @@ The user may change this parameter's value to any of the supported CPUs.
 Other untested/WIP compatible CPUs:
 The untested NaxRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-naxriscv
 The untested Ibex CPU compatible with iob_system is available at: https://github.com/IObundle/iob-ibex
-The untested VexiiRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexiiriscv
 
 These untested CPUs are not included in the Py2HWSW library. To use them, include them as git submodules of your project.
 """

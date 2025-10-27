@@ -92,7 +92,7 @@ delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
 export_fusesoc:
-	nix-shell --run "py2hwsw $(CORE) export_fusesoc"
+	nix-shell --run "make clean setup && py2hwsw $(CORE) export_fusesoc --build_dir '$(BUILD_DIR)'"
 
 lib-ipxact:
 	nix-shell --run "py2hwsw --browse"

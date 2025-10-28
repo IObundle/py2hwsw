@@ -11,6 +11,11 @@ OUTPUT_DIR = "fusesoc_exports"
 
 
 def export_core(core):
+    """Export core as a fusesoc core.
+    This function will use the given core's attributes to generate the corresponding fusesoc `.core` yaml file.
+    This function expects the  build directory for the core to have been generated previously.
+    """
+
     # Don't try to export if build dir doesn't exist
     if not os.path.exists(core.build_dir):
         # print error and exit
@@ -21,7 +26,7 @@ def export_core(core):
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     # Copy build directory to OUTPUT_DIR
-    shutil.copytree(core.build_dir, f"{OUTPUT_DIR}/{core.name}")
+    shutil.copytree(core.build_dir, f"{OUTPUT_DIR}/{core.name}", dirs_exist_ok=True)
 
     core_file_content = f"""\
 CAPI=2:
@@ -31,14 +36,12 @@ description : {core.description}
 
 filesets:
   rtl:
-{dependency_list(core)}
     files:
-      - {core.name}/hardware/src/{core.name}.v
-      - {core.name}/hardware/src/{core.name}_conf.vh: {{is_include_file : true}}
+{get_source_list(OUTPUT_DIR, core.name + "/hardware/src")}
     file_type : verilogSource
   sim:
     files:
-      - {core.name}/hardware/simulation/src/{core.name}_tb.v
+{get_source_list(OUTPUT_DIR, core.name + "/hardware/simulation/src")}
     file_type : verilogSource
 
 targets:
@@ -62,13 +65,18 @@ targets:
     print(f"FuseSoC core file generated at: {core_file_path}")
 
 
-def dependency_list(core):
-    """Return yaml list of subblocks for given core"""
-    dependencies = ""
-    for subblock in core.subblocks:
-        dependencies += f"      - {subblock.original_name}\n"
+def get_source_list(export_path, subdir):
+    """Return yaml list of sources in specified subdir of given export_path
+    :return: yaml list of verilog sources
+    """
+    source_path = f"{export_path}/{subdir}"
 
-    if dependencies:
-        dependencies = "    depend:\n" + dependencies
+    sources = ""
+    if os.path.isdir(source_path):
+        for file in os.listdir(source_path):
+            if file.endswith(".v"):
+                sources += f"      - {os.path.join(subdir, file)}\n"
+            if file.endswith(".vh"):
+                sources += f"      - {os.path.join(subdir, file)}: {{is_include_file : true}}\n"
 
-    return dependencies
+    return sources

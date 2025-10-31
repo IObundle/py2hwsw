@@ -1,0 +1,16 @@
+% SPDX-FileCopyrightText: 2025 IObundle, Lda
+%
+% SPDX-License-Identifier: MIT
+%
+% Py2HWSW Version 0.81 has generated this code (https://github.com/IObundle/py2hwsw).
+
+iob\_csrs\_iob\_valid\_i & input & 1 & Request address is valid. \\ \hline
+\rowcolor{iob-blue}
+iob\_csrs\_iob\_addr\_i & input & 3 & Byte address. \\ \hline
+iob\_csrs\_iob\_wdata\_i & input & DATA\_W & Write data. \\ \hline
+\rowcolor{iob-blue}
+iob\_csrs\_iob\_wstrb\_i & input & DATA\_W/8 & Write strobe. \\ \hline
+iob\_csrs\_iob\_rvalid\_o & output & 1 & Read data valid. \\ \hline
+\rowcolor{iob-blue}
+iob\_csrs\_iob\_rdata\_o & output & DATA\_W & Read data. \\ \hline
+iob\_csrs\_iob\_ready\_o & output & 1 & Interface ready. \\ \hline

@@ -91,8 +91,18 @@ py2-doc-update:
 delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
-export_fusesoc:
+fusesoc-export:
 	nix-shell --run "make clean setup && py2hwsw $(CORE) export_fusesoc --build_dir '$(BUILD_DIR)'"
+
+#fusesoc-test: fusesoc-export
+fusesoc-test:
+	rm -rf fusesoc_test
+	mkdir fusesoc_test
+	mkdir fusesoc_test/fusesoc_libraries
+	ln -s ../../fusesoc_exports fusesoc_test/fusesoc_libraries/py2hwsw
+	printf "[library.py2]\nlocation = fusesoc_libraries/py2hwsw\n" > fusesoc_test/fusesoc.conf
+	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE):0.81"
+
 
 lib-ipxact:
 	nix-shell --run "py2hwsw --browse"
@@ -100,7 +110,7 @@ lib-ipxact:
 	nix-shell --run "kactus2"
 
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery export_fusesoc lib-ipxact
+.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery fusesoc-export fusesoc-test lib-ipxact
 
 
 # Install board server and client

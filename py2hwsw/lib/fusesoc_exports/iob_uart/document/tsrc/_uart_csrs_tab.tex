@@ -1,0 +1,18 @@
+% SPDX-FileCopyrightText: 2025 IObundle, Lda
+%
+% SPDX-License-Identifier: MIT
+%
+% Py2HWSW Version 0.81 has generated this code (https://github.com/IObundle/py2hwsw).
+
+SOFTRESET & W & 0x0 & 1 & 8 & 0 & Soft reset \\ \hline
+\rowcolor{iob-blue}
+DIV & W & 0x2 & 16 & 16 & 0 & Bit duration in system clock cycles. \\ \hline
+TXDATA & W & 0x4 & 8 & 8 & 0 & TX data. \\ \hline
+\rowcolor{iob-blue}
+TXEN & W & 0x5 & 1 & 8 & 0 & TX enable. \\ \hline
+RXEN & W & 0x6 & 1 & 8 & 0 & RX enable. \\ \hline
+\rowcolor{iob-blue}
+TXREADY & R & 0x0 & 1 & 8 & 0 & TX ready to receive data. \\ \hline
+RXREADY & R & 0x1 & 1 & 8 & 0 & RX ready to be read. \\ \hline
+\rowcolor{iob-blue}
+RXDATA & R & 0x4 & 8 & 8 & 0 & RX data. \\ \hline

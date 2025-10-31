@@ -28,10 +28,16 @@ def export_core(core):
     # Copy build directory to OUTPUT_DIR
     shutil.copytree(core.build_dir, f"{OUTPUT_DIR}/{core.name}", dirs_exist_ok=True)
 
+    tb_top = f"{core.name}_tb"
+    # Check if core contains Py2HWSW's universal testbench
+    if os.path.isfile(f"{OUTPUT_DIR}/{core.name}/hardware/simulation/src/iob_v_tb.v":
+        tb_top = "iob_v_tb"
+
     core_file_content = f"""\
 CAPI=2:
 
 name: iobundle:py2hwsw:{core.name}:{core.version}
+license: {core.license.name}
 description : {core.description}
 
 filesets:
@@ -43,15 +49,21 @@ filesets:
     files:
 {get_source_list(OUTPUT_DIR, core.name + "/hardware/simulation/src")}
     file_type : verilogSource
+  scripts:
+    files:
+{get_source_list(OUTPUT_DIR, core.name + "/scripts")}
+
 
 targets:
   default:
     filesets:
       - rtl
   sim:
-    toplevel: {core.name}_tb
+    toplevel: {tb_top}
     description: Simulate the design
-    default_tool: icarus
+    flow: sim
+    flow_options:
+      tool: icarus
     filesets:
       - rtl
       - sim

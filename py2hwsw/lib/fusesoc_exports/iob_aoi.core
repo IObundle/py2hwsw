@@ -1,0 +1,36 @@
+CAPI=2:
+
+name: iobundle:py2hwsw:iob_aoi:0.81
+description : Default description
+
+filesets:
+  rtl:
+    files:
+      - iob_aoi/hardware/src/iob_coverage_analyze_conf.vh: {is_include_file : true}
+      - iob_aoi/hardware/src/iob_and_conf.vh: {is_include_file : true}
+      - iob_aoi/hardware/src/iob_and.v
+      - iob_aoi/hardware/src/iob_or_conf.vh: {is_include_file : true}
+      - iob_aoi/hardware/src/iob_or.v
+      - iob_aoi/hardware/src/iob_inv_conf.vh: {is_include_file : true}
+      - iob_aoi/hardware/src/iob_inv.v
+      - iob_aoi/hardware/src/iob_aoi_conf.vh: {is_include_file : true}
+      - iob_aoi/hardware/src/iob_aoi.v
+
+    file_type : verilogSource
+  sim:
+    files:
+      - iob_aoi/hardware/simulation/src/iob_aoi_tb.v
+
+    file_type : verilogSource
+
+targets:
+  default:
+    filesets:
+      - rtl
+  sim:
+    toplevel: iob_aoi_tb
+    description: Simulate the design
+    default_tool: icarus
+    filesets:
+      - rtl
+      - sim

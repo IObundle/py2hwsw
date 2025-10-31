@@ -1,0 +1,114 @@
+library(demo) {
+  cell(BUF) {
+    area: 6;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A"; }
+  }
+  cell(NOT) {
+    area: 3;
+    pin(A) { direction: input; }
+    pin(Y) { direction: output;
+              function: "A'"; }
+  }
+  cell(MUX) {
+    area: 4;
+    pin(S) { direction: input; }
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "A*S+B*S'"; }
+  }
+  cell(NAND) {
+    area: 4;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A*B)'"; }
+  }
+  cell(AND) {
+    area: 4;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A*B)"; }
+  }
+  cell(NOR) {
+    area: 4;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A+B)'"; }
+  }
+  cell(OR) {
+    area: 4;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A+B)"; }
+  }
+  cell(XNOR) {
+    area: 4;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A^B)'"; }
+  }
+  cell(XOR) {
+    area: 4;
+    pin(A) { direction: input; }
+    pin(B) { direction: input; }
+    pin(Y) { direction: output;
+             function: "(A^B)"; }
+  }
+  cell(DFF) {
+    area: 18;
+    ff(IQ, IQN) { clocked_on: C;
+                  clear: AR
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(AR) { direction: input; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+  cell(DFFE) {
+    area: 18;
+    ff(IQ, IQN) { clocked_on: C;
+                  clear: AR
+                  enable: E
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(AR) { direction: input; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+  cell(DFFP) {
+    area: 24;
+    ff(IQ, IQN) { clocked_on: C;
+                  preset: "P";
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+    pin(P) { direction: input; }
+  }
+  cell(DFFEP) {
+    area: 18;
+    ff(IQ, IQN) { clocked_on: C;
+                  preset: P
+                  enable: E
+                  next_state: D; }
+    pin(C) { direction: input;
+                 clock: true; }
+    pin(P) { direction: input; }
+    pin(D) { direction: input; }
+    pin(Q) { direction: output;
+              function: "IQ"; }
+  }
+}

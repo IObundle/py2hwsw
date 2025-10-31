@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+SPDX-FileCopyrightText: 2025 IObundle, Lda
+
+SPDX-License-Identifier: MIT
+
+Py2HWSW Version 0.81 has generated this code (https://github.com/IObundle/py2hwsw).
+-->
+
+<ipxact:component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2014" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd">
+	<ipxact:vendor>IObundle</ipxact:vendor>
+	<ipxact:library>IP</ipxact:library>
+	<ipxact:name>IOB-UART-IOB</ipxact:name>
+	<ipxact:version>0.81</ipxact:version>
+	<ipxact:busInterfaces>
+		<ipxact:busInterface>
+			<ipxact:name>clk_en_rst_s</ipxact:name>
+			<ipxact:displayName>Clock (configurable)</ipxact:displayName>
+			<ipxact:description>Clock, clock enable and reset</ipxact:description>
+			<ipxact:busType vendor="IObundle" library="CLK" name="iob_clk" version="1.0"/>
+			<ipxact:slave/>
+			<ipxact:connectionRequired>true</ipxact:connectionRequired>
+			<portMap>
+				<logicalPort>clk_i</logicalPort>
+				<physicalPort>clk_i</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>cke_i</logicalPort>
+				<physicalPort>cke_i</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>arst_i</logicalPort>
+				<physicalPort>arst_i</physicalPort>
+			</portMap>
+
+		</ipxact:busInterface>
+		<ipxact:busInterface>
+			<ipxact:name>rs232_m</ipxact:name>
+			<ipxact:displayName>RS232</ipxact:displayName>
+			<ipxact:description>RS232 interface</ipxact:description>
+			<ipxact:busType vendor="Generic" library="RS232" name="rs232" version="1.0"/>
+			<ipxact:master/>
+			<ipxact:connectionRequired>true</ipxact:connectionRequired>
+			<portMap>
+				<logicalPort>rs232_rxd_i</logicalPort>
+				<physicalPort>rs232_rxd_i</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>rs232_txd_o</logicalPort>
+				<physicalPort>rs232_txd_o</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>rs232_rts_o</logicalPort>
+				<physicalPort>rs232_rts_o</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>rs232_cts_i</logicalPort>
+				<physicalPort>rs232_cts_i</physicalPort>
+			</portMap>
+
+		</ipxact:busInterface>
+		<ipxact:busInterface>
+			<ipxact:name>iob_csrs_cbus_s</ipxact:name>
+			<ipxact:displayName>IOb</ipxact:displayName>
+			<ipxact:description>Control and Status Registers interface (auto-generated)</ipxact:description>
+			<ipxact:busType vendor="IObundle" library="IOb" name="iob" version="1.0"/>
+			<ipxact:slave/>
+			<ipxact:connectionRequired>true</ipxact:connectionRequired>
+			<portMap>
+				<logicalPort>iob_csrs_iob_valid_i</logicalPort>
+				<physicalPort>iob_csrs_iob_valid_i</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>iob_csrs_iob_addr_i</logicalPort>
+				<physicalPort>iob_csrs_iob_addr_i</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>iob_csrs_iob_wdata_i</logicalPort>
+				<physicalPort>iob_csrs_iob_wdata_i</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>iob_csrs_iob_wstrb_i</logicalPort>
+				<physicalPort>iob_csrs_iob_wstrb_i</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>iob_csrs_iob_rvalid_o</logicalPort>
+				<physicalPort>iob_csrs_iob_rvalid_o</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>iob_csrs_iob_rdata_o</logicalPort>
+				<physicalPort>iob_csrs_iob_rdata_o</physicalPort>
+			</portMap>
+			<portMap>
+				<logicalPort>iob_csrs_iob_ready_o</logicalPort>
+				<physicalPort>iob_csrs_iob_ready_o</physicalPort>
+			</portMap>
+
+		</ipxact:busInterface>
+
+	</ipxact:busInterfaces>
+
+	<ipxact:memoryMaps>
+		<ipxact:memoryMap>
+			<ipxact:name>CSR</ipxact:name>
+			<ipxact:addressBlock>
+				<ipxact:name>CSR_REGS</ipxact:name>
+				<ipxact:baseAddress>0</ipxact:baseAddress>
+				<ipxact:range>8</ipxact:range>
+				<ipxact:width>32</ipxact:width>
+				<ipxact:usage>register</ipxact:usage>
+				<ipxact:access>read-write</ipxact:access>
+				<ipxact:register>
+					<ipxact:name>softreset</ipxact:name>
+					<ipxact:description>Soft reset</ipxact:description>
+					<ipxact:addressOffset>"16'h0000</ipxact:addressOffset>
+					<ipxact:size>8</ipxact:size>
+					<ipxact:volatile>true</ipxact:volatile>
+					<ipxact:access>write-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>softreset</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>1</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>write-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+					<ipxact:field>
+						<ipxact:name>RSVD</ipxact:name>
+						<ipxact:bitOffset>1</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>7</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>write-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+				<ipxact:register>
+					<ipxact:name>txready</ipxact:name>
+					<ipxact:description>TX ready to receive data.</ipxact:description>
+					<ipxact:addressOffset>"16'h0000</ipxact:addressOffset>
+					<ipxact:size>8</ipxact:size>
+					<ipxact:volatile>true</ipxact:volatile>
+					<ipxact:access>read-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>txready</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>1</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>read-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+					<ipxact:field>
+						<ipxact:name>RSVD</ipxact:name>
+						<ipxact:bitOffset>1</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>7</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>read-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+				<ipxact:register>
+					<ipxact:name>rxready</ipxact:name>
+					<ipxact:description>RX ready to be read.</ipxact:description>
+					<ipxact:addressOffset>"16'h0001</ipxact:addressOffset>
+					<ipxact:size>8</ipxact:size>
+					<ipxact:volatile>true</ipxact:volatile>
+					<ipxact:access>read-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>rxready</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>1</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>read-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+					<ipxact:field>
+						<ipxact:name>RSVD</ipxact:name>
+						<ipxact:bitOffset>1</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>7</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>read-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+				<ipxact:register>
+					<ipxact:name>div</ipxact:name>
+					<ipxact:description>Bit duration in system clock cycles.</ipxact:description>
+					<ipxact:addressOffset>"16'h0002</ipxact:addressOffset>
+					<ipxact:size>16</ipxact:size>
+					<ipxact:volatile>true</ipxact:volatile>
+					<ipxact:access>write-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>div</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>16</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>write-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+				<ipxact:register>
+					<ipxact:name>txdata</ipxact:name>
+					<ipxact:description>TX data.</ipxact:description>
+					<ipxact:addressOffset>"16'h0004</ipxact:addressOffset>
+					<ipxact:size>8</ipxact:size>
+					<ipxact:volatile>true</ipxact:volatile>
+					<ipxact:access>write-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>txdata</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>8</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>write-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+				<ipxact:register>
+					<ipxact:name>rxdata</ipxact:name>
+					<ipxact:description>RX data.</ipxact:description>
+					<ipxact:addressOffset>"16'h0004</ipxact:addressOffset>
+					<ipxact:size>8</ipxact:size>
+					<ipxact:volatile>true</ipxact:volatile>
+					<ipxact:access>read-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>rxdata</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>8</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>read-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+				<ipxact:register>
+					<ipxact:name>txen</ipxact:name>
+					<ipxact:description>TX enable.</ipxact:description>
+					<ipxact:addressOffset>"16'h0005</ipxact:addressOffset>
+					<ipxact:size>8</ipxact:size>
+					<ipxact:volatile>true</ipxact:volatile>
+					<ipxact:access>write-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>txen</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>1</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>write-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+					<ipxact:field>
+						<ipxact:name>RSVD</ipxact:name>
+						<ipxact:bitOffset>1</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>7</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>write-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+				<ipxact:register>
+					<ipxact:name>rxen</ipxact:name>
+					<ipxact:description>RX enable.</ipxact:description>
+					<ipxact:addressOffset>"16'h0006</ipxact:addressOffset>
+					<ipxact:size>8</ipxact:size>
+					<ipxact:volatile>true</ipxact:volatile>
+					<ipxact:access>write-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>rxen</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>1</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>write-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+					<ipxact:field>
+						<ipxact:name>RSVD</ipxact:name>
+						<ipxact:bitOffset>1</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>7</ipxact:bitWidth>
+						<ipxact:volatile>true</ipxact:volatile>
+						<ipxact:access>write-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+				<ipxact:register>
+					<ipxact:name>version</ipxact:name>
+					<ipxact:description>Product version. This 16-bit register uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part. For example V12.34 is represented by 0x1234.</ipxact:description>
+					<ipxact:addressOffset>"16'h0006</ipxact:addressOffset>
+					<ipxact:size>16</ipxact:size>
+					<ipxact:volatile>false</ipxact:volatile>
+					<ipxact:access>read-only</ipxact:access>
+					<ipxact:field>
+						<ipxact:name>version</ipxact:name>
+						<ipxact:bitOffset>0</ipxact:bitOffset>
+						<ipxact:resets>
+							<ipxact:reset resetTypeRef="arst_i">
+								<ipxact:value>0081</ipxact:value>
+							</ipxact:reset>
+						</ipxact:resets>
+						<ipxact:bitWidth>16</ipxact:bitWidth>
+						<ipxact:volatile>false</ipxact:volatile>
+						<ipxact:access>read-only</ipxact:access>
+						<ipxact:modifiedWriteValue></ipxact:modifiedWriteValue>
+						<ipxact:readAction></ipxact:readAction>
+					</ipxact:field>
+
+				</ipxact:register>
+			</ipxact:addressBlock>
+			<ipxact:addressUnitBits>8</ipxact:addressUnitBits>
+		</ipxact:memoryMap>
+	</ipxact:memoryMaps>
+	<ipxact:model>
+		<ipxact:views>
+			<ipxact:view>
+				<ipxact:name>flat_verilog</ipxact:name>
+				<ipxact:envIdentifier>Verilog:kactus2.cs.tut.fi:</ipxact:envIdentifier>
+				<ipxact:componentInstantiationRef>verilog_implementation</ipxact:componentInstantiationRef>
+			</ipxact:view>
+		</ipxact:views>
+		<ipxact:instantiations>
+			<ipxact:componentInstantiation>
+				<ipxact:name>verilog_implementation</ipxact:name>
+				<ipxact:language>Verilog</ipxact:language>
+				<ipxact:moduleName>iob_uart</ipxact:moduleName>
+				<ipxact:moduleParameters>
+					<ipxact:moduleParameter parameterId="DATA_W_INST_ID" usageType="nontyped">
+						<ipxact:name>DATA_W</ipxact:name>
+						<ipxact:value>DATA_W_ID</ipxact:value>
+					</ipxact:moduleParameter>
+					<ipxact:moduleParameter parameterId="RST_POL_INST_ID" usageType="nontyped">
+						<ipxact:name>RST_POL</ipxact:name>
+						<ipxact:value>RST_POL_ID</ipxact:value>
+					</ipxact:moduleParameter>
+					<ipxact:moduleParameter parameterId="VERSION_INST_ID" usageType="nontyped">
+						<ipxact:name>VERSION</ipxact:name>
+						<ipxact:value>VERSION_ID</ipxact:value>
+					</ipxact:moduleParameter>
+				</ipxact:moduleParameters>
+			</ipxact:componentInstantiation>
+		</ipxact:instantiations>
+		<ipxact:ports>
+			<ipxact:port>
+				<ipxact:name>clk_i</ipxact:name>
+				<ipxact:description>Clock</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>clk_en_rst_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>cke_i</ipxact:name>
+				<ipxact:description>Clock enable</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>clk_en_rst_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>arst_i</ipxact:name>
+				<ipxact:description>Asynchronous active-high reset</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>clk_en_rst_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>rs232_rxd_i</ipxact:name>
+				<ipxact:description>Receive data.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>rs232_m</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>rs232_txd_o</ipxact:name>
+				<ipxact:description>Transmit data.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>out</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>rs232_m</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>rs232_rts_o</ipxact:name>
+				<ipxact:description>Request to send.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>out</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>rs232_m</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>rs232_cts_i</ipxact:name>
+				<ipxact:description>Clear to send.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>rs232_m</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>iob_csrs_iob_valid_i</ipxact:name>
+				<ipxact:description>Request address is valid.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>iob_csrs_cbus_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>iob_csrs_iob_addr_i</ipxact:name>
+				<ipxact:description>Byte address.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>2</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>iob_csrs_cbus_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>iob_csrs_iob_wdata_i</ipxact:name>
+				<ipxact:description>Write data.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>DATA_W_ID-1</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>iob_csrs_cbus_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>iob_csrs_iob_wstrb_i</ipxact:name>
+				<ipxact:description>Write strobe.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>in</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>DATA_W_ID/8-1</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>iob_csrs_cbus_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>iob_csrs_iob_rvalid_o</ipxact:name>
+				<ipxact:description>Read data valid.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>out</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>iob_csrs_cbus_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>iob_csrs_iob_rdata_o</ipxact:name>
+				<ipxact:description>Read data.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>out</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>DATA_W_ID-1</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>iob_csrs_cbus_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+			<ipxact:port>
+				<ipxact:name>iob_csrs_iob_ready_o</ipxact:name>
+				<ipxact:description>Interface ready.</ipxact:description>
+				<ipxact:wire>
+					<ipxact:direction>out</ipxact:direction>
+					<ipxact:vectors>
+						<ipxact:vector>
+							<ipxact:left>0</ipxact:left>
+							<ipxact:right>0</ipxact:right>
+						</ipxact:vector>
+					</ipxact:vectors>
+				</ipxact:wire>
+				<ipxact:vendorExtensions>
+					<kactus2:portTags>iob_csrs_cbus_s</kactus2:portTags>
+				</ipxact:vendorExtensions>
+			</ipxact:port>
+		</ipxact:ports>
+	</ipxact:model>
+	<ipxact:resetTypes>
+		<ipxact:resetType>
+			<ipxact:name>arst_i</ipxact:name>
+			<ipxact:displayName>arst_i</ipxact:displayName>
+			<ipxact:description>Asynchronous active-high reset</ipxact:description>
+		</ipxact:resetType>
+	</ipxact:resetTypes>
+	<ipxact:description>The IObundle UART is a RISC-V-based Peripheral written in Verilog, which users can download for free, modify, simulate and implement in FPGA or ASIC. It is written in Verilog and includes a C software driver. The IObundle UART is a very compact IP that works at high clock rates if needed. It supports full-duplex operation and a configurable baud rate. The IObundle UART has a fixed configuration for the Start and Stop bits. More flexible licensable commercial versions are available upon request.</ipxact:description>
+	<ipxact:parameters>
+		<ipxact:parameter kactus2:usageCount="4" parameterId="DATA_W_ID" type="int">
+			<ipxact:name>DATA_W</ipxact:name>
+			<ipxact:description>Data bus width.</ipxact:description>
+			<ipxact:value>32</ipxact:value>
+		</ipxact:parameter>
+		<ipxact:parameter kactus2:usageCount="1" maximum="1" minimum="0" parameterId="RST_POL_ID" type="int">
+			<ipxact:name>RST_POL</ipxact:name>
+			<ipxact:description>Reset polarity.</ipxact:description>
+			<ipxact:value>1</ipxact:value>
+		</ipxact:parameter>
+		<ipxact:parameter kactus2:usageCount="1" parameterId="VERSION_ID" type="string">
+			<ipxact:name>VERSION</ipxact:name>
+			<ipxact:description>Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part.</ipxact:description>
+			<ipxact:value>16'h0081</ipxact:value>
+		</ipxact:parameter>
+	</ipxact:parameters>
+	<ipxact:vendorExtensions>
+		<kactus2:author>IObundle, Lda</kactus2:author>
+		<kactus2:version>3,10,15,0</kactus2:version>
+		<kactus2:kts_attributes>
+			<kactus2:kts_productHier>Flat</kactus2:kts_productHier>
+			<kactus2:kts_implementation>HW</kactus2:kts_implementation>
+			<kactus2:kts_firmness>Mutable</kactus2:kts_firmness>
+		</kactus2:kts_attributes>
+		<kactus2:license>MIT License, Copyright (c) 2025</kactus2:license>
+	</ipxact:vendorExtensions>
+</ipxact:component>

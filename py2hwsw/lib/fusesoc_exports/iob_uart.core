@@ -49,6 +49,7 @@ filesets:
 
   scripts:
     files:
+      - iob_uart/scripts/iob_colors.py
       - iob_uart/scripts/board_client.py
       - iob_uart/scripts/console.py
       - iob_uart/scripts/makehex.py
@@ -101,6 +102,20 @@ targets:
         - sw_build
         - vutb_run
         #- stuck
+  vutb:
+    toplevel: iob_v_tb
+    description: Simulate the design, using board_client.py to manage VUTB processes and timeout.
+    # Generic flow only runs the build step by default.
+    flow: generic
+    flow_options:
+      tool: icarus
+    filesets:
+      - rtl
+      - sim
+    hooks:
+      post_build:
+        - sw_build
+        - board_client
 
 scripts:
   sw_build:
@@ -112,6 +127,21 @@ scripts:
       #- USE_FPGA=$(USE_FPGA)
     filesets:
       - sw
+
+  board_client:
+    cmd:
+      # Maybe there is a way to import variables from sim_build.mk (like GRAB_TIMEOUT)?
+      - src/iobundle_py2hwsw_iob_uart_0.81/iob_uart/scripts/board_client.py
+      - grab 
+      - "300"
+      - -s
+      #run the C testbench in background and kill it when simulator exits
+      - src/iobundle_py2hwsw_iob_uart_0.81/iob_uart/software/tb & make run && (kill $$! >/dev/null 2>&1; true) || (kill $$! >/dev/null 2>&1; false)
+      # - -c
+      # #run the console
+      # - rm -f soc2cnsl cnsl2soc; ../../scripts/console.py -L
+    filesets:
+      - scripts
 
   vutb_run:
     cmd:

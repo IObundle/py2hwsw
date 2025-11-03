@@ -134,7 +134,7 @@ board_server_status:
 
 clean:
 	nix-shell --run "py2hwsw $(CORE) clean --build_dir '$(BUILD_DIR)'"
-	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs
+	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs fusesoc_exports fusesoc_test
 	@find . -name \*~ -delete
 
 .PHONY: clean

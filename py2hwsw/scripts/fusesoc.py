@@ -114,10 +114,11 @@ scripts:
       - sw
 
 """
+
+    # Maybe there is a way to import variables from sim_build.mk (like GRAB_TIMEOUT)?
     core_file_content += f"""
   board_client:
     cmd:
-      # Maybe there is a way to import variables from sim_build.mk (like GRAB_TIMEOUT)?
       - src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/scripts/board_client.py
       - grab 
       - "300"

@@ -34,7 +34,11 @@ def export_core(core):
     # Check if core contains Py2HWSW's universal testbench
     if os.path.isfile(f"{OUTPUT_DIR}/{core.name}/hardware/simulation/src/iob_v_tb.v"):
         tb_top = "iob_v_tb"
-        sim_cmd = "src/iobundle_py2hwsw_iob_uart_0.81/iob_uart/software/tb & make run && (kill $$! >/dev/null 2>&1; true) || (kill $$! >/dev/null 2>&1; false)"
+        sim_cmd = f"src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/software/tb & make run && (kill $$! >/dev/null 2>&1; true) || (kill $$! >/dev/null 2>&1; false)"
+
+    has_software = False
+    if os.path.isdir(f"{OUTPUT_DIR}/{core.name}/hardware/software"):
+        has_software = True
 
     # console_cmd = "rm -f soc2cnsl cnsl2soc; ../../scripts/console.py -L"
 
@@ -57,11 +61,15 @@ filesets:
   scripts:
     files:
 {get_source_list(OUTPUT_DIR, core.name + "/scripts", source_extensions=['.py'])}\
+"""
+    if has_software:
+        core_file_content += f"""\
   sw:
     files:
       - {core.name}/config_build.mk
 {get_all_files(OUTPUT_DIR, core.name + "/software")}\
-
+"""
+    core_file_content += f"""
 
 targets:
   default:
@@ -81,7 +89,7 @@ targets:
       pre_build:
         - clean
       post_build:
-        - sw_build
+{"        - sw_build\n" if has_software else ""}\
         - board_client
 
 scripts:
@@ -92,25 +100,30 @@ scripts:
       - c2v.txt
       - v2c.txt
 
+"""
+    if has_software:
+        core_file_content += f"""
   sw_build:
     cmd:
       - make
       - -C
-      - src/iobundle_py2hwsw_iob_uart_0.81/iob_uart/software
+      - src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/software
       - build
       #- USE_FPGA=$(USE_FPGA)
     filesets:
       - sw
 
+"""
+    core_file_content += f"""
   board_client:
     cmd:
       # Maybe there is a way to import variables from sim_build.mk (like GRAB_TIMEOUT)?
-      - src/iobundle_py2hwsw_iob_uart_0.81/iob_uart/scripts/board_client.py
+      - src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/scripts/board_client.py
       - grab 
       - "300"
       - -s
       #run the C testbench in background and kill it when simulator exits
-      - {sim_cmd}
+      - "'{sim_cmd}'"
 """
     if console_cmd:
         core_file_content += f"""\

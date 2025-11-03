@@ -29,29 +29,38 @@ def export_core(core):
     shutil.copytree(core.build_dir, f"{OUTPUT_DIR}/{core.name}", dirs_exist_ok=True)
 
     tb_top = f"{core.name}_tb"
+    sim_cmd = "make run"
+    console_cmd = ""
     # Check if core contains Py2HWSW's universal testbench
-    if os.path.isfile(f"{OUTPUT_DIR}/{core.name}/hardware/simulation/src/iob_v_tb.v":
+    if os.path.isfile(f"{OUTPUT_DIR}/{core.name}/hardware/simulation/src/iob_v_tb.v"):
         tb_top = "iob_v_tb"
+        sim_cmd = "src/iobundle_py2hwsw_iob_uart_0.81/iob_uart/software/tb & make run && (kill $$! >/dev/null 2>&1; true) || (kill $$! >/dev/null 2>&1; false)"
+
+    # console_cmd = "rm -f soc2cnsl cnsl2soc; ../../scripts/console.py -L"
 
     core_file_content = f"""\
 CAPI=2:
 
 name: iobundle:py2hwsw:{core.name}:{core.version}
-license: {core.license.name}
+#license: {core.license.name}
 description : {core.description}
 
 filesets:
   rtl:
     files:
-{get_source_list(OUTPUT_DIR, core.name + "/hardware/src")}
+{get_source_list(OUTPUT_DIR, core.name + "/hardware/src", source_extensions=['.v'], header_extensions=['.vh'])}\
     file_type : verilogSource
   sim:
     files:
-{get_source_list(OUTPUT_DIR, core.name + "/hardware/simulation/src")}
+{get_source_list(OUTPUT_DIR, core.name + "/hardware/simulation/src", source_extensions=['.v'], header_extensions=['.vh'])}\
     file_type : verilogSource
   scripts:
     files:
-{get_source_list(OUTPUT_DIR, core.name + "/scripts")}
+{get_source_list(OUTPUT_DIR, core.name + "/scripts", source_extensions=['.py'])}\
+  sw:
+    files:
+      - {core.name}/config_build.mk
+{get_all_files(OUTPUT_DIR, core.name + "/software")}\
 
 
 targets:
@@ -60,13 +69,49 @@ targets:
       - rtl
   sim:
     toplevel: {tb_top}
-    description: Simulate the design
-    flow: sim
+    description: Simulate the design, using board_client.py to manage simulation processes and timeout.
+    # Generic flow only runs the build step by default.
+    flow: generic
     flow_options:
       tool: icarus
     filesets:
       - rtl
       - sim
+    hooks:
+      post_build:
+        - sw_build
+        - board_client
+
+scripts:
+  sw_build:
+    cmd:
+      - make
+      - -C
+      - src/iobundle_py2hwsw_iob_uart_0.81/iob_uart/software
+      - build
+      #- USE_FPGA=$(USE_FPGA)
+    filesets:
+      - sw
+
+  board_client:
+    cmd:
+      # Maybe there is a way to import variables from sim_build.mk (like GRAB_TIMEOUT)?
+      - src/iobundle_py2hwsw_iob_uart_0.81/iob_uart/scripts/board_client.py
+      - grab 
+      - "300"
+      - -s
+      #run the C testbench in background and kill it when simulator exits
+      - {sim_cmd}
+"""
+    if console_cmd:
+        core_file_content += f"""\
+      - -c
+      #run the console
+      - {console_cmd}
+"""
+    core_file_content += f"""\
+    filesets:
+      - scripts
 """
 
     # Write the core description to the .core file
@@ -77,7 +122,7 @@ targets:
     print(f"FuseSoC core file generated at: {core_file_path}")
 
 
-def get_source_list(export_path, subdir):
+def get_source_list(export_path, subdir, source_extensions=[], header_extensions=[]):
     """Return yaml list of sources in specified subdir of given export_path
     :return: yaml list of verilog sources
     """
@@ -86,9 +131,25 @@ def get_source_list(export_path, subdir):
     sources = ""
     if os.path.isdir(source_path):
         for file in os.listdir(source_path):
-            if file.endswith(".v"):
-                sources += f"      - {os.path.join(subdir, file)}\n"
-            if file.endswith(".vh"):
+            if any(file.endswith(ext) for ext in header_extensions):
                 sources += f"      - {os.path.join(subdir, file)}: {{is_include_file : true}}\n"
+            elif any(file.endswith(ext) for ext in source_extensions):
+                sources += f"      - {os.path.join(subdir, file)}\n"
 
     return sources
+
+
+def get_all_files(export_path, subdir):
+    """Return yaml list of all files (recursively) in specified subdir of given export_path
+    :return: yaml list of files
+    """
+    search_path = f"{export_path}/{subdir}"
+
+    yaml_files = ""
+    for root, dirs, files in os.walk(search_path):
+        for file in files:
+            yaml_files += (
+                f"      - {os.path.join(os.path.relpath(root, export_path), file)}\n"
+            )
+
+    return yaml_files

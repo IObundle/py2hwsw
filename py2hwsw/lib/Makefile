@@ -94,8 +94,7 @@ delivery:
 fusesoc-export:
 	nix-shell --run "make clean setup && py2hwsw $(CORE) export_fusesoc --build_dir '$(BUILD_DIR)'"
 
-#fusesoc-test: fusesoc-export
-fusesoc-test:
+fusesoc-test: fusesoc-export
 	rm -rf fusesoc_test
 	mkdir fusesoc_test
 	mkdir fusesoc_test/fusesoc_libraries

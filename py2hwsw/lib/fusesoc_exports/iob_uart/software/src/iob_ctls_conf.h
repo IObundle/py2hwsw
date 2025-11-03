@@ -3,8 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  *
- * Py2HWSW Version 0.81 has generated this code
- * (https://github.com/IObundle/py2hwsw).
+ * Py2HWSW Version 0.81 has generated this code (https://github.com/IObundle/py2hwsw).
  */
 
 #ifndef H_IOB_CTLS_CONF_H

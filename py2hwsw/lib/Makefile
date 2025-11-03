@@ -96,8 +96,7 @@ fusesoc-export:
 
 fusesoc-test: fusesoc-export
 	rm -rf fusesoc_test
-	mkdir fusesoc_test
-	mkdir fusesoc_test/fusesoc_libraries
+	mkdir -p fusesoc_test/fusesoc_libraries
 	ln -s ../../fusesoc_exports fusesoc_test/fusesoc_libraries/py2hwsw
 	printf "[library.py2]\nlocation = fusesoc_libraries/py2hwsw\n" > fusesoc_test/fusesoc.conf
 	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE):0.81"

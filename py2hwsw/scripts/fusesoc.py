@@ -78,11 +78,20 @@ targets:
       - rtl
       - sim
     hooks:
+      pre_build:
+        - clean
       post_build:
         - sw_build
         - board_client
 
 scripts:
+  clean:
+    cmd:
+      - rm
+      - -f
+      - c2v.txt
+      - v2c.txt
+
   sw_build:
     cmd:
       - make

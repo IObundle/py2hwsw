@@ -361,6 +361,7 @@ def doc_setup(python_module):
 
     # General documentation
     write_git_revision_short_hash(f"{build_dir}/document/tsrc")
+    nix_permission_hack(f"{build_dir}/document/tsrc/shortHash.tex")
 
 
 def write_git_revision_short_hash(dst_dir):

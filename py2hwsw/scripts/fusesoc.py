@@ -34,7 +34,7 @@ def export_core(core):
     # Check if core contains Py2HWSW's universal testbench
     if os.path.isfile(f"{OUTPUT_DIR}/{core.name}/hardware/simulation/src/iob_v_tb.v"):
         tb_top = "iob_v_tb"
-        sim_cmd = f"src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/software/tb & make run && (kill $$! >/dev/null 2>&1; true) || (kill $$! >/dev/null 2>&1; false)"
+        sim_cmd = f"./src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/software/tb & make run && (kill $$! >/dev/null 2>&1; true) || (kill $$! >/dev/null 2>&1; false)"
 
     has_software = False
     if os.path.isdir(f"{OUTPUT_DIR}/{core.name}/software"):
@@ -86,10 +86,9 @@ targets:
       - rtl
       - sim
     hooks:
-      pre_build:
-        - clean
       post_build:
 {"        - sw_build\n" if has_software else ""}\
+        - clean
         - board_client
 
 scripts:

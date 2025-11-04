@@ -49,6 +49,8 @@ PY_PARAMS:=$(shell echo $(PY_PARAMS) | cut -c2-)
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
 
+CORE_VERSION=$(shell nix-shell --run "py2hwsw $(CORE) print_core_version")
+
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
 ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)
 SETUP_ARGS =--no_verilog_lint 
@@ -99,7 +101,7 @@ fusesoc-test: fusesoc-export
 	mkdir -p fusesoc_test/fusesoc_libraries
 	ln -s ../../fusesoc_exports fusesoc_test/fusesoc_libraries/py2hwsw
 	printf "[library.py2]\nlocation = fusesoc_libraries/py2hwsw\n" > fusesoc_test/fusesoc.conf
-	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE):0.81"
+	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE):$(CORE_VERSION)"
 
 
 lib-ipxact:

@@ -37,7 +37,7 @@ def export_core(core):
         sim_cmd = f"src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/software/tb & make run && (kill $$! >/dev/null 2>&1; true) || (kill $$! >/dev/null 2>&1; false)"
 
     has_software = False
-    if os.path.isdir(f"{OUTPUT_DIR}/{core.name}/hardware/software"):
+    if os.path.isdir(f"{OUTPUT_DIR}/{core.name}/software"):
         has_software = True
 
     # console_cmd = "rm -f soc2cnsl cnsl2soc; ../../scripts/console.py -L"

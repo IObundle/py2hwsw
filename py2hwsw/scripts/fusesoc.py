@@ -120,7 +120,7 @@ scripts:
   board_client:
     cmd:
       - src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/scripts/board_client.py
-      - grab 
+      - grab
       - "300"
       - -s
       #run the C testbench in background and kill it when simulator exits

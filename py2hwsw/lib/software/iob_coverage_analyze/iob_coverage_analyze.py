@@ -12,8 +12,8 @@ def setup(py_params_dict):
     dst = os.path.join(py_params_dict["build_dir"], "scripts/iob_cov_analyze.py")
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     # Hack for Nix: Files copied from Nix's py2hwsw package do not contain write permissions
-    nix_permission_hack(os.path.dirname(dst))
     shutil.copy2(src, dst)
+    nix_permission_hack(os.path.dirname(dst))
 
     attributes_dict = {
         "generate_hw": False,

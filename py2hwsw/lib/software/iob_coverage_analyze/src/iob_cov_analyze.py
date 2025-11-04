@@ -107,7 +107,7 @@ class CovFile:
         )
 
     def is_covered(self) -> bool:
-        return self.total_lines == self.covered_lines
+        return self.total_lines == (self.covered_lines + self.waived_lines)
 
     @property
     def coverage_level(self) -> float:
@@ -167,7 +167,7 @@ class CovFile:
         waived_line_numbers = self.waived_line_numbers
         for lnum in waived_line_numbers:
             # replace waived line annotation with %waived
-            lines[lnum - 1] = re.sub(r"%([0-9]+)", "%waived", lines[lnum - 1], count=1)
+            lines[lnum - 1] = re.sub(r"[%~]([0-9]+)", "%waived", lines[lnum - 1], count=1)
         with open(self.path, "w") as file:
             file.writelines(lines)
 

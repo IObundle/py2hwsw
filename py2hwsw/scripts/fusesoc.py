@@ -13,7 +13,7 @@ OUTPUT_DIR = "fusesoc_exports"
 def export_core(core):
     """Export core as a fusesoc core.
     This function will use the given core's attributes to generate the corresponding fusesoc `.core` yaml file.
-    This function expects the  build directory for the core to have been generated previously.
+    This function expects the build directory for the core to have been generated previously.
     """
 
     # Don't try to export if build dir doesn't exist

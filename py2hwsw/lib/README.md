@@ -124,6 +124,38 @@ If the board server is not installed, the FPGA board can be accessed by any user
 but collisions may occur, and one user may reprogram the board while another is
 using it.
 
+## Export Cores for FuseSoC
+
+After generating the build directory for a core, users may call the Py2HWSW `export_fusesoc` target to export the core for [FuseSoC](https://github.com/olofk/fusesoc).
+
+Use the following command to print all cores available in the Py2HWSW library:
+```bash
+nix-shell --run "py2hwsw --print_lib_cores"
+```
+
+Use the following to export a core for FuseSoC:
+```bash
+make fusesoc-export CORE=module_name
+```
+
+The `fusesoc-export` target will create the `fusesoc_exports/` directory containing the exported FuseSoC cores.
+This directory can be imported as a library in a FuseSoC project.
+
+Use the following to export a core for FuseSoC and run it in simulation:
+```bash
+make fusesoc-test CORE=module_name
+```
+
+The `fusesoc-test` target will create the `fusesoc_test/` project directory and import the `fusesoc_exports/` library into it.
+It will then run the core in simulation using FuseSoC.
+
+From the generated `fusesoc_test/` project directory, use FuseSoC commands to print info or perform operations on the exported core.
+```bash
+nix-shell
+cd fusesoc_test
+fusesoc list-cores  # List exported Py2HWSW cores
+fusesoc core-info iobundle:py2hwsw:module_name:version  # Get details about a core
+```
 
 ## Build the Py2HWSW User Guide
 

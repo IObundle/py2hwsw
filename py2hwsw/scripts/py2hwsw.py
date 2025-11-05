@@ -37,6 +37,7 @@ if __name__ == "__main__":
             "print_core_version",
             "print_core_dict",
             "deliver",
+            "export_fusesoc",
         ],
     )
     parser.add_argument(
@@ -217,3 +218,5 @@ if __name__ == "__main__":
         iob_core.print_core_dict(args.core_name, **py_params)
     elif args.target == "deliver":
         iob_core.deliver_core(args.core_name, **py_params)
+    elif args.target == "export_fusesoc":
+        iob_core.export_fusesoc(args.core_name, **py_params)

@@ -49,6 +49,9 @@ PY_PARAMS:=$(shell echo $(PY_PARAMS) | cut -c2-)
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
 
+# Get the name of the generated core (sometimes not equal to $(CORE), like the generated 'iob_cache_axi' of the iob_cache core)
+CORE_NAME=$(shell nix-shell --run "py2hwsw $(CORE) print_core_name --py_params '$(PY_PARAMS)'")
+
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
 ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)
 SETUP_ARGS =--no_verilog_lint 
@@ -91,6 +94,16 @@ py2-doc-update:
 delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
+fusesoc-export:
+	nix-shell --run "make clean setup && py2hwsw $(CORE) export_fusesoc --build_dir '$(BUILD_DIR)' --py_params '$(PY_PARAMS)'"
+
+fusesoc-test: fusesoc-export
+	rm -rf fusesoc_test
+	mkdir -p fusesoc_test/fusesoc_libraries
+	ln -s ../../fusesoc_exports fusesoc_test/fusesoc_libraries/py2hwsw
+	printf "[library.py2]\nlocation = fusesoc_libraries/py2hwsw\n" > fusesoc_test/fusesoc.conf
+	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE_NAME)"
+
 
 lib-ipxact:
 	nix-shell --run "py2hwsw --browse"
@@ -98,7 +111,7 @@ lib-ipxact:
 	nix-shell --run "kactus2"
 
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery lib-ipxact
+.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery fusesoc-export fusesoc-test lib-ipxact
 
 
 # Install board server and client
@@ -124,7 +137,7 @@ board_server_status:
 
 clean:
 	nix-shell --run "py2hwsw $(CORE) clean --build_dir '$(BUILD_DIR)'"
-	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs
+	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs fusesoc_exports fusesoc_test
 	@find . -name \*~ -delete
 
 .PHONY: clean

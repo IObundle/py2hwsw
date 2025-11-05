@@ -82,6 +82,10 @@ targets:
     flow: generic
     flow_options:
       tool: icarus
+      iverilog_options:
+        - -W
+        - all
+        - -g2005-sv
     filesets:
       - rtl
       - sim

@@ -157,6 +157,14 @@ fusesoc list-cores  # List exported Py2HWSW cores
 fusesoc core-info iobundle:py2hwsw:module_name:version  # Get details about a core
 ```
 
+## Pre-built files
+
+Some [FuseSoC](https://github.com/olofk/fusesoc)-compatible pre-built versions of Py2HWSW library cores (such as iob_uart) are available in the [repository's release page](https://github.com/IObundle/py2hwsw/releases).
+The core's Verilog sources are available in the `<core_name>/hardware/src/` directory of the compressed tar.gz file in the release page.
+
+To use these pre-built cores in FuseSoC, extract the compressed tar.gz files to a [FuseSoC library directory](https://fusesoc.readthedocs.io/en/stable/user/overview.html#discover-cores-the-package-manager).
+
+
 ## Build the Py2HWSW User Guide
 
 To build the Py2HWSW User Guide, run the following command:

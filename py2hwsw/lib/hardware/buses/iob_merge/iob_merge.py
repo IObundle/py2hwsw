@@ -9,18 +9,18 @@ def setup(py_params_dict):
     # Check if should create a demonstation of this core
     if py_params_dict.get("demo", False):
         py_params_dict["name"] = os.path.basename(__file__)
-        py_params_dict["num_inputs"] = 2
+        py_params_dict["num_subordinates"] = 2
 
     assert "name" in py_params_dict, print(
         "Error: Missing name for generated merge module."
     )
-    assert "num_inputs" in py_params_dict, print(
-        "Error: Missing number of inputs for generated merge module."
+    assert "num_subordinates" in py_params_dict, print(
+        "Error: Missing number of subordinate interfaces for generated merge module."
     )
 
-    NUM_INPUTS = int(py_params_dict["num_inputs"])
+    NUM_SUBORDINATES = int(py_params_dict["num_subordinates"])
     # Number of bits required for input selection
-    NBITS = (NUM_INPUTS - 1).bit_length()
+    NBITS = (NUM_SUBORDINATES - 1).bit_length()
 
     ADDR_W = int(py_params_dict["addr_w"]) if "addr_w" in py_params_dict else 32
     DATA_W = int(py_params_dict["data_w"]) if "data_w" in py_params_dict else 32
@@ -47,41 +47,33 @@ def setup(py_params_dict):
                 ],
             },
             {
-                "name": "output_m",
+                "name": "m_m",
+                "descr": "Merge manager interface",
                 "signals": {
                     "type": "iob",
-                    "file_prefix": py_params_dict["name"] + "_output_",
-                    "prefix": "output_",
+                    "prefix": "m_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W,
                 },
-                "descr": "Merge output",
             },
         ],
     }
-    for port_idx in range(NUM_INPUTS):
+    for port_idx in range(NUM_SUBORDINATES):
         attributes_dict["ports"].append(
             {
-                "name": f"input_{port_idx}_s",
+                "name": f"s_{port_idx}_s",
+                "descr": "Merge subordinate interface",
                 "signals": {
                     "type": "iob",
-                    "file_prefix": f"{py_params_dict['name']}_input{port_idx}_",
-                    "prefix": f"input{port_idx}_",
+                    # "file_prefix": f"{py_params_dict['name']}_s{port_idx}_",
+                    "prefix": f"s{port_idx}_",
                     "DATA_W": DATA_W,
                     "ADDR_W": ADDR_W - NBITS,
                 },
-                "descr": "Merge input interfaces",
             },
         )
     attributes_dict["wires"] = [
-        # Output selection signals
-        {
-            "name": "sel_reg_rst",
-            "descr": "Enable and reset signal for sel_reg",
-            "signals": [
-                {"name": "rst_i"},
-            ],
-        },
+        # subordinate selection signals
         {
             "name": "sel_reg_data_i",
             "descr": "Input of sel_reg",
@@ -97,15 +89,15 @@ def setup(py_params_dict):
             ],
         },
         {
-            "name": "input_sel",
-            "descr": "Select output interface",
+            "name": "subordinate_sel",
+            "descr": "Select subordinate interface",
             "signals": [
                 {"name": "sel"},
             ],
         },
         {
-            "name": "input_sel_reg",
-            "descr": "Registered select output interface",
+            "name": "subordinate_sel_reg",
+            "descr": "Registered select subordinate interface",
             "signals": [
                 {"name": "sel_reg"},
             ],
@@ -115,56 +107,59 @@ def setup(py_params_dict):
             "name": "mux_valid_data_i",
             "descr": "Input of valid mux",
             "signals": [
-                {"name": "mux_valid_input", "width": NUM_INPUTS},
+                {"name": "mux_valid_input", "width": NUM_SUBORDINATES},
             ],
         },
         {
             "name": "mux_valid_data_o",
             "descr": "Output of valid mux",
             "signals": [
-                {"name": "output_iob_valid_o"},
+                {"name": "m_iob_valid_int", "width": 1},
             ],
         },
         {
             "name": "mux_addr_data_i",
             "descr": "Input of address mux",
             "signals": [
-                {"name": "mux_addr_input", "width": NUM_INPUTS * ADDR_W},
+                {"name": "mux_addr_input", "width": NUM_SUBORDINATES * ADDR_W},
             ],
         },
         {
             "name": "mux_addr_data_o",
             "descr": "Output of address mux",
             "signals": [
-                {"name": "output_iob_addr_o"},
+                {"name": "m_iob_addr_o"},
             ],
         },
         {
             "name": "mux_wdata_data_i",
             "descr": "Input of wdata mux",
             "signals": [
-                {"name": "mux_wdata_input", "width": NUM_INPUTS * DATA_W},
+                {"name": "mux_wdata_input", "width": NUM_SUBORDINATES * DATA_W},
             ],
         },
         {
             "name": "mux_wdata_data_o",
             "descr": "Output of wdata mux",
             "signals": [
-                {"name": "output_iob_wdata_o"},
+                {"name": "m_iob_wdata_o"},
             ],
         },
         {
             "name": "mux_wstrb_data_i",
             "descr": "Input of wstrb mux",
             "signals": [
-                {"name": "mux_wstrb_input", "width": NUM_INPUTS * int(DATA_W / 8)},
+                {
+                    "name": "mux_wstrb_input",
+                    "width": NUM_SUBORDINATES * int(DATA_W / 8),
+                },
             ],
         },
         {
             "name": "mux_wstrb_data_o",
             "descr": "Output of wstrb mux",
             "signals": [
-                {"name": "output_iob_wstrb_o"},
+                {"name": "m_iob_wstrb_o"},
             ],
         },
         # Demux signals
@@ -172,42 +167,42 @@ def setup(py_params_dict):
             "name": "demux_rdata_data_i",
             "descr": "Input of rdata demux",
             "signals": [
-                {"name": "output_iob_rdata_i"},
+                {"name": "m_iob_rdata_i"},
             ],
         },
         {
             "name": "demux_rdata_data_o",
             "descr": "Output of rdata demux",
             "signals": [
-                {"name": "demux_rdata_output", "width": NUM_INPUTS * DATA_W},
+                {"name": "demux_rdata_manager", "width": NUM_SUBORDINATES * DATA_W},
             ],
         },
         {
             "name": "demux_rvalid_data_i",
             "descr": "Input of rvalid demux",
             "signals": [
-                {"name": "output_iob_rvalid_i"},
+                {"name": "m_iob_rvalid_i"},
             ],
         },
         {
             "name": "demux_rvalid_data_o",
             "descr": "Output of rvalid demux",
             "signals": [
-                {"name": "demux_rvalid_output", "width": NUM_INPUTS},
+                {"name": "demux_rvalid_manager", "width": NUM_SUBORDINATES},
             ],
         },
         {
             "name": "demux_ready_data_i",
             "descr": "Input of ready demux",
             "signals": [
-                {"name": "output_iob_ready_i"},
+                {"name": "m_iob_ready_int", "width": 1},
             ],
         },
         {
             "name": "demux_ready_data_o",
             "descr": "Output of ready demux",
             "signals": [
-                {"name": "demux_ready_output", "width": NUM_INPUTS},
+                {"name": "demux_ready_manager", "width": NUM_SUBORDINATES},
             ],
         },
         # Priority encoder signals
@@ -222,7 +217,7 @@ def setup(py_params_dict):
             "name": "prio_enc_o",
             "descr": "Output of priority encoder",
             "signals": [
-                {"name": "sel"},
+                {"name": "prio_enc_o", "width": NUM_SUBORDINATES.bit_length()},
             ],
         },
     ]
@@ -254,10 +249,10 @@ def setup(py_params_dict):
             "instance_name": "iob_mux_valid",
             "parameters": {
                 "DATA_W": 1,
-                "N": NUM_INPUTS,
+                "N": NUM_SUBORDINATES,
             },
             "connect": {
-                "sel_i": "input_sel",
+                "sel_i": "subordinate_sel",
                 "data_i": "mux_valid_data_i",
                 "data_o": "mux_valid_data_o",
             },
@@ -267,10 +262,10 @@ def setup(py_params_dict):
             "instance_name": "iob_mux_addr",
             "parameters": {
                 "DATA_W": ADDR_W,
-                "N": NUM_INPUTS,
+                "N": NUM_SUBORDINATES,
             },
             "connect": {
-                "sel_i": "input_sel",
+                "sel_i": "subordinate_sel",
                 "data_i": "mux_addr_data_i",
                 "data_o": "mux_addr_data_o",
             },
@@ -280,10 +275,10 @@ def setup(py_params_dict):
             "instance_name": "iob_mux_wdata",
             "parameters": {
                 "DATA_W": DATA_W,
-                "N": NUM_INPUTS,
+                "N": NUM_SUBORDINATES,
             },
             "connect": {
-                "sel_i": "input_sel",
+                "sel_i": "subordinate_sel",
                 "data_i": "mux_wdata_data_i",
                 "data_o": "mux_wdata_data_o",
             },
@@ -293,10 +288,10 @@ def setup(py_params_dict):
             "instance_name": "iob_mux_wstrb",
             "parameters": {
                 "DATA_W": int(DATA_W / 8),
-                "N": NUM_INPUTS,
+                "N": NUM_SUBORDINATES,
             },
             "connect": {
-                "sel_i": "input_sel",
+                "sel_i": "subordinate_sel",
                 "data_i": "mux_wstrb_data_i",
                 "data_o": "mux_wstrb_data_o",
             },
@@ -307,10 +302,10 @@ def setup(py_params_dict):
             "instance_name": "iob_demux_rdata",
             "parameters": {
                 "DATA_W": DATA_W,
-                "N": NUM_INPUTS,
+                "N": NUM_SUBORDINATES,
             },
             "connect": {
-                "sel_i": "input_sel_reg",
+                "sel_i": "subordinate_sel_reg",
                 "data_i": "demux_rdata_data_i",
                 "data_o": "demux_rdata_data_o",
             },
@@ -320,10 +315,10 @@ def setup(py_params_dict):
             "instance_name": "iob_demux_rvalid",
             "parameters": {
                 "DATA_W": 1,
-                "N": NUM_INPUTS,
+                "N": NUM_SUBORDINATES,
             },
             "connect": {
-                "sel_i": "input_sel_reg",
+                "sel_i": "subordinate_sel_reg",
                 "data_i": "demux_rvalid_data_i",
                 "data_o": "demux_rvalid_data_o",
             },
@@ -333,11 +328,11 @@ def setup(py_params_dict):
             "instance_name": "iob_demux_ready",
             "parameters": {
                 "DATA_W": 1,
-                "N": NUM_INPUTS,
+                "N": NUM_SUBORDINATES,
             },
             "connect": {
                 # Ready selection must not be registered
-                "sel_i": "input_sel",
+                "sel_i": "subordinate_sel",
                 "data_i": "demux_ready_data_i",
                 "data_o": "demux_ready_data_o",
             },
@@ -347,7 +342,7 @@ def setup(py_params_dict):
             "core_name": "iob_prio_enc",
             "instance_name": "sel_enc",
             "parameters": {
-                "W": NUM_INPUTS,
+                "W": NUM_SUBORDINATES,
                 "MODE": '"HIGH"',
             },
             "connect": {
@@ -357,34 +352,90 @@ def setup(py_params_dict):
         },
     ]
 
-    # Connect demuxer outputs
     verilog_code = ""
-    verilog_outputs = []
-    for port_idx in range(NUM_INPUTS):
+
+    # Connect demuxer managers
+    verilog_managers = []
+    for port_idx in range(NUM_SUBORDINATES):
         verilog_code += f"""
-    assign input{port_idx}_iob_rdata_o = demux_rdata_output[{port_idx*DATA_W}+:{DATA_W}];
-    assign input{port_idx}_iob_rvalid_o = demux_rvalid_output[{port_idx}+:1];
-    assign input{port_idx}_iob_ready_o = demux_ready_output[{port_idx}+:1];
+    assign s{port_idx}_iob_rdata_o = demux_rdata_manager[{port_idx*DATA_W}+:{DATA_W}];
+    assign s{port_idx}_iob_rvalid_o = demux_rvalid_manager[{port_idx}+:1];
+    assign s{port_idx}_iob_ready_o = demux_ready_manager[{port_idx}+:1];
 """
-        verilog_outputs.append(f"input{port_idx}_iob_rdata")
-        verilog_outputs.append(f"input{port_idx}_iob_rvalid")
-        verilog_outputs.append(f"input{port_idx}_iob_ready")
+        verilog_managers.append(f"s{port_idx}_iob_rdata")
+        verilog_managers.append(f"s{port_idx}_iob_rvalid")
+        verilog_managers.append(f"s{port_idx}_iob_ready")
     verilog_code += "\n"
     # Connect muxer inputs
     for signal in ["valid", "addr", "wdata", "wstrb"]:
         verilog_code += f"    assign mux_{signal}_input = {{"
-        for port_idx in range(NUM_INPUTS - 1, -1, -1):
+        for port_idx in range(NUM_SUBORDINATES - 1, -1, -1):
             # Include padding bits for address
             if signal == "addr":
                 verilog_code += f"{{{NBITS}{{1'b0}}}}, "
-            verilog_code += f"input{port_idx}_iob_{signal}_i, "
+            verilog_code += f"s{port_idx}_iob_{signal}_i, "
         verilog_code = verilog_code[:-2] + "};\n"
-        verilog_outputs.append(f"mux_{signal}_input")
+        verilog_managers.append(f"mux_{signal}_input")
     # Create snippet with demuxer and muxer connections
     attributes_dict["snippets"] = [
         {
             "verilog_code": verilog_code,
         },
     ]
+
+    #
+    # FSM
+    #
+    attributes_dict["fsm"] = {
+        "type": "fsm",
+        "default_assignments": """
+   // Default assignments
+   sel = sel_reg;
+
+   // Disallow handshake signals from going through
+   m_iob_valid_o = 1'b0;
+   m_iob_ready_int = 1'b0;
+""",
+        "state_descriptions": """
+   WAIT_VALID: // Wait for valid data
+      // Allow handshake signals to go through
+      m_iob_valid_o = m_iob_valid_int;
+      m_iob_ready_int = m_iob_ready_i;
+"""
+        + f"""\
+      // Allow selector to be changed
+      // Priority encoder may have 1 more bit to signal 'no input', but we don't use it for selection.
+      sel = prio_enc_o[{NBITS}-1:0];
+"""
+        + """\
+      if (m_iob_valid_o && ~m_iob_ready_i) begin
+          // If not ready, wait for ready
+         state_nxt = WAIT_READY;
+      end else if (m_iob_valid_o && !m_iob_wstrb_o && ~m_iob_rvalid_i) begin
+          // If read (and ready) and not rvalid, wait for rvalid
+         state_nxt = WAIT_RVALID;
+      end
+
+   WAIT_READY: // Wait for ready signal
+      // Allow handshake signals to go through
+      m_iob_valid_o = m_iob_valid_int;
+      m_iob_ready_int = m_iob_ready_i;
+      if (m_iob_ready_i && |m_iob_wstrb_o) begin
+         // If write and ready, transaction complete
+         state_nxt = WAIT_VALID;
+      end else if (m_iob_ready_i && !m_iob_wstrb_o && m_iob_rvalid_i) begin
+         // If read and ready and rvalid, transaction complete
+         state_nxt = WAIT_VALID;
+      end else if (m_iob_ready_i && !m_iob_wstrb_o) begin
+         // If read and ready but not rvalid, wait for rvalid
+         state_nxt = WAIT_RVALID;
+      end
+
+   WAIT_RVALID: // Wait for read data
+      if (m_iob_rvalid_i) begin
+         state_nxt = WAIT_VALID;
+      end
+""",
+    }
 
     return attributes_dict

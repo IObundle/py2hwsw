@@ -6,7 +6,7 @@ name: Release-Artifacts
 
 on:
   release:
-    types: [created, edited, prereleased, published, released]
+    types: [created, prereleased, published, released]
   # Allow manual workflow runs
   workflow_dispatch:
 

@@ -94,8 +94,8 @@ py2-doc-update:
 delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
-fusesoc-export:
-	nix-shell --run "make clean setup && py2hwsw $(CORE) export_fusesoc --build_dir '$(BUILD_DIR)' --py_params '$(PY_PARAMS)'"
+fusesoc-export: clean setup
+	nix-shell --run "py2hwsw $(CORE) export_fusesoc --build_dir '$(BUILD_DIR)' --py_params '$(PY_PARAMS)'"
 
 fusesoc-test: fusesoc-export
 	rm -rf fusesoc_test
@@ -141,3 +141,13 @@ clean:
 	@find . -name \*~ -delete
 
 .PHONY: clean
+
+# Release Artifacts
+
+release-artifacts:
+	make fusesoc-export CORE=iob_uart
+	VERSION=`grep 'name:' fusesoc_exports/iob_uart.core | tr ':' '\n' | tail -1`;\
+	[ -n "$$VERSION" ] || { echo "Error: Could not extract version"; exit 1; }\
+	tar -czf iob_uart_V$$VERSION.tar.gz ./fusesoc_exports/*
+
+.PHONY: release-artifacts

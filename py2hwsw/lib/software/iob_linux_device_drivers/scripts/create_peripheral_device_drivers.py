@@ -296,6 +296,8 @@ static ssize_t {peripheral['name']}_read(struct file *file, char __user *buf, si
 """
     # Create read code for each CSR
     for csr in peripheral["csrs"]:
+        if "R" not in csr["mode"]:
+            continue
         CSR_NAME = csr["name"].upper()
         content += f"""\
   case {peripheral['upper_name']}_{CSR_NAME}_ADDR:
@@ -331,6 +333,8 @@ static ssize_t {peripheral['name']}_write(struct file *file, const char __user *
 """
     # Create write code for each CSR
     for csr in peripheral["csrs"]:
+        if "W" not in csr["mode"]:
+            continue
         CSR_NAME = csr["name"].upper()
         content += f"""\
   case {peripheral['upper_name']}_{CSR_NAME}_ADDR:
@@ -591,6 +595,17 @@ def generate_device_drivers(output_dir, peripheral):
         print("Error: no iob_csrs subblock found")
         exit(1)
 
+    # Create copy of csrs list
+    csrs_list = list(csrs_subblock["csrs"])
+    # Every peripheral has an implicit "version" CSR
+    csrs_list.append(
+        {
+            "name": "version",
+            "mode": "R",
+            "n_bits": 16,
+        }
+    )
+
     # Peripheral information
     # TODO: Replace hardcoded by dynamic info.
     _peripheral = {
@@ -603,7 +618,7 @@ def generate_device_drivers(output_dir, peripheral):
         "spdx_year": "2025",
         "spdx_license": "MIT",
         "license": "Dual MIT/GPL",
-        "csrs": csrs_subblock["csrs"],
+        "csrs": csrs_list,
     }
 
     print("Generating device drivers for", _peripheral["name"], "in", output_dir)

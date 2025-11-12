@@ -1,24 +1,5 @@
-#!/usr/bin/env python3
-
 import os
 import sys
-
-# Peripheral information
-peripheral = {
-    "name": "iob_timer",
-    "instance_name": "timer0",
-    "upper_name": "IOB_TIMER",
-    "version": "0.10",
-    "description": "IOb-Timer Drivers",
-    "author": "IObundle",
-    "spdx_year": "2025",
-    "spdx_license": "MIT",
-    "license": "Dual MIT/GPL",
-    "driver_name": "iob_timer",
-    "driver_class": "iob_timer_class",
-    "csrs_addr_w": "32",
-    "timer0_addr_macro": "40000000",
-}
 
 
 def create_dts_file(path, peripheral):
@@ -153,7 +134,7 @@ static const struct file_operations {peripheral['name']}_fops = {{
 }};
 
 static const struct of_device_id of_{peripheral['name']}_match[] = {{
-    {{.compatible = "iobundle,timer0"}},
+    {{.compatible = "iobundle,{peripheral['instance_name']}"}},
     {{}},
 }};
 
@@ -312,24 +293,20 @@ static ssize_t {peripheral['name']}_read(struct file *file, char __user *buf, si
 
   /* read value from register */
   switch (*ppos) {{
-  case {peripheral['upper_name']}_DATA_LOW_ADDR:
-    value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_DATA_LOW_ADDR,
-                              {peripheral['upper_name']}_DATA_LOW_W);
-    size = ({peripheral['upper_name']}_DATA_LOW_W >> 3); // bit to bytes
-    pr_info("[Driver] Read data low!\\n");
+"""
+    # Create read code for each CSR
+    for csr in peripheral["csrs"]:
+        CSR_NAME = csr["name"].upper()
+        content += f"""\
+  case {peripheral['upper_name']}_{CSR_NAME}_ADDR:
+    value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_{CSR_NAME}_ADDR,
+                              {peripheral['upper_name']}_{CSR_NAME}_W);
+    size = ({peripheral['upper_name']}_{CSR_NAME}_W >> 3); // bit to bytes
+    pr_info("[Driver] Read {csr['name']} CSR!\\n");
     break;
-  case {peripheral['upper_name']}_DATA_HIGH_ADDR:
-    value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_DATA_HIGH_ADDR,
-                              {peripheral['upper_name']}_DATA_HIGH_W);
-    size = ({peripheral['upper_name']}_DATA_HIGH_W >> 3); // bit to bytes
-    pr_info("[Driver] Read data high!\\n");
-    break;
-  case {peripheral['upper_name']}_VERSION_ADDR:
-    value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_VERSION_ADDR,
-                              {peripheral['upper_name']}_VERSION_W);
-    size = ({peripheral['upper_name']}_VERSION_W >> 3); // bit to bytes
-    pr_info("[Driver] Read version!\\n");
-    break;
+"""
+
+    content += f"""\
   default:
     // invalid address - no bytes read
     return 0;
@@ -351,30 +328,22 @@ static ssize_t {peripheral['name']}_write(struct file *file, const char __user *
   u32 value = 0;
 
   switch (*ppos) {{
-  case {peripheral['upper_name']}_RESET_ADDR:
-    size = ({peripheral['upper_name']}_RESET_W >> 3); // bit to bytes
+"""
+    # Create write code for each CSR
+    for csr in peripheral["csrs"]:
+        CSR_NAME = csr["name"].upper()
+        content += f"""\
+  case {peripheral['upper_name']}_{CSR_NAME}_ADDR:
+    size = ({peripheral['upper_name']}_{CSR_NAME}_W >> 3); // bit to bytes
     if (read_user_data(buf, size, &value))
       return -EFAULT;
-    iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_RESET_ADDR,
-                       {peripheral['upper_name']}_RESET_W);
-    pr_info("[Driver] Reset {peripheral['name']}: 0x%x\\n", value);
+    iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_{CSR_NAME}_ADDR,
+                       {peripheral['upper_name']}_{CSR_NAME}_W);
+    pr_info("[Driver] {csr['name']} {peripheral['name']}: 0x%x\\n", value);
     break;
-  case {peripheral['upper_name']}_ENABLE_ADDR:
-    size = ({peripheral['upper_name']}_ENABLE_W >> 3); // bit to bytes
-    if (read_user_data(buf, size, &value))
-      return -EFAULT;
-    iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_ENABLE_ADDR,
-                       {peripheral['upper_name']}_ENABLE_W);
-    pr_info("[Driver] Enable {peripheral['name']}: 0x%x\\n", value);
-    break;
-  case {peripheral['upper_name']}_SAMPLE_ADDR:         // sample counter
-    size = ({peripheral['upper_name']}_SAMPLE_W >> 3); // bit to bytes
-    if (read_user_data(buf, size, &value))
-      return -EFAULT;
-    iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_SAMPLE_ADDR,
-                       {peripheral['upper_name']}_SAMPLE_W);
-    pr_info("[Driver] Sample {peripheral['name']}: 0x%x\\n", value);
-    break;
+"""
+
+    content += f"""\
   default:
     pr_info("[Driver] Invalid write address 0x%x\\n", (unsigned int)*ppos);
     // invalid address - no bytes written
@@ -610,26 +579,43 @@ clean:
         f.write(content)
 
 
-def main():
-    # Get output directory from command line arguments
-    if len(sys.argv) > 1:
-        output_dir = sys.argv[1]
+def generate_device_drivers(output_dir, peripheral):
+    """Generate device driver files for a peripheral"""
+
+    # Find 'iob_csrs' subblock
+    for block in peripheral["subblocks"]:
+        if block["core_name"] == "iob_csrs":
+            csrs_subblock = block
+            break
     else:
-        output_dir = peripheral["name"]
+        print("Error: no iob_csrs subblock found")
+        exit(1)
+
+    # Peripheral information
+    # TODO: Replace hardcoded by dynamic info.
+    _peripheral = {
+        "name": peripheral["name"],  # example: 'iob_timer'
+        "instance_name": f"{peripheral['name'][4:]}0",  # example: 'timer0'
+        "upper_name": peripheral["name"].upper(),
+        "version": "0.81",
+        "description": f"{peripheral['name']} Drivers",
+        "author": "IObundle",
+        "spdx_year": "2025",
+        "spdx_license": "MIT",
+        "license": "Dual MIT/GPL",
+        "csrs": csrs_subblock["csrs"],
+    }
+
+    print("Generating device drivers for", _peripheral["name"], "in", output_dir)
 
     # Create directory structure
     os.makedirs(os.path.join(output_dir, "drivers"), exist_ok=True)
     os.makedirs(os.path.join(output_dir, "user"), exist_ok=True)
 
     # Create files
-    create_dts_file(output_dir, peripheral)
-    create_readme_file(output_dir, peripheral)
-    create_driver_mk_file(os.path.join(output_dir, "drivers"), peripheral)
-    create_driver_main_file(os.path.join(output_dir, "drivers"), peripheral)
-    create_user_c_file(os.path.join(output_dir, "user"), peripheral)
-    create_user_makefile(os.path.join(output_dir, "user"), peripheral)
-
-
-if __name__ == "__main__":
-    main()
-
+    create_dts_file(output_dir, _peripheral)
+    create_readme_file(output_dir, _peripheral)
+    create_driver_mk_file(os.path.join(output_dir, "drivers"), _peripheral)
+    create_driver_main_file(os.path.join(output_dir, "drivers"), _peripheral)
+    create_user_c_file(os.path.join(output_dir, "user"), _peripheral)
+    create_user_makefile(os.path.join(output_dir, "user"), _peripheral)

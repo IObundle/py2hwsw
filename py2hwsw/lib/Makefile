@@ -104,6 +104,22 @@ fusesoc-test: fusesoc-export
 	printf "[library.py2]\nlocation = fusesoc_libraries/py2hwsw\n" > fusesoc_test/fusesoc.conf
 	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE_NAME)"
 
+# Multiline string (use a here‑document)
+define MULTILINE_TEXT
+provider:
+  name: url
+  url: https://github.com/IObundle/py2hwsw/releases/latest/download/iob_uart_V0.81.tar.gz
+  filetype: tar
+endef
+
+# Generate independent fusesoc .core file. FuseSoC will obtain the Verilog sources from remote url with a pre-built build directory.
+export MULTILINE_TEXT
+fusesoc-core-file: fusesoc-export
+	cp fusesoc_exports/$(CORE_NAME).core .
+	# Append provider remote url to .core file
+	printf "\n%s\n" "$$MULTILINE_TEXT" >> $(CORE_NAME).core
+	echo "Generated independent $(CORE_NAME).core file."
+
 
 lib-ipxact:
 	nix-shell --run "py2hwsw --browse"
@@ -111,7 +127,7 @@ lib-ipxact:
 	nix-shell --run "kactus2"
 
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery fusesoc-export fusesoc-test lib-ipxact
+.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery fusesoc-export fusesoc-test fusesoc-core-file lib-ipxact
 
 
 # Install board server and client
@@ -137,7 +153,7 @@ board_server_status:
 
 clean:
 	nix-shell --run "py2hwsw $(CORE) clean --build_dir '$(BUILD_DIR)'"
-	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs fusesoc_exports fusesoc_test
+	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs fusesoc_exports fusesoc_test *.core
 	@find . -name \*~ -delete
 
 .PHONY: clean
@@ -147,7 +163,7 @@ clean:
 release-artifacts:
 	make fusesoc-export CORE=iob_uart
 	VERSION=`grep 'name:' fusesoc_exports/iob_uart.core | tr ':' '\n' | tail -1`;\
-	[ -n "$$VERSION" ] || { echo "Error: Could not extract version"; exit 1; }\
-	tar -czf iob_uart_V$$VERSION.tar.gz ./fusesoc_exports/*
+	[ -n "$$VERSION" ] || { echo "Error: Could not extract version"; exit 1; };\
+	tar -czf iob_uart_V$$VERSION.tar.gz -C ./fusesoc_exports .
 
 .PHONY: release-artifacts

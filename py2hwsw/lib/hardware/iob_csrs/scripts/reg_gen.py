@@ -113,4 +113,8 @@ def generate_csr(core, create_files=True):
     if create_files:
         generate_csr_hw(core, csr_gen_obj, reg_table)
         generate_csr_sw(core, csr_gen_obj, reg_table)
+
+    # Append macros for each CSR
+    csr_gen_obj.generate_csr_macros(core, reg_table)
+
     return csr_gen_obj, reg_table

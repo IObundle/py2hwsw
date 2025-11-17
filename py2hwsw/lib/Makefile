@@ -105,7 +105,6 @@ fusesoc-test: fusesoc-export
 	printf "[library.py2]\nlocation = fusesoc_libraries/py2hwsw\n" > fusesoc_test/fusesoc.conf
 	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE_NAME)"
 
-# Multiline string (use a here‑document)
 define MULTILINE_TEXT
 provider:
   name: url

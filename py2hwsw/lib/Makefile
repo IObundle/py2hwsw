@@ -51,7 +51,7 @@ CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
 
 # Get the name of the generated core (sometimes not equal to $(CORE), like the generated 'iob_cache_axi' of the iob_cache core)
 CORE_NAME=$(shell nix-shell --run "py2hwsw $(CORE) print_core_name --py_params '$(PY_PARAMS)'")
-VERSION ?=$(shell cat $(CORE).py | grep version | cut -d '"' -f 4)
+VERSION=$(shell nix-shell --run "py2hwsw $(CORE) print_core_version --py_params '$(PY_PARAMS)'")
 
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
 ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)

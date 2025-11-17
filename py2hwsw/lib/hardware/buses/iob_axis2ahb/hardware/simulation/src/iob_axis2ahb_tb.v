@@ -4,10 +4,8 @@
 
 `timescale 1ns / 1ps
 
-`include "iob_axistream_in_csrs.vh"
 `include "iob_axistream_in_csrs_conf.vh"
 `include "iob_axistream_in_conf.vh"
-`include "iob_axistream_out_csrs.vh"
 `include "iob_axistream_out_csrs_conf.vh"
 `include "iob_axistream_out_conf.vh"
 
@@ -112,19 +110,19 @@ module iob_axis2ahb_tb;
       $dumpvars();
 `endif
 
-      config_in_valid     = 0;
-      config_out_valid    = 0;
-      config_out_length   = 0;
+      config_in_valid    = 0;
+      config_out_valid   = 0;
+      config_out_length  = 0;
 
-      axis_in_iob_valid   = 0;
-      axis_in_iob_wdata   = 0;
-      axis_in_iob_addr    = 0;
-      axis_in_iob_wstrb   = 0;
+      axis_in_iob_valid  = 0;
+      axis_in_iob_wdata  = 0;
+      axis_in_iob_addr   = 0;
+      axis_in_iob_wstrb  = 0;
 
-      axis_out_iob_valid  = 0;
-      axis_out_iob_wdata  = 0;
-      axis_out_iob_addr   = 0;
-      axis_out_iob_wstrb  = 0;
+      axis_out_iob_valid = 0;
+      axis_out_iob_wdata = 0;
+      axis_out_iob_addr  = 0;
+      axis_out_iob_wstrb = 0;
 
       //apply async reset
       `IOB_RESET(clk, arst, 100, 1_000, 100);

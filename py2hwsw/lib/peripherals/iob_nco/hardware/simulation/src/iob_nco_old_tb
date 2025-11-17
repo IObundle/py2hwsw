@@ -5,7 +5,7 @@
 `timescale 1ns / 1ps
 
 `include "iob_nco_conf.vh"
-`include "iob_nco_csrs.vh"
+`include "iob_nco_csrs_conf.vh"
 
 `define IOB_NBYTES (DATA_W/8)
 `define IOB_GET_NBYTES(WIDTH) (WIDTH/8 + |(WIDTH%8))

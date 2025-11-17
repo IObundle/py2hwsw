@@ -1,5 +1,6 @@
 import os
-import sys
+
+from math import ceil
 
 
 def create_dts_file(path, peripheral):

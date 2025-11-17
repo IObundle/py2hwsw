@@ -1133,30 +1133,6 @@ class csr_gen:
         core_attributes["subblocks"] += subblocks
         core_attributes["snippets"] += [{"verilog_code": snippet}]
 
-    def write_hwheader(self, table, out_dir, top):
-        os.makedirs(out_dir, exist_ok=True)
-        f_def = open(f"{out_dir}/{top}.vh", "w")
-        f_def.write("//These macros may be dependent on instance parameters\n")
-        f_def.write("//address macros\n")
-        macro_prefix = f"{top}_".upper()
-        f_def.write("//addresses\n")
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            n_bytes = self.bceil(n_bits, 3) / 8
-            if n_bytes == 3:
-                n_bytes = 4
-            log2n_items = row.log2n_items
-            f_def.write(f"`define {macro_prefix}{name}_ADDR {row.addr}\n")
-            if eval_param_expression_from_config(log2n_items, self.config, "max") > 0:
-                f_def.write(
-                    f"`define {macro_prefix}{name}_ADDR_W {self.verilog_max(self.calc_verilog_addr_w(log2n_items,n_bytes),1)}\n"
-                )
-            f_def.write(
-                f"`define {macro_prefix}{name}_W {self.verilog_max(n_bits,1)}\n\n"
-            )
-        f_def.close()
-
     # Get C type from csrs n_bytes
     # uses unsigned int types from C stdint library
     @staticmethod
@@ -1179,7 +1155,7 @@ class csr_gen:
             if "W" in row.mode or "R" in row.mode:
                 core["confs"].append(
                     {
-                        "name": f"{core_prefix}_{name}_ADDR",
+                        "name": f"{name}_ADDR",
                         "descr": f"{row.name} CSR address.",
                         "type": "M",
                         "val": row.addr,
@@ -1195,7 +1171,7 @@ class csr_gen:
             if n_bytes == 3:
                 n_bytes = 4
             if "W" in row.mode or "R" in row.mode:
-                width_macro = f"{core_prefix}_{name}_W"
+                width_macro = f"{name}_W"
                 core["confs"].append(
                     {
                         "name": width_macro,
@@ -1231,7 +1207,7 @@ class csr_gen:
 
         fswhdr.write("#include <stdint.h>\n\n")
 
-        fswhdr.write(f'#include "{top}_csrs_conf.h"\n')
+        fswhdr.write(f'#include "{top}_conf.h"\n')
 
         fswhdr.write("\n// Base Address\n")
 

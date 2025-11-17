@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ps
 `include "iob_nco_sync_conf.vh"
-`include "iob_nco_csrs.vh"
+`include "iob_nco_csrs_conf.vh"
 
 module iob_nco_sync #(
    `include "iob_nco_sync_params.vs"

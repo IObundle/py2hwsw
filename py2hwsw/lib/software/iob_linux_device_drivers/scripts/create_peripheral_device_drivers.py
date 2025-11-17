@@ -61,7 +61,7 @@ SPDX-License-Identifier: {peripheral['spdx_license']}
           drivers
         - `Makefile`: user application compilation targets
     - `{peripheral['name']}.dts`: device tree template with {peripheral['name']} node
-        - manually add the `timer` node to the system device tree so the
+        - manually add the `{peripheral['name']}` node to the system device tree so the
           {peripheral['name']} is recognized by the linux kernel
 """
     with open(os.path.join(path, "README.md"), "w") as f:
@@ -644,6 +644,11 @@ int sysfs_write_file(const char *filename, uint32_t write_value) {{
   return ret;
 }}
 
+#
+# TODO: Improvement: Instead of hardcoded functions, try to reuse iob_timer.c functions.
+#                    Maybe emulate `iob_timer_csrs_set_<csr_name>` fucntions with sysfs
+#
+
 int timer_reset() {{
   if (sysfs_write_file({peripheral['upper_name']}_SYSFILE_RESET, 1) == -1) {{
     return -1;
@@ -826,5 +831,5 @@ def generate_device_drivers(output_dir, peripheral):
     create_driver_header_file(os.path.join(output_dir, "drivers"), _peripheral)
     create_driver_sysfs_header_file(os.path.join(output_dir, "drivers"), _peripheral)
     create_driver_main_file(os.path.join(output_dir, "drivers"), _peripheral)
-    create_user_c_file(os.path.join(output_dir, "user"), _peripheral)
+    # create_user_c_file(os.path.join(output_dir, "user"), _peripheral)
     create_user_makefile(os.path.join(output_dir, "user"), _peripheral)

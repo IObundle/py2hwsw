@@ -51,6 +51,7 @@ CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
 
 # Get the name of the generated core (sometimes not equal to $(CORE), like the generated 'iob_cache_axi' of the iob_cache core)
 CORE_NAME=$(shell nix-shell --run "py2hwsw $(CORE) print_core_name --py_params '$(PY_PARAMS)'")
+VERSION ?=$(shell cat $(CORE).py | grep version | cut -d '"' -f 4)
 
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
 ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)
@@ -108,7 +109,7 @@ fusesoc-test: fusesoc-export
 define MULTILINE_TEXT
 provider:
   name: url
-  url: https://github.com/IObundle/py2hwsw/releases/latest/download/iob_uart_V0.81.tar.gz
+  url: https://github.com/IObundle/py2hwsw/releases/latest/download/$(CORE)_V$(VERSION).tar.gz
   filetype: tar
 endef
 

@@ -163,7 +163,7 @@ clean:
 
 release-artifacts:
 	make fusesoc-export CORE=iob_uart
-	VERSION=`grep 'name:' fusesoc_exports/iob_uart.core | tr ':' '\n' | tail -1`;\
+	VERSION=`grep 'name:' fusesoc_exports/iob_uart.core | tr ':' '\n' | tail -1 | xargs`;\
 	[ -n "$$VERSION" ] || { echo "Error: Could not extract version"; exit 1; };\
 	tar -czf iob_uart_V$$VERSION.tar.gz -C ./fusesoc_exports .
 

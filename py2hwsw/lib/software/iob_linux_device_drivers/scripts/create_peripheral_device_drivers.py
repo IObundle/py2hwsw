@@ -191,11 +191,11 @@ def create_driver_sysfs_header_file(
             fswhdr.write('\tsscanf(buf, "%u", &value);\n')
             if multi:
                 fswhdr.write(
-                    f"\tiob_data_write_reg({top}_data->regbase, value, {TOP}_{CSR_NAME}_ADDR, {TOP}_{CSR_NAME}_W);\n"
+                    f"\tiob_data_write_reg({top}_data->regbase, value, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
                 )
             else:
                 fswhdr.write(
-                    f"\tiob_data_write_reg({top}_data.regbase, value, {TOP}_{CSR_NAME}_ADDR, {TOP}_{CSR_NAME}_W);\n"
+                    f"\tiob_data_write_reg({top}_data.regbase, value, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
                 )
             fswhdr.write(f"\tmutex_unlock(&{top}_mutex);\n")
             fswhdr.write(f'\tpr_info("[{top}] Sysfs - Write: 0x%x\\n", value);\n')
@@ -211,11 +211,11 @@ def create_driver_sysfs_header_file(
                     f"\tstruct iob_data *{top}_data = (struct iob_data*) dev->platform_data;\n"
                 )
                 fswhdr.write(
-                    f"\tu32 value = iob_data_read_reg({top}_data->regbase, {TOP}_{CSR_NAME}_ADDR, {TOP}_{CSR_NAME}_W);\n"
+                    f"\tu32 value = iob_data_read_reg({top}_data->regbase, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
                 )
             else:
                 fswhdr.write(
-                    f"\tu32 value = iob_data_read_reg({top}_data.regbase, {TOP}_{CSR_NAME}_ADDR, {TOP}_{CSR_NAME}_W);\n"
+                    f"\tu32 value = iob_data_read_reg({top}_data.regbase, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
                 )
             fswhdr.write(f'\tpr_info("[{top}] Sysfs - Read: 0x%x\\n", value);\n')
             fswhdr.write('\treturn sprintf(buf, "%u", value);\n')
@@ -486,10 +486,10 @@ static ssize_t {peripheral['name']}_read(struct file *file, char __user *buf, si
             continue
         CSR_NAME = csr["name"].upper()
         content += f"""\
-  case {peripheral['upper_name']}_{CSR_NAME}_ADDR:
-    value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_{CSR_NAME}_ADDR,
-                              {peripheral['upper_name']}_{CSR_NAME}_W);
-    size = ({peripheral['upper_name']}_{CSR_NAME}_W >> 3); // bit to bytes
+  case {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR:
+    value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
+                              {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
+    size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
     pr_info("[Driver] Read {csr['name']} CSR!\\n");
     break;
 """
@@ -523,12 +523,12 @@ static ssize_t {peripheral['name']}_write(struct file *file, const char __user *
             continue
         CSR_NAME = csr["name"].upper()
         content += f"""\
-  case {peripheral['upper_name']}_{CSR_NAME}_ADDR:
-    size = ({peripheral['upper_name']}_{CSR_NAME}_W >> 3); // bit to bytes
+  case {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR:
+    size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
     if (read_user_data(buf, size, &value))
       return -EFAULT;
-    iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_{CSR_NAME}_ADDR,
-                       {peripheral['upper_name']}_{CSR_NAME}_W);
+    iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
+                       {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
     pr_info("[Driver] {csr['name']} {peripheral['name']}: 0x%x\\n", value);
     break;
 """

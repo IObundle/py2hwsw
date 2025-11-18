@@ -748,11 +748,12 @@ def create_user_makefile(path, peripheral):
 # SPDX-License-Identifier: {peripheral['spdx_license']}
 
 SRC = $(wildcard *.c)
-HDR += {peripheral['name']}.h
+HDR += ../drivers/{peripheral['name']}.h
 FLAGS = -Wall -Werror -O2
 FLAGS += -static
 FLAGS += -march=rv32imac
 FLAGS += -mabi=ilp32
+FLAGS += -I../drivers -I../../src
 BIN = {peripheral['name']}_user
 CC = riscv64-unknown-linux-gnu-gcc
 

@@ -107,7 +107,7 @@ int timer_get_count(uint64_t *count) {
   if (ret == -1) {
     return -1;
   }
-  *count = ((uint64_t)data) << IOB_TIMER_DATA_LOW_W;
+  *count = ((uint64_t)data) << IOB_TIMER_CSRS_DATA_LOW_W;
   ret = sysfs_read_file(IOB_TIMER_SYSFILE_DATA_LOW, &data);
   if (ret == -1) {
     return -1;
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
   if (timer_get_count(&elapsed)) {
     perror("[User] Failed to get count");
   }
-  printf("\nExecution time: %lu clock cycles\n", elapsed);
+  printf("\nExecution time: %llu clock cycles\n", elapsed);
 
   return EXIT_SUCCESS;
 }

@@ -19,6 +19,9 @@ expect {
     timeout 10
 }
 
+# Test iob_timer driver
+send "insmod /drivers/iob_timer.ko"
+send "./iob_timer_user"
 
 # Versat Linux tests
 # send "rz"

@@ -286,3 +286,12 @@ insmod /path/to/driver.ko
 # iob-spi example:
 insmod /drivers/iob_spi_master.ko
 ```
+
+## 5. Compile the linux user space software
+
+Compile the user space software that uses the driver.
+
+```bash
+cd /path/to/device/repo/software/linux/user
+make
+```

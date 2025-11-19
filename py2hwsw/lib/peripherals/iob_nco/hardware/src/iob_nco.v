@@ -13,10 +13,9 @@ module iob_nco #(
 );
 
    wire [PERIOD_W-1:0] period_r;
-   wire [PERIOD_W-1:0] diff;
-   wire [  DATA_W-1:0] cnt;
-   wire [PERIOD_W-1:0] acc_in, acc_out;
-   wire                clk_int;
+   wire [PERIOD_W-1:0] cnt;
+   reg  [PERIOD_W-1:0] cnt_nxt;
+   reg                 clk_int;
 
    wire                soft_reset;
    wire                enable;
@@ -104,19 +103,16 @@ module iob_nco #(
    assign period_int_ready_wr  = 1'b1;
    assign period_frac_ready_wr = 1'b1;
 
-   reg [DATA_W-1:0] quant;
-
-   assign diff    = period_r - {quant, {FRAC_W{1'b0}}};
-   assign clk_int = (cnt > (quant / 2));
-
    always @* begin
-      if (acc_out[FRAC_W-1:0] == {1'b1, {FRAC_W - 1{1'b0}}})
-         quant = acc_out[PERIOD_W-1:FRAC_W] + ^acc_out[PERIOD_W-1:FRAC_W];
-      else if (acc_out[FRAC_W-1]) quant = acc_out[PERIOD_W-1:FRAC_W] + 1'b1;
-      else quant = acc_out[PERIOD_W-1:FRAC_W];
+      clk_int = (cnt[PERIOD_W-1:FRAC_W] > (period_r[PERIOD_W-1:FRAC_W] / 2));
+
+      if (cnt >= period_r)
+         cnt_nxt = cnt - period_r;
+      else
+         cnt_nxt = cnt + {1'b1, {FRAC_W{1'b0}}};
    end
 
-   //fractional period value register
+   //period value register
    iob_reg_care #(
       .DATA_W(PERIOD_W)
    ) per_reg (
@@ -142,31 +138,16 @@ module iob_nco #(
       .data_o(clk_out_o)
    );
 
-   //modulator accumulator
-   iob_acc_ld #(
-      .DATA_W(PERIOD_W)
-   ) acc_ld (
-      .clk_i   (clk_in_i),
-      .cke_i   (clk_in_cke_i),
-      .arst_i  (clk_in_arst_i),
-      .rst_i   (soft_reset),
-      .en_i    (enable),
-      .ld_i    (period_wen),
-      .ld_val_i(period_wdata),
-      .incr_i  (diff),
-      .data_o  (acc_out)
-   );
-
    //output period counter
-   iob_modcnt #(
-      .DATA_W(DATA_W)
-   ) modcnt (
+   iob_reg_care #(
+      .DATA_W(PERIOD_W)
+   ) cnt_reg (
       .clk_i (clk_in_i),
       .cke_i (clk_in_cke_i),
       .arst_i(clk_in_arst_i),
-      .rst_i (period_wen),
+      .rst_i (soft_reset),
       .en_i  (enable),
-      .mod_i (quant),
+      .data_i(cnt_nxt),
       .data_o(cnt)
    );
 

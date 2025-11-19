@@ -161,14 +161,6 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_acc_ld",
-                "instantiate": False,
-            },
-            {
-                "core_name": "iob_modcnt",
-                "instantiate": False,
-            },
-            {
                 "core_name": "iob_nco_sync",
                 "instantiate": False,
             },

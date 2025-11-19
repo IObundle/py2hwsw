@@ -27,7 +27,7 @@ void nco_enable(bool enable) { iob_nco_csrs_set_enable(enable); }
 // value are the fractional part of the period by default
 void nco_set_period(uint64_t period) {
   uint32_t period_int = (uint32_t)(period >> 32);
-  uint32_t period_frac = (uint32_t)(period && (0xFFFFFFFF));
+  uint32_t period_frac = (uint32_t)(period & (0xFFFFFFFF));
   iob_nco_csrs_set_period_int(period_int);
   iob_nco_csrs_set_period_frac(period_frac);
 }

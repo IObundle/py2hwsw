@@ -41,6 +41,14 @@ def setup(py_params_dict):
                 "max": "32",
             },
             {
+                "name": "AXI_LOCK_W",
+                "descr": "",
+                "type": "P",
+                "val": "2",
+                "min": "1",
+                "max": "32",
+            },
+            {
                 "name": "ADDR_W",
                 "descr": "",
                 "type": "P",
@@ -81,6 +89,7 @@ def setup(py_params_dict):
                     "LEN_W": "AXI_LEN_W",
                     "ADDR_W": "AXI_ADDR_W",
                     "DATA_W": "AXI_DATA_W",
+                    "LOCK_W": "AXI_LOCK_W",
                 },
             },
         ],

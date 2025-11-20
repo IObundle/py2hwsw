@@ -28,6 +28,9 @@ endif
 ifneq ($(INIT_MEM),)
 PY_PARAMS:=$(PY_PARAMS):init_mem=$(INIT_MEM)
 endif
+ifneq ($(USE_INTMEM),)
+PY_PARAMS:=$(PY_PARAMS):use_intmem=$(USE_INTMEM)
+endif
 ifneq ($(USE_EXTMEM),)
 PY_PARAMS:=$(PY_PARAMS):use_extmem=$(USE_EXTMEM)
 endif
@@ -51,6 +54,7 @@ CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
 
 # Get the name of the generated core (sometimes not equal to $(CORE), like the generated 'iob_cache_axi' of the iob_cache core)
 CORE_NAME=$(shell nix-shell --run "py2hwsw $(CORE) print_core_name --py_params '$(PY_PARAMS)'")
+VERSION=$(shell nix-shell --run "py2hwsw $(CORE) print_core_version --py_params '$(PY_PARAMS)'")
 
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
 ifeq ($(filter $(CORE),$(CORES_READY_FOR_LINT)),)
@@ -94,8 +98,8 @@ py2-doc-update:
 delivery:
 	nix-shell --run "py2hwsw $(CORE) deliver --build_dir '$(BUILD_DIR)'"
 
-fusesoc-export:
-	nix-shell --run "make clean setup && py2hwsw $(CORE) export_fusesoc --build_dir '$(BUILD_DIR)' --py_params '$(PY_PARAMS)'"
+fusesoc-export: clean setup
+	nix-shell --run "py2hwsw $(CORE) export_fusesoc --build_dir '$(BUILD_DIR)' --py_params '$(PY_PARAMS)'"
 
 fusesoc-test: fusesoc-export
 	rm -rf fusesoc_test
@@ -104,6 +108,21 @@ fusesoc-test: fusesoc-export
 	printf "[library.py2]\nlocation = fusesoc_libraries/py2hwsw\n" > fusesoc_test/fusesoc.conf
 	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE_NAME)"
 
+define MULTILINE_TEXT
+provider:
+  name: url
+  url: https://github.com/IObundle/py2hwsw/releases/latest/download/$(CORE)_V$(VERSION).tar.gz
+  filetype: tar
+endef
+
+# Generate independent fusesoc .core file. FuseSoC will obtain the Verilog sources from remote url with a pre-built build directory.
+export MULTILINE_TEXT
+fusesoc-core-file: fusesoc-export
+	cp fusesoc_exports/$(CORE_NAME).core .
+	# Append provider remote url to .core file
+	printf "\n%s\n" "$$MULTILINE_TEXT" >> $(CORE_NAME).core
+	echo "Generated independent $(CORE_NAME).core file."
+
 
 lib-ipxact:
 	nix-shell --run "py2hwsw --browse"
@@ -111,7 +130,7 @@ lib-ipxact:
 	nix-shell --run "kactus2"
 
 
-.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery fusesoc-export fusesoc-test lib-ipxact
+.PHONY: all setup sim-build sim-run sim-test sim-clean fpga-build fpga-clean doc-build py2-doc-build py2-doc-update delivery fusesoc-export fusesoc-test fusesoc-core-file lib-ipxact
 
 
 # Install board server and client
@@ -137,7 +156,17 @@ board_server_status:
 
 clean:
 	nix-shell --run "py2hwsw $(CORE) clean --build_dir '$(BUILD_DIR)'"
-	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs fusesoc_exports fusesoc_test
+	@rm -rf ../*.summary ../*.rpt py2hwsw_generated_docs fusesoc_exports fusesoc_test *.core
 	@find . -name \*~ -delete
 
 .PHONY: clean
+
+# Release Artifacts
+
+release-artifacts:
+	make fusesoc-export CORE=iob_uart
+	VERSION=`grep 'name:' fusesoc_exports/iob_uart.core | tr ':' '\n' | tail -1 | xargs`;\
+	[ -n "$$VERSION" ] || { echo "Error: Could not extract version"; exit 1; };\
+	tar -czf iob_uart_V$$VERSION.tar.gz -C ./fusesoc_exports .
+
+.PHONY: release-artifacts

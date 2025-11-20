@@ -283,17 +283,17 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": "tb_s",
-                    "output_0_m": "uart_cbus",
+                    "s_s": "tb_s",
+                    "m_0_m": "uart_cbus",
                 },
-                "num_outputs": 1,
+                "num_managers": 1,
                 "addr_w": 32,
             },
         ]
     # Connect ethernet and its RAM to pbus
     if params["use_ethernet"]:
-        subordinate_num = attributes_dict["subblocks"][-1]["num_outputs"]
-        attributes_dict["subblocks"][-1]["num_outputs"] += 1
+        subordinate_num = attributes_dict["subblocks"][-1]["num_managers"]
+        attributes_dict["subblocks"][-1]["num_managers"] += 1
         attributes_dict["subblocks"][-1]["connect"] |= {
             f"output_{subordinate_num}_m": "eth_cbus",
         }

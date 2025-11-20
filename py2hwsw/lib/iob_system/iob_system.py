@@ -60,10 +60,16 @@ def setup(py_params: dict):
     # Update parameters values with ones given in python parameters
     update_params(params, py_params)
 
+    sw_trap_handler = True
+
     if params["cpu"] == "none":
         params["use_intmem"] = False
         params["use_extmem"] = False
         params["use_bootrom"] = False
+
+    # Disable software trap handler for uncompatible CPUs
+    if params["cpu"] == "iob_picorv32":
+        sw_trap_handler = False
 
     num_xbar_managers = 0
     for param_name in ["use_intmem", "use_extmem", "use_bootrom", "use_peripherals"]:
@@ -173,6 +179,14 @@ def setup(py_params: dict):
                 "val": params["bootrom_addr_w"],
                 "min": "1",
                 "max": "32",
+            },
+            {  # Needed for software
+                "name": "TRAP_HANDLER",
+                "descr": "Enable trap handler in software using mvtec CSR. Only enable this for compatible CPUs. PicoRV32 not compatible.",
+                "type": "M",
+                "val": sw_trap_handler,
+                "min": "0",
+                "max": "1",
             },
             # mandatory parameters (do not change them!)
             {
@@ -722,12 +736,10 @@ def setup(py_params: dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": (
-                        "iob_periphs_cbus" if params["cpu"] != "none" else "iob_s"
-                    ),
+                    "s_s": ("iob_periphs_cbus" if params["cpu"] != "none" else "iob_s"),
                     # Peripherals cbus connections added automatically
                 },
-                "num_outputs": 0,  # Num outputs configured automatically
+                "num_managers": 0,  # Num managers configured automatically
                 "addr_w": params["addr_w"] - xbar_sel_w,
             },
             # Peripherals
@@ -858,15 +870,15 @@ The iob_vexriscv module, also included in the Py2HWSW's library, is a wrapper of
 In order to provide more CPU options, we have created the following CPU wrappers, making them compatible with iob_system:
 
 The VexRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexriscv
+The Picorv32 CPU compatible with iob_system is available at: https://github.com/IObundle/iob-picorv32
+The VexiiRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexiiriscv
 
 To switch between CPUs, iob_system supports the `cpu` python parameter.
 The user may change this parameter's value to any of the supported CPUs.
 
 Other untested/WIP compatible CPUs:
-The untested Picorv32 CPU compatible with iob_system is available at: https://github.com/IObundle/iob-picorv32
 The untested NaxRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-naxriscv
 The untested Ibex CPU compatible with iob_system is available at: https://github.com/IObundle/iob-ibex
-The untested VexiiRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexiiriscv
 
 These untested CPUs are not included in the Py2HWSW library. To use them, include them as git submodules of your project.
 """

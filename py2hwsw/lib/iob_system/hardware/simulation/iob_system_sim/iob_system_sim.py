@@ -295,7 +295,7 @@ def setup(py_params_dict):
         subordinate_num = attributes_dict["subblocks"][-1]["num_managers"]
         attributes_dict["subblocks"][-1]["num_managers"] += 1
         attributes_dict["subblocks"][-1]["connect"] |= {
-            f"output_{subordinate_num}_m": "eth_cbus",
+            f"m_{subordinate_num}_m": "eth_cbus",
         }
     attributes_dict["subblocks"] += [
         {

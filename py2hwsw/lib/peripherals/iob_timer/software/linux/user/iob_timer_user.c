@@ -20,8 +20,7 @@ int main(int argc, char *argv[]) {
   printf("[User] Version: 0x%x\n", iob_timer_csrs_get_version());
 
   // read current timer count
-  uint64_t elapsed = 0;
-  timer_get_count(&elapsed);
+  uint64_t elapsed = timer_get_count();
   printf("\nExecution time: %llu clock cycles\n", elapsed);
 
   return EXIT_SUCCESS;

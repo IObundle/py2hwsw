@@ -113,8 +113,8 @@ def setup(py_params_dict):
         ],
         "comb": {
             "code": """
-    data_in = d_i << (addr_i * DATA_W);
-    d_o = data_out >> (addr_i * DATA_W);
+    data_in = {{((DATA_W*(2**ADDR_W))-DATA_W){1'b0}}, d_i} << (addr_i * DATA_W);
+    d_o     = data_out[(addr_i*DATA_W)+:DATA_W];
         """,
         },
         "snippets": [

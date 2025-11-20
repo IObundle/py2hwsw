@@ -337,6 +337,12 @@ def setup(py_params_dict):
         for port_idx in range(NUM_MANAGERS - 1, -1, -1):
             verilog_code += f"m{port_idx}_iob_{signal}_i, "
         verilog_code = verilog_code[:-2] + "};\n"
+
+    # NOTE: Assigned 'sel' signal here, because it was causing an infinite loop when assigned in the FSM
+    verilog_code += f"""
+    assign sel = state == WAIT_VALID ? s_iob_addr_i[{ADDR_W-1}-:{NBITS}] : sel_reg;
+"""
+
     # Create snippet with muxer and demuxer connections
     attributes_dict["snippets"] = [
         {
@@ -351,7 +357,7 @@ def setup(py_params_dict):
         "type": "fsm",
         "default_assignments": """
    // Default assignments
-   sel = sel_reg;
+   // sel <- sel_reg;
 
    // Disallow handshake signals from going through
    s_iob_valid_int = 1'b0;
@@ -365,7 +371,7 @@ def setup(py_params_dict):
 """
         + f"""\
       // Allow selector to be changed
-      sel = s_iob_addr_i[{ADDR_W-1}-:{NBITS}];
+      // sel <- s_iob_addr_i[{ADDR_W-1}-:{NBITS}];
 """
         + """\
       if (s_iob_valid_i && ~s_iob_ready_o) begin

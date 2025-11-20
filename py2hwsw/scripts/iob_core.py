@@ -46,6 +46,7 @@ import sw_tools
 import verilog_format
 import verilog_lint
 from manage_headers import generate_headers
+import fusesoc
 
 
 class iob_core(iob_module, iob_instance):
@@ -838,6 +839,15 @@ class iob_core(iob_module, iob_instance):
             exit(1)
         print(f"{iob_colors.INFO}Delivering core: {core_name} {iob_colors.ENDC}")
         os.system(f"CORE={core_name} BUILD_DIR={module.build_dir} delivery.sh")
+
+    @staticmethod
+    def export_fusesoc(core_name, **kwargs):
+        """Export core as a fusesoc core."""
+        # Set project wide special target (will prevent normal setup)
+        __class__.global_special_target = "export_fusesoc"
+        # Build a new module instance, to obtain its attributes
+        module = __class__.get_core_obj(core_name, **kwargs)
+        fusesoc.export_core(module)
 
     @staticmethod
     def print_build_dir(core_name, **kwargs):

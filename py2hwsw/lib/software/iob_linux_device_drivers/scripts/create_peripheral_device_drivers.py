@@ -754,7 +754,7 @@ def generate_device_drivers(output_dir, peripheral):
         "license": "Dual MIT/GPL",
         "csrs": csrs_list,
     }
-    _peripheral["compatible_str"] = f"iobundle, {_peripheral['instance_name']}"
+    _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"
 
     print("Generating device drivers for", _peripheral["name"], "in", output_dir)
 

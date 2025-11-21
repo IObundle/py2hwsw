@@ -373,7 +373,7 @@ def setup(py_params_dict):
                     "iob_csrs_cbus_s": ("eth_cbus", ["eth_iob_addr[11:0]"]),
                     "axi_m": "unused_eth_axi",
                     "inta_o": "eth_int",
-                    "phy_rstn_o": "phy_rstn",
+                    "phy_rstn_o": "tb_phy_rstn",
                     "mii_io": "mii_invert",
                 },
             },

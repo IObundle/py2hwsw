@@ -182,7 +182,7 @@ def setup(py_params: dict):
             },
             {  # Needed for software
                 "name": "TRAP_HANDLER",
-                "descr": "Enable trap handler in software using mvtec CSR. Only enable this for compatible CPUs. PicoRV32 not compatible.",
+                "descr": "Enable trap handler in software using mtvec CSR. Only enable this for compatible CPUs. PicoRV32 not compatible.",
                 "type": "M",
                 "val": sw_trap_handler,
                 "min": "0",

@@ -1,4 +1,5 @@
 import os
+import string
 
 from math import ceil
 
@@ -94,6 +95,55 @@ def bceil(n, log2base):
         return n
     else:
         return int(base * ceil(n / base))
+
+
+def deterministic_magic(name: str) -> str:
+    """
+    Return a single printable ASCII character to use as an ioctl magic
+    number, derived deterministically from *name*.
+
+    The algorithm:
+    1. Sum the Unicode code points of all characters in *name*.
+    2. Reduce the sum modulo the number of allowed characters.
+    3. Pick the character at that index.
+
+    The allowed set excludes letters and digits (they’re often used by
+    other drivers) and contains the printable range 0x20‑0x7E.
+    """
+    # printable characters from space (0x20) to tilde (0x7E)
+    printable = [
+        ch
+        for ch in (chr(i) for i in range(0x20, 0x7F))
+        if ch not in string.ascii_letters + string.digits
+    ]
+
+    total = sum(ord(c) for c in name)
+    idx = total % len(printable)
+    return printable[idx]
+
+
+def generate_ioctl_defines(name, csrs):
+    """Define IOCTL commands for each CSR"""
+    content = ""
+    # define "ioctl name" __IOX("magic number","command number","argument type")
+    # define WR_VALUE _IOW('a','a',int32_t*)
+    # define RD_VALUE _IOR('a','b',int32_t*)
+    # define RW_VALUE _IOWR('a','b',int32_t*)
+    IOCTL_MAGIC = deterministic_magic(name)
+    i = 0
+    for csr in csrs:
+        CSR_NAME = csr["name"].upper()
+        if "W" in csr["mode"]:
+            content += f"""\
+#define WR_{CSR_NAME} _IOW('{IOCTL_MAGIC}',{i},int32_t*)
+"""
+            i += 1
+        if "R" in csr["mode"]:
+            content += f"""\
+#define RD_{CSR_NAME} _IOR('{IOCTL_MAGIC}',{i},int32_t*)
+"""
+            i += 1
+    return content
 
 
 ###############################################
@@ -223,7 +273,6 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{
   fd = open({peripheral['upper_name']}_DEVICE_FILE, O_RDWR);
   if (fd == -1) {{
     perror("[User] Failed to open the device file");
-    return EXIT_FAILURE;
   }}
 }}
 
@@ -266,31 +315,54 @@ void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
 def create_ioctl_user_csrs_source(path, peripheral):
     """Create user-space C file to interact with the driver"""
     content = f"""
-TODO
+#include <fcntl.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+
+#include "{peripheral['name']}.h"
+
 """
 
-    #     for csr in peripheral["csrs"]:
-    #         CSR_NAME = csr["name"].upper()
-    #         if int(csr["n_bits"]) <= 8:
-    #             data_type = "uint8_t"
-    #         elif int(csr["n_bits"]) <= 16:
-    #             data_type = "uint16_t"
-    #         else:
-    #             data_type = "uint32_t"
-    #         if "W" in csr["mode"]:
-    #             content += f"""\
-    # void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
-    #   write_reg(fd, {peripheral['upper_name']}_{CSR_NAME}_ADDR, {peripheral['upper_name']}_{CSR_NAME}_W, value);
-    # }}
-    # """
-    #         if "R" in csr["mode"]:
-    #             content += f"""\
-    # {data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
-    #   uint32_t return_value;
-    #   read_reg(fd, {peripheral['upper_name']}_{CSR_NAME}_ADDR, {peripheral['upper_name']}_{CSR_NAME}_W, &return_value);
-    #   return ({data_type})return_value;
-    # }}
-    # """
+    # Define IOCTL commands for each CSR
+    content += generate_ioctl_defines(peripheral["name"], peripheral["csrs"])
+
+    content += f"""\
+int fd = 0;
+
+void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{
+  fd = open({peripheral['upper_name']}_DEVICE_FILE, O_RDWR);
+  if (fd == -1) {{
+    perror("[User] Failed to open the device file");
+  }}
+}}
+
+// Core Setters and Getters
+"""
+    for csr in peripheral["csrs"]:
+        CSR_NAME = csr["name"].upper()
+        if int(csr["n_bits"]) <= 8:
+            data_type = "uint8_t"
+        elif int(csr["n_bits"]) <= 16:
+            data_type = "uint16_t"
+        else:
+            data_type = "uint32_t"
+        if "W" in csr["mode"]:
+            content += f"""\
+    void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
+      ioctl(fd, WR_{CSR_NAME}, (int32_t*) &value);
+    }}
+    """
+        if "R" in csr["mode"]:
+            content += f"""\
+    {data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
+      uint32_t return_value;
+      ioctl(fd, RD_{CSR_NAME}, (int32_t*) &return_value);
+      return ({data_type})return_value;
+    }}
+    """
 
     with open(os.path.join(path, f"{peripheral['name']}_ioctl_csrs.c"), "w") as f:
         f.write(content)
@@ -500,6 +572,13 @@ def create_driver_main_file(path, peripheral):
 #include <linux/platform_device.h>
 #include <linux/uaccess.h>
 
+#include <linux/ioctl.h>
+
+"""
+    # Define IOCTL commands for each CSR
+    content += generate_ioctl_defines(peripheral["name"], peripheral["csrs"])
+    content += f"""
+
 #include "iob_class/iob_class_utils.h"
 #include "{peripheral['name']}_driver_files.h"
 
@@ -523,6 +602,7 @@ static const struct file_operations {peripheral['name']}_fops = {{
     .write = {peripheral['name']}_write,
     .read = {peripheral['name']}_read,
     .llseek = {peripheral['name']}_llseek,
+    .unlocked_ioctl = {peripheral['name']}_ioctl,
     .open = {peripheral['name']}_open,
     .release = {peripheral['name']}_release,
 }};
@@ -782,6 +862,53 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
   return new_pos;
 }}
 
+/* IOCTL function
+ * This function will be called when we write IOCTL on the Device file
+ */
+ static long {peripheral['name']}_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+{{
+  int size = 0;
+  u32 value = 0;
+
+         switch(cmd) {{
+"""
+    # Create code for each CSR
+    for csr in peripheral["csrs"]:
+        CSR_NAME = csr["name"].upper()
+        if "W" in csr["mode"]:
+            content += f"""\
+                case WR_{CSR_NAME}:
+                        size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
+                        if (read_user_data((int32_t*) arg, size, &value))
+                          return -EFAULT;
+                        iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
+                                           {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
+                        pr_info("[Driver] {csr['name']} {peripheral['name']}: 0x%x\\n", value);
+
+                        break;
+"""
+        if "R" in csr["mode"]:
+            content += f"""\
+                case RD_{CSR_NAME}:
+                        value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
+                                                  {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
+                        size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
+                        pr_info("[Driver] Read {csr['name']} CSR!\\n");
+
+                        if (copy_to_user((int32_t*) arg, &value, size))
+                          return -EFAULT;
+
+                        break;
+"""
+
+    content += f"""\
+                default:
+                        pr_info("[Driver] Invalid IOCTL command 0x%x\\n", cmd);
+                        break;
+        }}
+        return 0;
+}}
+
 module_init(test_counter_init);
 module_exit(test_counter_exit);
 
@@ -975,5 +1102,5 @@ def generate_device_drivers(output_dir, peripheral):
     create_driver_main_file(os.path.join(output_dir, "drivers"), _peripheral)
     create_sysfs_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
     create_dev_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
-    # create_ioctl_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
+    create_ioctl_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
     create_user_makefile(os.path.join(output_dir, "user"), _peripheral)

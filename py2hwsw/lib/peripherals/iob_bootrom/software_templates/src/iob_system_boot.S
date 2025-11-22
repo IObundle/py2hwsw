@@ -18,6 +18,10 @@
   //call main
   jal ra, main
 
+  // Ensure write commits and invalidate the cache
+  fence rw, rw
+  fence.i
+
   // Jump to the firmware
   li x5, IOB_SYSTEM_FW_BASEADDR
   jalr x0, 0(x5)

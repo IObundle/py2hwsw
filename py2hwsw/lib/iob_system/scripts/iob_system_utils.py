@@ -203,7 +203,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
     peripheral_addr_w = params["addr_w"] - 2 - (num_peripherals - 1).bit_length()
 
     # Configure number of connections to pbus_split
-    pbus_split["num_outputs"] = num_peripherals
+    pbus_split["num_managers"] = num_peripherals
 
     for idx, peripheral in enumerate(peripherals):
         peripheral_name = peripheral["instance_name"].lower()
@@ -220,7 +220,7 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
             },
         )
         # Connect cbus to pbus_split
-        pbus_split["connect"][f"output_{idx}_m"] = f"{peripheral_name}_cbus"
+        pbus_split["connect"][f"m_{idx}_m"] = f"{peripheral_name}_cbus"
         # Connect cbus to peripheral
         peripheral["connect"]["iob_csrs_cbus_s"] = f"{peripheral_name}_cbus"
 
@@ -246,9 +246,9 @@ def connect_peripherals_cbus(attributes_dict, peripherals, params):
         },
     ]
 
-    # Connect CLINT and PLIC cbus to last outputs of pbus_split
-    pbus_split["connect"][f"output_{num_peripherals-2}_m"] = "clint_cbus"
-    pbus_split["connect"][f"output_{num_peripherals-1}_m"] = "plic_cbus"
+    # Connect CLINT and PLIC cbus to last managers of pbus_split
+    pbus_split["connect"][f"m_{num_peripherals-2}_m"] = "clint_cbus"
+    pbus_split["connect"][f"m_{num_peripherals-1}_m"] = "plic_cbus"
 
 
 def generate_memory_map(attributes_dict, peripherals_list, params, py_params):

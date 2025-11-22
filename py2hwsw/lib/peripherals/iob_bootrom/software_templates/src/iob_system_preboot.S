@@ -34,6 +34,10 @@ copy_loop:
   addi x1, x1, -4
   bne x1, x0, copy_loop
 
+  // Ensure write commits and invalidate the cache
+  fence rw, rw
+  fence.i
+
   // Jump to the bootloader
   li x5, BOOTLDR_ADDR
   jalr x0, 0(x5)

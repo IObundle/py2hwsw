@@ -203,11 +203,11 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": ("pbus_s", ["iob_addr_i[16:0]"]),
-                    "output_0_m": "uut_access",
-                    "output_1_m": "split_control_csrs",
+                    "s_s": ("pbus_s", ["iob_addr_i[16:0]"]),
+                    "m_0_m": "uut_access",
+                    "m_1_m": "split_control_csrs",
                 },
-                "num_outputs": 2,
+                "num_managers": 2,
                 "addr_w": 17,
             },
             {

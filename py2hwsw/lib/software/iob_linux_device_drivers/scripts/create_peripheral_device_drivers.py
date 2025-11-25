@@ -167,7 +167,9 @@ def create_dev_user_csrs_source(path, peripheral):
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "{peripheral['name']}.h"
+#include "{peripheral['name']}_driver_files.h"
+
+#include "{peripheral['name']}_csrs.h"
 """
         + """\
 
@@ -291,14 +293,14 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{
         if "W" in csr["mode"]:
             content += f"""\
 void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
-  write_reg(fd, {peripheral['upper_name']}_{CSR_NAME}_ADDR, {peripheral['upper_name']}_{CSR_NAME}_W, value);
+  write_reg(fd, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR, {peripheral['upper_name']}_CSRS_{CSR_NAME}_W, value);
 }}
 """
         if "R" in csr["mode"]:
             content += f"""\
 {data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
-  uint32_t return_value;
-  read_reg(fd, {peripheral['upper_name']}_{CSR_NAME}_ADDR, {peripheral['upper_name']}_{CSR_NAME}_W, &return_value);
+  uint32_t return_value = 0;
+  read_reg(fd, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR, {peripheral['upper_name']}_CSRS_{CSR_NAME}_W, &return_value);
   return ({data_type})return_value;
 }}
 """
@@ -322,7 +324,10 @@ def create_ioctl_user_csrs_source(path, peripheral):
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#include "{peripheral['name']}.h"
+#include "{peripheral['name']}_driver_files.h"
+
+#include "{peripheral['name']}_csrs.h"
+
 
 """
 
@@ -358,7 +363,7 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{
         if "R" in csr["mode"]:
             content += f"""\
     {data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
-      uint32_t return_value;
+      uint32_t return_value = 0;
       ioctl(fd, RD_{CSR_NAME}, (int32_t*) &return_value);
       return ({data_type})return_value;
     }}
@@ -505,6 +510,99 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
 
     fswhdr.write(f"\n#endif // H_{core_prefix}_SYSFS_H\n")
     fswhdr.close()
+
+
+def create_sysfs_user_csrs_source(path, peripheral):
+    """Create user-space C file to interact with the driver"""
+    content = f"""/*
+ * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+ *
+ * SPDX-License-Identifier: {peripheral['spdx_license']}
+ */
+
+#include <fcntl.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#include "{peripheral['name']}_driver_files.h"
+
+#include "{peripheral['name']}_csrs.h"
+
+int sysfs_read_file(const char *filename, uint32_t *read_value) {{
+  // Open file for read
+  FILE *file = fopen(filename, "r");
+  if (file == NULL) {{
+    perror("[User] Failed to open the file");
+    return -1;
+  }}
+
+  // Read uint32_t value from file in ASCII
+  ssize_t ret = fscanf(file, "%u", read_value);
+  if (ret == -1) {{
+    perror("[User] Failed to read from file");
+    fclose(file);
+    return -1;
+  }}
+
+  fclose(file);
+
+  return ret;
+}}
+
+int sysfs_write_file(const char *filename, uint32_t write_value) {{
+  // Open file for write
+  FILE *file = fopen(filename, "w");
+  if (file == NULL) {{
+    perror("[User] Failed to open the file");
+    return -1;
+  }}
+
+  // Write uint32_t value to file in ASCII
+  ssize_t ret = fprintf(file, "%u", write_value);
+  if (ret == -1) {{
+    perror("[User] Failed to write to file");
+    fclose(file);
+    return -1;
+  }}
+
+  fclose(file);
+
+  return ret;
+}}
+
+
+void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{}}
+
+// Core Setters and Getters
+"""
+
+    for csr in peripheral["csrs"]:
+        CSR_NAME = csr["name"].upper()
+        if int(csr["n_bits"]) <= 8:
+            data_type = "uint8_t"
+        elif int(csr["n_bits"]) <= 16:
+            data_type = "uint16_t"
+        else:
+            data_type = "uint32_t"
+        if "W" in csr["mode"]:
+            content += f"""\
+void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
+  sysfs_write_file({peripheral['upper_name']}_SYSFILE_{CSR_NAME}, value);
+}}
+"""
+        if "R" in csr["mode"]:
+            content += f"""\
+{data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
+  uint32_t return_value = 0;
+  sysfs_read_file({peripheral['upper_name']}_SYSFILE_{CSR_NAME}, &return_value);
+  return ({data_type})return_value;
+}}
+"""
+
+    with open(os.path.join(path, f"{peripheral['name']}_sysfs_csrs.c"), "w") as f:
+        f.write(content)
 
 
 #
@@ -921,106 +1019,15 @@ MODULE_VERSION("{peripheral['version']}");
         f.write(content)
 
 
-def create_sysfs_user_csrs_source(path, peripheral):
-    """Create user-space C file to interact with the driver"""
-    content = f"""/*
- * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
- *
- * SPDX-License-Identifier: {peripheral['spdx_license']}
- */
-
-#include <fcntl.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-#include "{peripheral['name']}_driver_files.h"
-
-#include "{peripheral['name']}_csrs.h"
-
-int sysfs_read_file(const char *filename, uint32_t *read_value) {{
-  // Open file for read
-  FILE *file = fopen(filename, "r");
-  if (file == NULL) {{
-    perror("[User] Failed to open the file");
-    return -1;
-  }}
-
-  // Read uint32_t value from file in ASCII
-  ssize_t ret = fscanf(file, "%u", read_value);
-  if (ret == -1) {{
-    perror("[User] Failed to read from file");
-    fclose(file);
-    return -1;
-  }}
-
-  fclose(file);
-
-  return ret;
-}}
-
-int sysfs_write_file(const char *filename, uint32_t write_value) {{
-  // Open file for write
-  FILE *file = fopen(filename, "w");
-  if (file == NULL) {{
-    perror("[User] Failed to open the file");
-    return -1;
-  }}
-
-  // Write uint32_t value to file in ASCII
-  ssize_t ret = fprintf(file, "%u", write_value);
-  if (ret == -1) {{
-    perror("[User] Failed to write to file");
-    fclose(file);
-    return -1;
-  }}
-
-  fclose(file);
-
-  return ret;
-}}
-
-
-void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{}}
-
-// Core Setters and Getters
-"""
-
-    for csr in peripheral["csrs"]:
-        CSR_NAME = csr["name"].upper()
-        if int(csr["n_bits"]) <= 8:
-            data_type = "uint8_t"
-        elif int(csr["n_bits"]) <= 16:
-            data_type = "uint16_t"
-        else:
-            data_type = "uint32_t"
-        if "W" in csr["mode"]:
-            content += f"""\
-void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
-  sysfs_write_file({peripheral['upper_name']}_SYSFILE_{CSR_NAME}, value);
-}}
-"""
-        if "R" in csr["mode"]:
-            content += f"""\
-{data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
-  uint32_t return_value;
-  sysfs_read_file({peripheral['upper_name']}_SYSFILE_{CSR_NAME}, &return_value);
-  return ({data_type})return_value;
-}}
-"""
-
-    with open(os.path.join(path, f"{peripheral['name']}_sysfs_csrs.c"), "w") as f:
-        f.write(content)
-
-
 def create_user_makefile(path, peripheral):
     """Create Makefile to build user application"""
     content = f"""# SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 #
 # SPDX-License-Identifier: {peripheral['spdx_license']}
 
-SRC = $(wildcard *.c)
+# Select kernel-userspace interface: sysfs; dev; ioctl
+IF = sysfs
+SRC = $(BIN).c {peripheral['name']}_$(IF)_csrs.c
 SRC += $(wildcard ../../src/{peripheral['name']}.c)
 HDR += ../drivers/{peripheral['name']}_driver_files.h
 FLAGS = -Wall -Werror -O2
@@ -1031,13 +1038,18 @@ FLAGS += -I../drivers -I../../src
 BIN = {peripheral['name']}_user
 CC = riscv64-unknown-linux-gnu-gcc
 
-all: $(BIN)
+$(BIN)_$(IF): $(SRC) $(HDR)
+	$(CC) $(FLAGS) $(INCLUDE) -o $(BIN)_$(IF) $(SRC)
 
-$(BIN): $(SRC) $(HDR)
-	$(CC) $(FLAGS) $(INCLUDE) -o $(BIN) $(SRC)
+all:
+	make IF=sysfs
+	make IF=dev
+	make IF=ioctl
 
 clean:
-	rm -rf $(BIN)
+	rm -f $(BIN)_sysfs $(BIN)_dev $(BIN)_ioctl
+
+.PHONY: all clean
 """
     with open(os.path.join(path, "Makefile"), "w") as f:
         f.write(content)

@@ -116,7 +116,7 @@ module iob_nco #(
       if (cnt >= period_r)
          cnt_nxt = cnt - period_r;
       else
-         cnt_nxt = cnt + {1'b1, {FRAC_W{1'b0}}};
+         cnt_nxt = cnt + {1'b1, {FRAC_W{1'b0}}}; // Increment by 1.0 (1 << FRAC_W) in fixed-point representation
    end
 
    //period value register

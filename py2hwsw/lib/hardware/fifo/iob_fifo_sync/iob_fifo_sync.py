@@ -79,6 +79,42 @@ def setup(py_params_dict):
                 "min": "NA",
                 "max": "NA",
             },
+            # Localparameters
+            {
+                "name": "ADDR_W_DIFF",
+                "descr": "",
+                "type": "D",
+                "val": "$clog2(R)",
+                "min": "NA",
+                "max": "NA",
+            },
+            {
+                "name": "FIFO_SIZE",
+                "descr": "in bytes",
+                "type": "D",
+                # "width": "ADDR_W+1",
+                "val": "{1'b1, {ADDR_W{1'b0}}}",
+                "min": "NA",
+                "max": "NA",
+            },
+            {
+                "name": "W_INCR",
+                "descr": "",
+                "type": "D",
+                # "width": "ADDR_W",
+                "val": "(W_DATA_W > R_DATA_W) ? {{ADDR_W-1{1'd0}},{1'd1}} << ADDR_W_DIFF : {{ADDR_W-1{1'd0}},{1'd1}}",
+                "min": "NA",
+                "max": "NA",
+            },
+            {
+                "name": "R_INCR",
+                "descr": "",
+                "type": "D",
+                # "width": "ADDR_W",
+                "val": "(R_DATA_W > W_DATA_W) ? {{ADDR_W-1{1'd0}},{1'd1}} << ADDR_W_DIFF : {{ADDR_W-1{1'd0}},{1'd1}}",
+                "min": "NA",
+                "max": "NA",
+            },
         ],
         "ports": [
             {
@@ -458,15 +494,9 @@ def setup(py_params_dict):
             {
                 "verilog_code": r"""
                 `include "iob_functions.vs"
-                localparam ADDR_W_DIFF = $clog2(R);
-                localparam [ADDR_W:0] FIFO_SIZE = {1'b1, {ADDR_W{1'b0}}};  //in bytes
                 assign w_en_int = (w_en_i & (~w_full_o));
                 assign r_en_int = (r_en_i & (~r_empty_o));
                 //assign according to assymetry type
-                localparam [ADDR_W-1:0] W_INCR = (W_DATA_W > R_DATA_W) ?
-                  {{ADDR_W-1{1'd0}},{1'd1}} << ADDR_W_DIFF : {{ADDR_W-1{1'd0}},{1'd1}};
-                localparam [ADDR_W-1:0] R_INCR = (R_DATA_W > W_DATA_W) ?
-                  {{ADDR_W-1{1'd0}},{1'd1}} << ADDR_W_DIFF : {{ADDR_W-1{1'd0}},{1'd1}};
                 assign level_o = level;
                 assign r_empty_nxt = level_nxt < {1'b0, R_INCR};
                 assign w_full_nxt = level_nxt > (FIFO_SIZE - W_INCR);

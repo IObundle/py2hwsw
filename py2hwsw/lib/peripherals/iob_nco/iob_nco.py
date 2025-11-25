@@ -16,6 +16,15 @@ def setup(py_params_dict):
                 "max": "32",
                 "descr": "Data bus width",
             },
+            # Derived Parameters
+            {
+                "name": "STRB_W",
+                "type": "D",
+                "val": "DATA_W / 8",
+                "min": "1",
+                "max": "32",
+                "descr": "Width of write strobe",
+            },
             {
                 "name": "PERIOD_W",
                 "type": "D",
@@ -88,8 +97,9 @@ def setup(py_params_dict):
                 "name": "period_int",
                 "descr": "",
                 "signals": [
+                    {"name": "period_int_valid_wr", "width": 1},
                     {"name": "period_int_wdata_wr", "width": 32},
-                    {"name": "period_int_wen_wr", "width": 1},
+                    {"name": "period_int_wstrb_wr", "width": "STRB_W"},
                     {"name": "period_int_ready_wr", "width": 1},
                 ],
             },
@@ -97,8 +107,9 @@ def setup(py_params_dict):
                 "name": "period_frac",
                 "descr": "",
                 "signals": [
+                    {"name": "period_frac_valid_wr", "width": 1},
                     {"name": "period_frac_wdata_wr", "width": 32},
-                    {"name": "period_frac_wen_wr", "width": 1},
+                    {"name": "period_frac_wstrb_wr", "width": "STRB_W"},
                     {"name": "period_frac_ready_wr", "width": 1},
                 ],
             },
@@ -159,14 +170,6 @@ def setup(py_params_dict):
                     "period_int_io": "period_int",
                     "period_frac_io": "period_frac",
                 },
-            },
-            {
-                "core_name": "iob_acc_ld",
-                "instantiate": False,
-            },
-            {
-                "core_name": "iob_modcnt",
-                "instantiate": False,
             },
             {
                 "core_name": "iob_nco_sync",

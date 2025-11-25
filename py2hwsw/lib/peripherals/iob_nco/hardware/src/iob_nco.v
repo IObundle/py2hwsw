@@ -27,6 +27,13 @@ module iob_nco #(
    // configuration control and status register file.
    `include "iob_nco_subblocks.vs"
 
+   wire                  period_int_wen_wr;
+   assign period_int_wen_wr = period_int_valid_wr & (|period_int_wstrb_wr);
+
+   wire                  period_frac_wen_wr;
+   assign period_frac_wen_wr = period_frac_valid_wr & (|period_frac_wstrb_wr);
+
+
    // Concatenate Integer and fractional Period registers
    wire [(2*DATA_W)-1:0] period_full_wdata;
    wire                  period_full_wen;

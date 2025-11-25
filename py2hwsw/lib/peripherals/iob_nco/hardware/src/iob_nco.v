@@ -111,7 +111,7 @@ module iob_nco #(
    assign period_frac_ready_wr = 1'b1;
 
    always @* begin
-      clk_int = (cnt[PERIOD_W-1:FRAC_W] > (period_r[PERIOD_W-1:FRAC_W] / 2));
+      clk_int = (cnt[PERIOD_W-1:FRAC_W] > (period_r[PERIOD_W-1:FRAC_W] >> 1));
 
       if (cnt >= period_r)
          cnt_nxt = cnt - period_r;

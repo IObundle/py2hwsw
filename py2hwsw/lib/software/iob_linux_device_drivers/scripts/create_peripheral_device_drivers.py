@@ -690,6 +690,8 @@ static loff_t {peripheral['name']}_llseek(struct file *, loff_t, int);
 static int {peripheral['name']}_open(struct inode *, struct file *);
 static int {peripheral['name']}_release(struct inode *, struct file *);
 
+static long {peripheral['name']}_ioctl(struct file *, unsigned int, unsigned long);
+
 static struct iob_data {peripheral['name']}_data = {{0}};
 DEFINE_MUTEX({peripheral['name']}_mutex);
 
@@ -977,7 +979,7 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
             content += f"""\
                 case WR_{CSR_NAME}:
                         size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
-                        if (read_user_data((int32_t*) arg, size, &value))
+                        if (copy_from_user(&value ,(int32_t*) arg, size))
                           return -EFAULT;
                         iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                                            {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);

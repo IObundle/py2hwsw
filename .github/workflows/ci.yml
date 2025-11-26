@@ -27,7 +27,7 @@ jobs:
 
   lib:
     runs-on: self-hosted
-    timeout-minutes: 35
+    timeout-minutes: 40
     if: ${{ !cancelled() }}
     needs: []
 

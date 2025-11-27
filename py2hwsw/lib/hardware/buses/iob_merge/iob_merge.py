@@ -390,10 +390,7 @@ def setup(py_params_dict):
     attributes_dict["fsm"] = {
         "type": "fsm",
         "default_assignments": """
-   // Default assignments
-   sel = sel_reg;
-
-   // Disallow handshake signals from going through
+   // Disallow handshake signals from going through by default
    m_iob_valid_o = 1'b0;
    m_iob_ready_int = 1'b0;
 """,
@@ -418,6 +415,8 @@ def setup(py_params_dict):
       end
 
    WAIT_READY: // Wait for ready signal
+      // Selector is locked
+      sel = sel_reg;
       // Allow handshake signals to go through
       m_iob_valid_o = m_iob_valid_int;
       m_iob_ready_int = m_iob_ready_i;
@@ -433,6 +432,8 @@ def setup(py_params_dict):
       end
 
    WAIT_RVALID: // Wait for read data
+      // Selector is locked
+      sel = sel_reg;
       if (m_iob_rvalid_i) begin
          state_nxt = WAIT_VALID;
       end

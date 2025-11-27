@@ -31,7 +31,7 @@ if { $USE_EXTMEM > 0 } {
         create_ip -name axi_interconnect -vendor xilinx.com -library ip -version 1.7 -module_name axi_interconnect_0 -dir ./ip -force
 
         set_property CONFIG.NUM_SLAVE_PORTS 1 [get_ips axi_interconnect_0]
-        set_property CONFIG.AXI_ADDR_WIDTH 28 [get_ips axi_interconnect_0]
+        set_property CONFIG.AXI_ADDR_WIDTH 30 [get_ips axi_interconnect_0]
         set_property CONFIG.ACLK_PERIOD 5000 [get_ips axi_interconnect_0]
         set_property CONFIG.INTERCONNECT_DATA_WIDTH 32 [get_ips axi_interconnect_0]
         set_property CONFIG.M00_AXI_IS_ACLK_ASYNC 1 [get_ips axi_interconnect_0]
@@ -87,9 +87,11 @@ if { $USE_EXTMEM > 0 } {
 } else { # USE_EXTMEM == 0
     read_verilog vivado/$BOARD/iob_xilinx_clock_wizard.v
     read_verilog vivado/$BOARD/iob_clock_wizard.v
-
     read_verilog vivado/$BOARD/iob_reset_sync.v
-    read_verilog vivado/$BOARD/iob_reg_a.v
+    # iob_reg_a is dependency of iob_reset_sync but may not exist in fpga folder if it is defined elsewhere (like hardware/src/)
+    if {[file exists vivado/$BOARD/iob_reg_a.v]} {
+        read_verilog vivado/$BOARD/iob_reg_a.v
+    }
 }
 
 if { $USE_ETHERNET > 0 } {

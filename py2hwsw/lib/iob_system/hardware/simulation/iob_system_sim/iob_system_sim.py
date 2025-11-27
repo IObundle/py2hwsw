@@ -283,19 +283,19 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reset_i": "split_reset",
-                    "input_s": "tb_s",
-                    "output_0_m": "uart_cbus",
+                    "s_s": "tb_s",
+                    "m_0_m": "uart_cbus",
                 },
-                "num_outputs": 1,
+                "num_managers": 1,
                 "addr_w": 32,
             },
         ]
     # Connect ethernet and its RAM to pbus
     if params["use_ethernet"]:
-        subordinate_num = attributes_dict["subblocks"][-1]["num_outputs"]
-        attributes_dict["subblocks"][-1]["num_outputs"] += 1
+        subordinate_num = attributes_dict["subblocks"][-1]["num_managers"]
+        attributes_dict["subblocks"][-1]["num_managers"] += 1
         attributes_dict["subblocks"][-1]["connect"] |= {
-            f"output_{subordinate_num}_m": "eth_cbus",
+            f"m_{subordinate_num}_m": "eth_cbus",
         }
     attributes_dict["subblocks"] += [
         {
@@ -373,7 +373,7 @@ def setup(py_params_dict):
                     "iob_csrs_cbus_s": ("eth_cbus", ["eth_iob_addr[11:0]"]),
                     "axi_m": "unused_eth_axi",
                     "inta_o": "eth_int",
-                    "phy_rstn_o": "phy_rstn",
+                    "phy_rstn_o": "tb_phy_rstn",
                     "mii_io": "mii_invert",
                 },
             },

@@ -1,7 +1,13 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 import os
 import string
 
 from math import ceil
+
+from create_peripheral_tests import create_peripheral_tests, create_test_makefile
 
 
 def create_dts_file(path, peripheral):
@@ -1118,3 +1124,5 @@ def generate_device_drivers(output_dir, peripheral):
     create_dev_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
     create_ioctl_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
     create_user_makefile(os.path.join(output_dir, "user"), _peripheral)
+    create_peripheral_tests(os.path.join(output_dir, "user"), _peripheral)
+    create_test_makefile(os.path.join(output_dir, "user"), _peripheral)

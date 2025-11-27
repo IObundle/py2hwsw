@@ -12,25 +12,27 @@ DEBUG = False
 
 
 # This is a simple server that will listen for connections on port 50007 from clients that want to use an FPGA board.
-# To install and run this server do the following:
-# 1. Install Python 3.6 or later
-# 2. run the following command from the root of this repository:
+# To install and run this server, do the following:
+# 1. Install Python 3.6 or later, and move to the lib directory
+#         > cd py2hwsw/lib
+#
+# 2. Run the following command from the root of this repository:
 #         > sudo make board_server_install
-
-# To uninstall the server run:
+#
+# To uninstall the server, run:
 #        > sudo make board_server_uninstall
 #
-# To check if the server is running run:
+# To check if the server is running, run:
 #        > sudo make board_server_status
 
-# Define the server's IP, port and version
+# Define the server's IP, port, and version
 # Must match the client's IP and port
 
 HOST = "localhost"  # Listen on all available interfaces
 PORT = 50007  # Use a non-privileged port
 VERSION = "V0.2"
 
-# user and duration board is needed
+# user and duration board are needed
 USER = ""
 DURATION = "300"  # 5 minutes
 

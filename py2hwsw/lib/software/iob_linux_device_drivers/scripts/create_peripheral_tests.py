@@ -1,7 +1,3 @@
-# SPDX-FileCopyrightText: 2025 IObundle
-#
-# SPDX-License-Identifier: MIT
-
 import os
 
 
@@ -27,105 +23,157 @@ def create_peripheral_tests(output_dir, peripheral):
 #include \"{peripheral['name']}.h\"
 #include \"{peripheral['name']}_csrs.h\"
 
-// Test functionality
-int test_functionality() {{
-    printf(\"Testing functionality...\\n");
+//
+// Test macros
+//
+#define TEST_PASSED 0
+#define TEST_FAILED 1
 
-    // Reset the timer
-    {peripheral['name']}_csrs_set_reset(1);
+#define RUN_TEST(test_name) \
+    printf(\"Running test: %s...\\n\", #test_name); \
+    if (test_name() != TEST_PASSED) {{ \
+        printf(\"Test failed: %s\\n\", #test_name); \
+        return TEST_FAILED; \
+    }} \
+    printf(\"Test passed: %s\\n\", #test_name);
 
-    // Enable the timer
-    {peripheral['name']}_csrs_set_enable(1);
+//
+// Functionality tests
+//
+"""
 
-    // Wait for a second
-    sleep(1);
-
-    // Sample the timer
-    {peripheral['name']}_csrs_set_sample(1);
-
-    // Read the timer value
-    uint32_t data_low = {peripheral['name']}_csrs_get_data_low();
-    uint32_t data_high = {peripheral['name']}_csrs_get_data_high();
-    uint64_t timer_value = ((uint64_t)data_high << 32) | data_low;
-
-    printf(\"Timer value: %llu\\n", timer_value);
-
-    // Check if the timer value is reasonable
-    if (timer_value == 0) {{
-        printf(\"Error: Timer value is 0\\n");
-        return -1;
+    for csr in csrs:
+        if "W" in csr["mode"]:
+            content += f"""
+int test_functionality_{csr['name']}_write() {{
+    uint32_t value = 0x12345678;
+    {peripheral['name']}_csrs_set_{csr['name']}(value);
+"""
+            if "R" in csr["mode"]:
+                content += f"""
+    uint32_t read_value = {peripheral['name']}_csrs_get_{csr['name']}();
+    if (read_value != value) {{
+        printf(\"Error: Read value (0x%x) does not match written value (0x%x)\\n\", read_value, value);
+        return TEST_FAILED;
     }}
-
-    printf(\"Functionality test passed!\\n");
-    return 0;
+"""
+            content += """
+    return TEST_PASSED;
+}
+"""
+        if "R" in csr["mode"]:
+            content += f"""
+int test_functionality_{csr['name']}_read() {{
+    {peripheral['name']}_csrs_get_{csr['name']}();
+    return TEST_PASSED;
 }}
+"""
 
-// Test error handling
-int test_error_handling() {{
-    printf(\"Testing error handling...\\n");
+    content += """
+//
+// Error handling tests
+//
+"""
 
-    // Try to write to a read-only register
+    for csr in csrs:
+        if "W" not in csr["mode"]:
+            content += f"""
+int test_error_handling_{csr['name']}_write() {{
     // This should fail, but the user-space library does not return an error code
     // Instead, it prints an error message to stderr
-    printf(\"Trying to write to a read-only register...\\n");
-    {peripheral['name']}_csrs_set_data_low(0);
-
-
-    printf(\"Error handling test passed!\\n");
-    return 0;
+    {peripheral['name']}_csrs_set_{csr['name']}(0);
+    return TEST_PASSED;
 }}
+"""
+        if "R" not in csr["mode"]:
+            content += f"""
+int test_error_handling_{csr['name']}_read() {{
+    // This should fail, but the user-space library does not return an error code
+    // Instead, it prints an error message to stderr
+    {peripheral['name']}_csrs_get_{csr['name']}();
+    return TEST_PASSED;
+}}
+"""
 
-// Test performance
-int test_performance() {{
-    printf(\"Testing performance...\\n");
+    content += """
+//
+// Performance tests
+//
+"""
 
+    for csr in csrs:
+        if "R" in csr["mode"]:
+            content += f"""
+int test_performance_{csr['name']}_read() {{
     const int num_iterations = 1000;
     struct timespec start, end;
     double total_time = 0;
 
-    // Test read performance
     clock_gettime(CLOCK_MONOTONIC, &start);
     for (int i = 0; i < num_iterations; i++) {{
-        {peripheral['name']}_csrs_get_data_low();
+        {peripheral['name']}_csrs_get_{csr['name']}();
     }}
     clock_gettime(CLOCK_MONOTONIC, &end);
 
     total_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    printf(\"Read performance: %f seconds for %d iterations\\n", total_time, num_iterations);
+    printf(\"Read performance for {csr['name']}: %f seconds for %d iterations\\n\", total_time, num_iterations);
 
-    // Test write performance
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    for (int i = 0; i < num_iterations; i++) {{
-        {peripheral['name']}_csrs_set_enable(1);
-    }}
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    total_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    printf(\"Write performance: %f seconds for %d iterations\\n", total_time, num_iterations);
-
-
-    printf(\"Performance test passed!\\n");
-    return 0;
+    return TEST_PASSED;
 }}
+"""
+        if "W" in csr["mode"]:
+            content += f"""
+int test_performance_{csr['name']}_write() {{
+    const int num_iterations = 1000;
+    struct timespec start, end;
+    double total_time = 0;
 
-int main() {{
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    for (int i = 0; i < num_iterations; i++) {{
+        {peripheral['name']}_csrs_set_{csr['name']}(i);
+    }}
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    total_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    printf(\"Write performance for {csr['name']}: %f seconds for %d iterations\\n\", total_time, num_iterations);
+
+    return TEST_PASSED;
+}}
+"""
+
+    content += """
+int main() {
     int ret = 0;
 
-    {peripheral['name']}_init(0);
+    printf(\"[User] Version: 0x%x\\n\", iob_timer_csrs_get_version());
 
-    printf("[User] Version: 0x%x\\n", {peripheral['name']}_csrs_get_version());
+    //
+    // Run all tests
+    //
+"""
+    for csr in csrs:
+        if "W" in csr["mode"]:
+            content += f"\n    RUN_TEST(test_functionality_{csr['name']}_write);"
+        if "R" in csr["mode"]:
+            content += f"\n    RUN_TEST(test_functionality_{csr['name']}_read);"
+        if "W" not in csr["mode"]:
+            content += f"\n    RUN_TEST(test_error_handling_{csr['name']}_write);"
+        if "R" not in csr["mode"]:
+            content += f"\n    RUN_TEST(test_error_handling_{csr['name']}_read);"
+        if "R" in csr["mode"]:
+            content += f"\n    RUN_TEST(test_performance_{csr['name']}_read);"
+        if "W" in csr["mode"]:
+            content += f"\n    RUN_TEST(test_performance_{csr['name']}_write);"
 
-    ret |= test_functionality();
-    ret |= test_error_handling();
-    ret |= test_performance();
-
-    if (ret) {{
+    content += """
+    if (ret) {
         printf(\"Tests failed!\\n");
-    }} else {{
+    } else {
         printf(\"All tests passed!\\n");
-    }}
+    }
 
     return ret;
-}}
+}
 """
 
     # Write the content to the file

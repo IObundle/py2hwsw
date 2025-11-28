@@ -316,6 +316,7 @@ module iob_axi_crossbar_rd #(
             .LSB_PRIORITY("HIGH")
          ) r_arb_inst (
             .clk          (clk),
+            .arst         (1'b0),
             .rst          (rst),
             .request      (r_request),
             .acknowledge  (r_acknowledge),
@@ -446,6 +447,7 @@ module iob_axi_crossbar_rd #(
             .LSB_PRIORITY("HIGH")
          ) a_arb_inst (
             .clk          (clk),
+            .arst         (1'b0),
             .rst          (rst),
             .request      (a_request),
             .acknowledge  (a_acknowledge),

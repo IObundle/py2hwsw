@@ -13,13 +13,14 @@
 module iob_arbiter #(
    parameter PORTS        = 4,
    // arbitration type: "PRIORITY" or "ROUND_ROBIN"
-   parameter TYPE         = "PRIORITY",
+   parameter [11*8-1:0] TYPE         = "PRIORITY",
    // block type: "NONE", "REQUEST", "ACKNOWLEDGE"
-   parameter BLOCK        = "NONE",
+   parameter [11*8-1:0] BLOCK        = "NONE",
    // LSB priority: "LOW", "HIGH"
    parameter LSB_PRIORITY = "LOW"
 ) (
    input wire clk,
+   input wire arst,
    input wire rst,
 
    input wire [PORTS-1:0] request,
@@ -30,9 +31,9 @@ module iob_arbiter #(
    output wire [$clog2(PORTS)-1:0] grant_encoded
 );
 
-   reg [PORTS-1:0] grant_reg = 0, grant_next;
-   reg grant_valid_reg = 0, grant_valid_next;
-   reg [$clog2(PORTS)-1:0] grant_encoded_reg = 0, grant_encoded_next;
+   reg [PORTS-1:0] grant_reg, grant_next;
+   reg grant_valid_reg, grant_valid_next;
+   reg [$clog2(PORTS)-1:0] grant_encoded_reg, grant_encoded_next;
 
    assign grant_valid   = grant_valid_reg;
    assign grant         = grant_reg;
@@ -52,7 +53,7 @@ module iob_arbiter #(
       .output_unencoded(request_mask)
    );
 
-   reg [PORTS-1:0] mask_reg = 0, mask_next;
+   reg [PORTS-1:0] mask_reg, mask_next;
 
    wire                     masked_request_valid;
    wire [$clog2(PORTS)-1:0] masked_request_index;
@@ -68,53 +69,83 @@ module iob_arbiter #(
       .output_unencoded(masked_request_mask)
    );
 
-   always @* begin
-      grant_next         = 0;
-      grant_valid_next   = 0;
-      grant_encoded_next = 0;
-      mask_next          = mask_reg;
+   wire grant_condition;
 
-      if (BLOCK == "REQUEST" && grant_reg & request) begin
-         // granted request still asserted; hold it
-         grant_valid_next   = grant_valid_reg;
-         grant_next         = grant_reg;
-         grant_encoded_next = grant_encoded_reg;
-      end else if (BLOCK == "ACKNOWLEDGE" && grant_valid && !(grant_reg & acknowledge)) begin
-         // granted request not yet acknowledged; hold it
-         grant_valid_next   = grant_valid_reg;
-         grant_next         = grant_reg;
-         grant_encoded_next = grant_encoded_reg;
-      end else if (request_valid) begin
-         if (TYPE == "PRIORITY") begin
-            grant_valid_next   = 1;
-            grant_next         = request_mask;
-            grant_encoded_next = request_index;
-         end else if (TYPE == "ROUND_ROBIN") begin
-            if (masked_request_valid) begin
-               grant_valid_next   = 1;
-               grant_next         = masked_request_mask;
-               grant_encoded_next = masked_request_index;
-               if (LSB_PRIORITY == "LOW") begin
-                  mask_next = {PORTS{1'b1}} >> (PORTS - masked_request_index);
-               end else begin
-                  mask_next = {PORTS{1'b1}} << (masked_request_index + 1);
-               end
-            end else begin
-               grant_valid_next   = 1;
-               grant_next         = request_mask;
-               grant_encoded_next = request_index;
-               if (LSB_PRIORITY == "LOW") begin
-                  mask_next = {PORTS{1'b1}} >> (PORTS - request_index);
-               end else begin
-                  mask_next = {PORTS{1'b1}} << (request_index + 1);
-               end
-            end
-         end
-      end
-   end
+   generate
+       if (BLOCK == "REQUEST") begin : g_block_request
+           assign grant_condition = grant_reg && request;
+       end else if (BLOCK == "ACKNOWLEDGE") begin : g_block_acknowledge
+           assign grant_condition = grant_valid && !(grant_reg & acknowledge);
+       end else begin : g_block_none
+           assign grant_condition = 1'b0;
+       end
+   endgenerate
 
-   always @(posedge clk) begin
-      if (rst) begin
+   generate
+       if (TYPE == "ROUND_ROBIN") begin : g_type_rr_wires
+           wire [PORTS-1:0] mask_next_req_valid;
+           wire [PORTS-1:0] mask_next_else;
+           if (LSB_PRIORITY == "LOW") begin : g_mask_next_lsb_priority_low
+               assign mask_next_req_valid = {PORTS{1'b1}} >> (PORTS - masked_request_index);
+               assign mask_next_else      = {PORTS{1'b1}} >> (PORTS - request_index);
+           end else begin : g_mask_next_lsb_priority_high
+               assign mask_next_req_valid = {PORTS{1'b1}} << (masked_request_index + 1);
+               assign mask_next_else      = {PORTS{1'b1}} << (request_index + 1);
+           end
+
+           always @* begin
+              grant_next         = 0;
+              grant_valid_next   = 0;
+              grant_encoded_next = 0;
+              mask_next          = mask_reg;
+
+              if (grant_condition) begin
+                 // granted request still asserted; hold it
+                 grant_valid_next   = grant_valid_reg;
+                 grant_next         = grant_reg;
+                 grant_encoded_next = grant_encoded_reg;
+              end else if (request_valid) begin
+                 if (masked_request_valid) begin
+                    grant_valid_next   = 1;
+                    grant_next         = masked_request_mask;
+                    grant_encoded_next = masked_request_index;
+                    mask_next          = mask_next_req_valid;
+                 end else begin
+                    grant_valid_next   = 1;
+                    grant_next         = request_mask;
+                    grant_encoded_next = request_index;
+                    mask_next          = mask_next_else;
+                 end
+              end
+           end
+       end else begin : g_type_priority
+           always @* begin
+              grant_next         = 0;
+              grant_valid_next   = 0;
+              grant_encoded_next = 0;
+              mask_next          = mask_reg;
+
+              if (grant_condition) begin
+                 // granted request still asserted; hold it
+                 grant_valid_next   = grant_valid_reg;
+                 grant_next         = grant_reg;
+                 grant_encoded_next = grant_encoded_reg;
+              end else if (request_valid) begin
+                 grant_valid_next   = 1;
+                 grant_next         = request_mask;
+                 grant_encoded_next = request_index;
+              end
+           end
+       end
+    endgenerate
+
+   always @(posedge clk, posedge arst) begin
+      if (arst) begin
+         grant_reg         <= 0;
+         grant_valid_reg   <= 0;
+         grant_encoded_reg <= 0;
+         mask_reg          <= 0;
+      end else if (rst) begin
          grant_reg         <= 0;
          grant_valid_reg   <= 0;
          grant_encoded_reg <= 0;

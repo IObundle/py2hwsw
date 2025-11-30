@@ -18,6 +18,11 @@
   //call main
   jal ra, main
 
+#ifdef IOB_SYSTEM_FENCEI
+  // Ensure that instruction fetches after jump are synced with previous writes - uses RISC-V 'Zifencei' extension
+  fence.i
+#endif
+
   // Jump to the firmware
   li x5, IOB_SYSTEM_FW_BASEADDR
   jalr x0, 0(x5)

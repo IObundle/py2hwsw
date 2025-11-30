@@ -17,3 +17,12 @@
 [submodule "py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master"]
 	path = py2hwsw/lib/iob_system/iob_system_linux/submodules/iob_spi_master
 	url = https://github.com/IObundle/iob-spi.git
+[submodule "py2hwsw/lib/iob_system/submodules/iob_vexiiriscv"]
+	path = py2hwsw/lib/iob_system/submodules/iob_vexiiriscv
+	url = https://github.com/IObundle/iob-vexiiriscv.git
+[submodule "py2hwsw/lib/iob_system/submodules/iob_cache"]
+	path = py2hwsw/lib/iob_system/submodules/iob_cache
+	url = https://github.com/IObundle/iob-cache.git
+[submodule "py2hwsw/lib/iob_system/submodules/iob_picorv32"]
+	path = py2hwsw/lib/iob_system/submodules/iob_picorv32
+	url = https://github.com/IObundle/iob-picorv32

@@ -34,6 +34,11 @@ copy_loop:
   addi x1, x1, -4
   bne x1, x0, copy_loop
 
+#ifdef IOB_SYSTEM_FENCEI
+  // Ensure that instruction fetches after jump are synced with previous writes - uses RISC-V 'Zifencei' extension
+  fence.i
+#endif
+
   // Jump to the bootloader
   li x5, BOOTLDR_ADDR
   jalr x0, 0(x5)

@@ -1053,6 +1053,7 @@ all:
 	make IF=sysfs
 	make IF=dev
 	make IF=ioctl
+	make BIN={peripheral['name']}_tests IF=sysfs
 
 clean:
 	rm -f $(BIN)_sysfs $(BIN)_dev $(BIN)_ioctl

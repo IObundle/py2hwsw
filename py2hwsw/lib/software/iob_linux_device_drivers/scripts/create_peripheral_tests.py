@@ -75,25 +75,26 @@ int test_functionality_{csr['name']}_read() {{
 //
 """
 
-    for csr in csrs:
-        if "W" not in csr["mode"]:
-            content += f"""
-int test_error_handling_{csr['name']}_write() {{
-    // This should fail, but the user-space library does not return an error code
-    // Instead, it prints an error message to stderr
-    {peripheral['name']}_csrs_set_{csr['name']}(0);
-    return TEST_PASSED;
-}}
-"""
-        if "R" not in csr["mode"]:
-            content += f"""
-int test_error_handling_{csr['name']}_read() {{
-    // This should fail, but the user-space library does not return an error code
-    // Instead, it prints an error message to stderr
-    {peripheral['name']}_csrs_get_{csr['name']}();
-    return TEST_PASSED;
-}}
-"""
+    # User-space library does not provide these funcions (read func for write CSR and vice versa)
+    #     for csr in csrs:
+    #         if "W" not in csr["mode"]:
+    #             content += f"""
+    # int test_error_handling_{csr['name']}_write() {{
+    #     // This should fail, but the user-space library does not return an error code
+    #     // Instead, it prints an error message to stderr
+    #     {peripheral['name']}_csrs_set_{csr['name']}(0);
+    #     return TEST_PASSED;
+    # }}
+    # """
+    #         if "R" not in csr["mode"]:
+    #             content += f"""
+    # int test_error_handling_{csr['name']}_read() {{
+    #     // This should fail, but the user-space library does not return an error code
+    #     // Instead, it prints an error message to stderr
+    #     {peripheral['name']}_csrs_get_{csr['name']}();
+    #     return TEST_PASSED;
+    # }}
+    # """
 
     content += """
 //
@@ -156,10 +157,10 @@ int main() {
             content += f"\n    RUN_TEST(test_functionality_{csr['name']}_write);"
         if "R" in csr["mode"]:
             content += f"\n    RUN_TEST(test_functionality_{csr['name']}_read);"
-        if "W" not in csr["mode"]:
-            content += f"\n    RUN_TEST(test_error_handling_{csr['name']}_write);"
-        if "R" not in csr["mode"]:
-            content += f"\n    RUN_TEST(test_error_handling_{csr['name']}_read);"
+        #         if "W" not in csr["mode"]:
+        #             content += f"\n    RUN_TEST(test_error_handling_{csr['name']}_write);"
+        #         if "R" not in csr["mode"]:
+        #             content += f"\n    RUN_TEST(test_error_handling_{csr['name']}_read);"
         if "R" in csr["mode"]:
             content += f"\n    RUN_TEST(test_performance_{csr['name']}_read);"
         if "W" in csr["mode"]:

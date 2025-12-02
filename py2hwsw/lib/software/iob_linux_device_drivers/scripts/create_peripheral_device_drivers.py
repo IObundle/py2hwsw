@@ -8,6 +8,7 @@ from math import ceil
 
 SPDX_PREFIX = "SPDX-"
 
+
 def create_dts_file(path, peripheral):
     """Create device tree file with demo on how to include the peripheral in the device tree"""
     content = f"""// {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}

@@ -87,8 +87,11 @@ def eval_param_expression_from_config(param_expression, confs, param_attribute):
     """
     # Create parameter dictionary with correct values to be replaced in string
     params_dict = {}
-    for param in confs:
-        params_dict[param["name"]] = param.get(param_attribute, None)
+    for conf in confs:
+        if conf["type"] in ["P", "D"]:  # Use given param_attribute
+            params_dict[conf["name"]] = conf.get(param_attribute, None)
+        else:  # M or C - Always use 'val'
+            params_dict[conf["name"]] = conf.get("val", None)
 
     return eval_param_expression(param_expression, params_dict)
 

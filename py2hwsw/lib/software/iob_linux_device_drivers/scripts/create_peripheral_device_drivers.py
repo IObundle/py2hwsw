@@ -1,13 +1,18 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 import os
 
 from math import ceil
 
+SPDX_PREFIX = "SPDX-"
 
 def create_dts_file(path, peripheral):
     """Create device tree file with demo on how to include the peripheral in the device tree"""
-    content = f"""// SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""// {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 //
-// SPDX-License-Identifier: {peripheral['spdx_license']}
+// {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 
 /dts-v1/;
@@ -43,9 +48,9 @@ def create_dts_file(path, peripheral):
 def create_readme_file(path, peripheral):
     """Create README with directory structure and file descriptions of generated device driver files"""
     content = f"""<!--
-SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+{SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 
-SPDX-License-Identifier: {peripheral['spdx_license']}
+{SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 -->
 
 # {peripheral['upper_name']} Linux Kernel Drivers
@@ -70,9 +75,9 @@ SPDX-License-Identifier: {peripheral['spdx_license']}
 
 def create_driver_mk_file(path, peripheral):
     """Create Makefile segment for driver compilation"""
-    content = f"""# SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""# {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 #
-# SPDX-License-Identifier: {peripheral['spdx_license']}
+# {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 {peripheral['name']}-objs := {peripheral['name']}_main.o iob_class/iob_class_utils.o
 """
@@ -269,9 +274,9 @@ def create_driver_sysfs_header_file(path, peripheral, multi=False):
 def create_driver_main_file(path, peripheral):
     """Create the driver's kernel source"""
     content = f"""/*
- * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+ * {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
  *
- * SPDX-License-Identifier: {peripheral['spdx_license']}
+ * {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
  */
 
 /* {peripheral['name']}_main.c: driver for {peripheral['name']}
@@ -587,9 +592,9 @@ MODULE_VERSION("{peripheral['version']}");
 def create_user_csrs_source(path, peripheral):
     """Create user-space C file to interact with the driver"""
     content = f"""/*
- * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+ * {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
  *
- * SPDX-License-Identifier: {peripheral['spdx_license']}
+ * {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
  */
 
 #include <fcntl.h>
@@ -679,9 +684,9 @@ void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
 
 def create_user_makefile(path, peripheral):
     """Create Makefile to build user application"""
-    content = f"""# SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""# {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 #
-# SPDX-License-Identifier: {peripheral['spdx_license']}
+# {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 SRC = $(wildcard *.c)
 SRC += $(wildcard ../../src/{peripheral['name']}.c)

@@ -431,13 +431,13 @@ static int {peripheral['name']}_remove(struct platform_device *pdev) {{
   return 0;
 }}
 
-static int __init test_counter_init(void) {{
+static int __init {peripheral['name']}_init(void) {{
   pr_info("[Driver] %s: initializing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
 
   return platform_driver_register(&{peripheral['name']}_driver);
 }}
 
-static void __exit test_counter_exit(void) {{
+static void __exit {peripheral['name']}_exit(void) {{
   pr_info("[Driver] %s: exiting.\\n", {peripheral['upper_name']}_DRIVER_NAME);
   platform_driver_unregister(&{peripheral['name']}_driver);
 }}
@@ -568,8 +568,8 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
   return new_pos;
 }}
 
-module_init(test_counter_init);
-module_exit(test_counter_exit);
+module_init({peripheral['name']}_init);
+module_exit({peripheral['name']}_exit);
 
 MODULE_LICENSE("{peripheral['license']}");
 MODULE_AUTHOR("{peripheral['author']}");

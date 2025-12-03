@@ -714,7 +714,7 @@ clean:
 #
 
 
-def generate_device_drivers(output_dir, peripheral):
+def generate_device_drivers(output_dir, peripheral, py2hwsw_version):
     """Generate device driver files for a peripheral"""
 
     # Find 'iob_csrs' subblock
@@ -737,19 +737,33 @@ def generate_device_drivers(output_dir, peripheral):
         }
     )
 
-    instance_name = peripheral["name"][4:] if peripheral["name"].startswith("iob_") else peripheral["name"]
-    # Peripheral information
-    # TODO: Replace hardcoded by dynamic info.
+    instance_name = (
+        peripheral["name"][4:]
+        if peripheral["name"].startswith("iob_")
+        else peripheral["name"]
+    )
+
+    license_autor = "IObundle"
+    license_year = "2025"
+    license_name = "MIT"
+    if "license" in peripheral:
+        license_name = peripheral["license"]["name"]
+        license_autor = peripheral["license"]["author"]
+        license_year = peripheral["license"]["year"]
+
+    # Group peripheral information into a dictionary
     _peripheral = {
         "name": peripheral["name"],  # example: 'iob_timer'
         "instance_name": f"{instance_name}0",  # example: 'timer0'
         "upper_name": peripheral["name"].upper(),
-        "version": "0.81",
+        "version": (
+            peripheral["version"] if "version" in peripheral else py2hwsw_version
+        ),
         "description": f"{peripheral['name']} Drivers",
-        "author": "IObundle",
-        "spdx_year": "2025",
-        "spdx_license": "MIT",
-        "license": "Dual MIT/GPL",
+        "author": license_autor,
+        "spdx_year": license_year,
+        "spdx_license": license_name,
+        "license": f"Dual {license_name}/GPL",
         "csrs": csrs_list,
     }
     _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"

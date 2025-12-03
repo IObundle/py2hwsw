@@ -370,7 +370,7 @@ static int {peripheral['name']}_probe(struct platform_device *pdev) {{
   }}
   {peripheral['name']}_data.regsize = resource_size(res);
 
-  // Alocate char device
+  // Allocate char device
   result =
       alloc_chrdev_region(&{peripheral['name']}_data.devnum, 0, 1, {peripheral['upper_name']}_DRIVER_NAME);
   if (result) {{

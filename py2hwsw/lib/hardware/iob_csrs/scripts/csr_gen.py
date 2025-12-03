@@ -1154,6 +1154,10 @@ class csr_gen:
         """Generate macros for each CSR in core's confs list"""
         for row in table:
             name = row.name.upper()
+            n_bits = row.n_bits
+            n_bytes = int(self.bceil(n_bits, 3) / 8)
+            if n_bytes == 3:
+                n_bytes = 4
             if "W" in row.mode or "R" in row.mode:
                 core["confs"].append(
                     {
@@ -1165,14 +1169,6 @@ class csr_gen:
                         "max": "NA",
                     }
                 )
-
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            n_bytes = int(self.bceil(n_bits, 3) / 8)
-            if n_bytes == 3:
-                n_bytes = 4
-            if "W" in row.mode or "R" in row.mode:
                 width_macro = f"{name}_W"
                 core["confs"].append(
                     {

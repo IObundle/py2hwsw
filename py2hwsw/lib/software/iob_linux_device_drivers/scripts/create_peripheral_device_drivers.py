@@ -736,11 +736,12 @@ def generate_device_drivers(output_dir, peripheral):
         }
     )
 
+    instance_name = peripheral["name"][4:] if peripheral["name"].startswith("iob_") else peripheral["name"]
     # Peripheral information
     # TODO: Replace hardcoded by dynamic info.
     _peripheral = {
         "name": peripheral["name"],  # example: 'iob_timer'
-        "instance_name": f"{peripheral['name'][4:]}0",  # example: 'timer0'
+        "instance_name": f"{instance_name}0",  # example: 'timer0'
         "upper_name": peripheral["name"].upper(),
         "version": "0.81",
         "description": f"{peripheral['name']} Drivers",

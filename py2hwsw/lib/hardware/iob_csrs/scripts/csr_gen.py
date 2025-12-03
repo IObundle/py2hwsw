@@ -1152,7 +1152,6 @@ class csr_gen:
 
     def generate_csr_macros(self, core, table):
         """Generate macros for each CSR in core's confs list"""
-        core_prefix = core["name"].upper()
         for row in table:
             name = row.name.upper()
             if "W" in row.mode or "R" in row.mode:

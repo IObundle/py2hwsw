@@ -92,16 +92,6 @@ def filter_csrs_list(csrs_list):
     return filtered_csrs_list
 
 
-def bceil(n, log2base):
-    base = int(2**log2base)
-    # n = eval_param_expression_from_config(n, self.config, "max")
-    # print(f"{n} of {type(n)} and {base}")
-    if n % base == 0:
-        return n
-    else:
-        return int(base * ceil(n / base))
-
-
 def create_driver_sysfs_header_file_list(path, peripheral):
     """Generate <peripheral_name>_sysfs_files.h header"""
     fswhdr = open(os.path.join(path, f"{peripheral['name']}_sysfs_files.h"), "w")

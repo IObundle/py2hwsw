@@ -641,6 +641,7 @@ int sysfs_write_file(const char *filename, uint32_t write_value) {{
 }}
 
 
+// Empty init function - base address is obtained from device tree
 void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{}}
 
 // Core Setters and Getters

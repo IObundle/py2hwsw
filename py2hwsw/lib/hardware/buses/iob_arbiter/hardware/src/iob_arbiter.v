@@ -17,7 +17,7 @@ module iob_arbiter #(
    // block type: "NONE", "REQUEST", "ACKNOWLEDGE"
    parameter [11*8-1:0] BLOCK        = "NONE",
    // LSB priority: "LOW", "HIGH"
-   parameter LSB_PRIORITY = "LOW"
+   parameter [4*8-1:0] LSB_PRIORITY = "LOW"
 ) (
    input wire clk,
    input wire arst,
@@ -73,9 +73,9 @@ module iob_arbiter #(
 
    generate
        if (BLOCK == "REQUEST") begin : g_block_request
-           assign grant_condition = grant_reg && request;
+           assign grant_condition = |(grant_reg & request);
        end else if (BLOCK == "ACKNOWLEDGE") begin : g_block_acknowledge
-           assign grant_condition = grant_valid && !(grant_reg & acknowledge);
+           assign grant_condition = grant_valid && !(|(grant_reg & acknowledge));
        end else begin : g_block_none
            assign grant_condition = 1'b0;
        end
@@ -85,12 +85,12 @@ module iob_arbiter #(
        if (TYPE == "ROUND_ROBIN") begin : g_type_rr_wires
            wire [PORTS-1:0] mask_next_req_valid;
            wire [PORTS-1:0] mask_next_else;
-           if (LSB_PRIORITY == "LOW") begin : g_mask_next_lsb_priority_low
-               assign mask_next_req_valid = {PORTS{1'b1}} >> (PORTS - masked_request_index);
-               assign mask_next_else      = {PORTS{1'b1}} >> (PORTS - request_index);
-           end else begin : g_mask_next_lsb_priority_high
+           if (LSB_PRIORITY == "HIGH") begin : g_mask_next_lsb_priority_high
                assign mask_next_req_valid = {PORTS{1'b1}} << (masked_request_index + 1);
                assign mask_next_else      = {PORTS{1'b1}} << (request_index + 1);
+           end else begin : g_mask_next_lsb_priority_low
+               assign mask_next_req_valid = {PORTS{1'b1}} >> (PORTS - masked_request_index);
+               assign mask_next_else      = {PORTS{1'b1}} >> (PORTS - request_index);
            end
 
            always @* begin

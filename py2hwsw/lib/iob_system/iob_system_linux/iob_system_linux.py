@@ -10,6 +10,7 @@ import shutil
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../scripts"))
 
 from iob_system_utils import update_params
+from iob_system_dts import generate_dts
 
 
 def setup(py_params: dict):
@@ -294,6 +295,9 @@ def setup(py_params: dict):
         minirc_path = os.path.join(fpga_dir, ".minirc.iobundle.dfl")
         if not os.path.exists(minirc_path):
             os.symlink("minirc.iobundle.dfl", minirc_path)
+
+        # Generate device tree file
+        generate_dts(attributes, parameters, python_params)
 
     #     iob_soc_scripts = [
     #         "terminalMode",

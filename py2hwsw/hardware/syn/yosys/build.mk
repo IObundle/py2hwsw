@@ -10,6 +10,11 @@ SYN_SSH_FLAGS=$(YOSYS_SSH_FLAGS)
 SYN_SCP_FLAGS=$(YOSYS_SCP_FLAGS)
 SYN_SYNC_FLAGS=$(YOSYS_SYNC_FLAGS)
 
+# yosys/build.tcl environment variables
+export INCLUDE
+TOP?=$(NAME)
+export TOP
+
 synth: $(VHDR) $(VSRC)
 	mkdir -p results
 	yosys -l yosys.log -c $(SYNTHESIZER)/build.tcl

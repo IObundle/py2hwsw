@@ -86,9 +86,6 @@ def build_regs_table(core):
 def generate_csr_hw(core, csr_gen_obj, reg_table):
     """Generate reg hardware files"""
     name = core["name"]
-    csr_gen_obj.write_hwheader(
-        reg_table, core["build_dir"] + "/" + core["dest_dir"], name
-    )
     csr_gen_obj.write_hwcode(
         reg_table,
         core,
@@ -113,4 +110,8 @@ def generate_csr(core, create_files=True):
     if create_files:
         generate_csr_hw(core, csr_gen_obj, reg_table)
         generate_csr_sw(core, csr_gen_obj, reg_table)
+
+    # Append macros for each CSR
+    csr_gen_obj.generate_csr_macros(core, reg_table)
+
     return csr_gen_obj, reg_table

@@ -16,6 +16,12 @@ To follow this tutorial, clone the [iob-linux](https://github.com/IObundle/iob-l
 
 ## 1. Create device drivers
 
+This step 1. can be fully automated by using the Py2HWSW's [iob_linux_device_drivers](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/software/iob_linux_device_drivers/iob_linux_device_drivers.py) software module.
+To use this software module, add it to the 'sw_modules' list of the peripheral core, like in [iob_timer](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/peripherals/iob_timer/iob_timer.py#L157) core.
+This will cause the Linux kernel module sources (from step 1. of this tutorial) to be automatically generated under the `software/linux/` folder of the core's build directory.
+
+### Alternatively, create the driver sources manually
+
 On the device repository create a `software/linux` directory with the following files:
 
 ```bash
@@ -250,7 +256,7 @@ Run the `make all` target.
 
 ```bash
 cd /path/to/iob-linux/software/drivers
-make all
+make all MODULE_NAME=<core_name>
 ```
 
 3.3. Add module files to buildroot (optional)
@@ -279,4 +285,13 @@ After booting into linux, use the `insmod` command to load the new driver module
 insmod /path/to/driver.ko
 # iob-spi example:
 insmod /drivers/iob_spi_master.ko
+```
+
+## 5. Compile the linux user space software
+
+Compile the user space software that uses the driver.
+
+```bash
+cd /path/to/device/repo/software/linux/user
+make
 ```

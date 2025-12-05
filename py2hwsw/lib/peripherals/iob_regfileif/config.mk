@@ -12,8 +12,8 @@ REGFILEIF_HW_DIR:=$(REGFILEIF_DIR)/hardware
 MKREGS:=$(shell find $(LIB_DIR) -name mkregs.py)
 
 #Check that configuration file exists
-ifeq (,$(wildcard $(ROOT_DIR)/sut_csrs.vh))
-    $(error Missing 'sut_csrs.vh' configuration file in root directory!)
+ifeq (,$(wildcard $(ROOT_DIR)/sut_csrs_conf.vh))
+    $(error Missing 'sut_csrs_conf.vh' configuration file in root directory!)
 endif
 
 # VERSION
@@ -22,7 +22,7 @@ $(TOP_MODULE)_version.txt:
 	echo $(VERSION) > version.txt
 
 #cpu accessible registers
-iob_regfileif_csrs.vh iob_regfileif_csrs_gen.vh: $(REGFILEIF_DIR)/mkregs.conf
+iob_regfileif_csrs_conf.vh iob_regfileif_csrs_gen.vh: $(REGFILEIF_DIR)/mkregs.conf
 	$(REGFILEIF_DIR)/software/python/mkregsregfileif.py $< HW $(shell dirname $(MKREGS)) iob_regfileif 
 
 regfileif-gen-clean:

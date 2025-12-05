@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ps
 `include "iob_axistream_out_conf.vh"
-`include "iob_axistream_out_csrs.vh"
+`include "iob_axistream_out_csrs_conf.vh"
 
 module iob_axistream_out #(
    `include "iob_axistream_out_params.vs"
@@ -129,7 +129,7 @@ module iob_axistream_out #(
       .cke_i        (axis_cke_i),
       .arst_i       (axis_arst_i),
       .counter_rst_i(axis_sw_rst),
-      .counter_en_i(axis_fifo_read),
+      .counter_en_i (axis_fifo_read),
       .data_o       (axis_word_count)
    );
 

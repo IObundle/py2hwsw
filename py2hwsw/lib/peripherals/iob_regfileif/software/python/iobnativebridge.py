@@ -59,11 +59,11 @@ $(TOP_MODULE)_version.txt:
 MKREGS:=$(shell find -L $(LIB_DIR) -name mkregs.py)
 
 #target to create (and update) csrs for nativebridgeif based on sut_csrs.conf
-$(IOBNATIVEBRIDGEIF_DIR)/mkregs.conf: $(IOBNATIVEBRIDGEIF_DIR)/../../sut_csrs.vh
+$(IOBNATIVEBRIDGEIF_DIR)/mkregs.conf: $(IOBNATIVEBRIDGEIF_DIR)/../../sut_csrs_conf.vh
 	$(IOBNATIVEBRIDGEIF_DIR)/software/python/createIObNativeIfcsrs.py $(IOBNATIVEBRIDGEIF_DIR)/../..
 
 #cpu accessible registers
-iob_nativebridgeif_csrs.vh iob_nativebridgeif_csrs_gen.vh: $(IOBNATIVEBRIDGEIF_DIR)/mkregs.conf
+iob_nativebridgeif_csrs_conf.vh iob_nativebridgeif_csrs_gen.vh: $(IOBNATIVEBRIDGEIF_DIR)/mkregs.conf
 	$(IOBNATIVEBRIDGEIF_DIR)/software/python/mkregsregfileif.py $< HW $(shell dirname $(MKREGS)) iob_nativebridgeif
 
     """
@@ -73,7 +73,7 @@ iob_nativebridgeif_csrs.vh iob_nativebridgeif_csrs_gen.vh: $(IOBNATIVEBRIDGEIF_D
 
     # ~~~~~~~~~~~~ Create gitignore (for csrs) ~~~~~~~~~~~~
     gitignore_str = """\
-hardware/include/iob_nativebridgeif_csrs.vh
+hardware/include/iob_nativebridgeif_csrs_conf.vh
     """
     fout = open(os.path.join(iobnativebridgeif_dir, ".gitignore"), "w")
     fout.write(gitignore_str)
@@ -93,7 +93,7 @@ IOBNATIVEBRIDGEIF_SRC_DIR:=$(IOBNATIVEBRIDGEIF_HW_DIR)/src
 
 #include files
 VHDR+=$(wildcard $(IOBNATIVEBRIDGEIF_INC_DIR)/*.vh)
-VHDR+=iob_nativebridgeif_csrs_gen.vh iob_nativebridgeif_csrs.vh
+VHDR+=iob_nativebridgeif_csrs_gen.vh iob_nativebridgeif_csrs_conf.vh
 VHDR+=$(LIB_DIR)/hardware/include/iob_lib.vh $(LIB_DIR)/hardware/include/iob_s_if.vh $(LIB_DIR)/hardware/include/iob_gen_if.vh
 
 
@@ -158,12 +158,12 @@ endif
     csrs_python_creator = """\
 #!/usr/bin/env python3
 #Script created by iobnativebridge.py
-# Call this script with ROOT_DIR to create the iob_nativebridge_csrs.vh
+# Call this script with ROOT_DIR to create the iob_nativebridge_csrs_conf.vh
 import os
 import sys
 import re
 
-fin = open (os.path.join(sys.argv[1], 'sut_csrs.vh'), 'r')
+fin = open (os.path.join(sys.argv[1], 'sut_csrs_conf.vh'), 'r')
 csrs_content=fin.readlines()
 fin.close()
 for i in range(len(csrs_content)):
@@ -200,7 +200,7 @@ fout.close()
     verilog_source_str = """
 `timescale 1ns/1ps
 `include "iob_lib.vh"
-`include "iob_nativebridgeif_csrs.vh"
+`include "iob_nativebridgeif_csrs_conf.vh"
 
 module iob_nativebridgeif
   # (

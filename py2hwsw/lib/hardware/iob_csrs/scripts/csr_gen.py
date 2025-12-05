@@ -87,8 +87,11 @@ def eval_param_expression_from_config(param_expression, confs, param_attribute):
     """
     # Create parameter dictionary with correct values to be replaced in string
     params_dict = {}
-    for param in confs:
-        params_dict[param["name"]] = param.get(param_attribute, None)
+    for conf in confs:
+        if conf["type"] in ["P", "D"]:  # Use given param_attribute
+            params_dict[conf["name"]] = conf.get(param_attribute, None)
+        else:  # M or C - Always use 'val'
+            params_dict[conf["name"]] = conf.get("val", None)
 
     return eval_param_expression(param_expression, params_dict)
 
@@ -1133,30 +1136,6 @@ class csr_gen:
         core_attributes["subblocks"] += subblocks
         core_attributes["snippets"] += [{"verilog_code": snippet}]
 
-    def write_hwheader(self, table, out_dir, top):
-        os.makedirs(out_dir, exist_ok=True)
-        f_def = open(f"{out_dir}/{top}.vh", "w")
-        f_def.write("//These macros may be dependent on instance parameters\n")
-        f_def.write("//address macros\n")
-        macro_prefix = f"{top}_".upper()
-        f_def.write("//addresses\n")
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            n_bytes = self.bceil(n_bits, 3) / 8
-            if n_bytes == 3:
-                n_bytes = 4
-            log2n_items = row.log2n_items
-            f_def.write(f"`define {macro_prefix}{name}_ADDR {row.addr}\n")
-            if eval_param_expression_from_config(log2n_items, self.config, "max") > 0:
-                f_def.write(
-                    f"`define {macro_prefix}{name}_ADDR_W {self.verilog_max(self.calc_verilog_addr_w(log2n_items,n_bytes),1)}\n"
-                )
-            f_def.write(
-                f"`define {macro_prefix}{name}_W {self.verilog_max(n_bits,1)}\n\n"
-            )
-        f_def.close()
-
     # Get C type from csrs n_bytes
     # uses unsigned int types from C stdint library
     @staticmethod
@@ -1170,6 +1149,37 @@ class csr_gen:
             )
             type_try = -1
         return type_try
+
+    def generate_csr_macros(self, core, table):
+        """Generate macros for each CSR in core's confs list"""
+        for row in table:
+            name = row.name.upper()
+            n_bits = row.n_bits
+            n_bytes = int(self.bceil(n_bits, 3) / 8)
+            if n_bytes == 3:
+                n_bytes = 4
+            if "W" in row.mode or "R" in row.mode:
+                core["confs"].append(
+                    {
+                        "name": f"{name}_ADDR",
+                        "descr": f"{row.name} CSR address.",
+                        "type": "M",
+                        "val": row.addr,
+                        "min": "0",
+                        "max": "NA",
+                    }
+                )
+                width_macro = f"{name}_W"
+                core["confs"].append(
+                    {
+                        "name": width_macro,
+                        "descr": f"{row.name} CSR Width.",
+                        "type": "M",
+                        "val": n_bytes * 8,
+                        "min": "0",
+                        "max": "NA",
+                    }
+                )
 
     def write_swheader(self, table, out_dir, top):
         os.makedirs(out_dir, exist_ok=True)
@@ -1195,47 +1205,7 @@ class csr_gen:
 
         fswhdr.write("#include <stdint.h>\n\n")
 
-        fswhdr.write("//used address space width\n")
-
-        addr_w_macro = f"{core_prefix_upper}CSRS_ADDR_W"
-        fswhdr.write("/**\n")
-        fswhdr.write(f" * @def {addr_w_macro}\n")
-        fswhdr.write(" * @brief Used core address space width.\n")
-        fswhdr.write(" *\n")
-        fswhdr.write(
-            " * This macro defines the required address width in bits to access all core\n"
-        )
-        fswhdr.write(" * CSRs.\n")
-        fswhdr.write(" */\n")
-        fswhdr.write(f"#define  {addr_w_macro} {self.core_addr_w}\n\n")
-
-        fswhdr.write("//Addresses\n")
-
-        for row in table:
-            name = row.name.upper()
-            if "W" in row.mode or "R" in row.mode:
-                addr_macro = f"{core_prefix_upper}{name}_ADDR"
-                fswhdr.write("/**\n")
-                fswhdr.write(f" * @def {addr_macro}\n")
-                fswhdr.write(f" * @brief {row.name} CSR address.\n")
-                fswhdr.write(" */\n")
-                fswhdr.write(f"#define {addr_macro} {row.addr}\n")
-
-        fswhdr.write("\n//Data widths (bit)\n")
-
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            n_bytes = int(self.bceil(n_bits, 3) / 8)
-            if n_bytes == 3:
-                n_bytes = 4
-            if "W" in row.mode or "R" in row.mode:
-                width_macro = f"{core_prefix_upper}{name}_W"
-                fswhdr.write("/**\n")
-                fswhdr.write(f" * @def {width_macro}\n")
-                fswhdr.write(f" * @brief {row.name} CSR Width.\n")
-                fswhdr.write(" */\n")
-                fswhdr.write(f"#define {width_macro} {n_bytes*8}\n")
+        fswhdr.write(f'#include "{top}_conf.h"\n')
 
         fswhdr.write("\n// Base Address\n")
 

@@ -244,7 +244,7 @@ def generate_headers(
     if not ignore_paths:
         ignore_paths = []
 
-    ignore_paths += ["./LICENSES"]
+    ignore_paths += ["./LICENSES", "./.git"]
 
     ignore_files = []
     # Read FILE_WITH_IGNORE_INFO if it exists

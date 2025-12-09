@@ -1,14 +1,20 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 import os
 import string
 
 from math import ceil
 
+SPDX_PREFIX = "SPDX-"
+
 
 def create_dts_file(path, peripheral):
     """Create device tree file with demo on how to include the peripheral in the device tree"""
-    content = f"""// SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""// {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 //
-// SPDX-License-Identifier: {peripheral['spdx_license']}
+// {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 
 /dts-v1/;
@@ -44,9 +50,9 @@ def create_dts_file(path, peripheral):
 def create_readme_file(path, peripheral):
     """Create README with directory structure and file descriptions of generated device driver files"""
     content = f"""<!--
-SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+{SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 
-SPDX-License-Identifier: {peripheral['spdx_license']}
+{SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 -->
 
 # {peripheral['upper_name']} Linux Kernel Drivers
@@ -71,9 +77,9 @@ SPDX-License-Identifier: {peripheral['spdx_license']}
 
 def create_driver_mk_file(path, peripheral):
     """Create Makefile segment for driver compilation"""
-    content = f"""# SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""# {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 #
-# SPDX-License-Identifier: {peripheral['spdx_license']}
+# {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 {peripheral['name']}-objs := {peripheral['name']}_main.o iob_class/iob_class_utils.o
 """
@@ -85,16 +91,6 @@ def create_driver_mk_file(path, peripheral):
 def filter_csrs_list(csrs_list):
     filtered_csrs_list = [i for i in csrs_list if i.get("log2n_items", 0) == 0]
     return filtered_csrs_list
-
-
-def bceil(n, log2base):
-    base = int(2**log2base)
-    # n = eval_param_expression_from_config(n, self.config, "max")
-    # print(f"{n} of {type(n)} and {base}")
-    if n % base == 0:
-        return n
-    else:
-        return int(base * ceil(n / base))
 
 
 def deterministic_magic(name: str) -> str:
@@ -515,9 +511,9 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
 def create_sysfs_user_csrs_source(path, peripheral):
     """Create user-space C file to interact with the driver"""
     content = f"""/*
- * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+ * {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
  *
- * SPDX-License-Identifier: {peripheral['spdx_license']}
+ * {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
  */
 
 #include <fcntl.h>
@@ -573,6 +569,7 @@ int sysfs_write_file(const char *filename, uint32_t write_value) {{
 }}
 
 
+// Empty init function - base address is obtained from device tree
 void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{}}
 
 // Core Setters and Getters
@@ -649,9 +646,9 @@ def create_driver_header_file_list(path, peripheral):
 def create_driver_main_file(path, peripheral):
     """Create the driver's kernel source"""
     content = f"""/*
- * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+ * {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
  *
- * SPDX-License-Identifier: {peripheral['spdx_license']}
+ * {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
  */
 
 /* {peripheral['name']}_main.c: driver for {peripheral['name']}
@@ -754,7 +751,7 @@ static int {peripheral['name']}_probe(struct platform_device *pdev) {{
   }}
   {peripheral['name']}_data.regsize = resource_size(res);
 
-  // Alocate char device
+  // Allocate char device
   result =
       alloc_chrdev_region(&{peripheral['name']}_data.devnum, 0, 1, {peripheral['upper_name']}_DRIVER_NAME);
   if (result) {{
@@ -825,13 +822,13 @@ static int {peripheral['name']}_remove(struct platform_device *pdev) {{
   return 0;
 }}
 
-static int __init test_counter_init(void) {{
+static int __init {peripheral['name']}_init(void) {{
   pr_info("[Driver] %s: initializing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
 
   return platform_driver_register(&{peripheral['name']}_driver);
 }}
 
-static void __exit test_counter_exit(void) {{
+static void __exit {peripheral['name']}_exit(void) {{
   pr_info("[Driver] %s: exiting.\\n", {peripheral['upper_name']}_DRIVER_NAME);
   platform_driver_unregister(&{peripheral['name']}_driver);
 }}
@@ -1009,8 +1006,8 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
         return 0;
 }}
 
-module_init(test_counter_init);
-module_exit(test_counter_exit);
+module_init({peripheral['name']}_init);
+module_exit({peripheral['name']}_exit);
 
 MODULE_LICENSE("{peripheral['license']}");
 MODULE_AUTHOR("{peripheral['author']}");
@@ -1023,9 +1020,9 @@ MODULE_VERSION("{peripheral['version']}");
 
 def create_user_makefile(path, peripheral):
     """Create Makefile to build user application"""
-    content = f"""# SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""# {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 #
-# SPDX-License-Identifier: {peripheral['spdx_license']}
+# {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 # Select kernel-userspace interface: sysfs; dev; ioctl
 IF = sysfs
@@ -1062,7 +1059,7 @@ clean:
 #
 
 
-def generate_device_drivers(output_dir, peripheral):
+def generate_device_drivers(output_dir, peripheral, py2hwsw_version):
     """Generate device driver files for a peripheral"""
 
     # Find 'iob_csrs' subblock
@@ -1086,17 +1083,33 @@ def generate_device_drivers(output_dir, peripheral):
     )
 
     # Peripheral information
-    # TODO: Replace hardcoded by dynamic info.
+    instance_name = (
+        peripheral["name"][4:]
+        if peripheral["name"].startswith("iob_")
+        else peripheral["name"]
+    )
+
+    license_autor = "IObundle"
+    license_year = "2025"
+    license_name = "MIT"
+    if "license" in peripheral:
+        license_name = peripheral["license"]["name"]
+        license_autor = peripheral["license"]["author"]
+        license_year = peripheral["license"]["year"]
+
+    # Group peripheral information into a dictionary
     _peripheral = {
         "name": peripheral["name"],  # example: 'iob_timer'
-        "instance_name": f"{peripheral['name'][4:]}0",  # example: 'timer0'
+        "instance_name": f"{instance_name}0",  # example: 'timer0'
         "upper_name": peripheral["name"].upper(),
-        "version": "0.81",
+        "version": (
+            peripheral["version"] if "version" in peripheral else py2hwsw_version
+        ),
         "description": f"{peripheral['name']} Drivers",
-        "author": "IObundle",
-        "spdx_year": "2025",
-        "spdx_license": "MIT",
-        "license": "Dual MIT/GPL",
+        "author": license_autor,
+        "spdx_year": license_year,
+        "spdx_license": license_name,
+        "license": f"Dual {license_name}/GPL",
         "csrs": csrs_list,
     }
     _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"

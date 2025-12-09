@@ -2,17 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
-set INCLUDE_DIRS $env(INCLUDE_DIRS)
+set INCLUDE $env(INCLUDE)
+set TOP $env(TOP)
 
 set YOSYS_FLAGS {}
-foreach dir $INCLUDE_DIRS {
+foreach dir $INCLUDE {
     lappend YOSYS_FLAGS "-I${dir}"
 }
 
 # Read the Verilog files
 yosys read_verilog -DSYNTHESIS -I./src -I../src -I../common_src $YOSYS_FLAGS ../src/*.v
 
-set top iob_soc
+set top $TOP
 
 yosys hierarchy -check -top $top
 

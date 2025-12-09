@@ -24,7 +24,11 @@ def setup(py_params_dict):
     ), "Missing build directory for Linux device drivers modules."
 
     linux_drivers_path = os.path.join(py_params_dict["build_dir"], "software/linux")
-    generate_device_drivers(linux_drivers_path, py_params_dict["issuer"])
+    generate_device_drivers(
+        linux_drivers_path,
+        py_params_dict["issuer"],
+        py_params_dict["py2hwsw_version"],
+    )
 
     attributes_dict = {
         "generate_hw": False,

@@ -87,8 +87,11 @@ def eval_param_expression_from_config(param_expression, confs, param_attribute):
     """
     # Create parameter dictionary with correct values to be replaced in string
     params_dict = {}
-    for param in confs:
-        params_dict[param["name"]] = param.get(param_attribute, None)
+    for conf in confs:
+        if conf["type"] in ["P", "D"]:  # Use given param_attribute
+            params_dict[conf["name"]] = conf.get(param_attribute, None)
+        else:  # M or C - Always use 'val'
+            params_dict[conf["name"]] = conf.get("val", None)
 
     return eval_param_expression(param_expression, params_dict)
 
@@ -1149,9 +1152,12 @@ class csr_gen:
 
     def generate_csr_macros(self, core, table):
         """Generate macros for each CSR in core's confs list"""
-        core_prefix = core["name"].upper()
         for row in table:
             name = row.name.upper()
+            n_bits = row.n_bits
+            n_bytes = int(self.bceil(n_bits, 3) / 8)
+            if n_bytes == 3:
+                n_bytes = 4
             if "W" in row.mode or "R" in row.mode:
                 core["confs"].append(
                     {
@@ -1163,14 +1169,6 @@ class csr_gen:
                         "max": "NA",
                     }
                 )
-
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            n_bytes = int(self.bceil(n_bits, 3) / 8)
-            if n_bytes == 3:
-                n_bytes = 4
-            if "W" in row.mode or "R" in row.mode:
                 width_macro = f"{name}_W"
                 core["confs"].append(
                     {

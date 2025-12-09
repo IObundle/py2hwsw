@@ -546,6 +546,7 @@ module iob_axi_interconnect #(
       .LSB_PRIORITY("HIGH")
    ) arb_inst (
       .clk          (clk_i),
+      .arst         (1'b0),
       .rst          (rst_i),
       .request      (request),
       .acknowledge  (acknowledge),

@@ -60,16 +60,16 @@ def setup(py_params: dict):
     # Update parameters values with ones given in python parameters
     update_params(params, py_params)
 
-    sw_trap_handler = True
+    sw_trap_fenci = True
 
     if params["cpu"] == "none":
         params["use_intmem"] = False
         params["use_extmem"] = False
         params["use_bootrom"] = False
 
-    # Disable software trap handler for uncompatible CPUs
+    # Disable software trap handler and fence.i for uncompatible CPUs
     if params["cpu"] == "iob_picorv32":
-        sw_trap_handler = False
+        sw_trap_fenci = False
 
     num_xbar_managers = 0
     for param_name in ["use_intmem", "use_extmem", "use_bootrom", "use_peripherals"]:
@@ -182,9 +182,17 @@ def setup(py_params: dict):
             },
             {  # Needed for software
                 "name": "TRAP_HANDLER",
-                "descr": "Enable trap handler in software using mvtec CSR. Only enable this for compatible CPUs. PicoRV32 not compatible.",
+                "descr": "Enable trap handler in software using mtvec CSR. Only enable this for compatible CPUs. PicoRV32 not compatible.",
                 "type": "M",
-                "val": sw_trap_handler,
+                "val": sw_trap_fenci,
+                "min": "0",
+                "max": "1",
+            },
+            {  # Needed for software
+                "name": "FENCEI",
+                "descr": "Enable 'FENCE.I' instruction from the RISC-V 'Zifencei' extension. Only enable this for compatible CPUs. PicoRV32 not compatible.",
+                "type": "M",
+                "val": sw_trap_fenci,
                 "min": "0",
                 "max": "1",
             },

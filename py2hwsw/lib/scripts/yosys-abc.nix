@@ -44,7 +44,7 @@ let
     owner = "YosysHQ";
     repo = "abc";
     rev = rev;
-    sha256 = "sha256-sMBCIV698TIvU/sgTwgPFWDC1kl2TeGv+3pQ06gs7aM=";
+    sha256 = "sha256-ou+E2lvDEOxXRXNygE/TyVi7quqk+CJHRI+HDI0xljE=";
   };
   yosys_abc = pkgs.clangStdenv.mkDerivation rec {
     name = "yosys-abc";

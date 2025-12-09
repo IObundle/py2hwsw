@@ -352,18 +352,18 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{
             data_type = "uint32_t"
         if "W" in csr["mode"]:
             content += f"""\
-    void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
-      ioctl(fd, WR_{CSR_NAME}, (int32_t*) &value);
-    }}
-    """
+void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
+  ioctl(fd, WR_{CSR_NAME}, (int32_t*) &value);
+}}
+"""
         if "R" in csr["mode"]:
             content += f"""\
-    {data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
-      uint32_t return_value = 0;
-      ioctl(fd, RD_{CSR_NAME}, (int32_t*) &return_value);
-      return ({data_type})return_value;
-    }}
-    """
+{data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
+  uint32_t return_value = 0;
+  ioctl(fd, RD_{CSR_NAME}, (int32_t*) &return_value);
+  return ({data_type})return_value;
+}}
+"""
 
     with open(os.path.join(path, f"{peripheral['name']}_ioctl_csrs.c"), "w") as f:
         f.write(content)

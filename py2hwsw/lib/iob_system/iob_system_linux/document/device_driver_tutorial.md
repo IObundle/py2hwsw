@@ -44,6 +44,10 @@ iob_spi_master-objs := iob_spi_main.o iob_class/iob_class_utils.o
 
 1.2. Create main driver file
 
+Note: These template steps to create the main driver file and user-space functions, only use the 'sysfs' user-space/kernel interface.
+To support other interfaces, like '/dev' and 'ioctl' interfaces, use the Py2HWSW's [iob_linux_device_drivers](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/software/iob_linux_device_drivers/iob_linux_device_drivers.py) software module.
+
+
 `software/linux/drivers/iob_spi_main.c`
 
 Copy the [SPI driver source](https://github.com/IObundle/iob-spi/blob/main/software/linux/drivers/iob_spi_main.c) to use it as a template for the new driver.

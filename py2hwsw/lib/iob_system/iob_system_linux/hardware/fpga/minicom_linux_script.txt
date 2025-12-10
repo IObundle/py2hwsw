@@ -26,7 +26,22 @@ expect {
     timeout 10
 }
 
-send "./iob_timer_user"
+print "\n[minicom] Test iob_timer with sysfs interface"
+send "./iob_timer_user_sysfs"
+expect {
+    "#"
+    timeout 10
+}
+
+print "\n[minicom] Test iob_timer with dev interface"
+send "./iob_timer_user_dev"
+expect {
+    "#"
+    timeout 10
+}
+
+print "\n[minicom] Test iob_timer with ioctl interface"
+send "./iob_timer_user_ioctl"
 expect {
     "#"
     timeout 10

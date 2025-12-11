@@ -134,6 +134,7 @@ def setup(py_params_dict):
         .c0_ddr4_s_axi_awqos  (axi_awqos_i),
         .c0_ddr4_s_axi_awvalid(axi_awvalid_i),
         .c0_ddr4_s_axi_awready(axi_awready_o),
+        .c0_ddr4_s_axi_awprot (1'b0),
 
         //write
         .c0_ddr4_s_axi_wvalid(axi_wvalid_i),
@@ -160,6 +161,7 @@ def setup(py_params_dict):
         .c0_ddr4_s_axi_arqos  (axi_arqos_i),
         .c0_ddr4_s_axi_arvalid(axi_arvalid_i),
         .c0_ddr4_s_axi_arready(axi_arready_o),
+        .c0_ddr4_s_axi_arprot (1'b0),
 
         //read
         .c0_ddr4_s_axi_rready(axi_rready_i),

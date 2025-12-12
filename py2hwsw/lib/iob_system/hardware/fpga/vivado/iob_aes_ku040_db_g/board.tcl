@@ -87,10 +87,12 @@ if { $USE_EXTMEM > 0 } {
 } else { # USE_EXTMEM == 0
     read_verilog vivado/$BOARD/iob_xilinx_clock_wizard.v
     read_verilog vivado/$BOARD/iob_clock_wizard.v
-    read_verilog vivado/$BOARD/iob_reset_sync.v
-    # iob_reg_a is dependency of iob_reset_sync but may not exist in fpga folder if it is defined elsewhere (like hardware/src/)
-    if {[file exists vivado/$BOARD/iob_reg_a.v]} {
-        read_verilog vivado/$BOARD/iob_reg_a.v
+    if {[file exists vivado/$BOARD/iob_reset_sync.v]} {
+        read_verilog vivado/$BOARD/iob_reset_sync.v
+    }
+    # iob_sync_reg_a is dependency of iob_reset_sync but may not exist in fpga folder if it is defined elsewhere (like hardware/src/)
+    if {[file exists vivado/$BOARD/iob_sync_reg_a.v]} {
+        read_verilog vivado/$BOARD/iob_sync_reg_a.v
     }
 }
 

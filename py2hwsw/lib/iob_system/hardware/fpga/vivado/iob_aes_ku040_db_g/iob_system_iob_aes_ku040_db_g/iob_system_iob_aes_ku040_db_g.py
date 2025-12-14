@@ -454,5 +454,12 @@ def setup(py_params_dict):
 create_clock -name "clk" -period 4.0 [get_ports {c0_sys_clk_clk_p_i}]
 """
             )
+            if params["use_ethernet"]:
+                f.write(
+                    """
+# Clock groups
+set_clock_groups -asynchronous -group {clk} -group {rx_eth_clk}
+                """
+                )
 
     return attributes_dict

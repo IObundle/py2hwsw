@@ -147,7 +147,7 @@ def setup(py_params_dict):
         .axi_bridge_0_s{i}_awburst(s{i}_axi_awburst_i),
         .axi_bridge_0_s{i}_awlock (s{i}_axi_awlock_i),
         .axi_bridge_0_s{i}_awcache(s{i}_axi_awcache_i),
-        .axi_bridge_0_s{i}_awprot (s{i}_axi_awprot_i),
+        .axi_bridge_0_s{i}_awprot (3'b0),
         .axi_bridge_0_s{i}_awvalid(s{i}_axi_awvalid_i),
         .axi_bridge_0_s{i}_awready(s{i}_axi_awready_o),
 
@@ -172,7 +172,7 @@ def setup(py_params_dict):
         .axi_bridge_0_s{i}_arburst(s{i}_axi_arburst_i),
         .axi_bridge_0_s{i}_arlock (s{i}_axi_arlock_i),
         .axi_bridge_0_s{i}_arcache(s{i}_axi_arcache_i),
-        .axi_bridge_0_s{i}_arprot (s{i}_axi_arprot_i),
+        .axi_bridge_0_s{i}_arprot (3'b0),
         .axi_bridge_0_s{i}_arvalid(s{i}_axi_arvalid_i),
         .axi_bridge_0_s{i}_arready(s{i}_axi_arready_o),
 

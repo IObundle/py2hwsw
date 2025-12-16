@@ -14,10 +14,10 @@ def setup(py_params_dict):
             FRACTIONAL_W -t P -v 0 -m NA -M NA
             -d 'Fractional part width'
 
-            REAL_W -t P -v 'DATA_W - FRACTIONAL_W' -m NA -M NA
+            REAL_W -t D -v 'DATA_W - FRACTIONAL_W' -m NA -M NA
             -d 'Real part width'
 
-            SIZE_W -t P -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
+            SIZE_W -t D -v '(REAL_W / 2) + FRACTIONAL_W' -m NA -M NA
             -d 'Size width'
 
             END_COUNT -t D -v '(DATA_W + FRACTIONAL_W) >> 1' -m NA -M NA

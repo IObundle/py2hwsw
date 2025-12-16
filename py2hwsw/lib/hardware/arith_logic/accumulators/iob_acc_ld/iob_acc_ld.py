@@ -18,7 +18,7 @@ def setup(py_params_dict):
             {
                 "name": "INCR_W",
                 "type": "P",
-                "val": "DATA_W",
+                "val": "21",
                 "min": "NA",
                 "max": "NA",
                 "descr": "Increment value width",

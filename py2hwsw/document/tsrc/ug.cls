@@ -73,7 +73,14 @@
 \renewcommand{\footrulewidth}{.4pt}
 
 \fancyfoot{}
-\fancyfoot[LO,RE]{\copyright \the\year{} IObundle Lda. All rights reserved\hspace{1cm}\url{www.iobundle.com}\hspace{1cm}{\bf Confidential}}
+\fancyfoot[LO,RE]{%
+  \copyright \the\year{} IObundle Lda. All rights reserved%
+  \hspace{1cm}\url{www.iobundle.com}%
+  \hspace{1cm}%
+  \ifdefined\CONFIDENTIAL
+    \textbf{Confidential}%
+  \fi
+}
 \fancyfoot[LE,RO]{\thepage}
 
 \newcommand{\category}[1]{\def\@category{#1}}

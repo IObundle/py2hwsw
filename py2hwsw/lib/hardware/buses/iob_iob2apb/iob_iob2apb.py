@@ -26,7 +26,7 @@ def setup(py_params_dict):
             {
                 "name": "ADDR_W",
                 "type": "P",
-                "val": "APB_ADDR_W",
+                "val": "22",
                 "min": "NA",
                 "max": "NA",
                 "descr": "Reset value.",
@@ -34,7 +34,7 @@ def setup(py_params_dict):
             {
                 "name": "DATA_W",
                 "type": "P",
-                "val": "APB_DATA_W",
+                "val": "22",
                 "min": "NA",
                 "max": "NA",
                 "descr": "Reset value.",

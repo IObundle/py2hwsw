@@ -149,7 +149,7 @@ def create_memory_instance(
         },
         {
             "name": f"{MEMORY_NAME}_MAX_ADDR_W",
-            "descr": "Hiher address width of the memory asymetric interfaces",
+            "descr": "Higher address width of the memory asymetric interfaces",
             "type": "D",
             "val": f"{asym} > 0 ? ({log2n_items} + $clog2(iob_abs({asym}))) : {log2n_items}",
             "min": "NA",

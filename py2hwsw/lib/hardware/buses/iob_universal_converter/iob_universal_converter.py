@@ -133,7 +133,7 @@ def setup(py_params_dict):
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_wishbone2iob",
-                "instance_name": "iob_wishbone2iob_coverter",
+                "instance_name": "iob_wishbone2iob_converter",
                 "instance_description": "Convert Wishbone from subordinate port into IOb interface for internal wire",
                 "parameters": {
                     "ADDR_W": "ADDR_W",
@@ -151,7 +151,7 @@ def setup(py_params_dict):
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_apb2iob",
-                "instance_name": "iob_apb2iob_coverter",
+                "instance_name": "iob_apb2iob_converter",
                 "instance_description": "Convert APB from subordinate port into IOb interface for internal wire",
                 "parameters": {
                     "APB_ADDR_W": "ADDR_W",
@@ -171,7 +171,7 @@ def setup(py_params_dict):
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_axil2iob",
-                "instance_name": "iob_axil2iob_coverter",
+                "instance_name": "iob_axil2iob_converter",
                 "instance_description": "Convert AXI-Lite from subordinate port into IOb interface for internal wire",
                 "parameters": {
                     "AXIL_ADDR_W": "ADDR_W",
@@ -189,7 +189,7 @@ def setup(py_params_dict):
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_axi2iob",
-                "instance_name": "iob_axi2iob_coverter",
+                "instance_name": "iob_axi2iob_converter",
                 "instance_description": "Convert AXI from subordinate port into IOb interface for internal wire",
                 "parameters": {
                     "ADDR_WIDTH": "ADDR_W",
@@ -216,7 +216,7 @@ def setup(py_params_dict):
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_iob2wishbone",
-                "instance_name": "iob_iob2wishbone_coverter",
+                "instance_name": "iob_iob2wishbone_converter",
                 "instance_description": "Convert IOb from internal wire into Wishbone interface for manager port",
                 "parameters": {
                     "ADDR_W": "ADDR_W",
@@ -234,7 +234,7 @@ def setup(py_params_dict):
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_iob2apb",
-                "instance_name": "iob_iob2apb_coverter",
+                "instance_name": "iob_iob2apb_converter",
                 "instance_description": "Convert IOb from internal wire into APB interface for manager port",
                 "parameters": {
                     "APB_ADDR_W": "ADDR_W",
@@ -254,11 +254,13 @@ def setup(py_params_dict):
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_iob2axil",
-                "instance_name": "iob_iob2axil_coverter",
+                "instance_name": "iob_iob2axil_converter",
                 "instance_description": "Convert IOb from internal wire into AXI-Lite interface for manager port",
                 "parameters": {
                     "AXIL_ADDR_W": "ADDR_W",
                     "AXIL_DATA_W": "DATA_W",
+                    "ADDR_W": "ADDR_W",
+                    "DATA_W": "DATA_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
@@ -272,13 +274,11 @@ def setup(py_params_dict):
         attributes_dict["subblocks"].append(
             {
                 "core_name": "iob_iob2axi",
-                "instance_name": "iob_iob2axi_coverter",
+                "instance_name": "iob_iob2axi_converter",
                 "instance_description": "Convert IOb from internal wire into AXI interface for manager port",
                 "parameters": {
-                    "ADDR_WIDTH": "ADDR_W",
-                    "DATA_WIDTH": "DATA_W",
-                    "AXI_ID_WIDTH": "AXI_ID_W",
-                    "AXI_LEN_WIDTH": "AXI_LEN_W",
+                    "AXI_ID_W": "AXI_ID_W",
+                    "AXI_LEN_W": "AXI_LEN_W",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",

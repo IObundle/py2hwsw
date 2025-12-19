@@ -789,6 +789,7 @@ def setup(py_params: dict):
                         "AXI_LEN_W": "AXI_LEN_W",
                         "AXI_ADDR_W": params["addr_w"],
                         "AXI_DATA_W": params["data_w"],
+                        "DATA_W": params["data_w"],
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",

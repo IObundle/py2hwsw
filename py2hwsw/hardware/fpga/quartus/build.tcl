@@ -62,6 +62,9 @@ set_global_assignment -name SDC_FILE ./quartus/$BOARD/$NAME\_dev.sdc
 set_global_assignment -name SDC_FILE ../src/$NAME.sdc
 set_global_assignment -name SDC_FILE ../src/$NAME\_$CSR_IF.sdc
 set_global_assignment -name SDC_FILE ./src/$NAME.sdc
+if {[file exists "quartus/$BOARD/auto_board.sdc"]} {
+    set_global_assignment -name SDC_FILE ./quartus/$BOARD/auto_board.sdc
+}
 
 set_global_assignment -name SYNCHRONIZER_IDENTIFICATION "Forced if Asynchronous"
 

@@ -64,6 +64,18 @@ def setup(py_params_dict):
                 "max": 8,
             },
         ]
+    # Add Wishbone parameters if needed
+    if params["manager_if"] == "wb":
+        attributes_dict["confs"] += [
+            {
+                "name": "READ_BYTES",
+                "descr": "Controls how many consecutive bytes the bridge will request from the Wishbone bus for a read. It builds a byte-select mask (wb_select) of length READ_BYTES and shifts it according to the low address bits so the read is aligned to the requested byte offset.",
+                "type": "P",
+                "val": "4",
+                "min": "NA",
+                "max": "32",
+            },
+        ]
     #
     # Ports
     #
@@ -221,6 +233,7 @@ def setup(py_params_dict):
                 "parameters": {
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
+                    "READ_BYTES": "READ_BYTES",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",

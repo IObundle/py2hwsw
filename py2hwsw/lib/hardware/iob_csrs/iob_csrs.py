@@ -51,11 +51,15 @@ def setup(py_params_dict):
         }
         py_params_dict["dest_dir"] = "dummy_dest"
 
+    assert (
+        "issuer" in py_params_dict and py_params_dict["issuer"]
+    ), "Error: Issuer for CSRs not defined. Use python parameter 'demo=True' to generate iob_csrs without issuer."
+
     # by default use same version as issuer
     # use py2hwsw version as fallback
-    default_version = py_params_dict["py2hwsw_version"]
-    if "issuer" in py_params_dict:
-        default_version = py_params_dict["issuer"].get("version", default_version)
+    default_version = py_params_dict["issuer"].get(
+        "version", py_params_dict["py2hwsw_version"]
+    )
 
     params = {
         # Use the same name as issuer + the suffix "_csrs"

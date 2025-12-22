@@ -1666,10 +1666,10 @@ class RS232Interface(_interface):
 
     def __set_signals(self):
         """Set signals for the RS232 interface."""
-        if self.n_pins not in [2, 4, 9]:
-            raise ValueError("RS232 interface must have 2, 4, or 9 pins.")
+        if self.n_pins not in [2, 4, 8, 9]:
+            raise ValueError("RS232 interface must have 2, 4, 8, or 9 pins.")
 
-        if self.n_pins == 9:
+        if self.n_pins >= 8:
             self._signals += [
                 iob_signal(
                     name="rs232_dcd_i",
@@ -1677,7 +1677,7 @@ class RS232Interface(_interface):
                     descr="Data carrier detect.",
                 ),
             ]
-        if self.n_pins in [2, 4]:
+        if self.n_pins >= 2:
             self._signals += [
                 iob_signal(
                     name="rs232_rxd_i",
@@ -1690,25 +1690,31 @@ class RS232Interface(_interface):
                     descr="Transmit data.",
                 ),
             ]
-        if self.n_pins == 9:
+        if self.n_pins >= 8:
             self._signals += [
                 iob_signal(
                     name="rs232_dtr_o",
                     width=1,
                     descr="Data terminal ready.",
                 ),
+            ]
+        if self.n_pins >= 9:
+            self._signals += [
                 iob_signal(
                     name="rs232_gnd_i",
                     width=1,
                     descr="Ground.",
                 ),
+            ]
+        if self.n_pins >= 8:
+            self._signals += [
                 iob_signal(
                     name="rs232_dsr_i",
                     width=1,
                     descr="Data set ready.",
                 ),
             ]
-        if self.n_pins == 4:
+        if self.n_pins >= 4:
             self._signals += [
                 iob_signal(
                     name="rs232_rts_o",
@@ -1721,7 +1727,7 @@ class RS232Interface(_interface):
                     descr="Clear to send.",
                 ),
             ]
-        if self.n_pins == 9:
+        if self.n_pins >= 8:
             self._signals += [
                 iob_signal(
                     name="rs232_ri_i",

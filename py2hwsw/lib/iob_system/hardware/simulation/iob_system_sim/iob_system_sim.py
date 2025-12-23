@@ -257,6 +257,7 @@ def setup(py_params_dict):
                 "AXI_LEN_W": "AXI_LEN_W",
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
+                "SIMULATION": "SIMULATION",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",

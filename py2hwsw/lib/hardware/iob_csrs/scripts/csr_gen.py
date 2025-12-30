@@ -1443,11 +1443,16 @@ class csr_gen:
         os.makedirs(out_dir, exist_ok=True)
         csrs_file = open(f"{out_dir}/csrs.tex", "w")
 
-        csrs_file.write(
-            """
-The software accessible registers of the core are described in the following
-tables. Each subsection corresponds to a specific configuration of the core, since
-different configurations have different registers available.
+        create_subsections = len(doc_tables) > 1
+
+        csrs_intro = r"""\
+The software accessible registers of the core are described in the following tables.
+"""
+        if create_subsections:
+            csrs_intro += r"""\
+Each subsection corresponds to a specific configuration of the core, since different configurations have different registers available.
+"""
+        csrs_intro += r"""\
 The tables give information on the name, read/write capability, address, hardware and software width, and a
 textual description. The addresses are byte aligned and given in hexadecimal format.
 The hardware width is the number of bits that the register occupies in the hardware, while the
@@ -1457,10 +1462,11 @@ Each register has only one type of access, either read or write, meaning that re
 a write-only register will produce invalid data or writing to a read-only register will
 not have any effect.
 """
-        )
+        csrs_file.write(csrs_intro)
 
         for doc_conf, doc_table in doc_tables.items():
-            csrs_file.write(f"\\subsubsection{{{doc_conf} Configuration}}")
+            if create_subsections:
+                csrs_file.write(f"\\subsubsection{{{doc_conf} Configuration}}")
 
             for csr_group in doc_table:
                 csrs_file.write(

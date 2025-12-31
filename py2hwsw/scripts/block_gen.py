@@ -25,11 +25,11 @@ def generate_subblocks_table_tex(subblocks, out_dir):
 
     subblocks_file.write(
         """
-\\begin{xltabular}{\\textwidth}{|l|l|X|}
+\\begin{xltabular}{\\textwidth}{|l|X|}
 
   \\hline
   \\rowcolor{iob-green}
-  {\\bf Module} & {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
+  {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
 
   \\input subblocks_tab
 
@@ -55,7 +55,6 @@ def generate_subblocks_tex(subblocks, out_dir):
             continue
         tex_table.append(
             [
-                block.name,
                 block.instance_name,
                 block.instance_description,
             ]

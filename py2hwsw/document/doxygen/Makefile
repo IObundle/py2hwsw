@@ -26,6 +26,7 @@ $(REFMAN_TEX):
 doxygen.tex: $(REFMAN_TEX)
 	@sed -n '/^\\chapter{File Documentation}/,/^%--- End generated contents ---/p' $(REFMAN_TEX) |\
 		grep input > $@
+	../../scripts/fix_doxygen_subsections.py $@
 
 clean:
 	rm -rf $(LATEX_DIR) doxygen.tex

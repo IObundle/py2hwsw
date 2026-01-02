@@ -66,7 +66,7 @@ module iob_csrs_demo_tb;
    end
 
    //instantiate iob_csrs_demo core
-   iob_csrs_demo iob_csrs_demo0 (
+   iob_csrs_demo csrs_demo0 (
       // clk_en_rst_s port
       .clk_i                (clk),
       .cke_i                (1'b1),

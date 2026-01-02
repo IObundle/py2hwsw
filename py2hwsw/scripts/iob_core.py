@@ -594,7 +594,7 @@ class iob_core(iob_module, iob_instance):
         for subblock in self.subblocks:
             for portmap in subblock.portmap_connections:
                 if (
-                    portmap.port.name == "iob_csrs_cbus_s"
+                    portmap.port.name == "csrs_cbus_s"
                     and isinstance(portmap.port.interface, interfaces.iobInterface)
                     and portmap.e_connect
                 ):

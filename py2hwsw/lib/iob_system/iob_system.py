@@ -710,7 +710,7 @@ def setup(py_params: dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_csrs_cbus_s": (
+                    "csrs_cbus_s": (
                         "bootrom_cbus",
                         [
                             "{1'b0, bootrom_axi_arlock}",

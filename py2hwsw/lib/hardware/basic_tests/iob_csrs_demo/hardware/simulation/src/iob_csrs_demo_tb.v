@@ -36,13 +36,13 @@ module iob_csrs_demo_tb;
       $dumpvars();
 `endif
 
-      rst          = 0;
+      rst         = 0;
 
       // Initialize inputs
-      iob_valid_i  = 0;
-      iob_addr_i   = 0;
-      iob_wdata_i  = 0;
-      iob_wstrb_i  = 0;
+      iob_valid_i = 0;
+      iob_addr_i  = 0;
+      iob_wdata_i = 0;
+      iob_wstrb_i = 0;
 
       //apply async reset
       `IOB_RESET(clk, rst, 100, 1_000, 100);
@@ -67,18 +67,18 @@ module iob_csrs_demo_tb;
 
    //instantiate iob_csrs_demo core
    iob_csrs_demo csrs_demo0 (
-      // clk_en_rst_s port
-      .clk_i                (clk),
-      .cke_i                (1'b1),
-      .arst_i               (rst),
-      // cbus_s port
-      .iob_csrs_iob_valid_i (iob_valid_i),
-      .iob_csrs_iob_addr_i  (iob_addr_i),
-      .iob_csrs_iob_wdata_i (iob_wdata_i),
-      .iob_csrs_iob_wstrb_i (iob_wstrb_i),
-      .iob_csrs_iob_rvalid_o(iob_rvalid_o),
-      .iob_csrs_iob_rdata_o (iob_rdata_o),
-      .iob_csrs_iob_ready_o (iob_ready_o)
+       // clk_en_rst_s port
+       .clk_i            (clk),
+       .cke_i            (1'b1),
+       .arst_i           (rst),
+       // cbus_s port
+       .csrs_iob_valid_i (iob_valid_i),
+       .csrs_iob_addr_i  (iob_addr_i),
+       .csrs_iob_wdata_i (iob_wdata_i),
+       .csrs_iob_wstrb_i (iob_wstrb_i),
+       .csrs_iob_rvalid_o(iob_rvalid_o),
+       .csrs_iob_rdata_o (iob_rdata_o),
+       .csrs_iob_ready_o (iob_ready_o)
    );
 
 endmodule

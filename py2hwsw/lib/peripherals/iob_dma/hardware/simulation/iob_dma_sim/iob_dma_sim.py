@@ -314,7 +314,7 @@ def setup(py_params_dict):
                 "interrupt_o": "axistream_in_interrupt",
                 "axistream_io": "axistream_in_axis",
                 "sys_axis_io": "dma_axis_in",
-                "iob_csrs_cbus_s": "axistream_in_csrs",
+                "csrs_cbus_s": "axistream_in_csrs",
             },
         },
         {
@@ -332,7 +332,7 @@ def setup(py_params_dict):
                 "interrupt_o": "axistream_out_interrupt",
                 "axistream_io": "axistream_out_axis",
                 "sys_axis_io": "dma_axis_out",
-                "iob_csrs_cbus_s": "axistream_out_csrs",
+                "csrs_cbus_s": "axistream_out_csrs",
             },
         },
         {
@@ -365,7 +365,7 @@ def setup(py_params_dict):
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
                 "rst_i": "rst",
-                "iob_csrs_cbus_s": "dma_csrs",
+                "csrs_cbus_s": "dma_csrs",
                 "dma_input_io": "dma_axis_in",
                 "dma_output_io": "dma_axis_out",
                 "axi_m": "axi_dma_ram",

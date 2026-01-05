@@ -242,7 +242,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_csrs_cbus_s": "control_csrs",
+                    "csrs_cbus_s": "control_csrs",
                     "soft_reset_o": "soft_reset",
                     "burst_length_o": "iob_s_axi_m_control_length",
                     "w_level_i": "iob_s_axi_m_control_w_level",

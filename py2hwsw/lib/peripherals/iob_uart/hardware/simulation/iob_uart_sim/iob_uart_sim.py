@@ -85,7 +85,7 @@ def setup(py_params_dict):
             "csr_if": params["csr_if"],
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "iob_csrs_cbus_s": "uart_cbus",
+                "csrs_cbus_s": "uart_cbus",
                 "rs232_m": "rs232_loopback",
             },
         },

@@ -336,6 +336,7 @@ def python_setup(build_dir):
         "console_ethernet.py",
         "makehex.py",
         "hex_join.py",
+        "fix_doxygen_subsections.py",
     ]:
         shutil.copy(f"{get_lib_dir()}/scripts/{file}", f"{dest_dir}/{file}")
         os.chmod(f"{dest_dir}/{file}", 0o755)

@@ -196,7 +196,7 @@ def setup(py_params: dict):
                 "min": "0",
                 "max": "1",
             },
-            # mandatory parameters (do not change them!)
+            # Parameters
             {
                 "name": "AXI_ID_W",
                 "descr": "AXI ID bus width",
@@ -228,6 +228,20 @@ def setup(py_params: dict):
                 "val": "4",
                 "min": "1",
                 "max": "4",
+            },
+            {
+                "name": "SIMULATION",
+                "descr": "Enable simulation optimizations. For example, lower ethernet PHY_RST_CNT value.",
+                "type": "P",
+                "val": "0",
+            },
+            #
+            # False-parameters
+            #
+            {
+                "name": "ETH_PHY_RST_CNT",
+                "type": "D",
+                "val": "(SIMULATION ? 20'h00100 : 20'hFFFFF)",
             },
             #
             # False-parameters for generated memories
@@ -696,7 +710,7 @@ def setup(py_params: dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_csrs_cbus_s": (
+                    "csrs_cbus_s": (
                         "bootrom_cbus",
                         [
                             "{1'b0, bootrom_axi_arlock}",
@@ -790,6 +804,7 @@ def setup(py_params: dict):
                         "AXI_ADDR_W": params["addr_w"],
                         "AXI_DATA_W": params["data_w"],
                         "DATA_W": params["data_w"],
+                        "PHY_RST_CNT": "ETH_PHY_RST_CNT",
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",

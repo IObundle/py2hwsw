@@ -257,6 +257,7 @@ def setup(py_params_dict):
                 "AXI_LEN_W": "AXI_LEN_W",
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
+                "SIMULATION": "SIMULATION",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
@@ -305,7 +306,7 @@ def setup(py_params_dict):
             "csr_if": "iob",
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "iob_csrs_cbus_s": ("uart_cbus", ["uart_iob_addr[2:0]"]),
+                "csrs_cbus_s": ("uart_cbus", ["uart_iob_addr[2:0]"]),
                 "rs232_m": "rs232_invert",
             },
         },
@@ -313,7 +314,7 @@ def setup(py_params_dict):
     if len(tb_peripherals) == 1:
         # Connect uart directly to tb_s port if there is no tb_pbus_split
         attributes_dict["subblocks"][-1]["connect"].update(
-            {"iob_csrs_cbus_s": ("tb_s", ["iob_addr_i[2:0]"])}
+            {"csrs_cbus_s": ("tb_s", ["iob_addr_i[2:0]"])}
         )
     if params["use_extmem"]:
         attributes_dict["subblocks"] += [
@@ -371,7 +372,7 @@ def setup(py_params_dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_csrs_cbus_s": ("eth_cbus", ["eth_iob_addr[11:0]"]),
+                    "csrs_cbus_s": ("eth_cbus", ["eth_iob_addr[11:0]"]),
                     "axi_m": "unused_eth_axi",
                     "inta_o": "eth_int",
                     "phy_rstn_o": "tb_phy_rstn",

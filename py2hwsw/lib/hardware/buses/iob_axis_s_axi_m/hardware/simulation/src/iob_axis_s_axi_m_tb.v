@@ -447,14 +447,14 @@ module iob_axis_s_axi_m_tb;
       .sys_tdata_o          (axis_s_axi_m_axis_in_tdata),
       .sys_tvalid_o         (axis_in_valid),
       .sys_tready_i         (axis_in_ready),
-      // iob_csrs_cbus_s
-      .iob_csrs_iob_valid_i (axis_in_iob_valid),
-      .iob_csrs_iob_addr_i  (axis_in_iob_addr),
-      .iob_csrs_iob_wdata_i (axis_in_iob_wdata),
-      .iob_csrs_iob_wstrb_i (axis_in_iob_wstrb),
-      .iob_csrs_iob_rvalid_o(axis_in_iob_rvalid),
-      .iob_csrs_iob_rdata_o (axis_in_iob_rdata),
-      .iob_csrs_iob_ready_o (axis_in_iob_ready)
+      // csrs_cbus_s
+      .csrs_iob_valid_i (axis_in_iob_valid),
+      .csrs_iob_addr_i  (axis_in_iob_addr),
+      .csrs_iob_wdata_i (axis_in_iob_wdata),
+      .csrs_iob_wstrb_i (axis_in_iob_wstrb),
+      .csrs_iob_rvalid_o(axis_in_iob_rvalid),
+      .csrs_iob_rdata_o (axis_in_iob_rdata),
+      .csrs_iob_ready_o (axis_in_iob_ready)
    );
 
    iob_axistream_out #(
@@ -481,14 +481,14 @@ module iob_axis_s_axi_m_tb;
       .sys_tdata_i          (axis_s_axi_m_axis_out_tdata),
       .sys_tvalid_i         (delayed_axis_out_valid),
       .sys_tready_o         (delayed_axis_out_ready),
-      // iob_csrs_cbus_s
-      .iob_csrs_iob_valid_i (axis_out_iob_valid),
-      .iob_csrs_iob_addr_i  (axis_out_iob_addr),
-      .iob_csrs_iob_wdata_i (axis_out_iob_wdata),
-      .iob_csrs_iob_wstrb_i (axis_out_iob_wstrb),
-      .iob_csrs_iob_rvalid_o(axis_out_iob_rvalid),
-      .iob_csrs_iob_rdata_o (axis_out_iob_rdata),
-      .iob_csrs_iob_ready_o (axis_out_iob_ready)
+      // csrs_cbus_s
+      .csrs_iob_valid_i (axis_out_iob_valid),
+      .csrs_iob_addr_i  (axis_out_iob_addr),
+      .csrs_iob_wdata_i (axis_out_iob_wdata),
+      .csrs_iob_wstrb_i (axis_out_iob_wstrb),
+      .csrs_iob_rvalid_o(axis_out_iob_rvalid),
+      .csrs_iob_rdata_o (axis_out_iob_rdata),
+      .csrs_iob_ready_o (axis_out_iob_ready)
    );
 
    iob_axi_ram #(

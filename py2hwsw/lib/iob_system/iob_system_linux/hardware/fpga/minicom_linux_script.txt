@@ -47,6 +47,13 @@ expect {
     timeout 10
 }
 
+print "\n[minicom] Run auto-generated tests iob_timer with sysfs interface"
+send "./iob_timer_tests_sysfs"
+expect {
+    "#"
+    timeout 10
+}
+
 # Versat Linux tests
 # send "rz"
 # ! sz ../../software/crypto ../../software/versat.ko  ../../software/exampleTransfer.sh ../../software/setupTest.sh ../../software/test.sh

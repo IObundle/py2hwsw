@@ -19,9 +19,15 @@ def create_peripheral_tests(output_dir, peripheral):
 #include <stdint.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <string.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 
-#include \"{peripheral['name']}.h\"
-#include \"{peripheral['name']}_csrs.h\"
+#include "{peripheral['name']}.h"
+#include "{peripheral['name']}_csrs.h"
+#include "{peripheral['name']}_driver_files.h"
 
 //
 // Test macros
@@ -30,12 +36,12 @@ def create_peripheral_tests(output_dir, peripheral):
 #define TEST_FAILED 1
 
 #define RUN_TEST(test_name) \
-    printf(\"Running test: %s...\\n\", #test_name); \
+    printf("Running test: %s...\\n", #test_name); \
     if (test_name() != TEST_PASSED) {{ \
-        printf(\"Test failed: %s\\n\", #test_name); \
+        printf("Test failed: %s\\n", #test_name); \
         return TEST_FAILED; \
     }} \
-    printf(\"Test passed: %s\\n\", #test_name);
+    printf("Test passed: %s\\n", #test_name);
 
 //
 // Functionality tests
@@ -53,7 +59,7 @@ int test_functionality_{csr['name']}_write() {{
                 content += f"""
     uint32_t read_value = {peripheral['name']}_csrs_get_{csr['name']}();
     if (read_value != value) {{
-        printf(\"Error: Read value (0x%x) does not match written value (0x%x)\\n\", read_value, value);
+        printf("Error: Read value (0x%x) does not match written value (0x%x)\\n", read_value, value);
         return TEST_FAILED;
     }}
 """
@@ -75,26 +81,179 @@ int test_functionality_{csr['name']}_read() {{
 //
 """
 
-    # User-space library does not provide these funcions (read func for write CSR and vice versa)
-    #     for csr in csrs:
-    #         if "W" not in csr["mode"]:
-    #             content += f"""
-    # int test_error_handling_{csr['name']}_write() {{
-    #     // This should fail, but the user-space library does not return an error code
-    #     // Instead, it prints an error message to stderr
-    #     {peripheral['name']}_csrs_set_{csr['name']}(0);
-    #     return TEST_PASSED;
-    # }}
-    # """
-    #         if "R" not in csr["mode"]:
-    #             content += f"""
-    # int test_error_handling_{csr['name']}_read() {{
-    #     // This should fail, but the user-space library does not return an error code
-    #     // Instead, it prints an error message to stderr
-    #     {peripheral['name']}_csrs_get_{csr['name']}();
-    #     return TEST_PASSED;
-    # }}
-    # """
+    content += f"""
+#if defined(DEV_IF)
+int test_error_concurrent_open() {{
+    /*
+     * Test concurrent open calls to the device file.
+     * This test is for the dev interface.
+     */
+    int fd1 = open({peripheral['upper_name']}_DEVICE_FILE, O_RDWR);
+    if (fd1 == -1) {{
+        perror("open");
+        return TEST_FAILED;
+    }}
+
+    int fd2 = open({peripheral['upper_name']}_DEVICE_FILE, O_RDWR);
+    if (fd2 != -1 || errno != EBUSY) {{
+        printf("Error: Second open should fail with EBUSY\\n");
+        if (fd2 != -1) {{
+            close(fd2);
+        }}
+        close(fd1);
+        return TEST_FAILED;
+    }}
+
+    close(fd1);
+    return TEST_PASSED;
+}}
+
+int test_error_invalid_read() {{
+    /*
+     * Test invalid read calls to the device file.
+     * This test is for the dev interface.
+     */
+    int fd = open({peripheral['upper_name']}_DEVICE_FILE, O_RDWR);
+    if (fd == -1) {{
+        perror("open");
+        return TEST_FAILED;
+    }}
+
+    char buf;
+    if (lseek(fd, -1, SEEK_SET) != -1 || read(fd, &buf, 1) != 0) {{
+        printf("Error: Invalid read should fail or read 0 bytes\\n");
+        close(fd);
+        return TEST_FAILED;
+    }}
+
+    close(fd);
+    return TEST_PASSED;
+}}
+
+int test_error_invalid_write() {{
+    /*
+     * Test invalid write calls to the device file.
+     * This test is for the dev interface.
+     */
+    int fd = open({peripheral['upper_name']}_DEVICE_FILE, O_RDWR);
+    if (fd == -1) {{
+        perror("open");
+        return TEST_FAILED;
+    }}
+
+    char buf = 0;
+    if (lseek(fd, -1, SEEK_SET) != -1 || write(fd, &buf, 1) != 0) {{
+        printf("Error: Invalid write should fail or write 0 bytes\\n");
+        close(fd);
+        return TEST_FAILED;
+    }}
+
+    close(fd);
+    return TEST_PASSED;
+}}
+
+int test_error_invalid_llseek() {{
+    /*
+     * Test invalid llseek calls to the device file.
+     * This test is for the dev interface.
+     */
+    int fd = open({peripheral['upper_name']}_DEVICE_FILE, O_RDWR);
+    if (fd == -1) {{
+        perror("open");
+        return TEST_FAILED;
+    }}
+
+    if (lseek(fd, 0, -1) != -1 || errno != EINVAL) {{
+        printf("Error: Invalid llseek should fail with EINVAL\\n");
+        close(fd);
+        return TEST_FAILED;
+    }}
+
+    close(fd);
+    return TEST_PASSED;
+}}
+
+#elif defined(IOCTL_IF)
+int test_error_invalid_ioctl() {{
+    /*
+     * Test invalid ioctl calls to the device file.
+     * This test is for the ioctl interface.
+     */
+    int fd = open({peripheral['upper_name']}_DEVICE_FILE, O_RDWR);
+    if (fd == -1) {{
+        perror("open");
+        return TEST_FAILED;
+    }}
+
+    if (ioctl(fd, -1, NULL) == 0 || errno != ENOTTY) {{
+        printf("Error: Invalid ioctl should fail with ENOTTY. Errno: %d\\n", errno);
+        close(fd);
+        return TEST_FAILED;
+    }}
+
+    close(fd);
+    return TEST_PASSED;
+}}
+
+#elif defined(SYSFS_IF)
+int test_error_sysfs_write_to_readonly() {{
+    /*
+     * Test writing to a read-only sysfs file.
+     * This test is for the sysfs interface.
+     */
+    char file_path[128];
+    sprintf(file_path, "/sys/class/{peripheral['name']}/{peripheral['name']}/version");
+    int fd = open(file_path, O_WRONLY);
+    if (fd != -1 || errno != EACCES) {{
+        printf("Error: Opening a read-only sysfs file for writing should fail with EACCES.\\n");
+        if (fd != -1) {{
+            close(fd);
+        }}
+        return TEST_FAILED;
+    }}
+    return TEST_PASSED;
+}}
+
+int test_error_sysfs_read_from_nonexistent() {{
+    /*
+     * Test reading from a non-existent sysfs file.
+     * This test is for the sysfs interface.
+     */
+    char file_path[128];
+    sprintf(file_path, "/sys/class/{peripheral['name']}/{peripheral['name']}/nonexistent");
+    int fd = open(file_path, O_RDONLY);
+    if (fd != -1 || errno != ENOENT) {{
+        printf("Error: Opening a non-existent sysfs file for reading should fail with ENOENT.\\n");
+        if (fd != -1) {{
+            close(fd);
+        }}
+        return TEST_FAILED;
+    }}
+    return TEST_PASSED;
+}}
+
+int test_error_sysfs_write_invalid_value() {{
+    /*
+     * Test writing an invalid value to a sysfs file.
+     * This test is for the sysfs interface.
+     */
+    char file_path[128];
+    sprintf(file_path, "/sys/class/{peripheral['name']}/{peripheral['name']}/soft_reset");
+    int fd = open(file_path, O_WRONLY);
+    if (fd == -1) {{
+        perror("open");
+        return TEST_FAILED;
+    }}
+    if (write(fd, "invalid", 7) != -1 || errno != EINVAL) {{
+        printf("Error: Writing an invalid value to a sysfs file should fail with EINVAL.\\n");
+        close(fd);
+        return TEST_FAILED;
+    }}
+    close(fd);
+    return TEST_PASSED;
+}}
+#endif  // SYSFS_IF
+"""
 
     content += """
 //
@@ -117,7 +276,7 @@ int test_performance_{csr['name']}_read() {{
     clock_gettime(CLOCK_MONOTONIC, &end);
 
     total_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    printf(\"Read performance for {csr['name']}: %f seconds for %d iterations\\n\", total_time, num_iterations);
+    printf("Read performance for {csr['name']}: %f seconds for %d iterations\\n", total_time, num_iterations);
 
     return TEST_PASSED;
 }}
@@ -136,17 +295,17 @@ int test_performance_{csr['name']}_write() {{
     clock_gettime(CLOCK_MONOTONIC, &end);
 
     total_time = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
-    printf(\"Write performance for {csr['name']}: %f seconds for %d iterations\\n\", total_time, num_iterations);
+    printf("Write performance for {csr['name']}: %f seconds for %d iterations\\n", total_time, num_iterations);
 
     return TEST_PASSED;
 }}
 """
 
-    content += """
-int main() {
+    content += f"""
+int main() {{
     int ret = 0;
 
-    printf(\"[User] Version: 0x%x\\n\", iob_timer_csrs_get_version());
+    printf("\\n[User] Version: 0x%x\\n", {peripheral['name']}_csrs_get_version());
 
     //
     // Run all tests
@@ -157,20 +316,33 @@ int main() {
             content += f"\n    RUN_TEST(test_functionality_{csr['name']}_write);"
         if "R" in csr["mode"]:
             content += f"\n    RUN_TEST(test_functionality_{csr['name']}_read);"
-        #         if "W" not in csr["mode"]:
-        #             content += f"\n    RUN_TEST(test_error_handling_{csr['name']}_write);"
-        #         if "R" not in csr["mode"]:
-        #             content += f"\n    RUN_TEST(test_error_handling_{csr['name']}_read);"
-        if "R" in csr["mode"]:
-            content += f"\n    RUN_TEST(test_performance_{csr['name']}_read);"
+
+    content += """
+#if defined(DEV_IF)
+    RUN_TEST(test_error_concurrent_open);
+    RUN_TEST(test_error_invalid_read);
+    RUN_TEST(test_error_invalid_write);
+    RUN_TEST(test_error_invalid_llseek);
+#elif defined(IOCTL_IF)
+    RUN_TEST(test_error_invalid_ioctl);
+#elif defined(SYSFS_IF)
+    RUN_TEST(test_error_sysfs_write_to_readonly);
+    RUN_TEST(test_error_sysfs_read_from_nonexistent);
+    RUN_TEST(test_error_sysfs_write_invalid_value);
+#endif
+"""
+
+    for csr in csrs:
         if "W" in csr["mode"]:
             content += f"\n    RUN_TEST(test_performance_{csr['name']}_write);"
+        if "R" in csr["mode"]:
+            content += f"\n    RUN_TEST(test_performance_{csr['name']}_read);"
 
     content += """
     if (ret) {
-        printf(\"Tests failed!\\n");
+        printf("Tests failed!\\n");
     } else {
-        printf(\"All tests passed!\\n");
+        printf("All tests passed!\\n");
     }
 
     return ret;
@@ -212,7 +384,7 @@ run: $(BIN)
 clean:
 	rm -f $(BIN)
 
-.PHONY: run clean
+.PHONY: run run_user clean
 
 """
     with open(os.path.join(output_dir, "Makefile-tests"), "w") as f:

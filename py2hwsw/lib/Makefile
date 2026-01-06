@@ -170,3 +170,39 @@ release-artifacts:
 	tar -czf iob_uart_V$$VERSION.tar.gz -C ./fusesoc_exports .
 
 .PHONY: release-artifacts
+
+# Regenerate timer userspace driver binaries and recompile buildroot of iob_system_linux
+buildroot-update:
+	# Generate iob_timer
+	make sim-run CORE=iob_timer
+	# Compile userspace binaries
+	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C ../../../iob_timer_V0.81/software/linux/user all'
+	# Copy driver binaries to iob_system_linux buildroot
+	for file in "iob_timer_user_dev" "iob_timer_user_ioctl" "iob_timer_user_sysfs" "iob_timer_tests_sysfs"; do\
+		cp ../../../iob_timer_V0.81/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
+	done
+	# Copy iob_system_linux buildroot to iob_linux
+	cp -r iob_system/iob_system_linux/software/buildroot/board iob_system/iob_system_linux/submodules/iob_linux/software/buildroot/;
+	# Recompile buildroot
+	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C iob_system/iob_system_linux/submodules/iob_linux build-buildroot'
+	# Copy rootfs to iob_system_linux
+	cp iob_system/iob_system_linux/submodules/iob_linux/software/OS_build/rootfs.cpio.gz iob_system/iob_system_linux/software/src/rootfs.cpio.gz
+	# Copy it to existing soc_linux build dir
+	cp iob_system/iob_system_linux/submodules/iob_linux/software/OS_build/rootfs.cpio.gz ../../../soc_linux_V0.8/hardware/fpga/rootfs.cpio.gz
+
+.PHONY: buildroot-update
+
+# running_system_upload:
+# 	make sim-run CORE=iob_timer
+# 	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C ../../../iob_timer_V0.81/software/linux/kernel all'
+# 	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C ../../../iob_timer_V0.81/software/linux/user all'
+# 	# Copy driver binaries
+# 	for file in "iob_timer_user_dev" "iob_timer_user_ioctl" "iob_timer_user_sysfs" "iob_timer_tests_sysfs"; do\
+# 		cp ../../../iob_timer_V0.81/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
+# 		cp ../../../iob_timer_V0.81/software/linux/user/$$file iob_system/iob_system_linux/submodules/iob_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
+# 	done
+# 	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C iob_system/iob_system_linux/submodules/iob_linux build-buildroot'
+# 	cp iob_system/iob_system_linux/submodules/iob_linux/software/OS_build/rootfs.cpio.gz iob_system/iob_system_linux/software/src/rootfs.cpio.gz
+# 	cp iob_system/iob_system_linux/submodules/iob_linux/software/OS_build/rootfs.cpio.gz ../../../soc_linux_V0.8/hardware/fpga/rootfs.cpio.gz
+# 
+# .PHONY: running_system_upload

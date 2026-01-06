@@ -891,7 +891,7 @@ static ssize_t {peripheral['name']}_read(struct file *file, char __user *buf, si
     content += f"""\
   default:
     // invalid address - no bytes read
-    return 0;
+    return -EACCES;
   }}
 
   // Read min between count and REG_SIZE
@@ -931,7 +931,7 @@ static ssize_t {peripheral['name']}_write(struct file *file, const char __user *
   default:
     pr_info("[Driver] Invalid write address 0x%x\\n", (unsigned int)*ppos);
     // invalid address - no bytes written
-    return 0;
+    return -EACCES;
   }}
 
   return count;
@@ -1035,6 +1035,7 @@ def create_user_makefile(path, peripheral):
 
 # Select kernel-userspace interface: sysfs; dev; ioctl
 IF = sysfs
+UPPER_IF = $(shell echo $(IF) | tr '[:lower:]' '[:upper:]')
 SRC = $(BIN).c {peripheral['name']}_$(IF)_csrs.c
 SRC += $(wildcard ../../src/{peripheral['name']}.c)
 HDR += ../drivers/{peripheral['name']}_driver_files.h
@@ -1043,6 +1044,7 @@ FLAGS += -static
 FLAGS += -march=rv32imac
 FLAGS += -mabi=ilp32
 FLAGS += -I../drivers -I../../src
+FLAGS += -D$(UPPER_IF)_IF
 BIN = {peripheral['name']}_user
 CC = riscv64-unknown-linux-gnu-gcc
 

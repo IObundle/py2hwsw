@@ -7,6 +7,13 @@ def create_peripheral_tests(output_dir, peripheral):
     # Get the list of CSRs
     csrs = peripheral["csrs"]
 
+    # Find a writable CSR for the invalid write test
+    writable_csr_name = None
+    for csr in csrs:
+        if "W" in csr["mode"]:
+            writable_csr_name = csr["name"]
+            break
+
     # Create the test file content
     content = f"""/*
  * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
@@ -120,8 +127,9 @@ int test_error_invalid_read() {{
     }}
 
     char buf;
-    if (lseek(fd, -1, SEEK_SET) != -1 || read(fd, &buf, 1) != 0) {{
-        printf("Error: Invalid read should fail or read 0 bytes\\n");
+    lseek(fd, 1, SEEK_SET); // Seek to an invalid address
+    if (read(fd, &buf, 1) != -1 || errno != EACCES) {{
+        printf("Error: Invalid read should fail with EACCES\\n");
         close(fd);
         return TEST_FAILED;
     }}
@@ -142,8 +150,9 @@ int test_error_invalid_write() {{
     }}
 
     char buf = 0;
-    if (lseek(fd, -1, SEEK_SET) != -1 || write(fd, &buf, 1) != 0) {{
-        printf("Error: Invalid write should fail or write 0 bytes\\n");
+    lseek(fd, 1, SEEK_SET); // Seek to an invalid address
+    if (write(fd, &buf, 1) != -1 || errno != EACCES) {{
+        printf("Error: Invalid write should fail with EACCES\\n");
         close(fd);
         return TEST_FAILED;
     }}
@@ -231,14 +240,18 @@ int test_error_sysfs_read_from_nonexistent() {{
     }}
     return TEST_PASSED;
 }}
+"""
 
+    # Only generate write test if there is a writable CSR
+    if writable_csr_name:
+        content += f"""
 int test_error_sysfs_write_invalid_value() {{
     /*
      * Test writing an invalid value to a sysfs file.
      * This test is for the sysfs interface.
      */
     char file_path[128];
-    sprintf(file_path, "/sys/class/{peripheral['name']}/{peripheral['name']}/soft_reset");
+    sprintf(file_path, "/sys/class/{peripheral['name']}/{peripheral['name']}/{writable_csr_name}");
     int fd = open(file_path, O_WRONLY);
     if (fd == -1) {{
         perror("open");
@@ -328,7 +341,13 @@ int main() {{
 #elif defined(SYSFS_IF)
     RUN_TEST(test_error_sysfs_write_to_readonly);
     RUN_TEST(test_error_sysfs_read_from_nonexistent);
+"""
+    # Only generate write test if there is a writable CSR
+    if writable_csr_name:
+        content += """
     RUN_TEST(test_error_sysfs_write_invalid_value);
+"""
+    content += """
 #endif
 """
 

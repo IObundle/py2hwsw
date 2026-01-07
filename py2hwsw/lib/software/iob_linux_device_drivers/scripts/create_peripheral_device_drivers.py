@@ -416,7 +416,7 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
     fswhdr.write("\treturn -ENOSYS;\n")
     fswhdr.write("}\n\n")
     fswhdr.write(
-        "static ssize_t sysfs_enosys_store(struct device *dev, struct device_attribute *attr, const char __user *buf, size_t count) {\n"
+        "static ssize_t sysfs_enosys_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count) {\n"
     )
     fswhdr.write("\treturn -ENOSYS;\n")
     fswhdr.write("}\n\n")
@@ -427,9 +427,10 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
         if "W" in csr["mode"]:
             # top, csr_name
             fswhdr.write(
-                f"static ssize_t sysfs_{csr_name}_store(struct device *dev, struct device_attribute *attr, const char __user *buf, size_t count) {{\n"
+                f"static ssize_t sysfs_{csr_name}_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count) {{\n"
             )
             fswhdr.write("\tu32 value = 0;\n")
+            fswhdr.write("\tint ret;\n")
             if multi:
                 fswhdr.write(
                     f"\tstruct iob_data *{top}_data = (struct iob_data*) dev->platform_data;\n"
@@ -438,7 +439,11 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
             fswhdr.write('\t\tpr_info("Another process is accessing the device\\n");\n')
             fswhdr.write("\t\treturn -EBUSY;\n")
             fswhdr.write("\t}\n")
-            fswhdr.write('\tsscanf(buf, "%u", &value);\n')
+            fswhdr.write("\tret = kstrtouint(buf, 0, &value);\n")
+            fswhdr.write("\tif (ret) {\n")
+            fswhdr.write(f"\t\tmutex_unlock(&{top}_mutex);\n")
+            fswhdr.write("\t\treturn ret;\n")
+            fswhdr.write("\t}\n")
             if multi:
                 fswhdr.write(
                     f"\tiob_data_write_reg({top}_data->regbase, value, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
@@ -476,7 +481,15 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
     for csr in csrs_list:
         # attr name and permissions
         reg_name = csr["name"]
-        fswhdr.write(f"DEVICE_ATTR({reg_name}, 0600,")
+        mode = csr["mode"]
+        permissions = "0000"
+        if "R" in mode and "W" in mode:
+            permissions = "0600"
+        elif "R" in mode:
+            permissions = "0400"
+        elif "W" in mode:
+            permissions = "0200"
+        fswhdr.write(f"DEVICE_ATTR({reg_name}, {permissions},")
 
         # sysfs show function
         if "R" in csr["mode"]:

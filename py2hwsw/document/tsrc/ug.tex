@@ -6,7 +6,7 @@
 
 \input{ug_title}
 \date{\today}
-\category{User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}}
+\category{User Guide}
 
 \input{color}
 
@@ -15,9 +15,12 @@
 \maketitle
 \pagenumbering{gobble}
 
+% Remove blank newline before version and shorthash strings of included file.
+\CatchFileDef{\version}{\NAME_version.tex}{\endlinechar=-1\relax}
+\CatchFileDef{\shortHash}{shortHash.tex}{\endlinechar=-1\relax}
 \vspace*{\fill}
-User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
-\hspace*{\fill} \includegraphics[keepaspectratio,scale=.7]{Logo.png}
+User Guide, V\version, Build \shortHash
+\hspace*{\fill}\raisebox{-\height}{\includegraphics[keepaspectratio,scale=.7]{Logo.png}}
 
 \cleardoublepage
 \pagenumbering{roman}

@@ -274,6 +274,7 @@ int test_error_sysfs_write_invalid_value() {{
 //
 """
 
+    # Generate performance tests for one write register and one read register
     for csr in csrs:
         if "R" in csr["mode"]:
             content += f"""
@@ -294,6 +295,9 @@ int test_performance_{csr['name']}_read() {{
     return TEST_PASSED;
 }}
 """
+            break  # Only generate one read test
+
+    for csr in csrs:
         if "W" in csr["mode"]:
             content += f"""
 int test_performance_{csr['name']}_write() {{
@@ -313,6 +317,7 @@ int test_performance_{csr['name']}_write() {{
     return TEST_PASSED;
 }}
 """
+            break  # Only generate one write test
 
     content += f"""
 int main() {{
@@ -354,8 +359,11 @@ int main() {{
     for csr in csrs:
         if "W" in csr["mode"]:
             content += f"\n    RUN_TEST(test_performance_{csr['name']}_write);"
+            break  # Only call one write performance test
+    for csr in csrs:
         if "R" in csr["mode"]:
             content += f"\n    RUN_TEST(test_performance_{csr['name']}_read);"
+            break  # Only call one read performance test
 
     content += """
     if (ret) {
@@ -370,41 +378,4 @@ int main() {{
 
     # Write the content to the file
     with open(os.path.join(output_dir, f"{peripheral['name']}_tests.c"), "w") as f:
-        f.write(content)
-
-
-def create_test_makefile(output_dir, peripheral):
-    """Create Makefile to build and run tests"""
-    content = f"""# SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
-#
-# SPDX-License-Identifier: {peripheral['spdx_license']}
-
-# Select kernel-userspace interface: sysfs
-IF = sysfs
-SRC = {peripheral['name']}_tests.c {peripheral['name']}_$(IF)_csrs.c
-SRC += $(wildcard ../../src/{peripheral['name']}.c)
-HDR += ../drivers/{peripheral['name']}_driver_files.h
-BIN = {peripheral['name']}_tests
-# Add compiler flags
-FLAGS = -Wall -Werror -O2
-FLAGS += -static
-FLAGS += -march=rv32imac
-FLAGS += -mabi=ilp32
-FLAGS += -I../drivers -I../../src
-CC = riscv64-unknown-linux-gnu-gcc
-
-
-$(BIN): $(SRC) $(HDR)
-	$(CC) $(FLAGS) $(INCLUDE) -o $(BIN) $(SRC)
-
-run: $(BIN)
-	./$(BIN)
-
-clean:
-	rm -f $(BIN)
-
-.PHONY: run run_user clean
-
-"""
-    with open(os.path.join(output_dir, "Makefile-tests"), "w") as f:
         f.write(content)

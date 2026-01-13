@@ -7,7 +7,7 @@ import string
 
 from math import ceil
 
-from create_peripheral_tests import create_peripheral_tests, create_test_makefile
+from create_peripheral_tests import create_peripheral_tests
 
 
 def create_dts_file(path, peripheral):
@@ -1069,6 +1069,8 @@ all:
 	make IF=dev
 	make IF=ioctl
 	make BIN={peripheral['name']}_tests IF=sysfs
+	make BIN={peripheral['name']}_tests IF=dev
+	make BIN={peripheral['name']}_tests IF=ioctl
 
 clean:
 	rm -f $(BIN)_sysfs $(BIN)_dev $(BIN)_ioctl
@@ -1141,4 +1143,3 @@ def generate_device_drivers(output_dir, peripheral):
     create_ioctl_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
     create_user_makefile(os.path.join(output_dir, "user"), _peripheral)
     create_peripheral_tests(os.path.join(output_dir, "user"), _peripheral)
-    create_test_makefile(os.path.join(output_dir, "user"), _peripheral)

@@ -436,7 +436,9 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
                     f"\tstruct iob_data *{top}_data = (struct iob_data*) dev->platform_data;\n"
                 )
             fswhdr.write(f"\tif (!mutex_trylock(&{top}_mutex)) {{\n")
-            fswhdr.write('\t\tpr_info("Another process is accessing the device\\n");\n')
+            fswhdr.write(
+                f'\t\tpr_info("[{top}] Another process is accessing the device\\n");\n'
+            )
             fswhdr.write("\t\treturn -EBUSY;\n")
             fswhdr.write("\t}\n")
             fswhdr.write("\tret = kstrtouint(buf, 0, &value);\n")
@@ -453,7 +455,9 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
                     f"\tiob_data_write_reg({top}_data.regbase, value, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
                 )
             fswhdr.write(f"\tmutex_unlock(&{top}_mutex);\n")
-            fswhdr.write(f'\tpr_info("[{top}] Sysfs - Write: 0x%x\\n", value);\n')
+            fswhdr.write(
+                f'\tpr_info("[{top}] Sysfs - Write {csr_name}: 0x%x\\n", value);\n'
+            )
             fswhdr.write("\treturn count;\n")
             fswhdr.write("}\n\n")
         elif "R" in csr["mode"]:
@@ -472,7 +476,9 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
                 fswhdr.write(
                     f"\tu32 value = iob_data_read_reg({top}_data.regbase, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
                 )
-            fswhdr.write(f'\tpr_info("[{top}] Sysfs - Read: 0x%x\\n", value);\n')
+            fswhdr.write(
+                f'\tpr_info("[{top}] Sysfs - Read {csr_name}: 0x%x\\n", value);\n'
+            )
             fswhdr.write('\treturn sprintf(buf, "%u", value);\n')
             fswhdr.write("}\n\n")
 
@@ -755,7 +761,7 @@ static int {peripheral['name']}_probe(struct platform_device *pdev) {{
     return -ENODEV;
   }}
 
-  pr_info("[Driver] %s: probing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
+  pr_info("[{peripheral['name']}] %s: probing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
 
   // Get the I/O region base address
   res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
@@ -845,13 +851,13 @@ static int {peripheral['name']}_remove(struct platform_device *pdev) {{
 }}
 
 static int __init test_counter_init(void) {{
-  pr_info("[Driver] %s: initializing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
+  pr_info("[{peripheral['name']}] %s: initializing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
 
   return platform_driver_register(&{peripheral['name']}_driver);
 }}
 
 static void __exit test_counter_exit(void) {{
-  pr_info("[Driver] %s: exiting.\\n", {peripheral['upper_name']}_DRIVER_NAME);
+  pr_info("[{peripheral['name']}] %s: exiting.\\n", {peripheral['upper_name']}_DRIVER_NAME);
   platform_driver_unregister(&{peripheral['name']}_driver);
 }}
 
@@ -860,10 +866,10 @@ static void __exit test_counter_exit(void) {{
 //
 
 static int {peripheral['name']}_open(struct inode *inode, struct file *file) {{
-  pr_info("[Driver] {peripheral['name']} device opened\\n");
+  pr_info("[{peripheral['name']}] Device opened\\n");
 
   if (!mutex_trylock(&{peripheral['name']}_mutex)) {{
-    pr_info("Another process is accessing the device\\n");
+    pr_info("[{peripheral['name']}] Another process is accessing the device\\n");
 
     return -EBUSY;
   }}
@@ -872,7 +878,7 @@ static int {peripheral['name']}_open(struct inode *inode, struct file *file) {{
 }}
 
 static int {peripheral['name']}_release(struct inode *inode, struct file *file) {{
-  pr_info("[Driver] {peripheral['name']} device closed\\n");
+  pr_info("[{peripheral['name']}] Device closed\\n");
 
   mutex_unlock(&{peripheral['name']}_mutex);
 
@@ -897,7 +903,7 @@ static ssize_t {peripheral['name']}_read(struct file *file, char __user *buf, si
     value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                               {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
     size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
-    pr_info("[Driver] Read {csr['name']} CSR!\\n");
+    pr_info("[{peripheral['name']}] Dev - Read {csr["name"]}: 0x%x\\n", value);
     break;
 """
 
@@ -933,20 +939,20 @@ static ssize_t {peripheral['name']}_write(struct file *file, const char __user *
   case {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR:
     size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
     if (count != size) {{
-        pr_info("[Driver] write size %d for {csr['name']} CSR is not equal to register size %d\\n", (int)count, size);
+        pr_info("[{peripheral['name']}] write size %d for {csr['name']} CSR is not equal to register size %d\\n", (int)count, size);
         return -EACCES;
     }}
     if (read_user_data(buf, size, &value))
       return -EFAULT;
     iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                        {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
-    pr_info("[Driver] {csr['name']} {peripheral['name']}: 0x%x\\n", value);
+    pr_info("[{peripheral['name']}] Dev - Write {csr["name"]}: 0x%x\\n", value);
     break;
 """
 
     content += f"""\
   default:
-    pr_info("[Driver] Invalid write address 0x%x\\n", (unsigned int)*ppos);
+    pr_info("[{peripheral['name']}] Invalid write address 0x%x\\n", (unsigned int)*ppos);
     // invalid address - no bytes written
     return -EACCES;
   }}
@@ -1006,7 +1012,7 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
                           return -EFAULT;
                         iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                                            {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
-                        pr_info("[Driver] {csr['name']} {peripheral['name']}: 0x%x\\n", value);
+                        pr_info("[{peripheral['name']}] IOCTL - Write {csr["name"]}: 0x%x\\n", value);
 
                         break;
 """
@@ -1016,7 +1022,7 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
                         value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                                                   {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
                         size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
-                        pr_info("[Driver] Read {csr['name']} CSR!\\n");
+                        pr_info("[{peripheral['name']}] IOCTL - Read {csr["name"]}: 0x%x\\n", value);
 
                         if (copy_to_user((int32_t*) arg, &value, size))
                           return -EFAULT;
@@ -1026,7 +1032,7 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
 
     content += f"""\
                 default:
-                        pr_info("[Driver] Invalid IOCTL command 0x%x\\n", cmd);
+                        pr_info("[{peripheral['name']}] Invalid IOCTL command 0x%x\\n", cmd);
                         return -ENOTTY;
         }}
         return 0;

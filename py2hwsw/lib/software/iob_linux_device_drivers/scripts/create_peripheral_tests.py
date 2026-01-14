@@ -341,11 +341,22 @@ int test_performance_{csr['name']}_write() {{
 int main() {{
     int ret = 0;
 
+    // Run error handling tests that manage their own file descriptors first
+#if defined(DEV_IF)
+    RUN_TEST(test_error_concurrent_open);
+    RUN_TEST(test_error_invalid_read);
+    RUN_TEST(test_error_invalid_write);
+    RUN_TEST(test_error_invalid_llseek);
+#elif defined(IOCTL_IF)
+    RUN_TEST(test_error_invalid_ioctl);
+#endif
+
+    // Initialize global file descriptor for remaining tests
+    {peripheral['name']}_csrs_init_baseaddr(0);
+
     printf("\\n[User] Version: 0x%x\\n", {peripheral['name']}_csrs_get_version());
 
-    //
-    // Run all tests
-    //
+    // Run functionality tests
 """
     for csr in csrs:
         if "W" in csr["mode"]:
@@ -354,14 +365,8 @@ int main() {{
             content += f"\n    RUN_TEST(test_functionality_{csr['name']}_read);"
 
     content += """
-#if defined(DEV_IF)
-    RUN_TEST(test_error_concurrent_open);
-    RUN_TEST(test_error_invalid_read);
-    RUN_TEST(test_error_invalid_write);
-    RUN_TEST(test_error_invalid_llseek);
-#elif defined(IOCTL_IF)
-    RUN_TEST(test_error_invalid_ioctl);
-#elif defined(SYSFS_IF)
+    // Run SYSFS error tests
+#if defined(SYSFS_IF)
     RUN_TEST(test_error_sysfs_write_to_readonly);
     RUN_TEST(test_error_sysfs_read_from_nonexistent);
 """
@@ -372,6 +377,8 @@ int main() {{
 """
     content += """
 #endif
+
+    // Run performance tests
 """
 
     for csr in csrs:

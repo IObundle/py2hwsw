@@ -198,26 +198,6 @@ The following tables describe the IP core configuration. The core may be configu
             if group.doc_clearpage:
                 confs_file.write("\\clearpage")
 
-    # Write info about "C" conf type
-    if "C" in conf_types:
-        confs_file.write(
-            """
-The macros not listed above are constants. They improve the code readability and
-should not be changed by the user. These constants are listed below:
-\\input constants
-"""
-        )
-
-    # Write info about "D" conf type
-    if "D" in conf_types:
-        confs_file.write(
-            """
-The top-level parameters not listed above are constant or derived from the primary parameters. They improve the code readability and should not be changed by the user.
-These parameters are listed below:
-\\input derived_params
-"""
-        )
-
     confs_file.close()
 
 

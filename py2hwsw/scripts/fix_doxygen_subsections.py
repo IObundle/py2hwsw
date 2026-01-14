@@ -49,6 +49,28 @@ def remove_orphaned_doxysubsections(tex_path: Path) -> None:
         tex_path.write_text(new_content, encoding="utf-8")
 
 
+def remove_orphaned_doxysections(files: list[Path]) -> None:
+    """
+    If tex_path contains exactly one file and file only has a single
+    '\\doxysection{', change it to
+    '\\doxysection*{' and write back the file.
+    """
+    # if more than 1 file, assume multiple doxysections
+    if len(files) == 1:
+        for tex_path in files:
+            if not tex_path.is_file():
+                return
+
+            content = tex_path.read_text(encoding="utf-8")
+
+            # Count occurrences without modifying first
+            occurrences = len(re.findall(r"\\doxysection\{", content))
+            if occurrences == 1:
+                # Replace that single occurrence with the starred version
+                new_content = content.replace(r"\doxysection{", r"\doxysection*{", 1)
+                tex_path.write_text(new_content, encoding="utf-8")
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: fix_doxygen_subsections.py DOXYGEN_TEX", file=sys.stderr)
@@ -57,6 +79,7 @@ def main():
     doxygen_tex_path = Path(sys.argv[1]).resolve()
     inputs = extract_input_files(doxygen_tex_path)
 
+    remove_orphaned_doxysections(inputs)
     for tex_file in inputs:
         remove_orphaned_doxysubsections(tex_file)
 

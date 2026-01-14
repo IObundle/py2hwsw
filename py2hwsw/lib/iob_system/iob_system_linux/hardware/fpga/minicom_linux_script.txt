@@ -54,6 +54,20 @@ expect {
     timeout 300 goto on_timeout
 }
 
+print "\n[minicom] Run auto-generated tests iob_timer with dev interface"
+send "./iob_timer_tests_dev"
+expect {
+    "#"
+    timeout 300 goto on_timeout
+}
+
+print "\n[minicom] Run auto-generated tests iob_timer with ioctl interface"
+send "./iob_timer_tests_ioctl"
+expect {
+    "#"
+    timeout 300 goto on_timeout
+}
+
 # Versat Linux tests
 # send "rz"
 # ! sz ../../software/crypto ../../software/versat.ko  ../../software/exampleTransfer.sh ../../software/setupTest.sh ../../software/test.sh

@@ -932,6 +932,10 @@ static ssize_t {peripheral['name']}_write(struct file *file, const char __user *
         content += f"""\
   case {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR:
     size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
+    if (count != size) {{
+        pr_info("[Driver] write size %d for {csr['name']} CSR is not equal to register size %d\\n", (int)count, size);
+        return -EACCES;
+    }}
     if (read_user_data(buf, size, &value))
       return -EFAULT;
     iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
@@ -1023,7 +1027,7 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
     content += f"""\
                 default:
                         pr_info("[Driver] Invalid IOCTL command 0x%x\\n", cmd);
-                        break;
+                        return -ENOTTY;
         }}
         return 0;
 }}

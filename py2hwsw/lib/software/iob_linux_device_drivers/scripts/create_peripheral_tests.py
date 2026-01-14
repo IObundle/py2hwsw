@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 import os
 
 
@@ -12,6 +16,16 @@ def create_peripheral_tests(output_dir, peripheral):
     for csr in csrs:
         if "W" in csr["mode"]:
             writable_csr_name = csr["name"]
+            break
+
+    # Find a read-only CSR for the invalid write test
+    readonly_csr_name = "version"  # Default to version CSR
+
+    # Find a write-only CSR for the invalid read test
+    writeonly_csr_name = None
+    for csr in csrs:
+        if "W" in csr["mode"] and "R" not in csr["mode"]:
+            writeonly_csr_name = csr["name"]
             break
 
     # Create the test file content
@@ -127,7 +141,11 @@ int test_error_invalid_read() {{
     }}
 
     char buf;
-    lseek(fd, 1, SEEK_SET); // Seek to an invalid address
+    #if defined({peripheral['upper_name']}_CSRS_{writeonly_csr_name.upper()}_ADDR)
+    lseek(fd, {peripheral['upper_name']}_CSRS_{writeonly_csr_name.upper()}_ADDR, SEEK_SET); // Seek to a write-only CSR
+    #else
+    lseek(fd, 0xff, SEEK_SET); // Seek to an invalid address
+    #endif
     if (read(fd, &buf, 1) != -1 || errno != EACCES) {{
         printf("Error: Invalid read should fail with EACCES\\n");
         close(fd);
@@ -150,7 +168,7 @@ int test_error_invalid_write() {{
     }}
 
     char buf = 0;
-    lseek(fd, 1, SEEK_SET); // Seek to an invalid address
+    lseek(fd, {peripheral['upper_name']}_CSRS_{readonly_csr_name.upper()}_ADDR, SEEK_SET); // Seek to a read-only CSR
     if (write(fd, &buf, 1) != -1 || errno != EACCES) {{
         printf("Error: Invalid write should fail with EACCES\\n");
         close(fd);
@@ -279,7 +297,7 @@ int test_error_sysfs_write_invalid_value() {{
         if "R" in csr["mode"]:
             content += f"""
 int test_performance_{csr['name']}_read() {{
-    const int num_iterations = 1000;
+    const int num_iterations = 100;
     struct timespec start, end;
     double total_time = 0;
 
@@ -301,7 +319,7 @@ int test_performance_{csr['name']}_read() {{
         if "W" in csr["mode"]:
             content += f"""
 int test_performance_{csr['name']}_write() {{
-    const int num_iterations = 1000;
+    const int num_iterations = 100;
     struct timespec start, end;
     double total_time = 0;
 

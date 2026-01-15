@@ -689,7 +689,7 @@ def try_evaluate(math_str):
         math_str (str): The mathematical expression to evaluate.
 
     Returns:
-        Any: The result of the evaluation, or the original expression if an error occurs.
+        Union[int, float, str]: The evaluated result as int or float, or the original string if evaluation fails.
     """
     try:
         # Evaluate with restricted globals/locals for security

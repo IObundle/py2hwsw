@@ -47,7 +47,7 @@ CAPI=2:
 
 name: iobundle:py2hwsw:{core.name}:{core.version}
 #license: {core.license.name}
-description : {core.description}
+description: "{core.description}"
 
 filesets:
   rtl:

@@ -254,7 +254,7 @@ class iob_instance(iob_base):
     def __connect_cbus_port(self, issuer):
         """Automatically adds "<prefix>_cbus_s" port to issuers of iob_csrs (are usually iob_system peripherals).
         The '<prefix>' is replaced by instance name of iob_csrs subblock.
-        Also, connects the newly created issuer port to the iob_csrs `control_if_s` port.
+        Also, connects the newly created issuer port to the iob_csrs control port.
         :param issuer: issuer core object
         """
         assert (

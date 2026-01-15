@@ -77,7 +77,7 @@ def setup(py_params_dict):
             "csr_if": params["csr_if"],
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "iob_csrs_cbus_s": "macc_cbus",
+                "csrs_cbus_s": "macc_cbus",
             },
         },
         {

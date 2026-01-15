@@ -26,7 +26,7 @@ def setup(py_params_dict):
             {
                 "name": "STRB_WIDTH",
                 "descr": "Width of input (subordinate/manager) AXIS/AHB interface wstrb (width of data bus in words)",
-                "type": "P",
+                "type": "D",
                 "val": "(DATA_WIDTH / 8)",
                 "min": "1",
                 "max": "32",

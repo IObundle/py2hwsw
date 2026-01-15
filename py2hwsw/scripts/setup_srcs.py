@@ -336,6 +336,7 @@ def python_setup(build_dir):
         "console_ethernet.py",
         "makehex.py",
         "hex_join.py",
+        "fix_doxygen_subsections.py",
     ]:
         shutil.copy(f"{get_lib_dir()}/scripts/{file}", f"{dest_dir}/{file}")
         os.chmod(f"{dest_dir}/{file}", 0o755)
@@ -644,7 +645,7 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
                     for file in os.listdir(setup_tools_dir):
                         setup_file = os.path.join(setup_tools_dir, file)
                         if os.path.isfile(setup_file):
-                            copy_with_rename(core.name, core.name)(
+                            copy_with_rename(core.original_name, core.name)(
                                 setup_file,
                                 os.path.join(build_tools_dir, file),
                             )

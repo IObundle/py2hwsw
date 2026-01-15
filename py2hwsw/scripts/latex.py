@@ -45,8 +45,11 @@ def write_description(outfile, text):
 
 def escape_latex(s):
     """Given a string, escape latex special characters"""
-    latex_special_chars = r"[&%$#_{}~^\\]"
-    escaped_str = re.sub(latex_special_chars, lambda match: "\\" + match.group(), s)
+    latex_special_chars = r"[&%$#_{}~^]"
+    escaped_str = s.replace("\\", "\\textbackslash ")
+    escaped_str = re.sub(
+        latex_special_chars, lambda match: "\\" + match.group(), escaped_str
+    )
     escaped_str = escaped_str.replace("<", "\\textless ").replace(">", "\\textgreater ")
     escaped_str = escaped_str.replace("$clog2", "log2")
     return escaped_str

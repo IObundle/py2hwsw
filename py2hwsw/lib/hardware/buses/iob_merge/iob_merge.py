@@ -377,11 +377,6 @@ def setup(py_params_dict):
         verilog_code = verilog_code[:-2] + "};\n"
         verilog_managers.append(f"mux_{signal}_input")
 
-    # NOTE: Assigned 'sel' signal here, because it was causing an infinite loop when assigned in the FSM
-    verilog_code += f"""
-    assign sel = state == WAIT_VALID ? prio_enc_o[{NBITS}-1:0] : sel_reg;
-"""
-
     # Create snippet with demuxer and muxer connections
     attributes_dict["snippets"] = [
         {
@@ -395,10 +390,7 @@ def setup(py_params_dict):
     attributes_dict["fsm"] = {
         "type": "fsm",
         "default_assignments": """
-   // Default assignments
-   // sel <- sel_reg;
-
-   // Disallow handshake signals from going through
+   // Disallow handshake signals from going through by default
    m_iob_valid_o = 1'b0;
    m_iob_ready_int = 1'b0;
 """,
@@ -411,7 +403,7 @@ def setup(py_params_dict):
         + f"""\
       // Allow selector to be changed
       // Priority encoder may have 1 more bit to signal 'no input', but we don't use it for selection.
-      // sel <- prio_enc_o[{NBITS}-1:0];
+      sel = prio_enc_o[{NBITS}-1:0];
 """
         + """\
       if (m_iob_valid_o && ~m_iob_ready_i) begin
@@ -423,6 +415,8 @@ def setup(py_params_dict):
       end
 
    WAIT_READY: // Wait for ready signal
+      // Selector is locked
+      sel = sel_reg;
       // Allow handshake signals to go through
       m_iob_valid_o = m_iob_valid_int;
       m_iob_ready_int = m_iob_ready_i;
@@ -438,6 +432,8 @@ def setup(py_params_dict):
       end
 
    WAIT_RVALID: // Wait for read data
+      // Selector is locked
+      sel = sel_reg;
       if (m_iob_rvalid_i) begin
          state_nxt = WAIT_VALID;
       end

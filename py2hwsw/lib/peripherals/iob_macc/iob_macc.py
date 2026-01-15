@@ -111,7 +111,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             # iob_csrs 'control_if_s' port is connected automatically by py2hwsw
-            f"""iob_csrs iob_csrs
+            f"""iob_csrs csrs
                 -d 'Control/Status Registers' 
                 -c 
                     "clk_en_rst_s":"clk_en_rst_s"

@@ -612,12 +612,14 @@ class iobInterface(_interface):
     """Class to represent an IOb interface for generation"""
 
     # Widths for the IOb interface
-    data_w: str or int = 32
-    # Only address width is configurable, data width is fixed
     addr_w: str or int = 32
+    data_w: str or int = 32
+    strb_w: str or int = None
 
     def __post_init__(self):
         super().__post_init__()
+        if not self.strb_w:
+            self.strb_w = f"{self.data_w}/8"
         self.__set_signals()
 
     def __set_signals(self):
@@ -628,7 +630,7 @@ class iobInterface(_interface):
             iob_signal(name="iob_addr_o", width=self.addr_w, descr="Byte address."),
             iob_signal(name="iob_wdata_o", width=self.data_w, descr="Write data."),
             iob_signal(
-                name="iob_wstrb_o", width=f"{self.data_w}/8", descr="Write strobe."
+                name="iob_wstrb_o", width=self.strb_w, descr="Write strobe."
             ),
             iob_signal(name="iob_rvalid_i", descr="Read data valid."),
             iob_signal(name="iob_rdata_i", width=self.data_w, descr="Read data."),
@@ -708,9 +710,12 @@ class symMemInterface(_memInterface):
 
     # Data width for the memory interface
     data_w: int or str = 32
+    strb_w: int or str = None
 
     def __post_init__(self):
         super().__post_init__()
+        if not self.strb_w:
+            self.strb_w = f"{self.data_w}/8"
         self.__set_signals()
 
     def __set_signals(self):
@@ -868,7 +873,7 @@ class symMemInterface(_memInterface):
             self._signals.append(
                 iob_signal(
                     name="w_strb" + suffix + "_o",
-                    width=f"{self.data_w}/8",
+                    width=self.strb_w,
                     descr=f"Write strobe port {suffix}",
                 )
             )
@@ -1135,6 +1140,7 @@ class AXILiteInterface(_interface):
 
     # Data width for the AXI-Lite interface
     data_w: int or str = 32
+    strb_w: int or str = None
     # Address width for the AXI-Lite interface
     addr_w: int or str = 32
     # AXI-Lite parameters
@@ -1147,6 +1153,8 @@ class AXILiteInterface(_interface):
 
     def __post_init__(self):
         super().__post_init__()
+        if not self.strb_w:
+            self.strb_w = f"{self.data_w}/8"
         self.__set_signals()
 
     def __set_signals(self):
@@ -1190,7 +1198,7 @@ class AXILiteInterface(_interface):
             ),
             iob_signal(
                 name="axil_wstrb_o",
-                width=f"{self.data_w}/8",
+                width=self.strb_w,
                 descr="AXI-Lite write channel write strobe.",
             ),
             iob_signal(
@@ -1269,6 +1277,7 @@ class AXIInterface(_interface):
 
     # Data width for the AXI interface
     data_w: int or str = 32
+    strb_w: int or str = None
     # Address width for the AXI interface
     addr_w: int or str = 32
     # AXI parameters
@@ -1288,6 +1297,8 @@ class AXIInterface(_interface):
 
     def __post_init__(self):
         super().__post_init__()
+        if not self.strb_w:
+            self.strb_w = f"{self.data_w}/8"
         self.__set_signals()
 
     def __set_signals(self):
@@ -1333,7 +1344,7 @@ class AXIInterface(_interface):
             ),
             iob_signal(
                 name="axi_wstrb_o",
-                width=f"{self.data_w}/8",
+                width=self.strb_w,
                 descr="AXI write channel write strobe.",
             ),
             iob_signal(
@@ -1515,11 +1526,14 @@ class APBInterface(_interface):
 
     # Data width for the APB interface
     data_w: int or str = 32
+    strb_w: int or str = None
     # Address width for the APB interface
     addr_w: int or str = 32
 
     def __post_init__(self):
         super().__post_init__()
+        if not self.strb_w:
+            self.strb_w = f"{self.data_w}/8"
         self.__set_signals()
 
     def __set_signals(self):
@@ -1549,7 +1563,7 @@ class APBInterface(_interface):
             ),
             iob_signal(
                 name="apb_wstrb_o",
-                width=f"{self.data_w}/8",
+                width=self.strb_w,
                 descr="APB write strobe.",
             ),
             iob_signal(
@@ -1570,6 +1584,7 @@ class AHBInterface(_interface):
 
     # Data width for the AHB interface
     data_w: int or str = 32
+    strb_w: int or str = None
     # Address width for the AHB interface
     addr_w: int or str = 32
     # AHB parameters
@@ -1580,6 +1595,8 @@ class AHBInterface(_interface):
 
     def __post_init__(self):
         super().__post_init__()
+        if not self.strb_w:
+            self.strb_w = f"{self.data_w}/8"
         self.__set_signals()
 
     def __set_signals(self):
@@ -1621,7 +1638,7 @@ class AHBInterface(_interface):
             ),
             iob_signal(
                 name="ahb_wstrb_o",
-                width=f"{self.data_w}/8",
+                width=self.strb_w,
                 descr="AHB write strobe.",
             ),
             iob_signal(
@@ -1963,6 +1980,7 @@ class wishboneInterface(_interface):
 
     # Data width for the Wishbone interface
     data_w: int or str = 32
+    strb_w: int or str = None
     # Address width for the Wishbone interface
     addr_w: int or str = 32
     # Sets if it is a full Wishbone interface
@@ -1970,6 +1988,8 @@ class wishboneInterface(_interface):
 
     def __post_init__(self):
         super().__post_init__()
+        if not self.strb_w:
+            self.strb_w = f"{self.data_w}/8"
         self.__set_signals()
 
     def __set_signals(self):
@@ -2000,7 +2020,7 @@ class wishboneInterface(_interface):
             ),
             iob_signal(
                 name="wb_sel_o",
-                width=f"{self.data_w}/8",
+                width=self.strb_w,
                 descr="Select output. Indicates where valid data is expected on the data bus.",
             ),
             iob_signal(
@@ -2086,6 +2106,7 @@ def create_interface(
     # Retrieve widths and parameters even if not needed
     # IOb
     data_w = widths.get("DATA_W", 32)
+    strb_w = widths.get("STRB_W", f"{data_w}/8")
     addr_w = widths.get("ADDR_W", 32)
     # Memory
     w_data_w = widths.get("W_DATA_W", 32)
@@ -2120,6 +2141,7 @@ def create_interface(
     # TODO: except for addr_w, all should later be only an integer
     for name, width in [
         ("DATA_W", data_w),
+        ("STRB_W", strb_w),
         ("ADDR_W", addr_w),
         ("W_DATA_W", w_data_w),
         ("R_DATA_W", r_data_w),
@@ -2185,6 +2207,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
             )
         case mem if mem in mem_if_names:
@@ -2211,6 +2234,7 @@ def create_interface(
                     addr_w=addr_w,
                     genre=genre,
                     data_w=data_w,
+                    strb_w=strb_w,
                 )
         case "axis":
             interface = AXIStreamInterface(
@@ -2230,6 +2254,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
                 prot_w=prot_w,
                 resp_w=resp_w,
@@ -2244,6 +2269,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
                 prot_w=prot_w,
                 resp_w=resp_w,
@@ -2258,6 +2284,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
                 prot_w=prot_w,
                 resp_w=resp_w,
@@ -2270,6 +2297,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
                 id_w=id_w,
                 size_w=size_w,
@@ -2291,6 +2319,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
                 id_w=id_w,
                 size_w=size_w,
@@ -2312,6 +2341,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
                 id_w=id_w,
                 size_w=size_w,
@@ -2332,6 +2362,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
             )
         case "ahb":
@@ -2342,6 +2373,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
                 prot_w=ahb_prot_w,
                 burst_w=ahb_burst_w,
@@ -2375,6 +2407,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
             )
         case "wb_full":
@@ -2385,6 +2418,7 @@ def create_interface(
                 file_prefix=file_prefix,
                 portmap_port_prefix=portmap_port_prefix,
                 data_w=data_w,
+                strb_w=strb_w,
                 addr_w=addr_w,
                 is_full=True,
             )

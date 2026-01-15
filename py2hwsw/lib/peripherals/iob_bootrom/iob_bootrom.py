@@ -65,7 +65,7 @@ def setup(py_params_dict):
         "subblocks": [
             {
                 "core_name": "iob_csrs",
-                "instance_name": "iob_csrs",
+                "instance_name": "csrs",
                 "csrs": [
                     {
                         "name": "rom",

@@ -92,7 +92,7 @@ endif
 
 # clean
 clean: $(FPGA_TOOL)-clean
-	find . -maxdepth 1 -type f -not \( -name "Makefile" -o -name "fpga_build.mk" -o -name "uut_build.mk" \) -delete
+	find . -maxdepth 1 -type f -not \( -name "Makefile" -o -name "*fpga_build.mk" -o -name "uut_build.mk" \) -delete
 	@rm -rf resynthesis *.hex
 ifneq ($(FPGA_SERVER),)
 	ssh $(FPGA_SSH_FLAGS) $(FPGA_USER)@$(FPGA_SERVER) 'rm -rf $(REMOTE_BUILD_DIR)'

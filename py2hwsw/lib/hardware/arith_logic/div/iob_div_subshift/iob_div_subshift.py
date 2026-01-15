@@ -18,7 +18,7 @@ def setup(py_params_dict):
             {
                 "name": "DIVISOR_W",
                 "type": "P",
-                "val": "DIVIDEND_W",
+                "val": "32",
                 "min": "NA",
                 "max": "NA",
                 "descr": "Divisor width",
@@ -26,7 +26,7 @@ def setup(py_params_dict):
             {
                 "name": "QUOTIENT_W",
                 "type": "P",
-                "val": "DIVIDEND_W",
+                "val": "32",
                 "min": "NA",
                 "max": "NA",
                 "descr": "Quotient width",

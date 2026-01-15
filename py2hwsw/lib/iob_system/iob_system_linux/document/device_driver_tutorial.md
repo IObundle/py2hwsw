@@ -16,8 +16,8 @@ To follow this tutorial, clone the [iob-linux](https://github.com/IObundle/iob-l
 
 ## 1. Create device drivers
 
-This step 1. can be fully automated by using the Py2HWSW's [iob_linux_device_drivers](https://github.com/arturum1/py2hwsw/blob/linux_csrs_script/py2hwsw/lib/software/iob_linux_device_drivers/iob_linux_device_drivers.py) software module.
-To use this software module, add it to the 'sw_modules' list of the peripheral core, like in [iob_timer](https://github.com/arturum1/py2hwsw/blob/linux_csrs_script/py2hwsw/lib/peripherals/iob_timer/iob_timer.py#L157) core.
+This step 1. can be fully automated by using the Py2HWSW's [iob_linux_device_drivers](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/software/iob_linux_device_drivers/iob_linux_device_drivers.py) software module.
+To use this software module, add it to the 'sw_modules' list of the peripheral core, like in [iob_timer](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/peripherals/iob_timer/iob_timer.py#L157) core.
 This will cause the Linux kernel module sources (from step 1. of this tutorial) to be automatically generated under the `software/linux/` folder of the core's build directory.
 
 ### Alternatively, create the driver sources manually
@@ -43,6 +43,10 @@ iob_spi_master-objs := iob_spi_main.o iob_class/iob_class_utils.o
 ```
 
 1.2. Create main driver file
+
+Note: These template steps to create the main driver file and user-space functions, only use the 'sysfs' user-space/kernel interface.
+To support other interfaces, like '/dev' and 'ioctl' interfaces, use the Py2HWSW's [iob_linux_device_drivers](https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/software/iob_linux_device_drivers/iob_linux_device_drivers.py) software module.
+
 
 `software/linux/drivers/iob_spi_main.c`
 

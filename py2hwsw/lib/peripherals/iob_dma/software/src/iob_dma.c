@@ -13,7 +13,9 @@
 // base_addr: Base address of external memory to start the data transfer.
 // size: Amount of 32-bit words to transfer.
 void dma_write_transfer(uint32_t *base_addr, uint32_t size) {
-  iob_dma_csrs_set_w_addr((uint32_t)base_addr);
+  // cast to uintptr_t to avoid compilation error in 64bit machines
+  // example: when running verilator simulation
+  iob_dma_csrs_set_w_addr((uint32_t)(uintptr_t)base_addr);
   iob_dma_csrs_set_w_length(size);
   iob_dma_csrs_set_w_start(1);
 }
@@ -23,7 +25,9 @@ void dma_write_transfer(uint32_t *base_addr, uint32_t size) {
 // base_addr: Base address of external memory to start the data transfer.
 // size: Amount of 32-bit words to transfer.
 void dma_read_transfer(uint32_t *base_addr, uint32_t size) {
-  iob_dma_csrs_set_r_addr((uint32_t)base_addr);
+  // cast to uintptr_t to avoid compilation error in 64bit machines
+  // example: when running verilator simulation
+  iob_dma_csrs_set_r_addr((uint32_t)(uintptr_t)base_addr);
   iob_dma_csrs_set_r_length(size);
   iob_dma_csrs_set_r_start(1);
 }

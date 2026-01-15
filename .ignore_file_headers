@@ -4,6 +4,8 @@
 
 ./bin/py2hwsw
 
+./py2hwsw/scripts/LICENSES
+
 ./py2hwsw/lib/hardware/buses/iob_axi_interconnect/hardware/src/iob_axi_interconnect.v
 ./py2hwsw/lib/hardware/buses/iob_arbiter/hardware/src/iob_arbiter.v
 ./py2hwsw/lib/hardware/buses/iob_arbiter/hardware/src/iob_priority_encoder.v
@@ -33,6 +35,8 @@
 ./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistseedexpander.h
 ./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistseedexpander.c
 ./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistkatrng.c
+./py2hwsw/lib/iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/etc/mdev.conf
+./py2hwsw/lib/iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/etc/init.d/S10mdev
 # openspbi
 ./py2hwsw/lib/iob_system/iob_system_linux/software/opensbi_platform/iob_system_linux/objects.mk
 ./py2hwsw/lib/iob_system/iob_system_linux/software/opensbi_platform/iob_system_linux/platform.c

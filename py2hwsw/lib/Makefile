@@ -170,3 +170,47 @@ release-artifacts:
 	tar -czf iob_uart_V$$VERSION.tar.gz -C ./fusesoc_exports .
 
 .PHONY: release-artifacts
+
+# Regenerate timer userspace driver binaries and recompile buildroot of iob_system_linux
+buildroot-update:
+	# Generate iob_timer
+	make clean setup CORE=iob_timer BUILD_DIR=../../../iob_timer_V0.81
+	# Compile userspace binaries
+	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C ../../../iob_timer_V0.81/software/linux/user all'
+	# Copy driver binaries to iob_system_linux buildroot
+	for file in "iob_timer_user_sysfs" "iob_timer_user_dev" "iob_timer_user_ioctl" "iob_timer_tests_sysfs" "iob_timer_tests_dev" "iob_timer_tests_ioctl"; do\
+		cp ../../../iob_timer_V0.81/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
+	done
+	# Compile kernel driver
+	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C iob_system/iob_system_linux/submodules/iob_linux build-linux-drivers MODULE_NAME=iob_timer MODULE_DRIVER_DIR=../../../../../../../iob_timer_V0.81/software/linux/drivers ROOTFS_OVERLAY_DIR=../../software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers'
+	# Copy iob_system_linux buildroot to iob_linux
+	cp -r iob_system/iob_system_linux/software/buildroot/* iob_system/iob_system_linux/submodules/iob_linux/software/buildroot/;
+	# Recompile buildroot
+	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C iob_system/iob_system_linux/submodules/iob_linux build-buildroot'
+	# Copy rootfs to iob_system_linux
+	cp iob_system/iob_system_linux/submodules/iob_linux/software/OS_build/rootfs.cpio.gz iob_system/iob_system_linux/software/src/rootfs.cpio.gz
+	# Copy it to existing soc_linux build dir
+	cp iob_system/iob_system_linux/software/src/rootfs.cpio.gz ../../../soc_linux_V0.8/hardware/fpga/rootfs.cpio.gz
+	
+
+.PHONY: buildroot-update
+
+running_system_upload:
+	# Generate iob_timer
+	make clean setup CORE=iob_timer BUILD_DIR=../../../iob_timer_V0.81
+	# Compile userspace binaries
+	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C ../../../iob_timer_V0.81/software/linux/user all'
+	# Copy driver binaries to iob_system_linux buildroot
+	for file in "iob_timer_user_sysfs" "iob_timer_user_dev" "iob_timer_user_ioctl" "iob_timer_tests_sysfs" "iob_timer_tests_dev" "iob_timer_tests_ioctl"; do\
+		cp ../../../iob_timer_V0.81/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
+	done
+	# Compile kernel driver
+	nix-shell iob_system/iob_system_linux/submodules/iob_linux --run 'make -C iob_system/iob_system_linux/submodules/iob_linux build-linux-drivers MODULE_NAME=iob_timer MODULE_DRIVER_DIR=../../../../../../../iob_timer_V0.81/software/linux/drivers ROOTFS_OVERLAY_DIR=../../software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers'
+	# Rsynz to remote machine
+	# Upload to running linux instance using lrzsz
+	echo "rz -o /drivers" > /dev/ttyS0 && sz iob_timer.ko > /dev/ttyS0
+	for file in "iob_timer_user_sysfs" "iob_timer_user_dev" "iob_timer_user_ioctl" "iob_timer_tests_sysfs" "iob_timer_tests_dev" "iob_timer_tests_ioctl"; do\
+		echo "rz -o /root" > /dev/ttyS0 && sz $$file > /dev/ttyS0
+	done
+
+.PHONY: running_system_upload

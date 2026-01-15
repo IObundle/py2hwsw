@@ -51,11 +51,15 @@ def setup(py_params_dict):
         }
         py_params_dict["dest_dir"] = "dummy_dest"
 
+    assert (
+        "issuer" in py_params_dict and py_params_dict["issuer"]
+    ), "Error: Issuer for CSRs not defined. Use python parameter 'demo=True' to generate iob_csrs without issuer."
+
     # by default use same version as issuer
     # use py2hwsw version as fallback
-    default_version = py_params_dict["py2hwsw_version"]
-    if "issuer" in py_params_dict:
-        default_version = py_params_dict["issuer"].get("version", default_version)
+    default_version = py_params_dict["issuer"].get(
+        "version", py_params_dict["py2hwsw_version"]
+    )
 
     params = {
         # Use the same name as issuer + the suffix "_csrs"
@@ -371,8 +375,13 @@ def setup(py_params_dict):
     global static_reg_tables
     static_reg_tables[params["name"]] = reg_table
 
-    # Generate tex section for each doc_configuration and reg table
-    if py_params_dict.get("py2hwsw_target", "") == "setup":
+    # Only generate CSRs docs if setting up build dir AND issuer is top module
+    if (
+        py_params_dict.get("py2hwsw_target", "") == "setup"
+        and py_params_dict["top_module"] == py_params_dict["issuer"]["original_name"]
+    ):
+        # Generate tex section for each doc_configuration and reg table
+
         # use regs copy to not modify original regs
         regs_copy = copy.deepcopy(attributes_with_csrs["csrs"])
         # Get doc_configuration_list

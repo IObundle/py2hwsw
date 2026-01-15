@@ -45,7 +45,9 @@ module iob_priority_encoder #(
          wire valid1, valid2;
          wire [W2-1:0] in2;
          assign in2[WIDTH-W2-1:0] = input_unencoded[WIDTH-1:W2];
-         if (WIDTH - W2 < W2) assign in2[W2-1:WIDTH-W2] = 0;
+         if (WIDTH - W2 < W2) begin : g_pad_in2
+             assign in2[W2-1:WIDTH-W2] = 0;
+         end
          iob_priority_encoder #(
             .WIDTH       (W2),
             .LSB_PRIORITY(LSB_PRIORITY)

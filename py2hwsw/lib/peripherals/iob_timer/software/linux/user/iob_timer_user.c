@@ -12,10 +12,6 @@
 
 #include "iob_timer.h"
 
-//
-// SysFs
-//
-
 int main(int argc, char *argv[]) {
   printf("[User] IOb-Timer application\n");
 

@@ -60,16 +60,16 @@ def setup(py_params: dict):
     # Update parameters values with ones given in python parameters
     update_params(params, py_params)
 
-    sw_trap_handler = True
+    sw_trap_fenci = True
 
     if params["cpu"] == "none":
         params["use_intmem"] = False
         params["use_extmem"] = False
         params["use_bootrom"] = False
 
-    # Disable software trap handler for uncompatible CPUs
+    # Disable software trap handler and fence.i for uncompatible CPUs
     if params["cpu"] == "iob_picorv32":
-        sw_trap_handler = False
+        sw_trap_fenci = False
 
     num_xbar_managers = 0
     for param_name in ["use_intmem", "use_extmem", "use_bootrom", "use_peripherals"]:
@@ -182,13 +182,21 @@ def setup(py_params: dict):
             },
             {  # Needed for software
                 "name": "TRAP_HANDLER",
-                "descr": "Enable trap handler in software using mvtec CSR. Only enable this for compatible CPUs. PicoRV32 not compatible.",
+                "descr": "Enable trap handler in software using mtvec CSR. Only enable this for compatible CPUs. PicoRV32 not compatible.",
                 "type": "M",
-                "val": sw_trap_handler,
+                "val": sw_trap_fenci,
                 "min": "0",
                 "max": "1",
             },
-            # mandatory parameters (do not change them!)
+            {  # Needed for software
+                "name": "FENCEI",
+                "descr": "Enable 'FENCE.I' instruction from the RISC-V 'Zifencei' extension. Only enable this for compatible CPUs. PicoRV32 not compatible.",
+                "type": "M",
+                "val": sw_trap_fenci,
+                "min": "0",
+                "max": "1",
+            },
+            # Parameters
             {
                 "name": "AXI_ID_W",
                 "descr": "AXI ID bus width",
@@ -220,6 +228,20 @@ def setup(py_params: dict):
                 "val": "4",
                 "min": "1",
                 "max": "4",
+            },
+            {
+                "name": "SIMULATION",
+                "descr": "Enable simulation optimizations. For example, lower ethernet PHY_RST_CNT value.",
+                "type": "P",
+                "val": "0",
+            },
+            #
+            # False-parameters
+            #
+            {
+                "name": "ETH_PHY_RST_CNT",
+                "type": "D",
+                "val": "(SIMULATION ? 20'h00100 : 20'hFFFFF)",
             },
             #
             # False-parameters for generated memories
@@ -688,7 +710,7 @@ def setup(py_params: dict):
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
-                    "iob_csrs_cbus_s": (
+                    "csrs_cbus_s": (
                         "bootrom_cbus",
                         [
                             "{1'b0, bootrom_axi_arlock}",
@@ -781,6 +803,8 @@ def setup(py_params: dict):
                         "AXI_LEN_W": "AXI_LEN_W",
                         "AXI_ADDR_W": params["addr_w"],
                         "AXI_DATA_W": params["data_w"],
+                        "DATA_W": params["data_w"],
+                        "PHY_RST_CNT": "ETH_PHY_RST_CNT",
                     },
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",

@@ -200,7 +200,7 @@ def setup(py_params: dict):
             #         "interrupt_o": "axistream_in_interrupt",
             #         "axistream_io": "axistream_in_axis", # AXI-Stream in and out should be connected in loopback for demo
             #         "sys_axis_io": "dma_axis_in",
-            #         "iob_csrs_cbus_s": "axistream_in_csrs",
+            #         "csrs_cbus_s": "axistream_in_csrs",
             #     },
             # },
             # {
@@ -216,7 +216,7 @@ def setup(py_params: dict):
             #         "interrupt_o": "axistream_out_interrupt",
             #         "axistream_io": "axistream_out_axis",
             #         "sys_axis_io": "dma_axis_out",
-            #         "iob_csrs_cbus_s": "axistream_out_csrs",
+            #         "csrs_cbus_s": "axistream_out_csrs",
             #     },
             # },
             # {

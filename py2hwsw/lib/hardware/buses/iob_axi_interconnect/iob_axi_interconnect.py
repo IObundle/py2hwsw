@@ -34,7 +34,7 @@ def setup(py_params_dict):
             {
                 "name": "M_ADDR_WIDTH",
                 "type": "P",
-                "val": "{M_COUNT{{M_REGIONS{32'd24}}}}",
+                "val": "32",
                 "min": "NA",
                 "max": "NA",
                 "descr": "Manager address bus width",

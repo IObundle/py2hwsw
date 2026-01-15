@@ -7,14 +7,15 @@ import string
 
 from math import ceil
 
-from create_peripheral_tests import create_peripheral_tests, create_test_makefile
+from create_peripheral_tests import create_peripheral_tests
+SPDX_PREFIX = "SPDX-"
 
 
 def create_dts_file(path, peripheral):
     """Create device tree file with demo on how to include the peripheral in the device tree"""
-    content = f"""// SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""// {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 //
-// SPDX-License-Identifier: {peripheral['spdx_license']}
+// {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 
 /dts-v1/;
@@ -50,9 +51,9 @@ def create_dts_file(path, peripheral):
 def create_readme_file(path, peripheral):
     """Create README with directory structure and file descriptions of generated device driver files"""
     content = f"""<!--
-SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+{SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 
-SPDX-License-Identifier: {peripheral['spdx_license']}
+{SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 -->
 
 # {peripheral['upper_name']} Linux Kernel Drivers
@@ -77,9 +78,9 @@ SPDX-License-Identifier: {peripheral['spdx_license']}
 
 def create_driver_mk_file(path, peripheral):
     """Create Makefile segment for driver compilation"""
-    content = f"""# SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""# {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 #
-# SPDX-License-Identifier: {peripheral['spdx_license']}
+# {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 {peripheral['name']}-objs := {peripheral['name']}_main.o iob_class/iob_class_utils.o
 """
@@ -91,16 +92,6 @@ def create_driver_mk_file(path, peripheral):
 def filter_csrs_list(csrs_list):
     filtered_csrs_list = [i for i in csrs_list if i.get("log2n_items", 0) == 0]
     return filtered_csrs_list
-
-
-def bceil(n, log2base):
-    base = int(2**log2base)
-    # n = eval_param_expression_from_config(n, self.config, "max")
-    # print(f"{n} of {type(n)} and {base}")
-    if n % base == 0:
-        return n
-    else:
-        return int(base * ceil(n / base))
 
 
 def deterministic_magic(name: str) -> str:
@@ -362,18 +353,18 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{
             data_type = "uint32_t"
         if "W" in csr["mode"]:
             content += f"""\
-    void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
-      ioctl(fd, WR_{CSR_NAME}, (int32_t*) &value);
-    }}
-    """
+void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
+  ioctl(fd, WR_{CSR_NAME}, (int32_t*) &value);
+}}
+"""
         if "R" in csr["mode"]:
             content += f"""\
-    {data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
-      uint32_t return_value = 0;
-      ioctl(fd, RD_{CSR_NAME}, (int32_t*) &return_value);
-      return ({data_type})return_value;
-    }}
-    """
+{data_type} {peripheral['name']}_csrs_get_{csr['name']}() {{
+  uint32_t return_value = 0;
+  ioctl(fd, RD_{CSR_NAME}, (int32_t*) &return_value);
+  return ({data_type})return_value;
+}}
+"""
 
     with open(os.path.join(path, f"{peripheral['name']}_ioctl_csrs.c"), "w") as f:
         f.write(content)
@@ -416,7 +407,7 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
     fswhdr.write("\treturn -ENOSYS;\n")
     fswhdr.write("}\n\n")
     fswhdr.write(
-        "static ssize_t sysfs_enosys_store(struct device *dev, struct device_attribute *attr, const char __user *buf, size_t count) {\n"
+        "static ssize_t sysfs_enosys_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count) {\n"
     )
     fswhdr.write("\treturn -ENOSYS;\n")
     fswhdr.write("}\n\n")
@@ -427,18 +418,25 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
         if "W" in csr["mode"]:
             # top, csr_name
             fswhdr.write(
-                f"static ssize_t sysfs_{csr_name}_store(struct device *dev, struct device_attribute *attr, const char __user *buf, size_t count) {{\n"
+                f"static ssize_t sysfs_{csr_name}_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count) {{\n"
             )
             fswhdr.write("\tu32 value = 0;\n")
+            fswhdr.write("\tint ret;\n")
             if multi:
                 fswhdr.write(
                     f"\tstruct iob_data *{top}_data = (struct iob_data*) dev->platform_data;\n"
                 )
             fswhdr.write(f"\tif (!mutex_trylock(&{top}_mutex)) {{\n")
-            fswhdr.write('\t\tpr_info("Another process is accessing the device\\n");\n')
+            fswhdr.write(
+                f'\t\tpr_info("[{top}] Another process is accessing the device\\n");\n'
+            )
             fswhdr.write("\t\treturn -EBUSY;\n")
             fswhdr.write("\t}\n")
-            fswhdr.write('\tsscanf(buf, "%u", &value);\n')
+            fswhdr.write("\tret = kstrtouint(buf, 0, &value);\n")
+            fswhdr.write("\tif (ret) {\n")
+            fswhdr.write(f"\t\tmutex_unlock(&{top}_mutex);\n")
+            fswhdr.write("\t\treturn ret;\n")
+            fswhdr.write("\t}\n")
             if multi:
                 fswhdr.write(
                     f"\tiob_data_write_reg({top}_data->regbase, value, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
@@ -448,7 +446,9 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
                     f"\tiob_data_write_reg({top}_data.regbase, value, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
                 )
             fswhdr.write(f"\tmutex_unlock(&{top}_mutex);\n")
-            fswhdr.write(f'\tpr_info("[{top}] Sysfs - Write: 0x%x\\n", value);\n')
+            fswhdr.write(
+                f'\tpr_info("[{top}] Sysfs - Write {csr_name}: 0x%x\\n", value);\n'
+            )
             fswhdr.write("\treturn count;\n")
             fswhdr.write("}\n\n")
         elif "R" in csr["mode"]:
@@ -467,7 +467,9 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
                 fswhdr.write(
                     f"\tu32 value = iob_data_read_reg({top}_data.regbase, {TOP}_CSRS_{CSR_NAME}_ADDR, {TOP}_CSRS_{CSR_NAME}_W);\n"
                 )
-            fswhdr.write(f'\tpr_info("[{top}] Sysfs - Read: 0x%x\\n", value);\n')
+            fswhdr.write(
+                f'\tpr_info("[{top}] Sysfs - Read {csr_name}: 0x%x\\n", value);\n'
+            )
             fswhdr.write('\treturn sprintf(buf, "%u", value);\n')
             fswhdr.write("}\n\n")
 
@@ -476,7 +478,15 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
     for csr in csrs_list:
         # attr name and permissions
         reg_name = csr["name"]
-        fswhdr.write(f"DEVICE_ATTR({reg_name}, 0600,")
+        mode = csr["mode"]
+        permissions = "0000"
+        if "R" in mode and "W" in mode:
+            permissions = "0600"
+        elif "R" in mode:
+            permissions = "0400"
+        elif "W" in mode:
+            permissions = "0200"
+        fswhdr.write(f"DEVICE_ATTR({reg_name}, {permissions},")
 
         # sysfs show function
         if "R" in csr["mode"]:
@@ -521,9 +531,9 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
 def create_sysfs_user_csrs_source(path, peripheral):
     """Create user-space C file to interact with the driver"""
     content = f"""/*
- * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+ * {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
  *
- * SPDX-License-Identifier: {peripheral['spdx_license']}
+ * {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
  */
 
 #include <fcntl.h>
@@ -579,6 +589,7 @@ int sysfs_write_file(const char *filename, uint32_t write_value) {{
 }}
 
 
+// Empty init function - base address is obtained from device tree
 void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{}}
 
 // Core Setters and Getters
@@ -655,9 +666,9 @@ def create_driver_header_file_list(path, peripheral):
 def create_driver_main_file(path, peripheral):
     """Create the driver's kernel source"""
     content = f"""/*
- * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+ * {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
  *
- * SPDX-License-Identifier: {peripheral['spdx_license']}
+ * {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
  */
 
 /* {peripheral['name']}_main.c: driver for {peripheral['name']}
@@ -742,7 +753,7 @@ static int {peripheral['name']}_probe(struct platform_device *pdev) {{
     return -ENODEV;
   }}
 
-  pr_info("[Driver] %s: probing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
+  pr_info("[{peripheral['name']}] %s: probing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
 
   // Get the I/O region base address
   res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
@@ -760,7 +771,7 @@ static int {peripheral['name']}_probe(struct platform_device *pdev) {{
   }}
   {peripheral['name']}_data.regsize = resource_size(res);
 
-  // Alocate char device
+  // Allocate char device
   result =
       alloc_chrdev_region(&{peripheral['name']}_data.devnum, 0, 1, {peripheral['upper_name']}_DRIVER_NAME);
   if (result) {{
@@ -831,14 +842,14 @@ static int {peripheral['name']}_remove(struct platform_device *pdev) {{
   return 0;
 }}
 
-static int __init test_counter_init(void) {{
-  pr_info("[Driver] %s: initializing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
+static int __init {peripheral['name']}_init(void) {{
+  pr_info("[{peripheral['name']}] %s: initializing.\\n", {peripheral['upper_name']}_DRIVER_NAME);
 
   return platform_driver_register(&{peripheral['name']}_driver);
 }}
 
-static void __exit test_counter_exit(void) {{
-  pr_info("[Driver] %s: exiting.\\n", {peripheral['upper_name']}_DRIVER_NAME);
+static void __exit {peripheral['name']}_exit(void) {{
+  pr_info("[{peripheral['name']}] %s: exiting.\\n", {peripheral['upper_name']}_DRIVER_NAME);
   platform_driver_unregister(&{peripheral['name']}_driver);
 }}
 
@@ -847,10 +858,10 @@ static void __exit test_counter_exit(void) {{
 //
 
 static int {peripheral['name']}_open(struct inode *inode, struct file *file) {{
-  pr_info("[Driver] {peripheral['name']} device opened\\n");
+  pr_info("[{peripheral['name']}] Device opened\\n");
 
   if (!mutex_trylock(&{peripheral['name']}_mutex)) {{
-    pr_info("Another process is accessing the device\\n");
+    pr_info("[{peripheral['name']}] Another process is accessing the device\\n");
 
     return -EBUSY;
   }}
@@ -859,7 +870,7 @@ static int {peripheral['name']}_open(struct inode *inode, struct file *file) {{
 }}
 
 static int {peripheral['name']}_release(struct inode *inode, struct file *file) {{
-  pr_info("[Driver] {peripheral['name']} device closed\\n");
+  pr_info("[{peripheral['name']}] Device closed\\n");
 
   mutex_unlock(&{peripheral['name']}_mutex);
 
@@ -884,14 +895,14 @@ static ssize_t {peripheral['name']}_read(struct file *file, char __user *buf, si
     value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                               {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
     size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
-    pr_info("[Driver] Read {csr['name']} CSR!\\n");
+    pr_info("[{peripheral['name']}] Dev - Read {csr["name"]}: 0x%x\\n", value);
     break;
 """
 
     content += f"""\
   default:
     // invalid address - no bytes read
-    return 0;
+    return -EACCES;
   }}
 
   // Read min between count and REG_SIZE
@@ -919,19 +930,23 @@ static ssize_t {peripheral['name']}_write(struct file *file, const char __user *
         content += f"""\
   case {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR:
     size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
+    if (count != size) {{
+        pr_info("[{peripheral['name']}] write size %d for {csr['name']} CSR is not equal to register size %d\\n", (int)count, size);
+        return -EACCES;
+    }}
     if (read_user_data(buf, size, &value))
       return -EFAULT;
     iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                        {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
-    pr_info("[Driver] {csr['name']} {peripheral['name']}: 0x%x\\n", value);
+    pr_info("[{peripheral['name']}] Dev - Write {csr["name"]}: 0x%x\\n", value);
     break;
 """
 
     content += f"""\
   default:
-    pr_info("[Driver] Invalid write address 0x%x\\n", (unsigned int)*ppos);
+    pr_info("[{peripheral['name']}] Invalid write address 0x%x\\n", (unsigned int)*ppos);
     // invalid address - no bytes written
-    return 0;
+    return -EACCES;
   }}
 
   return count;
@@ -989,7 +1004,7 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
                           return -EFAULT;
                         iob_data_write_reg({peripheral['name']}_data.regbase, value, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                                            {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
-                        pr_info("[Driver] {csr['name']} {peripheral['name']}: 0x%x\\n", value);
+                        pr_info("[{peripheral['name']}] IOCTL - Write {csr["name"]}: 0x%x\\n", value);
 
                         break;
 """
@@ -999,7 +1014,7 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
                         value = iob_data_read_reg({peripheral['name']}_data.regbase, {peripheral['upper_name']}_CSRS_{CSR_NAME}_ADDR,
                                                   {peripheral['upper_name']}_CSRS_{CSR_NAME}_W);
                         size = ({peripheral['upper_name']}_CSRS_{CSR_NAME}_W >> 3); // bit to bytes
-                        pr_info("[Driver] Read {csr['name']} CSR!\\n");
+                        pr_info("[{peripheral['name']}] IOCTL - Read {csr["name"]}: 0x%x\\n", value);
 
                         if (copy_to_user((int32_t*) arg, &value, size))
                           return -EFAULT;
@@ -1009,14 +1024,14 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
 
     content += f"""\
                 default:
-                        pr_info("[Driver] Invalid IOCTL command 0x%x\\n", cmd);
-                        break;
+                        pr_info("[{peripheral['name']}] Invalid IOCTL command 0x%x\\n", cmd);
+                        return -ENOTTY;
         }}
         return 0;
 }}
 
-module_init(test_counter_init);
-module_exit(test_counter_exit);
+module_init({peripheral['name']}_init);
+module_exit({peripheral['name']}_exit);
 
 MODULE_LICENSE("{peripheral['license']}");
 MODULE_AUTHOR("{peripheral['author']}");
@@ -1029,12 +1044,13 @@ MODULE_VERSION("{peripheral['version']}");
 
 def create_user_makefile(path, peripheral):
     """Create Makefile to build user application"""
-    content = f"""# SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+    content = f"""# {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 #
-# SPDX-License-Identifier: {peripheral['spdx_license']}
+# {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 # Select kernel-userspace interface: sysfs; dev; ioctl
 IF = sysfs
+UPPER_IF = $(shell echo $(IF) | tr '[:lower:]' '[:upper:]')
 SRC = $(BIN).c {peripheral['name']}_$(IF)_csrs.c
 SRC += $(wildcard ../../src/{peripheral['name']}.c)
 HDR += ../drivers/{peripheral['name']}_driver_files.h
@@ -1043,6 +1059,7 @@ FLAGS += -static
 FLAGS += -march=rv32imac
 FLAGS += -mabi=ilp32
 FLAGS += -I../drivers -I../../src
+FLAGS += -D$(UPPER_IF)_IF
 BIN = {peripheral['name']}_user
 CC = riscv64-unknown-linux-gnu-gcc
 
@@ -1054,6 +1071,8 @@ all:
 	make IF=dev
 	make IF=ioctl
 	make BIN={peripheral['name']}_tests IF=sysfs
+	make BIN={peripheral['name']}_tests IF=dev
+	make BIN={peripheral['name']}_tests IF=ioctl
 
 clean:
 	rm -f $(BIN)_sysfs $(BIN)_dev $(BIN)_ioctl
@@ -1069,7 +1088,7 @@ clean:
 #
 
 
-def generate_device_drivers(output_dir, peripheral):
+def generate_device_drivers(output_dir, peripheral, py2hwsw_version):
     """Generate device driver files for a peripheral"""
 
     # Find 'iob_csrs' subblock
@@ -1093,17 +1112,33 @@ def generate_device_drivers(output_dir, peripheral):
     )
 
     # Peripheral information
-    # TODO: Replace hardcoded by dynamic info.
+    instance_name = (
+        peripheral["name"][4:]
+        if peripheral["name"].startswith("iob_")
+        else peripheral["name"]
+    )
+
+    license_autor = "IObundle"
+    license_year = "2025"
+    license_name = "MIT"
+    if "license" in peripheral:
+        license_name = peripheral["license"]["name"]
+        license_autor = peripheral["license"]["author"]
+        license_year = peripheral["license"]["year"]
+
+    # Group peripheral information into a dictionary
     _peripheral = {
         "name": peripheral["name"],  # example: 'iob_timer'
-        "instance_name": f"{peripheral['name'][4:]}0",  # example: 'timer0'
+        "instance_name": f"{instance_name}0",  # example: 'timer0'
         "upper_name": peripheral["name"].upper(),
-        "version": "0.81",
+        "version": (
+            peripheral["version"] if "version" in peripheral else py2hwsw_version
+        ),
         "description": f"{peripheral['name']} Drivers",
-        "author": "IObundle",
-        "spdx_year": "2025",
-        "spdx_license": "MIT",
-        "license": "Dual MIT/GPL",
+        "author": license_autor,
+        "spdx_year": license_year,
+        "spdx_license": license_name,
+        "license": f"Dual {license_name}/GPL",
         "csrs": csrs_list,
     }
     _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"
@@ -1126,4 +1161,3 @@ def generate_device_drivers(output_dir, peripheral):
     create_ioctl_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
     create_user_makefile(os.path.join(output_dir, "user"), _peripheral)
     create_peripheral_tests(os.path.join(output_dir, "user"), _peripheral)
-    create_test_makefile(os.path.join(output_dir, "user"), _peripheral)

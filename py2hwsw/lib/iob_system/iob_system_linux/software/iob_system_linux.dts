@@ -47,7 +47,7 @@
     chosen {
         bootargs = "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init swiotlb=32 loglevel=8";
         linux,initrd-start = <0x01000000>;
-        linux,initrd-end = <0x01800000>; // max 8MB ramdisk image
+        linux,initrd-end = <0x01C00000>; // max 12MB ramdisk (rootfs) image
     };
     soc {
         #address-cells = <1>;

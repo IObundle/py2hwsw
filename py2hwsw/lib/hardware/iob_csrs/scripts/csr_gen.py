@@ -87,8 +87,11 @@ def eval_param_expression_from_config(param_expression, confs, param_attribute):
     """
     # Create parameter dictionary with correct values to be replaced in string
     params_dict = {}
-    for param in confs:
-        params_dict[param["name"]] = param.get(param_attribute, None)
+    for conf in confs:
+        if conf["type"] in ["P", "D"]:  # Use given param_attribute
+            params_dict[conf["name"]] = conf.get(param_attribute, None)
+        else:  # M or C - Always use 'val'
+            params_dict[conf["name"]] = conf.get("val", None)
 
     return eval_param_expression(param_expression, params_dict)
 
@@ -1149,9 +1152,12 @@ class csr_gen:
 
     def generate_csr_macros(self, core, table):
         """Generate macros for each CSR in core's confs list"""
-        core_prefix = core["name"].upper()
         for row in table:
             name = row.name.upper()
+            n_bits = row.n_bits
+            n_bytes = int(self.bceil(n_bits, 3) / 8)
+            if n_bytes == 3:
+                n_bytes = 4
             if "W" in row.mode or "R" in row.mode:
                 core["confs"].append(
                     {
@@ -1163,14 +1169,6 @@ class csr_gen:
                         "max": "NA",
                     }
                 )
-
-        for row in table:
-            name = row.name.upper()
-            n_bits = row.n_bits
-            n_bytes = int(self.bceil(n_bits, 3) / 8)
-            if n_bytes == 3:
-                n_bytes = 4
-            if "W" in row.mode or "R" in row.mode:
                 width_macro = f"{name}_W"
                 core["confs"].append(
                     {
@@ -1445,11 +1443,16 @@ class csr_gen:
         os.makedirs(out_dir, exist_ok=True)
         csrs_file = open(f"{out_dir}/csrs.tex", "w")
 
-        csrs_file.write(
-            """
-The software accessible registers of the core are described in the following
-tables. Each subsection corresponds to a specific configuration of the core, since
-different configurations have different registers available.
+        create_subsections = len(doc_tables) > 1
+
+        csrs_intro = r"""\
+The software accessible registers of the core are described in the following tables.
+"""
+        if create_subsections:
+            csrs_intro += r"""\
+Each subsection corresponds to a specific configuration of the core, since different configurations have different registers available.
+"""
+        csrs_intro += r"""\
 The tables give information on the name, read/write capability, address, hardware and software width, and a
 textual description. The addresses are byte aligned and given in hexadecimal format.
 The hardware width is the number of bits that the register occupies in the hardware, while the
@@ -1459,10 +1462,11 @@ Each register has only one type of access, either read or write, meaning that re
 a write-only register will produce invalid data or writing to a read-only register will
 not have any effect.
 """
-        )
+        csrs_file.write(csrs_intro)
 
         for doc_conf, doc_table in doc_tables.items():
-            csrs_file.write(f"\\subsubsection{{{doc_conf} Configuration}}")
+            if create_subsections:
+                csrs_file.write(f"\\subsubsection{{{doc_conf} Configuration}}")
 
             for csr_group in doc_table:
                 csrs_file.write(

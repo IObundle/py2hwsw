@@ -402,6 +402,7 @@ class iob_core(iob_module, iob_instance):
         filtered_parent_py_params.pop("is_superblock", None)
         filtered_parent_py_params.pop("is_parent", None)
         filtered_parent_py_params.pop("child_attributes", None)
+        filtered_parent_py_params.pop("top_module", None)
         if "name" not in filtered_parent_py_params:
             filtered_parent_py_params["name"] = name
 
@@ -593,7 +594,7 @@ class iob_core(iob_module, iob_instance):
         for subblock in self.subblocks:
             for portmap in subblock.portmap_connections:
                 if (
-                    portmap.port.name == "iob_csrs_cbus_s"
+                    portmap.port.name == "csrs_cbus_s"
                     and isinstance(portmap.port.interface, interfaces.iobInterface)
                     and portmap.e_connect
                 ):
@@ -917,6 +918,7 @@ class iob_core(iob_module, iob_instance):
             )
             core_module = sys.modules[core_name]
             issuer = kwargs.pop("issuer", None)
+            top_module = __class__.global_top_module.original_name if __class__.global_top_module else core_name
             # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
             # obtain the core's py2hwsw dictionary.
             # Give it a dictionary with all arguments of this function, since the user
@@ -928,6 +930,7 @@ class iob_core(iob_module, iob_instance):
                     "py2hwsw_target": __class__.global_special_target or "setup",
                     "issuer": (issuer.attributes_dict if issuer else ""),
                     "py2hwsw_version": PY2HWSW_VERSION,
+                    "top_module": top_module,
                     **kwargs,
                 }
             )

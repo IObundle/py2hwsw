@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 
 from iob_signal import iob_signal, iob_signal_reference
 from iob_globals import iob_globals
+from iob_base import try_evaluate
 
 mem_if_details = [
     {
@@ -628,7 +629,7 @@ class iobInterface(_interface):
             iob_signal(name="iob_addr_o", width=self.addr_w, descr="Byte address."),
             iob_signal(name="iob_wdata_o", width=self.data_w, descr="Write data."),
             iob_signal(
-                name="iob_wstrb_o", width=f"{self.data_w}/8", descr="Write strobe."
+                name="iob_wstrb_o", width=try_evaluate(f"{self.data_w}/8"), descr="Write strobe."
             ),
             iob_signal(name="iob_rvalid_i", descr="Read data valid."),
             iob_signal(name="iob_rdata_i", width=self.data_w, descr="Read data."),
@@ -868,7 +869,7 @@ class symMemInterface(_memInterface):
             self._signals.append(
                 iob_signal(
                     name="w_strb" + suffix + "_o",
-                    width=f"{self.data_w}/8",
+                    width=try_evaluate(f"{self.data_w}/8"),
                     descr=f"Write strobe port {suffix}",
                 )
             )
@@ -1190,7 +1191,7 @@ class AXILiteInterface(_interface):
             ),
             iob_signal(
                 name="axil_wstrb_o",
-                width=f"{self.data_w}/8",
+                width=try_evaluate(f"{self.data_w}/8"),
                 descr="AXI-Lite write channel write strobe.",
             ),
             iob_signal(
@@ -1333,7 +1334,7 @@ class AXIInterface(_interface):
             ),
             iob_signal(
                 name="axi_wstrb_o",
-                width=f"{self.data_w}/8",
+                width=try_evaluate(f"{self.data_w}/8"),
                 descr="AXI write channel write strobe.",
             ),
             iob_signal(
@@ -1549,7 +1550,7 @@ class APBInterface(_interface):
             ),
             iob_signal(
                 name="apb_wstrb_o",
-                width=f"{self.data_w}/8",
+                width=try_evaluate(f"{self.data_w}/8"),
                 descr="APB write strobe.",
             ),
             iob_signal(
@@ -1621,7 +1622,7 @@ class AHBInterface(_interface):
             ),
             iob_signal(
                 name="ahb_wstrb_o",
-                width=f"{self.data_w}/8",
+                width=try_evaluate(f"{self.data_w}/8"),
                 descr="AHB write strobe.",
             ),
             iob_signal(
@@ -2000,7 +2001,7 @@ class wishboneInterface(_interface):
             ),
             iob_signal(
                 name="wb_sel_o",
-                width=f"{self.data_w}/8",
+                width=try_evaluate(f"{self.data_w}/8"),
                 descr="Select output. Indicates where valid data is expected on the data bus.",
             ),
             iob_signal(

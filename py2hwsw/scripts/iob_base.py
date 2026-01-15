@@ -680,3 +680,26 @@ def find_folder_by_name(root_dir, folder_name):
         if folder_name in dirs:
             return os.path.join(root, folder_name)
     return None
+
+def try_evaluate(math_str):
+    """
+    Evaluate a mathematical expression safely.
+
+    Args:
+        math_str (str): The mathematical expression to evaluate.
+
+    Returns:
+        Any: The result of the evaluation, or the original expression if an error occurs.
+    """
+    try:
+        # Evaluate with restricted globals/locals for security
+        result = eval(math_str, {"__builtins__": None}, {})
+
+        # Check if result is a float but has no decimal part
+        if isinstance(result, float) and result.is_integer():
+            return int(result)
+        # Keep as float if there are actual decimals
+        return result
+    except Exception:
+        # Return original string if evaluation fails
+        return math_str

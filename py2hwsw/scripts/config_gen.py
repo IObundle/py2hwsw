@@ -198,6 +198,12 @@ The following tables describe the IP core configuration. The core may be configu
             if group.doc_clearpage:
                 confs_file.write("\\clearpage")
 
+        confs_file.write(
+            """
+There may be other macros or generic parameters in the code that are not documented. They are typically derived from other primary macros or parameters or exist for documentation purposes.
+"""
+        )
+
     confs_file.close()
 
 

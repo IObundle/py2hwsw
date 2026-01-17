@@ -207,7 +207,7 @@ def generate_mems_tex(mems, out_dir):
       \\rowcolor{iob-green}
       {\\bf Name} & {\\bf Type} & {\\bf (Word-)Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
       \\input mems_tab
-      \\caption{Table of memories of the core}
+      \\caption{Core memories.}
     \\end{xltabular}
     \\label{mems_tab:is}
 """

@@ -33,7 +33,7 @@ def generate_subblocks_table_tex(subblocks, out_dir):
 
   \\input subblocks_tab
 
-  \\caption{Table of subblocks in the core.}
+  \\caption{Core subblocks.}
 \\end{xltabular}
 \\label{subblocks_tab:is}
 """

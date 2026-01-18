@@ -9,44 +9,58 @@ import iob_system_utils
 # Functions
 #
 
+SPDX_PREFIX = "SPDX-"
 
-def generate_dts(attributes_dict, params, py_params):
-    """Generate a Linux device tree for iob_system.
-    :param dict attributes_dict: iob_system attributes
-    :param dict params: iob_system python parameters
-    :param dict py_params: iob_system argument python parameters
-    """
-    # Don't create DTS file for other targets (like clean)
-    if "py2hwsw_target" not in py_params or py_params["py2hwsw_target"] != "setup":
-        return
 
-    # Get peripherals list
-    peripherals = iob_system_utils.get_iob_system_peripherals_list(attributes_dict)
+def generate_dts(dts_parameters):
+    """Generate a Linux device tree for iob_system."""
+    spdx = {
+        "author": dts_parameters.get("author", "IObundle"),
+        "spdx_year": dts_parameters.get("spdx_year", "2025"),
+        "spdx_license": dts_parameters.get("spdx_license", "MIT"),
+    }
 
-    # Generate memory map
-    iob_system_utils.generate_memory_map(
-        attributes_dict, peripherals, params, py_params
-    )
+    extra_peripherals = ""
+    if dts_parameters["hardcoded_plic_cint"]:
+        extra_peripherals += """
+        // Hardcoded PLIC and CLINT
 
-    # Read generated memory map
-    memory_map = {}
-    with open(
-        os.path.join(
-            attributes_dict["build_dir"],
-            "software/src",
-            f"{attributes_dict['name']}_mmap.h",
-        ),
-        "r",
-    ) as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("#define"):
-                parts = line.split()
-                memory_map[parts[1]] = int(parts[2], 0)
+        // Do we need CLINT0 here? OpenSBI already uses it.
+        CLINT0: clint@/*CLINT0_BASE_MACRO*/ {
+            compatible = "riscv,clint0";
+            interrupts-extended = < &CPU0_intc 3
+                                    &CPU0_intc 7 >;
+            reg = <0x/*CLINT0_BASE_MACRO*/ 0xc0000>;
+            reg-names = "control";
+        };
+
+        // Do we need PLIC0 here? OpenSBI already uses it.
+        //PLIC0: plic@/*PLIC0_BASE_MACRO*/ {
+        //    #address-cells = <0>;
+        //    #interrupt-cells = <1>;
+        //    compatible = "riscv,plic0";
+        //    interrupt-controller;
+        //    interrupts-extended = < &CPU0_intc 11
+        //                            &CPU0_intc 9 >;
+        //    reg = <0x/*PLIC0_BASE_MACRO*/ 0x4000000>;
+        //    reg-names = "control";
+        //    riscv,max-priority = <7>;
+        //    riscv,ndev = <31>;
+        //};
+"""
 
     # Generate DTS file
     dts = f"""
+// {SPDX_PREFIX}FileCopyrightText: {spdx['spdx_year']} {spdx['author']}
+//
+// {SPDX_PREFIX}License-Identifier: {spdx['spdx_license']}
+
+/* Auto-generated device tree file for {dts_parameters['name']} SoC. */
+
 /dts-v1/;
+
+/* Include peripherals dtsi files here */
+/include/ peripherals.dtsi
 
 / {{
     #address-cells = <1>;
@@ -56,9 +70,9 @@ def generate_dts(attributes_dict, params, py_params):
     cpus {{
         #address-cells = <0x1>;
         #size-cells = <0x0>;
-        timebase-frequency = <{params.get("freq", "/*FREQ_MACRO*/")}>;
+        timebase-frequency = </*FREQ_MACRO*/>;
         CPU0: cpu@0 {{
-            clock-frequency = <{params.get("freq", "/*FREQ_MACRO*/")}>;
+            clock-frequency = </*FREQ_MACRO*/>;
             device_type = "cpu";
             reg = <0x0>;
             status = "okay";
@@ -86,82 +100,41 @@ def generate_dts(attributes_dict, params, py_params):
     }};
     memory@0 {{
         device_type = "memory";
-        reg = <0x0 {params.get("mem_size", "/*OS_RANGE_MACRO*/")}>;
+        reg = <0x0 /*OS_RANGE_MACRO*/>;
     }};
     chosen {{
         bootargs = "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init swiotlb=32 loglevel=8";
         linux,initrd-start = <0x01000000>;
-        linux,initrd-end = <0x01800000>; // max 8MB ramdisk image
+        linux,initrd-end = <0x03000000>; // max 32MB ramdisk (rootfs) image
     }};
     soc {{
         #address-cells = <1>;
         #size-cells = <1>;
-        compatible = "iobundle,iob-system-linux", "simple-bus";
+        compatible = "iobundle,{dts_parameters['name']}", "simple-bus";
         ranges;
-"""
 
-    for peripheral in peripherals:
-        p_name = peripheral["instance_name"]
-        p_addr = memory_map.get(f"{p_name}_BASE", f"/*{p_name}_BASE_MACRO*/")
-        dts += f"""
-        {p_name}: {p_name.lower()}@{p_addr:x} {{
-            compatible = "iobundle,{peripheral['core_name']}";
-            reg = <0x{p_addr:x} 0x1000>;
-"""
-        if p_name == "UART0":
-            dts += f"""            clock-frequency = <{params.get("freq", "/*FREQ_MACRO*/")}>;
-            current-speed = <{params.get("baud", "/*BAUD_MACRO*/")}>;
-"""
-        dts += "        };\n"
-
-    # Add CLINT0 and PLIC0
-    clint_addr = memory_map.get("CLINT0_BASE", "/*CLINT0_BASE_MACRO*/")
-    dts += f"""
-        CLINT0: clint@{clint_addr:x} {{
-            compatible = "riscv,clint0";
-            interrupts-extended = < &CPU0_intc 3
-                                    &CPU0_intc 7 >;
-            reg = <0x{clint_addr:x} 0xc0000>;
-            reg-names = "control";
-        }};
-"""
-
-    plic_addr = memory_map.get("PLIC0_BASE", "/*PLIC0_BASE_MACRO*/")
-    dts += f"""
-        PLIC0: plic@{plic_addr:x} {{
-            #address-cells = <0>;
-            #interrupt-cells = <1>;
-            compatible = "riscv,plic0";
-            interrupt-controller;
-            interrupts-extended = < &CPU0_intc 11
-                                    &CPU0_intc 9 >;
-            reg = <0x{plic_addr:x} 0x4000000>;
-            reg-names = "control";
-            riscv,max-priority = <7>;
-            riscv,ndev = <31>;
-        }};
-"""
-
-    dts += """
-    };
-};
+        // Peripherals added via /include/ statements.
+        {extra_peripherals}
+    }};
+}};
 """
 
     # Write DTS file
     os.makedirs(
-        os.path.join(attributes_dict["build_dir"], "software/src"), exist_ok=True
+        os.path.join(dts_parameters["build_dir"], "software/src"), exist_ok=True
     )
     with open(
         os.path.join(
-            attributes_dict["build_dir"],
+            dts_parameters["build_dir"],
             "software/src",
-            f"{attributes_dict['name']}.dts",
+            f"{dts_parameters['name']}.dts",
         ),
         "w",
     ) as f:
         f.write(dts)
+
     print(
-        f"Generated DTS file: {attributes_dict['build_dir']}/software/src/{attributes_dict['name']}.dts"
+        f"Generated DTS file: {dts_parameters['build_dir']}/software/src/{dts_parameters['name']}.dts"
     )
 
 
@@ -171,39 +144,10 @@ def generate_dts(attributes_dict, params, py_params):
 
 if __name__ == "__main__":
     # Dummy data for testing
-    attributes = {
+    dts_parameters = {
         "name": "iob_system",
-        "version": "0.1",
-        "build_dir": "build",
-        "subblocks": [
-            {"instance_name": "cpu", "core_name": "VexRiscv"},
-            {"instance_name": "iob_pbus_split"},
-            {
-                "instance_name": "TIMER0",
-                "core_name": "iob_timer",
-                "is_peripheral": True,
-            },
-            {"instance_name": "SPI0", "core_name": "iob_spi", "is_peripheral": True},
-            {"instance_name": "UART0", "core_name": "iob_uart", "is_peripheral": True},
-        ],
-        "wires": [],
+        "build_dir": "/tmp",
+        "hardcoded_plic_cint": False,
     }
-    parameters = {
-        "addr_w": 32,
-        "use_peripherals": True,
-        "use_intmem": True,
-        "use_extmem": True,
-        "use_bootrom": True,
-        "freq": 100000000,
-        "mem_size": 0x8000000,
-        "baud": 115200,
-        "cpu": "VexRiscv",
-        "init_mem": True,
-        "use_ethernet": False,
-        "fw_baseaddr": 0,
-        "fw_addr_w": 24,
-        "bootrom_addr_w": 16,
-    }
-    python_params = {"py2hwsw_target": "setup"}
 
-    generate_dts(attributes, parameters, python_params)
+    generate_dts(dts_parameters)

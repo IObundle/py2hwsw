@@ -8,44 +8,9 @@ import string
 from math import ceil
 
 from create_peripheral_tests import create_peripheral_tests
+from create_device_tree_files import create_device_tree_files
+
 SPDX_PREFIX = "SPDX-"
-
-
-def create_dts_file(path, peripheral):
-    """Create device tree file with demo on how to include the peripheral in the device tree"""
-    content = f"""// {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
-//
-// {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
-
-
-/dts-v1/;
-
-/ {{
-    #address-cells = <1>;
-    #size-cells = <1>;
-    model = \"IOb-SoC, VexRiscv\";
-    compatible = \"IOb-SoC, VexRiscv\";
-    // CPU
-    // Memory
-    // Choosen
-    soc {{
-        #address-cells = <1>;
-        #size-cells = <1>;
-        compatible = \"iobundle,iob-soc\", \"simple-bus\";
-        ranges;
-
-        // Other SOC peripherals go here
-
-        // Add this Node to device tree
-        {peripheral['instance_name'].upper()}: {peripheral['name']}@/*{peripheral['instance_name'].upper()}_ADDR_MACRO*/ {{
-            compatible = \"{peripheral['compatible_str']}\";
-            reg = <0x/*{peripheral['instance_name'].upper()}_ADDR_MACRO*/ 0x100>;
-        }};
-
-    }};
-}};"""
-    with open(os.path.join(path, f"{peripheral['name']}.dts"), "w") as f:
-        f.write(content)
 
 
 def create_readme_file(path, peripheral):
@@ -1088,7 +1053,9 @@ clean:
 #
 
 
-def generate_device_drivers(output_dir, peripheral, py2hwsw_version):
+def generate_device_drivers(
+    output_dir, peripheral, py2hwsw_version, dts_extra_properties
+):
     """Generate device driver files for a peripheral"""
 
     # Find 'iob_csrs' subblock
@@ -1150,7 +1117,6 @@ def generate_device_drivers(output_dir, peripheral, py2hwsw_version):
     os.makedirs(os.path.join(output_dir, "user"), exist_ok=True)
 
     # Create files
-    create_dts_file(output_dir, _peripheral)
     create_readme_file(output_dir, _peripheral)
     create_driver_mk_file(os.path.join(output_dir, "drivers"), _peripheral)
     create_driver_header_file_list(os.path.join(output_dir, "drivers"), _peripheral)
@@ -1161,3 +1127,4 @@ def generate_device_drivers(output_dir, peripheral, py2hwsw_version):
     create_ioctl_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
     create_user_makefile(os.path.join(output_dir, "user"), _peripheral)
     create_peripheral_tests(os.path.join(output_dir, "user"), _peripheral)
+    create_device_tree_files(output_dir, _peripheral, dts_extra_properties)

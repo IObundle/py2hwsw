@@ -8,6 +8,10 @@ import shutil
 
 # Add iob-system scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../scripts"))
+# Add iob-system-linux scripts folder to python path
+sys.path.append(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "dts_script")
+)  # FIXME: Move this to scripts/ folder
 
 from iob_system_utils import update_params
 from iob_system_dts import generate_dts
@@ -296,8 +300,21 @@ def setup(py_params: dict):
         if not os.path.exists(minirc_path):
             os.symlink("minirc.iobundle.dfl", minirc_path)
 
+        # NOTE: Ideally, soc_name would just be the name of the leaf soc in the parent/child hierarchy.
+        # But due to current py2hwsw limitations, we have to hardcode it here or use the direct child's (issuer) name.
+        soc_name = "iob_system_linux"
+        if (
+            py_params.get("issuer", {})
+            and py_params["issuer"]["parent"] == "iob_system_linux"
+        ):
+            soc_name = py_params["issuer"]["original_name"]
         # Generate device tree file
-        generate_dts(attributes, parameters, python_params)
+        dts_parameters = {
+            "name": soc_name,
+            "build_dir": py_params["build_dir"],
+            "hardcoded_plic_cint": True,
+        }
+        generate_dts(dts_parameters)
 
     #     iob_soc_scripts = [
     #         "terminalMode",

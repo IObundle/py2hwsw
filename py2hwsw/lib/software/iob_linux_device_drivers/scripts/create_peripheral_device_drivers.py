@@ -107,6 +107,22 @@ def generate_ioctl_defines(name, csrs):
             i += 1
     return content
 
+def csr_type(n_bits):
+    type_dict = {8: "uint8_t", 16: "uint16_t", 32: "uint32_t"}
+    try:
+        n_bits = int(n_bits)
+
+        for type_try in type_dict:
+            if n_bits <= type_try:
+                return type_dict[type_try]
+    except:
+        pass
+
+    # If its not an integer, or its too big, default to 32
+    # NOTE: Ideally, we should try to evaluate verilog parameters contained in n_bits.
+    #       The best solution would be to obatin the evaluated value from the iob_csrs module directly.
+    #       But currently py2hwsw does not have an easy mechanism to do that.
+    return "uint32_t"
 
 ###############################################
 #                                             #
@@ -246,12 +262,7 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{
 
     for csr in peripheral["csrs"]:
         CSR_NAME = csr["name"].upper()
-        if int(csr["n_bits"]) <= 8:
-            data_type = "uint8_t"
-        elif int(csr["n_bits"]) <= 16:
-            data_type = "uint16_t"
-        else:
-            data_type = "uint32_t"
+        data_type = csr_type(csr["n_bits"])
         if "W" in csr["mode"]:
             content += f"""\
 void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
@@ -310,12 +321,7 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{
 """
     for csr in peripheral["csrs"]:
         CSR_NAME = csr["name"].upper()
-        if int(csr["n_bits"]) <= 8:
-            data_type = "uint8_t"
-        elif int(csr["n_bits"]) <= 16:
-            data_type = "uint16_t"
-        else:
-            data_type = "uint32_t"
+        data_type = csr_type(csr["n_bits"])
         if "W" in csr["mode"]:
             content += f"""\
 void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
@@ -562,12 +568,7 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr) {{}}
 
     for csr in peripheral["csrs"]:
         CSR_NAME = csr["name"].upper()
-        if int(csr["n_bits"]) <= 8:
-            data_type = "uint8_t"
-        elif int(csr["n_bits"]) <= 16:
-            data_type = "uint16_t"
-        else:
-            data_type = "uint32_t"
+        data_type = csr_type(csr["n_bits"])
         if "W" in csr["mode"]:
             content += f"""\
 void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
@@ -1068,7 +1069,16 @@ def generate_device_drivers(
         exit(1)
 
     # Create copy of csrs list
-    csrs_list = list(csrs_subblock["csrs"])
+    grouped_csrs_list = list(csrs_subblock["csrs"])
+    # Create new list only with individual CSRs - no groups.
+    csrs_list = []
+    for csr_element in grouped_csrs_list:
+        # If csr_element is a group of CSRs, extract them
+        if "regs" in csr_element:
+            csrs_list += csr_element["regs"]
+        else:
+            csrs_list.append(csr_element)
+
     # Every peripheral has an implicit "version" CSR
     csrs_list.append(
         {

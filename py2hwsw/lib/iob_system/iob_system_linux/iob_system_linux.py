@@ -300,17 +300,13 @@ def setup(py_params: dict):
         if not os.path.exists(minirc_path):
             os.symlink("minirc.iobundle.dfl", minirc_path)
 
-        # NOTE: Ideally, soc_name would just be the name of the leaf soc in the parent/child hierarchy.
-        # But due to current py2hwsw limitations, we have to hardcode it here or use the direct child's (issuer) name.
-        soc_name = "iob_system_linux"
-        if (
-            py_params.get("issuer", {})
-            and py_params["issuer"]["parent"] == "iob_system_linux"
-        ):
-            soc_name = py_params["issuer"]["original_name"]
+        # soc_name = "iob_system_linux"
+        # if (py_params.get("child_attributes", {})):
+        #     soc_name = py_params["child_attributes"]["name"]
+
         # Generate device tree file
         dts_parameters = {
-            "name": soc_name,
+            "name": py_params["name"],
             "build_dir": py_params["build_dir"],
             "hardcoded_plic_cint": True,
         }

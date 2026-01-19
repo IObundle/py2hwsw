@@ -387,6 +387,8 @@ def generate_makefile_segments(attributes_dict, peripherals, params, py_params):
                 peripheral_name_list.append(peripheral["core_name"])
         if peripherals:
             file.write("PERIPHERALS ?=" + " ".join(peripheral_name_list) + "\n")
+            file.write("PERIPHERALS_INSTANCE_NAME ?=" + " ".join([i["instance_name"] for i in peripherals]) + "\n")
+            file.write("PERIPHERALS_INSTANCE_TYPE ?=" + " ".join([i["core_name"] for i in peripherals]) + "\n")
         if params["use_ethernet"]:
             # Set USE_ETHERNET variable
             file.write("USE_ETHERNET=1\n")

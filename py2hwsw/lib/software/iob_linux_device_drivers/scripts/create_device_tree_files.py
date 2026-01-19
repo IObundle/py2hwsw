@@ -19,7 +19,7 @@ def create_dts_file(path, peripheral):
 /dts-v1/;
 
 // Include peripheral's device tree file
-/include/ \"{peripheral['name']}.dtsi\"
+#include \"{peripheral['name']}.dtsi\"
 
 / {{
     #address-cells = <1>;
@@ -35,7 +35,7 @@ def create_dts_file(path, peripheral):
         compatible = \"iobundle,iob-soc\", \"simple-bus\";
         ranges;
 
-        // {peripheral['name']} added via /include/ statement.
+        // {peripheral['name']} added via #include statement.
 
         // Other SoC peripherals go here
 
@@ -47,6 +47,7 @@ def create_dts_file(path, peripheral):
 
 def create_dtsi_file(path, peripheral, extra_properties=""):
     """Create device tree include file to be included in the main SoC's device tree"""
+    # NOTE: Using 'INSTANCE_NAME' as a special keyword that will be replaced with correct peripheral instance name by scripts in build dir.
     content = f"""\
 // {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 //
@@ -58,9 +59,9 @@ def create_dtsi_file(path, peripheral, extra_properties=""):
 
 &soc {{
     // Include this core as a peripheral of main system labeled 'soc'.
-    {peripheral['instance_name'].upper()}: {peripheral['name']}@/*{peripheral['instance_name'].upper()}_ADDR_MACRO*/ {{
+    INSTANCE_NAME: {peripheral['name']}@/*INSTANCE_NAME_BASE_MACRO*/ {{
         compatible = \"{peripheral['compatible_str']}\";
-        reg = <0x/*{peripheral['instance_name'].upper()}_ADDR_MACRO*/ 0x/*{peripheral['instance_name'].upper()}_CSRS_ADDR_W_MACRO*/>;
+        reg = <0x/*INSTANCE_NAME_BASE_MACRO*/ 0x/*{peripheral['name'].upper()}_CSRS_ADDR_RANGE_MACRO*/>;
         {extra_properties}
     }};
 }};"""

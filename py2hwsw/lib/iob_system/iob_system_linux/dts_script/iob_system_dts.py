@@ -59,9 +59,6 @@ def generate_dts(dts_parameters):
 
 /dts-v1/;
 
-/* Include peripherals dtsi files here */
-/include/ peripherals.dtsi
-
 / {{
     #address-cells = <1>;
     #size-cells = <1>;
@@ -105,28 +102,31 @@ def generate_dts(dts_parameters):
     chosen {{
         bootargs = "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init swiotlb=32 loglevel=8";
         linux,initrd-start = <0x01000000>;
-        linux,initrd-end = <0x03000000>; // max 32MB ramdisk (rootfs) image
+        linux,initrd-end = <0x01C00000>; // max 12MB ramdisk (rootfs) image
     }};
-    soc {{
+    soc: soc {{
         #address-cells = <1>;
         #size-cells = <1>;
         compatible = "iobundle,{dts_parameters['name']}", "simple-bus";
         ranges;
 
-        // Peripherals added via /include/ statements.
+        // Peripherals added via #include statements.
         {extra_peripherals}
     }};
 }};
+
+/* Include peripherals dtsi files here */
+#include "peripherals.dtsi"
 """
 
     # Write DTS file
     os.makedirs(
-        os.path.join(dts_parameters["build_dir"], "software/src"), exist_ok=True
+        os.path.join(dts_parameters["build_dir"], "software"), exist_ok=True
     )
     with open(
         os.path.join(
             dts_parameters["build_dir"],
-            "software/src",
+            "software",
             f"{dts_parameters['name']}.dts",
         ),
         "w",

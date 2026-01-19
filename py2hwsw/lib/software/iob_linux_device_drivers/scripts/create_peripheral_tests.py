@@ -128,7 +128,11 @@ int test_error_concurrent_open() {{
     close(fd1);
     return TEST_PASSED;
 }}
+"""
 
+    # Only generate read invalid test if there is a write-only CSR
+    if writeonly_csr_name:
+        content += f"""
 int test_error_invalid_read() {{
     /*
      * Test invalid read calls to the device file.
@@ -155,7 +159,9 @@ int test_error_invalid_read() {{
     close(fd);
     return TEST_PASSED;
 }}
+"""
 
+    content += f"""
 int test_error_invalid_write() {{
     /*
      * Test invalid write calls to the device file.
@@ -344,7 +350,13 @@ int main() {{
     // Run error handling tests that manage their own file descriptors first
 #if defined(DEV_IF)
     RUN_TEST(test_error_concurrent_open);
+"""
+    # Only generate read invalid test if there is a write-only CSR
+    if writeonly_csr_name:
+        content += f"""
     RUN_TEST(test_error_invalid_read);
+"""
+    content += f"""
     RUN_TEST(test_error_invalid_write);
     RUN_TEST(test_error_invalid_llseek);
 #elif defined(IOCTL_IF)

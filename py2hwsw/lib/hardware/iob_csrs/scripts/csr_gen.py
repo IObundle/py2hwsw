@@ -1505,15 +1505,17 @@ not have any effect.
   \\customcsrshhline
   \\rowcolor{iob-green}
               &            &             & {\\bf Hw}       & {\\bf Sw}     &                &                    \\\\ \\hline \\hline
+  \\endfirsthead
+  \\caption{"""
+                    + csr_group.descr.replace("_", "\\_")
+                    + """}
+  \\endlastfoot
 
   \\input """
                     + doc_conf
                     + f"_{csr_group.name}"
                     + """_csrs_tab
 
-  \\caption{"""
-                    + csr_group.descr.replace("_", "\\_")
-                    + """}
 \\end{xltabular}
 \\label{"""
                     + doc_conf

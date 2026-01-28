@@ -32,10 +32,12 @@ def generate_subblocks_table_tex(subblocks, out_dir):
   \\hline
   \\rowcolor{iob-green}
   {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
+  \\endfirsthead
+  \\caption{Core subblocks.}
+  \\endlastfoot
 
   \\input subblocks_tab
 
-  \\caption{Core subblocks.}
 \\end{xltabular}
 \\label{subblocks_tab:is}
 }

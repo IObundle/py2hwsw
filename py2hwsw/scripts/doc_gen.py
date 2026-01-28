@@ -140,6 +140,8 @@ See the \\textit{Python Parameters} section of the \\href{https://github.com/IOb
     for group in python_parameters:
         py_params_file.write(
             """
+{
+\\setlength{\\LTcapwidth}{\\linewidth} % make sure the caption takes up the whole linewidth
 \\begin{xltabular}{\\textwidth}{|l|c|X|}
 
   \\hline
@@ -157,6 +159,7 @@ See the \\textit{Python Parameters} section of the \\href{https://github.com/IOb
 \\label{"""
             + group.name
             + """_py_params_tab:is}
+}
 """
         )
         if group.doc_clearpage:

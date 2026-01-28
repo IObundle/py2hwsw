@@ -25,6 +25,8 @@ def generate_subblocks_table_tex(subblocks, out_dir):
 
     subblocks_file.write(
         """
+{
+\\setlength{\\LTcapwidth}{\\linewidth} % make sure the caption takes up the whole linewidth
 \\begin{xltabular}{\\textwidth}{|l|X|}
 
   \\hline
@@ -36,6 +38,7 @@ def generate_subblocks_table_tex(subblocks, out_dir):
   \\caption{Core subblocks.}
 \\end{xltabular}
 \\label{subblocks_tab:is}
+}
 """
     )
 

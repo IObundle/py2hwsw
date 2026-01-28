@@ -22,6 +22,8 @@ The \textit{Python Parameters} received by the core's "setup" function is a dict
 Each key, value pair in the dictionary is a \textit{Python Parameter}.
 The value of the python parameter may be of any data type.
 
+{
+\setlength{\LTcapwidth}{\linewidth} % make sure the caption takes up the whole linewidth
 \begin{xltabular}{\textwidth}{|l|l|X|}
 
   \hline
@@ -33,6 +35,7 @@ The value of the python parameter may be of any data type.
   \caption{Standard \textit{Python Parameters} passed by Py2HWSW to every core's "setup" function.}
 \end{xltabular}
 \label{py2hwsw_py_params_tab}
+}
 
 The standard python parameters passed by Py2HWSW are listed in Table~\ref{py2hwsw_py_params_tab}.
 
@@ -44,18 +47,20 @@ Instructions on how to build a core's user guide can be found in Section~\ref{se
 % Core dictionary
 %
 
+{
+\setlength{\LTcapwidth}{\linewidth} % make sure the caption takes up the whole linewidth
 \begin{xltabular}{\textwidth}{|l|l|X|}
   \hline
   \rowcolor{iob-green}
   % TODO: The "Data Type" column should specify what the user should input, instead of the internal object used by py2hwsw.
   {\bf Name} & {\bf Data Type} & {\bf Description}  \\ \hline \hline
-  \endhead
 
   \input py2hwsw_attributes_tab
 
   \caption{Supported Py2HWSW attributes in the \textbf{Core Dictionary}. The \textit{Data Type} column specifies the type of internal object that the Py2HWSW will convert the attribute's value to (usually the user inputs a string, list, or dictionary value and then py2 converts it to an internal object).}
   \label{py2hwsw_attributes_tab}
 \end{xltabular}
+}
 
 The list of attributes supported by the Py2HWSW framework is given in Table~\ref{py2hwsw_attributes_tab}.
 If a core provides a dictionary with keys not listed in Table~\ref{py2hwsw_attributes_tab}, then the Py2HWSW framework will raise an error.

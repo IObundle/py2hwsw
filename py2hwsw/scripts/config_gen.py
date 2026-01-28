@@ -176,6 +176,8 @@ The following tables describe the IP core configuration. The core may be configu
         for group in confs:
             confs_file.write(
                 """
+{
+\\setlength{\\LTcapwidth}{\\linewidth} % make sure the caption takes up the whole linewidth
 \\begin{xltabular}{\\textwidth}{|l|c|c|c|c|X|}
 
   \\hline
@@ -193,6 +195,7 @@ The following tables describe the IP core configuration. The core may be configu
 \\label{"""
                 + group.name
                 + """_confs_tab:is}
+}
 """
             )
             if group.doc_clearpage:

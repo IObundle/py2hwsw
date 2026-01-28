@@ -202,6 +202,8 @@ def generate_mems_tex(mems, out_dir):
 
     mems_file.write(
         """
+    {
+    \\setlength{\\LTcapwidth}{\\linewidth} % make sure the caption takes up the whole linewidth
     \\begin{xltabular}{\\textwidth}{|l|c|c|c|X|}
       \\hline
       \\rowcolor{iob-green}
@@ -210,6 +212,7 @@ def generate_mems_tex(mems, out_dir):
       \\caption{Core memories.}
     \\end{xltabular}
     \\label{mems_tab:is}
+}
 """
     )
 

@@ -85,8 +85,9 @@ Note that the ouput signals are registered in the core, while the input signals 
     for port in ports:
         if_file.write(
             """
+{
+\\setlength{\\LTcapwidth}{\\linewidth} % make sure the caption takes up the whole linewidth
 \\begin{xltabular}{\\textwidth}{|l|l|r|X|}
-
   \\hline
   \\rowcolor{iob-green}
   {\\bf Name} & {\\bf Direction} & {\\bf Width} & {\\bf Description}  \\\\ \\hline \\hline
@@ -102,6 +103,7 @@ Note that the ouput signals are registered in the core, while the input signals 
 \\label{"""
             + port.name
             + """_if_tab:is}
+}
 """
         )
         if port.doc_clearpage:

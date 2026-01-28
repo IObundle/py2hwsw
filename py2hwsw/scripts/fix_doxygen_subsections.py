@@ -57,18 +57,22 @@ def remove_orphaned_doxysections(files: list[Path]) -> None:
     """
     # if more than 1 file, assume multiple doxysections
     if len(files) == 1:
-        for tex_path in files:
-            if not tex_path.is_file():
-                return
+        tex_path = list(files)[0]
 
-            content = tex_path.read_text(encoding="utf-8")
+        if not tex_path.is_file():
+            return
 
-            # Count occurrences without modifying first
-            occurrences = len(re.findall(r"\\doxysection\{", content))
-            if occurrences == 1:
-                # Replace that single occurrence with the starred version
-                new_content = content.replace(r"\doxysection{", r"\doxysection*{", 1)
-                tex_path.write_text(new_content, encoding="utf-8")
+        content = tex_path.read_text(encoding="utf-8")
+
+        # Count section and subsection occurrences
+        section_occurrences = len(re.findall(r"\\doxysection\{", content))
+        subsection_occurrences = len(re.findall(r"\\doxysubsection\{", content))
+
+        # Only remove section if it's the only one and it has no subsections
+        if section_occurrences == 1 and subsection_occurrences == 0:
+            # Replace that single occurrence with the starred version
+            new_content = content.replace(r"\doxysection{", r"\doxysection*{", 1)
+            tex_path.write_text(new_content, encoding="utf-8")
 
 
 def main():
@@ -79,9 +83,10 @@ def main():
     doxygen_tex_path = Path(sys.argv[1]).resolve()
     inputs = extract_input_files(doxygen_tex_path)
 
-    remove_orphaned_doxysections(inputs)
     for tex_file in inputs:
         remove_orphaned_doxysubsections(tex_file)
+
+    remove_orphaned_doxysections(inputs)
 
 
 if __name__ == "__main__":

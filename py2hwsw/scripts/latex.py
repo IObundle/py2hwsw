@@ -9,8 +9,12 @@
 import re
 
 
-def write_table(outfile, table):
-    """Write Latex table"""
+def write_table(outfile, table, unbreakable_rows=4):
+    """
+    unbreakable_rows: configures the amount of rows from the start of the table that should not be broken. This avoids the table from breaking on the first N rows. Set to zero to allow breaking on any row.
+    """
+
+    """Write Latex table contents for xltabular"""
     fout = open(outfile + "_tab.tex", "w")
     for i in range(len(table)):
         if (i % 2) != 0:
@@ -30,6 +34,15 @@ def write_table(outfile, table):
             line_out = line_out + (" & %s" % line[num])
         # Write the line
         fout.write(line_out + " \\\\ \\hline\n")
+
+        # Insert \endfirsthead on the second-to-last unbreakable row. This prevents xltabular from breaking the table on these first rows by considering them as header.
+        if i == unbreakable_rows-2:
+            # This is the second-to-last unbreakable row. Consider it as part of the header.
+            fout.write("\\endfirsthead\n")
+        elif i < unbreakable_rows-2 and i == len(table)-1:
+            # This is the last row and table must not be broken because it is too small. Consider entire table as header.
+            fout.write("\\endfirsthead\n")
+
 
     fout.close()
     return

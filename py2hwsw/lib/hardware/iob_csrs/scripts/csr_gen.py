@@ -1464,6 +1464,30 @@ not have any effect.
 """
         csrs_file.write(csrs_intro)
 
+        # Fix \hhline colors
+        csrs_file.write(r"""
+% Since \cline and \hhline dont work well with colored tables, we use this workaround to partially change colors of \hhline to match table's background.
+\newcommand{\customcsrshhline}{%
+  \hhline{|%
+    >{\arrayrulecolor{iob-green}}-%
+    >{\arrayrulecolor{black}}|%
+    >{\arrayrulecolor{iob-green}}-%
+    >{\arrayrulecolor{black}}|%
+    >{\arrayrulecolor{iob-green}}-%
+    >{\arrayrulecolor{black}}|%
+    >{\arrayrulecolor{black}}-%
+    >{\arrayrulecolor{black}}|%
+    >{\arrayrulecolor{black}}-%
+    >{\arrayrulecolor{black}}|%
+    >{\arrayrulecolor{iob-green}}-%
+    >{\arrayrulecolor{black}}|%
+    >{\arrayrulecolor{iob-green}}-%
+    >{\arrayrulecolor{black}}|%
+  }%
+  \arrayrulecolor{black}% reset
+}
+""")
+
         for doc_conf, doc_table in doc_tables.items():
             if create_subsections:
                 csrs_file.write(f"\\subsubsection{{{doc_conf} Configuration}}")
@@ -1471,13 +1495,16 @@ not have any effect.
             for csr_group in doc_table:
                 csrs_file.write(
                     """
+{
+\\setlength{\\LTcapwidth}{\\linewidth} % make sure the caption takes up the whole linewidth
 \\begin{xltabular}{\\textwidth}{|l|c|c|c|c|c|X|}
 
   \\hline
   \\rowcolor{iob-green}
   {\\bf Name} & {\\bf R/W} & {\\bf Addr} & \multicolumn{2}{c|}{\\bf Width} & {\\bf Default} & {\\bf Description} \\\\ 
-              &            &             & {\\bf Hw}       & {\\bf Sw}     &                &                    \\\\
-  \\hline
+  \\customcsrshhline
+  \\rowcolor{iob-green}
+              &            &             & {\\bf Hw}       & {\\bf Sw}     &                &                    \\\\ \\hline \\hline
 
   \\input """
                     + doc_conf
@@ -1492,6 +1519,7 @@ not have any effect.
                     + doc_conf
                     + f"_{csr_group.name}"
                     + """_csrs_tab:is}
+}
 """
                 )
 

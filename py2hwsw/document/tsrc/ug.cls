@@ -35,6 +35,7 @@
 \RequirePackage{lscape}
 \RequirePackage{longtable}
 \RequirePackage{xltabular}
+\RequirePackage{hhline}
 
 \ifdefined\DOXYGEN
 %% moved from doxygen.sty due to workaround for LaTex 2019 version and unmaintained tabu package

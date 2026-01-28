@@ -33,6 +33,7 @@ def generate_subblocks_table_tex(subblocks, out_dir):
   \\rowcolor{iob-green}
   {\\bf Name} & {\\bf Description}  \\\\ \\hline \\hline
   \\endfirsthead
+  \\hline
   \\caption{Core subblocks.}
   \\endlastfoot
 

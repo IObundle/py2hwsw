@@ -92,6 +92,7 @@ Note that the ouput signals are registered in the core, while the input signals 
   \\rowcolor{iob-green}
   {\\bf Name} & {\\bf Direction} & {\\bf Width} & {\\bf Description}  \\\\ \\hline \\hline
   \\endfirsthead
+  \\hline
   \\caption{"""
             + port.descr.replace("_", "\\_")
             + """}

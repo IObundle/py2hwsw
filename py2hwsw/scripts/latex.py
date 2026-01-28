@@ -33,10 +33,14 @@ def write_table(outfile, table, unbreakable_rows=4):
         for num in range(1, len(line)):
             line_out = line_out + (" & %s" % line[num])
 
-        # Insert special \nobreakhline at the end of unbreakable rows. This prevents latex from breaking the table into a new page on the first rows.
-        if i < unbreakable_rows-1:
+        if i == len(table)-1:
+            # Don't insert \\hline (or \nobreakhline) at the last row to prevent latex from breaking the table before footer
+            row_end = r"\\"
+        elif i < unbreakable_rows-1:
+            # Insert special \nobreakhline at the end of unbreakable rows. This prevents latex from breaking the table into a new page on the first rows.
             row_end = r"\\* \nobreakhline"
         else:
+            # Allow breaking into new page
             row_end = r"\\ \hline"
 
         # Write the line

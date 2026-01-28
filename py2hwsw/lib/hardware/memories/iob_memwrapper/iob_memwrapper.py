@@ -209,6 +209,7 @@ def generate_mems_tex(mems, out_dir):
       \\rowcolor{iob-green}
       {\\bf Name} & {\\bf Type} & {\\bf (Word-)Addr Width} & {\\bf Data Width} & {\\bf Init file} \\\\ \\hline
       \\endfirsthead
+      \\hline
       \\caption{Core memories.}
       \\endlastfoot
       \\input mems_tab

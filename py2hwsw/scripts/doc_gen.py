@@ -148,6 +148,7 @@ See the \\textit{Python Parameters} section of the \\href{https://github.com/IOb
   \\rowcolor{iob-green}
   {\\bf Name} & {\\bf Default Value} & {\\bf Description} \\\\ \\hline \\hline
   \\endfirsthead
+  \\hline
   \\caption{"""
             + group.descr.replace("_", "\\_")
             + """}

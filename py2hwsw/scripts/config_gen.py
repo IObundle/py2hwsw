@@ -184,6 +184,7 @@ The following tables describe the IP core configuration. The core may be configu
   \\rowcolor{iob-green}
   {\\bf Configuration} & {\\bf Type} & {\\bf Min} & {\\bf Typical} & {\\bf Max} & {\\bf Description} \\\\ \\hline \\hline
   \\endfirsthead
+  \\hline
   \\caption{"""
                 + group.descr.replace("_", "\\_")
                 + """}

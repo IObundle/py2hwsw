@@ -1506,6 +1506,7 @@ not have any effect.
   \\rowcolor{iob-green}
               &            &             & {\\bf Hw}       & {\\bf Sw}     &                &                    \\\\ \\hline \\hline
   \\endfirsthead
+  \\hline
   \\caption{"""
                     + csr_group.descr.replace("_", "\\_")
                     + """}

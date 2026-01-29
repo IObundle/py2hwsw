@@ -91,14 +91,16 @@ Note that the ouput signals are registered in the core, while the input signals 
   \\hline
   \\rowcolor{iob-green}
   {\\bf Name} & {\\bf Direction} & {\\bf Width} & {\\bf Description}  \\\\ \\hline \\hline
+  \\endfirsthead
+  \\hline
+  \\caption{"""
+            + port.descr.replace("_", "\\_")
+            + """}
+  \\endlastfoot
 
   \\input """
             + port.name
             + """_if_tab
-
-  \\caption{"""
-            + port.descr.replace("_", "\\_")
-            + """}
 \\end{xltabular}
 \\label{"""
             + port.name

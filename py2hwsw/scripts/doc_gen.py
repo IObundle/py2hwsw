@@ -147,14 +147,17 @@ See the \\textit{Python Parameters} section of the \\href{https://github.com/IOb
   \\hline
   \\rowcolor{iob-green}
   {\\bf Name} & {\\bf Default Value} & {\\bf Description} \\\\ \\hline \\hline
+  \\endfirsthead
+  \\hline
+  \\caption{"""
+            + group.descr.replace("_", "\\_")
+            + """}
+  \\endlastfoot
 
   \\input """
             + group.name
             + """_py_params_tab
 
-  \\caption{"""
-            + group.descr.replace("_", "\\_")
-            + """}
 \\end{xltabular}
 \\label{"""
             + group.name

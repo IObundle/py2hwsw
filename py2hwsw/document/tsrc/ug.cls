@@ -95,3 +95,11 @@
 
 \graphicspath{ {./figures/} }
 
+% Custom alternative to \hline that prevents latex from breaking table rows into new pages
+\makeatletter
+\def\nobreakhline{%
+  \multispan\LT@cols
+  \unskip\leaders\hrule\@height\arrayrulewidth\hfill\cr
+  \noalign{\penalty10000}%
+}
+\makeatother

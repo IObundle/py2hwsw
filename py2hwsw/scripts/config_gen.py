@@ -183,14 +183,17 @@ The following tables describe the IP core configuration. The core may be configu
   \\hline
   \\rowcolor{iob-green}
   {\\bf Configuration} & {\\bf Type} & {\\bf Min} & {\\bf Typical} & {\\bf Max} & {\\bf Description} \\\\ \\hline \\hline
+  \\endfirsthead
+  \\hline
+  \\caption{"""
+                + group.descr.replace("_", "\\_")
+                + """}
+  \\endlastfoot
 
   \\input """
                 + group.name
                 + """_confs_tab
 
-  \\caption{"""
-                + group.descr.replace("_", "\\_")
-                + """}
 \\end{xltabular}
 \\label{"""
                 + group.name

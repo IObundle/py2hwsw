@@ -9,42 +9,63 @@ timeout 900
 print "\n[minicom] Waiting for buildroot login..."
 expect {
     "buildroot login:"
-    timeout 300
+    timeout 300 goto on_timeout
 }
 
 send "root"
 
 expect {
     "#"
-    timeout 10
+    timeout 10 goto on_timeout
 }
 
 # Test iob_timer driver
 send "insmod /drivers/iob_timer.ko"
 expect {
     "#"
-    timeout 10
+    timeout 10 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with sysfs interface"
 send "./iob_timer_user_sysfs"
 expect {
     "#"
-    timeout 10
+    timeout 10 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with dev interface"
 send "./iob_timer_user_dev"
 expect {
     "#"
-    timeout 10
+    timeout 10 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with ioctl interface"
 send "./iob_timer_user_ioctl"
 expect {
     "#"
-    timeout 10
+    timeout 10 goto on_timeout
+}
+
+print "\n[minicom] Run auto-generated tests iob_timer with sysfs interface"
+send "./iob_timer_tests_sysfs"
+expect {
+    "#"
+    timeout 300 goto on_timeout
+}
+
+print "\n[minicom] Run auto-generated tests iob_timer with dev interface"
+send "./iob_timer_tests_dev"
+expect {
+    "#"
+    timeout 300 goto on_timeout
+}
+
+print "\n[minicom] Run auto-generated tests iob_timer with ioctl interface"
+send "./iob_timer_tests_ioctl"
+expect {
+    "#"
+    timeout 300 goto on_timeout
 }
 
 # Versat Linux tests
@@ -53,21 +74,21 @@ expect {
 # 
 # expect {
 #     "#"
-#     timeout 100
+#     timeout 100 goto on_timeout
 # }
 # 
 # send "./setupTest.sh"
 # 
 # expect {
 #     "#"
-#     timeout 100
+#     timeout 100 goto on_timeout
 # }
 # 
 # send "./test.sh && ./exampleTransfer.sh"
 # 
 # expect {
 #     "#"
-#     timeout 900
+#     timeout 900 goto on_timeout
 # }
 
 # Send test.log
@@ -79,3 +100,11 @@ print "\n[minicom] Done Test"
 
 # Exit minicom
 ! kill `cut -f4 -d' ' /proc/$PPID/stat`
+
+
+# Jump here when timeout is triggered
+on_timeout:
+  print "\n[minicom] Timeout reached. Exiting..."
+
+  # Exit minicom
+  ! kill `cut -f4 -d' ' /proc/$PPID/stat`

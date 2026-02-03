@@ -5,6 +5,9 @@
 import os
 from linux_utils import csr_type
 
+def escape(text):
+    return text.replace("_", r"\_")
+
 def create_driver_documentation(output_dir, peripheral):
     """Generate LaTeX documentation for the peripheral's driver."""
 
@@ -16,11 +19,13 @@ def create_driver_documentation(output_dir, peripheral):
     csrs = peripheral["csrs"]
 
     # Create the LaTeX file content
+
+    # Intro
     content = f"""
-This section provides a detailed description of the user-space software interface for the {peripheral['name']} peripheral.
+This section provides a detailed description of the Linux user-space software interface for the {escape(peripheral["name"])} peripheral.
 The software interface is designed to allow user-space applications to control and monitor the peripheral's Control and Status Registers (CSRs).
 
-The driver for the {peripheral['name']} peripheral provides three distinct interfaces for user-space applications:
+The driver for the {escape(peripheral["name"])} peripheral provides three distinct interfaces for user-space applications:
 \\begin{{itemize}}
     \\item The \\texttt{{/dev}} interface, which allows direct read/write access to the peripheral's registers through a device file.
     \\item The \\texttt{{ioctl}} interface, which uses I/O control commands to interact with the peripheral.
@@ -28,15 +33,17 @@ The driver for the {peripheral['name']} peripheral provides three distinct inter
 \\end{{itemize}}
 
 The following sections describe each of these interfaces in detail.
+"""
 
+    content = f"""
 \\subsection{{User-Space API}}
 
-The user-space API provides a set of functions to interact with the {peripheral['name']} peripheral. These functions are available for each of the three interfaces.
+The user-space API provides a set of functions to interact with the {escape(peripheral["name"])} peripheral. These functions are available for each of the three interfaces.
 
 The following header files must be included in your user-space application to use the API:
 \\begin{{itemize}}
-    \\item \\texttt{{{peripheral['name']}_driver_files.h}}
-    \\item \\texttt{{{peripheral['name']}_csrs.h}}
+    \\item \\texttt{{{escape(peripheral["name"])}\\_driver\\_files.h}}
+    \\item \\texttt{{{escape(peripheral["name"])}\\_csrs.h}}
 \\end{{itemize}}
 
 Before using any of the API functions, you must initialize the library by calling the following function:
@@ -47,7 +54,7 @@ For the \\texttt{{/dev}} and \\texttt{{ioctl}} interfaces, this function opens t
 
 \\subsubsection{{/dev Interface}}
 
-The \\texttt{{/dev}} interface allows direct access to the peripheral's registers through the device file \\texttt{{/dev/{peripheral['name']}}}.
+The \\texttt{{/dev}} interface allows direct access to the peripheral's registers through the device file \\texttt{{/dev/{escape(peripheral["name"])}}}.
 The following functions are provided to interact with the peripheral's CSRs:
 """
 
@@ -59,22 +66,22 @@ The following functions are provided to interact with the peripheral's CSRs:
         if "W" in csr_mode:
             content += f"""
 
-\\paragraph{{{peripheral['name']}_csrs_set_{csr_name}}}
+\\paragraph{{{escape(peripheral["name"])}\\_csrs\\_set\\_{escape(csr_name)}}}
 \\begin{{verbatim}}
 void {peripheral['name']}_csrs_set_{csr_name}({data_type} value);
 \\end{{verbatim}}
-This function writes the given value to the \\texttt{{{csr_name}}} CSR.
+This function writes the given value to the \\texttt{{{escape(csr_name)}}} CSR.
 
 """
 
         if "R" in csr_mode:
             content += f"""
 
-\\paragraph{{{peripheral['name']}_csrs_get_{csr_name}}}
+\\paragraph{{{escape(peripheral["name"])}\\_csrs\\_get\\_{escape(csr_name)}}}
 \\begin{{verbatim}}
 {data_type} {peripheral['name']}_csrs_get_{csr_name}();
 \\end{{verbatim}}
-This function reads the current value of the \\texttt{{{csr_name}}} CSR and returns it.
+This function reads the current value of the \\texttt{{{escape(csr_name)}}} CSR and returns it.
 
 """
 
@@ -87,12 +94,13 @@ The functions provided for this interface are identical to the \texttt{/dev} int
 The following IOCTL commands are defined for each CSR:
 \begin{itemize}"""
     for csr in csrs:
-        csr_name = csr["name"].upper()
+        csr_name = escape(csr["name"])
+        CSR_NAME = escape(csr["name"].upper())
         csr_mode = csr["mode"]
         if "W" in csr_mode:
-            content += f"    \\item \\texttt{{WR_{{{csr_name}}}}}: Write to the {csr['name']} CSR.\\\\ \n"
+            content += f"    \\item \\texttt{{WR\\_{{{CSR_NAME}}}}}: Write to the {csr_name} CSR.\\\\ \n"
         if "R" in csr_mode:
-            content += f"    \\item \\texttt{{RD_{{{csr_name}}}}}: Read from the {csr['name']} CSR.\\\\ \n"
+            content += f"    \\item \\texttt{{RD\\_{{{CSR_NAME}}}}}: Read from the {csr_name} CSR.\\\\ \n"
 
     content += f"""\\end{{itemize}}
 
@@ -109,10 +117,10 @@ The CSRs are exposed as files in the following directory:
 The following files are available for each CSR:
 \\begin{{itemize}}"""
     for csr in csrs:
-        csr_name = csr["name"]
+        csr_name = escape(csr["name"])
         csr_mode = csr["mode"]
         if "W" in csr_mode or "R" in csr_mode:
-            content += f"    \\item \\texttt{{{csr_name}}}: Access the {csr_name} CSR. (Mode: {csr_mode})\\\\ \n"
+            content += f"    \\item \\texttt{{{csr_name}}}: Access the {csr_name} CSR. (Mode: {escape(csr_mode)})\\\\ \n"
 
     content += f"""
 \\end{{itemize}}
@@ -120,7 +128,7 @@ The following files are available for each CSR:
 \\subsection{{Tests}}
 
 A test suite is provided to verify the functionality and performance of the driver interfaces.
-The test source code is located in `user/{peripheral['name']}_tests.c`.
+The test source code is located in `user/{escape(peripheral["name"])}\\_tests.c`.
 
 \\paragraph{{Building the tests}}
 The tests can be built using the `Makefile` in the `user` directory by setting the `BIN` variable:
@@ -147,9 +155,6 @@ The test suite includes:
     \\item \\textbf{{Performance tests:}} Measure the time taken for a large number of read and write operations to evaluate the interface performance.
 \\end{{itemize}}
 """
-
-    # Escape special latex characters
-    content = content.replace("_", "\\_")
 
     # Write the content to the file
     with open(file_path, "w") as f:

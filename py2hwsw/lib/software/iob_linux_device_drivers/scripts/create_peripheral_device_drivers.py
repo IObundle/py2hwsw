@@ -9,6 +9,8 @@ from math import ceil
 
 from create_peripheral_tests import create_peripheral_tests
 from create_device_tree_files import create_device_tree_files
+from create_driver_documentation import create_driver_documentation
+from linux_utils import csr_type
 
 SPDX_PREFIX = "SPDX-"
 
@@ -106,23 +108,6 @@ def generate_ioctl_defines(name, csrs):
 """
             i += 1
     return content
-
-def csr_type(n_bits):
-    type_dict = {8: "uint8_t", 16: "uint16_t", 32: "uint32_t"}
-    try:
-        n_bits = int(n_bits)
-
-        for type_try in type_dict:
-            if n_bits <= type_try:
-                return type_dict[type_try]
-    except:
-        pass
-
-    # If its not an integer, or its too big, default to 32
-    # NOTE: Ideally, we should try to evaluate verilog parameters contained in n_bits.
-    #       The best solution would be to obatin the evaluated value from the iob_csrs module directly.
-    #       But currently py2hwsw does not have an easy mechanism to do that.
-    return "uint32_t"
 
 ###############################################
 #                                             #
@@ -1055,9 +1040,12 @@ clean:
 
 
 def generate_device_drivers(
-    output_dir, peripheral, py2hwsw_version, dts_extra_properties
+    build_dir, peripheral, py2hwsw_version, dts_extra_properties
 ):
     """Generate device driver files for a peripheral"""
+
+    drivers_output_dir = os.path.join(build_dir, "software/linux")
+    drivers_doc_dir = os.path.join(build_dir, "document/tsrc")
 
     # Find 'iob_csrs' subblock
     for block in peripheral["subblocks"]:
@@ -1120,21 +1108,26 @@ def generate_device_drivers(
     }
     _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"
 
-    print("Generating device drivers for", _peripheral["name"], "in", output_dir)
+    print("Generating device drivers for", _peripheral["name"], "in", drivers_output_dir)
 
     # Create directory structure
-    os.makedirs(os.path.join(output_dir, "drivers"), exist_ok=True)
-    os.makedirs(os.path.join(output_dir, "user"), exist_ok=True)
+    os.makedirs(os.path.join(drivers_output_dir, "drivers"), exist_ok=True)
+    os.makedirs(os.path.join(drivers_output_dir, "user"), exist_ok=True)
 
     # Create files
-    create_readme_file(output_dir, _peripheral)
-    create_driver_mk_file(os.path.join(output_dir, "drivers"), _peripheral)
-    create_driver_header_file_list(os.path.join(output_dir, "drivers"), _peripheral)
-    create_sysfs_driver_header_file(os.path.join(output_dir, "drivers"), _peripheral)
-    create_driver_main_file(os.path.join(output_dir, "drivers"), _peripheral)
-    create_sysfs_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
-    create_dev_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
-    create_ioctl_user_csrs_source(os.path.join(output_dir, "user"), _peripheral)
-    create_user_makefile(os.path.join(output_dir, "user"), _peripheral)
-    create_peripheral_tests(os.path.join(output_dir, "user"), _peripheral)
-    create_device_tree_files(output_dir, _peripheral, dts_extra_properties)
+    create_readme_file(drivers_output_dir, _peripheral)
+    create_driver_mk_file(os.path.join(drivers_output_dir, "drivers"), _peripheral)
+    create_driver_header_file_list(os.path.join(drivers_output_dir, "drivers"), _peripheral)
+    create_sysfs_driver_header_file(os.path.join(drivers_output_dir, "drivers"), _peripheral)
+    create_driver_main_file(os.path.join(drivers_output_dir, "drivers"), _peripheral)
+    create_sysfs_user_csrs_source(os.path.join(drivers_output_dir, "user"), _peripheral)
+    create_dev_user_csrs_source(os.path.join(drivers_output_dir, "user"), _peripheral)
+    create_ioctl_user_csrs_source(os.path.join(drivers_output_dir, "user"), _peripheral)
+    create_user_makefile(os.path.join(drivers_output_dir, "user"), _peripheral)
+    create_peripheral_tests(os.path.join(drivers_output_dir, "user"), _peripheral)
+    create_device_tree_files(drivers_output_dir, _peripheral, dts_extra_properties)
+
+
+    print("Generating device drivers documentation for", _peripheral["name"], "in", drivers_doc_dir)
+
+    create_driver_documentation(drivers_doc_dir, _peripheral)

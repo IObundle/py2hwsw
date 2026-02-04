@@ -1465,7 +1465,8 @@ not have any effect.
         csrs_file.write(csrs_intro)
 
         # Fix \hhline colors
-        csrs_file.write(r"""
+        csrs_file.write(
+            r"""
 % Since \cline and \hhline dont work well with colored tables, we use this workaround to partially change colors of \hhline to match table's background.
 \newcommand{\customcsrshhline}{%
   \hhline{|%
@@ -1486,7 +1487,8 @@ not have any effect.
   }%
   \arrayrulecolor{black}% reset
 }
-""")
+"""
+        )
 
         for doc_conf, doc_table in doc_tables.items():
             if create_subsections:

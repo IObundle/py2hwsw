@@ -5,8 +5,10 @@
 import os
 from linux_utils import csr_type
 
+
 def escape(text):
     return text.replace("_", r"\_")
+
 
 def create_driver_documentation(output_dir, peripheral):
     """Generate LaTeX documentation for the peripheral's driver."""
@@ -79,7 +81,9 @@ The following CSRs are available through this interface:
     for csr in csrs:
         csr_name = escape(csr["name"])
         upper_csr_name = escape(csr["name"].upper())
-        addr_macro = f"{escape(peripheral['upper_name'])}\\_CSRS\\_{upper_csr_name}\\_ADDR"
+        addr_macro = (
+            f"{escape(peripheral['upper_name'])}\\_CSRS\\_{upper_csr_name}\\_ADDR"
+        )
         csr_mode = escape(csr["mode"])
         content += f"    \\item \\texttt{{{csr_name}}}: Address: \\texttt{{{addr_macro}}}, Access: {csr_mode}\n"
 

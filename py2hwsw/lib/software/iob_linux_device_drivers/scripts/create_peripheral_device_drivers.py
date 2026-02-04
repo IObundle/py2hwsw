@@ -109,6 +109,7 @@ def generate_ioctl_defines(name, csrs):
             i += 1
     return content
 
+
 ###############################################
 #                                             #
 #       Interface specific functions          #
@@ -1118,7 +1119,9 @@ def generate_device_drivers(
     }
     _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"
 
-    print("Generating device drivers for", _peripheral["name"], "in", drivers_output_dir)
+    print(
+        "Generating device drivers for", _peripheral["name"], "in", drivers_output_dir
+    )
 
     # Create directory structure
     os.makedirs(os.path.join(drivers_output_dir, "drivers"), exist_ok=True)
@@ -1127,8 +1130,12 @@ def generate_device_drivers(
     # Create files
     create_readme_file(drivers_output_dir, _peripheral)
     create_driver_mk_file(os.path.join(drivers_output_dir, "drivers"), _peripheral)
-    create_driver_header_file_list(os.path.join(drivers_output_dir, "drivers"), _peripheral)
-    create_sysfs_driver_header_file(os.path.join(drivers_output_dir, "drivers"), _peripheral)
+    create_driver_header_file_list(
+        os.path.join(drivers_output_dir, "drivers"), _peripheral
+    )
+    create_sysfs_driver_header_file(
+        os.path.join(drivers_output_dir, "drivers"), _peripheral
+    )
     create_driver_main_file(os.path.join(drivers_output_dir, "drivers"), _peripheral)
     create_sysfs_user_csrs_source(os.path.join(drivers_output_dir, "user"), _peripheral)
     create_dev_user_csrs_source(os.path.join(drivers_output_dir, "user"), _peripheral)
@@ -1137,7 +1144,11 @@ def generate_device_drivers(
     create_peripheral_tests(os.path.join(drivers_output_dir, "user"), _peripheral)
     create_device_tree_files(drivers_output_dir, _peripheral, dts_extra_properties)
 
-
-    print("Generating device drivers documentation for", _peripheral["name"], "in", drivers_doc_dir)
+    print(
+        "Generating device drivers documentation for",
+        _peripheral["name"],
+        "in",
+        drivers_doc_dir,
+    )
 
     create_driver_documentation(drivers_doc_dir, _peripheral)

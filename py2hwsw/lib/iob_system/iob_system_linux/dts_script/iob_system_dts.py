@@ -120,9 +120,7 @@ def generate_dts(dts_parameters):
 """
 
     # Write DTS file
-    os.makedirs(
-        os.path.join(dts_parameters["build_dir"], "software"), exist_ok=True
-    )
+    os.makedirs(os.path.join(dts_parameters["build_dir"], "software"), exist_ok=True)
     with open(
         os.path.join(
             dts_parameters["build_dir"],

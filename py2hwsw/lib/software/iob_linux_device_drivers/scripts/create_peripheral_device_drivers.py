@@ -32,8 +32,8 @@ def create_readme_file(path, peripheral):
           compilation
     - `user/`: directory with user application example that uses {peripheral['name']}
       drivers
-        - `{peripheral['name']}_user.c`: example user application that uses {peripheral['name']}
-          drivers
+        - `{peripheral['name']}_user.c`: user space application that uses {peripheral['name']}
+          drivers. Example provided for some cores.
         - `Makefile`: user application compilation targets
     - `{peripheral['name']}.dts`: device tree template with {peripheral['name']} node
         - manually add the `{peripheral['name']}` node to the system device tree so the
@@ -593,17 +593,27 @@ def create_driver_header_file_list(path, peripheral):
 
     fswhdr.write(f"#ifndef H_{core_prefix}_DRIVER_FILES_H\n")
     fswhdr.write(f"#define H_{core_prefix}_DRIVER_FILES_H\n\n")
-    fswhdr.write(f'#define {core_prefix}_DRIVER_NAME "{top}"\n')
-    fswhdr.write(f'#define {core_prefix}_DRIVER_CLASS "{top}"\n')
-    fswhdr.write(f'#define {core_prefix}_DEVICE_FILE "/dev/{top}"\n')
+
+    fswhdr.write("/** @file\n")
+    fswhdr.write(f" *  @brief {top} driver file paths.\n")
+    fswhdr.write(" */\n\n")
+
+    fswhdr.write(f'#define {core_prefix}_DRIVER_NAME "{top}" /**< Driver name. */\n')
+    fswhdr.write(f'#define {core_prefix}_DRIVER_CLASS "{top}" /**< Driver class. */\n')
     fswhdr.write(
-        f'#define {core_prefix}_DEVICE_CLASS "/sys/class/" {core_prefix}_DRIVER_CLASS "/" {core_prefix}_DRIVER_NAME\n\n'
+        f'#define {core_prefix}_DEVICE_FILE "/dev/{top}" /**< Device file path. */\n'
+    )
+    fswhdr.write(
+        f'#define {core_prefix}_DEVICE_CLASS "/sys/class/" {core_prefix}_DRIVER_CLASS "/" {core_prefix}_DRIVER_NAME /**< Device class path. */\n\n'
     )
 
+    fswhdr.write("/**\n")
+    fswhdr.write(" * @brief System file paths for CSRs.\n")
+    fswhdr.write(" */\n")
     for csr in peripheral["csrs"]:
         CSR_NAME = csr["name"].upper()
         fswhdr.write(
-            f'#define {core_prefix}_SYSFILE_{CSR_NAME} {core_prefix}_DEVICE_CLASS "/{csr["name"].lower()}"\n'
+            f'#define {core_prefix}_SYSFILE_{CSR_NAME} {core_prefix}_DEVICE_CLASS "/{csr["name"].lower()}" /**< System file path for {csr["name"]} CSR. */\n'
         )
     fswhdr.write("\n")
 

@@ -22,23 +22,35 @@ def create_driver_documentation(output_dir, peripheral):
 
     # Intro
     content = f"""
-This section provides a detailed description of the Linux user-space software interface for the {escape(peripheral["name"])} peripheral.
-The software interface is designed to allow user-space applications to control and monitor the peripheral's Control and Status Registers (CSRs).
+This section describes the Linux driver for the {escape(peripheral["name"])} peripheral.
+It includes details about the main kernel module, the kernel-user space interfaces it provides for interacting with the peripheral's Control and Status Registers (CSRs), and the available tests to verify the driver's functionality.
 
-The driver for the {escape(peripheral["name"])} peripheral provides three distinct interfaces for user-space applications:
+The driver consists of:
 \\begin{{itemize}}
-    \\item The \\texttt{{/dev}} interface, which allows direct read/write access to the peripheral's registers through a device file.
-    \\item The \\texttt{{ioctl}} interface, which uses I/O control commands to interact with the peripheral.
-    \\item The \\texttt{{sysfs}} interface, which exposes the peripheral's registers as files in the system's file system.
+    \\item A kernel module, implemented in \\texttt{{{escape(peripheral["name"])}\\_main.c}}, which is the core of the driver.
+    \\item Three distinct kernel-user space interfaces: \\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}.
+    \\item A set of user-space functions with a common API to access the CSRs through any of the interfaces.
+    \\item A test suite to validate the driver and the interfaces.
 \\end{{itemize}}
-
-The following sections describe each of these interfaces in detail.
 """
 
-    content = f"""
-\\subsection{{User-Space API}}
+    content += f"""
+\\subsection{{Kernel Module}}
 
-The user-space API provides a set of functions to interact with the {escape(peripheral["name"])} peripheral. These functions are available for each of the three interfaces.
+The main source code for the kernel module is located in the \\texttt{{{escape(peripheral["name"])}\\_main.c}} file.
+This module is implemented as a platform driver, which is responsible for probing and initializing the peripheral device based on information from the device tree.
+When the device is detected, the driver maps the peripheral's memory-mapped registers and creates the necessary user-space interfaces (\\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}).
+It also implements the file operations (e.g., \\texttt{{read}}, \\texttt{{write}}, \\texttt{{ioctl}}) for the \\texttt{{/dev}} and \\texttt{{ioctl}} interfaces.
+"""
+
+    content += f"""
+\\subsection{{Userspace Interfaces}}
+
+The driver provides three distinct interfaces for user-space applications to interact with the {escape(peripheral["name"])} peripheral: \\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}.
+All three interfaces use a common set of user-space functions to access the CSRs, with function prototypes that are similar to those of the bare-metal drivers, providing a consistent API.
+\\ifdefined\\DOXYGEN
+The baremetal function prototypes are documented in Section~\\ref{{sec:baremetal}}.
+\\fi
 
 The following header files must be included in your user-space application to use the API:
 \\begin{{itemize}}
@@ -52,44 +64,32 @@ void {peripheral['name']}_csrs_init_baseaddr(uint32_t addr);
 \\end{{verbatim}}
 For the \\texttt{{/dev}} and \\texttt{{ioctl}} interfaces, this function opens the device file. For the \\texttt{{sysfs}} interface, this function does nothing.
 
+The following sections describe each of these interfaces in detail.
+"""
+
+    content += f"""
 \\subsubsection{{/dev Interface}}
 
 The \\texttt{{/dev}} interface allows direct access to the peripheral's registers through the device file \\texttt{{/dev/{escape(peripheral["name"])}}}.
-The following functions are provided to interact with the peripheral's CSRs:
-"""
+Access to the CSRs is performed by seeking to the appropriate address offset using \\texttt{{lseek()}} and then using \\texttt{{read()}} or \\texttt{{write()}} to access the register.
 
+The following CSRs are available through this interface:
+\\begin{{itemize}}
+"""
     for csr in csrs:
-        csr_name = csr["name"]
-        csr_mode = csr["mode"]
-        data_type = csr_type(csr["n_bits"])
+        csr_name = escape(csr["name"])
+        upper_csr_name = escape(csr["name"].upper())
+        addr_macro = f"{escape(peripheral['upper_name'])}\\_CSRS\\_{upper_csr_name}\\_ADDR"
+        csr_mode = escape(csr["mode"])
+        content += f"    \\item \\texttt{{{csr_name}}}: Address: \\texttt{{{addr_macro}}}, Access: {csr_mode}\n"
 
-        if "W" in csr_mode:
-            content += f"""
-
-\\paragraph{{{escape(peripheral["name"])}\\_csrs\\_set\\_{escape(csr_name)}}}
-\\begin{{verbatim}}
-void {peripheral['name']}_csrs_set_{csr_name}({data_type} value);
-\\end{{verbatim}}
-This function writes the given value to the \\texttt{{{escape(csr_name)}}} CSR.
-
-"""
-
-        if "R" in csr_mode:
-            content += f"""
-
-\\paragraph{{{escape(peripheral["name"])}\\_csrs\\_get\\_{escape(csr_name)}}}
-\\begin{{verbatim}}
-{data_type} {peripheral['name']}_csrs_get_{csr_name}();
-\\end{{verbatim}}
-This function reads the current value of the \\texttt{{{escape(csr_name)}}} CSR and returns it.
-
-"""
+    content += "\\end{itemize}"
 
     content += r"""
 \subsubsection{ioctl Interface}
 
 The \texttt{ioctl} interface uses I/O control commands to interact with the peripheral.
-The functions provided for this interface are identical to the \texttt{/dev} interface functions.
+The function prototypes provided for this interface are identical to the \texttt{/dev} interface functions.
 
 The following IOCTL commands are defined for each CSR:
 \begin{itemize}"""
@@ -98,16 +98,16 @@ The following IOCTL commands are defined for each CSR:
         CSR_NAME = escape(csr["name"].upper())
         csr_mode = csr["mode"]
         if "W" in csr_mode:
-            content += f"    \\item \\texttt{{WR\\_{{{CSR_NAME}}}}}: Write to the {csr_name} CSR.\\\\ \n"
+            content += f"    \\item \\texttt{{WR\\_{{{CSR_NAME}}}}}: Write to the {csr_name} CSR.\n"
         if "R" in csr_mode:
-            content += f"    \\item \\texttt{{RD\\_{{{CSR_NAME}}}}}: Read from the {csr_name} CSR.\\\\ \n"
+            content += f"    \\item \\texttt{{RD\\_{{{CSR_NAME}}}}}: Read from the {csr_name} CSR.\n"
 
     content += f"""\\end{{itemize}}
 
 \\subsubsection{{sysfs Interface}}
 
 The \\texttt{{sysfs}} interface exposes the peripheral's registers as files in the system's file system.
-The functions provided for this interface are identical to the \\texttt{{/dev}} interface functions.
+The functions prototypes provided for this interface are identical to the \\texttt{{/dev}} interface functions.
 
 The CSRs are exposed as files in the following directory:
 \\begin{{verbatim}}
@@ -118,12 +118,30 @@ The following files are available for each CSR:
 \\begin{{itemize}}"""
     for csr in csrs:
         csr_name = escape(csr["name"])
-        csr_mode = csr["mode"]
+        csr_mode = escape(csr["mode"])
         if "W" in csr_mode or "R" in csr_mode:
-            content += f"    \\item \\texttt{{{csr_name}}}: Access the {csr_name} CSR. (Mode: {escape(csr_mode)})\\\\ \n"
+            content += f"    \\item \\texttt{{{csr_name}}}: Access the {csr_name} CSR. (Mode: {escape(csr_mode)})\n"
 
     content += f"""
 \\end{{itemize}}
+
+\\subsection{{Userspace Application}}
+
+User space applications can be developed to interact with the peripheral's driver interfaces. An example application, \\texttt{{user/{escape(peripheral["name"])}\\_user.c}}, is provided for some cores.
+Otherwise, the auto-generated test application, \\texttt{{user/{escape(peripheral["name"])}\\_tests.c}}, can serve as a reference for creating custom user-space applications.
+
+\\paragraph{{Building an application}}
+User-space applications can be built using the \\texttt{{Makefile}} located in the \\texttt{{user}} directory. You need to specify the name of your application's source file (without the \\texttt{{.c}} extension) and the desired interface.
+\\begin{{verbatim}}
+make BIN=<your_app_name> IF=<interface>
+\\end{{verbatim}}
+The \\texttt{{IF}} variable can be set to \\texttt{{sysfs}}, \\texttt{{dev}}, or \\texttt{{ioctl}} to build the application for the corresponding interface. For example, to build an application from a source file named \\texttt{{my\\_app.c}}, you would run \\texttt{{make BIN=my\\_app IF=sysfs}}.
+
+\\paragraph{{Running the application}}
+To run the application, execute the compiled binary in the target Linux system, replacing \\texttt{{<your\\_app\\_name>}} and \\texttt{{<interface>}} with the ones you selected during the build:
+\\begin{{verbatim}}
+./<your_app_name>_<interface>
+\\end{{verbatim}}
 
 \\subsection{{Tests}}
 
@@ -131,22 +149,16 @@ A test suite is provided to verify the functionality and performance of the driv
 The test source code is located in `user/{escape(peripheral["name"])}\\_tests.c`.
 
 \\paragraph{{Building the tests}}
-The tests can be built using the `Makefile` in the `user` directory by setting the `BIN` variable:
+The tests can be built using the `Makefile` in the `user` directory by setting the `BIN` variable to \\texttt{{{escape(peripheral["name"])}\\_tests}}:
 \\begin{{verbatim}}
 make BIN={peripheral['name']}_tests IF=<interface>
 \\end{{verbatim}}
 The `IF` variable can be set to `sysfs`, `dev`, or `ioctl` to test the corresponding interface.
 
-Alternatively, a dedicated makefile `user/Makefile-tests` is provided. You can edit this file to select the desired interface.
-
 \\paragraph{{Running the tests}}
-To run the tests, execute the compiled binary:
+To run the tests, execute the compiled binary in the target Linux system, replacing \\texttt{{<interface>}} with the one you selected during build:
 \\begin{{verbatim}}
-./{peripheral['name']}_tests
-\\end{{verbatim}}
-If using `Makefile-tests`, you can simply run:
-\\begin{{verbatim}}
-make -f user/Makefile-tests run
+./{peripheral['name']}_tests_<interface>
 \\end{{verbatim}}
 
 The test suite includes:

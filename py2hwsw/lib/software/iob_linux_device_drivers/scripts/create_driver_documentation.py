@@ -164,6 +164,7 @@ To run the tests, execute the compiled binary in the target Linux system, replac
 The test suite includes:
 \\begin{{itemize}}
     \\item \\textbf{{Functionality tests:}} Verify that writing to and reading from Control and Status Registers (CSRs) works correctly.
+    \\item \\textbf{{Error Handling tests:}} Simulate faults and verify that appropriate error messages are generated.
     \\item \\textbf{{Performance tests:}} Measure the time taken for a large number of read and write operations to evaluate the interface performance.
 \\end{{itemize}}
 """

@@ -1150,5 +1150,6 @@ def generate_device_drivers(
         "in",
         drivers_doc_dir,
     )
+    os.makedirs(drivers_doc_dir, exist_ok=True)
 
     create_driver_documentation(drivers_doc_dir, _peripheral)

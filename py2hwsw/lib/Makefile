@@ -242,9 +242,10 @@ endif
 	# NOTE: These commands dont use board_client.py to grab the FPGA board. May cause conflicts with shared FPGAs.
 	# They dont grab the board, since its meant to be used with an already grabbed fpga running a linux instance.
 	$(SSH_START) cd $(REMOTE_BUILD_DIR)/software/linux;\
-	echo "rz -o /drivers" > $(BOARD_SERIAL_PORT) && sz drivers/$(CORE).ko > $(BOARD_SERIAL_PORT);\
+	echo "rz -o /drivers" > $(BOARD_SERIAL_PORT) && sz -y drivers/$(CORE).ko < $(BOARD_SERIAL_PORT) > $(BOARD_SERIAL_PORT);\
 	for file in "$(CORE)_user_sysfs" "$(CORE)_user_dev" "$(CORE)_user_ioctl" "$(CORE)_tests_sysfs" "$(CORE)_tests_dev" "$(CORE)_tests_ioctl"; do\
-		echo "rz -o /root" > $(BOARD_SERIAL_PORT) && sz user/$$file > $(BOARD_SERIAL_PORT);\
-	done $(SSH_END)
+		echo "rz -o /root" > $(BOARD_SERIAL_PORT) && sz -y user/$$file < $(BOARD_SERIAL_PORT) > $(BOARD_SERIAL_PORT);\
+	done;\
+	echo "modprobe /drivers/$(CORE).ko" > $(BOARD_SERIAL_PORT) $(SSH_END)
 
 .PHONY: running_system_upload

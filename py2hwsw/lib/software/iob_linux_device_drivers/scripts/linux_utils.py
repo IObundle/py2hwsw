@@ -11,7 +11,7 @@ def csr_type(n_bits):
         for type_try in type_dict:
             if n_bits <= type_try:
                 return type_dict[type_try]
-    except:
+    except (ValueError, TypeError):
         pass
 
     # If its not an integer, or its too big, default to 32

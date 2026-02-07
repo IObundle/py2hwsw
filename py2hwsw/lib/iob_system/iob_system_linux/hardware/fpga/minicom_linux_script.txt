@@ -15,7 +15,7 @@ expect {
     timeout 300 goto on_timeout
 }
 
-print "\n[minicom] Detected login prompt. Logging in...""
+print "\n[minicom] Detected login prompt. Logging in..."
 
 send "root"
 
@@ -26,10 +26,10 @@ expect {
 
 post_login:
 
-print "\n[minicom] Logged in. Running tests..."""
+print "\n[minicom] Logged in. Running tests..."
 
-# Test iob_timer driver
-send "insmod /drivers/iob_timer.ko"
+# Test iob_timer driver (unloading first it if it has already been loaded before)
+send "rmmod iob_timer 2>/dev/null; insmod /drivers/iob_timer.ko"
 expect {
     "#"
     timeout 10 goto on_timeout

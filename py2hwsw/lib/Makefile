@@ -195,7 +195,7 @@ buildroot-update:
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-buildroot'
 	# Copy rootfs to iob_system_linux
 	cp $(LINUX_SUBMODULE_DIR)/software/OS_build/rootfs.cpio.gz iob_system/iob_system_linux/software/src/rootfs.cpio.gz
-ifneq (SOC_LINUX_BUILD_DIR,)
+ifneq ($(SOC_LINUX_BUILD_DIR),)
 	# Copy it to existing soc_linux build dir. Re-running soc_linux on fpga without rebuilding, will cause it to upload this new version of rootfs.
 	cp iob_system/iob_system_linux/software/src/rootfs.cpio.gz $(SOC_LINUX_BUILD_DIR)/hardware/fpga/rootfs.cpio.gz
 endif

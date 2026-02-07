@@ -100,6 +100,7 @@ ugtop.tex:
 	if [ $(ASICSYNTH) == 1 ]; then echo "\def\ASICSYNTH{Y}" >> $@; fi
 	if [ $(FPGACOMP) == 1 ]; then echo "\def\FPGACOMP{Y}" >> $@; fi
 	if [ $(DOXYGEN) == 1 ]; then echo "\def\DOXYGEN{Y}" >> $@; fi
+	if ls linux.tex > /dev/null 2>&1; then echo "\def\LINUX{Y}" >> $@; fi
 	if [ $(CONFIDENTIAL) == 1 ]; then echo "\def\CONFIDENTIAL{Y}" >> $@; fi
 	make doctop DOC=ug
 

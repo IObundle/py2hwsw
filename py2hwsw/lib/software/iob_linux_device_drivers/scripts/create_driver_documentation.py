@@ -13,9 +13,7 @@ def escape(text):
 def create_driver_documentation(output_dir, peripheral):
     """Generate LaTeX documentation for the peripheral's driver."""
 
-    print(f"output_dir: {output_dir}")
     file_path = os.path.join(output_dir, "linux.tex")
-    print(f"Creating file: {file_path}")
 
     # Get the list of CSRs
     csrs = peripheral["csrs"]

@@ -345,8 +345,6 @@ int test_performance_{csr['name']}_write() {{
 
     content += f"""
 int main() {{
-    int ret = 0;
-
     // Run error handling tests that manage their own file descriptors first
 #if defined(DEV_IF)
     RUN_TEST(test_error_concurrent_open);
@@ -403,13 +401,7 @@ int main() {{
             break  # Only call one read performance test
 
     content += """
-    if (ret) {
-        printf("Tests failed!\\n");
-    } else {
-        printf("All tests passed!\\n");
-    }
-
-    return ret;
+    printf("All tests passed!\\n");
 }
 """
 

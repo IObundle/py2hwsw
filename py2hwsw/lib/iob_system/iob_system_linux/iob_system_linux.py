@@ -9,9 +9,7 @@ import shutil
 # Add iob-system scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../scripts"))
 # Add iob-system-linux scripts folder to python path
-sys.path.append(
-    os.path.join(os.path.dirname(os.path.abspath(__file__)), "dts_script")
-)  # FIXME: Move this to scripts/ folder
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")) 
 
 from iob_system_utils import update_params
 from iob_system_dts import generate_dts

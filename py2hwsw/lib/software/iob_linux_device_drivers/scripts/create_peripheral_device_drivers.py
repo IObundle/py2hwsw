@@ -1011,7 +1011,7 @@ def create_user_makefile(path, peripheral):
 # {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
 
 # Select kernel-userspace interface: sysfs; dev; ioctl
-IF = sysfs
+IF ?= sysfs
 UPPER_IF = $(shell echo $(IF) | tr '[:lower:]' '[:upper:]')
 SRC = $(BIN).c {peripheral['name']}_$(IF)_csrs.c
 SRC += $(wildcard ../../src/{peripheral['name']}.c)

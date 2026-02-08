@@ -29,7 +29,7 @@ The driver consists of:
 \\begin{{itemize}}
     \\item A kernel module, implemented in \\texttt{{{escape(peripheral["name"])}\\_main.c}}, which is the core of the driver.
     \\item Three distinct kernel-user space interfaces: \\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}.
-    \\item A set of user-space functions with a common API to access the CSRs through any of the interfaces.
+    \\item A set of user space functions with a common API to access the CSRs through any of the interfaces.
     \\item A test suite to validate the driver and the interfaces.
 \\end{{itemize}}
 """
@@ -39,20 +39,20 @@ The driver consists of:
 
 The main source code for the kernel module is located in the \\texttt{{{escape(peripheral["name"])}\\_main.c}} file.
 This module is implemented as a platform driver, which is responsible for probing and initializing the peripheral device based on information from the device tree.
-When the device is detected, the driver maps the peripheral's memory-mapped registers and creates the necessary user-space interfaces (\\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}).
+When the device is detected, the driver maps the peripheral's memory-mapped registers and creates the necessary user space interfaces (\\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}).
 It also implements the file operations (e.g., \\texttt{{read}}, \\texttt{{write}}, \\texttt{{ioctl}}) for the \\texttt{{/dev}} and \\texttt{{ioctl}} interfaces.
 """
 
     content += f"""
-\\subsection{{Userspace Interfaces}}
+\\subsection{{User Space Interfaces}}
 
-The driver provides three distinct interfaces for user-space applications to interact with the {escape(peripheral["name"])} peripheral: \\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}.
-All three interfaces use a common set of user-space functions to access the CSRs, with function prototypes that are similar to those of the bare-metal drivers, providing a consistent API.
+The driver provides three distinct interfaces for user space applications to interact with the {escape(peripheral["name"])} peripheral: \\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}.
+All three interfaces use a common set of user space functions to access the CSRs, with function prototypes that are similar to those of the bare-metal drivers, providing a consistent API.
 \\ifdefined\\DOXYGEN
 The baremetal function prototypes are documented in Section~\\ref{{sec:baremetal}}.
 \\fi
 
-The following header files must be included in your user-space application to use the API:
+The following header files must be included in your user space application to use the API:
 \\begin{{itemize}}
     \\item \\texttt{{{escape(peripheral["name"])}\\_driver\\_files.h}}
     \\item \\texttt{{{escape(peripheral["name"])}\\_csrs.h}}
@@ -127,13 +127,13 @@ The following files are available for each CSR:
     content += f"""
 \\end{{itemize}}
 
-\\subsection{{Userspace Application}}
+\\subsection{{User Space Application}}
 
 User space applications can be developed to interact with the peripheral's driver interfaces. An example application, \\texttt{{user/{escape(peripheral["name"])}\\_user.c}}, is provided for some cores.
-Otherwise, the auto-generated test application, \\texttt{{user/{escape(peripheral["name"])}\\_tests.c}}, can serve as a reference for creating custom user-space applications.
+Otherwise, the auto-generated test application, \\texttt{{user/{escape(peripheral["name"])}\\_tests.c}}, can serve as a reference for creating custom user space applications.
 
 \\paragraph{{Building an application}}
-User-space applications can be built using the \\texttt{{Makefile}} located in the \\texttt{{user}} directory. You need to specify the name of your application's source file (without the \\texttt{{.c}} extension) and the desired interface.
+User space applications can be built using the \\texttt{{Makefile}} located in the \\texttt{{user}} directory. You need to specify the name of your application's source file (without the \\texttt{{.c}} extension) and the desired interface.
 \\begin{{verbatim}}
 make BIN=<your_app_name> IF=<interface>
 \\end{{verbatim}}
@@ -148,14 +148,14 @@ To run the application, execute the compiled binary in the target Linux system, 
 \\subsection{{Tests}}
 
 A test suite is provided to verify the functionality and performance of the driver interfaces.
-The test source code is located in `user/{escape(peripheral["name"])}\\_tests.c`.
+The test source code is located in \\texttt{{user/{escape(peripheral["name"])}\\_tests.c}}.
 
 \\paragraph{{Building the tests}}
-The tests can be built using the `Makefile` in the `user` directory by setting the `BIN` variable to \\texttt{{{escape(peripheral["name"])}\\_tests}}:
+The tests can be built using the \\texttt{{Makefile}} in the \\texttt{{user}} directory by setting the \\texttt{{BIN}} variable to \\texttt{{{escape(peripheral["name"])}\\_tests}}:
 \\begin{{verbatim}}
 make BIN={peripheral['name']}_tests IF=<interface>
 \\end{{verbatim}}
-The `IF` variable can be set to `sysfs`, `dev`, or `ioctl` to test the corresponding interface.
+The \\texttt{{IF}} variable can be set to \\texttt{{sysfs}}, \\textt{{dev}}, or \\texttt{{ioctl}} to test the corresponding interface.
 
 \\paragraph{{Running the tests}}
 To run the tests, execute the compiled binary in the target Linux system, replacing \\texttt{{<interface>}} with the one you selected during build:

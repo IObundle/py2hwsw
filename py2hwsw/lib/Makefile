@@ -177,7 +177,6 @@ release-artifacts:
 
 # Regenerate timer userspace driver binaries and recompile buildroot of iob_system_linux
 LINUX_SUBMODULE_DIR=iob_system/iob_system_linux/submodules/iob_linux
-#SOC_LINUX_BUILD_DIR=../../../soc_linux_V0.8
 buildroot-update:
 	# Generate $(CORE)
 	make clean setup CORE=$(CORE) BUILD_DIR=$(BUILD_DIR)

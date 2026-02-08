@@ -36,6 +36,7 @@ The driver consists of:
 
     content += f"""
 \\subsection{{Kernel Module}}
+\\label{{sec:linux_kernel_module}}
 
 The main source code for the kernel module is located in the \\texttt{{{escape(peripheral["name"])}\\_main.c}} file.
 This module is implemented as a platform driver, which is responsible for probing and initializing the peripheral device based on information from the device tree.
@@ -45,6 +46,7 @@ It also implements the file operations (e.g., \\texttt{{read}}, \\texttt{{write}
 
     content += f"""
 \\subsection{{User Space Interfaces}}
+\\label{{sec:linux_user_space_interfaces}}
 
 The driver provides three distinct interfaces for user space applications to interact with the {escape(peripheral["name"])} peripheral: \\texttt{{/dev}}, \\texttt{{ioctl}}, and \\texttt{{sysfs}}.
 All three interfaces use a common set of user space functions to access the CSRs, with function prototypes that are similar to those of the bare-metal drivers, providing a consistent API.
@@ -69,6 +71,7 @@ The following sections describe each of these interfaces in detail.
 
     content += f"""
 \\subsubsection{{/dev Interface}}
+\\label{{sec:linux_dev_interface}}
 
 The \\texttt{{/dev}} interface allows direct access to the peripheral's registers through the device file \\texttt{{/dev/{escape(peripheral["name"])}}}.
 Access to the CSRs is performed by seeking to the appropriate address offset using \\texttt{{lseek()}} and then using \\texttt{{read()}} or \\texttt{{write()}} to access the register.
@@ -89,6 +92,7 @@ The following CSRs are available through this interface:
 
     content += r"""
 \subsubsection{ioctl Interface}
+\label{sec:linux_ioctl_interface}
 
 The \texttt{ioctl} interface uses I/O control commands to interact with the peripheral.
 The function prototypes provided for this interface are identical to the \texttt{/dev} interface functions.
@@ -107,6 +111,7 @@ The following IOCTL commands are defined for each CSR:
     content += f"""\\end{{itemize}}
 
 \\subsubsection{{sysfs Interface}}
+\\label{{sec:linux_sysfs_interface}}
 
 The \\texttt{{sysfs}} interface exposes the peripheral's registers as files in the system's file system.
 The functions prototypes provided for this interface are identical to the \\texttt{{/dev}} interface functions.
@@ -128,6 +133,7 @@ The following files are available for each CSR:
 \\end{{itemize}}
 
 \\subsection{{User Space Application}}
+\\label{{sec:linux_user_space_application}}
 
 User space applications can be developed to interact with the peripheral's driver interfaces. An example application, \\texttt{{user/{escape(peripheral["name"])}\\_user.c}}, is provided for some cores.
 Otherwise, the auto-generated test application, \\texttt{{user/{escape(peripheral["name"])}\\_tests.c}}, can serve as a reference for creating custom user space applications.
@@ -146,6 +152,7 @@ To run the application, execute the compiled binary in the target Linux system, 
 \\end{{verbatim}}
 
 \\subsection{{Tests}}
+\\label{{sec:linux_tests}}
 
 A test suite is provided to verify the functionality and performance of the driver interfaces.
 The test source code is located in \\texttt{{user/{escape(peripheral["name"])}\\_tests.c}}.

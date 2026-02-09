@@ -160,7 +160,7 @@ The tests can be built using the \\texttt{{Makefile}} in the \\texttt{{user}} di
 \\begin{{verbatim}}
 make BIN={peripheral['name']}_tests IF=<interface>
 \\end{{verbatim}}
-The \\texttt{{IF}} variable can be set to \\texttt{{sysfs}}, \\textt{{dev}}, or \\texttt{{ioctl}} to test the corresponding interface.
+The \\texttt{{IF}} variable can be set to \\texttt{{sysfs}}, \\texttt{{dev}}, or \\texttt{{ioctl}} to test the corresponding interface.
 
 \\paragraph{{Running the tests}}
 To run the tests, execute the compiled binary in the target Linux system, replacing \\texttt{{<interface>}} with the one you selected during build:

@@ -85,7 +85,7 @@ int test_functionality_{csr['name']}_write() {{
 """
             if "R" in csr["mode"]:
                 content += f"""
-    uint32_t read_value = {peripheral['name']}_csrs_get_{csr['name']}();
+    {data_type} read_value = {peripheral['name']}_csrs_get_{csr['name']}();
     if (read_value != value) {{
         printf("Error: Read value (0x%x) does not match written value (0x%x)\\n", read_value, value);
         return TEST_FAILED;

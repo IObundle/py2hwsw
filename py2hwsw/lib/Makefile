@@ -170,3 +170,81 @@ release-artifacts:
 	tar -czf iob_uart_V$$VERSION.tar.gz -C ./fusesoc_exports .
 
 .PHONY: release-artifacts
+
+#
+# Linux targets
+#
+
+# Regenerate timer userspace driver binaries and recompile buildroot of iob_system_linux
+LINUX_SUBMODULE_DIR=iob_system/iob_system_linux/submodules/iob_linux
+buildroot-update:
+	# Generate $(CORE)
+	make clean setup CORE=$(CORE) BUILD_DIR=$(BUILD_DIR)
+	# Compile userspace binaries
+	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(BUILD_DIR)/software/linux/user all'
+	# Copy driver binaries to iob_system_linux buildroot
+	for file in "$(CORE)_user_sysfs" "$(CORE)_user_dev" "$(CORE)_user_ioctl" "$(CORE)_tests_sysfs" "$(CORE)_tests_dev" "$(CORE)_tests_ioctl"; do\
+		cp $(BUILD_DIR)/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
+	done
+	# Compile kernel driver
+	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-linux-drivers MODULE_NAME=$(CORE) MODULE_DRIVER_DIR=../../../../$(BUILD_DIR)/software/linux/drivers ROOTFS_OVERLAY_DIR=../../software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers'
+	# Copy iob_system_linux buildroot to iob_linux
+	cp -r iob_system/iob_system_linux/software/buildroot/* $(LINUX_SUBMODULE_DIR)/software/buildroot/;
+	# Recompile buildroot
+	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-buildroot'
+	# Copy rootfs to iob_system_linux
+	cp $(LINUX_SUBMODULE_DIR)/software/OS_build/rootfs.cpio.gz iob_system/iob_system_linux/software/src/rootfs.cpio.gz
+ifneq ($(SOC_LINUX_BUILD_DIR),)
+	# Copy it to existing soc_linux build dir. Re-running soc_linux on fpga without rebuilding, will cause it to upload this new version of rootfs.
+	cp iob_system/iob_system_linux/software/src/rootfs.cpio.gz $(SOC_LINUX_BUILD_DIR)/hardware/fpga/rootfs.cpio.gz
+endif
+
+.PHONY: buildroot-update
+
+# Find board directoy in py2hwsw/hardware/fpga
+BOARD_DIR := $(shell find ../hardware/fpga -name $(BOARD) -type d -print -quit)
+# Include board.mk to set BOARD_USER, BOARD_SERVER, and BOARD_SERIAL_PORT
+ifneq ($(BOARD_DIR),)
+include $(BOARD_DIR)/board.mk
+endif
+#
+ifneq ($(BOARD_SERVER),)
+SSH_START=ssh $(BOARD_USER)@$(BOARD_SERVER) '
+SSH_END='
+REMOTE_BUILD_DIR?=$(BOARD_USER)/$(notdir $(BUILD_DIR))
+else
+REMOTE_BUILD_DIR=$(BUILD_DIR)
+endif
+ifeq ($(BOARD_SERIAL_PORT),)
+# Assume a serial port if not specified
+BOARD_SERIAL_PORT=/dev/usb-uart
+endif
+
+running_system_upload:
+	# Generate $(CORE)
+	make clean setup CORE=$(CORE) BUILD_DIR=$(BUILD_DIR)
+	# Compile userspace binaries
+	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(BUILD_DIR)/software/linux/user all'
+	# Copy driver binaries to iob_system_linux buildroot
+	for file in "$(CORE)_user_sysfs" "$(CORE)_user_dev" "$(CORE)_user_ioctl" "$(CORE)_tests_sysfs" "$(CORE)_tests_dev" "$(CORE)_tests_ioctl"; do\
+		cp $(BUILD_DIR)/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
+	done
+	# Compile kernel driver
+	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-linux-drivers MODULE_NAME=$(CORE) MODULE_DRIVER_DIR=../../../../$(BUILD_DIR)/software/linux/drivers ROOTFS_OVERLAY_DIR=../../software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers'
+	# Copy built driver to build dir
+	cp iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers/$(CORE).ko $(BUILD_DIR)/software/linux/drivers/
+ifneq ($(BOARD_SERVER),)
+	# Rsync build dir to remote machine
+	rsync $(BOARD_SYNC_FLAGS) -avz --force --delete --exclude 'software/tb' $(BUILD_DIR)/ $(BOARD_USER)@$(BOARD_SERVER):$(REMOTE_BUILD_DIR)/
+endif
+	# Upload to running linux instance using lrzsz
+	# NOTE: These commands dont use board_client.py to grab the FPGA board. May cause conflicts with shared FPGAs.
+	# They dont grab the board, since its meant to be used with an already grabbed fpga running a linux instance.
+	$(SSH_START) cd $(REMOTE_BUILD_DIR)/software/linux;\
+	echo "rz -o /drivers" > $(BOARD_SERIAL_PORT) && sz -y drivers/$(CORE).ko < $(BOARD_SERIAL_PORT) > $(BOARD_SERIAL_PORT);\
+	for file in "$(CORE)_user_sysfs" "$(CORE)_user_dev" "$(CORE)_user_ioctl" "$(CORE)_tests_sysfs" "$(CORE)_tests_dev" "$(CORE)_tests_ioctl"; do\
+		echo "rz -o /root" > $(BOARD_SERIAL_PORT) && sz -y user/$$file < $(BOARD_SERIAL_PORT) > $(BOARD_SERIAL_PORT);\
+	done;\
+	echo "modprobe /drivers/$(CORE).ko" > $(BOARD_SERIAL_PORT) $(SSH_END)
+
+.PHONY: running_system_upload

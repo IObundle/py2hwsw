@@ -27,6 +27,8 @@ Writing HDL code in a  lint-friendly fashion is tedious and error-prone.
 Py2HWSW solves this problem by generating lint-friendly and portable Verilog code that can 
 be ported seamlessly between FPGA and ASIC flows.
 
+An AI generated wiki for Py2HWSW is available [here](https://deepwiki.com/IObundle/py2hwsw).
+
 ## Installation
 
 Py2HWSW runs on a Nix shell. First, download and install

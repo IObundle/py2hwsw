@@ -23,11 +23,14 @@ def setup(py_params_dict):
         "build_dir" in py_params_dict
     ), "Missing build directory for Linux device drivers modules."
 
-    linux_drivers_path = os.path.join(py_params_dict["build_dir"], "software/linux")
+    # Extra properties to include in device tree peripheral snippet
+    dts_extra_properties = py_params_dict.get("dts_extra_properties", "")
+
     generate_device_drivers(
-        linux_drivers_path,
+        py_params_dict["build_dir"],
         py_params_dict["issuer"],
         py_params_dict["py2hwsw_version"],
+        dts_extra_properties,
     )
 
     attributes_dict = {

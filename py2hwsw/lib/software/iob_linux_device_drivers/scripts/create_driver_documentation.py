@@ -3,8 +3,6 @@
 # SPDX-License-Identifier: MIT
 
 import os
-from linux_utils import csr_type
-
 
 def escape(text):
     return text.replace("_", r"\_")

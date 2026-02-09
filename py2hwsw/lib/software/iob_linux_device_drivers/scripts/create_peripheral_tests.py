@@ -4,6 +4,8 @@
 
 import os
 
+from linux_utils import csr_type
+
 
 def create_peripheral_tests(output_dir, peripheral):
     """Create a C file with tests for the peripheral"""
@@ -56,6 +58,8 @@ def create_peripheral_tests(output_dir, peripheral):
 #define TEST_PASSED 0
 #define TEST_FAILED 1
 
+#define TEST_WRITE_VALUE 0x12345678
+
 #define RUN_TEST(test_name) \
     printf("Running test: %s...\\n", #test_name); \
     if (test_name() != TEST_PASSED) {{ \
@@ -70,10 +74,12 @@ def create_peripheral_tests(output_dir, peripheral):
 """
 
     for csr in csrs:
+        data_type = csr_type(csr["n_bits"])
         if "W" in csr["mode"]:
             content += f"""
 int test_functionality_{csr['name']}_write() {{
-    uint32_t value = 0x12345678;
+    // Cast the test value to the correct data type, adjusting to the CSR width (ignoring most significant bits if needed)
+    {data_type} value = ({data_type})TEST_WRITE_VALUE;
     {peripheral['name']}_csrs_set_{csr['name']}(value);
 """
             if "R" in csr["mode"]:

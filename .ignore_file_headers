@@ -37,6 +37,7 @@
 ./py2hwsw/lib/iob_system/iob_system_linux/software/src/crypto/McEliece/common/nistkatrng.c
 ./py2hwsw/lib/iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/etc/mdev.conf
 ./py2hwsw/lib/iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/etc/init.d/S10mdev
+./py2hwsw/lib/iob_system/iob_system_linux/software/buildroot/configs/iob_soc_defconfig
 # openspbi
 ./py2hwsw/lib/iob_system/iob_system_linux/software/opensbi_platform/iob_system_linux/objects.mk
 ./py2hwsw/lib/iob_system/iob_system_linux/software/opensbi_platform/iob_system_linux/platform.c

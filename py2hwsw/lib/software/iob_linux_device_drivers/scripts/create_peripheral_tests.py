@@ -6,6 +6,7 @@ import os
 
 from linux_utils import csr_type
 
+SPDX_PREFIX = "SPDX-"
 
 def create_peripheral_tests(output_dir, peripheral):
     """Create a C file with tests for the peripheral"""
@@ -32,9 +33,9 @@ def create_peripheral_tests(output_dir, peripheral):
 
     # Create the test file content
     content = f"""/*
- * SPDX-FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
+ * {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
  *
- * SPDX-License-Identifier: {peripheral['spdx_license']}
+ * {SPDX_PREFIX}License-Identifier: {peripheral['spdx_license']}
  */
 
 #include <stdio.h>

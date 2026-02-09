@@ -304,7 +304,7 @@ def setup(py_params: dict):
 
         # Generate device tree file
         dts_parameters = {
-            "name": py_params["name"],
+            "name": py_params.get("name","iob_system_linux"),
             "build_dir": py_params["build_dir"],
             "hardcoded_plic_cint": True,
         }

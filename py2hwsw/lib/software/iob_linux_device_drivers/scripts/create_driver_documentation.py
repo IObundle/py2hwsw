@@ -4,6 +4,7 @@
 
 import os
 
+
 def escape(text):
     return text.replace("_", r"\_")
 

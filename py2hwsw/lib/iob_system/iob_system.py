@@ -417,6 +417,43 @@ def setup(py_params: dict):
                 },
             },
             {
+                "name": "riscv_interrupts",
+                "descr": "Standard RISC‑V interrupt pending bits",
+                "signals": [
+                    {
+                        "name": "riscv_msip",
+                        "descr": "Machine software interrupt.",
+                        "width": "1",
+                    },
+                    {
+                        "name": "riscv_mtip",
+                        "descr": "Machine timer interrupt.",
+                        "width": "1",
+                    },
+                    {
+                        "name": "riscv_meip",
+                        "descr": "Machine external interrupt.",
+                        "width": "1",
+                    },
+                    {
+                        "name": "riscv_seip",
+                        "descr": "Supervisor external interrupt.",
+                        "width": "1",
+                    },
+                ],
+            },
+            {
+                "name": "riscv_timebase",
+                "descr": "Timebase interface",
+                "signals": [
+                    {
+                        "name": "riscv_mtime",
+                        "descr": "Input from external 64-bit counter for time CSRs",
+                        "width": "64",
+                    },
+                ],
+            },
+            {
                 "name": "unused_interconnect_bits",
                 "descr": "Wires to connect to unused output bits of interconnect",
                 "signals": [
@@ -518,6 +555,33 @@ def setup(py_params: dict):
                 },
             },
             # Peripheral cbus wires added automatically
+            {
+                "name": "plic_interrupts",
+                "descr": "Connect PLIC interrupts to CPU",
+                "signals": [
+                    {"name": "riscv_meip"},
+                    {"name": "riscv_seip"},
+                ],
+            },
+            {
+                "name": "clint_rt_clk",
+                "descr": "CLINT real time clock",
+                "signals": [
+                    {
+                        "name": "rt_clk",
+                        "descr": "Real Time clock input if available (usually 32.768 kHz)",
+                        "width": "1",
+                    },
+                ],
+            },
+            {
+                "name": "clint_interrupts",
+                "descr": "Connect CLINT interrupts to CPU",
+                "signals": [
+                    {"name": "riscv_mtip"},
+                    {"name": "riscv_msip"},
+                ],
+            },
             # NOTE: Add other peripheral wires here
         ]
         if params["use_ethernet"]:
@@ -587,15 +651,8 @@ def setup(py_params: dict):
                             "cpu_d_axi_bid[0]",
                         ],
                     ),
-                    "plic_interrupts_i": "interrupts",
-                    "plic_cbus_s": (
-                        "plic_cbus",
-                        ["plic_cbus_iob_addr[22-1:0]"],
-                    ),
-                    "clint_cbus_s": (
-                        "clint_cbus",
-                        ["clint_cbus_iob_addr[16-1:0]"],
-                    ),
+                    "interrupt_i": "riscv_interrupts",
+                    "timebase_i": "riscv_timebase",
                 },
             },
             {
@@ -728,7 +785,7 @@ def setup(py_params: dict):
             {
                 "core_name": "iob_axi2iob",
                 "instance_name": "periphs_axi2iob",
-                "instance_description": "Convert AXI to AXI lite for CLINT",
+                "instance_description": "Convert AXI to IOb for peripherals",
                 "parameters": {
                     "AXI_ID_WIDTH": "AXI_ID_W",
                     "AXI_LEN_WIDTH": "AXI_LEN_W",
@@ -787,6 +844,38 @@ def setup(py_params: dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     # Cbus connected automatically
+                },
+            },
+            {
+                "core_name": "iob_plic",
+                "instance_name": "PLIC0",
+                "instance_description": "RISC-V PLIC peripheral",
+                "is_peripheral": True,
+                "parameters": {
+                    "N_SOURCES": 32,
+                    "N_TARGETS": 1,
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    # Cbus connected automatically
+                    "interrupt_i": "interrupts",
+                    "interrupt_o": "plic_interrupts",
+                },
+            },
+            {
+                "core_name": "iob_clint",
+                "instance_name": "CLINT0",
+                "instance_description": "RISC-V CLINT peripheral",
+                "is_peripheral": True,
+                "parameters": {
+                    "N_CORES": 1,
+                },
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    # Cbus connected automatically
+                    "rt_clk_i": "clint_rt_clk",
+                    "interrupt_o": "clint_interrupts",
+                    "timebase_o": "riscv_timebase",
                 },
             },
             # NOTE: Instantiate other peripherals here, using the 'is_peripheral' flag

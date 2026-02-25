@@ -2,4 +2,4 @@
 #
 # SPDX-License-Identifier: MIT
 
-PY2HWSW_VERSION = "0.81"
+PY2HWSW_VERSION = "0.81.0"

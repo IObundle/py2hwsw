@@ -9,7 +9,7 @@ import shutil
 # Add iob-system scripts folder to python path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "../scripts"))
 # Add iob-system-linux scripts folder to python path
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")) 
+sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts"))
 
 from iob_system_utils import update_params
 from iob_system_dts import generate_dts
@@ -304,7 +304,7 @@ def setup(py_params: dict):
 
         # Generate device tree file
         dts_parameters = {
-            "name": py_params.get("name","iob_system_linux"),
+            "name": py_params.get("name", "iob_system_linux"),
             "build_dir": py_params["build_dir"],
             "hardcoded_plic_cint": True,
         }

@@ -4,6 +4,7 @@
 
 import os
 
+
 def escape(text):
     return text.replace("_", r"\_")
 
@@ -187,7 +188,7 @@ if __name__ == "__main__":
         "name": "iob_timer",
         "instance_name": "timer0",
         "upper_name": "IOB_TIMER",
-        "version": "0.1",
+        "version": "0.1.0",
         "description": "IOb-Timer, a timer peripheral",
         "author": "IObundle",
         "spdx_year": "2025",

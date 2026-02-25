@@ -115,7 +115,7 @@ class iob_core(iob_module, iob_instance):
             "version",
             PY2HWSW_VERSION,
             str,
-            descr="Core version. By default is the same as Py2HWSW version.",
+            descr="Core version in SemVer format (major.minor.patch). By default is the same as Py2HWSW version.",
         )
         self.set_default_attribute(
             "previous_version",
@@ -284,8 +284,8 @@ class iob_core(iob_module, iob_instance):
         self.create_conf_group(
             name="VERSION",
             type="M",
-            val="16'h" + self.version_str_to_digits(self.version),
-            descr="Product version. This 16-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the integral part of the version, and the two least significant nibbles represent the decimal part.",
+            val="24'h" + self.version_str_to_digits(self.version),
+            descr="Product version in SemVer format. This 24-bit macro uses nibbles to represent decimal numbers using their binary values. The two most significant nibbles represent the major part of the version, followed by two nibbles that represent the minor part. The two least significant nibbles represent the patch version. For example V12.34.56 is represented by 0x123456.",
         )
 
         # Ensure superblocks are instanciated last
@@ -1017,11 +1017,14 @@ class iob_core(iob_module, iob_instance):
 
     @staticmethod
     def version_str_to_digits(version_str):
-        """Given a version string (like "V0.12"), return a 4 digit string representing
-        the version (like "0012")"""
+        """Given a version string (like "V0.12.3"), return a 6 digit string representing
+        the version (like "001203")"""
         version_str = version_str.replace("V", "")
-        major_ver, minor_ver = version_str.split(".")
-        return f"{int(major_ver):02d}{int(minor_ver):02d}"
+        try:
+            major_ver, minor_ver, patch_ver = version_str.split(".")
+        except ValueError:
+                fail_with_msg(f"Core version does not have expected SemVer format.", ValueError)
+        return f"{int(major_ver):02d}{int(minor_ver):02d}{int(patch_ver):02d}"
 
 
 def find_common_deep(path1, path2):

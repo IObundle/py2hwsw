@@ -72,12 +72,12 @@ filesets:
     core_file_content += f"""
 
 targets:
+"""
+    if tb_top == "iob_v_tb": # Universal Testbench (with board_client.py and parallel processes)
+        core_file_content += f"""\
   default:
-    filesets:
-      - rtl
-  sim:
     toplevel: {tb_top}
-    description: Simulate the design, using board_client.py to manage simulation processes and timeout.
+    description: Simulate the design.
     # Generic flow only runs the build step by default.
     flow: generic
     flow_options:
@@ -94,8 +94,19 @@ targets:
 {"        - sw_build\n" if has_software else ""}\
         - clean
         - board_client
-
+"""
+    else: # Standard testbench (no parallel processes nor board_client.py)
+        core_file_content += f"""\
+  default:
+    description: Simulate the design.
+    filesets:
+      - rtl
+"""
+    core_file_content += f"""
 scripts:
+"""
+    if tb_top == "iob_v_tb": # Universal Testbench
+        core_file_content += f"""\
   clean:
     cmd:
       - rm
@@ -118,8 +129,9 @@ scripts:
 
 """
 
-    # Maybe there is a way to import variables from sim_build.mk (like GRAB_TIMEOUT)?
-    core_file_content += f"""
+    if tb_top == "iob_v_tb": # Universal Testbench
+        # Maybe there is a way to import variables from sim_build.mk (like GRAB_TIMEOUT)?
+        core_file_content += f"""\
   board_client:
     cmd:
       - src/iobundle_py2hwsw_{core.name}_{core.version}/{core.name}/scripts/board_client.py
@@ -129,13 +141,13 @@ scripts:
       #run the C testbench in background and kill it when simulator exits
       - "'{sim_cmd}'"
 """
-    if console_cmd:
-        core_file_content += f"""\
+        if console_cmd:
+            core_file_content += f"""\
       - -c
       #run the console
       - {console_cmd}
 """
-    core_file_content += f"""\
+        core_file_content += f"""\
     filesets:
       - scripts
 """

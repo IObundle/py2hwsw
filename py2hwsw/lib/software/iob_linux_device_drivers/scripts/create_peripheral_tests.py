@@ -8,6 +8,7 @@ from linux_utils import csr_type
 
 SPDX_PREFIX = "SPDX-"
 
+
 def create_peripheral_tests(output_dir, peripheral):
     """Create a C file with tests for the peripheral"""
 

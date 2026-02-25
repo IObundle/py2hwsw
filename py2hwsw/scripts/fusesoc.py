@@ -46,7 +46,7 @@ def export_core(core):
 CAPI=2:
 
 name: iobundle:py2hwsw:{core.name}:{core.version}
-#license: {core.license.name}
+license: {core.license.name}
 description: "{core.description}"
 
 filesets:

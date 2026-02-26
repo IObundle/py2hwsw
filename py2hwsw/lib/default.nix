@@ -40,7 +40,8 @@
 # gcc-wrapper-14.2.1.20250322
 # libcap-2.75
 # reuse-5.0.2
-# python3.12-fusesoc-2.2.1
+# python3.12-fusesoc-2.4.5
+# python3.12-fusesoc-publish-v0.1.0
 # kactus2 (commit 19c5702)
 # doxygen-1.13.2
 
@@ -93,6 +94,80 @@ let
     jinja2
   ]);
 
+  # FuseSoC provided by nixpkgs is not adequate for py2hwsw. Use custom version from GitHub.
+  custom_fusesoc = pkgs.python3.pkgs.buildPythonPackage rec {
+    pname = "fusesoc";
+    version = "2.4.5";
+  
+    src = pkgs.fetchzip {
+      url = "https://github.com/olofk/fusesoc/archive/refs/tags/${version}.tar.gz";
+      sha256 = "1sw0zl6hjlzp1a0agdl9yp901pih70ppzzss18l8f3jxs6q7jm1n";  # Run `nix-prefetch-url --unpack https://...` to get the hash
+    };
+
+    format = "pyproject";  # Tells Nix to use pyproject.toml instead of setup.py
+
+   # FuseSoC dependencies (from its pyproject.toml)
+    propagatedBuildInputs = with pkgs.python3.pkgs; [
+      click
+      toml
+      jsonschema
+      packaging
+      pyyaml
+      edalize
+      pyparsing
+      fastjsonschema
+      argcomplete
+      simplesat
+    ]; 
+
+    # BUILD INPUTS - required by [build-system] in pyproject.toml
+    nativeBuildInputs = with pkgs.python3.pkgs; [
+      setuptools
+      wheel
+      setuptools_scm
+    ];
+
+    #doCheck = false;  # Skip tests (optional, speeds up build)
+
+    # FuseSoC uses pyproject.toml (PEP 621), so format="pyproject" is auto-detected in modern nixpkgs (25.05+).
+    # Add propagatedBuildInputs if needed (e.g., for click, toml; check `pip show fusesoc` after manual install).
+    # propagatedBuildInputs = with pkgs.python3.pkgs; [ click toml ];
+  };
+
+  fusesoc_publish = pkgs.python3.pkgs.buildPythonPackage rec {
+    pname = "fusesoc-publish";
+    version = "v0.1.0";
+  
+    src = pkgs.fetchzip {
+      url = "https://github.com/fusesoc/fusesoc-publish/archive/refs/tags/${version}.tar.gz";
+      sha256 = "0aq97bb40sxfryc2lv5ms7xf60ljb19pq2czq89if5gh8rzs7vdj";  # Run `nix-prefetch-url --unpack https://...` to get the hash
+    };
+
+    format = "pyproject";  # Tells Nix to use pyproject.toml instead of setup.py
+
+    propagatedBuildInputs = with pkgs.python3.pkgs; [
+      click
+      toml
+      jsonschema
+      packaging
+      pyyaml
+      requests
+      edalize
+      pyparsing
+      fastjsonschema
+      argcomplete
+      simplesat
+      custom_fusesoc
+    ]; 
+
+    # BUILD INPUTS - required by [build-system] in pyproject.toml
+    nativeBuildInputs = with pkgs.python3.pkgs; [
+      hatchling
+      hatch-vcs
+    ];
+  };
+
+
   py2hwsw_dependencies = with pkgs; [
     bash
     gnumake
@@ -126,7 +201,8 @@ let
     gcc
     libcap # Allows setting POSIX capabilities
     reuse
-    fusesoc
+    custom_fusesoc
+    fusesoc_publish
     (callPackage ./scripts/kactus2.nix { })
     doxygen
     py2hwsw

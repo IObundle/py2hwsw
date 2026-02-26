@@ -249,7 +249,7 @@ def setup(py_params: dict):
 
     # Iob_system_linux is actually a derived core of iob_system. Therefore, set iob_system as the parent core and pass iob_system_linux's attributes_dict as a python paremter.
     attributes_dict = {
-        "version": "0.8",
+        "version": "0.8.0",
         "parent": {
             # IOb-System-Linux is a derived core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
             # IOb-System-Linux will inherit all attributes/files from the iob_system core.

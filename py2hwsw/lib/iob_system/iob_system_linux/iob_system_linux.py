@@ -306,7 +306,7 @@ def setup(py_params: dict):
         dts_parameters = {
             "name": py_params.get("name", "iob_system_linux"),
             "build_dir": py_params["build_dir"],
-            "hardcoded_plic_cint": True,
+            "hardcoded_plic_cint": False,
         }
         generate_dts(dts_parameters)
 

@@ -1051,7 +1051,7 @@ clean:
 
 
 def generate_device_drivers(
-    build_dir, peripheral, py2hwsw_version, dts_extra_properties
+    build_dir, peripheral, py2hwsw_version, dts_extra_properties, compatible_str=""
 ):
     """Generate device driver files for a peripheral"""
 
@@ -1117,7 +1117,10 @@ def generate_device_drivers(
         "license": f"Dual {license_name}/GPL",
         "csrs": csrs_list,
     }
-    _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"
+    if compatible_str:
+        _peripheral["compatible_str"] = compatible_str
+    else:
+        _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"
 
     print(
         "Generating device drivers for", _peripheral["name"], "in", drivers_output_dir

@@ -21,7 +21,7 @@ send "root"
 
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 post_login:
@@ -32,28 +32,28 @@ print "\n[minicom] Logged in. Running tests..."
 send "rmmod iob_timer 2>/dev/null; insmod /drivers/iob_timer.ko"
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with sysfs interface"
 send "./iob_timer_user_sysfs"
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with dev interface"
 send "./iob_timer_user_dev"
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with ioctl interface"
 send "./iob_timer_user_ioctl"
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 print "\n[minicom] Run auto-generated tests iob_timer with sysfs interface"

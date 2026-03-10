@@ -67,7 +67,7 @@ def generate_dts(dts_parameters):
     cpus {{
         #address-cells = <0x1>;
         #size-cells = <0x0>;
-        timebase-frequency = </*FREQ_MACRO*/>;
+        timebase-frequency = <100000>; // Timebase frequency matches frequency of 'mtime' updates from PLIC peripheral (100 kHz for iob_plic). Change this value to match configured PLIC peripheral.
         CPU0: cpu@0 {{
             clock-frequency = </*FREQ_MACRO*/>;
             device_type = "cpu";

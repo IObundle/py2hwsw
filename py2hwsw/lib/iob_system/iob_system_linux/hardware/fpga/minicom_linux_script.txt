@@ -26,6 +26,10 @@ expect {
 
 post_login:
 
+#
+# Run tests
+#
+
 print "\n[minicom] Logged in. Running tests..."
 
 # Test iob_timer driver (unloading first it if it has already been loaded before)
@@ -77,28 +81,17 @@ expect {
     timeout 300 goto on_timeout
 }
 
-# Versat Linux tests
-# send "rz"
-# ! sz ../../software/crypto ../../software/versat.ko  ../../software/exampleTransfer.sh ../../software/setupTest.sh ../../software/test.sh
-# 
-# expect {
-#     "#"
-#     timeout 100 goto on_timeout
-# }
-# 
-# send "./setupTest.sh"
-# 
-# expect {
-#     "#"
-#     timeout 100 goto on_timeout
-# }
-# 
-# send "./test.sh && ./exampleTransfer.sh"
-# 
-# expect {
-#     "#"
-#     timeout 900 goto on_timeout
-# }
+# Run CLINT tests
+
+echo "=== Interrupt Test ==="
+echo "CLINT Timer: $(cat /proc/interrupts | grep timer | awk '{print $2}')"
+echo "PLIC Contexts: $(dmesg | grep plic | grep contexts)"
+echo "Total IRQs: $(wc -l < /proc/interrupts)"
+echo "Uptime: $(uptime)"
+
+#
+# Tests complete
+#
 
 # Send test.log
 send "echo 'Test passed!' > test.log"

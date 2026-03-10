@@ -78,7 +78,7 @@ def setup(py_params_dict):
                 "descr": "Port parameters are passed to interfaces to generate different interfaces.",
             },
         ],
-        "version": "0.1",
+        "version": "0.1.0",
         "confs": [
             {
                 "name": "DATA_W",

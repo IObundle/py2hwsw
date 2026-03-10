@@ -42,7 +42,7 @@ def setup(py_params_dict):
         "name": reg_name,
         "generate_hw": True,
         "description": "Generated sync register module. Module used for CDC circuits.",
-        "version": "0.1",
+        "version": "0.1.0",
         "confs": [
             {
                 "name": "DATA_W",

@@ -1083,7 +1083,7 @@ def generate_device_drivers(
         {
             "name": "version",
             "mode": "R",
-            "n_bits": 16,
+            "n_bits": 24,
         }
     )
 

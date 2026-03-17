@@ -81,13 +81,16 @@ expect {
     timeout 300 goto on_timeout
 }
 
-# Run CLINT tests
+# Run CLINT & PLIC tests
 
-echo "=== Interrupt Test ==="
-echo "CLINT Timer: $(cat /proc/interrupts | grep timer | awk '{print $2}')"
-echo "PLIC Contexts: $(dmesg | grep plic | grep contexts)"
-echo "Total IRQs: $(wc -l < /proc/interrupts)"
-echo "Uptime: $(uptime)"
+send "rz"
+! sz clint_plic_test.sh
+
+send "./clint_plic_test.sh"
+expect {
+    "#"
+    timeout 5 goto on_timeout
+}
 
 #
 # Tests complete

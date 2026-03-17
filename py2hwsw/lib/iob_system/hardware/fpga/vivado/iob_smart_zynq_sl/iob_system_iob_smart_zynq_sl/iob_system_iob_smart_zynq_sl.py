@@ -280,29 +280,38 @@ def setup(py_params_dict):
         .FCLK_RESET0_N(rst_n),
         
         .S_AXI_HP0_awaddr({3'b0, axi_awaddr}),
+        .S_AXI_HP0_awid(axi_awid),
         .S_AXI_HP0_awlen(axi_awlen[3:0]),
         .S_AXI_HP0_awsize(axi_awsize),
         .S_AXI_HP0_awburst(axi_awburst),
+        .S_AXI_HP0_awlock(axi_awlock),
         .S_AXI_HP0_awcache(axi_awcache),
         .S_AXI_HP0_awprot(axi_awprot),
+        .S_AXI_HP0_awqos(axi_awqos),
         .S_AXI_HP0_awvalid(axi_awvalid),
         .S_AXI_HP0_awready(axi_awready),
         .S_AXI_HP0_wdata(axi_wdata),
         .S_AXI_HP0_wstrb(axi_wstrb),
         .S_AXI_HP0_wlast(axi_wlast),
+        .S_AXI_HP0_wid(axi_awid), // Zynq HP ports use awid for wid
         .S_AXI_HP0_wvalid(axi_wvalid),
         .S_AXI_HP0_wready(axi_wready),
+        .S_AXI_HP0_bid(axi_bid),
         .S_AXI_HP0_bresp(axi_bresp),
         .S_AXI_HP0_bvalid(axi_bvalid),
         .S_AXI_HP0_bready(axi_bready),
         .S_AXI_HP0_araddr({3'b0, axi_araddr}),
+        .S_AXI_HP0_arid(axi_arid),
         .S_AXI_HP0_arlen(axi_arlen[3:0]),
         .S_AXI_HP0_arsize(axi_arsize),
         .S_AXI_HP0_arburst(axi_arburst),
+        .S_AXI_HP0_arlock(axi_arlock),
         .S_AXI_HP0_arcache(axi_arcache),
         .S_AXI_HP0_arprot(axi_arprot),
+        .S_AXI_HP0_arqos(axi_arqos),
         .S_AXI_HP0_arvalid(axi_arvalid),
         .S_AXI_HP0_arready(axi_arready),
+        .S_AXI_HP0_rid(axi_rid),
         .S_AXI_HP0_rdata(axi_rdata),
         .S_AXI_HP0_rresp(axi_rresp),
         .S_AXI_HP0_rlast(axi_rlast),
@@ -320,6 +329,7 @@ def setup(py_params_dict):
     // Connect unused AXI inputs to zero
     assign axi_awid = 'b0;
     assign axi_awaddr = 'b0;
+    assign axi_awprot = 'b0;
     assign axi_awlen = 'b0;
     assign axi_awsize = 'd2; // 4 byte data transfer
     assign axi_awburst = 'b0;
@@ -334,6 +344,7 @@ def setup(py_params_dict):
     assign axi_bready = 'b0;
     assign axi_arid = 'b0;
     assign axi_araddr = 'b0;
+    assign axi_arprot = 'b0;
     assign axi_arlen = 'b0;
     assign axi_arsize = 'd2; // 4 byte data transfer
     assign axi_arburst = 'b0;

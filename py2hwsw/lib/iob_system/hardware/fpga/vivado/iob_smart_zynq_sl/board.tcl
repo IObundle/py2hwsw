@@ -61,7 +61,6 @@ if { [get_files system.bd] == "" } {
 
     # Associate clock and set frequency for S_AXI_HP0
     set_property CONFIG.ASSOCIATED_BUSIF {S_AXI_HP0} [get_bd_ports FCLK_CLK0]
-    set_property CONFIG.FREQ_HZ 50000000 [get_bd_intf_ports S_AXI_HP0]
     set_property name GPIO_O [get_bd_ports GPIO_O_0]
     set_property name GPIO_I [get_bd_ports GPIO_I_0]
     set_property name UART0_RX [get_bd_ports UART0_RX_0]

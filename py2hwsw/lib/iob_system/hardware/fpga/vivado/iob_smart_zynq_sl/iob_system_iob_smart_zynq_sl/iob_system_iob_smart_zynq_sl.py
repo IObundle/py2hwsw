@@ -28,15 +28,15 @@ def setup(py_params_dict):
                 "name": "AXI_LEN_W",
                 "descr": "AXI burst length width",
                 "type": "D",
-                "val": "4",
+                "val": "8",
                 "min": "1",
                 "max": "8",
             },
             {
                 "name": "AXI_ADDR_W",
-                "descr": "AXI address bus width",
+                "descr": "AXI address bus width. 2**29 byte-addresses for 512 MiB of DDR3 memory.",
                 "type": "D",
-                "val": "27",
+                "val": "29",
                 "min": "1",
                 "max": "32",
             },
@@ -152,8 +152,8 @@ def setup(py_params_dict):
             "name": "ps_gpio",
             "descr": "PS GPIO signals",
             "signals": [
-                {"name": "ps_gpio_o", "width": "4"},
-                {"name": "ps_gpio_i", "width": "4"},
+                {"name": "ps_gpio_o", "width": "64"},
+                {"name": "ps_gpio_i", "width": "64"},
             ],
         },
         {
@@ -165,6 +165,7 @@ def setup(py_params_dict):
                 "ADDR_W": "AXI_ADDR_W",
                 "DATA_W": "AXI_DATA_W",
                 "LEN_W": "AXI_LEN_W",
+                "PROT_W": 3,
             },
         },
         {
@@ -233,7 +234,7 @@ def setup(py_params_dict):
     verilog_snippet = """
     // Connect board's LEDs and KEYs to PS7 GPIO.
     assign led_o = ps_gpio_o[1:0];
-    assign ps_gpio_i = {2'b0, key_i};
+    assign ps_gpio_i = {62'b0, key_i};
     
     // Connect clk_en_rst sources
     assign cke = 1'b1;
@@ -278,8 +279,8 @@ def setup(py_params_dict):
         .FCLK_CLK0(clk),
         .FCLK_RESET0_N(rst_n),
         
-        .S_AXI_HP0_awaddr(axi_awaddr),
-        .S_AXI_HP0_awlen(axi_awlen),
+        .S_AXI_HP0_awaddr({3'b0, axi_awaddr}),
+        .S_AXI_HP0_awlen(axi_awlen[3:0]),
         .S_AXI_HP0_awsize(axi_awsize),
         .S_AXI_HP0_awburst(axi_awburst),
         .S_AXI_HP0_awcache(axi_awcache),
@@ -294,8 +295,8 @@ def setup(py_params_dict):
         .S_AXI_HP0_bresp(axi_bresp),
         .S_AXI_HP0_bvalid(axi_bvalid),
         .S_AXI_HP0_bready(axi_bready),
-        .S_AXI_HP0_araddr(axi_araddr),
-        .S_AXI_HP0_arlen(axi_arlen),
+        .S_AXI_HP0_araddr({3'b0, axi_araddr}),
+        .S_AXI_HP0_arlen(axi_arlen[3:0]),
         .S_AXI_HP0_arsize(axi_arsize),
         .S_AXI_HP0_arburst(axi_arburst),
         .S_AXI_HP0_arcache(axi_arcache),

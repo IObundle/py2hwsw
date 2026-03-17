@@ -10,9 +10,9 @@ def setup(py_params_dict):
         "confs": [
             {
                 "name": "DDR_ADDR_W",
-                "descr": "Smart Zynq SL has 512 MiB of DDR3 memory. (2**27 addresses) * (4 byte words) = 512 MiB.",
+                "descr": "Smart Zynq SL has 512 MiB of DDR3 memory. 2**29 byte-addresses = 512 MiB.",
                 "type": "D",
-                "val": "27",
+                "val": "29",
             },
             {
                 "name": "BAUD",

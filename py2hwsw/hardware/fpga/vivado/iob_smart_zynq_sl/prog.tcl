@@ -23,11 +23,15 @@ fpga "$FPGA_TOP.bit"
 # 3. Initialize PS
 targets -set -nocase -filter {name =~ "ARM Cortex-A9 MPCore #0"}
 puts "--- Initializing PS ---"
-# Find ps7_init.tcl. In Py2HWSW it should be in the generated ip directory.
-set PS7_INIT_FILE [glob -nocomplain -directory ./ip/system/ip/ *ps7_init.tcl]
+# Find ps7_init.tcl. In Py2HWSW it should be in the generated .gen directory.
+set PS7_INIT_FILE [glob -nocomplain -directory . -- .gen/sources_1/bd/system/ip/*/ps7_init.tcl]
 if {[llength $PS7_INIT_FILE] == 0} {
     # Fallback to alternative location
-    set PS7_INIT_FILE [glob -nocomplain -directory . -recursive ps7_init.tcl]
+    set PS7_INIT_FILE [glob -nocomplain -directory . -- ip/system/ip/*/ps7_init.tcl]
+}
+if {[llength $PS7_INIT_FILE] == 0} {
+    # Last resort search
+    set PS7_INIT_FILE [glob -nocomplain -directory . -- */*/*/*/ps7_init.tcl]
 }
 
 if {[llength $PS7_INIT_FILE] > 0} {

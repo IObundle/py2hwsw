@@ -72,3 +72,16 @@ if { [get_files system.bd] == "" } {
     set wrapper_path [make_wrapper -files [get_files system.bd] -top]
     read_verilog $wrapper_path
 }
+
+if { $USE_ETHERNET > 0 } {
+    read_verilog vivado/$BOARD/iob_xilinx_ibufg.v
+    read_verilog vivado/$BOARD/iob_xilinx_oddr.v
+
+    if {[file exists "vivado/$BOARD/iob_eth_dev.sdc"]} {
+        read_xdc vivado/$BOARD/iob_eth_dev.sdc
+    }
+}
+
+if {[file exists "vivado/$BOARD/auto_board.sdc"]} {
+    read_xdc vivado/$BOARD/auto_board.sdc
+}

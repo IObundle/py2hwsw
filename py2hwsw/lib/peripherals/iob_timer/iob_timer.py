@@ -4,6 +4,8 @@
 
 
 def setup(py_params_dict):
+    PLIC_SOURCE_ID = py_params_dict.get("plic_source_id", 1)
+
     attributes_dict = {
         "generate_hw": True,
         "confs": [
@@ -23,6 +25,16 @@ def setup(py_params_dict):
                     "type": "iob_clk",
                 },
                 "descr": "Clock, clock enable and reset",
+            },
+            {
+                "name": "interrupt_o",
+                "signals": [
+                    {
+                        "name": "interrupt_o",
+                        "width": 1,
+                        "descr": "Timer interrupt source",
+                    },
+                ],
             },
         ],
         "wires": [
@@ -62,6 +74,20 @@ def setup(py_params_dict):
                     {"name": "data_high_rd", "width": 32},
                 ],
             },
+            {
+                "name": "interrupt_data_low",
+                "descr": "",
+                "signals": [
+                    {"name": "interrupt_data_low_wr", "width": 32},
+                ],
+            },
+            {
+                "name": "interrupt_data_high",
+                "descr": "",
+                "signals": [
+                    {"name": "interrupt_data_high_wr", "width": 32},
+                ],
+            },
             # Internal wires
             {
                 "name": "time_now",
@@ -79,6 +105,13 @@ def setup(py_params_dict):
                     {"name": "reset_wr"},
                     {"name": "sample_wr"},
                     {"name": "time_now"},
+                ],
+            },
+            {
+                "name": "interrupt_threshold",
+                "signals": [
+                    {"name": "interrupt_data_low_wr"},
+                    {"name": "interrupt_data_high_wr"},
                 ],
             },
         ],
@@ -118,7 +151,7 @@ def setup(py_params_dict):
                         "n_bits": 32,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "descr": "High part of the timer value, which has twice the width of the data word width",
+                        "descr": "Low part of the timer value, which has twice the width of the data word width",
                     },
                     {
                         "name": "data_high",
@@ -126,7 +159,23 @@ def setup(py_params_dict):
                         "n_bits": 32,
                         "rst_val": 0,
                         "log2n_items": 0,
-                        "descr": "Low part of the timer value, which has twice the width of the data word width",
+                        "descr": "High part of the timer value, which has twice the width of the data word width",
+                    },
+                    {
+                        "name": "interrupt_data_low",
+                        "mode": "W",
+                        "n_bits": 32,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "descr": "Low part of the timer interrupt threshold value, which has twice the width of the data word width. Interrupts disabled if low and high parts are set to zero.",
+                    },
+                    {
+                        "name": "interrupt_data_high",
+                        "mode": "W",
+                        "n_bits": 32,
+                        "rst_val": 0,
+                        "log2n_items": 0,
+                        "descr": "High part of the timer interrupt threshold value, which has twice the width of the data word width. Interrupts disabled if low and high parts are set to zero.",
                     },
                 ],
                 "csr_if": "iob",
@@ -139,6 +188,8 @@ def setup(py_params_dict):
                     "sample_o": "sample",
                     "data_low_i": "data_low",
                     "data_high_i": "data_high",
+                    "interrupt_data_low_o": "interrupt_data_low",
+                    "interrupt_data_high_o": "interrupt_data_high",
                 },
             },
             {
@@ -148,6 +199,8 @@ def setup(py_params_dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     "reg_interface_io": "iob_timer_core_reg_interface",
+                    "interrupt_threshold_i": "interrupt_threshold",
+                    "interrupt_o": "interrupt_o",
                 },
             },
         ],
@@ -155,6 +208,11 @@ def setup(py_params_dict):
             # Software modules
             {
                 "core_name": "iob_linux_device_drivers",
+                # Extra device tree properties specific to this peripheral
+                "dts_extra_properties": f"""
+        interrupt-parent = < &PLIC0 >; // PLIC phandle (matches PLIC peripheral name in system's DT)
+        interrupts = <{PLIC_SOURCE_ID}>; // PLIC source ID
+""",
             },
         ],
         "snippets": [

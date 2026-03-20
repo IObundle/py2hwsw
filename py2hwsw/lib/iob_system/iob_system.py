@@ -78,9 +78,9 @@ def setup(py_params: dict):
     xbar_sel_w = (num_xbar_managers - 1).bit_length()
 
     # Create list of interrupt signals
-    interrupt_signals = []
+    interrupt_signals = ["timer0_interrupt"]
     if params["use_ethernet"]:
-        interrupt_signals += ["eth_interrupt"]
+        interrupt_signals += ["eth0_interrupt"]
 
     attributes_dict = {
         "name": params["name"],
@@ -844,7 +844,9 @@ def setup(py_params: dict):
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     # Cbus connected automatically
+                    "interrupt_o": "timer0_interrupt",
                 },
+                "plice_source_id": 1,
             },
             {
                 "core_name": "iob_plic",
@@ -898,7 +900,7 @@ def setup(py_params: dict):
                     "connect": {
                         "clk_en_rst_s": "clk_en_rst_s",
                         "axi_m": "eth_axi",
-                        "inta_o": "eth_interrupt",
+                        "inta_o": "eth0_interrupt",
                         "phy_rstn_o": "phy_rstn_o",
                         "mii_io": "mii_io",
                     },

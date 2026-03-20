@@ -50,7 +50,7 @@ def setup(py_params: dict):
     # Verilog snippets
     #
     verilog_snippet = """
-   assign interrupts = {{28{1'b0}}, uart2_interrupt, uart1_interrupt, uart0_interrupt, 1'b0};
+   assign interrupts = {{27{1'b0}}, uart2_interrupt, uart1_interrupt, uart0_interrupt, timer0_interrupt, 1'b0};
 """
 
     if params["dma_demo"]:
@@ -113,26 +113,35 @@ def setup(py_params: dict):
         ],
         "wires": [
             # UART
-            {"name": "uart0_interrupt", "signals": [{"name": "uart0_interrupt", "width": 1}]},
-            {"name": "uart1_interrupt", "signals": [{"name": "uart1_interrupt", "width": 1}]},
-            {"name": "uart2_interrupt", "signals": [{"name": "uart2_interrupt", "width": 1}]},
+            {
+                "name": "uart0_interrupt",
+                "signals": [{"name": "uart0_interrupt", "width": 1}],
+            },
+            {
+                "name": "uart1_interrupt",
+                "signals": [{"name": "uart1_interrupt", "width": 1}],
+            },
+            {
+                "name": "uart2_interrupt",
+                "signals": [{"name": "uart2_interrupt", "width": 1}],
+            },
             {
                 "name": "internal_rs232",
                 "descr": "Internal RS232 connection between UART1 and UART2",
                 "signals": {
                     "type": "rs232",
-                    "prefix": "internal_"
+                    "prefix": "internal_",
                 },
             },
             {
                 "name": "internal_rs232_inverted",
                 "descr": "Internal RS232 connection between UART1 and UART2",
-                "signals": {
+                "signals": [
                     {"name": "internal_rs232_txd"},
                     {"name": "internal_rs232_rxd"},
                     {"name": "internal_rs232_cts"},
                     {"name": "internal_rs232_rts"},
-                },
+                ],
             },
             # SPI master
             # {
@@ -171,7 +180,7 @@ def setup(py_params: dict):
                     "rs232_m": "rs232_m",
                     "interrupt_o": "uart0_interrupt",
                 },
-                "plice_source_id": 1,
+                "plice_source_id": 2,
             },
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
@@ -186,7 +195,7 @@ def setup(py_params: dict):
                     "rs232_m": "internal_rs232",
                     "interrupt_o": "uart1_interrupt",
                 },
-                "plice_source_id": 2,
+                "plice_source_id": 3,
             },
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
@@ -201,7 +210,7 @@ def setup(py_params: dict):
                     "rs232_m": "internal_rs232_inverted",
                     "interrupt_o": "uart2_interrupt",
                 },
-                "plice_source_id": 3,
+                "plice_source_id": 4,
             },
             # {
             #     # Instantiate a VERSAT core from: https://github.com/IObundle/iob-versat

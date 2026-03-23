@@ -99,6 +99,9 @@ class iob_core(iob_module, iob_instance):
         # Store kwargs to allow access to python parameters after object has been created
         self.received_python_parameters = kwargs
 
+        # Instance name attribute is usually passed via python parameters to subblocks
+        attributes["instance_name"] = kwargs.get("instance_name", "")
+
         # Reference to parent core
         self.parent_obj = None
 

@@ -47,7 +47,6 @@ def create_dts_file(path, peripheral):
 
 def create_dtsi_file(path, peripheral, extra_properties=""):
     """Create device tree include file to be included in the main SoC's device tree"""
-    # NOTE: Using 'INSTANCE_NAME' as a special keyword that will be replaced with correct peripheral instance name by scripts in build dir.
     content = f"""\
 // {SPDX_PREFIX}FileCopyrightText: {peripheral['spdx_year']} {peripheral['author']}
 //
@@ -59,13 +58,13 @@ def create_dtsi_file(path, peripheral, extra_properties=""):
 
 &soc {{
     // Include this core as a peripheral of main system labeled 'soc'.
-    INSTANCE_NAME: {peripheral['name']}@/*INSTANCE_NAME_BASE_MACRO*/ {{
+    {peripheral['instance_name']}: {peripheral['name']}@/*{peripheral['instance_name']}_BASE_MACRO*/ {{
         compatible = \"{peripheral['compatible_str']}\";
-        reg = <0x/*INSTANCE_NAME_BASE_MACRO*/ 0x/*{peripheral['name'].upper()}_CSRS_ADDR_RANGE_MACRO*/>;
+        reg = <0x/*{peripheral['instance_name']}_BASE_MACRO*/ 0x/*{peripheral['name'].upper()}_CSRS_ADDR_RANGE_MACRO*/>;
         {extra_properties}
     }};
 }};"""
-    with open(os.path.join(path, f"{peripheral['name']}.dtsi"), "w") as f:
+    with open(os.path.join(path, f"{peripheral['instance_name']}.dtsi"), "w") as f:
         f.write(content)
 
 

@@ -180,7 +180,7 @@ def setup(py_params: dict):
                     "rs232_m": "rs232_m",
                     "interrupt_o": "uart0_interrupt",
                 },
-                "plice_source_id": 2,
+                "plic_source_id": 2,
             },
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
@@ -195,7 +195,7 @@ def setup(py_params: dict):
                     "rs232_m": "internal_rs232",
                     "interrupt_o": "uart1_interrupt",
                 },
-                "plice_source_id": 3,
+                "plic_source_id": 3,
             },
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
@@ -210,7 +210,7 @@ def setup(py_params: dict):
                     "rs232_m": "internal_rs232_inverted",
                     "interrupt_o": "uart2_interrupt",
                 },
-                "plice_source_id": 4,
+                "plic_source_id": 4,
             },
             # {
             #     # Instantiate a VERSAT core from: https://github.com/IObundle/iob-versat

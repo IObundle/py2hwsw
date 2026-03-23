@@ -846,7 +846,7 @@ def setup(py_params: dict):
                     # Cbus connected automatically
                     "interrupt_o": "timer0_interrupt",
                 },
-                "plice_source_id": 1,
+                "plic_source_id": 1,
             },
             {
                 "core_name": "iob_plic",

@@ -1088,12 +1088,6 @@ def generate_device_drivers(
     )
 
     # Peripheral information
-    instance_name = (
-        peripheral["name"][4:]
-        if peripheral["name"].startswith("iob_")
-        else peripheral["name"]
-    )
-
     license_autor = "IObundle"
     license_year = "2025"
     license_name = "MIT"
@@ -1105,7 +1099,7 @@ def generate_device_drivers(
     # Group peripheral information into a dictionary
     _peripheral = {
         "name": peripheral["name"],  # example: 'iob_timer'
-        "instance_name": f"{instance_name}0",  # example: 'timer0'
+        "instance_name": peripheral["instance_name"],  # example: 'timer0'
         "upper_name": peripheral["name"].upper(),
         "version": (
             peripheral["version"] if "version" in peripheral else py2hwsw_version
@@ -1116,11 +1110,10 @@ def generate_device_drivers(
         "spdx_license": license_name,
         "license": f"Dual {license_name}/GPL",
         "csrs": csrs_list,
+        "compatible_str": (
+            compatible_str if compatible_str else f"iobundle,{peripheral['name']}"
+        ),
     }
-    if compatible_str:
-        _peripheral["compatible_str"] = compatible_str
-    else:
-        _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"
 
     print(
         "Generating device drivers for", _peripheral["name"], "in", drivers_output_dir

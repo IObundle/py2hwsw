@@ -126,7 +126,7 @@ def setup(py_params_dict):
                     {"name": "mii_rxd_i", "width": "4"},
                     {"name": "mii_rx_dv_i", "width": "1"},
                     {"name": "mii_rx_er_i", "width": "1"},
-                    {"name": "mii_tx_clk_i", "width": "1"},
+                    {"name": "mii_tx_clk_o", "width": "1"},
                     {"name": "mii_txd_o", "width": "4"},
                     {"name": "mii_tx_en_o", "width": "1"},
                     {"name": "mii_mdc_o", "width": "1"},
@@ -204,7 +204,7 @@ def setup(py_params_dict):
                     {"name": "eth_clk"},
                     {"name": "high", "width": "1"},
                     {"name": "low", "width": "1"},
-                    {"name": "mii_tx_clk_i"},
+                    {"name": "mii_tx_clk_o"},
                 ],
             },
             {
@@ -250,6 +250,8 @@ def setup(py_params_dict):
             "dest_dir": "hardware/common_src",
         },
     ]
+    if params["use_extmem"]:
+        attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
     if params["use_ethernet"]:
         attributes_dict["subblocks"][-1]["connect"].update({"mii_io": "mii"})
         attributes_dict["subblocks"][-1]["connect"].update({"phy_rstn_o": "phy_rstn"})
@@ -269,8 +271,6 @@ def setup(py_params_dict):
                 },
             },
         ]
-    if params["use_extmem"]:
-        attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
 
     #
     # Snippets

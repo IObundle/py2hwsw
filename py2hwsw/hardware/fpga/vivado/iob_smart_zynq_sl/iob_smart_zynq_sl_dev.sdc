@@ -34,13 +34,13 @@ set_property -dict {PACKAGE_PIN F21 IOSTANDARD LVCMOS33} [get_ports {mii_txd_o[1
 set_property -dict {PACKAGE_PIN F22 IOSTANDARD LVCMOS33} [get_ports {mii_txd_o[2]}]
 set_property -dict {PACKAGE_PIN G20 IOSTANDARD LVCMOS33} [get_ports {mii_txd_o[3]}]
 set_property -dict {PACKAGE_PIN G22 IOSTANDARD LVCMOS33} [get_ports mii_tx_en_o]
-set_property -dict {PACKAGE_PIN D21 IOSTANDARD LVCMOS33} [get_ports mii_tx_clk_i]
+set_property -dict {PACKAGE_PIN D21 IOSTANDARD LVCMOS33} [get_ports mii_tx_clk_o]
 set_property SLEW FAST [get_ports {mii_txd_o[0]}]
 set_property SLEW FAST [get_ports {mii_txd_o[1]}]
 set_property SLEW FAST [get_ports {mii_txd_o[2]}]
 set_property SLEW FAST [get_ports {mii_txd_o[3]}]
 set_property SLEW FAST [get_ports mii_tx_en_o]
-set_property SLEW FAST [get_ports mii_tx_clk_i]
+set_property SLEW FAST [get_ports mii_tx_clk_o]
 
 ## J5 on board (BANK35 V3V3)
 # Set voltage level for banks35 (match with jumper setting on board)

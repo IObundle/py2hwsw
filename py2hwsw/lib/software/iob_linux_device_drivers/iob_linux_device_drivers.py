@@ -30,6 +30,7 @@ def setup(py_params_dict):
         # Extra properties to include in device tree peripheral snippet
         py_params_dict.get("dts_extra_properties", ""),
         compatible_str=py_params_dict.get("compatible_str", ""),
+        support_interrupt=py_params_dict.get("support_interrupts", False),
     )
 
     attributes_dict = {

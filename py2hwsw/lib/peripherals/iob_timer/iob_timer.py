@@ -213,6 +213,8 @@ def setup(py_params_dict):
         interrupt-parent = < &PLIC0 >; // PLIC phandle (matches PLIC peripheral name in system's DT)
         interrupts = <{PLIC_SOURCE_ID}>; // PLIC source ID
 """,
+                # Enable interrupt support in the generated driver
+                "support_interrupts": True,
             },
         ],
         "snippets": [

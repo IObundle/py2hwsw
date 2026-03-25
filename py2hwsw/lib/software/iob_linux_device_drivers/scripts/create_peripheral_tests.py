@@ -62,17 +62,45 @@ def create_peripheral_tests(output_dir, peripheral):
 
 #define TEST_WRITE_VALUE 0x12345678
 
-#define RUN_TEST(test_name) \
-    printf("Running test: %s...\\n", #test_name); \
-    if (test_name() != TEST_PASSED) {{ \
-        printf("Test failed: %s\\n", #test_name); \
-        return TEST_FAILED; \
-    }} \
+#define RUN_TEST(test_name) \\
+    printf("Running test: %s...\\n", #test_name); \\
+    if (test_name() != TEST_PASSED) {{ \\
+        printf("Test failed: %s\\n", #test_name); \\
+        return TEST_FAILED; \\
+    }} \\
     printf("Test passed: %s\\n", #test_name);
 
+"""
+    if peripheral["support_interrupt"]:
+        content += f"int {peripheral['name']}_csrs_wait_interrupt();\n"
+
+    content += """
 //
 // Functionality tests
 //
+"""
+
+    if peripheral["support_interrupt"]:
+        content += f"""
+int test_functionality_interrupt() {{
+    // Reset and Start Timer
+    {peripheral['name']}_csrs_set_reset(1);
+    {peripheral['name']}_csrs_set_reset(0);
+    {peripheral['name']}_csrs_set_enable(1);
+
+    // Set threshold for 1000000 cycles (assuming some clock)
+    uint32_t threshold = 1000000;
+    {peripheral['name']}_csrs_set_interrupt_data_low(threshold);
+    {peripheral['name']}_csrs_set_interrupt_data_high(0);
+
+    printf("Waiting for interrupt...\\n");
+    if ({peripheral['name']}_csrs_wait_interrupt() != 0) {{
+        return TEST_FAILED;
+    }}
+    printf("Interrupt received!\\n");
+
+    return TEST_PASSED;
+}}
 """
 
     for csr in csrs:
@@ -376,6 +404,9 @@ int main() {{
 
     // Run functionality tests
 """
+    if peripheral["support_interrupt"]:
+        content += f"\n    RUN_TEST(test_functionality_interrupt);"
+
     for csr in csrs:
         if "W" in csr["mode"]:
             content += f"\n    RUN_TEST(test_functionality_{csr['name']}_write);"

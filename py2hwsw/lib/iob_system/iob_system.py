@@ -31,12 +31,12 @@ def setup(py_params: dict):
         "addr_w": (32, "CPU address width"),
         "data_w": (32, "CPU data width"),
         "mem_addr_w": (
-            18,
+            15,
             "Internal memory address width. Also specifies default value for external memory address width.",
         ),
         "bootrom_addr_w": (12, "Bootrom address width"),
         "fw_baseaddr": (0, "Firmware base address"),
-        "fw_addr_w": (18, "Firmware address width"),
+        "fw_addr_w": (15, "Firmware address width"),
         "include_tester": (True, "If should include a tester system"),
         "include_snippet": (True, "If should include default system snippet"),
         # See notes at the end of this file for more info about custom CPU integration and available CPUs

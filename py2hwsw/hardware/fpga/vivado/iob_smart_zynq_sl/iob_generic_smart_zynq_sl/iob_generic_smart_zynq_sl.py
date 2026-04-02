@@ -5,14 +5,14 @@
 
 def setup(py_params_dict):
     attributes_dict = {
-        "name": py_params_dict["issuer"]["name"] + "_iob_zybo_z7",
+        "name": py_params_dict["issuer"]["name"] + "_iob_smart_zynq_sl",
         "generate_hw": True,
         "confs": [
             {
                 "name": "DDR_ADDR_W",
-                "descr": "Zybo Z7 has 1 GiB of DDR3L memory. 2**30 byte-addresses = 1 GiB.",
+                "descr": "Smart Zynq SL has 512 MiB of DDR3 memory. 2**29 byte-addresses = 512 MiB.",
                 "type": "D",
-                "val": "30",
+                "val": "29",
             },
             {
                 "name": "BAUD",

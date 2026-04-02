@@ -73,6 +73,7 @@ def setup(py_params: dict):
             "iob_aes_ku040_db_g",
             "iob_cyclonev_gt_dk",
             "iob_zybo_z7",
+            "iob_smart_zynq_sl",
         ],
         "confs": [
             {  # Used for software.

@@ -11,7 +11,7 @@ def setup(py_params_dict):
 
     attributes_dict = {
         "name": params["name"] + "_iob_zybo_z7",
-        "generate_hw": False,
+        "generate_hw": True,
         #
         # Configuration
         #
@@ -20,7 +20,7 @@ def setup(py_params_dict):
                 "name": "AXI_ID_W",
                 "descr": "AXI ID bus width",
                 "type": "D",
-                "val": "4",
+                "val": "6",
                 "min": "1",
                 "max": "32",
             },
@@ -34,9 +34,9 @@ def setup(py_params_dict):
             },
             {
                 "name": "AXI_ADDR_W",
-                "descr": "AXI address bus width",
+                "descr": "AXI address bus width. 2**30 byte-addresses for 1 GiB of DDR3 memory.",
                 "type": "D",
-                "val": "30" if params["use_extmem"] else "20",
+                "val": "30",
                 "min": "1",
                 "max": "32",
             },
@@ -72,252 +72,70 @@ def setup(py_params_dict):
     # Ports
     #
     attributes_dict["ports"] = [
-        # inout [14:0]DDR_addr;
-        #  inout [2:0]DDR_ba;
-        #  inout DDR_cas_n;
-        #  inout DDR_ck_n;
-        #  inout DDR_ck_p;
-        #  inout DDR_cke;
-        #  inout DDR_cs_n;
-        #  inout [3:0]DDR_dm;
-        #  inout [31:0]DDR_dq;
-        #  inout [3:0]DDR_dqs_n;
-        #  inout [3:0]DDR_dqs_p;
-        #  inout DDR_odt;
-        #  inout DDR_ras_n;
-        #  inout DDR_reset_n;
-        #  inout DDR_we_n;
-        #  inout FIXED_IO_ddr_vrn;
-        #  inout FIXED_IO_ddr_vrp;
-        #  inout [53:0]FIXED_IO_mio;
-        #  inout FIXED_IO_ps_clk;
-        #  inout FIXED_IO_ps_porb;
-        #  inout FIXED_IO_ps_srstb;
         {
-            "name": "DDR_addr_io",
-            "descr": "DDR address bus",
+            "name": "ddr_io",
+            "descr": "Zynq DDR pins",
             "signals": [
-                {"name": "DDR_addr_io", "width": "15"},
+                {"name": "ddr_addr_io", "width": "15"},
+                {"name": "ddr_ba_io", "width": "3"},
+                {"name": "ddr_cas_n_io", "width": "1"},
+                {"name": "ddr_ck_n_io", "width": "1"},
+                {"name": "ddr_ck_p_io", "width": "1"},
+                {"name": "ddr_cke_io", "width": "1"},
+                {"name": "ddr_cs_n_io", "width": "1"},
+                {"name": "ddr_dm_io", "width": "4"},
+                {"name": "ddr_dq_io", "width": "32"},
+                {"name": "ddr_dqs_n_io", "width": "4"},
+                {"name": "ddr_dqs_p_io", "width": "4"},
+                {"name": "ddr_odt_io", "width": "1"},
+                {"name": "ddr_ras_n_io", "width": "1"},
+                {"name": "ddr_reset_n_io", "width": "1"},
+                {"name": "ddr_we_n_io", "width": "1"},
             ],
         },
         {
-            "name": "DDR_ba_io",
-            "descr": "DDR bank address bus",
+            "name": "fixed_io",
+            "descr": "Zynq Fixed IO pins",
             "signals": [
-                {"name": "DDR_ba_io", "width": "3"},
+                {"name": "fixed_io_ddr_vrn_io", "width": "1"},
+                {"name": "fixed_io_ddr_vrp_io", "width": "1"},
+                {"name": "fixed_io_mio_io", "width": "54"},
+                {"name": "fixed_io_ps_clk_io", "width": "1"},
+                {"name": "fixed_io_ps_porb_io", "width": "1"},
+                {"name": "fixed_io_ps_srstb_io", "width": "1"},
             ],
         },
         {
-            "name": "DDR_cas_n_io",
-            "descr": "DDR CAS signal",
+            "name": "board_peripherals_io",
+            "descr": "Board Peripherals",
             "signals": [
-                {"name": "DDR_cas_n_io", "width": "1"},
-            ],
-        },
-        {
-            "name": "DDR_ck_n_io",
-            "descr": "DDR clock negative signal",
-            "signals": [
-                {"name": "DDR_ck_n_io", "width": "1"},
-            ],
-        },
-        {
-            "name": "DDR_ck_p_io",
-            "descr": "DDR clock positive signal",
-            "signals": [
-                {"name": "DDR_ck_p_io", "width": "1"},
-            ],
-        },
-        {
-            "name": "DDR_cke_io",
-            "descr": "DDR clock enable signal",
-            "signals": [
-                {"name": "DDR_cke_io", "width": "1"},
-            ],
-        },
-        {
-            "name": "DDR_cs_n_io",
-            "descr": "DDR chip select signal",
-            "signals": [
-                {"name": "DDR_cs_n_io", "width": "1"},
-            ],
-        },
-        {
-            "name": "DDR_dm_io",
-            "descr": "DDR data mask bus",
-            "signals": [
-                {
-                    "name": "DDR_dm_io",  # Data mask
-                    # Width is 4 for DDR3, 8 for DDR4
-                    # This should match the memory type used
-                    # in the design.
-                    # For Zybo Z7, it is typically 4.
-                    # Adjust as necessary based on your design.
-                    # Here we assume DDR3 with 4 data masks
-                    "width": 4,
-                },
-            ],
-        },
-        {
-            # DDR data bus
-            # Width is typically 32 bits for DDR3/4
-            # Adjust based on your design requirements.
-            # For Zybo Z7, it is usually 32 bits.
-            # If using DDR4, consider using a wider bus if needed.
-            # Here we assume a standard 32-bit data bus.
-            # If you need more bits, adjust accordingly.
-            # For example, if using DDR4 with
-            # 64-bit data bus, change width to 64.
-            "name": "DDR_dq_io",
-            "descr": "DDR data bus",
-            "signals": [
-                {"name": "DDR_dq_io", "width": "32"},
-            ],
-        },
-        {
-            "name": "DDR_dqs_n_io",
-            "descr": "DDR data strobe negative signal",
-            "signals": [
-                {"name": "DDR_dqs_n_io", "width": "4"},
-            ],
-        },
-        {
-            "name": "DDR_dqs_p_io",
-            "descr": "DDR data strobe positive signal",
-            "signals": [
-                {"name": "DDR_dqs_p_io", "width": "4"},
-            ],
-        },
-        {
-            "name": "DDR_odt_io",
-            "descr": "DDR on-die termination signal",
-            "signals": [
-                {"name": "DDR_odt_io", "width": "1"},
-            ],
-        },
-        {
-            "name": "DDR_ras_n_io",
-            "descr": "DDR RAS signal",
-            "signals": [
-                {"name": "DDR_ras_n_io", "width": "1"},
-            ],
-        },
-        {
-            # DDR reset signal
-            # This is typically active low.
-            # Ensure it matches your design requirements.
-            # For Zybo Z7, it is usually active low.
-            # If using DDR4, ensure the reset logic is compatible.
-            # Here we assume a standard active low reset.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high reset, change to '1'.
-            # Here we assume an active low reset.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high reset, change to '1'.
-            # Here we assume an active low reset.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high reset, change to '1'.
-            # Here we assume an active low reset.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high reset, change to '1'.
-            # Here we assume an active low reset.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high reset, change to '1'.
-            # Here we assume an active low reset.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high reset, change to '1'.
-            # Here we assume an active low reset.
-            #
-            "name": "DDR_reset_n_io",
-            "descr": "DDR reset signal",
-            "signals": [
-                {"name": "DDR_reset_n_io", "width": "1"},
-            ],
-        },
-        {
-            "name": "FIXED_IO_ddr_vrn_io",
-            "descr": "DDR voltage reference negative",
-            "signals": [
-                {"name": "FIXED_IO_ddr_vrn_io", "width": "1"},
-            ],
-        },
-        {
-            "name": "FIXED_IO_ddr_vrp_io",
-            "descr": "DDR voltage reference positive",
-            "signals": [
-                {"name": "FIXED_IO_ddr_vrp_io", "width": "1"},
-            ],
-        },
-        {
-            # MIO pins for various functions
-            # Adjust the width based on your design requirements.
-            # For Zybo Z7, it is typically 54 bits.
-            # If using fewer MIO pins, adjust the width accordingly.
-            # Here we assume a standard 54-bit MIO bus.
-            # If you need more or fewer bits, adjust accordingly.
-            # For example, if using 40 MIO pins, change width to 40.
-            # Here we assume a standard 54-bit MIO bus.
-            # If you need more or fewer bits, adjust accordingly.
-            # For example, if using 40 MIO pins, change width to 40.
-            # Here we assume a standard 54-bit MIO bus.
-            # If you need more or fewer bits, adjust accordingly.
-            # For example, if using 40 MIO pins, change width to 40.
-            "name": "FIXED_IO_mio_io",
-            "descr": "MIO pins for various functions",
-            "signals": [
-                {"name": "FIXED_IO_mio_io", "width": "54"},
-            ],
-        },
-        {
-            # PS clock input
-            # This is typically used for system clock input.
-            # Ensure it matches your design requirements.
-            # For Zybo Z7, it is usually connected to a clock source.
-            # If using a different clock frequency, adjust accordingly.
-            # Here we assume a standard clock input signal.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high clock input, change to '1'.
-            # Here we assume an active high clock input signal.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active low clock input, change to '0'.
-            # Here we assume an active high clock input
-            "name": "FIXED_IO_ps_clk_io",
-            "descr": "PS clock input",
-            "signals": [
-                {"name": "FIXED_IO_ps_clk_io", "width": "1"},
-            ],
-        },
-        {
-            # PS PORB (Power-On Reset) signal
-            # This is typically used for system reset.
-            # Ensure it matches your design requirements.
-            # For Zybo Z7, it is usually connected to a reset source.
-            # If using a different reset logic, adjust accordingly.
-            # Here we assume an active low reset signal.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high reset, change to '1'.
-            "name": "FIXED_IO_ps_porb_io",
-            "descr": "PS PORB signal",
-            "signals": [
-                {"name": "FIXED_IO_ps_porb_io", "width": "1"},
-            ],
-        },
-        {
-            # PS SRSTB (System Reset) signal
-            # This is typically used for system reset.
-            # Ensure it matches your design requirements.
-            # For Zybo Z7, it is usually connected to a reset source.
-            # If using a different reset logic, adjust accordingly.
-            # Here we assume an active low reset signal.
-            # If you need a different logic level, adjust accordingly.
-            # For example, if using active high reset, change to '1'.
-            "name": "FIXED_IO_ps_srstb_io",
-            "descr": "PS SRSTB signal",
-            "signals": [
-                {"name": "FIXED_IO_ps_srstb_io", "width": "1"},
+                {"name": "led_o", "width": "4"},
+                {"name": "btn_i", "width": "4"},
+                {"name": "uart_rxd_i", "width": "1"},
+                {"name": "uart_txd_o", "width": "1"},
             ],
         },
     ]
+    if params["use_ethernet"]:
+        attributes_dict["ports"] += [
+            {
+                "name": "mii_io",
+                "descr": "Ethernet interface",
+                "signals": [
+                    {"name": "mii_rx_clk_i", "width": "1"},
+                    {"name": "mii_rxd_i", "width": "4"},
+                    {"name": "mii_rx_dv_i", "width": "1"},
+                    {"name": "mii_rx_er_i", "width": "1"},
+                    {"name": "mii_tx_clk_o", "width": "1"},
+                    {"name": "mii_txd_o", "width": "4"},
+                    {"name": "mii_tx_en_o", "width": "1"},
+                    {"name": "mii_mdc_o", "width": "1"},
+                    {"name": "mii_mdio_io", "width": "1"},
+                    {"name": "mii_crs_i", "width": "1"},
+                    {"name": "mii_col_i", "width": "1"},
+                ],
+            },
+        ]
 
     #
     # Wires
@@ -330,89 +148,300 @@ def setup(py_params_dict):
                 "type": "iob_clk",
             },
         },
+        {"name": "rst_n", "signals": [{"name": "rst_n", "width": 1}]},
         {
-            "name": "arst_n",
-            "descr": "Negated reset",
+            "name": "ps_uart",
+            "descr": "PS UART signals",
             "signals": [
-                {"name": "arst_n", "width": "1"},
+                {"name": "ps_uart_rx", "width": "1"},
+                {"name": "ps_uart_tx", "width": "1"},
             ],
         },
         {
-            "name": "rs232_int",
-            "descr": "iob-system uart interface",
+            "name": "ps_gpio",
+            "descr": "PS GPIO signals",
+            "signals": [
+                {"name": "ps_gpio_o", "width": "64"},
+                {"name": "ps_gpio_i", "width": "64"},
+            ],
+        },
+        {
+            "name": "axi",
+            "descr": "AXI interface to connect SoC to PS DDR",
+            "signals": {
+                "type": "axi",
+                "ID_W": "AXI_ID_W",
+                "ADDR_W": "AXI_ADDR_W",
+                "DATA_W": "AXI_DATA_W",
+                "LEN_W": "AXI_LEN_W",
+                "PROT_W": 3,
+                "LOCK_W": 1,
+            },
+        },
+        {
+            "name": "uut_rs232",
+            "descr": "Uart interface for UUT",
             "signals": {
                 "type": "rs232",
+                "prefix": "uut_",
             },
         },
     ]
+    if params["use_ethernet"]:
+        attributes_dict["wires"] += [
+            {
+                "name": "rxclk_buf_io",
+                "descr": "IBUFG io",
+                "signals": [
+                    {"name": "mii_rx_clk_i"},
+                    {"name": "eth_clk", "width": "1"},
+                ],
+            },
+            {
+                "name": "oddr_io",
+                "descr": "ODDR io",
+                "signals": [
+                    {"name": "eth_clk"},
+                    {"name": "high", "width": "1"},
+                    {"name": "low", "width": "1"},
+                    {"name": "mii_tx_clk_o"},
+                ],
+            },
+            {
+                "name": "phy_rstn",
+                "descr": "",
+                "signals": [
+                    {
+                        "name": "phy_rstn",
+                        "width": "1",
+                        "descr": "Issuer ethernet reset signal for PHY.",
+                    },
+                ],
+            },
+            {
+                "name": "mii",
+                "descr": "Ethernet MII interface for UUT",
+                "signals": {
+                    "type": "mii",
+                    "prefix": "uut_",
+                },
+            },
+        ]
 
     #
     # Blocks
     #
     attributes_dict["subblocks"] = [
         {
-            # Memory Wrapper
+            # IOb-SoC instance
             "core_name": py_params_dict["issuer"]["original_name"],
             "instance_name": py_params_dict["issuer"]["original_name"],
-            "instance_description": "IOb-SoC instance",
+            "instance_description": "IOb-System instance",
             "parameters": {
                 "AXI_ID_W": "AXI_ID_W",
-                "AXI_LEN_W": "AXI_LEN_W",
+                "AXI_LEN_W": "8",  # SoC expects AXI4
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst",
-                "rs232_m": "rs232_int",
+                "rs232_m": "uut_rs232",
             },
             "dest_dir": "hardware/common_src",
         },
     ]
+    if params["use_extmem"]:
+        attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
+    if params["use_ethernet"]:
+        attributes_dict["subblocks"][-1]["connect"].update({"mii_io": "mii"})
+        attributes_dict["subblocks"][-1]["connect"].update({"phy_rstn_o": "phy_rstn"})
+        attributes_dict["subblocks"] += [
+            {
+                "core_name": "iob_xilinx_ibufg",
+                "instance_name": "rxclk_buf",
+                "connect": {
+                    "io_io": "rxclk_buf_io",
+                },
+            },
+            {
+                "core_name": "iob_xilinx_oddr",
+                "instance_name": "txclk_oddr",
+                "connect": {
+                    "io_io": "oddr_io",
+                },
+            },
+        ]
 
     #
     # Snippets
     #
-    attributes_dict["snippets"] = [
-        {
-            "verilog_code": """
-            // General connections
-            assign cke = 1'b1;
-            assign arst = ~arst_n;
+    verilog_snippet = """
+    // Connect board's LEDs and Buttons to PS7 GPIO.
+    assign led_o = ps_gpio_o[3:0];
+    assign ps_gpio_i = {60'b0, btn_i};
+    
+    // Connect clk_en_rst sources
+    assign cke = 1'b1;
+    assign arst = ~rst_n;
 
-            assign txd_o = rs232_txd;
-            assign rs232_rxd = rxd_i;
+    // Connect iob_system uart flow control
+    assign uut_rs232_cts = 1'b1;
+    // uut_rs232_rts floating
 
- processing_system7_0 processing_system7_0
-       (
-        .PS_CLK(FIXED_IO_ps_clk_io),
-        .PS_PORB(FIXED_IO_ps_porb_io),
-        .PS_SRSTB(FIXED_IO_ps_srstb_io,
+    // For now, UART pins can be connected to either iob_system or PS7. Select one below.
+    // Connect iob_system uart
+    assign uut_rs232_rxd = uart_rxd_i;
+    assign uart_txd_o = uut_rs232_txd;
+    // Connect PS7 uart
+    // assign ps_uart_rx = uart_rxd_i;
+    // assign uart_txd_o = ps_uart_tx;
 
+    // Instantiate Zynq Block Design Wrapper
+    system_wrapper ps_inst (
+        .DDR_addr(ddr_addr_io),
+        .DDR_ba(ddr_ba_io),
+        .DDR_cas_n(ddr_cas_n_io),
+        .DDR_ck_n(ddr_ck_n_io),
+        .DDR_ck_p(ddr_ck_p_io),
+        .DDR_cke(ddr_cke_io),
+        .DDR_cs_n(ddr_cs_n_io),
+        .DDR_dm(ddr_dm_io),
+        .DDR_dq(ddr_dq_io),
+        .DDR_dqs_n(ddr_dqs_n_io),
+        .DDR_dqs_p(ddr_dqs_p_io),
+        .DDR_odt(ddr_odt_io),
+        .DDR_ras_n(ddr_ras_n_io),
+        .DDR_reset_n(ddr_reset_n_io),
+        .DDR_we_n(ddr_we_n_io),
+        .FIXED_IO_ddr_vrn(fixed_io_ddr_vrn_io),
+        .FIXED_IO_ddr_vrp(fixed_io_ddr_vrp_io),
+        .FIXED_IO_mio(fixed_io_mio_io),
+        .FIXED_IO_ps_clk(fixed_io_ps_clk_io),
+        .FIXED_IO_ps_porb(fixed_io_ps_porb_io),
+        .FIXED_IO_ps_srstb(fixed_io_ps_srstb_io),
+        
         .FCLK_CLK0(clk),
-        .FCLK_RESET0_N(arst_n),
+        .FCLK_RESET0_N(rst_n),
+        
+        .S_AXI_HP0_awaddr({3'b0, axi_awaddr}),
+        .S_AXI_HP0_awid(axi_awid),
+        .S_AXI_HP0_awlen(axi_awlen[3:0]),
+        .S_AXI_HP0_awsize(axi_awsize),
+        .S_AXI_HP0_awburst(axi_awburst),
+        .S_AXI_HP0_awlock({1'b0, axi_awlock}),
+        .S_AXI_HP0_awcache(axi_awcache),
+        .S_AXI_HP0_awprot(axi_awprot),
+        .S_AXI_HP0_awqos(axi_awqos),
+        .S_AXI_HP0_awvalid(axi_awvalid),
+        .S_AXI_HP0_awready(axi_awready),
+        .S_AXI_HP0_wdata(axi_wdata),
+        .S_AXI_HP0_wstrb(axi_wstrb),
+        .S_AXI_HP0_wlast(axi_wlast),
+        .S_AXI_HP0_wid(axi_awid), // Zynq HP ports use awid for wid
+        .S_AXI_HP0_wvalid(axi_wvalid),
+        .S_AXI_HP0_wready(axi_wready),
+        .S_AXI_HP0_bid(axi_bid),
+        .S_AXI_HP0_bresp(axi_bresp),
+        .S_AXI_HP0_bvalid(axi_bvalid),
+        .S_AXI_HP0_bready(axi_bready),
+        .S_AXI_HP0_araddr({3'b0, axi_araddr}),
+        .S_AXI_HP0_arid(axi_arid),
+        .S_AXI_HP0_arlen(axi_arlen[3:0]),
+        .S_AXI_HP0_arsize(axi_arsize),
+        .S_AXI_HP0_arburst(axi_arburst),
+        .S_AXI_HP0_arlock({1'b0, axi_arlock}),
+        .S_AXI_HP0_arcache(axi_arcache),
+        .S_AXI_HP0_arprot(axi_arprot),
+        .S_AXI_HP0_arqos(axi_arqos),
+        .S_AXI_HP0_arvalid(axi_arvalid),
+        .S_AXI_HP0_arready(axi_arready),
+        .S_AXI_HP0_rid(axi_rid),
+        .S_AXI_HP0_rdata(axi_rdata),
+        .S_AXI_HP0_rresp(axi_rresp),
+        .S_AXI_HP0_rlast(axi_rlast),
+        .S_AXI_HP0_rvalid(axi_rvalid),
+        .S_AXI_HP0_rready(axi_rready),
+        
+        .GPIO_O(ps_gpio_o),
+        .GPIO_I(ps_gpio_i),
+        .UART0_RX(ps_uart_rx),
+        .UART0_TX(ps_uart_tx)
+    );
+"""
+    if not params["use_extmem"]:
+        verilog_snippet += """
+    // Connect unused AXI inputs to zero
+    assign axi_awid = 'b0;
+    assign axi_awaddr = 'b0;
+    assign axi_awprot = 'b0;
+    assign axi_awlen = 'b0;
+    assign axi_awsize = 'd2; // 4 byte data transfer
+    assign axi_awburst = 'b0;
+    assign axi_awlock = 'b0;
+    assign axi_awcache = 'b0;
+    assign axi_awqos = 'b0;
+    assign axi_awvalid = 'b0;
+    assign axi_wstrb = 'b0;
+    assign axi_wdata = 'b0;
+    assign axi_wlast = 'd1; // All bursts are single transfers: always the last burst
+    assign axi_wvalid = 'b0;
+    assign axi_bready = 'b0;
+    assign axi_arid = 'b0;
+    assign axi_araddr = 'b0;
+    assign axi_arprot = 'b0;
+    assign axi_arlen = 'b0;
+    assign axi_arsize = 'd2; // 4 byte data transfer
+    assign axi_arburst = 'b0;
+    assign axi_arlock = 'b0;
+    assign axi_arcache = 'b0;
+    assign axi_arqos = 'b0;
+    assign axi_arvalid = 'b0;
+    assign axi_rready = 'b0;
+"""
+    if params["use_ethernet"]:
+        verilog_snippet += """
+    // Ethernet connections
+    assign high = 1'b1;
+    assign low = 1'b0;
 
-        .DDR_Addr(DDR_addr),
-        .DDR_BankAddr(DDR_ba),
-        .DDR_CAS_n(DDR_cas_n),
-        .DDR_CKE(DDR_cke),
-        .DDR_CS_n(DDR_cs_n),
-        .DDR_Clk(DDR_ck_p),
-        .DDR_Clk_n(DDR_ck_n),
-        .DDR_DM(DDR_dm),
-        .DDR_DQ(DDR_dq),
-        .DDR_DQS(DDR_dqs_p),
-        .DDR_DQS_n(DDR_dqs_n),
-        .DDR_DRSTB(DDR_reset_n),
-        .DDR_ODT(DDR_odt),
-        .DDR_RAS_n(DDR_ras_n),
-        .DDR_VRN(FIXED_IO_ddr_vrn),
-        .DDR_VRP(FIXED_IO_ddr_vrp),
-        .DDR_WEB(DDR_we_n)
-  );
+    // Use mii_rx_clk_i buffered clock (eth_clk) for internal MII and external mii_tx_clk_i
+    assign uut_mii_rx_clk = eth_clk;
+    assign uut_mii_tx_clk = eth_clk;
 
+    // Connect internal MII data/control to external ports
+    assign uut_mii_rxd = mii_rxd_i;
+    assign uut_mii_rx_dv = mii_rx_dv_i;
+    assign uut_mii_rx_er = mii_rx_er_i;
 
-            """,
-        },
-    ]
+    assign mii_txd_o = uut_mii_txd;
+    assign mii_tx_en_o = uut_mii_tx_en;
+
+    assign mii_mdc_o = uut_mii_mdc;
+    assign mii_mdio_io = uut_mii_mdio;
+
+    assign uut_mii_crs = mii_crs_i;
+    assign uut_mii_col = mii_col_i;
+
+    assign phy_rstn = ~arst; // PHY reset
+"""
+
+    attributes_dict["snippets"] = [{"verilog_code": verilog_snippet}]
+
+    # Create system clock constraint
+    assert py_params_dict["build_dir"], "build_dir not set!"
+    fpga_folder = os.path.join(
+        py_params_dict["build_dir"],
+        "hardware/fpga/vivado/iob_zybo_z7",
+    )
+    os.makedirs(fpga_folder, exist_ok=True)
+    with open(os.path.join(fpga_folder, "auto_board.sdc"), "w") as f:
+        f.write(
+            """\
+# This file was automatically generated by the iob_system_iob_zybo_z7.py script.
+
+# Clock groups
+set_clock_groups -asynchronous -group {clk_fpga_0} -group {mii_rx_clk_i}
+"""
+        )
 
     return attributes_dict

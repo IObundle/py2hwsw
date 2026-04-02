@@ -22,13 +22,13 @@ def setup(py_params_dict):
             },
             {
                 "name": "FREQ",
-                "descr": "Clock frequency",
+                "descr": "Typical clock frequency for this FPGA board",
                 "type": "D",
                 "val": "50000000",
             },
             {
                 "name": "XILINX",
-                "descr": "xilinx flag",
+                "descr": "Xilinx flag to signal that this board uses Xilinx tools",
                 "type": "D",
                 "val": "1",
             },

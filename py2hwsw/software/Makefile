@@ -21,9 +21,9 @@ endif
 #           Embedded settings           #
 #########################################
 
-ifneq ($(filter smart_zynq_sl iob_zybo_z7,$(BOARD)),)
-IS_ZYNQ=1
-endif
+# ifneq ($(filter iob_smart_zynq_sl iob_zybo_z7,$(BOARD)),)
+# IS_ZYNQ=1
+# endif
 
 ifeq ($(IS_ZYNQ),1)
 TEMPLATE_LDS ?=zynq_ps.ld

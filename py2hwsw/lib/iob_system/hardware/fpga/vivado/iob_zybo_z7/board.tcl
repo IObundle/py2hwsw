@@ -21,7 +21,7 @@ if { [get_files system.bd] == "" } {
     set_property -dict [list \
         CONFIG.PCW_CRYSTAL_PERIPHERAL_FREQMHZ {33.333333} \
         CONFIG.PCW_UIPARAM_DDR_PARTNO {MT41K256M16 RE-125} \
-        CONFIG.PCW_UIPARAM_DDR_BUS_WIDTH {16 Bit} \
+        CONFIG.PCW_UIPARAM_DDR_BUS_WIDTH {32 Bit} \
         CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {50} \
         CONFIG.PCW_USE_M_AXI_GP0 {0} \
         CONFIG.PCW_USE_S_AXI_HP0 {1} \

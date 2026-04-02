@@ -735,6 +735,22 @@ def create_driver_main_file(path, peripheral):
 
 #include "iob_class/iob_class_utils.h"
 #include "{peripheral['name']}_driver_files.h"
+
+static int {peripheral['name']}_probe(struct platform_device *);
+static int {peripheral['name']}_remove(struct platform_device *);
+
+static ssize_t {peripheral['name']}_read(struct file *, char __user *, size_t, loff_t *);
+static ssize_t {peripheral['name']}_write(struct file *, const char __user *, size_t,
+                               loff_t *);
+static loff_t {peripheral['name']}_llseek(struct file *, loff_t, int);
+static int {peripheral['name']}_open(struct inode *, struct file *);
+static int {peripheral['name']}_release(struct inode *, struct file *);
+
+static long {peripheral['name']}_ioctl(struct file *, unsigned int, unsigned long);
+
+static struct iob_data {peripheral['name']}_data = {{0}};
+DEFINE_MUTEX({peripheral['name']}_mutex);
+
 """
     if peripheral["support_interrupt"]:
         content += f"""
@@ -754,21 +770,6 @@ static irqreturn_t {peripheral['name']}_irq_handler(int irq, void *dev_id) {{
 }}
 """
     content += f"""
-static int {peripheral['name']}_probe(struct platform_device *);
-static int {peripheral['name']}_remove(struct platform_device *);
-
-static ssize_t {peripheral['name']}_read(struct file *, char __user *, size_t, loff_t *);
-static ssize_t {peripheral['name']}_write(struct file *, const char __user *, size_t,
-                               loff_t *);
-static loff_t {peripheral['name']}_llseek(struct file *, loff_t, int);
-static int {peripheral['name']}_open(struct inode *, struct file *);
-static int {peripheral['name']}_release(struct inode *, struct file *);
-
-static long {peripheral['name']}_ioctl(struct file *, unsigned int, unsigned long);
-
-static struct iob_data {peripheral['name']}_data = {{0}};
-DEFINE_MUTEX({peripheral['name']}_mutex);
-
 #include "{peripheral['name']}_sysfs.h"
 
 static const struct file_operations {peripheral['name']}_fops = {{
@@ -796,6 +797,9 @@ static struct platform_driver {peripheral['name']}_driver = {{
     .probe = {peripheral['name']}_probe,
     .remove = {peripheral['name']}_remove,
 }};
+
+"""
+    content += f"""
 
 //
 // Module init and exit functions

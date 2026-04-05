@@ -514,14 +514,14 @@ virtual-network-if:
             # Create target to copy UUT's hex files
             file.write(
                 """
-# Tester target to build and get UUT's hex files
-BUILD_DEPS+=get_uut_hex
+# Tester targets to build and get UUT's hex files
+BUILD_DEPS+=get_uut_build_deps
 
-get_uut_hex:
-	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation build_hex
+get_uut_build_deps:
+	make -C $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation build_deps
 	-cp $(ROOT_DIR)/$(RELATIVE_PATH_TO_UUT)/hardware/simulation/*.hex .
 
-.PHONY: get_uut_hex
+.PHONY: get_uut_build_deps
 """
             )
 

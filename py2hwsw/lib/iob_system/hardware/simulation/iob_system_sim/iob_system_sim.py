@@ -92,7 +92,7 @@ def setup(py_params_dict):
                 "signals": {
                     "type": "iob",
                     "prefix": "pbus_",
-                    "ADDR_W": 3,
+                    "ADDR_W": 4,
                 },
             },
         ]
@@ -132,16 +132,19 @@ def setup(py_params_dict):
                 {"name": "rs232_rts"},
             ],
         },
-        {
-            "name": "uart_cbus",
-            "descr": "UART CSR bus",
-            "signals": {
-                "type": "iob",
-                "prefix": "uart_",
-                "ADDR_W": periph_addr_w,
-            },
-        },
     ]
+    if len(tb_peripherals) > 1:
+        attributes_dict["wires"] += [
+            {
+                "name": "uart_cbus",
+                "descr": "UART CSR bus",
+                "signals": {
+                    "type": "iob",
+                    "prefix": "uart_",
+                    "ADDR_W": periph_addr_w,
+                },
+            },
+        ]
     if params["use_extmem"]:
         attributes_dict["wires"] += [
             {
@@ -306,7 +309,7 @@ def setup(py_params_dict):
             "csr_if": "iob",
             "connect": {
                 "clk_en_rst_s": "clk_en_rst_s",
-                "csrs_cbus_s": ("uart_cbus", ["uart_iob_addr[2:0]"]),
+                "csrs_cbus_s": ("uart_cbus", ["uart_iob_addr[3:0]"]),
                 "rs232_m": "rs232_invert",
             },
         },
@@ -314,7 +317,7 @@ def setup(py_params_dict):
     if len(tb_peripherals) == 1:
         # Connect uart directly to tb_s port if there is no tb_pbus_split
         attributes_dict["subblocks"][-1]["connect"].update(
-            {"csrs_cbus_s": ("tb_s", ["iob_addr_i[2:0]"])}
+            {"csrs_cbus_s": ("tb_s", ["iob_addr_i[3:0]"])}
         )
     if params["use_extmem"]:
         attributes_dict["subblocks"] += [

@@ -119,7 +119,9 @@ def setup(py_params_dict):
                             ],
                         }
                     )
-                    snippets += f"assign {csr['name']}_wstrb = {{{csr['n_bits']}{{1'b1}}}};"
+                    snippets += (
+                        f"assign {csr['name']}_wstrb = {{{csr['n_bits']}{{1'b1}}}};"
+                    )
 
                 # Connect register interfaces
                 if csr["mode"] == "W":

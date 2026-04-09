@@ -5,3 +5,6 @@
 ---
 # Use LLVM Defaults
 BasedOnStyle: LLVM
+# Avoid reordering includes since it breaks some C libraries (like OpenSBI and libfdk-aac)
+SortIncludes: Never
+IncludeBlocks: Preserve

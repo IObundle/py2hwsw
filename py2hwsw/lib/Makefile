@@ -226,11 +226,11 @@ running_system_upload:
 	make clean setup CORE=$(CORE) BUILD_DIR=$(BUILD_DIR)
 	# Compile userspace binaries
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(BUILD_DIR)/software/linux/user all'
-	# Copy driver binaries to iob_system_linux buildroot
+	# Copy userspace driver binaries to iob_system_linux buildroot
 	for file in "$(CORE)_user_sysfs" "$(CORE)_user_dev" "$(CORE)_user_ioctl" "$(CORE)_tests_sysfs" "$(CORE)_tests_dev" "$(CORE)_tests_ioctl"; do\
 		cp $(BUILD_DIR)/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
 	done
-	# Compile kernel driver
+	# Compile kernel driver (along with Linux kernel) and place it in iob_system_linux buildroot
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-linux-drivers MODULE_NAME=$(CORE) MODULE_DRIVER_DIR=../../../../$(BUILD_DIR)/software/linux/drivers ROOTFS_OVERLAY_DIR=../../software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers'
 	# Copy built driver to build dir
 	cp iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers/$(CORE).ko $(BUILD_DIR)/software/linux/drivers/

@@ -26,3 +26,9 @@
 [submodule "py2hwsw/lib/iob_system/submodules/iob_picorv32"]
 	path = py2hwsw/lib/iob_system/submodules/iob_picorv32
 	url = https://github.com/IObundle/iob-picorv32
+[submodule "py2hwsw/lib/iob_system/submodules/iob_clint"]
+	path = py2hwsw/lib/iob_system/submodules/iob_clint
+	url = https://github.com/IObundle/iob-clint.git
+[submodule "py2hwsw/lib/iob_system/submodules/iob_plic"]
+	path = py2hwsw/lib/iob_system/submodules/iob_plic
+	url = https://github.com/IObundle/iob-plic.git

@@ -846,7 +846,7 @@ def setup(py_params: dict):
                     # Cbus connected automatically
                     "interrupt_o": "timer0_interrupt",
                 },
-                "plic_source_id": 2,
+                "plic_source_id": 1,
             },
             {
                 "core_name": "iob_plic",
@@ -854,7 +854,7 @@ def setup(py_params: dict):
                 "instance_description": "RISC-V PLIC peripheral",
                 "is_peripheral": True,
                 "parameters": {
-                    "N_SOURCES": 32,
+                    "N_SOURCES": 31,  # + reserved bit 0
                     "N_TARGETS": 1,
                 },
                 "connect": {

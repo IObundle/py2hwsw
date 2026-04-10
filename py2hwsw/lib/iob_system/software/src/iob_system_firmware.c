@@ -36,8 +36,8 @@ void irq_handler(void) {
     int source_id = plic_claim_interrupt();
     printf("Detected interrupt. Source ID: %d.\n", source_id);
 
-    // Source ID 2 is the TIMER0_INTERRUPT
-    if (source_id == 2) {
+    // Source ID 1 is the TIMER0_INTERRUPT
+    if (source_id == 1) {
       timer_triggered = 1;
       // Disable timer interrupt to avoid continuous triggering
       timer_set_interrupt(0);

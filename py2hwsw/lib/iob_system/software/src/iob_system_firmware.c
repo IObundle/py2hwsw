@@ -33,7 +33,7 @@ void irq_handler(void) {
   if ((mcause & MCAUSE_INTERRUPT_BIT_MASK) &&
       ((mcause & 0xFF) == RISCV_INT_POS_MEI)) {
     // Claim the interrupt from PLIC
-    int source_id = plic_claim_interrupt();
+    int source_id = plic_claim_interrupt(0);
     printf("Detected interrupt. Source ID: %d.\n", source_id);
 
     // Source ID 1 is the TIMER0_INTERRUPT
@@ -44,7 +44,7 @@ void irq_handler(void) {
     }
 
     // Complete the interrupt in PLIC
-    plic_complete_interrupt(source_id);
+    plic_complete_interrupt(0, source_id);
   }
 }
 #pragma GCC pop_options
@@ -87,7 +87,7 @@ int main() {
   csr_set_bits_mstatus(MSTATUS_MIE_BIT_MASK);
 
   // Enable source ID 1 (Timer 0) in PLIC
-  plic_enable_interrupt(1);
+  plic_enable_interrupt(0, 1);
 
   unsigned long long elapsed = timer_get_count();
   // printf("\Current timer count: %d clock cycles\n", (unsigned int)elapsed);

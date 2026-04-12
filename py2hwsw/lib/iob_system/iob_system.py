@@ -853,10 +853,6 @@ def setup(py_params: dict):
                 "instance_name": "PLIC0",
                 "instance_description": "RISC-V PLIC peripheral",
                 "is_peripheral": True,
-                "parameters": {
-                    "N_SOURCES": 31,  # + reserved bit 0
-                    "N_TARGETS": 1,
-                },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
                     # Cbus connected automatically

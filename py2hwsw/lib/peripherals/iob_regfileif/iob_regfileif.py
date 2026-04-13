@@ -104,9 +104,10 @@ def setup(py_params_dict):
                     },
                 )
                 if csr["mode"] == "RW":
-                    reg_wires[-1]["signals"].append(
+                    reg_wires[-1]["signals"] += [
                         {"name": csr["name"] + "_2", "width": csr["n_bits"]},
-                    )
+                        {"name": csr["name"] + "_wstrb", "width": csr["n_bits"]},
+                    ]
                     reg_wires.append(
                         {
                             "name": csr["name"] + "_inv",
@@ -114,8 +115,12 @@ def setup(py_params_dict):
                             "signals": [
                                 {"name": csr["name"] + "_2"},
                                 {"name": csr["name"]},
+                                {"name": csr["name"] + "_wstrb"},
                             ],
-                        },
+                        }
+                    )
+                    snippets += (
+                        f"assign {csr['name']}_wstrb = {{{csr['n_bits']}{{1'b1}}}};"
                     )
 
                 # Connect register interfaces

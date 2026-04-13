@@ -42,7 +42,7 @@ def setup(py_params_dict):
             "descr": "Testbench uart csrs interface",
             "signals": {
                 "type": "iob",
-                "ADDR_W": 3,
+                "ADDR_W": 4,
             },
         },
     ]
@@ -63,7 +63,7 @@ def setup(py_params_dict):
             "signals": {
                 "type": params["csr_if"],
                 "prefix": "internal_",
-                "ADDR_W": 3,
+                "ADDR_W": 4,
             },
         },
     ]
@@ -96,7 +96,7 @@ def setup(py_params_dict):
             "subordinate_if": "iob",
             "manager_if": params["csr_if"],
             "parameters": {
-                "ADDR_W": 3,
+                "ADDR_W": 4,
                 "DATA_W": "DATA_W",
             },
             "connect": converter_connect,

@@ -178,6 +178,8 @@ endif
 
 test: $(TEST_LIST)
 
+build_deps: $(BUILD_DEPS)
+
 debug:
 	@echo NAME=$(NAME)
 	@echo VHDR=$(VHDR)
@@ -187,4 +189,4 @@ debug:
 
 .PRECIOUS: uut.vcd test.log
 
-.PHONY: build run waves gen-clean debug test $(TEST_LIST) fix-vcd remote_build_dir build_hex
+.PHONY: build run waves gen-clean debug test $(TEST_LIST) build_deps fix-vcd remote_build_dir

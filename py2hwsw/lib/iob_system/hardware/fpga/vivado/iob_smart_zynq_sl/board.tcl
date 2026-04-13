@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: MIT
 
-set PART xc7z010clg400-1
+set PART xc7z020clg484-1
 
 # Create a temporary project for Zynq (required for BD)
 if { [current_project -quiet] == "" } {
-    create_project -force -part $PART iob_zybo_z7 ./iob_zybo_z7
+    create_project -force -part $PART iob_smart_zynq_sl ./iob_smart_zynq_sl
 } else {
     set_property part $PART [current_project]
 }
@@ -16,12 +16,12 @@ if { [get_files system.bd] == "" } {
     create_bd_design "system"
     create_bd_cell -type ip -vlnv xilinx.com:ip:processing_system7:5.5 processing_system7_0
 
-    # Configure PS with settings from zybo_z7
+    # Configure PS with settings from smart_zynq_sl
     # (Note: These settings should match the ones in zynq_fpga_demo/scripts/build.tcl)
     set_property -dict [list \
         CONFIG.PCW_CRYSTAL_PERIPHERAL_FREQMHZ {33.333333} \
         CONFIG.PCW_UIPARAM_DDR_PARTNO {MT41K256M16 RE-125} \
-        CONFIG.PCW_UIPARAM_DDR_BUS_WIDTH {32 Bit} \
+        CONFIG.PCW_UIPARAM_DDR_BUS_WIDTH {16 Bit} \
         CONFIG.PCW_FPGA0_PERIPHERAL_FREQMHZ {50} \
         CONFIG.PCW_USE_M_AXI_GP0 {0} \
         CONFIG.PCW_USE_S_AXI_HP0 {1} \

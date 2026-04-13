@@ -81,15 +81,11 @@ expect {
     timeout 300 goto on_timeout
 }
 
-# Run CLINT & PLIC tests
-
-send "rz"
-! sz clint_plic_test.sh
-
+print "\n[minicom] Run CLINT and PLIC tests"
 send "./clint_plic_test.sh"
 expect {
     "#"
-    timeout 5 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 #

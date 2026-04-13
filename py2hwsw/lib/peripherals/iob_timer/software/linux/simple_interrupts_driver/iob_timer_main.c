@@ -5,8 +5,10 @@
  */
 
 /*
- * This driver binds to the iob_timer device, retrieves its IRQ from the Device Tree, and registers a simple interrupt handler that logs when the timer fires.
- * It serves as a minimal example of platform device registration and IRQ handling in the Linux kernel.
+ * This driver binds to the iob_timer device, retrieves its IRQ from the Device
+ * Tree, and registers a simple interrupt handler that logs when the timer
+ * fires. It serves as a minimal example of platform device registration and IRQ
+ * handling in the Linux kernel.
  */
 
 #include <linux/module.h>

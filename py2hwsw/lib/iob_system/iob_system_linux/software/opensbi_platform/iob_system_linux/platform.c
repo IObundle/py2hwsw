@@ -35,13 +35,15 @@
 #define IOB_SYSTEM_LINUX_UART_ADDR 0x/*UART0_BASE_MACRO*/
 #define IOB_SYSTEM_LINUX_UART_INPUT_FREQ /*FREQ_MACRO*/
 #define IOB_SYSTEM_LINUX_UART_BAUDRATE /*BAUD_MACRO*/
+#define IOB_SYSTEM_LINUX_UART_REG_SHIFT 0
+#define IOB_SYSTEM_LINUX_UART_REG_WIDTH 1
+#define IOB_SYSTEM_LINUX_UART_REG_OFFSET 0
 // clang-format on
 
 static struct platform_uart_data uart = {
-    IOB_SYSTEM_LINUX_UART_ADDR,
-    IOB_SYSTEM_LINUX_UART_INPUT_FREQ,
-    IOB_SYSTEM_LINUX_UART_BAUDRATE,
-};
+    IOB_SYSTEM_LINUX_UART_ADDR,      IOB_SYSTEM_LINUX_UART_INPUT_FREQ,
+    IOB_SYSTEM_LINUX_UART_BAUDRATE,  IOB_SYSTEM_LINUX_UART_REG_SHIFT,
+    IOB_SYSTEM_LINUX_UART_REG_WIDTH, IOB_SYSTEM_LINUX_UART_REG_OFFSET};
 
 static struct plic_data plic = {
     .addr = IOB_SYSTEM_LINUX_PLIC_ADDR,
@@ -83,7 +85,9 @@ static int iob_system_linux_early_init(bool cold_boot) {
     return 0;
   fdt = fdt_get_address();
 
-  rc = fdt_parse_uart8250(fdt, &uart_data, "ns16550");
+  // Note: instead of this, we could use OpenSBI helper functions, like
+  // serial_uart8250_init() from OpenSBI/lib/utils/serial/fdt_serial_uart8250.c
+  rc = fdt_parse_uart8250(fdt, &uart_data, "ns16550a");
   if (!rc)
     uart = uart_data;
 
@@ -127,9 +131,8 @@ static int iob_system_linux_final_init(bool cold_boot) {
  */
 static int iob_system_linux_console_init(void) {
   /* Example if the generic UART8250 driver is used */
-  return uart8250_init(IOB_SYSTEM_LINUX_UART_ADDR,
-                       IOB_SYSTEM_LINUX_UART_INPUT_FREQ,
-                       IOB_SYSTEM_LINUX_UART_BAUDRATE, 0, 1, 0);
+  return uart8250_init(uart.addr, uart.freq, uart.baud, uart.reg_shift,
+                       uart.reg_io_width, uart.reg_offset);
 }
 
 /*

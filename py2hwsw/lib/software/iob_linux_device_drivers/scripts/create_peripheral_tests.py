@@ -88,8 +88,8 @@ int test_functionality_interrupt() {{
     {peripheral['name']}_csrs_set_reset(0);
     {peripheral['name']}_csrs_set_enable(1);
 
-    // Set threshold for 1000000 cycles (assuming some clock)
-    uint32_t threshold = 1000000;
+    // Set threshold for 0x9000000 cycles (assuming some clock)
+    uint32_t threshold = 0x9000000;
     {peripheral['name']}_csrs_set_interrupt_data_low(threshold);
     {peripheral['name']}_csrs_set_interrupt_data_high(0);
 

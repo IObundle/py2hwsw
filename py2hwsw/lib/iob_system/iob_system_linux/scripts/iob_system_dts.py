@@ -19,34 +19,41 @@ def generate_dts(dts_parameters):
         "spdx_year": dts_parameters.get("spdx_year", "2025"),
         "spdx_license": dts_parameters.get("spdx_license", "MIT"),
     }
+    # Use 'console=ttyS0,115200' for Linux 8250 serial driver (interrupts). Use 'console=hvc0` for OpenSBI serial driver (polling).
+    bootargs = dts_parameters.get(
+        "bootargs",
+        "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init swiotlb=32 loglevel=8",
+    )
 
     extra_peripherals = ""
     if dts_parameters["hardcoded_plic_cint"]:
+        # Only need hardcoded PLIC and CLINT if they included in the CPU wrapper (and are not in the iob_system's peripherals list)
         extra_peripherals += """
         // Hardcoded PLIC and CLINT
 
-        // Do we need CLINT0 here? OpenSBI already uses it.
         CLINT0: clint@/*CLINT0_BASE_MACRO*/ {
             compatible = "riscv,clint0";
+            reg = <0x/*CLINT0_BASE_MACRO*/ 0xc0000>;
             interrupts-extended = < &CPU0_intc 3
                                     &CPU0_intc 7 >;
-            reg = <0x/*CLINT0_BASE_MACRO*/ 0xc0000>;
             reg-names = "control";
         };
 
-        // Do we need PLIC0 here? OpenSBI already uses it.
-        //PLIC0: plic@/*PLIC0_BASE_MACRO*/ {
-        //    #address-cells = <0>;
-        //    #interrupt-cells = <1>;
-        //    compatible = "riscv,plic0";
-        //    interrupt-controller;
-        //    interrupts-extended = < &CPU0_intc 11
-        //                            &CPU0_intc 9 >;
-        //    reg = <0x/*PLIC0_BASE_MACRO*/ 0x4000000>;
-        //    reg-names = "control";
-        //    riscv,max-priority = <7>;
-        //    riscv,ndev = <31>;
-        //};
+        PLIC0: plic@/*PLIC0_BASE_MACRO*/ {
+            compatible = "riscv,plic0";
+            reg = <0x/*PLIC0_BASE_MACRO*/ 0x4000000>;
+
+            #address-cells = <0>; // No sub-nodes expected under PLIC (leaf interrupt controller)
+            #interrupt-cells = <1>; // PLIC interrupt specifiers use 1 cell: the interrupt ID number
+            interrupt-controller; // Declares this node as an interrupt controller
+            // PLIC context connections to CPU interrupt controller:
+            // Context 0 on CPU0 IRQ 11, Context 1 on CPU0 IRQ 9 (for M-mode/S-mode)
+            interrupts-extended = < &CPU0_intc 11
+                                    &CPU0_intc 9 >;
+            reg-names = "control"; // Names the register region ("control" for PLIC CSRs)
+            //riscv,max-priority = <4>; // Maximum interrupt priority level supported (0-4 scale)
+            riscv,ndev = <31>; // Number of external interrupt sources/lines supported by this PLIC (1-31
+        };
 """
 
     # Generate DTS file
@@ -100,7 +107,7 @@ def generate_dts(dts_parameters):
         reg = <0x0 /*OS_RANGE_MACRO*/>;
     }};
     chosen {{
-        bootargs = "rootwait console=hvc0 earlycon=sbi root=/dev/ram0 init=/sbin/init swiotlb=32 loglevel=8";
+        bootargs = "{bootargs}";
         linux,initrd-start = <0x01000000>;
         linux,initrd-end = <0x01C00000>; // max 12MB ramdisk (rootfs) image
     }};

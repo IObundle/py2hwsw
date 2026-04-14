@@ -1,4 +1,10 @@
 #!/bin/sh
+
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
+#!/bin/sh
 echo "Verify current UART 1 and 2 interrupt count (may be none if no interrupts triggered)"
 cat /proc/interrupts | grep -E 'CPU0|3 Edge|4 Edge'
 

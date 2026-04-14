@@ -1,3 +1,9 @@
+#!/bin/sh
+
+# SPDX-FileCopyrightText: 2025 IObundle
+#
+# SPDX-License-Identifier: MIT
+
 # Reset timer
 devmem 0x88000000 8 1
 devmem 0x88000000 8 0

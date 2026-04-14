@@ -78,3 +78,15 @@ uint32_t iob_timer_csrs_get_data_low() {
   double counter_freq = (1.0 * counter_reg) * PC_TO_FREQ_FACTOR;
   return ((int)(((unsigned long long)counter_freq) & 0xFFFFFFFF));
 }
+
+void iob_timer_csrs_set_interrupt_data_high(uint32_t value) {
+  // Not implemented for PC emulation
+  (void)value;
+  return;
+}
+
+void iob_timer_csrs_set_interrupt_data_low(uint32_t value) {
+  // Not implemented for PC emulation
+  (void)value;
+  return;
+}

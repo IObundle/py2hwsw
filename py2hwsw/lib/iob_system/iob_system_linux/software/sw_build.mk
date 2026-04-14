@@ -149,16 +149,11 @@ compile_device_tree: linux_build_macros.txt peripherals.dtsi
 	# Copy device tree dependencies into build directory
 	mkdir -p $(OS_DIR)/software/OS_build/
 	cp peripherals.dtsi $(OS_DIR)/software/OS_build/
-	# Copy .dtsi files of peripherals, creating a new one for each instance with correct instance name.
-	# For example, two uart instances will have uart0.dtsi and uart1.dtsi
-	index=0;\
-	peripherals_instance_name=($(PERIPHERALS_INSTANCE_NAME));\
-	for peripheral in $(PERIPHERALS_INSTANCE_TYPE); do\
-		echo cp linux/$${peripheral}.dtsi $(OS_DIR)/software/OS_build/$${peripherals_instance_name[index]}.dtsi;\
-		cp linux/$${peripheral}.dtsi $(OS_DIR)/software/OS_build/$${peripherals_instance_name[index]}.dtsi ||\
-		{ echo -e "\033[31mMissing device tree include (.dtsi) include file for peripheral: $${peripheral}\033[0m"; exit 1; };\
-		sed -i "s/INSTANCE_NAME/$${peripherals_instance_name[index]}/g" $(OS_DIR)/software/OS_build/$${peripherals_instance_name[index]}.dtsi;\
-		((index++));\
+	# Copy .dtsi files of peripheral instances into build directory
+	for peripheral in $(PERIPHERALS_INSTANCE_NAME); do\
+		echo cp linux/$${peripheral}.dtsi $(OS_DIR)/software/OS_build/;\
+		cp linux/$${peripheral}.dtsi $(OS_DIR)/software/OS_build/ ||\
+		{ echo -e "\033[31mMissing device tree include (.dtsi) include file for peripheral instance: $${peripheral}\033[0m"; exit 1; };\
 	done
 	# Copy and build the device tree
 	nix-shell $(OS_DIR)/default.nix --run 'make -C $(OS_DIR) build-dts MACROS_FILE=$(REL_OS2ROOT)/software/linux_build_macros.txt DTS_FILE=$(REL_OS2ROOT)/software/iob_system_linux.dts'

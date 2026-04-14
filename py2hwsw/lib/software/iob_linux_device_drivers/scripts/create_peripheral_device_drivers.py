@@ -86,7 +86,7 @@ def deterministic_magic(name: str) -> str:
     return printable[idx]
 
 
-def generate_ioctl_defines(name, csrs):
+def generate_ioctl_defines(name, csrs, support_interrupt):
     """Define IOCTL commands for each CSR"""
     content = ""
     # define "ioctl name" __IOX("magic number","command number","argument type")
@@ -107,6 +107,10 @@ def generate_ioctl_defines(name, csrs):
 #define RD_{CSR_NAME} _IOR('{IOCTL_MAGIC}',{i},int32_t*)
 """
             i += 1
+    if support_interrupt:
+        content += f"""\
+#define WAIT_INTERRUPT _IO('{IOCTL_MAGIC}',{i})
+"""
     return content
 
 
@@ -264,6 +268,18 @@ void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
 }}
 """
 
+    if peripheral["support_interrupt"]:
+        content += f"""
+int {peripheral['name']}_csrs_wait_interrupt() {{
+  uint32_t dummy;
+  if (read_reg(fd, {peripheral['upper_name']}_INTERRUPT_ADDR, 32, &dummy) == -1) {{
+    perror("[User] Failed to wait for interrupt");
+    return -1;
+  }}
+  return 0;
+}}
+"""
+
     with open(os.path.join(path, f"{peripheral['name']}_dev_csrs.c"), "w") as f:
         f.write(content)
 
@@ -291,7 +307,9 @@ def create_ioctl_user_csrs_source(path, peripheral):
 """
 
     # Define IOCTL commands for each CSR
-    content += generate_ioctl_defines(peripheral["name"], peripheral["csrs"])
+    content += generate_ioctl_defines(
+        peripheral["name"], peripheral["csrs"], peripheral["support_interrupt"]
+    )
 
     content += f"""\
 int fd = 0;
@@ -320,6 +338,17 @@ void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
   uint32_t return_value = 0;
   ioctl(fd, RD_{CSR_NAME}, (int32_t*) &return_value);
   return ({data_type})return_value;
+}}
+"""
+
+    if peripheral["support_interrupt"]:
+        content += f"""
+int {peripheral['name']}_csrs_wait_interrupt() {{
+  if (ioctl(fd, WAIT_INTERRUPT, NULL) == -1) {{
+    perror("[User] Failed to wait for interrupt");
+    return -1;
+  }}
+  return 0;
 }}
 """
 
@@ -430,6 +459,17 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
             fswhdr.write('\treturn sprintf(buf, "%u", value);\n')
             fswhdr.write("}\n\n")
 
+    if peripheral["support_interrupt"]:
+        fswhdr.write(
+            f"static ssize_t sysfs_interrupt_show(struct device *dev, struct device_attribute *attr, char *buf) {{\n"
+        )
+        fswhdr.write(f"\t{top}_irq_received = 0;\n")
+        fswhdr.write(
+            f"\twait_event_interruptible({top}_wait_queue, {top}_irq_received != 0);\n"
+        )
+        fswhdr.write(f'\treturn sprintf(buf, "1\\n");\n')
+        fswhdr.write("}\n\n")
+
     # DEVICE_ATTR(name, 0600, sysfs_show, sysfs_store)
     fswhdr.write("// Device attributes\n")
     for csr in csrs_list:
@@ -457,6 +497,11 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
         else:
             fswhdr.write(" sysfs_enosys_store);\n")
 
+    if peripheral["support_interrupt"]:
+        fswhdr.write(
+            f"DEVICE_ATTR(interrupt, 0400, sysfs_interrupt_show, sysfs_enosys_store);\n"
+        )
+
     fswhdr.write("\n")
 
     # probe / remove functions
@@ -467,6 +512,10 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
     fswhdr.write("\tint ret = 0;\n")
     for csr in csrs_list:
         fswhdr.write(f"\tret |= device_create_file(device, &dev_attr_{csr['name']});\n")
+
+    if peripheral["support_interrupt"]:
+        fswhdr.write(f"\tret |= device_create_file(device, &dev_attr_interrupt);\n")
+
     fswhdr.write("\treturn ret;\n")
     fswhdr.write("}\n\n")
 
@@ -477,6 +526,12 @@ def create_sysfs_driver_header_file(path, peripheral, multi=False):
         fswhdr.write(
             f"\tdevice_remove_file({top}_data->device, &dev_attr_{csr['name']});\n"
         )
+
+    if peripheral["support_interrupt"]:
+        fswhdr.write(
+            f"\tdevice_remove_file({top}_data->device, &dev_attr_interrupt);\n"
+        )
+
     fswhdr.write(f"\tdevice_destroy({top}_data->class, {top}_data->devnum);\n")
     fswhdr.write("\treturn;\n")
     fswhdr.write("}\n")
@@ -570,6 +625,14 @@ void {peripheral['name']}_csrs_set_{csr['name']}({data_type} value) {{
 }}
 """
 
+    if peripheral["support_interrupt"]:
+        content += f"""
+int {peripheral['name']}_csrs_wait_interrupt() {{
+  uint32_t dummy;
+  return sysfs_read_file({peripheral['upper_name']}_SYSFILE_INTERRUPT, &dummy);
+}}
+"""
+
     with open(os.path.join(path, f"{peripheral['name']}_sysfs_csrs.c"), "w") as f:
         f.write(content)
 
@@ -616,6 +679,13 @@ def create_driver_header_file_list(path, peripheral):
         fswhdr.write(
             f'#define {core_prefix}_SYSFILE_{CSR_NAME} {core_prefix}_DEVICE_CLASS "/{csr["name"].lower()}" /**< System file path for {csr["name"]} CSR. */\n'
         )
+    if peripheral["support_interrupt"]:
+        fswhdr.write(
+            f'#define {core_prefix}_SYSFILE_INTERRUPT {core_prefix}_DEVICE_CLASS "/interrupt" /**< System file path for interrupt. */\n'
+        )
+        fswhdr.write(
+            f"#define {core_prefix}_INTERRUPT_ADDR (1 << {core_prefix}_CSRS_ADDR_W) /**< Pseudo-address for interrupt wait. */\n"
+        )
     fswhdr.write("\n")
 
     fswhdr.write(f'#include "{top}_csrs_conf.h"\n')
@@ -653,7 +723,14 @@ def create_driver_main_file(path, peripheral):
 
 """
     # Define IOCTL commands for each CSR
-    content += generate_ioctl_defines(peripheral["name"], peripheral["csrs"])
+    content += generate_ioctl_defines(
+        peripheral["name"], peripheral["csrs"], peripheral["support_interrupt"]
+    )
+    if peripheral["support_interrupt"]:
+        content += """
+#include <linux/interrupt.h>
+#include <linux/wait.h>
+"""
     content += f"""
 
 #include "iob_class/iob_class_utils.h"
@@ -674,6 +751,25 @@ static long {peripheral['name']}_ioctl(struct file *, unsigned int, unsigned lon
 static struct iob_data {peripheral['name']}_data = {{0}};
 DEFINE_MUTEX({peripheral['name']}_mutex);
 
+"""
+    if peripheral["support_interrupt"]:
+        content += f"""
+static int {peripheral['name']}_irq;
+static wait_queue_head_t {peripheral['name']}_wait_queue;
+static int {peripheral['name']}_irq_received = 0;
+
+static irqreturn_t {peripheral['name']}_irq_handler(int irq, void *dev_id) {{
+  // Disable interrupts by setting threshold to zero
+  iob_data_write_reg({peripheral['name']}_data.regbase, 0, {peripheral['upper_name']}_CSRS_INTERRUPT_DATA_LOW_ADDR, {peripheral['upper_name']}_CSRS_INTERRUPT_DATA_LOW_W);
+  iob_data_write_reg({peripheral['name']}_data.regbase, 0, {peripheral['upper_name']}_CSRS_INTERRUPT_DATA_HIGH_ADDR, {peripheral['upper_name']}_CSRS_INTERRUPT_DATA_HIGH_W);
+
+  {peripheral['name']}_irq_received = 1;
+  wake_up_interruptible(&{peripheral['name']}_wait_queue);
+
+  return IRQ_HANDLED;
+}}
+"""
+    content += f"""
 #include "{peripheral['name']}_sysfs.h"
 
 static const struct file_operations {peripheral['name']}_fops = {{
@@ -701,6 +797,9 @@ static struct platform_driver {peripheral['name']}_driver = {{
     .probe = {peripheral['name']}_probe,
     .remove = {peripheral['name']}_remove,
 }};
+
+"""
+    content += f"""
 
 //
 // Module init and exit functions
@@ -771,7 +870,19 @@ static int {peripheral['name']}_probe(struct platform_device *pdev) {{
     pr_err("Cannot create device attribute file......\\n");
     goto r_dev_file;
   }}
-
+"""
+    if peripheral["support_interrupt"]:
+        content += f"""
+  init_waitqueue_head(&{peripheral['name']}_wait_queue);
+  {peripheral['name']}_irq = platform_get_irq(pdev, 0);
+  if ({peripheral['name']}_irq >= 0) {{
+    result = devm_request_irq(&pdev->dev, {peripheral['name']}_irq, {peripheral['name']}_irq_handler, 0, {peripheral['upper_name']}_DRIVER_NAME, NULL);
+    if (result) {{
+      dev_err(&pdev->dev, "Failed to request IRQ %d\\n", {peripheral['name']}_irq);
+    }}
+  }}
+"""
+    content += f"""
   dev_info(&pdev->dev, "initialized.\\n");
   goto r_ok;
 
@@ -861,6 +972,17 @@ static ssize_t {peripheral['name']}_read(struct file *file, char __user *buf, si
     break;
 """
 
+    if peripheral.get("support_interrupt", False):
+        content += f"""\
+  case {peripheral['upper_name']}_INTERRUPT_ADDR:
+    {peripheral['name']}_irq_received = 0;
+    if (wait_event_interruptible({peripheral['name']}_wait_queue, {peripheral['name']}_irq_received != 0))
+      return -ERESTARTSYS;
+    value = 1;
+    size = 4;
+    break;
+"""
+
     content += f"""\
   default:
     // invalid address - no bytes read
@@ -935,7 +1057,8 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
   }}
 
   // Check for valid bounds
-  if (new_pos < 0 || new_pos > {peripheral['name']}_data.regsize) {{
+  if (new_pos < 0 || (new_pos > {peripheral['name']}_data.regsize && 
+                     new_pos != {peripheral['upper_name']}_INTERRUPT_ADDR)) {{
     return -EINVAL;
   }}
 
@@ -982,6 +1105,13 @@ static loff_t {peripheral['name']}_llseek(struct file *filp, loff_t offset, int 
                           return -EFAULT;
 
                         break;
+"""
+
+    if peripheral["support_interrupt"]:
+        content += f"""
+                case WAIT_INTERRUPT:
+                        {peripheral['name']}_irq_received = 0;
+                        return wait_event_interruptible({peripheral['name']}_wait_queue, {peripheral['name']}_irq_received != 0);
 """
 
     content += f"""\
@@ -1051,7 +1181,12 @@ clean:
 
 
 def generate_device_drivers(
-    build_dir, peripheral, py2hwsw_version, dts_extra_properties
+    build_dir,
+    peripheral,
+    py2hwsw_version,
+    dts_extra_properties,
+    compatible_str="",
+    support_interrupt=False,
 ):
     """Generate device driver files for a peripheral"""
 
@@ -1083,17 +1218,11 @@ def generate_device_drivers(
         {
             "name": "version",
             "mode": "R",
-            "n_bits": 16,
+            "n_bits": 24,
         }
     )
 
     # Peripheral information
-    instance_name = (
-        peripheral["name"][4:]
-        if peripheral["name"].startswith("iob_")
-        else peripheral["name"]
-    )
-
     license_autor = "IObundle"
     license_year = "2025"
     license_name = "MIT"
@@ -1105,7 +1234,7 @@ def generate_device_drivers(
     # Group peripheral information into a dictionary
     _peripheral = {
         "name": peripheral["name"],  # example: 'iob_timer'
-        "instance_name": f"{instance_name}0",  # example: 'timer0'
+        "instance_name": peripheral["instance_name"],  # example: 'timer0'
         "upper_name": peripheral["name"].upper(),
         "version": (
             peripheral["version"] if "version" in peripheral else py2hwsw_version
@@ -1116,8 +1245,11 @@ def generate_device_drivers(
         "spdx_license": license_name,
         "license": f"Dual {license_name}/GPL",
         "csrs": csrs_list,
+        "support_interrupt": support_interrupt,
+        "compatible_str": (
+            compatible_str if compatible_str else f"iobundle,{peripheral['name']}"
+        ),
     }
-    _peripheral["compatible_str"] = f"iobundle,{_peripheral['instance_name']}"
 
     print(
         "Generating device drivers for", _peripheral["name"], "in", drivers_output_dir

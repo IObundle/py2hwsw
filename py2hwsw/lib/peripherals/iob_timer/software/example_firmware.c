@@ -22,6 +22,10 @@ int main() {
 
   printf("\nHello world!\n");
 
+  // set timer interrupt threshold for 10ms
+  timer_set_interrupt(FREQ / 100);
+  printf("\nTimer interrupt set for 10ms (@%dHz)\n", FREQ / 100);
+
   // read current timer count, compute elapsed time
   elapsed = timer_get_count();
   elapsedu = elapsed / (FREQ / 1000000);

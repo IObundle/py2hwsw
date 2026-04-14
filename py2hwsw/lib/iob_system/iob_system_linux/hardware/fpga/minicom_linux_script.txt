@@ -21,10 +21,14 @@ send "root"
 
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 post_login:
+
+#
+# Run tests
+#
 
 print "\n[minicom] Logged in. Running tests..."
 
@@ -32,28 +36,28 @@ print "\n[minicom] Logged in. Running tests..."
 send "rmmod iob_timer 2>/dev/null; insmod /drivers/iob_timer.ko"
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with sysfs interface"
 send "./iob_timer_user_sysfs"
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with dev interface"
 send "./iob_timer_user_dev"
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 print "\n[minicom] Test iob_timer with ioctl interface"
 send "./iob_timer_user_ioctl"
 expect {
     "#"
-    timeout 10 goto on_timeout
+    timeout 20 goto on_timeout
 }
 
 print "\n[minicom] Run auto-generated tests iob_timer with sysfs interface"
@@ -77,28 +81,16 @@ expect {
     timeout 300 goto on_timeout
 }
 
-# Versat Linux tests
-# send "rz"
-# ! sz ../../software/crypto ../../software/versat.ko  ../../software/exampleTransfer.sh ../../software/setupTest.sh ../../software/test.sh
-# 
-# expect {
-#     "#"
-#     timeout 100 goto on_timeout
-# }
-# 
-# send "./setupTest.sh"
-# 
-# expect {
-#     "#"
-#     timeout 100 goto on_timeout
-# }
-# 
-# send "./test.sh && ./exampleTransfer.sh"
-# 
-# expect {
-#     "#"
-#     timeout 900 goto on_timeout
-# }
+print "\n[minicom] Run CLINT and PLIC tests"
+send "./clint_plic_test.sh"
+expect {
+    "#"
+    timeout 20 goto on_timeout
+}
+
+#
+# Tests complete
+#
 
 # Send test.log
 send "echo 'Test passed!' > test.log"

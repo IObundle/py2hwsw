@@ -32,3 +32,8 @@ uint64_t timer_get_count() {
 
   return count;
 }
+
+void timer_set_interrupt(uint64_t threshold) {
+  iob_timer_csrs_set_interrupt_data_high((uint32_t)(threshold >> 32));
+  iob_timer_csrs_set_interrupt_data_low((uint32_t)(threshold & 0xFFFFFFFF));
+}

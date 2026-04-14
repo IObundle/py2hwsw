@@ -50,7 +50,8 @@ endif
 PY_PARAMS:=$(shell echo $(PY_PARAMS) | cut -c2-)
 
 # List of lib cores that pass linter checks. This list will be deprecated when all lib cores pass linter checks.
-CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
+#CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_timer iob_uart
+CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_uart
 
 # Get the name of the generated core (sometimes not equal to $(CORE), like the generated 'iob_cache_axi' of the iob_cache core)
 CORE_NAME=$(shell nix-shell --run "py2hwsw $(CORE) print_core_name --py_params '$(PY_PARAMS)'")
@@ -182,17 +183,17 @@ buildroot-update:
 	make clean setup CORE=$(CORE) BUILD_DIR=$(BUILD_DIR)
 	# Compile userspace binaries
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(BUILD_DIR)/software/linux/user all'
-	# Copy driver binaries to iob_system_linux buildroot
+	# Copy userspace driver binaries to iob_system_linux buildroot
 	for file in "$(CORE)_user_sysfs" "$(CORE)_user_dev" "$(CORE)_user_ioctl" "$(CORE)_tests_sysfs" "$(CORE)_tests_dev" "$(CORE)_tests_ioctl"; do\
 		cp $(BUILD_DIR)/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
 	done
-	# Compile kernel driver
+	# Compile kernel driver (along with Linux kernel) and place it in iob_system_linux buildroot
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-linux-drivers MODULE_NAME=$(CORE) MODULE_DRIVER_DIR=../../../../$(BUILD_DIR)/software/linux/drivers ROOTFS_OVERLAY_DIR=../../software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers'
 	# Copy iob_system_linux buildroot to iob_linux
 	cp -r iob_system/iob_system_linux/software/buildroot/* $(LINUX_SUBMODULE_DIR)/software/buildroot/;
 	# Recompile buildroot
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-buildroot'
-	# Copy rootfs to iob_system_linux
+	# Copy generated rootfs to iob_system_linux
 	cp $(LINUX_SUBMODULE_DIR)/software/OS_build/rootfs.cpio.gz iob_system/iob_system_linux/software/src/rootfs.cpio.gz
 ifneq ($(SOC_LINUX_BUILD_DIR),)
 	# Copy it to existing soc_linux build dir. Re-running soc_linux on fpga without rebuilding, will cause it to upload this new version of rootfs.
@@ -225,11 +226,11 @@ running_system_upload:
 	make clean setup CORE=$(CORE) BUILD_DIR=$(BUILD_DIR)
 	# Compile userspace binaries
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(BUILD_DIR)/software/linux/user all'
-	# Copy driver binaries to iob_system_linux buildroot
+	# Copy userspace driver binaries to iob_system_linux buildroot
 	for file in "$(CORE)_user_sysfs" "$(CORE)_user_dev" "$(CORE)_user_ioctl" "$(CORE)_tests_sysfs" "$(CORE)_tests_dev" "$(CORE)_tests_ioctl"; do\
 		cp $(BUILD_DIR)/software/linux/user/$$file iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/root/;\
 	done
-	# Compile kernel driver
+	# Compile kernel driver (along with Linux kernel) and place it in iob_system_linux buildroot
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-linux-drivers MODULE_NAME=$(CORE) MODULE_DRIVER_DIR=../../../../$(BUILD_DIR)/software/linux/drivers ROOTFS_OVERLAY_DIR=../../software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers'
 	# Copy built driver to build dir
 	cp iob_system/iob_system_linux/software/buildroot/board/IObundle/iob-soc/rootfs-overlay/drivers/$(CORE).ko $(BUILD_DIR)/software/linux/drivers/

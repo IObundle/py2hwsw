@@ -9,6 +9,16 @@
 
 .section .init
 .globl main
+.align 2
+
+  // Set global pointer (gp) to speed up global variable access.
+  // We use '.option push/pop' to isolate the 'norelax' setting.
+  .option push
+  // Disable 'relaxation' to prevent the linker from making this 
+  // instruction relative to 'gp' itself before it is initialized.
+  .option norelax
+  la gp, __global_pointer$
+  .option pop
 
   //set stack pointer
   lui sp, %hi(STACK_ADDR)

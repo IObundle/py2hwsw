@@ -50,7 +50,7 @@ def setup(py_params: dict):
     # Verilog snippets
     #
     verilog_snippet = """
-   assign interrupts = {{30{1'b0}}, uart_interrupt, 1'b0};
+   assign interrupts = {{27{1'b0}}, uart2_interrupt, uart1_interrupt, uart0_interrupt, timer0_interrupt, 1'b0};
 """
 
     if params["dma_demo"]:
@@ -115,10 +115,33 @@ def setup(py_params: dict):
         "wires": [
             # UART
             {
-                "name": "uart_interrupt",
-                "descr": "Uart interrupt",
+                "name": "uart0_interrupt",
+                "signals": [{"name": "uart0_interrupt", "width": 1}],
+            },
+            {
+                "name": "uart1_interrupt",
+                "signals": [{"name": "uart1_interrupt", "width": 1}],
+            },
+            {
+                "name": "uart2_interrupt",
+                "signals": [{"name": "uart2_interrupt", "width": 1}],
+            },
+            {
+                "name": "internal_rs232",
+                "descr": "Internal RS232 connection between UART1 and UART2",
+                "signals": {
+                    "type": "rs232",
+                    "prefix": "internal_",
+                },
+            },
+            {
+                "name": "internal_rs232_inverted",
+                "descr": "Internal RS232 connection between UART1 and UART2",
                 "signals": [
-                    {"name": "uart_interrupt", "width": 1},
+                    {"name": "internal_rs232_txd"},
+                    {"name": "internal_rs232_rxd"},
+                    {"name": "internal_rs232_cts"},
+                    {"name": "internal_rs232_rts"},
                 ],
             },
             # SPI master
@@ -156,8 +179,39 @@ def setup(py_params: dict):
                     "clk_en_rst_s": "clk_en_rst_s",
                     # Cbus connected automatically
                     "rs232_m": "rs232_m",
-                    "interrupt_o": "uart_interrupt",
+                    "interrupt_o": "uart0_interrupt",
                 },
+                "plic_source_id": 2,
+            },
+            {
+                # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
+                "core_name": "iob_uart16550",
+                "instance_name": "UART1",  # Use same name as one inherited from iob_system to replace it
+                "instance_description": "UART peripheral",
+                "is_peripheral": True,
+                "parameters": {},
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    # Cbus connected automatically
+                    "rs232_m": "internal_rs232",
+                    "interrupt_o": "uart1_interrupt",
+                },
+                "plic_source_id": 3,
+            },
+            {
+                # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
+                "core_name": "iob_uart16550",
+                "instance_name": "UART2",  # Use same name as one inherited from iob_system to replace it
+                "instance_description": "UART peripheral",
+                "is_peripheral": True,
+                "parameters": {},
+                "connect": {
+                    "clk_en_rst_s": "clk_en_rst_s",
+                    # Cbus connected automatically
+                    "rs232_m": "internal_rs232_inverted",
+                    "interrupt_o": "uart2_interrupt",
+                },
+                "plic_source_id": 4,
             },
             # {
             #     # Instantiate a VERSAT core from: https://github.com/IObundle/iob-versat
@@ -250,7 +304,7 @@ def setup(py_params: dict):
 
     # Iob_system_linux is actually a derived core of iob_system. Therefore, set iob_system as the parent core and pass iob_system_linux's attributes_dict as a python paremter.
     attributes_dict = {
-        "version": "0.8.0",
+        "version": "0.8.1",
         "parent": {
             # IOb-System-Linux is a derived core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
             # IOb-System-Linux will inherit all attributes/files from the iob_system core.
@@ -307,7 +361,7 @@ def setup(py_params: dict):
         dts_parameters = {
             "name": py_params.get("name", "iob_system_linux"),
             "build_dir": py_params["build_dir"],
-            "hardcoded_plic_cint": True,
+            "hardcoded_plic_cint": False,
         }
         generate_dts(dts_parameters)
 

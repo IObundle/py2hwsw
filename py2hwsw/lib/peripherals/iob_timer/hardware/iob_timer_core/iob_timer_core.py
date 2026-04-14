@@ -34,6 +34,19 @@ def setup(py_params_dict):
                     {"name": "time_o", "width": "64"},
                 ],
             },
+            {
+                "name": "interrupt_threshold_i",
+                "signals": [
+                    {"name": "interrupt_data_low_i", "width": 32},
+                    {"name": "interrupt_data_high_i", "width": 32},
+                ],
+            },
+            {
+                "name": "interrupt_o",
+                "signals": [
+                    {"name": "interrupt_o", "width": 1},
+                ],
+            },
         ],
         "wires": [
             {
@@ -103,6 +116,15 @@ def setup(py_params_dict):
                 },
             },
         ],
+        "comb": {
+            "code": """
+    interrupt_o = 1'b0;
+    // If threshold is set, trigger interrupt when reached
+    if ( |{interrupt_data_low_i, interrupt_data_high_i} ) begin
+        interrupt_o = (time_counter == {interrupt_data_high_i, interrupt_data_low_i});
+    end
+"""
+        },
     }
 
     return attributes_dict

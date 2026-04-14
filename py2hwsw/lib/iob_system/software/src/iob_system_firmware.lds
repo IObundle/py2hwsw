@@ -16,6 +16,11 @@ SECTIONS {
 
     /* Initialized data */
     *(.data);
+    . = ALIGN(4);
+    /* Define the global pointer symbol 2048 bytes (0x800) into the data 
+       section. This allows reaching the start of data with a single 
+       12-bit signed offset (-2048 to +2047). */
+    PROVIDE(__global_pointer$ = . + 0x800);
 
     /* Uninitialized data */
     *(.bss);

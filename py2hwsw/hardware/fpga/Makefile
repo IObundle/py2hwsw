@@ -67,6 +67,9 @@ else
 ifneq ($(FPGA_STUB),)
 	scp $(FPGA_SCP_FLAGS) $(FPGA_USER)@$(FPGA_SERVER):$(REMOTE_FPGA_DIR)/$(FPGA_STUB) .
 endif
+ifneq ($(FPGA_EXTRA_DIRS),)
+	rsync $(FPGA_SYNC_FLAGS) -avz --force $(FPGA_EXTRA_DIRS:%=$(FPGA_USER)@$(FPGA_SERVER):$(REMOTE_FPGA_DIR)/%) .
+endif
 endif
 
 BOARD_SERIAL_PORT ?=/dev/usb-uart

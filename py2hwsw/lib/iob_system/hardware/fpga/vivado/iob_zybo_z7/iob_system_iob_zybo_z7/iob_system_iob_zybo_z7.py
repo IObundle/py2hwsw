@@ -379,7 +379,7 @@ def setup(py_params_dict):
         .FCLK_CLK0(clk),
         .FCLK_RESET0_N(rst_n),
         
-        .S_AXI_HP0_awaddr({3'b0, axi_awaddr}),
+        .S_AXI_HP0_awaddr({2'b0, axi_awaddr}),
         .S_AXI_HP0_awid(axi_awid),
         .S_AXI_HP0_awlen(axi_awlen[3:0]),
         .S_AXI_HP0_awsize(axi_awsize),
@@ -400,7 +400,7 @@ def setup(py_params_dict):
         .S_AXI_HP0_bresp(axi_bresp),
         .S_AXI_HP0_bvalid(axi_bvalid),
         .S_AXI_HP0_bready(axi_bready),
-        .S_AXI_HP0_araddr({3'b0, axi_araddr}),
+        .S_AXI_HP0_araddr({2'b0, axi_araddr}),
         .S_AXI_HP0_arid(axi_arid),
         .S_AXI_HP0_arlen(axi_arlen[3:0]),
         .S_AXI_HP0_arsize(axi_arsize),

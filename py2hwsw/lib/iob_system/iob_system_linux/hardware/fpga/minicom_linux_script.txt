@@ -20,6 +20,13 @@ print "\n[minicom] Detected login prompt. Logging in..."
 send "root"
 
 expect {
+    "Password:"
+    timeout 20 goto on_timeout
+}
+
+send "root"
+
+expect {
     "#"
     timeout 20 goto on_timeout
 }

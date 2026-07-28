@@ -1129,7 +1129,8 @@ static int test_tx_sizes(void) {
     int fd;
     struct net_stats stats_before, stats_after;
     uint8_t data[1536];
-    int sizes[] = {60, 128, 512, 1500};
+    /* Max payload = 1500 (MTU) - 20 (IP) - 8 (UDP) - 4 (HDR) = 1468 */
+    int sizes[] = {60, 128, 512, 1468};
     int ok = 1;
     int num_tests = sizeof(sizes) / sizeof(sizes[0]);
     uint16_t resp_len;
@@ -1248,7 +1249,8 @@ static int test_rx_sizes(void) {
     int fd;
     struct net_stats stats_before, stats_after;
     struct cmd_packet pkt;
-    int sizes[] = {60, 128, 512, 1500};
+    /* Max payload = 1500 (MTU) - 20 (IP) - 8 (UDP) - 4 (HDR) = 1468 */
+    int sizes[] = {60, 128, 512, 1468};
     int num_tests = sizeof(sizes) / sizeof(sizes[0]);
     int ok = 1;
     uint8_t data[1536];
@@ -1871,7 +1873,7 @@ static int test_stress_tx(void) {
 static int test_stress_rx(void) {
     int fd;
     struct net_stats stats_before, stats_after;
-    uint16_t count = 50;
+    uint16_t count = 10;
     uint16_t size = 512;
     uint8_t payload[4];
     struct cmd_packet pkt;

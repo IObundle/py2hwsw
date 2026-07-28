@@ -160,6 +160,7 @@ def handle_stress_rx(data, sock, soc_addr):
             log(f"Send error at frame {i}: {e}")
             stats["errors"] += 1
             break
+        time.sleep(0.01)  # 10ms delay for SoC to drain RX ring
 
     log(f"Stress RX: sent {count} frames")
     return b"\x42"

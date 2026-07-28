@@ -214,23 +214,25 @@ if [ -n "$SSH_USER" ]; then
     $SSH_PASS_CMD ssh $SSH_OPTS "${SSH_USER}@${SOC_IP}" "
         SOC_IF=\$(ls /sys/class/net/ | grep -v lo | head -n1)
         echo '--- /proc/net/dev ---'
+        head -2 /proc/net/dev 2>/dev/null || true
         grep \"\$SOC_IF\" /proc/net/dev 2>/dev/null || echo '(interface not found in /proc/net/dev)'
 
         echo ''
         echo '--- Error counters ---'
-        RX_ERRS=\$(grep \"\$SOC_IF\" /proc/net/dev 2>/dev/null | awk '{print \$5}')
-        TX_ERRS=\$(grep \"\$SOC_IF\" /proc/net/dev 2>/dev/null | awk '{print \$11}')
+        RX_ERRS=\$(grep \"\$SOC_IF\" /proc/net/dev 2>/dev/null | awk '{print \$4}')
+        TX_ERRS=\$(grep \"\$SOC_IF\" /proc/net/dev 2>/dev/null | awk '{print \$12}')
         echo \"rx_errors: \$RX_ERRS\"
         echo \"tx_errors: \$TX_ERRS\"
     " 2>&1
 else
     echo "--- /proc/net/dev ---"
+    head -1 /proc/net/dev 2>/dev/null || true
     grep "$INTERFACE" /proc/net/dev 2>/dev/null || echo "(interface not found in /proc/net/dev)"
 
     echo ""
     echo "--- Error counters ---"
-    RX_ERRS=$(grep "$INTERFACE" /proc/net/dev 2>/dev/null | awk '{print $5}')
-    TX_ERRS=$(grep "$INTERFACE" /proc/net/dev 2>/dev/null | awk '{print $11}')
+    RX_ERRS=$(grep "$INTERFACE" /proc/net/dev 2>/dev/null | awk '{print $4}')
+    TX_ERRS=$(grep "$INTERFACE" /proc/net/dev 2>/dev/null | awk '{print $12}')
     echo "rx_errors: $RX_ERRS"
     echo "tx_errors: $TX_ERRS"
 fi

@@ -377,6 +377,14 @@ def setup(py_params: dict):
         }
         generate_dts(dts_parameters)
 
+        # Copy tests to build directory
+        # Py2HWSW already copies most files under software/, but skips .py files since commit be69de3e92. This script copies .py as well.
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "software/tests"),
+            os.path.join(py_params["build_dir"], "software/tests"),
+            dirs_exist_ok=True
+        )
+
     #     iob_soc_scripts = [
     #         "terminalMode",
     #         "makehex",

@@ -632,6 +632,7 @@ static int get_irq_count(unsigned long *count_out) {
     FILE *f;
     char line[512];
     unsigned long total = 0;
+    int cpu_cols = 0;
 
     *count_out = 0;
 
@@ -639,8 +640,18 @@ static int get_irq_count(unsigned long *count_out) {
     if (!f)
         return -1;
 
-    /* skip header line */
-    fgets(line, sizeof(line), f);
+    /* count CPU columns from header line */
+    if (fgets(line, sizeof(line), f)) {
+        char *h = line;
+        while ((h = strstr(h, "CPU")) != NULL) {
+            cpu_cols++;
+            h += 3;
+        }
+    }
+    if (cpu_cols == 0) {
+        fclose(f);
+        return -1;
+    }
 
     while (fgets(line, sizeof(line), f)) {
         if (strstr(line, g_iface) || strstr(line, "ethoc")) {
@@ -648,18 +659,19 @@ static int get_irq_count(unsigned long *count_out) {
             if (!p)
                 continue;
             p++;
-            /* sum all CPU columns */
-            while (*p) {
+            int col = 0;
+            while (*p && col < cpu_cols) {
                 unsigned long val;
+                while (*p == ' ' || *p == '\t')
+                    p++;
                 if (sscanf(p, " %lu", &val) == 1) {
                     total += val;
-                    p++;
-                    /* skip to next number */
-                    while (*p && (*p < '0' || *p > '9'))
-                        p++;
+                    col++;
                 } else {
                     break;
                 }
+                while (*p >= '0' && *p <= '9')
+                    p++;
             }
             break;
         }

@@ -682,6 +682,7 @@ def copy_rename_setup_subdir(core, directory, exclude_file_list=[]):
     nix_permission_hack(os.path.join(core.build_dir, dst_directory))
 
 
+# AN: We dont copy .py files from setup to build dir by deafult since commit be69de3e92. Why? Is it to avoid python scripts during build?
 def copy_rename_setup_directory(core, exclude_file_list=["*.py"]):
     """Copy and rename files from the module's setup dir.
     Any string from the files in the setup dir that matches the

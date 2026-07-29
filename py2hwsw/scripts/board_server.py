@@ -10,88 +10,97 @@ import socket
 
 DEBUG = False
 
+HOST = "localhost"
+PORT = 50007
+VERSION = "V0.3"
 
-# This is a simple server that will listen for connections on port 50007 from clients that want to use an FPGA board.
-# To install and run this server, do the following:
-# 1. Install Python 3.6 or later, and move to the lib directory
-#         > cd py2hwsw/lib
-#
-# 2. Run the following command from the root of this repository:
-#         > sudo make board_server_install
-#
-# To uninstall the server, run:
-#        > sudo make board_server_uninstall
-#
-# To check if the server is running, run:
-#        > sudo make board_server_status
-
-# Define the server's IP, port, and version
-# Must match the client's IP and port
-
-HOST = "localhost"  # Listen on all available interfaces
-PORT = 50007  # Use a non-privileged port
-VERSION = "V0.2"
-
-# user and duration board are needed
-USER = ""
-DURATION = "300"  # 5 minutes
-
-# Init board status
-board_status = "idle"
+# Dynamically tracks boards as clients grab them.
+# board_name -> {"user": str, "grab_time": float, "duration": str}
+boards = {}
 
 
-def get_remaining_time():
-    global DURATION
-    return str(int(DURATION) - (time.time() - grab_time))
+def get_remaining_time(grab_time, duration):
+    return int(duration) - (time.time() - grab_time)
 
 
 def get_response(request):
-    global board_status
-    global grab_time
-    global USER
-    global DURATION
+    global boards
 
-    # check client's version
     if VERSION not in request:
         return "ERROR: Wrong version"
 
-    if get_remaining_time() <= "0.1":
-        board_status = "idle"
-        USER = ""
+    # Clean up expired grabs
+    now = time.time()
+    expired = [
+        b
+        for b in list(boards.keys())
+        if int(boards[b]["duration"]) - (now - boards[b]["grab_time"]) <= 0.1
+    ]
+    for b in expired:
         if DEBUG:
-            print("Board released due to timeout")
+            print(f"Board {b} released due to timeout")
+        del boards[b]
 
-    if request.startswith("query"):
-        if board_status == "idle":
-            response = "Board is idle"
-        else:
-            time_remaining = get_remaining_time()
-            response = f"Board is grabbed by user {USER} for {time_remaining} seconds"
+    parts = request.split()
+    command = parts[0]
 
-    elif request.startswith("grab"):
-        if board_status == "idle":
-            board_status = "grabbed"
-            grab_time = time.time()
-            USER = request.split()[1]
-            DURATION = request.split()[2]
-            response = f"Success: board grabbed by {USER} for {DURATION} seconds."
-        else:
-            time_remaining = get_remaining_time()
-            response = f"Failure: board grabbed by {USER} for {time_remaining} seconds."
-
-    elif request.startswith("release"):
-        if board_status == "idle":
-            response = "ERROR: board already idle."
-        elif board_status == "grabbed":
-            requesting_user = request.split()[1]
-            if requesting_user == USER:
-                board_status = "idle"
-                USER = ""
-                response = "Success: board released."
+    if command == "query":
+        if len(parts) >= 3:
+            # query BOARD VERSION
+            board = parts[1]
+            if board in boards:
+                b = boards[board]
+                time_remaining = get_remaining_time(b["grab_time"], b["duration"])
+                response = f"Board {board} is grabbed by user {b['user']} for {time_remaining} seconds"
             else:
-                response = (
-                    f"ERROR: cannot release board in use by another user ({USER})"
-                )
+                response = f"Board {board} is idle"
+        else:
+            # query VERSION -> report all tracked boards
+            if not boards:
+                response = "All boards are idle"
+            else:
+                board_strs = []
+                for b, info in boards.items():
+                    time_remaining = get_remaining_time(
+                        info["grab_time"], info["duration"]
+                    )
+                    board_strs.append(
+                        f"Board {b} grabbed by {info['user']} for {time_remaining}s"
+                    )
+                response = " | ".join(board_strs)
+
+    elif command == "grab":
+        # grab BOARD USER DURATION VERSION
+        board = parts[1]
+        user = parts[2]
+        duration = parts[3]
+
+        if board not in boards:
+            boards[board] = {
+                "user": user,
+                "grab_time": time.time(),
+                "duration": duration,
+            }
+            response = (
+                f"Success: board {board} grabbed by {user} for {duration} seconds."
+            )
+        else:
+            b = boards[board]
+            time_remaining = get_remaining_time(b["grab_time"], b["duration"])
+            response = f"Failure: board {board} grabbed by {b['user']} for {time_remaining} seconds."
+
+    elif command == "release":
+        # release BOARD USER VERSION
+        board = parts[1]
+        requesting_user = parts[2]
+
+        if board not in boards:
+            response = f"ERROR: board {board} already idle."
+        elif requesting_user == boards[board]["user"]:
+            del boards[board]
+            response = f"Success: board {board} released."
+        else:
+            response = f"ERROR: cannot release board {board} in use by another user ({boards[board]['user']})"
 
     if DEBUG:
         print(f'Returning response: "{response}"')
@@ -99,20 +108,16 @@ def get_response(request):
 
 
 if __name__ == "__main__":
-    grab_time = time.time()
-
-    # Create a TCP/IP socket
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((HOST, PORT))
     s.listen()
 
-    # Loop forever
     while True:
         conn, addr = s.accept()
         request = conn.recv(1024).decode("utf-8")
         if DEBUG:
             print(f"Received request: {request}")
-            response = get_response(request)
+        response = get_response(request)
         if DEBUG:
             print(f"Got response: {response}")
-            conn.sendall(response.encode("utf-8"))
+        conn.sendall(response.encode("utf-8"))

@@ -16,7 +16,7 @@ interfaces = {
     ],
     "axil": [
         ("awaddr", "output", "ADDR_W", 32),
-        # ("awprot", "output", "PROT_W", 3),
+        ("awprot", "output", "PROT_W", 3),
         ("awvalid", "output", 1),
         ("awready", "input", 1),
         ("wdata", "output", "DATA_W", 32),
@@ -27,7 +27,7 @@ interfaces = {
         ("bvalid", "input", 1),
         ("bready", "output", 1),
         ("araddr", "output", "ADDR_W", 32),
-        # ("arprot", "output", "PROT_W", 3),
+        ("arprot", "output", "PROT_W", 3),
         ("arvalid", "output", 1),
         ("arready", "input", 1),
         ("rdata", "input", "DATA_W", 32),
@@ -37,7 +37,7 @@ interfaces = {
     ],
     "axi": [
         ("awaddr", "output", "ADDR_W", 32),
-        # ("awprot", "output", "PROT_W", 3),
+        ("awprot", "output", "PROT_W", 3),
         ("awvalid", "output", 1),
         ("awready", "input", 1),
         ("wdata", "output", "DATA_W", 32),
@@ -48,7 +48,7 @@ interfaces = {
         ("bvalid", "input", 1),
         ("bready", "output", 1),
         ("araddr", "output", "ADDR_W", 32),
-        # ("arprot", "output", "PROT_W", 3),
+        ("arprot", "output", "PROT_W", 3),
         ("arvalid", "output", 1),
         ("arready", "input", 1),
         ("rdata", "input", "DATA_W", 32),
@@ -105,6 +105,19 @@ Memory zones must be configured via the 'memory_zones' python parameter.
 Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), Offset to add (for translation))
 """
 
+    # AXI params
+    HAS_PROT = py_params_dict.get("has_prot", False)
+
+    interface_signals = interfaces[INTERFACE]
+    if INTERFACE == "axi":
+        # Remove prot signals from interface signals
+        if not HAS_PROT:
+            interface_signals = [
+                signal
+                for signal in interfaces[INTERFACE]
+                if not signal[0].endswith("prot")
+            ]
+
     verilog_snippet = ""
     parameter_names = []
     verilog_parameters = []
@@ -113,7 +126,7 @@ Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), 
     #
     # Create verilog parameters
     #
-    for signal in interfaces[INTERFACE]:
+    for signal in interface_signals:
         name = signal[0]
         width = signal[2]
         default_width = signal[2] if type(width) is int else signal[3]
@@ -144,7 +157,7 @@ Memory zone tuple syntax: (Initial zone address, Last zone address (inclusive), 
     #
     # Connect interfaces
     #
-    for signal in interfaces[INTERFACE]:
+    for signal in interface_signals:
         name = signal[0]
         # Skip address signal
         if "addr" in name:
@@ -172,7 +185,7 @@ begin
       end
 """
 
-    for signal in interfaces[INTERFACE]:
+    for signal in interface_signals:
         name = INTERFACE + "_" + signal[0]
         if "addr" not in name:
             continue

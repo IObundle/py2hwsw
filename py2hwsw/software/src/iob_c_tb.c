@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-only
  */
 
+#include <fcntl.h> // For open, O_RDWR
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,8 +113,13 @@ void iob_start() {
     printf("C: Error opening file %s\n", C2V_FILE);
     exit(1);
   }
-  fpw = fopen(C2V_FILE, "wb");
-  fpr = fopen(V2C_FILE, "rb");
+  // Avoid deadlock with Xcelium: $fopen doesn't register a real OS-level
+  // reader on the FIFO, so fopen(O_WRONLY) would block forever.
+  // Opening with O_RDWR provides both ends and avoids blocking.
+  int fd_c2v = open(C2V_FILE, O_RDWR);
+  fpw = fdopen(fd_c2v, "wb");
+  int fd_v2c = open(V2C_FILE, O_RDWR);
+  fpr = fdopen(fd_v2c, "rb");
 }
 
 void iob_finish() {

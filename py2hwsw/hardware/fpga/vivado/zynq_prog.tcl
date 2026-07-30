@@ -16,7 +16,7 @@ rst -system
 after 1000
 
 # 2. Program the PL
-targets -set -nocase -filter {name =~ "xc7z020"}
+targets -set -nocase -filter {name =~ "xc7z*"}
 puts "--- Programming PL ---"
 fpga "$FPGA_TOP.bit"
 

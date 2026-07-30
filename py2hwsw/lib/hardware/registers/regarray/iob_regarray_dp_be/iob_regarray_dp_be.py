@@ -91,7 +91,7 @@ def setup(py_params_dict):
                 "instance_description": "2-port register array",
                 "parameters": {
                     "N": "1<<ADDR_W",
-                    "W": "DATA_W",
+                    "W": "8",
                     "WDATA_W": "DATA_W",
                     "WADDR_W": "ADDR_W",
                     "RDATA_W": "DATA_W",

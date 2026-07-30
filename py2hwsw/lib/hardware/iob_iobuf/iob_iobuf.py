@@ -91,7 +91,7 @@ def setup(py_params_dict):
       end else begin : tool_other
          reg o_var;
          assign io_io = t_i ? 1'bz : i_i;
-         always @* o_var = #1 io_io;
+         always @* o_var <= #1 io_io;
          assign o_int = o_var;
       end
    endgenerate

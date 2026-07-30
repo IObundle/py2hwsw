@@ -73,6 +73,12 @@ if { [get_files system.bd] == "" } {
     read_verilog $wrapper_path
 }
 
+if { $USE_EXTMEM > 0 } {
+    if {[file exists "vivado/$BOARD/ps7_ddr_address_translator.v"]} {
+        read_verilog vivado/$BOARD/ps7_ddr_address_translator.v
+    }
+}
+
 if { $USE_ETHERNET > 0 } {
     read_verilog vivado/$BOARD/iob_xilinx_ibufg.v
     read_verilog vivado/$BOARD/iob_xilinx_oddr.v

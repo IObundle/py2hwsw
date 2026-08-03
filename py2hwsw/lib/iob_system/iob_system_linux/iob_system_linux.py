@@ -382,7 +382,7 @@ def setup(py_params: dict):
         shutil.copytree(
             os.path.join(os.path.dirname(__file__), "software/tests"),
             os.path.join(py_params["build_dir"], "software/tests"),
-            dirs_exist_ok=True
+            dirs_exist_ok=True,
         )
 
     #     iob_soc_scripts = [

@@ -105,6 +105,7 @@ def get_interface_ip(iface):
 # Command handlers
 # ---------------------------------------------------------------
 
+
 def handle_echo(data):
     """Echo back the payload unchanged."""
     stats["echo_count"] += 1
@@ -181,6 +182,7 @@ def handle_done(data):
 # ---------------------------------------------------------------
 # Main loop
 # ---------------------------------------------------------------
+
 
 def run_server(args):
     """Main event loop: receive commands from SoC and respond."""
@@ -313,8 +315,9 @@ def main():
     )
     parser.add_argument("interface", help="Network interface connected to SoC")
     parser.add_argument("--soc-ip", help="SoC IP address for static ARP")
-    parser.add_argument("--port", type=int, default=9000,
-                        help="UDP port (default: 9000)")
+    parser.add_argument(
+        "--port", type=int, default=9000, help="UDP port (default: 9000)"
+    )
     args = parser.parse_args()
 
     run_server(args)

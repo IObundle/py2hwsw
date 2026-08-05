@@ -91,7 +91,9 @@ def setup(py_params_dict):
       end else begin : tool_other
          reg o_var;
          assign io_io = t_i ? 1'bz : i_i;
+         /* verilator lint_off COMBDLY */
          always @* o_var <= #1 io_io;
+         /* verilator lint_on COMBDLY */
          assign o_int = o_var;
       end
    endgenerate

@@ -90,11 +90,13 @@ def setup(py_params_dict):
          );
       end else begin : tool_other
          reg o_var;
+
          assign io_io = t_i ? 1'bz : i_i;
-         /* verilator lint_off COMBDLY */
-         always @* o_var <= #1 io_io;
-         /* verilator lint_on COMBDLY */
-         assign o_int = o_var;
+
+         // Buffer gate primitive to add inertial delay. Models physical pad propagation time and prevents
+         // infinite zero-delay combinational feedback loops in event-driven simulators.
+         // Ignored by synthesis tools.
+         buf #1 u_pad_delay (o_int, io_io);
       end
    endgenerate
 

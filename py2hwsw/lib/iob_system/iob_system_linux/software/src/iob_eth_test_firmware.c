@@ -1,7 +1,7 @@
 /*
- * SPDX-FileCopyrightText: 2026 IObundle, Lda
+ * SPDX-FileCopyrightText: 2026 IObundle
  *
- * SPDX-License-Identifier: MIT
+ * SPDX-License-Identifier: GPL-3.0-only
  *
  * Py2HWSW Version 0.81.0 has generated this code
  * (https://github.com/IObundle/py2hwsw).

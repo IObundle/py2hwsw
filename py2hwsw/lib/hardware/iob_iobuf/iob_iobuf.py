@@ -11,7 +11,7 @@ def setup(py_params_dict):
                 "name": "FPGA_TOOL",
                 "descr": "Use IPs from fpga tool. Avaliable options: 'XILINX', 'other'.",
                 "type": "P",
-                "val": '"XILINX"',
+                "val": '"other"',
                 "min": "NA",
                 "max": "NA",
             },

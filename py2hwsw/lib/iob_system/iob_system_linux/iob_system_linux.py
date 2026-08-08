@@ -50,7 +50,7 @@ def setup(py_params: dict):
     # Verilog snippets
     #
     verilog_snippet = """
-   assign interrupts = {{27{1'b0}}, uart2_interrupt, uart1_interrupt, uart0_interrupt, timer0_interrupt, 1'b0};
+   assign interrupts = {{26{1'b0}}, uart2_interrupt, uart1_interrupt, uart0_interrupt, eth0_interrupt, timer0_interrupt, 1'b0};
 """
 
     if params["dma_demo"]:
@@ -83,14 +83,6 @@ def setup(py_params: dict):
                 "val": hex(1 << py_params["mem_addr_w"]),
                 "min": "1",
                 "max": "32",
-            },
-            {  # For iob_spi_master
-                "name": "FPGA_TOOL",
-                "descr": "Use IPs from fpga tool. Avaliable options: 'XILINX', 'other'.",
-                "type": "P",
-                "val": '"other"',
-                "min": "NA",
-                "max": "NA",
             },
             # {
             #     "name": "DMA_DEMO",
@@ -145,27 +137,27 @@ def setup(py_params: dict):
                 ],
             },
             # SPI master
+            # # {
+            # #     "name": "spi_cache",
+            # #     "descr": "SPI cache bus",
+            # #     "if_defined": "RUN_FLASH",
+            # #     "signals": {
+            # #         "type": "iob",
+            # #         "prefix": "spi_",
+            # #     },
+            # # },
             # {
-            #     "name": "spi_cache",
-            #     "descr": "SPI cache bus",
-            #     "if_defined": "RUN_FLASH",
-            #     "signals": {
-            #         "type": "iob",
-            #         "prefix": "spi_",
-            #     },
+            #     "name": "spi_flash",
+            #     "descr": "SPI flash bus",
+            #     "signals": [
+            #         {"name": "ss", "width": 1},
+            #         {"name": "sclk", "width": 1},
+            #         {"name": "miso", "width": 1},
+            #         {"name": "mosi", "width": 1},
+            #         {"name": "wp_n", "width": 1},
+            #         {"name": "hold_n", "width": 1},
+            #     ],
             # },
-            {
-                "name": "spi_flash",
-                "descr": "SPI flash bus",
-                "signals": [
-                    {"name": "ss", "width": 1},
-                    {"name": "sclk", "width": 1},
-                    {"name": "miso", "width": 1},
-                    {"name": "mosi", "width": 1},
-                    {"name": "wp_n", "width": 1},
-                    {"name": "hold_n", "width": 1},
-                ],
-            },
         ],
         "subblocks": [
             {
@@ -181,7 +173,7 @@ def setup(py_params: dict):
                     "rs232_m": "rs232_m",
                     "interrupt_o": "uart0_interrupt",
                 },
-                "plic_source_id": 2,
+                "plic_source_id": 3,
             },
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
@@ -196,7 +188,7 @@ def setup(py_params: dict):
                     "rs232_m": "internal_rs232",
                     "interrupt_o": "uart1_interrupt",
                 },
-                "plic_source_id": 3,
+                "plic_source_id": 4,
             },
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
@@ -211,7 +203,7 @@ def setup(py_params: dict):
                     "rs232_m": "internal_rs232_inverted",
                     "interrupt_o": "uart2_interrupt",
                 },
-                "plic_source_id": 4,
+                "plic_source_id": 5,
             },
             # {
             #     # Instantiate a VERSAT core from: https://github.com/IObundle/iob-versat
@@ -226,22 +218,23 @@ def setup(py_params: dict):
             #         # TODO:
             #     },
             # },
-            {
-                # Instantiate a SPI master core from: https://github.com/IObundle/iob-spi
-                "core_name": "iob_spi_master",
-                "instance_name": "SPI0",
-                "instance_description": "SPI master peripheral",
-                "is_peripheral": True,
-                "parameters": {
-                    "FPGA_TOOL": "FPGA_TOOL",
-                },
-                "connect": {
-                    "clk_en_rst_s": "clk_en_rst_s",
-                    # Cbus connected automatically
-                    # "cache_iob_s": "spi_cache",
-                    "flash_io": "spi_flash",
-                },
-            },
+            #
+            # {
+            #     # Instantiate a SPI master core from: https://github.com/IObundle/iob-spi
+            #     "core_name": "iob_spi_master",
+            #     "instance_name": "SPI0",
+            #     "instance_description": "SPI master peripheral",
+            #     "is_peripheral": True,
+            #     "parameters": {
+            #         "FPGA_TOOL": "FPGA_TOOL",
+            #     },
+            #     "connect": {
+            #         "clk_en_rst_s": "clk_en_rst_s",
+            #         # Cbus connected automatically
+            #         # "cache_iob_s": "spi_cache",
+            #         "flash_io": "spi_flash",
+            #     },
+            # },
             #
             # Peripherals for DMA demo
             # {
@@ -383,6 +376,14 @@ def setup(py_params: dict):
             "bootargs": "rootwait console=ttyS0,115200 earlycon=sbi root=/dev/ram0 init=/sbin/init swiotlb=32 loglevel=8",
         }
         generate_dts(dts_parameters)
+
+        # Copy tests to build directory
+        # Py2HWSW already copies most files under software/, but skips .py files since commit be69de3e92. This script copies .py as well.
+        shutil.copytree(
+            os.path.join(os.path.dirname(__file__), "software/tests"),
+            os.path.join(py_params["build_dir"], "software/tests"),
+            dirs_exist_ok=True,
+        )
 
     #     iob_soc_scripts = [
     #         "terminalMode",

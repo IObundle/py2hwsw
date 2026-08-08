@@ -143,6 +143,7 @@ def setup(py_params_dict):
                 "AXI_LEN_W": "AXI_LEN_W",
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
+                "FPGA_TOOL": '"XILINX"',
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst",

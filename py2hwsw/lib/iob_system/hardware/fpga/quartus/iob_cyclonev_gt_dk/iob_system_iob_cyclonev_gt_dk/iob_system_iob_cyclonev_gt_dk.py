@@ -118,7 +118,7 @@ def setup(py_params_dict):
         attributes_dict["ports"] += [
             {
                 "name": "phy_io",
-                "descr": "MII ethernet interface + PHY signals",
+                "descr": "RGMII ethernet interface + PHY signals",
                 "signals": [
                     {"name": "enet_resetn_o", "width": "1"},
                     {"name": "enet_rx_clk_i", "width": "1"},
@@ -135,6 +135,8 @@ def setup(py_params_dict):
                     {"name": "enet_tx_d3_o", "width": "1"},
                     {"name": "enet_tx_en_o", "width": "1"},
                     # {"name": "enet_tx_err_o", "width": "1"},
+                    {"name": "enet_mdio_io", "width": "1"},
+                    {"name": "enet_mdc_o", "width": "1"},
                 ],
             },
         ]
@@ -257,9 +259,22 @@ def setup(py_params_dict):
             {
                 "name": "mii",
                 "descr": "Ethernet MII interface",
-                "signals": {
-                    "type": "mii",
-                },
+                "signals": [
+                    {"name": "mii_tx_clk", "width": "1"},
+                    {"name": "mii_txd", "width": "4"},
+                    {"name": "mii_tx_en", "width": "1"},
+                    {"name": "mii_tx_er", "width": "1"},
+                    {"name": "mii_rx_clk", "width": "1"},
+                    {"name": "mii_rxd", "width": "4"},
+                    {"name": "mii_rx_dv", "width": "1"},
+                    {"name": "mii_rx_er", "width": "1"},
+                    {"name": "mii_crs", "width": "1"},
+                    {"name": "mii_col", "width": "1"},
+                    {
+                        "name": "enet_mdio_io"
+                    },  # Don't create internal wire 'mii_mdio', because we cant assign bidirectional signals in verilog. Use enet_mdio_io signal directly.
+                    {"name": "mii_mdc", "width": "1"},
+                ],
             },
         ]
     #
@@ -276,6 +291,7 @@ def setup(py_params_dict):
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
                 "MEM_NO_READ_ON_WRITE": "MEM_NO_READ_ON_WRITE",
+                "FPGA_TOOL": '"other"',
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst",
@@ -394,6 +410,8 @@ def setup(py_params_dict):
 
     assign mii_col = 1'b0;
     assign mii_crs = 1'b0;
+
+    assign enet_mdc_o = mii_mdc;
 """,
             },
         ]

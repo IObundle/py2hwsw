@@ -119,6 +119,12 @@ def generate_dts(dts_parameters):
 
         // Peripherals added via #include statements.
         {extra_peripherals}
+        // Sys clock for Ethernet MII MDIO clock divider
+        sys_clk: clock {{
+          compatible = "fixed-clock";
+          #clock-cells = <0>;
+          clock-frequency = </*FREQ_MACRO*/>;
+        }};
     }};
 }};
 

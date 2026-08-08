@@ -8,6 +8,7 @@ import os
 def setup(py_params_dict):
     # user-passed parameters
     params = py_params_dict["iob_system_params"]
+    params["use_spi"] = False
 
     attributes_dict = {
         "name": params["name"] + "_iob_aes_ku040_db_g",
@@ -117,7 +118,7 @@ def setup(py_params_dict):
         attributes_dict["ports"] += [
             {
                 "name": "phy_io",
-                "descr": "MII ethernet interface + PHY signals",
+                "descr": "RGMII ethernet interface + PHY signals",
                 "signals": [
                     {"name": "enet_resetn_o", "width": "1"},
                     {"name": "enet_rx_clk_i", "width": "1"},
@@ -134,6 +135,23 @@ def setup(py_params_dict):
                     {"name": "enet_tx_d3_o", "width": "1"},
                     {"name": "enet_tx_en_o", "width": "1"},
                     # {"name": "enet_tx_err_o", "width": "1"},
+                    {"name": "enet_mdio_io", "width": "1"},
+                    {"name": "enet_mdc_o", "width": "1"},
+                ],
+            },
+        ]
+    if params["use_spi"]:
+        attributes_dict["ports"] += [
+            {
+                "name": "spi_io",
+                "descr": "SPI Flash memory connection",
+                "signals": [
+                    {"name": "spi_ss_o", "width": "1"},
+                    {"name": "spi_sclk_o", "width": "1"},
+                    {"name": "spi_miso_io", "width": "1"},
+                    {"name": "spi_mosi_io", "width": "1"},
+                    {"name": "spi_wp_n_io", "width": "1"},
+                    {"name": "spi_hold_n_io", "width": "1"},
                 ],
             },
         ]
@@ -280,9 +298,22 @@ def setup(py_params_dict):
             {
                 "name": "mii",
                 "descr": "Ethernet MII interface",
-                "signals": {
-                    "type": "mii",
-                },
+                "signals": [
+                    {"name": "mii_tx_clk", "width": "1"},
+                    {"name": "mii_txd", "width": "4"},
+                    {"name": "mii_tx_en", "width": "1"},
+                    {"name": "mii_tx_er", "width": "1"},
+                    {"name": "mii_rx_clk", "width": "1"},
+                    {"name": "mii_rxd", "width": "4"},
+                    {"name": "mii_rx_dv", "width": "1"},
+                    {"name": "mii_rx_er", "width": "1"},
+                    {"name": "mii_crs", "width": "1"},
+                    {"name": "mii_col", "width": "1"},
+                    {
+                        "name": "enet_mdio_io"
+                    },  # Don't create internal wire 'mii_mdio', because we cant assign bidirectional signals in verilog. Use enet_mdio_io signal directly.
+                    {"name": "mii_mdc", "width": "1"},
+                ],
             },
         ]
 
@@ -300,6 +331,7 @@ def setup(py_params_dict):
                 "AXI_LEN_W": "AXI_LEN_W",
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
+                "FPGA_TOOL": '"XILINX"',
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst",
@@ -311,6 +343,8 @@ def setup(py_params_dict):
     if params["use_ethernet"]:
         attributes_dict["subblocks"][-1]["connect"].update({"mii_io": "mii"})
         attributes_dict["subblocks"][-1]["connect"].update({"phy_rstn_o": "phy_rstn"})
+    if params["use_spi"]:
+        attributes_dict["subblocks"][-1]["connect"].update({"spi_io": "spi_io"})
     if params["use_extmem"]:
         attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
         # DDR4 controller
@@ -425,6 +459,8 @@ def setup(py_params_dict):
 
     assign mii_col = 1'b0;
     assign mii_crs = 1'b0;
+
+    assign enet_mdc_o = mii_mdc;
 """,
             },
         ]

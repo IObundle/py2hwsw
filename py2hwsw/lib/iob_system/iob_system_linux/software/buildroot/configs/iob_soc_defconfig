@@ -40,7 +40,17 @@ BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_DEVTMPFS=y
 BR2_ROOTFS_OVERLAY="$(BR2_EXTERNAL_IOB_SOC_PATH)/board/IObundle/iob-soc/rootfs-overlay"
 
 ## Extra packages
+# Benchmark software
 BR2_PACKAGE_DHRYSTONE=y
+# To support python scripts under Linux
 BR2_PACKAGE_MICROPYTHON=y
-BR2_PACKAGE_DROPBEAR=y
+# To transfer files via UART
 BR2_PACKAGE_LRZSZ=y
+# To manage iob_eth core
+BR2_PACKAGE_ETHTOOL=y
+# SSH server for Linux
+BR2_PACKAGE_DROPBEAR=y
+
+# Set root user password to 'root'. Allows dropbear ssh connections to use root account
+BR2_TARGET_GENERIC_PASSWD_SHA512=y
+BR2_TARGET_GENERIC_ROOT_PASSWD="root"

@@ -119,20 +119,18 @@ def setup(py_params_dict):
     if params["use_ethernet"]:
         attributes_dict["ports"] += [
             {
-                "name": "mii_io",
-                "descr": "Ethernet interface",
+                "name": "rgmii_io",
+                "descr": "Ethernet RGMII interface for PHY",
                 "signals": [
-                    {"name": "mii_rx_clk_i", "width": "1"},
-                    {"name": "mii_rxd_i", "width": "4"},
-                    {"name": "mii_rx_dv_i", "width": "1"},
-                    {"name": "mii_rx_er_i", "width": "1"},
-                    {"name": "mii_tx_clk_o", "width": "1"},
-                    {"name": "mii_txd_o", "width": "4"},
-                    {"name": "mii_tx_en_o", "width": "1"},
-                    {"name": "mii_mdc_o", "width": "1"},
-                    {"name": "mii_mdio_io", "width": "1"},
-                    {"name": "mii_crs_i", "width": "1"},
-                    {"name": "mii_col_i", "width": "1"},
+                    {"name": "rgmii_rx_clk_i", "width": "1"},
+                    {"name": "rgmii_rxd_i", "width": "4"},
+                    {"name": "rgmii_rx_dv_i", "width": "1"},
+                    {"name": "rgmii_rx_er_i", "width": "1"},
+                    {"name": "rgmii_tx_clk_o", "width": "1"},
+                    {"name": "rgmii_txd_o", "width": "4"},
+                    {"name": "rgmii_tx_en_o", "width": "1"},
+                    {"name": "rgmii_mdc_o", "width": "1"},
+                    {"name": "rgmii_mdio_io", "width": "1"},
                 ],
             },
         ]
@@ -210,7 +208,7 @@ def setup(py_params_dict):
                 "name": "rxclk_buf_io",
                 "descr": "IBUFG io",
                 "signals": [
-                    {"name": "mii_rx_clk_i"},
+                    {"name": "rgmii_rx_clk_i"},
                     {"name": "eth_clk", "width": "1"},
                 ],
             },
@@ -221,7 +219,7 @@ def setup(py_params_dict):
                     {"name": "eth_clk"},
                     {"name": "high", "width": "1"},
                     {"name": "low", "width": "1"},
-                    {"name": "mii_tx_clk_o"},
+                    {"name": "rgmii_tx_clk_o"},
                 ],
             },
             {
@@ -237,11 +235,23 @@ def setup(py_params_dict):
             },
             {
                 "name": "mii",
-                "descr": "Ethernet MII interface for UUT",
-                "signals": {
-                    "type": "mii",
-                    "prefix": "uut_",
-                },
+                "descr": "Ethernet MII interface",
+                "signals": [
+                    {"name": "uut_mii_tx_clk", "width": "1"},
+                    {"name": "uut_mii_txd", "width": "4"},
+                    {"name": "uut_mii_tx_en", "width": "1"},
+                    {"name": "uut_mii_tx_er", "width": "1"},
+                    {"name": "uut_mii_rx_clk", "width": "1"},
+                    {"name": "uut_mii_rxd", "width": "4"},
+                    {"name": "uut_mii_rx_dv", "width": "1"},
+                    {"name": "uut_mii_rx_er", "width": "1"},
+                    {"name": "uut_mii_crs", "width": "1"},
+                    {"name": "uut_mii_col", "width": "1"},
+                    {
+                        "name": "rgmii_mdio_io"
+                    },  # Don't create internal wire 'uut_mii_mdio', because we cant assign bidirectional signals in verilog. Use rgmii_mdio_io signal directly.
+                    {"name": "uut_mii_mdc", "width": "1"},
+                ],
             },
         ]
 
@@ -259,6 +269,7 @@ def setup(py_params_dict):
                 "AXI_LEN_W": "AXI_LEN_W",
                 "AXI_ADDR_W": "AXI_ADDR_W",
                 "AXI_DATA_W": "AXI_DATA_W",
+                "FPGA_TOOL": '"XILINX"',
             },
             "connect": {
                 "clk_en_rst_s": "clk_en_rst",
@@ -466,23 +477,22 @@ def setup(py_params_dict):
     assign high = 1'b1;
     assign low = 1'b0;
 
-    // Use mii_rx_clk_i buffered clock (eth_clk) for internal MII and external mii_tx_clk_i
+    // Use rgmii_rx_clk_i buffered clock (eth_clk) for internal MII and external rgmii_tx_clk_o
     assign uut_mii_rx_clk = eth_clk;
     assign uut_mii_tx_clk = eth_clk;
 
-    // Connect internal MII data/control to external ports
-    assign uut_mii_rxd = mii_rxd_i;
-    assign uut_mii_rx_dv = mii_rx_dv_i;
-    assign uut_mii_rx_er = mii_rx_er_i;
+    // Connect internal MII data/control to external RGMII ports
+    assign uut_mii_rxd = rgmii_rxd_i;
+    assign uut_mii_rx_dv = rgmii_rx_dv_i;
+    assign uut_mii_rx_er = rgmii_rx_er_i;
 
-    assign mii_txd_o = uut_mii_txd;
-    assign mii_tx_en_o = uut_mii_tx_en;
+    assign rgmii_txd_o = uut_mii_txd;
+    assign rgmii_tx_en_o = uut_mii_tx_en;
 
-    assign mii_mdc_o = uut_mii_mdc;
-    assign mii_mdio_io = uut_mii_mdio;
+    assign rgmii_mdc_o = uut_mii_mdc;
 
-    assign uut_mii_crs = mii_crs_i;
-    assign uut_mii_col = mii_col_i;
+    assign uut_mii_crs = 1'b0;
+    assign uut_mii_col = 1'b0;
 
     assign phy_rstn = ~arst; // PHY reset
 """
@@ -502,7 +512,7 @@ def setup(py_params_dict):
 # This file was automatically generated by the iob_system_iob_zybo_z7.py script.
 
 # Clock groups
-set_clock_groups -asynchronous -group {clk_fpga_0} -group {mii_rx_clk_i}
+set_clock_groups -asynchronous -group {clk_fpga_0} -group {rgmii_rx_clk_i}
 """
         )
 

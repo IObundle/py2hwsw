@@ -80,6 +80,11 @@ if {$IS_FPGA == "1"} {
         set_instance_assignment -name IO_STANDARD "2.5-V" -to enet_tx_d2_o
         set_instance_assignment -name IO_STANDARD "2.5-V" -to enet_tx_d3_o
         set_instance_assignment -name IO_STANDARD "2.5-V" -to enet_tx_en_o
+
+        set_location_assignment PIN_AM8 -to enet_mdc_o
+        set_instance_assignment -name IO_STANDARD "2.5-V" -to enet_mdc_o
+        set_location_assignment PIN_AG14 -to enet_mdio_io
+        set_instance_assignment -name IO_STANDARD "2.5-V" -to enet_mdio_io
     }
 
     #Force registers into IOBs

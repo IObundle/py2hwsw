@@ -205,6 +205,10 @@ endif
 linux-kernel:
 	# Copy defconfig (linux_config) from iob_system_linux to iob_linux
 	cp iob_system/iob_system_linux/software/linux_config $(LINUX_SUBMODULE_DIR)/software/linux_config
+	# Run target to create linux directory (so that we can modify its sources)
+	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) clean-linux-kernel $(CURDIR)/$(LINUX_SUBMODULE_DIR)/submodules/linux-5.15.98'
+	# Copy custom ethoc driver to kernel source folder
+	cp iob_system/submodules/iob_eth/software/linux/ethoc.c $(LINUX_SUBMODULE_DIR)/submodules/linux-5.15.98/drivers/net/ethernet/ethoc.c
 	# Build Linux kernel
 	nix-shell $(LINUX_SUBMODULE_DIR) --run 'make -C $(LINUX_SUBMODULE_DIR) build-linux-kernel'
 	# Copy built Linux kernel to iob_system_linux

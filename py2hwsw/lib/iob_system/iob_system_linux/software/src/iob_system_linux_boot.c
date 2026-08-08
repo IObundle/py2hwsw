@@ -7,9 +7,9 @@
 #include "clint.h"
 #include "iob_bsp.h"
 #include "iob_printf.h"
-#include "iob_spi.h"
-#include "iob_spidefs.h"
-#include "iob_spiplatform.h"
+// #include "iob_spi.h"
+// #include "iob_spidefs.h"
+// #include "iob_spiplatform.h"
 #include "iob_system_linux_conf.h"
 #include "iob_system_linux_mmap.h"
 #include "iob_uart16550.h"
@@ -133,69 +133,72 @@ void console_get_files(int file_count, long int file_address_array[4],
 // Flash memory
 //
 
-void program_flash(int file_count, long int file_address_array[4],
-                   char *file_start_addr, int file_sizes[4]) {
-  int i = 0;
-  unsigned int flash_addr = 0x0;
-  char *prog_data = NULL;
-  int next_subsector = 0;
-
-  // erase SPI Flash
-  flash_addr = FLASH_FILE_SIZE_OFFSET;
-  spiflash_erase_address_range(flash_addr, 4 * file_count);
-
-  // store file sizes
-  prog_data = (char *)file_sizes;
-  spiflash_memProgram(prog_data, 4 * file_count, flash_addr);
-
-  for (i = 0; i < file_count; i++) {
-    flash_addr = FLASH_FIRMWARE_OFFSET + (next_subsector * SUBSECTOR_SIZE);
-    prog_data = file_start_addr + file_address_array[i];
-    spiflash_erase_address_range(flash_addr, file_sizes[i]);
-    printf("Program %d: addr: %p\tflash: %x\tsize: %d\n", i, prog_data,
-           flash_addr, file_sizes[i]);
-    spiflash_memProgram(prog_data, file_sizes[i], flash_addr);
-    printf("Program %d: complete\n", i);
-    next_subsector += (((file_sizes[i] + SUBSECTOR_SIZE - 1) / SUBSECTOR_SIZE));
-  }
-}
-
-void read_flash(int file_count, long int file_address_array[4],
-                char *file_start_addr) {
-  int i = 0;
-  int sample = 0;
-  unsigned int *read_array = NULL;
-  unsigned int spi_data = 0;
-  unsigned int flash_file_start = 0;
-  int read_cnt = 0, read_total = 0;
-  int file_sizes[4] = {0};
-  int next_subsector = 0;
-
-  // get file sizes
-  for (sample = 0; sample < 4 * file_count; sample = sample + 4) {
-    file_sizes[sample >> 2] = spiflash_readmem(FLASH_FILE_SIZE_OFFSET + sample);
-  }
-
-  for (i = 0; i < file_count; i++) {
-    read_array = (unsigned int *)(file_start_addr + file_address_array[i]);
-    flash_file_start =
-        FLASH_FIRMWARE_OFFSET + (next_subsector * SUBSECTOR_SIZE);
-    read_total = file_sizes[i] / 4;
-    read_cnt = 0;
-
-    printf("Read %d: flash: %x\tmem: %p\tsize: %d\n", i, flash_file_start,
-           read_array, file_sizes[i]);
-    for (sample = 0; sample < file_sizes[i]; sample = sample + 4) {
-      read_array[sample >> 2] = spiflash_readmem(flash_file_start + sample);
-      // progress every 10%
-      if (read_cnt % (read_total / 10) == 0) {
-        printf("\tRead %d: %d%%\n", i, read_cnt * 100 / read_total);
-      }
-      read_cnt++;
-    }
-    next_subsector += (((file_sizes[i] + SUBSECTOR_SIZE - 1) / SUBSECTOR_SIZE));
-  }
-}
+// void program_flash(int file_count, long int file_address_array[4],
+//                    char *file_start_addr, int file_sizes[4]) {
+//   int i = 0;
+//   unsigned int flash_addr = 0x0;
+//   char *prog_data = NULL;
+//   int next_subsector = 0;
+//
+//   // erase SPI Flash
+//   flash_addr = FLASH_FILE_SIZE_OFFSET;
+//   spiflash_erase_address_range(flash_addr, 4 * file_count);
+//
+//   // store file sizes
+//   prog_data = (char *)file_sizes;
+//   spiflash_memProgram(prog_data, 4 * file_count, flash_addr);
+//
+//   for (i = 0; i < file_count; i++) {
+//     flash_addr = FLASH_FIRMWARE_OFFSET + (next_subsector * SUBSECTOR_SIZE);
+//     prog_data = file_start_addr + file_address_array[i];
+//     spiflash_erase_address_range(flash_addr, file_sizes[i]);
+//     printf("Program %d: addr: %p\tflash: %x\tsize: %d\n", i, prog_data,
+//            flash_addr, file_sizes[i]);
+//     spiflash_memProgram(prog_data, file_sizes[i], flash_addr);
+//     printf("Program %d: complete\n", i);
+//     next_subsector += (((file_sizes[i] + SUBSECTOR_SIZE - 1) /
+//     SUBSECTOR_SIZE));
+//   }
+// }
+//
+// void read_flash(int file_count, long int file_address_array[4],
+//                 char *file_start_addr) {
+//   int i = 0;
+//   int sample = 0;
+//   unsigned int *read_array = NULL;
+//   unsigned int spi_data = 0;
+//   unsigned int flash_file_start = 0;
+//   int read_cnt = 0, read_total = 0;
+//   int file_sizes[4] = {0};
+//   int next_subsector = 0;
+//
+//   // get file sizes
+//   for (sample = 0; sample < 4 * file_count; sample = sample + 4) {
+//     file_sizes[sample >> 2] = spiflash_readmem(FLASH_FILE_SIZE_OFFSET +
+//     sample);
+//   }
+//
+//   for (i = 0; i < file_count; i++) {
+//     read_array = (unsigned int *)(file_start_addr + file_address_array[i]);
+//     flash_file_start =
+//         FLASH_FIRMWARE_OFFSET + (next_subsector * SUBSECTOR_SIZE);
+//     read_total = file_sizes[i] / 4;
+//     read_cnt = 0;
+//
+//     printf("Read %d: flash: %x\tmem: %p\tsize: %d\n", i, flash_file_start,
+//            read_array, file_sizes[i]);
+//     for (sample = 0; sample < file_sizes[i]; sample = sample + 4) {
+//       read_array[sample >> 2] = spiflash_readmem(flash_file_start + sample);
+//       // progress every 10%
+//       if (read_cnt % (read_total / 10) == 0) {
+//         printf("\tRead %d: %d%%\n", i, read_cnt * 100 / read_total);
+//       }
+//       read_cnt++;
+//     }
+//     next_subsector += (((file_sizes[i] + SUBSECTOR_SIZE - 1) /
+//     SUBSECTOR_SIZE));
+//   }
+// }
 
 #ifdef IOB_SYSTEM_LINUX_TRAP_HANDLER
 //
@@ -308,18 +311,19 @@ int main() {
   if (!strcmp(boot_flow, "CONSOLE_TO_FLASH")) {
     uart16550_puts(PROGNAME);
     uart16550_puts(": CONSOLE_TO_FLASH\n");
-    // init spi flash controller
-    spiflash_init(SPI0_BASE);
-    // Read files from console
-    console_get_files(file_count, file_address_array, prog_start_addr,
-                      file_name_array, file_sizes);
-    program_flash(file_count, file_address_array, prog_start_addr, file_sizes);
+    // // init spi flash controller
+    // spiflash_init(SPI0_BASE);
+    // // Read files from console
+    // console_get_files(file_count, file_address_array, prog_start_addr,
+    //                   file_name_array, file_sizes);
+    // program_flash(file_count, file_address_array, prog_start_addr,
+    // file_sizes);
   } else if (!strcmp(boot_flow, "FLASH_TO_EXTMEM")) {
     uart16550_puts(PROGNAME);
     uart16550_puts(": FLASH_TO_EXTMEM\n");
-    // init spi flash controller
-    spiflash_init(SPI0_BASE);
-    read_flash(file_count, file_address_array, prog_start_addr);
+    // // init spi flash controller
+    // spiflash_init(SPI0_BASE);
+    // read_flash(file_count, file_address_array, prog_start_addr);
   } else {
     uart16550_puts(PROGNAME);
     uart16550_puts(": CONSOLE_TO_EXTMEM\n");

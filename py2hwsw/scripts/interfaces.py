@@ -1768,6 +1768,7 @@ class MIIInterface(_interface):
     # Variant of the MII interface
     variant: str = "mii"
     management_signals: bool = True
+    inout_signals: bool = True
 
     def __post_init__(self):
         super().__post_init__()
@@ -1831,12 +1832,33 @@ class MIIInterface(_interface):
                 ),
             ]
         elif self.variant == "rmii":
+            if self.inout_signals:
+                self._signals += [
+                    iob_signal(
+                        name=f"{self.variant}_ref_clk_io",
+                        width=1,
+                        descr=f"{self.variant.upper()} continuous 50 MHz reference clock. Direction varies, as it may be driven by PHY, MAC, or External clock source.",
+                    ),
+                ]
+            else:
+                self._signals += [
+                    iob_signal(
+                        name=f"{self.variant}_ref_clk_i_i",
+                        width=1,
+                        descr=f"Input for {self.variant.upper()} continuous 50 MHz reference clock. Direction varies, as it may be driven by PHY, MAC, or External clock source.",
+                    ),
+                    iob_signal(
+                        name=f"{self.variant}_ref_clk_o_o",
+                        width=1,
+                        descr=f"Output for {self.variant.upper()} continuous 50 MHz reference clock. Direction varies, as it may be driven by PHY, MAC, or External clock source.",
+                    ),
+                    iob_signal(
+                        name=f"{self.variant}_ref_clk_oe_o",
+                        width=1,
+                        descr=f"Output enable for {self.variant.upper()} continuous 50 MHz reference clock. Direction varies, as it may be driven by PHY, MAC, or External clock source.",
+                    ),
+                ]
             self._signals += [
-                iob_signal(
-                    name=f"{self.variant}_ref_clk_io",
-                    width=1,
-                    descr=f"{self.variant.upper()} continuous 50 MHz reference clock. Direction varies, as it may be driven by PHY, MAC, or External clock source.",
-                ),
                 iob_signal(
                     name=f"{self.variant}_txd_o",
                     width=2,
@@ -1864,12 +1886,33 @@ class MIIInterface(_interface):
                 ),
             ]
         elif self.variant == "gmii":
+            if self.inout_signals:
+                self._signals += [
+                    iob_signal(
+                        name=f"{self.variant}_gtxclk_io",
+                        width=1,
+                        descr=f"{self.variant.upper()} clock signal for gigabit TX signals (125 MHz)",
+                    ),
+                ]
+            else:
+                self._signals += [
+                    iob_signal(
+                        name=f"{self.variant}_gtxclk_i_i",
+                        width=1,
+                        descr=f"Input for {self.variant.upper()} clock signal for gigabit TX signals (125 MHz)",
+                    ),
+                    iob_signal(
+                        name=f"{self.variant}_gtxclk_o_o",
+                        width=1,
+                        descr=f"Output for {self.variant.upper()} clock signal for gigabit TX signals (125 MHz)",
+                    ),
+                    iob_signal(
+                        name=f"{self.variant}_gtxclk_oe_o",
+                        width=1,
+                        descr=f"Output enable for {self.variant.upper()} clock signal for gigabit TX signals (125 MHz)",
+                    ),
+                ]
             self._signals += [
-                iob_signal(
-                    name=f"{self.variant}_gtxclk_io",
-                    width=1,
-                    descr=f"{self.variant.upper()} clock signal for gigabit TX signals (125 MHz)",
-                ),
                 iob_signal(
                     name=f"{self.variant}_txclk_o",
                     width=1,
@@ -1956,12 +1999,33 @@ class MIIInterface(_interface):
             ]
 
         if self.management_signals:
+            if self.inout_signals:
+                self._signals += [
+                    iob_signal(
+                        name=f"{self.variant}_mdio_io",
+                        width=1,
+                        descr=f"{self.variant.upper()} MDIO I/O.",
+                    ),
+                ]
+            else:
+                self._signals += [
+                    iob_signal(
+                        name=f"{self.variant}_mdio_i_i",
+                        width=1,
+                        descr=f"Input for {self.variant.upper()} MDIO I/O.",
+                    ),
+                    iob_signal(
+                        name=f"{self.variant}_mdio_o_o",
+                        width=1,
+                        descr=f"Output for {self.variant.upper()} MDIO I/O.",
+                    ),
+                    iob_signal(
+                        name=f"{self.variant}_mdio_oe_o",
+                        width=1,
+                        descr=f"Output enable for {self.variant.upper()} MDIO I/O.",
+                    ),
+                ]
             self._signals += [
-                iob_signal(
-                    name=f"{self.variant}_mdio_io",
-                    width=1,
-                    descr=f"{self.variant.upper()} MDIO I/O.",
-                ),
                 iob_signal(
                     name=f"{self.variant}_mdc_o",
                     width=1,
@@ -2136,6 +2200,7 @@ def create_interface(
     # mii
     variant = widths.get("VARIANT", "mii")
     management_signals = widths.get("MANAGEMENT_SIGNALS", True)
+    inout_signals = widths.get("INOUT_SIGNALS", True)
 
     # Check if widths are integers or strings
     # TODO: except for addr_w, all should later be only an integer
@@ -2398,6 +2463,7 @@ def create_interface(
                 portmap_port_prefix=portmap_port_prefix,
                 variant=variant,
                 management_signals=management_signals,
+                inout_signals=inout_signals,
             )
         case "wb":
             interface = wishboneInterface(

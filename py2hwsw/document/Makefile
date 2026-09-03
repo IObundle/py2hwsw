@@ -18,6 +18,8 @@ endif
 #default DOC
 DOC?=ug
 
+PDFLATEX = pdflatex -interaction=nonstopmode
+
 CONFIDENTIAL?=1
 
 TSRC = $(patsubst tsrc/%, ./%, $(wildcard tsrc/*))
@@ -70,13 +72,13 @@ build: debug $(DOC).pdf
 
 #build presentation document type
 presentation.pdf: figs presentation.tex
-	pdflatex -jobname pres presentation.tex
-	pdflatex -jobname pres presentation.tex
+	$(PDFLATEX) -jobname pres presentation.tex
+	$(PDFLATEX) -jobname pres presentation.tex
 
 #build product brief document type
 pb.pdf: debug results pb_figs pbtop.tex
-	pdflatex -jobname pb pbtop.tex
-	pdflatex -jobname pb pbtop.tex
+	$(PDFLATEX) -jobname pb pbtop.tex
+	$(PDFLATEX) -jobname pb pbtop.tex
 
 #pb top file containing the definition of sections to include
 pbtop.tex:
@@ -84,10 +86,10 @@ pbtop.tex:
 
 #build user guide document type
 ug.pdf: debug results figs ugtop.tex
-	pdflatex -jobname ug ugtop.tex
+	$(PDFLATEX) -jobname ug ugtop.tex
 	if [ -f *.bib ]; then bibtex ug; fi
-	pdflatex -jobname ug ugtop.tex
-	pdflatex -jobname ug ugtop.tex
+	$(PDFLATEX) -jobname ug ugtop.tex
+	$(PDFLATEX) -jobname ug ugtop.tex
 
 
 #ug top file containing the definition of sections to include
@@ -120,8 +122,8 @@ rntop.tex:
 	make doctop DOC=rn
 
 rn.pdf: rntop.tex
-	pdflatex -jobname rn rntop.tex
-	pdflatex -jobname rn rntop.tex
+	$(PDFLATEX) -jobname rn rntop.tex
+	$(PDFLATEX) -jobname rn rntop.tex
 
 
 doctop:

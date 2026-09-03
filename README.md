@@ -56,12 +56,12 @@ Simpler examples, including the submodules used in IOb-SoC, are available in the
 directory.
 
 
-## User Guide
+## Design Specification
 
-A preliminary version of the Py2HWSW user guide can be found
-[here](py2hwsw/py2hwsw_document/document/ug.pdf).  This user guide is a work in
-progress and will be updated as the project evolves. It uses LaTeX and can be
-built with the following command:
+A preliminary version of the Py2HWSW design specification can be found
+[here](py2hwsw/py2hwsw_document/document/ds.pdf).  This design specification is
+a work in progress and will be updated as the project evolves. It uses LaTeX
+and can be built with the following command:
 
 ```bash
 make -C py2hwsw/lib py2-doc-build

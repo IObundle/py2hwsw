@@ -91,9 +91,10 @@ doc-build:
 
 py2-doc-build:
 	nix-shell --run "py2hwsw --py2hwsw_docs && make -C py2hwsw_generated_docs/document/ build"
+	mv py2hwsw_generated_docs/document/ug.pdf py2hwsw_generated_docs/document/ds.pdf
 
 py2-doc-update:
-	cp py2hwsw_generated_docs/document/ug.pdf ../py2hwsw_document/document/ug.pdf
+	cp py2hwsw_generated_docs/document/ds.pdf ../py2hwsw_document/document/ds.pdf
 
 
 delivery:

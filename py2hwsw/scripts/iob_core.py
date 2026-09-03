@@ -196,7 +196,7 @@ class iob_core(iob_module, iob_instance):
             "is_tester",
             False,
             bool,
-            descr="Generates makefiles and depedencies to run this core as if it was the top module. Used for testers (superblocks of top moudle).",
+            descr="Generates makefiles and dependencies to run this core as if it was the top module. Used for testers (superblocks of top module).",
         )
         # List of core Python Parameters (for documentation)
         self.set_default_attribute(
@@ -971,9 +971,13 @@ class iob_core(iob_module, iob_instance):
         )
         setup_srcs.doc_setup(core)
         setup_srcs.copy_rename_setup_subdir(core, "document")
+        # Document Makefile and TeX sources refer to these files via $(NAME)
+        doc_name = "Py2HWSW"
         with open(f"{core.build_dir}/config_build.mk", "w") as f:
-            f.write("NAME=Py2HWSW\n")
-        with open(f"{core.build_dir}/document/tsrc/{core.name}_version.tex", "w") as f:
+            f.write(f"NAME={doc_name}\n")
+        with open(f"{core.build_dir}/document/tsrc/name.tex", "w") as f:
+            f.write(doc_name)
+        with open(f"{core.build_dir}/document/tsrc/{doc_name}_version.tex", "w") as f:
             f.write(py2_version)
         # Build a new dummy module instance, to obtain its attributes
         __class__.global_special_target = "print_attributes"

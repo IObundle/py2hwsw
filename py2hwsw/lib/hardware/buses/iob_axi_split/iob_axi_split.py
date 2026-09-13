@@ -21,6 +21,24 @@ def setup(py_params_dict):
     NUM_MANAGERS = int(py_params_dict["num_managers"])
     # Number of bits required for manager selection
     NBITS = (NUM_MANAGERS - 1).bit_length()
+    # Total number of slots: one manager per external port plus an internal
+    # error-responder slot. Manager selections with no mapped manager (e.g.
+    # top address bits selecting a non-existent manager) are routed to the
+    # error-responder slot, which answers with a DECERR instead of leaving
+    # the request unanswered (which would deadlock the requesting manager).
+    NUM_SLOTS = NUM_MANAGERS + 1
+    # Select width required to address all slots (managers + error responder)
+    SEL_W_EXT = NUM_MANAGERS.bit_length()
+    # Zero-extension (in Verilog) of a NBITS-wide select to SEL_W_EXT bits
+    _pad = SEL_W_EXT - NBITS
+    _read_sel_ext_rhs = "read_sel" if _pad == 0 else f"{{{_pad}{{1'b0}}, read_sel}}"
+    _read_sel_reg_ext_rhs = (
+        "read_sel_reg" if _pad == 0 else f"{{{_pad}{{1'b0}}, read_sel_reg}}"
+    )
+    _write_sel_ext_rhs = "write_sel" if _pad == 0 else f"{{{_pad}{{1'b0}}, write_sel}}"
+    _write_sel_reg_ext_rhs = (
+        "write_sel_reg" if _pad == 0 else f"{{{_pad}{{1'b0}}, write_sel_reg}}"
+    )
 
     TRANSFER_COUNTER_DATA_W = py_params_dict.get("transfer_counter_data_w", 5)
 
@@ -417,6 +435,57 @@ def setup(py_params_dict):
                 {"name": "write_sel_reg"},
             ],
         },
+        # Extended selections: unmapped selects are redirected to the error
+        # responder slot (index NUM_MANAGERS) instead of leaving them
+        # unanswered.
+        {
+            "name": "s_read_sel_ext",
+            "descr": "Extended read select (unmapped selects routed to error responder)",
+            "signals": [
+                {"name": "read_sel_ext", "width": SEL_W_EXT},
+            ],
+        },
+        {
+            "name": "s_read_sel_reg_ext",
+            "descr": "Registered extended read select",
+            "signals": [
+                {"name": "read_sel_reg_ext", "width": SEL_W_EXT},
+            ],
+        },
+        {
+            "name": "s_write_sel_ext",
+            "descr": "Extended write select (unmapped selects routed to error responder)",
+            "signals": [
+                {"name": "write_sel_ext", "width": SEL_W_EXT},
+            ],
+        },
+        {
+            "name": "s_write_sel_reg_ext",
+            "descr": "Registered extended write select",
+            "signals": [
+                {"name": "write_sel_reg_ext", "width": SEL_W_EXT},
+            ],
+        },
+        # AXI subordinate interface of the error responder for unmapped
+        # addresses
+        {
+            "name": "err_axi",
+            "descr": "AXI subordinate interface of error responder for unmapped addresses",
+            "signals": {
+                "type": "axi",
+                "prefix": "err_",
+                "DATA_W": DATA_W,
+                "ADDR_W": ADDR_W - NBITS,
+                "ID_W": "ID_W",
+                "SIZE_W": SIZE_W,
+                "BURST_W": BURST_W,
+                "LOCK_W": LOCK_W,
+                "CACHE_W": CACHE_W,
+                "QOS_W": QOS_W,
+                "RESP_W": RESP_W,
+                "LEN_W": "LEN_W",
+            },
+        },
     ]
     # Generate wires for muxers and demuxers
     for signal, direction, width, _, _ in axi_signals:
@@ -441,7 +510,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "demux_" + signal,
-                            "width": f"{NUM_MANAGERS} * {width}",
+                            "width": f"{NUM_SLOTS} * {width}",
                         },
                     ],
                 },
@@ -458,7 +527,7 @@ def setup(py_params_dict):
                     "signals": [
                         {
                             "name": "mux_" + signal,
-                            "width": f"{NUM_MANAGERS} * {width}",
+                            "width": f"{NUM_SLOTS} * {width}",
                         },
                     ],
                 },
@@ -574,6 +643,35 @@ def setup(py_params_dict):
                 "data_o": "write_sel_reg_data_o",
             },
         },
+        # Error responder: terminates requests targeting unmapped addresses
+        # (manager selection value >= NUM_MANAGERS) with a DECERR response,
+        # so that they never remain unanswered (which would deadlock the
+        # requesting manager).
+        {
+            "core_name": "iob_axi_error_slave",
+            "instance_name": "iob_axi_error_slave",
+            "parameters": {
+                "ID_W": "ID_W",
+                "LEN_W": "LEN_W",
+                "ADDR_W": ADDR_W - NBITS,
+                "DATA_W": DATA_W,
+                "SIZE_W": SIZE_W,
+                "BURST_W": BURST_W,
+                "LOCK_W": LOCK_W,
+                "CACHE_W": CACHE_W,
+                "QOS_W": QOS_W,
+                "RESP_W": RESP_W,
+            },
+            "connect": {
+                "clk_en_rst_s": (
+                    "clk_en_rst_s",
+                    [
+                        "rst_i:rst_i",
+                    ],
+                ),
+                "s_s": "err_axi",
+            },
+        },
     ]
     # Generate muxers and demuxers
     for signal, direction, width, sig_type, registered in axi_signals:
@@ -586,10 +684,10 @@ def setup(py_params_dict):
                     "instance_name": "iob_demux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_MANAGERS,
+                        "N": NUM_SLOTS,
                     },
                     "connect": {
-                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}_ext",
                         "data_i": "demux_" + signal + "_i",
                         "data_o": "demux_" + signal + "_o",
                     },
@@ -603,10 +701,10 @@ def setup(py_params_dict):
                     "instance_name": "iob_mux_" + signal,
                     "parameters": {
                         "DATA_W": width,
-                        "N": NUM_MANAGERS,
+                        "N": NUM_SLOTS,
                     },
                     "connect": {
-                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}",
+                        "sel_i": f"s_{sig_type}_sel{sel_signal_suffix}_ext",
                         "data_i": "mux_" + signal + "_i",
                         "data_o": "mux_" + signal + "_o",
                     },
@@ -625,6 +723,12 @@ def setup(py_params_dict):
    // Only switch subordinates when there is no current active transaction
    assign read_sel = active_transaction_read_reg_o ? read_sel_reg : s_axi_araddr_i[{ADDR_W-1}-:{NBITS}];
 
+   // Route unmapped manager selections (value >= {NUM_MANAGERS}) to the error
+   // responder slot ({NUM_MANAGERS}) so that they always get a response
+   // instead of being left unanswered (deadlock).
+   assign read_sel_ext      = (read_sel >= {NUM_MANAGERS}) ? {SEL_W_EXT}'d{NUM_MANAGERS} : {_read_sel_ext_rhs};
+   assign read_sel_reg_ext  = (read_sel_reg >= {NUM_MANAGERS}) ? {SEL_W_EXT}'d{NUM_MANAGERS} : {_read_sel_reg_ext_rhs};
+
    // Block address valid/ready signals of current subordinate if there is still an active transaction
    assign s_axi_arready_o = ~active_transaction_read_reg_o & mux_axi_arready_o;
    assign demux_axi_arvalid_i = ~active_transaction_read_reg_o & s_axi_arvalid_i;
@@ -642,6 +746,12 @@ def setup(py_params_dict):
 
    // Only switch subordinates when there is no current active transaction
    assign write_sel = active_write_transaction ? write_sel_reg : s_axi_awaddr_i[{ADDR_W-1}-:{NBITS}];
+
+   // Route unmapped manager selections (value >= {NUM_MANAGERS}) to the error
+   // responder slot ({NUM_MANAGERS}) so that they always get a response
+   // instead of being left unanswered (deadlock).
+   assign write_sel_ext     = (write_sel >= {NUM_MANAGERS}) ? {SEL_W_EXT}'d{NUM_MANAGERS} : {_write_sel_ext_rhs};
+   assign write_sel_reg_ext = (write_sel_reg >= {NUM_MANAGERS}) ? {SEL_W_EXT}'d{NUM_MANAGERS} : {_write_sel_reg_ext_rhs};
 
    // Block address valid/ready signals of current subordinates if accumulator full or if another manager wants to write
    assign wants_change_write_sel = write_sel != s_axi_awaddr_i[{ADDR_W-1}-:{NBITS}];
@@ -683,6 +793,11 @@ def setup(py_params_dict):
    assign m{port_idx}_axi_araddr_o = demux_axi_araddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
    assign m{port_idx}_axi_awaddr_o = demux_axi_awaddr[{port_idx*ADDR_W}+:{ADDR_W-NBITS}];
 """
+    # Connect error responder address signals (slot NUM_MANAGERS)
+    verilog_code += f"""
+   assign err_axi_araddr = demux_axi_araddr[{NUM_MANAGERS*ADDR_W}+:{ADDR_W-NBITS}];
+   assign err_axi_awaddr = demux_axi_awaddr[{NUM_MANAGERS*ADDR_W}+:{ADDR_W-NBITS}];
+"""
     # Connect other signals
     for signal, direction, width, _, _ in axi_signals:
         if signal in ["axi_araddr", "axi_awaddr"]:
@@ -694,9 +809,13 @@ def setup(py_params_dict):
                 verilog_code += f"""
    assign m{port_idx}_{signal}_o = demux_{signal}[{port_idx}*{width}+:{width}];
 """
+            # Connect error responder input signals (slot NUM_MANAGERS)
+            verilog_code += f"""
+   assign err_{signal} = demux_{signal}[{NUM_MANAGERS}*{width}+:{width}];
+"""
         else:  # Output direction
-            # Connect muxer inputs
-            verilog_code += f"    assign mux_{signal} = {{"
+            # Connect muxer inputs (error responder at the highest slot)
+            verilog_code += f"    assign mux_{signal} = {{err_{signal}, "
             for port_idx in range(NUM_MANAGERS - 1, -1, -1):
                 verilog_code += f"m{port_idx}_{signal}_i, "
             verilog_code = verilog_code[:-2] + "};\n"

@@ -35,9 +35,6 @@
 [submodule "py2hwsw/lib/iob_system/submodules/iob_naxriscv"]
 	path = py2hwsw/lib/iob_system/submodules/iob_naxriscv
 	url = https://github.com/IObundle/iob-naxriscv.git
-[submodule "py2hwsw/lib/iob_system/submodules/iob_cva6"]
-	path = py2hwsw/lib/iob_system/submodules/iob_cva6
-	url = https://github.com/arturum1/iob-cva6.git
 [submodule "py2hwsw/lib/iob_system/submodules/iob_ibex"]
 	path = py2hwsw/lib/iob_system/submodules/iob_ibex
 	url = https://github.com/IObundle/iob-ibex.git

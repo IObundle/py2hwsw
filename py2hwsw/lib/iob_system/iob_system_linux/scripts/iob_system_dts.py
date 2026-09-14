@@ -110,15 +110,10 @@ def generate_dts(dts_parameters):
 {extra_cpu_props}            mmu-type = "riscv,sv32";
             d-cache-block-size = <0x40>;
             d-cache-sets = <0x40>;
-            d-cache-size = <0x8000>;
-            d-tlb-sets = <0x1>;
-            d-tlb-size = <0x20>;
+            d-cache-size = <0x1000>;
             i-cache-block-size = <0x40>;
             i-cache-sets = <0x40>;
-            i-cache-size = <0x8000>;
-            i-tlb-sets = <0x1>;
-            i-tlb-size = <0x20>;
-            tlb-split;
+            i-cache-size = <0x2000>;
             CPU0_intc: interrupt-controller {{
                 #address-cells = <0>;
                 #interrupt-cells = <1>;

@@ -166,6 +166,20 @@ static int iob_system_linux_final_init(bool cold_boot) {
 }
 
 /*
+ * Enable SBI HART extensions (e.g. zicbom) reported by the CPU
+ * device-tree node ("riscv,isa"/"riscv,isa-extensions"). This must run
+ * before hart feature detection so that OpenSBI can program the
+ * corresponding menvcfg bits (CBIE/CBCFE for Zicbom) for lower
+ * privilege levels.
+ */
+static int iob_system_linux_extensions_init(bool cold_boot) {
+  if (!cold_boot)
+    return 0;
+
+  return fdt_parse_isa_extensions_all_harts(fdt_get_address());
+}
+
+/*
  * Initialize the iob_system_linux interrupt controller during cold boot.
  */
 static int iob_system_linux_irqchip_init(void) {
@@ -187,6 +201,7 @@ static int iob_system_linux_timer_init(void) {
 const struct sbi_platform_operations platform_ops = {
     .early_init = iob_system_linux_early_init,
     .final_init = iob_system_linux_final_init,
+    .extensions_init = iob_system_linux_extensions_init,
     .irqchip_init = iob_system_linux_irqchip_init,
     .timer_init = iob_system_linux_timer_init};
 const struct sbi_platform platform = {

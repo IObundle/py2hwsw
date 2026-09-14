@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2026 IObundle
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
 # Patch OpenSBI fw_base.S to disable CLEAR_MDT for VexRiscv cores.
 # This script is invoked from sw_build.mk before the OpenSBI build.
 

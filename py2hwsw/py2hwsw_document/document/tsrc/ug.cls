@@ -23,6 +23,8 @@
 \RequirePackage{enumerate}
 \RequirePackage{enumitem}
 \RequirePackage{longtable}
+\RequirePackage{xltabular}
+\RequirePackage{hhline}
 
 \RequirePackage{float}
 \RequirePackage{color, colortbl}
@@ -31,18 +33,30 @@
 \RequirePackage{amsthm}
 \RequirePackage[T1]{fontenc} 
 \RequirePackage{array}
-\RequirePackage[binary-units=true]{siunitx}
+\RequirePackage{siunitx}
 \RequirePackage[all]{nowidow}
 \RequirePackage{lscape}
+\RequirePackage{microtype}
+% Let long URLs break across lines
+\Urlmuskip=0mu plus 1mu\relax
+\g@addto@macro\UrlBreaks{\do\_\do\-\do\.}
+
+% Included figures are exported as PDF 1.7
+\ifdefined\pdfvariable
+  \pdfvariable minorversion=7
+\else
+  \pdfminorversion=7
+\fi
 
 \widowpenalty10000
 \clubpenalty10000
+\raggedbottom
 
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 
 \geometry{
  a4paper,
- total={170mm,257mm},
+ width=170mm,
  left=20mm,
  top=20mm,
 }
@@ -79,3 +93,11 @@
 
 \graphicspath{ {./figures/} }
 
+% Custom alternative to \hline that prevents latex from breaking table rows into new pages
+\makeatletter
+\def\nobreakhline{%
+  \multispan\LT@cols
+  \unskip\leaders\hrule\@height\arrayrulewidth\hfill\cr
+  \noalign{\penalty10000}%
+}
+\makeatother

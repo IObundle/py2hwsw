@@ -12,6 +12,8 @@
 
 \usepackage{hyperref}
 \hypersetup{bookmarksnumbered=true}
+% Anchor names derived from counters repeat across pagenumbering resets
+\hypersetup{hypertexnames=false}
 % Set up hyperlink colors
 \hypersetup{
     colorlinks=true, % false: boxed links; true: colored links
@@ -56,7 +58,7 @@
 
 \input{ug_title}
 \date{\today}
-\category{User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}}
+\category{Design Specification, \input{\NAME_version.tex}, Build \input{shortHash.tex}}
 
 \input{color}
 
@@ -66,14 +68,12 @@
 \pagenumbering{gobble}
 
 \vspace*{\fill}
-User Guide, \input{\NAME_version.tex}, Build \input{shortHash.tex}
+Design Specification, \input{\NAME_version.tex}, Build \input{shortHash.tex}
 \hspace*{\fill} \includegraphics[keepaspectratio,scale=.7]{Logo.png}
 
 \cleardoublepage
 \pagenumbering{roman}
 \setcounter{page}{1}
-\input{revhist}
-\cleardoublepage
 \tableofcontents
 \clearpage
 \listoftables
@@ -229,7 +229,7 @@ Superblocks are only used if they are superblocks of the project's top module or
 \label{sec:iob_port}
 \input{iob_port}
 
-\subsection{Interface class: if\_gen.py}
+\subsection{Interface class: interfaces.py}
 \label{sec:if_gen}
 \input{if_gen}
 
@@ -258,17 +258,13 @@ Superblocks are only used if they are superblocks of the project's top module or
 \label{sec:sim}
 \input{sim}
 
-\ifdefined\ASICSYNTH
 \subsection{ASIC Synthesis}
 \label{sec:synth}
 \input{synth}
-\fi
 
-\ifdefined\FPGACOMP
 \subsection{FPGA Compilation}
 \label{sec:fpga}
 \input{fpga}
-\fi
 
 \ifdefined\SECTIONCLEARPAGE
 \clearpage

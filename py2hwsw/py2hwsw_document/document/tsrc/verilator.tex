@@ -5,7 +5,7 @@
 With mandatory structured IOs, the testbench behaves like a processor reading
 and writing to its CSR. A universal Verilator testbench has been developed for
 an IP with a structured IOb native interface (bridges to standard AXI-Lite, APB
-or Wishbone are supplied). The testbench is a C++ program provides hardware
+or Wishbone are supplied). The testbench is a C++ program which provides hardware
 reset and CSR read and write functions.
 
 \subsubsection{IP core simulation}
@@ -19,12 +19,12 @@ runs, without modifications, on a RISC-V processor with the IP as a submodule,
 for example, for FPGA testing or emulation.
 
 The {\tt iob\_uart} core is used as an example, located in the {\tt
-  py2hwsw/lib/peripherals/iob\_uartiob-uart} directory.
+  py2hwsw/lib/peripherals/iob\_uart} directory.
 
 \begin{lstlisting}[language=bash]
   $ git clone --recursive git@github.com:IObundle/py2hwsw.git
   $ cd py2hwsw/lib
-  $ make sim-run CORE=iob\_uart SIMULATOR=verilator
+  $ make sim-run CORE=iob_uart SIMULATOR=verilator
 \end{lstlisting}
 
 The {\tt make sim-run} command will run core setup, creating the build directory
@@ -41,9 +41,9 @@ the {\tt iob\_system} subsystem core is used as an example, located in the {\tt
 \begin{lstlisting}[language=bash]
   $ git clone --recursive git@github.com:IObundle/py2hwsw.git
   $ cd py2hwsw/lib
-  $ make sim-run CORE=iob\_uart SIMULATOR=verilator
+  $ make sim-run CORE=iob_system SIMULATOR=verilator
 \end{lstlisting}
 
 In this case the {\tt iob\_core\_tb()} function is running on the desktop,
-emualting a system tester. The console output comes from teh system itself
-runnig its embedded test, a more elaborated form of a hello world program.
+emulating a system tester. The console output comes from the system itself
+running its embedded test, a more elaborated form of a hello world program.

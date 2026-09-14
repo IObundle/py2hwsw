@@ -24,7 +24,7 @@ The value of the python parameter may be of any data type.
 
 {
 \setlength{\LTcapwidth}{\linewidth} % make sure the caption takes up the whole linewidth
-\begin{xltabular}{\textwidth}{|l|l|X|}
+\begin{xltabular}{\textwidth}{|l|l|>{\raggedright\arraybackslash}X|}
 
   \hline
   \rowcolor{iob-green}
@@ -36,8 +36,8 @@ The value of the python parameter may be of any data type.
 
   \input py2hwsw_py_params_tab
 
+  \label{py2hwsw_py_params_tab}
 \end{xltabular}
-\label{py2hwsw_py_params_tab}
 }
 
 The standard python parameters passed by Py2HWSW are listed in Table~\ref{py2hwsw_py_params_tab}.
@@ -52,7 +52,7 @@ Instructions on how to build a core's user guide can be found in Section~\ref{se
 
 {
 \setlength{\LTcapwidth}{\linewidth} % make sure the caption takes up the whole linewidth
-\begin{xltabular}{\textwidth}{|l|l|X|}
+\begin{xltabular}{\textwidth}{|l|l|>{\raggedright\arraybackslash}X|}
   \hline
   \rowcolor{iob-green}
   % TODO: The "Data Type" column should specify what the user should input, instead of the internal object used by py2hwsw.

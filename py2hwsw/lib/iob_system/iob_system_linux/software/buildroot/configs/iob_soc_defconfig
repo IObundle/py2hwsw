@@ -18,7 +18,7 @@ BR2_RISCV_32=y
 BR2_RISCV_ABI_ILP32=y
 
 ## Linux headers same as kernel
-BR2_KERNEL_HEADERS_5_15=y
+BR2_KERNEL_HEADERS_7_0=y
 
 ## System
 BR2_TARGET_GENERIC_GETTY=y

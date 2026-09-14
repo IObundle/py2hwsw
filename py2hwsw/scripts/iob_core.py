@@ -48,6 +48,9 @@ import verilog_lint
 from manage_headers import generate_headers
 import fusesoc
 
+# Cache for find_module_setup_dir results (core_name -> (setup_dir, file_ext))
+_find_module_setup_dir_cache = {}
+
 
 class iob_core(iob_module, iob_instance):
     """Generic class to describe how to generate a base IOb IP core"""
@@ -1058,6 +1061,9 @@ def find_module_setup_dir(core_name):
     returns: The path to the setup directory
     returns: The file extension
     """
+    if core_name in _find_module_setup_dir_cache:
+        return _find_module_setup_dir_cache[core_name]
+
     file_path = find_file(
         iob_core.global_project_root, core_name, [".py", ".json"]
     ) or find_file(
@@ -1088,4 +1094,6 @@ def find_module_setup_dir(core_name):
 
     # print("Found setup dir based on location of: " + file_path, file=sys.stderr)
     if file_ext == ".py" or file_ext == ".json":
-        return os.path.dirname(file_path), file_ext
+        result = (os.path.dirname(file_path), file_ext)
+        _find_module_setup_dir_cache[core_name] = result
+        return result

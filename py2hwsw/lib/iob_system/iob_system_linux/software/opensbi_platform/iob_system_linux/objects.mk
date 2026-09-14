@@ -1,18 +1,20 @@
 #
 # SPDX-License-Identifier: BSD-2-Clause
 #
-# SPDX-FileCopyrightText: 2019 FORTH-ICS/CARV, Panagiotis Peristerakis <perister@ics.forth.gr>
+# SPDX-FileCopyrightText: 2019 Western Digital Corporation or its affiliates
 # SPDX-FileCopyrightText: 2026 IObundle
 #
 
-# Compiler flags
+# Compiler pre-processor flags
 platform-cppflags-y =
+
+# C Compiler and assembler flags.
 platform-cflags-y =
 platform-asflags-y =
-platform-ldflags-y =
 
-# Object to build
-platform-objs-y += platform.o
+# Linker flags: additional libraries and object files that the platform
+# code needs can be added here
+platform-ldflags-y =
 
 #
 # Command for platform specific "make run"
@@ -28,11 +30,18 @@ platform-runcmd = cp build/platform/iob_system_linux/firmware/*.bin $(OS_BUILD_D
 #
 PLATFORM_RISCV_XLEN = 32
 PLATFORM_RISCV_ABI = ilp32
-PLATFORM_RISCV_ISA = rv32imac
+PLATFORM_RISCV_ISA = rv32imac_zicsr_zifencei_zicbom  # Supports Zicbom extensions for cache management
 # PLATFORM_RISCV_CODE_MODEL = medany
 
-# Firmware load address configuration. This is mandatory.
-FW_TEXT_START=0x00000000
+# Space separated list of object file names to be compiled for the platform
+platform-objs-y += platform.o
+
+#
+# If the platform support requires a builtin device tree file, the name of
+# the device tree compiled file should be specified here. The device tree
+# source file be in the form <dt file name>.dts
+#
+# platform-objs-y += <dt file name>.o
 
 # Optional parameter for path to external FDT
 # FW_FDT_PATH="path to platform flattened device tree file"
@@ -52,6 +61,16 @@ FW_DYNAMIC=n
 FW_JUMP=y
 # This needs to be 4MB aligned for 32-bit support
 # This needs to be 2MB aligned for 64-bit support
+# ifeq ($(PLATFORM_RISCV_XLEN), 32)
+# FW_JUMP_OFFSET=0x400000
+# else
+# FW_JUMP_OFFSET=0x200000
+# endif
+# FW_JUMP_FDT_OFFSET=0x2200000
+#
+# You can use fixed address for jump firmware as an alternative option.
+# SBI will prefer "<X>_ADDR" if both "<X>_ADDR" and "<X>_OFFSET" are
+# defined
 ifeq ($(PLATFORM_RISCV_XLEN), 32)
 FW_JUMP_ADDR=0x00400000
 else
@@ -74,4 +93,9 @@ FW_PAYLOAD=n
 # endif
 # FW_PAYLOAD_ALIGN=0x1000
 # FW_PAYLOAD_PATH="path to next boot stage binary image file"
+# FW_PAYLOAD_FDT_OFFSET=0x2200000
+#
+# You can use fixed address for payload firmware as an alternative option.
+# SBI will prefer "FW_PAYLOAD_FDT_ADDR" if both "FW_PAYLOAD_FDT_OFFSET"
+# and "FW_PAYLOAD_FDT_ADDR" are defined.
 # FW_PAYLOAD_FDT_ADDR=0x00F80000

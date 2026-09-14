@@ -467,6 +467,24 @@ def str_to_kwargs(attrs: list):
 # Other methods
 #
 
+# Marker file to exclude directories from py2hwsw module search
+_PY2HWSW_EXCLUDE_MARKER = ".py2hwsw_exclude"
+
+
+def is_excluded_dir(dir_path):
+    """Check if a directory should be excluded from py2hwsw module search.
+    A directory is excluded if it contains a .py2hwsw_exclude marker file.
+    """
+    return os.path.isfile(os.path.join(dir_path, _PY2HWSW_EXCLUDE_MARKER))
+
+
+def _prune_excluded_dirs(dirs, parent_path):
+    """Filter out directories that contain a .py2hwsw_exclude marker file.
+    Modifies dirs in-place and returns the filtered list.
+    """
+    dirs[:] = [d for d in dirs if not is_excluded_dir(os.path.join(parent_path, d))]
+    return dirs
+
 
 def find_file(search_directory, name_without_ext, filter_extensions=[]):
     """Find a file, without extension, in a given directory or subdirectories
@@ -474,7 +492,8 @@ def find_file(search_directory, name_without_ext, filter_extensions=[]):
     param search_directory: directory to search
     param filter_extensions: list of extensions to filter (example: [".py", ".tex"])
     """
-    for root, _, files in os.walk(search_directory):
+    for root, dirs, files in os.walk(search_directory):
+        _prune_excluded_dirs(dirs, root)
         for file in files:
             file_name, file_ext = os.path.splitext(file)
             if file_name == name_without_ext and (
@@ -512,6 +531,7 @@ def find_path(search_directory, path):
     param path: path to find. Examples: "submodules/ethernet", "iob_uart.py", "iob_uart/hardware/simulation/src/iob_vlt_tb.vh"
     """
     for root, dirs, files in os.walk(search_directory):
+        _prune_excluded_dirs(dirs, root)
         for dir in dirs:
             dir_path = os.path.join(root, dir)
             if dir_path.endswith(path):
@@ -566,6 +586,8 @@ def get_lib_cores():
     cores = []
     # Find all .py files under lib_path
     for root, dirs, files in os.walk(lib_path):
+        # Skip directories marked with .py2hwsw_exclude
+        _prune_excluded_dirs(dirs, root)
         # Skip specific directories
         if os.path.basename(root) in ["scripts", "test", "document"]:
             dirs[:] = []

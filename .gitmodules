@@ -32,3 +32,9 @@
 [submodule "py2hwsw/lib/iob_system/submodules/iob_plic"]
 	path = py2hwsw/lib/iob_system/submodules/iob_plic
 	url = https://github.com/IObundle/iob-plic.git
+[submodule "py2hwsw/lib/iob_system/submodules/iob_naxriscv"]
+	path = py2hwsw/lib/iob_system/submodules/iob_naxriscv
+	url = https://github.com/IObundle/iob-naxriscv.git
+[submodule "py2hwsw/lib/iob_system/submodules/iob_ibex"]
+	path = py2hwsw/lib/iob_system/submodules/iob_ibex
+	url = https://github.com/IObundle/iob-ibex.git

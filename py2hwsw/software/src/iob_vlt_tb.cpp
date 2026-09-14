@@ -35,7 +35,22 @@ vluint64_t sim_time = 0;
 // Used to avoid large VCD dump files during long simulations
 #if (VM_TRACE == 1)
 vluint64_t vcd_delayed_start = 0;
+//vluint64_t vcd_delayed_start = 22600005; // At the end of opensbi banner
+// Trace depth for CPU signals (1=only top-level, higher=include CPU internals)
+vluint64_t vcd_trace_depth = 6;
 #endif
+
+// Maximum simulation time (0 means no limit)
+#ifndef SIM_TIME_MAX
+//#define SIM_TIME_MAX 0
+// A bit after after opensbi banner
+//#define SIM_TIME_MAX 32500005
+#endif
+
+//define PERIODIC_TIME_PRINT 1000000
+
+// Static flag to track if VCD dump has started after delay
+static bool dump_started = false;
 
 Viob_uut *dut = new Viob_uut; // Create instance of module
 
@@ -43,16 +58,38 @@ int iob_core_tb();
 
 // Clock tick
 void clk_tick(unsigned int n = 1) {
+  static vluint64_t last_print_time = 0;
   for (unsigned int i = 0; i < n; i++) {
     dut->eval();
 #if (VM_TRACE == 1)
-    tfp->dump(sim_time); // Dump values into tracing file
+    bool start_dumping =
+        (vcd_delayed_start == 0) || (sim_time >= vcd_delayed_start);
+    if (start_dumping) {
+      tfp->dump(sim_time); // Dump values into tracing file
+      if (!dump_started) {
+        fprintf(stderr, "Starting VCD dump at time %lu ns (delay: %lu ns)\n",
+                (unsigned long)sim_time, (unsigned long)vcd_delayed_start);
+        dump_started = true;
+      }
+    }
 #endif
     sim_time += CLK_PERIOD / 2;
     dut->clk_i = !dut->clk_i; // negedge
     dut->eval();
-#if (VM_TRACE == 1)
-    tfp->dump(sim_time);
+#if defined(PERIODIC_TIME_PRINT)
+    // Periodic simulation time print. Useful to identify starting time for VCD dump
+    if (sim_time - last_print_time >= PERIODIC_TIME_PRINT) {
+      fprintf(stderr, "Simulation time %lu ns\n",
+              (unsigned long)sim_time);
+      last_print_time = sim_time;
+    }
+#endif
+#if defined(SIM_TIME_MAX) && SIM_TIME_MAX > 0
+    if (sim_time >= SIM_TIME_MAX) {
+      fprintf(stderr, "Simulation time %lu ns reached, terminating.\n",
+              (unsigned long)sim_time);
+      exit(0);
+    }
 #endif
     sim_time += CLK_PERIOD / 2;
     dut->clk_i = !dut->clk_i; // posedge
@@ -144,7 +181,7 @@ int main(int argc, char **argv) {
 
 #if (VM_TRACE == 1)
   Verilated::traceEverOn(true); // Enable tracing
-  dut->trace(tfp, 1);
+  dut->trace(tfp, vcd_trace_depth);
   tfp->open("uut.vcd");
 #endif
 

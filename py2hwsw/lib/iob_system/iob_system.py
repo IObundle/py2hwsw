@@ -69,15 +69,32 @@ def setup(py_params: dict):
     update_params(params, py_params)
 
     sw_trap_fenci = True
+    sw_cbo = False
+    sw_mstatush = False
 
     if params["cpu"] == "none":
         params["use_intmem"] = False
         params["use_extmem"] = False
         params["use_bootrom"] = False
 
-    # Disable software trap handler and fence.i for uncompatible CPUs
     if params["cpu"] == "iob_picorv32":
         sw_trap_fenci = False
+
+    if params["cpu"] == "iob_vexriscv":
+        sw_mstatush = False
+        sw_cbo = False
+
+    if params["cpu"] == "iob_vexiiriscv":
+        sw_mstatush = False
+        sw_cbo = True
+
+    if params["cpu"] == "iob_naxriscv":
+        sw_mstatush = False
+        sw_cbo = False
+
+    if params["cpu"] == "iob_cva6":
+        sw_mstatush = True
+        sw_cbo = False
 
     num_xbar_managers = 0
     for param_name in ["use_intmem", "use_extmem", "use_bootrom", "use_peripherals"]:
@@ -207,6 +224,22 @@ def setup(py_params: dict):
                 "descr": "Enable 'FENCE.I' instruction from the RISC-V 'Zifencei' extension. Only enable this for compatible CPUs. PicoRV32 not compatible.",
                 "type": "M",
                 "val": sw_trap_fenci,
+                "min": "0",
+                "max": "1",
+            },
+            {  # Needed for software
+                "name": "CBO",
+                "descr": "Enable 'CBO' (Cache-Block Option) instructions from the RISC-V 'Zicbom' Extension. Only enable this for compatible CPUs. PicoRV32, Vexriscv not compatible.",
+                "type": "M",
+                "val": sw_cbo,
+                "min": "0",
+                "max": "1",
+            },
+            {  # Needed for software
+                "name": "MSTATUSH",
+                "descr": "If xlen=32 CPU implements 'MSTATUSH' RISC-V CSR. Only enable this for compatible CPUs. Vexriscv, Naxriscv, and Vexiiriscv not compatible.",
+                "type": "M",
+                "val": sw_mstatush,
                 "min": "0",
                 "max": "1",
             },
@@ -1041,14 +1074,15 @@ In order to provide more CPU options, we have created the following CPU wrappers
 
 The VexRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexriscv
 The Picorv32 CPU compatible with iob_system is available at: https://github.com/IObundle/iob-picorv32
+The NaxRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-naxriscv
 The VexiiRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-vexiiriscv
 
 To switch between CPUs, iob_system supports the `cpu` python parameter.
 The user may change this parameter's value to any of the supported CPUs.
 
 Other untested/WIP compatible CPUs:
-The untested NaxRiscv CPU compatible with iob_system is available at: https://github.com/IObundle/iob-naxriscv
 The untested Ibex CPU compatible with iob_system is available at: https://github.com/IObundle/iob-ibex
+The WIP CVA6 CPU compatible with iob_system is available at: https://github.com/IObundle/iob-cva6
 
 These untested CPUs are not included in the Py2HWSW library. To use them, include them as git submodules of your project.
 """

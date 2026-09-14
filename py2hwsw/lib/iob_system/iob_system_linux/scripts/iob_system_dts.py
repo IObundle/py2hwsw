@@ -56,6 +56,31 @@ def generate_dts(dts_parameters):
         };
 """
 
+    cpu_name = dts_parameters.get("cpu", "iob_vexriscv")
+
+    if "vexiiriscv" in cpu_name:
+        cpu_model = "IOb-System-Linux, VexiiRiscv"
+        riscv_isa = "rv32imac_zicsr_zifencei_zicbom"
+        extra_cpu_props = "            riscv,cbom-block-size = <64>; // Define the cache line size (VexiiRiscv default is 64 bytes) - needed for zicbom cache management\n"
+        bus_dma_prop = "        dma-noncoherent; // tells Linux that every peripheral of this bus using DMA need explicit cache flushes\n"
+    elif "cva6" in cpu_name:
+        # CVA6 rv32imac + Sv32 MMU (cv32a6_imac_sv32 config). CVA6
+        # implements Zicsr and Zifencei natively but does NOT implement
+        # Zicbom (cache-block management) - leave the IO region
+        # non-coherent and let software fall back to the SBI
+        # cache-flush calls.
+        cpu_model = "IOb-System-Linux, CVA6"
+        riscv_isa = "rv32imac_zicsr_zifencei"
+        extra_cpu_props = ""
+        bus_dma_prop = "        dma-noncoherent; // tells Linux that every peripheral of this bus using DMA need explicit cache flushes\n"
+    else:  # vexriscv / default
+        cpu_model = "IOb-System-Linux, VexRiscv"
+        riscv_isa = "rv32imac_zicsr_zifencei"
+        extra_cpu_props = ""
+        bus_dma_prop = ""
+        # FIXME: AN: I think vexriscv is also noncoherent with DMA peripherals since it has a data cache that must be invalidated to ensure peripehral DMA data is read correctly.
+        # bus_dma_prop = "        dma-noncoherent; // tells Linux that every peripheral of this bus using DMA need explicit cache flushes\n"
+
     # Generate DTS file
     dts = f"""
 // {SPDX_PREFIX}FileCopyrightText: {spdx['spdx_year']} {spdx['author']}
@@ -69,8 +94,8 @@ def generate_dts(dts_parameters):
 / {{
     #address-cells = <1>;
     #size-cells = <1>;
-    model = "IOb-System-Linux, VexRiscv";
-    compatible = "IOb-System-Linux, VexRiscv";
+    model = "{cpu_model}";
+    compatible = "{cpu_model}";
     cpus {{
         #address-cells = <0x1>;
         #size-cells = <0x0>;
@@ -81,19 +106,14 @@ def generate_dts(dts_parameters):
             reg = <0x0>;
             status = "okay";
             compatible = "riscv";
-            riscv,isa = "rv32imac";
-            mmu-type = "riscv,sv32";
+            riscv,isa = "{riscv_isa}";
+{extra_cpu_props}            mmu-type = "riscv,sv32";
             d-cache-block-size = <0x40>;
             d-cache-sets = <0x40>;
-            d-cache-size = <0x8000>;
-            d-tlb-sets = <0x1>;
-            d-tlb-size = <0x20>;
+            d-cache-size = <0x1000>;
             i-cache-block-size = <0x40>;
             i-cache-sets = <0x40>;
-            i-cache-size = <0x8000>;
-            i-tlb-sets = <0x1>;
-            i-tlb-size = <0x20>;
-            tlb-split;
+            i-cache-size = <0x2000>;
             CPU0_intc: interrupt-controller {{
                 #address-cells = <0>;
                 #interrupt-cells = <1>;
@@ -123,7 +143,7 @@ def generate_dts(dts_parameters):
         #size-cells = <1>;
         compatible = "iobundle,{dts_parameters['name']}", "simple-bus";
         ranges;
-
+{bus_dma_prop}
         // Peripherals added via #include statements.
         {extra_peripherals}
         // Sys clock for Ethernet MII MDIO clock divider

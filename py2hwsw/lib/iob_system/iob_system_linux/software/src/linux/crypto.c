@@ -5,6 +5,7 @@
  */
 
 #include <fcntl.h>
+#include <stddef.h>
 #include <unistd.h>
 
 #include <argp.h>
@@ -38,12 +39,32 @@ void nist_kat_init(unsigned char *entropy_input,
                    unsigned char *personalization_string,
                    int security_strength);
 
-void clear_cache() {
+// Assumes 64-byte cache lines (common in VexiiRiscv/VexRiscv); adjust if
+// different
+#define CACHE_LINE_SIZE 64
+
+// Clean and invalidate CPU data cache. Write-back dirty lines to memory and
+// then discard cache contents.
+void flush_cache(void *start, size_t len) {
+#ifdef IOB_SYSTEM_LINUX_CBO
+  char *end = (char *)start + len;
+  char *ptr;
+
+  // Round start down to line boundary
+  ptr = (char *)((uintptr_t)start & ~(CACHE_LINE_SIZE - 1));
+
+  // Flush (clean + invalidate) whole lines covering the range
+  while (ptr < end) {
+    asm volatile("cbo.flush 0(%0)" ::"r"(ptr) : "memory");
+    ptr += CACHE_LINE_SIZE;
+  }
+#else  // NOT IOB_SYSTEM_LINUX_CBO
   // Delay to ensure all data is written to memory
   for (unsigned int i = 0; i < 10; i++)
     asm volatile("nop");
   // Flush VexRiscv CPU internal cache
   asm volatile(".word 0x500F" ::: "memory");
+#endif // IOB_SYSTEM_LINUX_CBO
 }
 
 static char HexToInt(char ch) {

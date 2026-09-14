@@ -21,12 +21,24 @@ PYTHON_DIR = ../../scripts
 VHDR+=$(wildcard ./src/*.vh)
 VSRC+=$(wildcard ./src/*.v)
 
+# This will catch uvm sources inadvertently
+# VHDR+=$(wildcard ./src/*.svh)
+# ALL:=$(wildcard ./src/*.sv)
+# VSRC:=$(VSRC) $(filter %_pkg.sv, $(ALL)) $(filter-out %_pkg.sv, $(ALL))
+
 ifeq ($(SYN),)
 #include the module's headers and sources
 VHDR+=$(wildcard ../src/*.vh)
 VSRC+=$(wildcard ../src/*.v)
 VHDR+=$(wildcard ../common_src/*.vh)
 VSRC+=$(wildcard ../common_src/*.v)
+
+VHDR+=$(wildcard ../src/*.svh)
+ALL:=$(wildcard ../src/*.sv)
+VSRC:=$(VSRC) $(filter %_pkg.sv, $(ALL)) $(filter-out %_pkg.sv, $(ALL))
+VHDR+=$(wildcard ../common_src/*.svh)
+ALL:=$(wildcard ../common_src/*.sv)
+VSRC:=$(VSRC) $(filter %_pkg.sv, $(ALL)) $(filter-out %_pkg.sv, $(ALL))
 else
 NODE ?= umc130
 include ../syn/$(NODE)/sim.mk

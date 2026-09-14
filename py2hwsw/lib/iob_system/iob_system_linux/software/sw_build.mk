@@ -95,7 +95,7 @@ FIRM_ADDR_W = $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,MEM_ADDR_W)
 iob_system_linux_firmware.hex: $(FIRMWARE)
 	../../scripts/makehex.py $(FIRM_ARGS) $(FIRM_ADDR_W) $@
 #	../../scripts/hex_split.py iob_system_linux_firmware .
-	../../scripts/makehex.py --split $< $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,MEM_ADDR_W) $@
+	../../scripts/makehex.py --split $(FIRM_ARGS) $(FIRM_ADDR_W) $@
 
 iob_system_linux_firmware.bin: ../../software/iob_system_linux_firmware.bin
 	cp $< $@
@@ -159,6 +159,7 @@ compile_device_tree: linux_build_macros.txt peripherals.dtsi
 	nix-shell $(OS_DIR)/default.nix --run 'make -C $(OS_DIR) build-dts MACROS_FILE=$(REL_OS2ROOT)/software/linux_build_macros.txt DTS_FILE=$(REL_OS2ROOT)/software/iob_system_linux.dts'
 
 compile_opensbi:
+	$(if $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,MSTATUSH),,$(ROOT_DIR)/scripts/patch_opensbi.sh)
 	nix-shell $(OS_DIR)/default.nix --run 'make -C $(OS_DIR) build-opensbi MACROS_FILE=$(REL_OS2ROOT)/software/linux_build_macros.txt OPENSBI_PLATFORM_DIR=$(REL_OS2ROOT)/software/opensbi_platform/iob_system_linux'
 
 .PHONY: compile_device_tree compile_opensbi
@@ -183,8 +184,8 @@ TEMPLATE_LDS=src/$@.lds
 #endif
 #
 ## Compiler FLAGS with custom architecture, including atomic instructions
-#IOB_SYSTEM_LINUX_CFLAGS ?=-Os -nostdlib -march=rv32imac -mabi=ilp32 --specs=nano.specs -Wcast-align=strict $(SIM_DEFINE)
-IOB_SYSTEM_LINUX_CFLAGS ?=-Os -nostdlib -march=rv32imac -mabi=ilp32 --specs=nano.specs -Wcast-align=strict
+#IOB_SYSTEM_LINUX_CFLAGS ?=-Os -nostdlib -march=rv32imac_zicsr_zifencei_zicbom -mabi=ilp32 --specs=nano.specs -Wcast-align=strict $(SIM_DEFINE)
+#IOB_SYSTEM_LINUX_CFLAGS ?=-Os -nostdlib -march=rv32imac_zicsr_zifencei_zicbom -mabi=ilp32 --specs=nano.specs -Wcast-align=strict
 
 IOB_SYSTEM_LINUX_INCLUDES=-Isrc
 #IOB_SYSTEM_LINUX_INCLUDES=-Isrc -Isrc/crypto/McEliece -Isrc/crypto/McEliece/common
@@ -216,7 +217,7 @@ IOB_SYSTEM_LINUX_FW_SRC+=src/iob_printf.c
 # UTARGETS+=crypto
 # 
 # crypto:
-# 	riscv64-unknown-linux-gnu-gcc -std=gnu99 -march=rv32imac -mabi=ilp32 -Wcast-align=strict -Os -s -ffunction-sections $(CRYPTO_SRC) -o crypto -Isrc/crypto/McEliece -Isrc/crypto/McEliece/common -Isrc/linux -Wl,-gc-sections -Wl,--strip-all
+# 	riscv64-unknown-linux-gnu-gcc -std=gnu99 -march=rv32imac_zicsr_zifencei_zicbom -mabi=ilp32 -Wcast-align=strict -Os -s -ffunction-sections $(CRYPTO_SRC) -o crypto -Isrc/crypto/McEliece -Isrc/crypto/McEliece/common -Isrc/linux -Wl,-gc-sections -Wl,--strip-all
 # 
 # .PHONY: crypto
 

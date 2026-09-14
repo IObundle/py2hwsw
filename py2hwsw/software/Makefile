@@ -39,7 +39,7 @@ LFLAGS ?= -Wl,-L,src,-Bstatic,-T,$(TEMPLATE_LDS),--strip-debug
 else
 # RISC-V settings
 MFLAGS=$(MFLAGS_BASE)$(MFLAG_M)$(MFLAG_C)
-MFLAGS_BASE:=rv32i
+MFLAGS_BASE:=rv32i_zicsr_zifencei_zicbom
 ifeq ($(USE_MUL_DIV),1)
 MFLAG_M=m
 endif

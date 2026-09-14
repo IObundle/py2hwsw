@@ -27,12 +27,33 @@
 #define FLASH_FIRMWARE_OFFSET 0x1000 // sector 0, subsector 1
 
 // Ethernet utility functions
-void clear_cache() {
+
+// Assumes 64-byte cache lines (common in VexiiRiscv/VexRiscv); adjust if
+// different
+#define CACHE_LINE_SIZE 64
+
+// Clean and invalidate CPU data cache. Write-back dirty lines to memory and
+// then discard cache contents.
+void flush_cache(void *start, size_t len) {
+#ifdef IOB_SYSTEM_LINUX_CBO
+  char *end = (char *)start + len;
+  char *ptr;
+
+  // Round start down to line boundary
+  ptr = (char *)((uintptr_t)start & ~(CACHE_LINE_SIZE - 1));
+
+  // Flush (clean + invalidate) whole lines covering the range
+  while (ptr < end) {
+    asm volatile("cbo.flush 0(%0)" ::"r"(ptr) : "memory");
+    ptr += CACHE_LINE_SIZE;
+  }
+#else  // NOT IOB_SYSTEM_LINUX_CBO
   // Delay to ensure all data is written to memory
   for (unsigned int i = 0; i < 10; i++)
     asm volatile("nop");
   // Flush VexRiscv CPU internal cache
   asm volatile(".word 0x500F" ::: "memory");
+#endif // IOB_SYSTEM_LINUX_CBO
 }
 
 #ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
@@ -285,7 +306,7 @@ int main() {
 
 #ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
   // Init ethernet
-  eth_init(ETH0_BASE, IOB_BSP_FREQ, &clear_cache, &printf_);
+  eth_init(ETH0_BASE, IOB_BSP_FREQ, &flush_cache, &printf_);
   // Wait for PHY reset to finish
   eth_wait_phy_rst();
 #endif // IOB_SYSTEM_LINUX_USE_ETHERNET
@@ -355,16 +376,6 @@ int main() {
   uart16550_putc((char)DC1);
 #endif
 #endif // INIT_MEM
-
-  // Clear CPU registers, to not pass arguments to the next
-  asm volatile("li a0,0");
-  asm volatile("li a1,0");
-  asm volatile("li a2,0");
-  asm volatile("li a3,0");
-  asm volatile("li a4,0");
-  asm volatile("li a5,0");
-  asm volatile("li a6,0");
-  asm volatile("li a7,0");
 
   // run firmware
   uart16550_puts(PROGNAME);

@@ -1225,7 +1225,7 @@ def generate_device_drivers(
 
     # Find 'iob_csrs' subblock
     for block in peripheral["subblocks"]:
-        if block["core_name"] == "iob_csrs":
+        if block["core"] == "iob_csrs":
             csrs_subblock = block
             break
     else:

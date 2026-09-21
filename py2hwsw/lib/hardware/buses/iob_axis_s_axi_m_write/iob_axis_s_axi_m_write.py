@@ -119,13 +119,13 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a_r",
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a_r_e",
                 },

@@ -177,7 +177,7 @@ def create_autoclear_instance(attributes_dict, csr_ref):
     #
     attributes_dict["subblocks"] += [
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": f"iob_reg_{name}",
             "instance_description": f"{name} autoclear csr",
             "parameters": {

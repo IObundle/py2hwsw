@@ -141,14 +141,14 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instantiate": False,
             },
         ],
         "superblocks": [
-            {"core_name": "iob_axistream_in"},
-            {"core_name": "iob_axistream_out"},
-            {"core_name": "iob_ahb_ram"},
+            {"core": "iob_axistream_in"},
+            {"core": "iob_axistream_out"},
+            {"core": "iob_ahb_ram"},
         ],
     }
 

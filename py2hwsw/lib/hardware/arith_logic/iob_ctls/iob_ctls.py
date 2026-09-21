@@ -82,11 +82,11 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reverse",
+                "core": "iob_reverse",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_prio_enc",
+                "core": "iob_prio_enc",
                 "instance_name": "prio_encoder0",
                 "instance_description": "count trailing zeros",
                 "parameters": {

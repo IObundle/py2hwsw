@@ -196,7 +196,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_split",
+                "core": "iob_split",
                 "name": "tb_pbus_split",
                 "instance_name": "iob_pbus_split",
                 "instance_description": "Split between testbench peripherals",
@@ -211,7 +211,7 @@ def setup(py_params_dict):
                 "addr_w": 17,
             },
             {
-                "core_name": "iob_memwrapper",
+                "core": "iob_memwrapper",
                 "instance_name": "uut_inst",
                 "instance_description": "Unit Under Test (UUT)",
                 "parameters": {
@@ -233,7 +233,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_s_axi_m_sim_controller",
+                "core": "iob_s_axi_m_sim_controller",
                 "instance_name": "iob_s_axi_m_sim_controller_inst",
                 "instance_description": "Length and levels controller",
                 "parameters": {
@@ -250,7 +250,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_axi_ram",
+                "core": "iob_axi_ram",
                 "instance_name": "iob_axi_ram_inst",
                 "instance_description": "AXI RAM",
                 "parameters": {
@@ -267,7 +267,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_ram_t2p_be",
+                "core": "iob_ram_t2p_be",
                 "instance_name": "iob_ram_t2p_be_inst",
                 "instance_description": "Memory for AXI RAM",
                 "parameters": {

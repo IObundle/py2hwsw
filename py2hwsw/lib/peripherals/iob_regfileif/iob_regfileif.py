@@ -241,7 +241,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_csrs",
+                "core": "iob_csrs",
                 "instance_name": "csrs_external",
                 "instance_description": "Control/Status Registers for external CPU",
                 "csrs": params["csrs"],
@@ -256,7 +256,7 @@ def setup(py_params_dict):
                 "autoaddr": params["autoaddr"],
             },
             {
-                "core_name": "iob_csrs",
+                "core": "iob_csrs",
                 "name": attributes_dict["name"] + "_inverted_csrs",
                 "instance_name": "csrs",
                 "instance_description": "Control/Status Registers for internal CPU (inverted registers)",

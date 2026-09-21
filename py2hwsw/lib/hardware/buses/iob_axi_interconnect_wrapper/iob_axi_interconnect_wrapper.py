@@ -219,7 +219,7 @@ def setup(py_params_dict):
     #
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_axi_interconnect",
+            "core": "iob_axi_interconnect",
             "instance_name": "iob_axi_interconnect_core",
             "instance_description": "Interconnect core",
             "parameters": {

@@ -54,7 +54,7 @@ PY_PARAMS:=$(shell echo $(PY_PARAMS) | cut -c2-)
 CORES_READY_FOR_LINT=iob_pulse_gen iob_and iob_aoi iob_uart
 
 # Get the name of the generated core (sometimes not equal to $(CORE), like the generated 'iob_cache_axi' of the iob_cache core)
-CORE_NAME=$(shell nix-shell --run "py2hwsw $(CORE) print_core_name --py_params '$(PY_PARAMS)'")
+GENERATED_NAME=$(shell nix-shell --run "py2hwsw $(CORE) print_core --py_params '$(PY_PARAMS)'")
 VERSION=$(shell nix-shell --run "py2hwsw $(CORE) print_core_version --py_params '$(PY_PARAMS)'")
 
 # Check if $(CORE) is in $(CORES_READY_FOR_LINT)
@@ -108,7 +108,7 @@ fusesoc-test: fusesoc-export
 	mkdir -p fusesoc_test/fusesoc_libraries
 	ln -s ../../fusesoc_exports fusesoc_test/fusesoc_libraries/py2hwsw
 	printf "[library.py2]\nlocation = fusesoc_libraries/py2hwsw\n" > fusesoc_test/fusesoc.conf
-	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(CORE_NAME)"
+	nix-shell --run "cd fusesoc_test && fusesoc run --target=sim iobundle:py2hwsw:$(GENERATED_NAME)"
 
 define MULTILINE_TEXT
 provider:
@@ -120,10 +120,10 @@ endef
 # Generate independent fusesoc .core file. FuseSoC will obtain the Verilog sources from remote url with a pre-built build directory.
 export MULTILINE_TEXT
 fusesoc-core-file: fusesoc-export
-	cp fusesoc_exports/$(CORE_NAME).core .
+	cp fusesoc_exports/$(GENERATED_NAME).core .
 	# Append provider remote url to .core file
-	printf "\n%s\n" "$$MULTILINE_TEXT" >> $(CORE_NAME).core
-	echo "Generated independent $(CORE_NAME).core file."
+	printf "\n%s\n" "$$MULTILINE_TEXT" >> $(GENERATED_NAME).core
+	echo "Generated independent $(GENERATED_NAME).core file."
 
 
 lib-ipxact:

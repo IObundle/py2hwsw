@@ -234,7 +234,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_sync",
+                "core": "iob_sync",
                 "instance_name": "cts_sync",
                 "parameters": {
                     "DATA_W": "1",
@@ -246,7 +246,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "txdata_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a_e",
@@ -268,7 +268,7 @@ def setup(py_params_dict):
             },
             # manual register for custom RST_VAL
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "tx_pattern_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a_r_e",
@@ -290,7 +290,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "rx_cyclecnt_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a_r_e",

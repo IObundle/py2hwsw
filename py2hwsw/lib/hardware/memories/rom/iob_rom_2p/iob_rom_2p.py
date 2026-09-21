@@ -8,7 +8,7 @@ def setup(py_params_dict):
         "generate_hw": False,
         "subblocks": [
             {
-                "core_name": "iob_rom_sp",
+                "core": "iob_rom_sp",
                 "instance_name": "iob_rom_sp_inst",
             },
         ],

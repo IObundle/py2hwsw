@@ -202,7 +202,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_csrs",
+                "core": "iob_csrs",
                 "instance_name": "csrs",
                 "instance_description": "Control/Status Registers",
                 "parameters": {
@@ -320,56 +320,56 @@ def setup(py_params_dict):
             },
             # TODO: Connect remaining subblocks
             {
-                "core_name": "iob_fifo2axis",
+                "core": "iob_fifo2axis",
                 "instantiate": False,
                 "use_tlast": True,
                 "use_level": True,
                 "use_en": True,
             },
             {
-                "core_name": "iob_fifo_async",
+                "core": "iob_fifo_async",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instantiate": False,
                 "port_params": {
                     "clk_en_rst_s": "c_a_r_e",
                 },
             },
             {
-                "core_name": "iob_ram_at2p",
+                "core": "iob_ram_at2p",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_sync",
+                "core": "iob_sync",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_edge_detect",
+                "core": "iob_edge_detect",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_gray_counter",
+                "core": "iob_gray_counter",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_gray2bin",
+                "core": "iob_gray2bin",
                 "instantiate": False,
             },
         ],
         "superblocks": [
             # Simulation wrapper
             {
-                "core_name": "iob_axistream_in_sim",
+                "core": "iob_axistream_in_sim",
                 "dest_dir": "hardware/simulation/src",
             },
         ],

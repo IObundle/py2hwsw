@@ -364,7 +364,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_csrs",
+                "core": "iob_csrs",
                 "instance_name": "csrs",
                 "instance_description": "Control/Status Registers",
                 "autoaddr": True,
@@ -507,7 +507,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "w_length",
                 "instance_description": "Write length register",
                 "parameters": {
@@ -522,7 +522,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instance_name": "counter_inst",
                 "instance_description": "Count number of words read via AXI Stream in",
                 "parameters": {
@@ -536,7 +536,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_axi_m",
+                "core": "iob_axi_m",
                 "instance_name": "axis_s_axi_m_inst",
                 "instance_description": "AXIS to AXI",
                 "parameters": {
@@ -561,7 +561,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_ram_t2p",
+                "core": "iob_ram_t2p",
                 "instance_name": "write_fifo_memory",
                 "instance_description": "Write FIFO RAM",
                 "parameters": {
@@ -573,7 +573,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_ram_t2p",
+                "core": "iob_ram_t2p",
                 "instance_name": "read_fifo_memory",
                 "instance_description": "Read FIFO RAM",
                 "parameters": {
@@ -588,14 +588,14 @@ def setup(py_params_dict):
         "superblocks": [
             # Simulation wrapper
             {
-                "core_name": "iob_dma_sim",
+                "core": "iob_dma_sim",
                 "dest_dir": "hardware/simulation/src",
                 "csr_if": CSR_IF,
             },
         ],
         "sw_modules": [
             {
-                "core_name": "iob_linux_device_drivers",
+                "core": "iob_linux_device_drivers",
             },
         ],
         "snippets": [

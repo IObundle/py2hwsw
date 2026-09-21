@@ -615,7 +615,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
 
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_fifo_async",
+                "core": "iob_fifo_async",
                 "instance_name": fifo_name,
                 "instance_description": f"Asyncronous FIFO {fifo_name}",
                 "parameters": {
@@ -660,7 +660,7 @@ def create_fifo_instance(attributes_dict, csr_ref):
 
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_fifo_sync",
+                "core": "iob_fifo_sync",
                 "instance_name": fifo_name,
                 "instance_description": f"Synchronous FIFO {fifo_name}",
                 "parameters": {

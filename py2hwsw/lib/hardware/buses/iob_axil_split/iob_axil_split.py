@@ -238,7 +238,7 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         # Read blocks
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "read_sel_reg_re",
             "parameters": {
                 "DATA_W": NBITS,
@@ -261,7 +261,7 @@ def setup(py_params_dict):
         },
         # Write blocks
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "write_sel_reg_re",
             "parameters": {
                 "DATA_W": NBITS,
@@ -289,7 +289,7 @@ def setup(py_params_dict):
             # Demuxers
             attributes_dict["subblocks"].append(
                 {
-                    "core_name": "iob_demux",
+                    "core": "iob_demux",
                     "instance_name": "iob_demux_" + signal,
                     "parameters": {
                         "DATA_W": width,
@@ -308,7 +308,7 @@ def setup(py_params_dict):
             # Muxers
             attributes_dict["subblocks"].append(
                 {
-                    "core_name": "iob_mux",
+                    "core": "iob_mux",
                     "instance_name": "iob_mux_" + signal,
                     "parameters": {
                         "DATA_W": width,

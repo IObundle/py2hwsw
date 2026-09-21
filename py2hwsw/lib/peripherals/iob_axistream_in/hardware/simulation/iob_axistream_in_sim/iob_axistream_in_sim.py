@@ -226,7 +226,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_axistream_in",
+                "core": "iob_axistream_in",
                 "instance_name": "axistream_in0",
                 "instance_description": "Unit Under Test (UUT)",
                 "parameters": {
@@ -244,7 +244,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_axistream_out",
+                "core": "iob_axistream_out",
                 "instance_name": "axistream_out0",
                 "instance_description": "Unit Under Test (UUT)",
                 "parameters": {
@@ -262,7 +262,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_split",
+                "core": "iob_split",
                 "name": "tb_pbus_split",
                 "instance_name": "iob_pbus_split",
                 "instance_description": "Split between testbench peripherals",

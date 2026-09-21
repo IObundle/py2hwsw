@@ -8,19 +8,19 @@ def setup(py_params_dict):
         "generate_hw": False,
         "subblocks": [
             {
-                "core_name": "iob_fp_special",
+                "core": "iob_fp_special",
                 "instance_name": "iob_fp_special_inst",
             },
             {
-                "core_name": "iob_div_subshift",
+                "core": "iob_div_subshift",
                 "instance_name": "iob_div_subshift_inst",
             },
             {
-                "core_name": "iob_fp_clz",
+                "core": "iob_fp_clz",
                 "instance_name": "iob_fp_clz_inst",
             },
             {
-                "core_name": "iob_fp_round",
+                "core": "iob_fp_round",
                 "instance_name": "iob_fp_round_inst",
             },
         ],

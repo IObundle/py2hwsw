@@ -133,19 +133,19 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_sync",
+                "core": "iob_sync",
                 "instantiate": False,
                 "dest_dir": "hardware/simulation/src",
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instantiate": False,
                 "port_params": {
                     "clk_en_rst_s": "c_a_e",
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "rdata",
                 "port_params": {
                     "clk_en_rst_s": "c_a",

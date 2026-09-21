@@ -715,14 +715,14 @@ def generate_ipxact_xml(core, dest_dir):
             break
 
     # Add the CSR IF,
-    core_name = core.name
+    core_str = core.name
     if csr_block and "csr_if" in core.received_python_parameters:
-        core_name += "_" + core.received_python_parameters["csr_if"]
-    # core_name += += "_" + core.data_if
+        core_str += "_" + core.received_python_parameters["csr_if"]
+    # core += += "_" + core.data_if
 
     # Core name to be displayed in the xml file
     # Change "_" to "-" and capitalize all the letters
-    core_name_display = core_name.replace("_", "-").upper()
+    core_display = core_str.replace("_", "-").upper()
 
     # Set the core vendor and library
     core_vendor = "IObundle"
@@ -768,14 +768,14 @@ def generate_ipxact_xml(core, dest_dir):
         os.makedirs(dest_dir)
 
     # Create the xml file
-    xml_file = open(dest_dir + "/" + core_name + ".xml", "w+")
+    xml_file = open(dest_dir + "/" + core_str + ".xml", "w+")
 
     # Write the xml header
     xml_text = f"""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <ipxact:component xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2014" xmlns:kactus2="http://kactus2.cs.tut.fi" xsi:schemaLocation="http://www.accellera.org/XMLSchema/IPXACT/1685-2014 http://www.accellera.org/XMLSchema/IPXACT/1685-2014/index.xsd">
 	<ipxact:vendor>{core_vendor}</ipxact:vendor>
 	<ipxact:library>{core_library}</ipxact:library>
-	<ipxact:name>{core_name_display}</ipxact:name>
+	<ipxact:name>{core_display}</ipxact:name>
 	<ipxact:version>{core.version}</ipxact:version>
 	{bus_interfaces_xml}
 	{memory_map_xml}

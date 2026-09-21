@@ -197,7 +197,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_fifo2axis",
+                "core": "iob_fifo2axis",
                 "instance_name": "fifo2axis_inst",
                 "instance_description": "FIFO to AXI-Stream converter",
                 "parameters": {"DATA_W": "AXI_DATA_W"},
@@ -212,7 +212,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_fifo_sync",
+                "core": "iob_fifo_sync",
                 "instance_name": "write_data_fifo",
                 "instance_description": "Write data FIFO",
                 "parameters": {
@@ -233,7 +233,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_axis2fifo",
+                "core": "iob_axis2fifo",
                 "instance_name": "axis2fifo_inst",
                 "instance_description": "AXI-Stream to FIFO converter",
                 "parameters": {
@@ -248,7 +248,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_axis_m_axi_m_read",
+                "core": "iob_axis_m_axi_m_read",
                 "instance_name": "axis_m_axi_m_read_inst",
                 "instance_description": "AXI read burst to AXI-Stream converter",
                 "parameters": {

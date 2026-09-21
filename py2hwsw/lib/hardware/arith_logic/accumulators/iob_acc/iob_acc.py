@@ -108,7 +108,7 @@ def setup(py_params_dict):
             # """,
             # So, as an alternative, we dont use short notation and use the following:
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "reg0",
                 "instance_descr": "Accomulator register with synchronous reset and enable",
                 "parameters": {

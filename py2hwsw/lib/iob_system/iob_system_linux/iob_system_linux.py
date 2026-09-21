@@ -162,7 +162,7 @@ def setup(py_params: dict):
         "subblocks": [
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
-                "core_name": "iob_uart16550",
+                "core": "iob_uart16550",
                 "instance_name": "UART0",  # Use same name as one inherited from iob_system to replace it
                 "instance_description": "UART peripheral",
                 "is_peripheral": True,
@@ -177,7 +177,7 @@ def setup(py_params: dict):
             },
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
-                "core_name": "iob_uart16550",
+                "core": "iob_uart16550",
                 "instance_name": "UART1",  # Use same name as one inherited from iob_system to replace it
                 "instance_description": "UART peripheral",
                 "is_peripheral": True,
@@ -192,7 +192,7 @@ def setup(py_params: dict):
             },
             {
                 # Instantiate a UART16550 core from: https://github.com/IObundle/iob-uart16550
-                "core_name": "iob_uart16550",
+                "core": "iob_uart16550",
                 "instance_name": "UART2",  # Use same name as one inherited from iob_system to replace it
                 "instance_description": "UART peripheral",
                 "is_peripheral": True,
@@ -207,7 +207,7 @@ def setup(py_params: dict):
             },
             # {
             #     # Instantiate a VERSAT core from: https://github.com/IObundle/iob-versat
-            #     "core_name": "iob_versat",
+            #     "core": "iob_versat",
             #     "instance_name": "VERSAT0",
             #     "instance_description": "VERSAT accelerator",
             #     "is_peripheral": True,
@@ -221,7 +221,7 @@ def setup(py_params: dict):
             #
             # {
             #     # Instantiate a SPI master core from: https://github.com/IObundle/iob-spi
-            #     "core_name": "iob_spi_master",
+            #     "core": "iob_spi_master",
             #     "instance_name": "SPI0",
             #     "instance_description": "SPI master peripheral",
             #     "is_peripheral": True,
@@ -238,7 +238,7 @@ def setup(py_params: dict):
             #
             # Peripherals for DMA demo
             # {
-            #     "core_name": "iob_axistream_in",
+            #     "core": "iob_axistream_in",
             #     "instance_name": "AXISTREAMIN0",
             #     "instance_description": "AXI-Stream input interface",
             #     "parameters": {
@@ -254,7 +254,7 @@ def setup(py_params: dict):
             #     },
             # },
             # {
-            #     "core_name": "iob_axistream_out",
+            #     "core": "iob_axistream_out",
             #     "instance_name": "AXISTREAMOUT0",
             #     "instance_description": "AXI-Stream output interface",
             #     "parameters": {
@@ -270,7 +270,7 @@ def setup(py_params: dict):
             #     },
             # },
             # {
-            #     "core_name": "iob_dma",
+            #     "core": "iob_dma",
             #     "instance_name": "DMA0",
             #     "instance_description": "DMA interface",
             #     "parameters": {
@@ -288,7 +288,7 @@ def setup(py_params: dict):
         ],
         "sw_modules": [
             {
-                "core_name": "iob_linux",
+                "core": "iob_linux",
                 "instance_name": "iob_linux_inst",
             },
         ],
@@ -319,7 +319,7 @@ def setup(py_params: dict):
         "parent": {
             # IOb-System-Linux is a derived core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
             # IOb-System-Linux will inherit all attributes/files from the iob_system core.
-            "core_name": "iob_system",
+            "core": "iob_system",
             # Every parameter in the lines below will be passed to the iob_system parent core.
             # Full list of parameters available here: https://github.com/IObundle/py2hwsw/blob/main/py2hwsw/lib/iob_system/iob_system.py
             "system_attributes": attributes_dict,

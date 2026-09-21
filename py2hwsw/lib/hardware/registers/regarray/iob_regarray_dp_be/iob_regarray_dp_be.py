@@ -86,7 +86,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_regarray_2p",
+                "core": "iob_regarray_2p",
                 "instance_name": "iob_regarray_2p_inst",
                 "instance_description": "2-port register array",
                 "parameters": {

@@ -246,7 +246,7 @@ def setup(py_params_dict):
     ]
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
@@ -268,7 +268,7 @@ def setup(py_params_dict):
         },
         # Demuxers
         {
-            "core_name": "iob_demux",
+            "core": "iob_demux",
             "instance_name": "iob_demux_valid",
             "parameters": {
                 "DATA_W": 1,
@@ -281,7 +281,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_demux",
+            "core": "iob_demux",
             "instance_name": "iob_demux_addr",
             "parameters": {
                 "DATA_W": ADDR_W,
@@ -294,7 +294,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_demux",
+            "core": "iob_demux",
             "instance_name": "iob_demux_wdata",
             "parameters": {
                 "DATA_W": DATA_W,
@@ -307,7 +307,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_demux",
+            "core": "iob_demux",
             "instance_name": "iob_demux_wstrb",
             "parameters": {
                 "DATA_W": int(DATA_W / 8),
@@ -321,7 +321,7 @@ def setup(py_params_dict):
         },
         # Muxers
         {
-            "core_name": "iob_mux",
+            "core": "iob_mux",
             "instance_name": "iob_mux_rdata",
             "parameters": {
                 "DATA_W": DATA_W,
@@ -334,7 +334,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_mux",
+            "core": "iob_mux",
             "instance_name": "iob_mux_rvalid",
             "parameters": {
                 "DATA_W": 1,
@@ -347,7 +347,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_mux",
+            "core": "iob_mux",
             "instance_name": "iob_mux_ready",
             "parameters": {
                 "DATA_W": 1,
@@ -364,7 +364,7 @@ def setup(py_params_dict):
         # (manager selection value >= NUM_MANAGERS) so that they never remain
         # unanswered, which would deadlock the requesting manager.
         {
-            "core_name": "iob_iob_error_slave",
+            "core": "iob_iob_error_slave",
             "instance_name": "iob_iob_error_slave",
             "parameters": {
                 "ADDR_W": ADDR_W - NBITS,

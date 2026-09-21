@@ -294,7 +294,7 @@ def create_memory_instance(
     #
     attributes_dict["subblocks"] += [
         {
-            "core_name": "iob_asym_converter_m_s",
+            "core": "iob_asym_converter_m_s",
             "instance_name": f"{memory_name}_asym_converter",
             "instance_description": f"Asymetric converter for MEMORY {memory_name}",
             "parameters": {
@@ -312,7 +312,7 @@ def create_memory_instance(
     if internal_memory:
         attributes_dict["subblocks"] += [
             {
-                "core_name": memory_type,
+                "core": memory_type,
                 "instance_name": memory_name,
                 "instance_description": f"MEMORY {memory_name}",
                 "parameters": {

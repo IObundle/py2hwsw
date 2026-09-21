@@ -198,8 +198,8 @@ def setup(py_params_dict):
             },
         ],
         "subblocks": [
-            {"core_name": "iob_axi_m_read"},
-            {"core_name": "iob_axi_m_write"},
+            {"core": "iob_axi_m_read"},
+            {"core": "iob_axi_m_write"},
         ],
     }
 

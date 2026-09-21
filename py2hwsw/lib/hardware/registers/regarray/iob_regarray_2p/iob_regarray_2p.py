@@ -127,7 +127,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_ctls",
+                "core": "iob_ctls",
                 # For now, this subblock is instantiated manually in the snippet
                 "instantiate": False,
             },

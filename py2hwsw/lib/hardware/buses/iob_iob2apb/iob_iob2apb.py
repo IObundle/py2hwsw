@@ -120,7 +120,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "pc_reg",
                 "parameters": {
                     "DATA_W": 1,
@@ -133,7 +133,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "iob_rdata_reg",
                 "parameters": {
                     "DATA_W": "DATA_W",
@@ -154,7 +154,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "iob_rvalid_reg",
                 "parameters": {
                     "DATA_W": 1,

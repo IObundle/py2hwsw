@@ -170,8 +170,8 @@ def setup(py_params_dict):
             },
         ],
         "subblocks": [
-            {"core_name": "iob_axi_m_read_dma"},
-            {"core_name": "iob_axi_m_write_dma"},
+            {"core": "iob_axi_m_read_dma"},
+            {"core": "iob_axi_m_write_dma"},
         ],
     }
 

@@ -282,7 +282,7 @@ def setup(py_params_dict):
     #
     attributes_dict["subblocks"] = [
         {
-            "core_name": py_params_dict["issuer"]["original_name"],
+            "core": py_params_dict["issuer"]["original_name"],
             "instance_name": py_params_dict["issuer"]["original_name"],
             "instance_description": "IOb-SoC memory wrapper",
             "parameters": {
@@ -307,7 +307,7 @@ def setup(py_params_dict):
         attributes_dict["subblocks"][-1]["connect"].update({"axi_m": "axi"})
     attributes_dict["subblocks"] += [
         {
-            "core_name": "iob_reset_sync",
+            "core": "iob_reset_sync",
             "instance_name": "rst_sync",
             "instance_description": "Reset synchronizer",
             "connect": {
@@ -320,7 +320,7 @@ def setup(py_params_dict):
         # DDR3 controller
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_altera_alt_ddr3",
+                "core": "iob_altera_alt_ddr3",
                 "instance_name": "ddr3_ctrl",
                 "instance_description": "DDR3 controller",
                 "parameters": {
@@ -341,7 +341,7 @@ def setup(py_params_dict):
         # Eth clock
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_altera_clk_buf_altclkctrl",
+                "core": "iob_altera_clk_buf_altclkctrl",
                 "instance_name": "rxclk_buf",
                 "instance_description": "RX clock buffer",
                 "connect": {
@@ -349,7 +349,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_altera_ddio_out_clkbuf",
+                "core": "iob_altera_ddio_out_clkbuf",
                 "instance_name": "ddio_out_clkbuf_inst",
                 "instance_description": "DDIO out clock buffer",
                 "connect": {

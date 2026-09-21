@@ -108,7 +108,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "start_detected_inst",
                 "instance_description": "Detect start signal",
                 "parameters": {
@@ -122,7 +122,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instance_name": "cnt0",
                 "instance_description": "Counter for pulse generation",
                 "parameters": {
@@ -137,7 +137,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "pulse_reg",
                 "instance_description": "Pulse output state",
                 "parameters": {
@@ -153,7 +153,7 @@ def setup(py_params_dict):
         ],
         "superblocks": [
             {
-                "core_name": "iob_pulse_gen_tester",
+                "core": "iob_pulse_gen_tester",
                 "dest_dir": "tester",
             },
         ],

@@ -108,7 +108,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_arbiter",
+                "core": "iob_arbiter",
                 "instance_name": "arbiter_inst",
             },
         ],

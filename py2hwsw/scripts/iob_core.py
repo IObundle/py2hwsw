@@ -48,7 +48,7 @@ import verilog_lint
 from manage_headers import generate_headers
 import fusesoc
 
-# Cache for find_module_setup_dir results (core_name -> (setup_dir, file_ext))
+# Cache for find_module_setup_dir results (core -> (setup_dir, file_ext))
 _find_module_setup_dir_cache = {}
 
 
@@ -383,8 +383,8 @@ class iob_core(iob_module, iob_instance):
         if not parent:
             return False
 
-        assert parent["core_name"] != attributes["original_name"], fail_with_msg(
-            f"Parent and child cannot have the same name: '{parent['core_name']}'"
+        assert parent["core"] != attributes["original_name"], fail_with_msg(
+            f"Parent and child cannot have the same name: '{parent['core']}'"
         )
 
         belongs_to_top_module = not __class__.global_top_module
@@ -398,7 +398,7 @@ class iob_core(iob_module, iob_instance):
             __class__.global_build_dir = f"../{name}_V{version}"
 
         filtered_parent_py_params = dict(parent)
-        filtered_parent_py_params.pop("core_name", None)
+        filtered_parent_py_params.pop("core", None)
         filtered_parent_py_params.pop("py2hwsw_target", None)
         filtered_parent_py_params.pop("build_dir", None)
         filtered_parent_py_params.pop("issuer", None)
@@ -417,7 +417,7 @@ class iob_core(iob_module, iob_instance):
 
         # Setup parent core
         parent_module = self.get_core_obj(
-            parent["core_name"],
+            parent["core"],
             **filtered_parent_py_params,
             is_parent=True,
             child_attributes=attributes,
@@ -614,7 +614,7 @@ class iob_core(iob_module, iob_instance):
         """Create memory wrapper for top module"""
         new_superblocks = [
             {
-                "core_name": "iob_memwrapper",
+                "core": "iob_memwrapper",
                 "instance_name": f"{self.name}_memwrapper",
                 "mem_if_names": interfaces.mem_if_names,
                 "superblocks": superblocks,
@@ -801,10 +801,10 @@ class iob_core(iob_module, iob_instance):
         with open(filepath) as f:
             core_dict = json.load(f)
 
-        default_core_name = os.path.splitext(os.path.basename(filepath))[0]
+        default_core = os.path.splitext(os.path.basename(filepath))[0]
         py2_core_dict = {
-            "original_name": default_core_name,
-            "name": default_core_name,
+            "original_name": default_core,
+            "name": default_core,
             "setup_dir": os.path.dirname(filepath),
         }
         py2_core_dict.update(core_dict)
@@ -812,12 +812,12 @@ class iob_core(iob_module, iob_instance):
         return cls.py2hw(py2_core_dict, **kwargs)
 
     @staticmethod
-    def clean_build_dir(core_name):
+    def clean_build_dir(core):
         """Clean build directory."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "clean"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name)
+        module = __class__.get_core_obj(core)
         # Don't try to clean if build dir doesn't exist
         if not os.path.exists(module.build_dir):
             return
@@ -831,12 +831,12 @@ class iob_core(iob_module, iob_instance):
         )
 
     @staticmethod
-    def deliver_core(core_name):
+    def deliver_core(core):
         """Deliver core."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "deliver"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name)
+        module = __class__.get_core_obj(core)
         # Don't try to deliver if build dir doesn't exist
         if not os.path.exists(module.build_dir):
             # print error and exit
@@ -844,50 +844,50 @@ class iob_core(iob_module, iob_instance):
                 f"{iob_colors.FAIL}Build directory not found: {module.build_dir}{iob_colors.ENDC}"
             )
             exit(1)
-        print(f"{iob_colors.INFO}Delivering core: {core_name} {iob_colors.ENDC}")
-        os.system(f"CORE={core_name} BUILD_DIR={module.build_dir} delivery.sh")
+        print(f"{iob_colors.INFO}Delivering core: {core} {iob_colors.ENDC}")
+        os.system(f"CORE={core} BUILD_DIR={module.build_dir} delivery.sh")
 
     @staticmethod
-    def export_fusesoc(core_name, **kwargs):
+    def export_fusesoc(core, **kwargs):
         """Export core as a fusesoc core."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "export_fusesoc"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name, **kwargs)
+        module = __class__.get_core_obj(core, **kwargs)
         fusesoc.export_core(module)
 
     @staticmethod
-    def print_build_dir(core_name, **kwargs):
+    def print_build_dir(core, **kwargs):
         """Print build directory."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_build_dir"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name, **kwargs)
+        module = __class__.get_core_obj(core, **kwargs)
         print(module.build_dir)
 
-    def print_core_name(core_name, **kwargs):
+    def print_core(core, **kwargs):
         """Print build directory."""
         # Set project wide special target (will prevent normal setup)
-        __class__.global_special_target = "print_core_name"
+        __class__.global_special_target = "print_core"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name, **kwargs)
+        module = __class__.get_core_obj(core, **kwargs)
         print(module.name)
 
-    def print_core_version(core_name, **kwargs):
+    def print_core_version(core, **kwargs):
         """Print build directory."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_core_version"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name, **kwargs)
+        module = __class__.get_core_obj(core, **kwargs)
         print(module.version)
 
     @staticmethod
-    def print_core_dict(core_name, **kwargs):
+    def print_core_dict(core, **kwargs):
         """Print core attributes dictionary."""
         # Set project wide special target (will prevent normal setup)
         __class__.global_special_target = "print_core_dict"
         # Build a new module instance, to obtain its attributes
-        module = __class__.get_core_obj(core_name, **kwargs)
+        module = __class__.get_core_obj(core, **kwargs)
         print(json.dumps(module.attributes_dict, indent=4))
 
     @staticmethod
@@ -908,30 +908,30 @@ class iob_core(iob_module, iob_instance):
             print(f"- {name}:{align_spaces}{datatype}{align_spaces2}{descr}")
 
     @staticmethod
-    def get_core_obj(core_name, **kwargs):
-        """Generate an instance of a core based on given core_name and python parameters
+    def get_core_obj(core, **kwargs):
+        """Generate an instance of a core based on given core and python parameters
         This method will search for the .py and .json files of the core, and generate a
         python object based on info stored in those files, and info passed via python
         parameters.
         Calling this method may also begin the setup process of the core, depending on
         the value of the `global_special_target` attribute.
         """
-        core_dir, file_ext = find_module_setup_dir(core_name)
+        core_dir, file_ext = find_module_setup_dir(core)
 
         if file_ext == ".py":
             import_python_module(
-                os.path.join(core_dir, f"{core_name}.py"),
+                os.path.join(core_dir, f"{core}.py"),
             )
-            core_module = sys.modules[core_name]
+            core_module = sys.modules[core]
             issuer = kwargs.pop("issuer", None)
-            top_module = __class__.global_top_module.original_name if __class__.global_top_module else core_name
-            # Call `setup(<py_params_dict>)` function of `<core_name>.py` to
+            top_module = __class__.global_top_module.original_name if __class__.global_top_module else core
+            # Call `setup(<py_params_dict>)` function of `<core>.py` to
             # obtain the core's py2hwsw dictionary.
             # Give it a dictionary with all arguments of this function, since the user
             # may want to use any of them to manipulate the core attributes.
             core_dict = core_module.setup(
                 {
-                    # "core_name": core_name,
+                    # "core": core,
                     "build_dir": __class__.global_build_dir,
                     "py2hwsw_target": __class__.global_special_target or "setup",
                     "issuer": (issuer.attributes_dict if issuer else ""),
@@ -941,8 +941,8 @@ class iob_core(iob_module, iob_instance):
                 }
             )
             py2_core_dict = {
-                "original_name": core_name,
-                "name": core_name,
+                "original_name": core,
+                "name": core,
                 "setup_dir": core_dir,
             }
             py2_core_dict.update(core_dict)
@@ -955,7 +955,7 @@ class iob_core(iob_module, iob_instance):
             )
         elif file_ext == ".json":
             instance = __class__.read_py2hw_json(
-                os.path.join(core_dir, f"{core_name}.json"),
+                os.path.join(core_dir, f"{core}.json"),
                 # Note, any of the arguments below can have their values overridden by
                 # the json data
                 **kwargs,
@@ -1055,25 +1055,25 @@ def find_common_deep(path1, path2):
     )
 
 
-def find_module_setup_dir(core_name):
+def find_module_setup_dir(core):
     """Searches for a core's setup directory
-    param core_name: The core_name object
+    param core: The core object
     returns: The path to the setup directory
     returns: The file extension
     """
-    if core_name in _find_module_setup_dir_cache:
-        return _find_module_setup_dir_cache[core_name]
+    if core in _find_module_setup_dir_cache:
+        return _find_module_setup_dir_cache[core]
 
     file_path = find_file(
-        iob_core.global_project_root, core_name, [".py", ".json"]
+        iob_core.global_project_root, core, [".py", ".json"]
     ) or find_file(
         os.path.join(os.path.dirname(__file__), ".."),
-        core_name,
+        core,
         [".py", ".json"],
     )
     if not file_path:
         fail_with_msg(
-            f"Python/JSON setup file of '{core_name}' core not found under path '{iob_core.global_project_root}'!",
+            f"Python/JSON setup file of '{core}' core not found under path '{iob_core.global_project_root}'!",
             ModuleNotFoundError,
         )
 
@@ -1082,18 +1082,18 @@ def find_module_setup_dir(core_name):
     filepath = pathlib.Path(file_path)
     # Force core file to be contained in a folder with the same name.
     # Skip this check if we are the top module (no top defined) or trying to setup the top module again (same name as previous defined top)
-    if filepath.parent.name != core_name and (
+    if filepath.parent.name != core and (
         iob_core.global_top_module
-        and core_name != iob_core.global_top_module.original_name
+        and core != iob_core.global_top_module.original_name
     ):
         fail_with_msg(
-            f"Setup file of '{core_name}' must be contained in a folder with the same name!\n"
-            f"It should be in a path like: '{filepath.parent.resolve()}/{core_name}/{filepath.name}'.\n"
+            f"Setup file of '{core}' must be contained in a folder with the same name!\n"
+            f"It should be in a path like: '{filepath.parent.resolve()}/{core}/{filepath.name}'.\n"
             f"But found incorrect path:    '{filepath.resolve()}'."
         )
 
     # print("Found setup dir based on location of: " + file_path, file=sys.stderr)
     if file_ext == ".py" or file_ext == ".json":
         result = (os.path.dirname(file_path), file_ext)
-        _find_module_setup_dir_cache[core_name] = result
+        _find_module_setup_dir_cache[core] = result
         return result

@@ -393,7 +393,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "r_empty_reg0",
                 "port_params": {
                     "clk_en_rst_s": "c_a_r",
@@ -409,7 +409,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "w_full_reg0",
                 "port_params": {
                     "clk_en_rst_s": "c_a_r",
@@ -425,7 +425,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instance_name": "w_addr_cnt0",
                 "parameters": {
                     "DATA_W": "W_ADDR_W",
@@ -439,7 +439,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instance_name": "r_addr_cnt0",
                 "parameters": {
                     "DATA_W": "R_ADDR_W",
@@ -453,7 +453,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_asym_converter",
+                "core": "iob_asym_converter",
                 "instance_name": "asym_converter",
                 "parameters": {
                     "W_DATA_W": "W_DATA_W",
@@ -468,12 +468,12 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_functions",
+                "core": "iob_functions",
                 "instantiate": False,
             },
             # For simulation
             {
-                "core_name": "iob_ram_t2p",
+                "core": "iob_ram_t2p",
                 "instantiate": False,
             },
         ],

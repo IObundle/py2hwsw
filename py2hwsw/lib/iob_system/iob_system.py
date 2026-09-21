@@ -677,7 +677,7 @@ def setup(py_params: dict):
     if params["cpu"] != "none":
         attributes_dict["subblocks"] += [
             {
-                "core_name": params["cpu"],
+                "core": params["cpu"],
                 "name": params["name"] + "_" + params["cpu"],
                 "instance_name": "cpu",
                 "instance_description": "RISC-V CPU instance",
@@ -717,7 +717,7 @@ def setup(py_params: dict):
                 },
             },
             {
-                "core_name": "iob_axi_full_xbar",
+                "core": "iob_axi_full_xbar",
                 "name": params["name"] + "_axi_full_xbar",
                 "instance_name": "iob_axi_full_xbar",
                 "instance_description": "AXI full xbar instance",
@@ -793,7 +793,7 @@ def setup(py_params: dict):
     if params["use_intmem"]:
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_axi_ram",
+                "core": "iob_axi_ram",
                 "instance_name": "internal_memory",
                 "instance_description": "Internal memory",
                 "parameters": {
@@ -819,7 +819,7 @@ def setup(py_params: dict):
     if params["use_bootrom"]:
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_bootrom",
+                "core": "iob_bootrom",
                 "instance_name": "bootrom",
                 "instance_description": "Boot ROM peripheral",
                 "parameters": {
@@ -844,7 +844,7 @@ def setup(py_params: dict):
     if params["use_peripherals"] and params["cpu"] != "none":
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_axi2iob",
+                "core": "iob_axi2iob",
                 "instance_name": "periphs_axi2iob",
                 "instance_description": "Convert AXI to IOb for peripherals",
                 "parameters": {
@@ -869,7 +869,7 @@ def setup(py_params: dict):
     if params["use_peripherals"]:
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_split",
+                "core": "iob_split",
                 "name": params["name"] + "_pbus_split",
                 "instance_name": "iob_pbus_split",
                 "instance_description": "Split between peripherals",
@@ -884,7 +884,7 @@ def setup(py_params: dict):
             },
             # Peripherals
             {
-                "core_name": "iob_uart",
+                "core": "iob_uart",
                 "instance_name": "UART0",
                 "instance_description": "UART peripheral",
                 # This attribute signals to iob_system scripts that this block is a peripheral
@@ -897,7 +897,7 @@ def setup(py_params: dict):
                 },
             },
             {
-                "core_name": "iob_timer",
+                "core": "iob_timer",
                 "instance_name": "TIMER0",
                 "instance_description": "Timer peripheral",
                 "is_peripheral": True,
@@ -914,7 +914,7 @@ def setup(py_params: dict):
         if params["use_plic"]:
             attributes_dict["subblocks"] += [
                 {
-                    "core_name": "iob_plic",
+                    "core": "iob_plic",
                     "instance_name": "PLIC0",
                     "instance_description": "RISC-V PLIC peripheral",
                     "is_peripheral": True,
@@ -929,7 +929,7 @@ def setup(py_params: dict):
         if params["use_clint"]:
             attributes_dict["subblocks"] += [
                 {
-                    "core_name": "iob_clint",
+                    "core": "iob_clint",
                     "instance_name": "CLINT0",
                     "instance_description": "RISC-V CLINT peripheral",
                     "is_peripheral": True,
@@ -949,7 +949,7 @@ def setup(py_params: dict):
         if params["use_ethernet"]:
             attributes_dict["subblocks"] += [
                 {
-                    "core_name": "iob_eth",
+                    "core": "iob_eth",
                     "instance_name": "ETH0",
                     "instance_description": "Ethernet interface",
                     "is_peripheral": True,
@@ -975,14 +975,14 @@ def setup(py_params: dict):
     attributes_dict["superblocks"] = [
         # Synthesis module (needed for macros)
         {
-            "core_name": "iob_system_syn",
+            "core": "iob_system_syn",
             "instance_name": "iob_system_syn",
             "dest_dir": "hardware/syn/src",
             "iob_system_params": params,
         },
         # Simulation wrapper
         {
-            "core_name": "iob_system_sim",
+            "core": "iob_system_sim",
             "instance_name": "iob_system_sim",
             "dest_dir": "hardware/simulation/src",
             "iob_system_params": params,
@@ -993,7 +993,7 @@ def setup(py_params: dict):
         # Append tester to "superblocks" list of memory wrapper
         attributes_dict["superblocks"] += [
             {
-                "core_name": "iob_system_tester",
+                "core": "iob_system_tester",
                 "instance_name": "iob_system_tester",
                 "iob_system_params": params,
                 "dest_dir": "tester",
@@ -1001,7 +1001,7 @@ def setup(py_params: dict):
             # # Create second tester but without CPU
             # # This Tester's verification instruments will be controlled by testbench
             # {
-            #     "core_name": "iob_system_tester",
+            #     "core": "iob_system_tester",
             #     "instance_name": "iob_system_tester_no_cpu",
             #     "cpu": "none",
             #     "iob_system_params": params,
@@ -1011,7 +1011,7 @@ def setup(py_params: dict):
     attributes_dict["sw_modules"] = [
         # Software modules
         {
-            "core_name": "iob_printf",
+            "core": "iob_printf",
             "instance_name": "iob_printf_inst",
         },
     ]

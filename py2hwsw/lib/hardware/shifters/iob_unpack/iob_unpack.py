@@ -210,7 +210,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_bfifo",
+                "core": "iob_bfifo",
                 "instance_name": "bfifo",
                 "parameters": {
                     "DATA_W": "DATA_W",

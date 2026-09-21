@@ -170,7 +170,7 @@ def setup(py_params_dict):
                         -r rxdata:8 -t NOAUTO -m R -d 'RX data.'                             --rst_val 0 --addr 4 --log2n_items 0
             """,
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "iob_reg_rvalid",
                 "instance_description": "Register for rxdata rvalid",
                 "parameters": {
@@ -184,7 +184,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_uart_core",
+                "core": "iob_uart_core",
                 "instance_name": "iob_uart_core_inst",
                 "instance_description": "UART core driver",
                 "connect": {
@@ -197,19 +197,19 @@ def setup(py_params_dict):
         "superblocks": [
             # Tester
             {
-                "core_name": "iob_uart_tester",
+                "core": "iob_uart_tester",
                 "dest_dir": "tester",
             },
             # Simulation wrapper
             {
-                "core_name": "iob_uart_sim",
+                "core": "iob_uart_sim",
                 "dest_dir": "hardware/simulation/src",
                 "csr_if": CSR_IF,
             },
         ],
         "sw_modules": [
             {
-                "core_name": "iob_coverage_analyze",
+                "core": "iob_coverage_analyze",
                 "instance_name": "iob_coverage_analyze_inst",
             },
         ],

@@ -53,24 +53,24 @@ To support other interfaces, like '/dev' and 'ioctl' interfaces, use the Py2HWSW
 Copy the [SPI driver source](https://github.com/IObundle/iob-spi/blob/main/software/linux/drivers/iob_spi_main.c) to use it as a template for the new driver.
 
 ```bash
-cp iob-spi/software/linux/drivers/iob_spi_main.c <new_core_name>/software/linux/drivers/<new_core_name>_main.c
+cp iob-spi/software/linux/drivers/iob_spi_main.c <new_core>/software/linux/drivers/<new_core>_main.c
 ```
 
-Replace `<new_core_name>` with the new device name.
+Replace `<new_core>` with the new device name.
 
 1.2.1. Rename the functions to the particular device
 
 Use the following commands to rename the functions from the template:
 
 ```bash
-NEW_CORE_NAME=<new_core_name>
-sed -i "s/IOB_SPI_MASTER/${NEW_CORE_NAME}/g" ${NEW_CORE_NAME}/software/linux/drivers/${NEW_CORE_NAME}_main.c
-sed -i "s/iob_spi_master/${NEW_CORE_NAME}/g" ${NEW_CORE_NAME}/software/linux/drivers/${NEW_CORE_NAME}_main.c
-sed -i "s/iob_spi/${NEW_CORE_NAME}/g" ${NEW_CORE_NAME}/software/linux/drivers/${NEW_CORE_NAME}_main.c
-sed -i "s/spi/${NEW_CORE_NAME}/g" ${NEW_CORE_NAME}/software/linux/drivers/${NEW_CORE_NAME}_main.c
+NEW_CORE=<new_core>
+sed -i "s/IOB_SPI_MASTER/${NEW_CORE}/g" ${NEW_CORE}/software/linux/drivers/${NEW_CORE}_main.c
+sed -i "s/iob_spi_master/${NEW_CORE}/g" ${NEW_CORE}/software/linux/drivers/${NEW_CORE}_main.c
+sed -i "s/iob_spi/${NEW_CORE}/g" ${NEW_CORE}/software/linux/drivers/${NEW_CORE}_main.c
+sed -i "s/spi/${NEW_CORE}/g" ${NEW_CORE}/software/linux/drivers/${NEW_CORE}_main.c
 ```
 
-Replace `<new_core_name>` with the new device name.
+Replace `<new_core>` with the new device name.
 
 1.2.2. Update read function
 
@@ -260,7 +260,7 @@ Run the `make all` target.
 
 ```bash
 cd /path/to/iob-linux/software/drivers
-make all MODULE_NAME=<core_name>
+make all MODULE_NAME=<core>
 ```
 
 3.3. Add module files to buildroot (optional)

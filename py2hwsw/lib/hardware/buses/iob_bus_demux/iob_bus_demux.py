@@ -18,18 +18,18 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "iob_reg_re_inst",
                 "port_params": {
                     "clk_en_rst_s": "c_a_r_e",
                 },
             },
             {
-                "core_name": "iob_demux",
+                "core": "iob_demux",
                 "instance_name": "iob_demux_inst",
             },
             {
-                "core_name": "iob_mux",
+                "core": "iob_mux",
                 "instance_name": "iob_mux_inst",
             },
         ],

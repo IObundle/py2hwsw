@@ -71,7 +71,7 @@ def setup(py_params_dict):
         converter_connect["clk_en_rst_s"] = "clk_en_rst_s"
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_macc",
+            "core": "iob_macc",
             "instance_name": "macc_inst",
             "instance_description": f"Unit Under Test (UUT) MACC instance with '{params['csr_if']}' interface.",
             "csr_if": params["csr_if"],
@@ -81,7 +81,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_universal_converter",
+            "core": "iob_universal_converter",
             "instance_name": "iob_universal_converter",
             "instance_description": "Convert IOb port from testbench into correct interface for MACC CSRs bus",
             "subordinate_if": "iob",

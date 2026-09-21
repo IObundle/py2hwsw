@@ -97,7 +97,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_ram_tdp",
+                "core": "iob_ram_tdp",
                 "instantiate": False,
             },
         ],

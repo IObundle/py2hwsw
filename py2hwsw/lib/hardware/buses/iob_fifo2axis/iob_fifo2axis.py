@@ -314,7 +314,7 @@ def setup(py_params_dict):
 
         attributes_dict["subblocks"] = [
             {
-                "core_name": "iob_modcnt",
+                "core": "iob_modcnt",
                 "instance_name": "word_count_inst",
                 "instance_description": "tdata word count",
                 "parameters": {

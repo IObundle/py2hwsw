@@ -57,7 +57,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_aoi",
+                "core": "iob_aoi",
                 "instance_name": "uut_aoi",
                 "instance_description": "Unit Under Test",
                 "parameters": {

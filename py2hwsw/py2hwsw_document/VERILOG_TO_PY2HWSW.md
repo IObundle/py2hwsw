@@ -339,7 +339,7 @@ Subblocks instantiate other py2hwsw cores inside your module.
 ```python
 "subblocks": [
     {
-        "core_name": "iob_timer_core",      # Name of the .py module to instantiate
+        "core": "iob_timer_core",      # Name of the .py module to instantiate
         "instance_name": "timer_inst",       # Verilog instance name
         "instance_description": "Timer core",
         "connect": {
@@ -354,7 +354,7 @@ Subblocks instantiate other py2hwsw cores inside your module.
 
 ```python
 {
-    "core_name": "iob_fifo_sync",
+    "core": "iob_fifo_sync",
     "instance_name": "data_fifo",
     "parameters": {
         "DATA_W": 8,
@@ -403,7 +403,7 @@ auto-generates the register file, the CSR bus port, and address decoding.
 ```python
 "subblocks": [
     {
-        "core_name": "iob_csrs",
+        "core": "iob_csrs",
         "instance_name": "csrs",
         "instance_description": "Control/Status Registers",
         "csr_if": "iob",           # "iob", "axil", "wb", etc.
@@ -930,7 +930,7 @@ becomes:
 
 ```python
 "subblocks": [{
-    "core_name": "iob_reg",
+    "core": "iob_reg",
     "instance_name": "buf_reg",
     "parameters": {"DATA_W": 8},
     "connect": {

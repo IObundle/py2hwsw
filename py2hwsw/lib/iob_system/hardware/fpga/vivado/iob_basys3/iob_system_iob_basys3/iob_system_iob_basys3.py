@@ -135,7 +135,7 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         {
             # IOb-SoC Memory Wrapper
-            "core_name": py_params_dict["issuer"]["original_name"],
+            "core": py_params_dict["issuer"]["original_name"],
             "instance_name": py_params_dict["issuer"]["original_name"],
             "instance_description": "IOb-SoC instance",
             "parameters": {
@@ -153,7 +153,7 @@ def setup(py_params_dict):
             "dest_dir": "hardware/common_src",
         },
         {
-            "core_name": "iob_xilinx_axi_interconnect",
+            "core": "iob_xilinx_axi_interconnect",
             "instance_name": "axi_async_bridge",
             "instance_description": "Interconnect instance",
             "parameters": {
@@ -172,7 +172,7 @@ def setup(py_params_dict):
             "num_subordinates": 1,
         },
         {
-            "core_name": "iob_axi_ram",
+            "core": "iob_axi_ram",
             "instance_name": "ddr_model_mem",
             "instance_description": "DDR model memory",
             "parameters": {

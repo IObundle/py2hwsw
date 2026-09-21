@@ -135,12 +135,12 @@ def setup(py_params_dict):
         "superblocks": [
             # Tester
             {
-                "core_name": "iob_macc_tester",
+                "core": "iob_macc_tester",
                 "dest_dir": "tester",
             },
             # Simulation wrapper
             {
-                "core_name": "iob_macc_sim",
+                "core": "iob_macc_sim",
                 "dest_dir": "hardware/simulation/src",
                 "csr_if": CSR_IF,
             },

@@ -223,7 +223,7 @@ def setup(py_params_dict):
     ]
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
@@ -245,7 +245,7 @@ def setup(py_params_dict):
         },
         # muxers
         {
-            "core_name": "iob_mux",
+            "core": "iob_mux",
             "instance_name": "iob_mux_valid",
             "parameters": {
                 "DATA_W": 1,
@@ -258,7 +258,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_mux",
+            "core": "iob_mux",
             "instance_name": "iob_mux_addr",
             "parameters": {
                 "DATA_W": ADDR_W,
@@ -271,7 +271,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_mux",
+            "core": "iob_mux",
             "instance_name": "iob_mux_wdata",
             "parameters": {
                 "DATA_W": DATA_W,
@@ -284,7 +284,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_mux",
+            "core": "iob_mux",
             "instance_name": "iob_mux_wstrb",
             "parameters": {
                 "DATA_W": int(DATA_W / 8),
@@ -298,7 +298,7 @@ def setup(py_params_dict):
         },
         # demuxers
         {
-            "core_name": "iob_demux",
+            "core": "iob_demux",
             "instance_name": "iob_demux_rdata",
             "parameters": {
                 "DATA_W": DATA_W,
@@ -311,7 +311,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_demux",
+            "core": "iob_demux",
             "instance_name": "iob_demux_rvalid",
             "parameters": {
                 "DATA_W": 1,
@@ -324,7 +324,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_demux",
+            "core": "iob_demux",
             "instance_name": "iob_demux_ready",
             "parameters": {
                 "DATA_W": 1,
@@ -339,7 +339,7 @@ def setup(py_params_dict):
         },
         # priority encoder
         {
-            "core_name": "iob_prio_enc",
+            "core": "iob_prio_enc",
             "instance_name": "sel_enc",
             "parameters": {
                 "W": NUM_SUBORDINATES,

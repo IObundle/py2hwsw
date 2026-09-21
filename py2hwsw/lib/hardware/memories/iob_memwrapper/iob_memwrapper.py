@@ -69,7 +69,7 @@ def setup(py_params_dict):
 
     attributes_dict["subblocks"] = [
         {
-            "core_name": attrs["original_name"],
+            "core": attrs["original_name"],
             "instance_name": f"{attrs['name']}_inst",
             "instance_description": "Wrapped module",
             "parameters": {
@@ -132,7 +132,7 @@ def setup(py_params_dict):
         # Add memory instace to subblocks list
         attributes_dict["subblocks"].append(
             {
-                "core_name": type,
+                "core": type,
                 "instance_name": name,
                 "parameters": {
                     "DATA_W": data_w,

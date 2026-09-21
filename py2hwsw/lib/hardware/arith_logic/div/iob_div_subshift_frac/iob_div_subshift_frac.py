@@ -140,7 +140,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "divisor_reg0",
                 "parameters": {
                     "DATA_W": "DATA_W",
@@ -156,7 +156,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_div_subshift",
+                "core": "iob_div_subshift",
                 "instance_name": "div_subshift0",
                 "parameters": {
                     "DIVIDEND_W": "DATA_W",

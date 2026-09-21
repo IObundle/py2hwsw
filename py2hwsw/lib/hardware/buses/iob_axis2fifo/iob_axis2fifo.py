@@ -264,7 +264,7 @@ def setup(py_params_dict):
 
         attributes_dict["subblocks"] = [
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instance_name": "word_count_inst",
                 "instance_description": "Word counter",
                 "parameters": {
@@ -279,7 +279,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_edge_detect",
+                "core": "iob_edge_detect",
                 "instance_name": "tlast_detect_inst",
                 "instance_description": "tlast detection",
                 "parameters": {

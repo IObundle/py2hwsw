@@ -202,7 +202,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_csrs",
+                "core": "iob_csrs",
                 "instance_name": "csrs",
                 "instance_description": "Control/Status Registers",
                 "parameters": {
@@ -311,26 +311,26 @@ def setup(py_params_dict):
             },
             # TODO: Connect remaining subblocks
             {
-                "core_name": "iob_fifo_async",
+                "core": "iob_fifo_async",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_sync",
+                "core": "iob_sync",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instantiate": False,
                 "port_params": {
                     "clk_en_rst_s": "c_a_r_e",
                 },
             },
             {
-                "core_name": "iob_ram_at2p",
+                "core": "iob_ram_at2p",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instantiate": False,
             },
         ],

@@ -600,7 +600,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_gray_counter",
+                "core": "iob_gray_counter",
                 "instance_name": "r_raddr_gray_counter",
                 "parameters": {
                     "W": "(R_ADDR_W + 1)",
@@ -611,7 +611,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_gray_counter",
+                "core": "iob_gray_counter",
                 "instance_name": "w_waddr_gray_counter",
                 "parameters": {
                     "W": "(W_ADDR_W + 1)",
@@ -622,7 +622,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_gray2bin",
+                "core": "iob_gray2bin",
                 "instance_name": "gray2bin_r_raddr",
                 "parameters": {
                     "DATA_W": "(R_ADDR_W + 1)",
@@ -633,7 +633,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_gray2bin",
+                "core": "iob_gray2bin",
                 "instance_name": "gray2bin_r_raddr_sync",
                 "parameters": {
                     "DATA_W": "(W_ADDR_W + 1)",
@@ -644,7 +644,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_gray2bin",
+                "core": "iob_gray2bin",
                 "instance_name": "gray2bin_w_waddr",
                 "parameters": {
                     "DATA_W": "(W_ADDR_W + 1)",
@@ -655,7 +655,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_gray2bin",
+                "core": "iob_gray2bin",
                 "instance_name": "gray2bin_w_raddr_sync",
                 "parameters": {
                     "DATA_W": "(R_ADDR_W + 1)",
@@ -666,7 +666,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_sync",
+                "core": "iob_sync",
                 "instance_name": "w_waddr_gray_sync0",
                 "parameters": {
                     "DATA_W": "(W_ADDR_W + 1)",
@@ -679,7 +679,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_sync",
+                "core": "iob_sync",
                 "instance_name": "r_raddr_gray_sync0",
                 "parameters": {
                     "DATA_W": "(R_ADDR_W + 1)",
@@ -692,7 +692,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_asym_converter",
+                "core": "iob_asym_converter",
                 "instance_name": "asym_converter",
                 "parameters": {
                     "W_DATA_W": "W_DATA_W",
@@ -708,16 +708,16 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_functions",
+                "core": "iob_functions",
                 "instantiate": False,
             },
             # For simulation
             {
-                "core_name": "iob_ram_at2p",
+                "core": "iob_ram_at2p",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_clock",
+                "core": "iob_clock",
                 "instantiate": False,
             },
         ],

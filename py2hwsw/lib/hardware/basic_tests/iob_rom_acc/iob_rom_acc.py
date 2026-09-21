@@ -83,7 +83,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_acc",
+                "core": "iob_acc",
                 "instance_name": "accomulator0",
                 "parameters": {
                     "DATA_W": "VALUES_DATA_W",
@@ -97,7 +97,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instance_name": "counter0",
                 "parameters": {
                     "DATA_W": "VALUES_ADDR_W",

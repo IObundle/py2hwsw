@@ -80,7 +80,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "time_counter_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a_r_e",
@@ -102,7 +102,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_counter",
+                "core": "iob_counter",
                 "instance_name": "time_counter_cnt",
                 "parameters": {
                     "DATA_W": "2 * DATA_W",

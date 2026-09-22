@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 IObundle
+
+SPDX-License-Identifier: GPL-3.0-only
+-->
+
 # AGENTS.md
 
 Py2HWSW: Python framework that generates lint-friendly Verilog, software drivers, and build trees for embedded HW/SW (RISC-V SoC) projects. GPL-3.0-only, REUSE-compliant.

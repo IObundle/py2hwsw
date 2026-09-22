@@ -434,7 +434,7 @@ def str_to_kwargs(attrs: list):
             for key in output.keys():
                 if isinstance(output[key], list):
                     for i in range(len(output[key])):
-                        if "core_name" in output[key][i]:
+                        if "core" in output[key][i]:
                             output[key][i]["instance_description"] = output[key][i].pop(
                                 "descr"
                             )
@@ -447,16 +447,17 @@ def str_to_kwargs(attrs: list):
 
     def decorator(func):
         @wraps(func)
-        def wrapper(core, *args, **kwargs):
+        def wrapper(module, *args, **kwargs):
             if len(args) == 1 and isinstance(args[0], str):
                 parser_dict = create_parsers(attrs)
                 lines = [line.strip() for line in args[0].split("\n\n") if line.strip()]
                 for line in lines:
                     kwargs = organize_kwargs(parser_dict, line)
-                    func(core, **kwargs)
+                    func(module, **kwargs)
                 return None
             else:
-                return func(core, *args, **kwargs)
+                # No conflict: inner function's first param is 'module', kwargs has 'core' (core name string)
+                return func(module, *args, **kwargs)
 
         return wrapper
 

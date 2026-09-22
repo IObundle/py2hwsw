@@ -293,7 +293,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_int_sqrt",
+                "core": "iob_int_sqrt",
                 "instance_name": "int_sqrt",
                 "parameters": {"DATA_W": "MAN_W+2", "FRACTIONAL_W": "MAN_W"},
                 "connect": {

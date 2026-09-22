@@ -155,7 +155,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "pc_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a",
@@ -171,7 +171,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "apb_ready_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a",
@@ -187,7 +187,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "apb_rdata_reg",
                 "port_params": {
                     "clk_en_rst_s": "c_a_e",

@@ -252,7 +252,7 @@ def setup(py_params_dict):
     #
     attributes_dict["subblocks"] = [
         {
-            "core_name": py_params_dict["issuer"]["original_name"],
+            "core": py_params_dict["issuer"]["original_name"],
             "instance_name": py_params_dict["issuer"]["original_name"],
             "instance_description": "IOb-SoC memory wrapper",
             "parameters": {
@@ -280,7 +280,7 @@ def setup(py_params_dict):
     if len(tb_peripherals) > 1:
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_split",
+                "core": "iob_split",
                 "name": "tb_pbus_split",
                 "instance_name": "iob_pbus_split",
                 "instance_description": "Split between testbench peripherals",
@@ -303,7 +303,7 @@ def setup(py_params_dict):
         }
     attributes_dict["subblocks"] += [
         {
-            "core_name": "iob_uart",
+            "core": "iob_uart",
             "instance_name": "uart_tb",
             "instance_description": "Testbench uart core",
             "csr_if": "iob",
@@ -322,7 +322,7 @@ def setup(py_params_dict):
     if params["use_extmem"]:
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_axi_ram",
+                "core": "iob_axi_ram",
                 "instance_name": "ddr_model_mem",
                 "instance_description": "External memory",
                 "parameters": {
@@ -344,7 +344,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_ram_t2p_be",
+                "core": "iob_ram_t2p_be",
                 "instance_name": "iob_ram_t2p_be_inst",
                 "parameters": {
                     "ADDR_W": "AXI_ADDR_W - 2",
@@ -364,7 +364,7 @@ def setup(py_params_dict):
     if params["use_ethernet"]:
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_eth",
+                "core": "iob_eth",
                 "instance_name": "eth_tb",
                 "parameters": {
                     "AXI_ID_W": "AXI_ID_W",

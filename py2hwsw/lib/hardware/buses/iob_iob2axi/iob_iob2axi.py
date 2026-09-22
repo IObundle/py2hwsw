@@ -106,7 +106,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_iob2axil",
+                "core": "iob_iob2axil",
                 "instance_name": "iob2axil_inst",
                 "instance_description": "Convert IOb instruction bus to AXI Lite",
                 "parameters": {

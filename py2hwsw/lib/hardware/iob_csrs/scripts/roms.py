@@ -83,7 +83,7 @@ def create_rom_instance(attributes_dict, csr_ref):
     #
     attributes_dict["subblocks"].append(
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": f"{rom_name}_rvalid_r",
             "instance_description": f"{rom_name} rvalid register",
             "parameters": {

@@ -290,7 +290,7 @@ def setup(py_params_dict):
     # Subblocks List
     subblocks = [
         {
-            "core_name": "iob_iob_s_axi_m_write",
+            "core": "iob_iob_s_axi_m_write",
             "instance_name": "iob_s_axi_m_write_inst",
             "instance_description": "IOB to AXI write",
             "parameters": {
@@ -311,7 +311,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_iob_s_axi_m_read",
+            "core": "iob_iob_s_axi_m_read",
             "instance_name": "iob_s_axi_m_read_inst",
             "instance_description": "IOB to AXI read",
             "parameters": {
@@ -332,7 +332,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "read_data_ready_reg",
             "instance_description": "Register for read data ready logic",
             "parameters": {
@@ -428,7 +428,7 @@ def setup(py_params_dict):
     # Simulation wrapper
     superblocks = [
         {
-            "core_name": "iob_iob_s_axi_m_sim",
+            "core": "iob_iob_s_axi_m_sim",
             "dest_dir": "hardware/simulation/src",
         },
     ]

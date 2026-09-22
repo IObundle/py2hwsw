@@ -97,7 +97,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_ram_sp",
+                "core": "iob_ram_sp",
                 "instance_name": "iob_ram_sp_inst",
                 "parameters": {
                     "HEXFILE": "HEXFILE",

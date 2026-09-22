@@ -561,7 +561,7 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         # Read blocks
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "busy_read_reg_re",
             "parameters": {
                 "DATA_W": 1,
@@ -583,7 +583,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "active_transaction_read_reg_re",
             "parameters": {
                 "DATA_W": 1,
@@ -605,7 +605,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "read_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
@@ -626,7 +626,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_prio_enc",
+            "core": "iob_prio_enc",
             "instance_name": "read_sel_enc",
             "parameters": {
                 "W": NUM_SUBORDINATES,
@@ -639,7 +639,7 @@ def setup(py_params_dict):
         },
         # Write blocks
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "busy_write_reg_re",
             "parameters": {
                 "DATA_W": 1,
@@ -662,7 +662,7 @@ def setup(py_params_dict):
         },
         # Write blocks
         {
-            "core_name": "iob_acc",
+            "core": "iob_acc",
             "instance_name": "active_write_transaction_acc",
             "parameters": {
                 "DATA_W": TRANSFER_COUNTER_DATA_W,
@@ -678,7 +678,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_acc",
+            "core": "iob_acc",
             "instance_name": "pending_write_response_acc",
             "parameters": {
                 "DATA_W": TRANSFER_COUNTER_DATA_W,
@@ -694,7 +694,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "write_sel_reg_r",
             "parameters": {
                 "DATA_W": NBITS,
@@ -715,7 +715,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_prio_enc",
+            "core": "iob_prio_enc",
             "instance_name": "write_sel_enc",
             "parameters": {
                 "W": NUM_SUBORDINATES,
@@ -734,7 +734,7 @@ def setup(py_params_dict):
             # Demuxers
             attributes_dict["subblocks"].append(
                 {
-                    "core_name": "iob_demux",
+                    "core": "iob_demux",
                     "instance_name": "iob_demux_" + signal,
                     "parameters": {
                         "DATA_W": width,
@@ -751,7 +751,7 @@ def setup(py_params_dict):
             # Muxers
             attributes_dict["subblocks"].append(
                 {
-                    "core_name": "iob_mux",
+                    "core": "iob_mux",
                     "instance_name": "iob_mux_" + signal,
                     "parameters": {
                         "DATA_W": width,

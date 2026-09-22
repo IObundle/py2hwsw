@@ -493,7 +493,7 @@ def version_file(
     python_module,
     create_version_header=True,
 ):
-    core_name = python_module.name
+    core = python_module.name
     core_version = python_module.version
     core_previous_version = python_module.previous_version
     build_dir = python_module.build_dir
@@ -502,18 +502,18 @@ def version_file(
     verilog_dir = f"{build_dir}/hardware/src"
 
     os.makedirs(tex_dir, exist_ok=True)
-    tex_file = f"{tex_dir}/{core_name}_version.tex"
+    tex_file = f"{tex_dir}/{core}_version.tex"
     with open(tex_file, "w") as tex_f:
         tex_f.write(core_version)
-    tex_file = f"{tex_dir}/{core_name}_previous_version.tex"
+    tex_file = f"{tex_dir}/{core}_previous_version.tex"
     with open(tex_file, "w") as tex_f:
         tex_f.write(core_previous_version)
 
 
-def copy_with_rename(old_core_name, new_core_name):
+def copy_with_rename(old_core, new_core):
     """Creates a function that:
-    - Renames any '<old_core_name>' string inside the src file and in its filename,
-    to the given '<new_core_name>' string argument.
+    - Renames any '<old_core>' string inside the src file and in its filename,
+    to the given '<new_core>' string argument.
     """
 
     def copy_func(src, dst):
@@ -522,8 +522,8 @@ def copy_with_rename(old_core_name, new_core_name):
         dst = os.path.join(
             os.path.dirname(dst),
             os.path.basename(
-                dst.replace(old_core_name, new_core_name).replace(
-                    old_core_name.upper(), new_core_name.upper()
+                dst.replace(old_core, new_core).replace(
+                    old_core.upper(), new_core.upper()
                 )
             ),
         )
@@ -535,8 +535,8 @@ def copy_with_rename(old_core_name, new_core_name):
             for idx in range(len(lines)):
                 lines[idx] = (
                     lines[idx]
-                    .replace(old_core_name, new_core_name)
-                    .replace(old_core_name.upper(), new_core_name.upper())
+                    .replace(old_core, new_core)
+                    .replace(old_core.upper(), new_core.upper())
                 )
             with open(dst, "w") as file:
                 file.writelines(lines)

@@ -91,7 +91,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_fp_clz",
+                "core": "iob_fp_clz",
                 "instance_name": "clz0",
                 "parameters": {
                     "DATA_W": "DATA_W",

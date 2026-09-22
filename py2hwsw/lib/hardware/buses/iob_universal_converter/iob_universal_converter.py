@@ -144,7 +144,7 @@ def setup(py_params_dict):
         # "Wishbone" interface
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_wishbone2iob",
+                "core": "iob_wishbone2iob",
                 "instance_name": "iob_wishbone2iob_converter",
                 "instance_description": "Convert Wishbone from subordinate port into IOb interface for internal wire",
                 "parameters": {
@@ -162,7 +162,7 @@ def setup(py_params_dict):
         # "APB" interface
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_apb2iob",
+                "core": "iob_apb2iob",
                 "instance_name": "iob_apb2iob_converter",
                 "instance_description": "Convert APB from subordinate port into IOb interface for internal wire",
                 "parameters": {
@@ -182,7 +182,7 @@ def setup(py_params_dict):
         # "AXI_Lite" interface
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_axil2iob",
+                "core": "iob_axil2iob",
                 "instance_name": "iob_axil2iob_converter",
                 "instance_description": "Convert AXI-Lite from subordinate port into IOb interface for internal wire",
                 "parameters": {
@@ -200,7 +200,7 @@ def setup(py_params_dict):
         # "AXI" interface
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_axi2iob",
+                "core": "iob_axi2iob",
                 "instance_name": "iob_axi2iob_converter",
                 "instance_description": "Convert AXI from subordinate port into IOb interface for internal wire",
                 "parameters": {
@@ -227,7 +227,7 @@ def setup(py_params_dict):
         # "Wishbone" interface
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_iob2wishbone",
+                "core": "iob_iob2wishbone",
                 "instance_name": "iob_iob2wishbone_converter",
                 "instance_description": "Convert IOb from internal wire into Wishbone interface for manager port",
                 "parameters": {
@@ -246,7 +246,7 @@ def setup(py_params_dict):
         # "APB" interface
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_iob2apb",
+                "core": "iob_iob2apb",
                 "instance_name": "iob_iob2apb_converter",
                 "instance_description": "Convert IOb from internal wire into APB interface for manager port",
                 "parameters": {
@@ -266,7 +266,7 @@ def setup(py_params_dict):
         # "AXI_Lite" interface
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_iob2axil",
+                "core": "iob_iob2axil",
                 "instance_name": "iob_iob2axil_converter",
                 "instance_description": "Convert IOb from internal wire into AXI-Lite interface for manager port",
                 "parameters": {
@@ -286,7 +286,7 @@ def setup(py_params_dict):
         # "AXI" interface
         attributes_dict["subblocks"].append(
             {
-                "core_name": "iob_iob2axi",
+                "core": "iob_iob2axi",
                 "instance_name": "iob_iob2axi_converter",
                 "instance_description": "Convert IOb from internal wire into AXI interface for manager port",
                 "parameters": {

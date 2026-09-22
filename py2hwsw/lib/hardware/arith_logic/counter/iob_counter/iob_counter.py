@@ -59,7 +59,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "reg0",
                 "parameters": {
                     "DATA_W": "DATA_W",

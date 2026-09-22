@@ -166,7 +166,7 @@ def setup(py_params_dict):
     #
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "iob_reg_valid",
             "parameters": {
                 "DATA_W": 1,
@@ -188,7 +188,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "iob_reg_addr",
             "parameters": {
                 "DATA_W": "ADDR_W",
@@ -209,7 +209,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "iob_reg_data",
             "parameters": {
                 "DATA_W": "DATA_W",
@@ -230,7 +230,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "iob_reg_we",
             "parameters": {
                 "DATA_W": 1,
@@ -251,7 +251,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "iob_reg_strb",
             "parameters": {
                 "DATA_W": "DATA_W/8",
@@ -272,7 +272,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_reg",
+            "core": "iob_reg",
             "instance_name": "iob_reg_wb_data",
             "parameters": {
                 "DATA_W": "DATA_W",

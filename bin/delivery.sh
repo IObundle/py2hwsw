@@ -21,7 +21,7 @@ if [ ! -d "$BUILD_DIR" ]; then
 fi
 
 #get name and version using bootstrap.py
-NAME=`py2hwsw $CORE print_core_name`
+NAME=`py2hwsw $CORE print_core`
 VERSION_STR=`py2hwsw $CORE print_core_version`
 
 BUILD_VSRC_DIR=$BUILD_DIR/hardware/src

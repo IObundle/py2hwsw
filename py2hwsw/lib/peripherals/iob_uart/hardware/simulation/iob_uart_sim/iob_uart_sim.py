@@ -79,7 +79,7 @@ def setup(py_params_dict):
         converter_connect["clk_en_rst_s"] = "clk_en_rst_s"
     attributes_dict["subblocks"] = [
         {
-            "core_name": "iob_uart",
+            "core": "iob_uart",
             "instance_name": "uart_inst",
             "instance_description": f"Unit Under Test (UUT) UART instance with '{params['csr_if']}' interface.",
             "csr_if": params["csr_if"],
@@ -90,7 +90,7 @@ def setup(py_params_dict):
             },
         },
         {
-            "core_name": "iob_universal_converter",
+            "core": "iob_universal_converter",
             "instance_name": "iob_universal_converter",
             "instance_description": "Convert IOb port from testbench into correct interface for UART CSRs bus",
             "subordinate_if": "iob",

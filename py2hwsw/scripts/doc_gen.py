@@ -73,7 +73,7 @@ def generate_tex_py2hwsw_standard_py_params(out_dir):
 
     tex_table = [
         [
-            "core_name",
+            "core",
             str,
             "Name of current core (determined by the core's file name).",
         ],

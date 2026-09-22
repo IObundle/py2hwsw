@@ -78,7 +78,7 @@ def setup(py_params_dict):
         "superblocks": [
             # Tester
             {
-                "core_name": "iob_aoi_tester",
+                "core": "iob_aoi_tester",
                 "instance_name": "iob_tester",
                 "dest_dir": "tester",
             },

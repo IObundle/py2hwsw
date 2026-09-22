@@ -484,11 +484,11 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_fp_special",
+                "core": "iob_fp_special",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_fp_round",
+                "core": "iob_fp_round",
                 "instance_name": "round0",
                 "parameters": {
                     "DATA_W": "MAN_W",

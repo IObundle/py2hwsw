@@ -8,7 +8,7 @@ def setup(py_params_dict):
         "generate_hw": False,
         "subblocks": [
             {
-                "core_name": "iob_fp_dq",
+                "core": "iob_fp_dq",
                 "instance_name": "iob_fp_dq_inst",
             },
         ],

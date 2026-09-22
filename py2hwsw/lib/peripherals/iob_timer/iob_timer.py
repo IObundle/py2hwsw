@@ -117,7 +117,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_csrs",
+                "core": "iob_csrs",
                 "instance_name": "csrs",
                 "instance_description": "Control/Status Registers",
                 "csrs": [
@@ -193,7 +193,7 @@ def setup(py_params_dict):
                 },
             },
             {
-                "core_name": "iob_timer_core",
+                "core": "iob_timer_core",
                 "instance_name": "iob_timer_core_inst",
                 "instance_description": "Timer core driver",
                 "connect": {
@@ -207,7 +207,7 @@ def setup(py_params_dict):
         "sw_modules": [
             # Software modules
             {
-                "core_name": "iob_linux_device_drivers",
+                "core": "iob_linux_device_drivers",
                 # Extra device tree properties specific to this peripheral
                 "dts_extra_properties": f"""
         interrupt-parent = < &PLIC0 >; // PLIC phandle (matches PLIC peripheral name in system's DT)

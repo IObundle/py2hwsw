@@ -21,7 +21,7 @@ if __name__ == "__main__":
         description="Python to hardware/software generator"
     )
     parser.add_argument(
-        "core_name", nargs="?", type=str, help="The name of the core to use."
+        "core", nargs="?", type=str, help="The name of the core to use."
     )
     parser.add_argument(
         "target",
@@ -33,7 +33,7 @@ if __name__ == "__main__":
             "setup",
             "clean",
             "print_build_dir",
-            "print_core_name",
+            "print_core",
             "print_core_version",
             "print_core_dict",
             "deliver",
@@ -193,7 +193,7 @@ if __name__ == "__main__":
             cat_file(os.path.join(py2hwsw_dir, args.__dict__[f"{dir}_cat"]))
             exit(0)
 
-    if not args.core_name:
+    if not args.core:
         parser.print_usage(sys.stderr)
         exit(1)
 
@@ -204,19 +204,19 @@ if __name__ == "__main__":
             py_params[k] = v
 
     if args.target == "setup":
-        instance = iob_core.get_core_obj(args.core_name, **py_params)
+        instance = iob_core.get_core_obj(args.core, **py_params)
         instance.generate_build_dir()
     elif args.target == "clean":
-        iob_core.clean_build_dir(args.core_name)
+        iob_core.clean_build_dir(args.core)
     elif args.target == "print_build_dir":
-        iob_core.print_build_dir(args.core_name, **py_params)
-    elif args.target == "print_core_name":
-        iob_core.print_core_name(args.core_name, **py_params)
+        iob_core.print_build_dir(args.core, **py_params)
+    elif args.target == "print_core":
+        iob_core.print_core(args.core, **py_params)
     elif args.target == "print_core_version":
-        iob_core.print_core_version(args.core_name, **py_params)
+        iob_core.print_core_version(args.core, **py_params)
     elif args.target == "print_core_dict":
-        iob_core.print_core_dict(args.core_name, **py_params)
+        iob_core.print_core_dict(args.core, **py_params)
     elif args.target == "deliver":
-        iob_core.deliver_core(args.core_name, **py_params)
+        iob_core.deliver_core(args.core, **py_params)
     elif args.target == "export_fusesoc":
-        iob_core.export_fusesoc(args.core_name, **py_params)
+        iob_core.export_fusesoc(args.core, **py_params)

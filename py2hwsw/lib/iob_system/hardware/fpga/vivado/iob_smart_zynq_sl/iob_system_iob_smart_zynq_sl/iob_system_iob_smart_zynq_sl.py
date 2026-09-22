@@ -276,7 +276,7 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         {
             # IOb-SoC instance
-            "core_name": py_params_dict["issuer"]["original_name"],
+            "core": py_params_dict["issuer"]["original_name"],
             "instance_name": py_params_dict["issuer"]["original_name"],
             "instance_description": "IOb-System instance",
             "parameters": {
@@ -300,28 +300,28 @@ def setup(py_params_dict):
         attributes_dict["subblocks"][-1]["connect"].update({"phy_rstn_o": "phy_rstn"})
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_xilinx_ibufg",
+                "core": "iob_xilinx_ibufg",
                 "instance_name": "rxclk_buf",
                 "connect": {
                     "io_io": "rxclk_buf_io",
                 },
             },
             {  # Also instantiated in verilog snippet
-                "core_name": "iob_xilinx_oddr",
+                "core": "iob_xilinx_oddr",
                 "instance_name": "txclk_oddr",
                 "connect": {
                     "io_io": "oddr_io",
                 },
             },
             {  # Instantiated in verilog snippet
-                "core_name": "iob_xilinx_iddr",
+                "core": "iob_xilinx_iddr",
                 "instantiate": False,
             },
         ]
     if params["use_extmem"]:
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_address_translator",
+                "core": "iob_address_translator",
                 "instance_name": "ps7_ddr_address_translator",
                 "instance_description": "AXI Address Translator to offset all addresses requested by SoC by 0x80000, since PS7 DDR memory can only be accessed from HP0 interface starting at 0x80000.",
                 "parameters": {

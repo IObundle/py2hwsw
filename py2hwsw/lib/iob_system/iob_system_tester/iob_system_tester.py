@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "parent": {
             # Tester is a child core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
             # Tester will inherit all attributes/files from the iob_system core.
-            "core_name": "iob_system",
+            "core": "iob_system",
             "include_tester": False,
             # Every parameter in the lines below will be passed to the iob_system parent core.
             **py_params_dict,
@@ -46,7 +46,7 @@ def setup(py_params_dict):
                 "subblocks": [
                     {
                         # Instantiate SUT (usually iob_system or a child of it)
-                        "core_name": py_params_dict["issuer"]["original_name"],
+                        "core": py_params_dict["issuer"]["original_name"],
                         "instance_name": "SUT",
                         "instance_description": "System Under Test (SUT) to be verified by this tester.",
                         # "is_peripheral": True,  # Only applies if SUT has CSRs (via regfileif).
@@ -64,7 +64,7 @@ def setup(py_params_dict):
                     },
                     {
                         # Instantiate a UART core to communicate with SUT
-                        "core_name": "iob_uart",
+                        "core": "iob_uart",
                         "instance_name": "UART1",
                         "instance_description": "UART peripheral for communication with SUT.",
                         "is_peripheral": True,

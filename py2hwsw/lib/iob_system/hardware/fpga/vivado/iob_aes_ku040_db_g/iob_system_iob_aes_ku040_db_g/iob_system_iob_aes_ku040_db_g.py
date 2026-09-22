@@ -323,7 +323,7 @@ def setup(py_params_dict):
     attributes_dict["subblocks"] = [
         {
             # IOb-SoC Memory Wrapper
-            "core_name": py_params_dict["issuer"]["original_name"],
+            "core": py_params_dict["issuer"]["original_name"],
             "instance_name": py_params_dict["issuer"]["original_name"],
             "instance_description": "IOb-SoC instance",
             "parameters": {
@@ -350,7 +350,7 @@ def setup(py_params_dict):
         # DDR4 controller
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_xilinx_axi_interconnect",
+                "core": "iob_xilinx_axi_interconnect",
                 "instance_name": "axi_async_bridge",
                 "instance_description": "Interconnect instance",
                 "parameters": {
@@ -369,7 +369,7 @@ def setup(py_params_dict):
                 "num_subordinates": 1,
             },
             {
-                "core_name": "iob_xilinx_ddr4_ctrl",
+                "core": "iob_xilinx_ddr4_ctrl",
                 "instance_name": "ddr4_ctrl",
                 "instance_description": "DDR4 controller instance",
                 "parameters": {
@@ -391,7 +391,7 @@ def setup(py_params_dict):
         # Clock wizard
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_xilinx_clock_wizard",
+                "core": "iob_xilinx_clock_wizard",
                 "instance_name": "clk_250_to_100_MHz",
                 "instance_description": "PLL to generate system clock",
                 "parameters": {
@@ -408,14 +408,14 @@ def setup(py_params_dict):
         # Eth clock
         attributes_dict["subblocks"] += [
             {
-                "core_name": "iob_xilinx_ibufg",
+                "core": "iob_xilinx_ibufg",
                 "instance_name": "rxclk_buf",
                 "connect": {
                     "io_io": "rxclk_buf_io",
                 },
             },
             {
-                "core_name": "iob_xilinx_oddre1",
+                "core": "iob_xilinx_oddre1",
                 "instance_name": "oddre1_inst",
                 "connect": {
                     "io_io": "oddre1_io",

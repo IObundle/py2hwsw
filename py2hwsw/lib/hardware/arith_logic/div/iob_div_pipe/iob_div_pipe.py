@@ -88,7 +88,7 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_div_slice",
+                "core": "iob_div_slice",
                 "instantiate": False,
             },
         ],

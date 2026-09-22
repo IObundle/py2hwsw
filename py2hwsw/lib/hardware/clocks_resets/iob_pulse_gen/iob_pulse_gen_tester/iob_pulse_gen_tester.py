@@ -9,7 +9,7 @@ def setup(py_params_dict):
         "parent": {
             # Tester is a child core of iob_system: https://github.com/IObundle/py2hwsw/tree/main/py2hwsw/lib/hardware/iob_system
             # Tester will inherit all attributes/files from the iob_system core.
-            "core_name": "iob_system",
+            "core": "iob_system",
             "include_tester": False,
             # Every parameter in the lines below will be passed to the iob_system parent core.
             **py_params_dict,
@@ -41,7 +41,7 @@ def setup(py_params_dict):
                 "subblocks": [
                     {
                         # Instantiate SUT (usually iob_system or a child of it)
-                        "core_name": py_params_dict["issuer"]["original_name"],
+                        "core": py_params_dict["issuer"]["original_name"],
                         "instance_name": "pulse_gen_uut",
                         "instance_description": "Unit Under Test (UUT) to be verified by this tester.",
                         "parameters": {
@@ -56,7 +56,7 @@ def setup(py_params_dict):
                     },
                     {
                         # Instantiate a GPIO core to verify pulse_gen
-                        "core_name": "iob_gpio",
+                        "core": "iob_gpio",
                         "instance_name": "GPIO0",
                         "instance_description": "GPIO verification instrument",
                         "is_peripheral": True,

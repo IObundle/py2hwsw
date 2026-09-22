@@ -187,7 +187,7 @@ class iob_module(iob_base):
         Also append issuer object found to the core's 'subblocks' list.
         """
         issuer = self.issuer
-        if kwargs.get("core_name") == issuer.original_name:
+        if kwargs.get("core") == issuer.original_name:
             self.update_issuer_obj(issuer, kwargs)
             return True
         else:

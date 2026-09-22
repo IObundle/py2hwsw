@@ -234,7 +234,7 @@ class iob_comb(iob_snippet):
                         for block in core.subblocks
                     ):
                         core.create_subblock(
-                            core_name="iob_reg",
+                            core="iob_reg",
                             instance_name=f"{signal.name}_reg",
                             parameters={"DATA_W": signal.width, "RST_VAL": signal.rst_val},
                             connect=connect,

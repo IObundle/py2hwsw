@@ -8,7 +8,7 @@ def setup(py_params_dict):
         "generate_hw": False,
         "subblocks": [
             {
-                "core_name": "iob_add2",
+                "core": "iob_add2",
                 "instance_name": "iob_add2_inst",
             },
         ],

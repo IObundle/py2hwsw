@@ -150,7 +150,7 @@ def setup(py_params_dict):
     #
     attributes_dict["subblocks"] = [
         {
-            "core_name": py_params_dict["issuer"]["original_name"],
+            "core": py_params_dict["issuer"]["original_name"],
             "instance_name": py_params_dict["issuer"]["original_name"],
             "instance_description": "IOb-SoC instance",
             "parameters": {
@@ -171,7 +171,7 @@ def setup(py_params_dict):
     # Clock wizard
     attributes_dict["subblocks"] += [
         {
-            "core_name": "iob_xilinx_clock_wizard",
+            "core": "iob_xilinx_clock_wizard",
             "instance_name": "clk_125_to_100_MHz",
             "instance_description": "PLL to generate system clock",
             "parameters": {

@@ -88,12 +88,12 @@ def setup(py_params_dict):
         ],
         "subblocks": [
             {
-                "core_name": "iob_functions",
+                "core": "iob_functions",
                 "instance_description": "Functions used for math calculations in derived parameters.",
                 "instantiate": False,
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "port_params": {"clk_en_rst_s": "c_a"},
                 "instantiate": False,
             },

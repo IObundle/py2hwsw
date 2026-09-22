@@ -737,7 +737,7 @@ class csr_gen:
             converter_connect["clk_en_rst_s"] = "clk_en_rst_s"
         subblocks.append(
             {
-                "core_name": "iob_universal_converter",
+                "core": "iob_universal_converter",
                 "instance_name": "iob_universal_converter",
                 "instance_description": "Convert CSR interface into internal IOb port",
                 "subordinate_if": core_attributes["csr_if"],
@@ -879,7 +879,7 @@ class csr_gen:
             ]
         subblocks += [
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "rvalid_reg",
                 "instance_description": "rvalid register",
                 "parameters": {
@@ -893,7 +893,7 @@ class csr_gen:
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "rdata_reg",
                 "instance_description": "rdata register",
                 "parameters": {
@@ -907,7 +907,7 @@ class csr_gen:
                 },
             },
             {
-                "core_name": "iob_reg",
+                "core": "iob_reg",
                 "instance_name": "ready_reg",
                 "instance_description": "ready register",
                 "parameters": {

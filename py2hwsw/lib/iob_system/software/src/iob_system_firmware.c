@@ -58,6 +58,7 @@ char *send_string = "Sending this string as a file to console.\n"
                     " adding extra targets for file generation.\n";
 
 int main() {
+  int test_passed = 1;
   char pass_string[] = "Test passed!";
   char fail_string[] = "Test failed!";
 
@@ -119,8 +120,9 @@ int main() {
   file_size = uart_recvfile("Sendfile.txt", recvfile);
 
   // compare files
-  if (strcmp(sendfile, recvfile)) {
+  if (file_size != send_file_size || memcmp(sendfile, recvfile, file_size)) {
     printf("FAILURE: Send and received file differ!\n");
+    test_passed = 0;
   } else {
     printf("SUCCESS: Send and received file match!\n");
   }
@@ -128,7 +130,10 @@ int main() {
   free(sendfile);
   free(recvfile);
 
-  uart_sendfile("test.log", strlen(pass_string), pass_string);
+  if (test_passed)
+    uart_sendfile("test.log", strlen(pass_string), pass_string);
+  else
+    uart_sendfile("test.log", strlen(fail_string), fail_string);
 #endif // TESTER
 
   // read current timer count, compute elapsed time

@@ -46,6 +46,9 @@ module iob_axis_s_axi_m_write #(
    // Assignment to outputs
    // AXI
    assign axi_wdata_nxt = axis_in_data_i;
+   // W channel output registers can load a new beat when the current one is
+   // accepted by the subordinate or when they hold no valid beat
+   wire w_reg_en = axi_wready_i | ~axi_wvalid_o;
    // Constants
    assign axi_awid_o    = {AXI_ID_W{1'd0}};
    assign axi_awsize_o  = 3'd2;
@@ -117,14 +120,14 @@ module iob_axis_s_axi_m_write #(
                axi_awvalid_nxt = 1'd1;  // Start transfer
                length_nxt = burst_length_beats - (axi_awlen_nxt + 1);  // Set remaining length
                // Set valid data for this burst and count it when the transfer is done
-               axis_in_ready_o = axi_wready_i;
+               axis_in_ready_o = w_reg_en;
                axi_wvalid_nxt = axis_in_valid_i;
-               transfer_count_incr = axi_wready_i & axis_in_valid_i;
+               transfer_count_incr = w_reg_en & axis_in_valid_i;
 
                // Set the last signal in the last data
                if ((transf_data_count == axi_awlen_nxt) && axis_in_valid_i) begin
                   axi_wlast_nxt = 1'd1;
-                  if (axi_wready_i) begin
+                  if (w_reg_en) begin
                      data_done_nxt = 1'd1;
                   end
                end
@@ -144,12 +147,12 @@ module iob_axis_s_axi_m_write #(
 
             // Check if the data channel is done
             if (!data_done) begin
-               axis_in_ready_o     = axi_wready_i;  // Set ready signal for the input stream
-               transfer_count_incr = axi_wready_i & axis_in_valid_i;
+               axis_in_ready_o     = w_reg_en;  // Set ready signal for the input stream
+               transfer_count_incr = w_reg_en & axis_in_valid_i;
                axi_wvalid_nxt      = axis_in_valid_i;
                if ((transf_data_count == axi_awlen_o) && axis_in_valid_i) begin
                   axi_wlast_nxt = 1'd1;
-                  if (axi_wready_i) begin
+                  if (w_reg_en) begin
                      data_done_nxt = 1'd1;
                   end
                end
@@ -274,7 +277,7 @@ module iob_axis_s_axi_m_write #(
    ) axi_wdata_reg (
        `include "iob_axis_s_axi_m_write_iob_clk_s_s_portmap.vs"
        .rst_i (rst_i),
-       .en_i  (axi_wready_i),
+       .en_i  (w_reg_en),
        .data_i(axi_wdata_nxt),
        .data_o(axi_wdata_o)
    );
@@ -285,7 +288,7 @@ module iob_axis_s_axi_m_write #(
    ) axi_wvalid_reg (
        `include "iob_axis_s_axi_m_write_iob_clk_s_s_portmap.vs"
        .rst_i (rst_i),
-       .en_i  (axi_wready_i),
+       .en_i  (w_reg_en),
        .data_i(axi_wvalid_nxt),
        .data_o(axi_wvalid_o)
    );
@@ -296,7 +299,7 @@ module iob_axis_s_axi_m_write #(
    ) axi_wlast_reg (
        `include "iob_axis_s_axi_m_write_iob_clk_s_s_portmap.vs"
        .rst_i (rst_i),
-       .en_i  (axi_wready_i),
+       .en_i  (w_reg_en),
        .data_i(axi_wlast_nxt),
        .data_o(axi_wlast_o)
    );

@@ -4,12 +4,13 @@
 
 #include "iob_system_conf.h"
 #include "iob_system_mmap.h"
+#include "iob_cpu.s"
 
 // Can't include iob_bootrom_csrs.h because the assembler doesn't recognize stdint.h,
 // so define the constants here instead (these are address offsets).
 
 // Bootloader start address within the ROM
-#define IOB_BOOTROM_ROM_ADDR 0x80
+#define IOB_BOOTROM_ROM_ADDR IOB_SYSTEM_BOOTLOADER_ROM_OFFSET
 // Bootloader size
 #define LENGTH ((1 << IOB_SYSTEM_BOOTROM_ADDR_W) - IOB_BOOTROM_ROM_ADDR)
 // Bootloader start address in system's memory map
@@ -34,10 +35,10 @@ copy_loop:
   addi x1, x1, -4
   bne x1, x0, copy_loop
 
-#ifdef IOB_SYSTEM_FENCEI
-  // Ensure that instruction fetches after jump are synced with previous writes - uses RISC-V 'Zifencei' extension
-  fence.i
-#endif
+  // The bootloader was stored through the data cache: write it back to memory
+  // before the instruction cache fetches it
+  iob_cpu_flush_dcache
+  iob_cpu_invalidate_icache
 
   // Jump to the bootloader
   li x5, BOOTLDR_ADDR

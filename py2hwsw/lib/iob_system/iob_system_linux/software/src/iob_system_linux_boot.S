@@ -4,6 +4,7 @@
 
 #include "iob_system_linux_conf.h"
 #include "iob_system_linux_mmap.h"
+#include "iob_cpu.s"
 
 // Bootloader stack address: at the end of the bootloader region == at the end of the firmware region
 #define STACK_ADDR (IOB_SYSTEM_LINUX_FW_BASEADDR + (1 << IOB_SYSTEM_LINUX_FW_ADDR_W))
@@ -18,10 +19,10 @@
   //call main
   jal ra, main
 
-#ifdef IOB_SYSTEM_LINUX_FENCEI
-  // Ensure that instruction fetches after jump are synced with previous writes - uses RISC-V 'Zifencei' extension
-  fence.i
-#endif
+  // The firmware was stored through the data cache: write it back to memory
+  // before the instruction cache fetches it
+  iob_cpu_flush_dcache
+  iob_cpu_invalidate_icache
 
   // Set up OpenSBI entry arguments (must be here, not in C code, to avoid
   // clobbering by function calls)

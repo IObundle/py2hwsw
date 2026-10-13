@@ -56,7 +56,7 @@ endif
 #
 
 iob_system_linux_bootrom.hex: ../../software/iob_system_linux_preboot.bin ../../software/iob_system_linux_boot.bin
-	../../scripts/makehex.py $^ 00000080 $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,BOOTROM_ADDR_W) $@
+	../../scripts/makehex.py $^ $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,BOOTLOADER_ROM_OFFSET) $(call GET_IOB_SYSTEM_LINUX_CONF_MACRO,BOOTROM_ADDR_W) $@
 
 #
 # OS
@@ -71,11 +71,11 @@ OS_DIR = $(ROOT_DIR)/submodules/iob_linux
 REL_OS2ROOT :=`realpath $(ROOT_DIR) --relative-to=$(OS_DIR)`
 OPENSBI_DIR = fw_jump.bin
 DTB_DIR = iob_system_linux.dtb
-DTB_ADDR:=00F80000
+DTB_ADDR:=0x00F80000
 LINUX_DIR = Image
-LINUX_ADDR:=00400000
+LINUX_ADDR:=0x00400000
 ROOTFS_DIR = rootfs.cpio.gz
-ROOTFS_ADDR:=01000000
+ROOTFS_ADDR:=0x01000000
 FIRM_ARGS = $(OPENSBI_DIR)
 FIRM_ARGS += $(DTB_DIR) $(DTB_ADDR)
 FIRM_ARGS += $(LINUX_DIR) $(LINUX_ADDR)

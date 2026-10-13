@@ -60,7 +60,7 @@ def main():
 
     for i in range(nFiles - 1):
         binfile.append(argv[(i + 1) * 2])
-        binaddr.append(int(argv[(i + 1) * 2 + 1], 16))
+        binaddr.append(int(argv[(i + 1) * 2 + 1], 0))
 
     for i in range(nFiles):
         with open(binfile[i], "rb") as f:

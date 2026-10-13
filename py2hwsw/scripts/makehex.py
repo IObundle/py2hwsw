@@ -60,7 +60,7 @@ def main():
 
     for i in range(nFiles - 1):
         binfile.append(argv[(i + 1) * 2])
-        binaddr.append(int(argv[(i + 1) * 2 + 1], 16))
+        binaddr.append(int(argv[(i + 1) * 2 + 1], 0))
 
     for i in range(nFiles):
         with open(binfile[i], "rb") as f:
@@ -73,9 +73,32 @@ def main():
 
     for i in range(nFiles):
         assert binaddr[i] + len(bindata[i]) <= mem_size, (
-            "File %d doesn't fit in memory" % i
+            f"File {i} ('{binfile[i]}') doesn't fit in memory: "
+            f"addr=0x{binaddr[i]:x}, size={len(bindata[i])}, mem_size={mem_size}"
         )
         assert (binaddr[i] + len(bindata[i])) % 4 == 0
+
+    # Check for overlaps between files
+    for i in range(nFiles):
+        start_i = binaddr[i]
+        end_i = binaddr[i] + len(bindata[i])
+        for j in range(i + 1, nFiles):
+            start_j = binaddr[j]
+            end_j = binaddr[j] + len(bindata[j])
+            # Check if ranges overlap: [start_i, end_i) and [start_j, end_j)
+            if start_i < end_j and start_j < end_i:
+                overlap_start = max(start_i, start_j)
+                overlap_end = min(end_i, end_j)
+                overlap_size = overlap_end - overlap_start
+                print(
+                    f"Error: File {i} ('{binfile[i]}') and File {j} ('{binfile[j]}') "
+                    f"overlap at 0x{overlap_start:x}-0x{overlap_end:x} "
+                    f"({overlap_size} bytes). "
+                    f"File {i}: 0x{start_i:x}-0x{end_i:x}, "
+                    f"File {j}: 0x{start_j:x}-0x{end_j:x}",
+                    file=sys.stderr,
+                )
+                exit(1)
 
     lines = []
     valid = False

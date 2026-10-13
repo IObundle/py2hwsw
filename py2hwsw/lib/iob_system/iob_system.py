@@ -43,6 +43,10 @@ def setup(py_params: dict):
             "Internal memory address width. Also specifies default value for external memory address width.",
         ),
         "bootrom_addr_w": (12, "Bootrom address width"),
+        "bootloader_rom_offset": (
+            0x100,
+            "Bootloader offset within bootrom (in bytes). Bootloader is placed at this offset from bootrom base. Prebootloader is placed at address 0. Must be >= preboot binary size. Used as macro BOOTLOADER_ROM_OFFSET.",
+        ),
         "fw_baseaddr": (0, "Firmware base address"),
         "fw_addr_w": (15, "Firmware address width"),
         "include_tester": (True, "If should include a tester system"),
@@ -205,11 +209,19 @@ def setup(py_params: dict):
             },
             {  # Needed for software and makefiles
                 "name": "BOOTROM_ADDR_W",
-                "descr": "Bootloader ROM address width (byte addressable). Includes a pre-bootloader that uses the first 128 bytes. Bootloader starts at address 0x80 of this ROM.",
+                "descr": "Bootloader ROM address width (byte addressable). Includes a pre-bootloader at address 0 and bootloader at BOOTLOADER_ROM_OFFSET. Total ROM size = 2^BOOTROM_ADDR_W bytes.",
                 "type": "M",
                 "val": params["bootrom_addr_w"],
                 "min": "1",
                 "max": "32",
+            },
+            {  # Needed for software
+                "name": "BOOTLOADER_ROM_OFFSET",
+                "descr": "Bootloader offset within bootrom (in bytes). Bootloader is placed at this offset from bootrom base. Prebootloader is placed at address 0. Must be >= preboot binary size.",
+                "type": "M",
+                "val": params["bootloader_rom_offset"],
+                "min": "0",
+                "max": "1024",
             },
             {  # Needed for software
                 "name": "TRAP_HANDLER",

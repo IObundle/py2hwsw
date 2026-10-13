@@ -6,6 +6,7 @@
 
 #include "clint.h"
 #include "iob_bsp.h"
+#include "iob_cpu.h"
 #include "iob_printf.h"
 // #include "iob_spi.h"
 // #include "iob_spidefs.h"
@@ -52,34 +53,6 @@ static volatile uint64_t timestamp = 0;
 
 void send_axistream();
 void receive_axistream();
-
-// Assumes 64-byte cache lines (common in VexiiRiscv/VexRiscv); adjust if
-// different
-#define CACHE_LINE_SIZE 64
-
-// Clean and invalidate CPU data cache. Write-back dirty lines to memory and
-// then discard cache contents.
-void flush_cache(void *start, size_t len) {
-#ifdef IOB_SYSTEM_LINUX_CBO
-  char *end = (char *)start + len;
-  char *ptr;
-
-  // Round start down to line boundary
-  ptr = (char *)((uintptr_t)start & ~(CACHE_LINE_SIZE - 1));
-
-  // Flush (clean + invalidate) whole lines covering the range
-  while (ptr < end) {
-    asm volatile("cbo.flush 0(%0)" ::"r"(ptr) : "memory");
-    ptr += CACHE_LINE_SIZE;
-  }
-#else  // NOT IOB_SYSTEM_LINUX_CBO
-  // Delay to ensure all data is written to memory
-  for (unsigned int i = 0; i < 10; i++)
-    asm volatile("nop");
-  // Flush VexRiscv CPU internal cache
-  asm volatile(".word 0x500F" ::: "memory");
-#endif // IOB_SYSTEM_LINUX_CBO
-}
 
 #ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
 // Send signal by uart to receive file by ethernet
@@ -266,7 +239,7 @@ int main() {
   printf_init(&uart16550_putc);
 #ifdef IOB_SYSTEM_LINUX_USE_ETHERNET
   // init eth
-  eth_init(ETH0_BASE, IOB_BSP_FREQ, &flush_cache, &printf_);
+  eth_init(ETH0_BASE, IOB_BSP_FREQ, iob_cpu_flush_dcache_range, &printf_);
   eth_wait_phy_rst();
   // Run PHY connection debug tests
   debug_phy_connection();
@@ -588,7 +561,8 @@ void receive_axistream() {
   IOB_AXISTREAM_IN_SET_MODE(1);
   dma_start_transfer((uint32_t *)byte_stream, n_received_words, 1, 0);
 
-  flush_cache();
+  iob_cpu_flush_dcache_range((void *)byte_stream,
+                             n_received_words * sizeof(uint32_t));
 
   // Print byte stream received
   uart16550_puts("Received AXI stream bytes: ");

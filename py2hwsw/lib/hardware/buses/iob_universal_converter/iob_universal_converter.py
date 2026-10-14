@@ -75,6 +75,26 @@ def setup(py_params_dict):
                 "min": "NA",
                 "max": "32",
             },
+            {
+                "name": "ADDR_SHIFT",
+                "descr": "Address shift for stride conversion. 0=1-byte stride (no shift), 2=4-byte stride (shift right by 2). The input IOb address is right-shifted by this amount before being output on the Wishbone bus.",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "4",
+            },
+        ]
+    # Add ADDR_SHIFT for IOb-to-IOb conversion (for stride conversion)
+    if params["manager_if"] == "iob":
+        attributes_dict["confs"] += [
+            {
+                "name": "ADDR_SHIFT",
+                "descr": "Address shift for stride conversion. 0=1-byte stride (no shift), 2=4-byte stride (shift right by 2). The input IOb address is right-shifted by this amount before being output on the manager IOb bus.",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "4",
+            },
         ]
     #
     # Ports
@@ -105,7 +125,9 @@ def setup(py_params_dict):
             "descr": "Manager port",
             "signals": {
                 "type": params["manager_if"],
-                "ADDR_W": "ADDR_W",
+                "ADDR_W": (
+                    "ADDR_W - ADDR_SHIFT" if params["manager_if"] == "wb" else "ADDR_W"
+                ),
                 "DATA_W": "DATA_W",
             },
         },
@@ -234,6 +256,7 @@ def setup(py_params_dict):
                     "ADDR_W": "ADDR_W",
                     "DATA_W": "DATA_W",
                     "READ_BYTES": "READ_BYTES",
+                    "ADDR_SHIFT": "ADDR_SHIFT",
                 },
                 "connect": {
                     "clk_en_rst_s": "clk_en_rst_s",
@@ -328,7 +351,7 @@ def setup(py_params_dict):
         snippet_code += """
    // Directly connect internal IOb wire to manager IOb port
    assign iob_valid_o = iob_valid;
-   assign iob_addr_o = iob_addr;
+   assign iob_addr_o = iob_addr >> ADDR_SHIFT;
    assign iob_wdata_o = iob_wdata;
    assign iob_wstrb_o = iob_wstrb;
    assign iob_rvalid = iob_rvalid_i;

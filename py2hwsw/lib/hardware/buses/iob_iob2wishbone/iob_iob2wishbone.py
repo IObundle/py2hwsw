@@ -34,6 +34,14 @@ def setup(py_params_dict):
                 "min": "NA",
                 "max": "NA",
             },
+            {
+                "name": "ADDR_SHIFT",
+                "descr": "Address shift for stride conversion. 0=1-byte stride (no shift), 2=4-byte stride (shift right by 2). The input IOb address is right-shifted by this amount before being output on the Wishbone bus.",
+                "type": "P",
+                "val": "0",
+                "min": "0",
+                "max": "4",
+            },
         ],
         #
         # Ports
@@ -59,7 +67,7 @@ def setup(py_params_dict):
                 "name": "wb_m",
                 "signals": {
                     "type": "wb",
-                    "ADDR_W": "ADDR_W",
+                    "ADDR_W": "ADDR_W - ADDR_SHIFT",
                     "DATA_W": "DATA_W",
                 },
                 "descr": "Wishbone manager interface",
@@ -301,26 +309,43 @@ def setup(py_params_dict):
             "verilog_code": """
 
    // Logic
-   assign wb_adr_o     = iob_valid_i ? iob_addr_i : iob_address_r;
+   assign wb_adr_o     = iob_valid_i ? (iob_addr_i >> ADDR_SHIFT) : (iob_address_r >> ADDR_SHIFT);
    assign wb_cyc_o     = iob_valid_i ? iob_valid_i : iob_valid_r;
    assign wb_stb_o     = wb_cyc_o;
-   assign wb_datout_o  = iob_valid_i ? iob_wdata_i : iob_wdata_r;
-   assign wb_sel_o     = iob_valid_i ? wb_select : wb_select_r;
    assign wb_we_o      = iob_valid_i ? wb_we : wb_we_r;
-
-   generate
-       if (READ_BYTES >= (DATA_W/8)) begin : gen_pad_read_bytes
-           localparam RB_MASK = {READ_BYTES{1'b1}};
-           assign wb_select   = wb_we ? iob_wstrb_i : (RB_MASK) << (iob_addr_i[1:0]);
-       end else begin : gen_read_bytes
-           localparam RB_MASK = {{(DATA_W/8-READ_BYTES){1'b0}}, {READ_BYTES{1'b1}}};
-           assign wb_select   = wb_we ? iob_wstrb_i : (RB_MASK) << (iob_addr_i[1:0]);
-       end
-   endgenerate
+   assign wb_sel_o     = iob_valid_i ? wb_select : wb_select_r;
    assign wb_we        = |iob_wstrb_i;
 
-   assign iob_rdata_o  = wb_ack_i ? wb_dat_i : wb_data_r;
-   assign iob_ready_o  = wb_ack_i;
+generate
+        if (ADDR_SHIFT != 0) begin : gen_stride
+           // Stride conversion to a packed byte-lane register file:
+           // The external address uses a 2**ADDR_SHIFT-byte stride per register.
+           // The register word index is `addr >> ADDR_SHIFT`, while the register
+           // byte lane inside that word is selected by the address bits
+           // [ADDR_SHIFT +: $clog2(DATA_W/8)].
+           localparam LANE_W = $clog2(DATA_W/8);
+           localparam [DATA_W/8-1:0] LANE_ONE = 1;
+
+           wire [LANE_W-1:0] lane_i = iob_addr_i[ADDR_SHIFT+:LANE_W];
+           wire [LANE_W-1:0] lane_r = iob_address_r[ADDR_SHIFT+:LANE_W];
+
+           assign wb_select   = LANE_ONE << lane_i;
+           assign wb_datout_o = iob_valid_i ? (iob_wdata_i << (lane_i * 8)) : (iob_wdata_r << (lane_r * 8));
+           assign iob_rdata_o = (wb_ack_i ? wb_dat_i : wb_data_r) >> (lane_r * 8);
+        end else begin : gen_no_stride
+           assign wb_datout_o  = iob_valid_i ? iob_wdata_i : iob_wdata_r;
+           assign iob_rdata_o  = wb_ack_i ? wb_dat_i : wb_data_r;
+           if (READ_BYTES >= (DATA_W/8)) begin : gen_pad_read_bytes
+               localparam RB_MASK = {READ_BYTES{1'b1}};
+               assign wb_select   = wb_we ? iob_wstrb_i : (RB_MASK) << (iob_addr_i[1:0]);
+           end else begin : gen_read_bytes
+               localparam RB_MASK = {{(DATA_W/8-READ_BYTES){1'b0}}, {READ_BYTES{1'b1}}};
+               assign wb_select   = wb_we ? iob_wstrb_i : (RB_MASK) << (iob_addr_i[1:0]);
+           end
+        end
+    endgenerate
+
+    assign iob_ready_o  = wb_ack_i;
 """,
         },
     ]

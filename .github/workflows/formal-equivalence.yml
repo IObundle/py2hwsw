@@ -1,0 +1,173 @@
+# SPDX-FileCopyrightText: 2026 IObundle
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
+# Sequential equivalence check (SEC) of the library cores a change touches.
+#
+# Each changed core is generated with py2hwsw at the base and at the head of
+# the change, and Kepler Formal compares the two generated RTL trees at their
+# top-level ports. A refactor or lint fix should prove equivalent; an intended
+# behavior change shows up as a counterexample trace in the job summary.
+# The check is informational: it reports, it does not block.
+
+name: Formal equivalence
+
+on:
+  pull_request:
+    paths:
+      - 'py2hwsw/lib/**'
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: Commit to compare with its parent
+        required: true
+      cores:
+        description: Space-separated cores to check (default, the cores the commit changes)
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changed-cores:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      cores: ${{ steps.find.outputs.cores }}
+      base: ${{ steps.revs.outputs.base }}
+      head: ${{ steps.revs.outputs.head }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select the commits to compare
+        id: revs
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          COMMIT: ${{ inputs.commit }}
+        run: |
+          if [ -n "$COMMIT" ]; then
+            head=$(git rev-parse "$COMMIT^{commit}")
+            base=$(git rev-parse "$head^")
+          else
+            base=$PR_BASE
+            head=$(git rev-parse HEAD)
+          fi
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "head=$head" >> "$GITHUB_OUTPUT"
+
+      - name: Find the changed cores
+        id: find
+        env:
+          CORES: ${{ inputs.cores }}
+        run: |
+          # shellcheck disable=SC2086
+          python3 .github/formal/changed_cores.py \
+            "${{ steps.revs.outputs.base }}" "${{ steps.revs.outputs.head }}" $CORES
+
+  sec:
+    needs: changed-cores
+    if: needs.changed-cores.outputs.cores != '[]'
+    name: SEC ${{ matrix.core }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        core: ${{ fromJSON(needs.changed-cores.outputs.cores) }}
+    env:
+      CORE: ${{ matrix.core }}
+      BASE: ${{ needs.changed-cores.outputs.base }}
+      HEAD: ${{ needs.changed-cores.outputs.head }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the py2hwsw Python dependencies
+        # Same packages as pythonEnv in py2hwsw/lib/default.nix.
+        run: >-
+          python -m pip install --quiet
+          black mypy parse numpy wavedrom matplotlib scipy pyserial pydantic jinja2
+
+      - name: Generate ${{ matrix.core }} at both commits
+        id: gen
+        run: |
+          set -o pipefail
+          status=changed
+          if ! .github/formal/generate_core.sh "$CORE" "$BASE" ".formal/$CORE/base" \
+             || ! .github/formal/generate_core.sh "$CORE" "$HEAD" ".formal/$CORE/head"; then
+            status=generation-failed
+          elif diff -rq ".formal/$CORE/base/build/hardware/src" ".formal/$CORE/head/build/hardware/src" >/dev/null; then
+            status=identical
+          fi
+          # Hold the asynchronous reset during a short bootstrap, so registers
+          # start from their reset value on both sides.
+          reset=""
+          if grep -Eq '\barst_i\b' ".formal/$CORE/head/build/hardware/src/$CORE.v" 2>/dev/null; then
+            reset="arst_i=1"
+          fi
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          echo "reset-ports=$reset" >> "$GITHUB_OUTPUT"
+
+      - name: Prove ${{ matrix.core }} equivalent
+        id: sec
+        if: steps.gen.outputs.status == 'changed'
+        continue-on-error: true
+        uses: keplertech/kepler-formal-action@v1
+        with:
+          design1: .formal/${{ matrix.core }}/base/build/hardware/src/*.v
+          design2: .formal/${{ matrix.core }}/head/build/hardware/src/*.v
+          top: ${{ matrix.core }}
+          mode: sec
+          sec-engine: pdr
+          sec-encoding: binary
+          reset-ports: ${{ steps.gen.outputs.reset-ports }}
+          reset-cycles: '4'
+          artifact-dir: .formal/${{ matrix.core }}/kepler-formal
+
+      - name: Report
+        if: always()
+        env:
+          GEN: ${{ steps.gen.outputs.status }}
+          VERDICT: ${{ steps.sec.outputs.verdict }}
+        run: |
+          case "$GEN/$VERDICT" in
+            changed/equivalent)
+              msg="proved equivalent: the change keeps the behavior at the top-level ports" ;;
+            changed/different)
+              msg="behavior changed: see the counterexample in the job summary"
+              echo "::warning title=$CORE::$msg" ;;
+            changed/partially_proved)
+              msg="partially proved: some outputs proved equivalent, no difference found; see the kepler-formal log"
+              echo "::notice title=$CORE::$msg" ;;
+            changed/*)
+              msg="no verdict ($VERDICT): see the kepler-formal log"
+              echo "::notice title=$CORE::$msg" ;;
+            identical/*)
+              msg="generated RTL is identical at both commits; nothing to compare" ;;
+            *)
+              msg="py2hwsw setup failed on one side; not compared"
+              echo "::notice title=$CORE::$msg" ;;
+          esac
+          echo "$CORE: $msg"
+          echo "**$CORE** ($(git rev-parse --short "$BASE") → $(git rev-parse --short "$HEAD")): $msg" >> "$GITHUB_STEP_SUMMARY"
+
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-${{ matrix.core }}
+          path: |
+            .formal/${{ matrix.core }}/kepler-formal
+            .formal/${{ matrix.core }}/*/setup.log
+          if-no-files-found: ignore

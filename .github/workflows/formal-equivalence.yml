@@ -161,7 +161,8 @@ jobs:
               echo "::notice title=$CORE::$msg" ;;
           esac
           echo "$CORE: $msg"
-          echo "**$CORE** ($(git rev-parse --short "$BASE") → $(git rev-parse --short "$HEAD")): $msg" >> "$GITHUB_STEP_SUMMARY"
+          python3 .github/formal/report.py row "$CORE" "${GEN:-generation-failed}" "$msg" \
+            ".formal/$CORE/kepler-formal/result.json" ".formal/rows/$CORE.json"
 
       - if: always()
         uses: actions/upload-artifact@v4
@@ -171,3 +172,34 @@ jobs:
             .formal/${{ matrix.core }}/kepler-formal
             .formal/${{ matrix.core }}/*/setup.log
           if-no-files-found: ignore
+
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-row-${{ matrix.core }}
+          path: .formal/rows/${{ matrix.core }}.json
+          if-no-files-found: ignore
+          retention-days: 1
+
+  summary:
+    needs: [changed-cores, sec]
+    if: always() && needs.changed-cores.outputs.cores != '[]' && needs.changed-cores.outputs.cores != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/formal
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: formal-row-*
+          path: .formal/rows
+          merge-multiple: true
+
+      - name: Summarize the results
+        env:
+          CORES: ${{ needs.changed-cores.outputs.cores }}
+          BASE: ${{ needs.changed-cores.outputs.base }}
+          HEAD: ${{ needs.changed-cores.outputs.head }}
+        run: python3 .github/formal/report.py table .formal/rows

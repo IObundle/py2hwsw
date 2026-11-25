@@ -39,6 +39,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       cores: ${{ steps.find.outputs.cores }}
+      via: ${{ steps.find.outputs.via }}
       base: ${{ steps.revs.outputs.base }}
       head: ${{ steps.revs.outputs.head }}
     steps:
@@ -104,13 +105,31 @@ jobs:
         id: gen
         run: |
           set -o pipefail
-          status=changed
-          if ! .github/formal/generate_core.sh "$CORE" "$BASE" ".formal/$CORE/base" \
-             || ! .github/formal/generate_core.sh "$CORE" "$HEAD" ".formal/$CORE/head"; then
-            status=generation-failed
+          base_ok=true head_ok=true
+          .github/formal/generate_core.sh "$CORE" "$BASE" ".formal/$CORE/base" || base_ok=false
+          .github/formal/generate_core.sh "$CORE" "$HEAD" ".formal/$CORE/head" || head_ok=false
+          # not-generated: the core cannot be set up this way (at the head, or
+          # at both commits); setup-broken: setup works at the base only.
+          if ! $head_ok; then
+            if $base_ok; then status=setup-broken; else status=not-generated; fi
+            failed=head
+          elif ! $base_ok; then
+            status=not-generated failed=base
           elif diff -rq ".formal/$CORE/base/build/hardware/src" ".formal/$CORE/head/build/hardware/src" >/dev/null; then
             status=identical
+          else
+            status=changed
           fi
+          # The root cause is the last Python exception in the setup log;
+          # py2hwsw then adds one "Failed to ..." line per enclosing block.
+          error=""
+          if [ -n "${failed:-}" ]; then
+            log=$(sed 's/\x1b\[[0-9;]*m//g' ".formal/$CORE/$failed/setup.log")
+            error=$(grep -E '^[A-Za-z_.]+(Error|Exception): ' <<<"$log" | tail -1)
+            [ -n "$error" ] || error=$(grep -v '^[[:space:]]*$' <<<"$log" | tail -1)
+            error=$(cut -c1-200 <<<"$error")
+          fi
+          echo "setup-error=$error" >> "$GITHUB_OUTPUT"
           # Hold the asynchronous reset during a short bootstrap, so registers
           # start from their reset value on both sides.
           reset=""
@@ -141,6 +160,8 @@ jobs:
         env:
           GEN: ${{ steps.gen.outputs.status }}
           VERDICT: ${{ steps.sec.outputs.verdict }}
+          SETUP_ERROR: ${{ steps.gen.outputs.setup-error }}
+          VIA: ${{ fromJSON(needs.changed-cores.outputs.via)[matrix.core] }}
         run: |
           case "$GEN/$VERDICT" in
             changed/equivalent)
@@ -156,12 +177,18 @@ jobs:
               echo "::notice title=$CORE::$msg" ;;
             identical/*)
               msg="generated RTL is identical at both commits; nothing to compare" ;;
+            setup-broken/*)
+              msg="py2hwsw setup works at the base but fails at the head: $SETUP_ERROR"
+              echo "::warning title=$CORE::$msg" ;;
             *)
-              msg="py2hwsw setup failed on one side; not compared"
+              msg="not generated (py2hwsw setup fails on its own): ${SETUP_ERROR:-see setup.log}"
               echo "::notice title=$CORE::$msg" ;;
           esac
+          if [ -n "$VIA" ]; then
+            msg="checks the change to $VIA; $msg"
+          fi
           echo "$CORE: $msg"
-          python3 .github/formal/report.py row "$CORE" "${GEN:-generation-failed}" "$msg" \
+          python3 .github/formal/report.py row "$CORE" "${GEN:-not-generated}" "$msg" \
             ".formal/$CORE/kepler-formal/result.json" ".formal/rows/$CORE.json"
 
       - if: always()

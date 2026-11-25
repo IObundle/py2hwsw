@@ -24,7 +24,8 @@ ICONS = {
     "identical": "➖",
     "different": "⚠️",
     "partially_proved": "🟡",
-    "generation-failed": "🚫",
+    "setup-broken": "⚠️",
+    "not-generated": "🚫",
 }
 
 
@@ -42,8 +43,10 @@ def write_row(core: str, generation: str, message: str, result: str, out: str) -
 def outcome(row: dict) -> str:
     if row["generation"] == "identical":
         return "identical"
+    if row["generation"] in ("setup-broken", "not-generated"):
+        return row["generation"]
     if row["generation"] != "changed":
-        return "generation-failed"
+        return "not-generated"
     return row.get("verdict") or "no verdict"
 
 
@@ -73,10 +76,10 @@ def write_table(rows_dir: str) -> None:
         outputs = ""
         if row.get("total_outputs"):
             outputs = f"{row.get('covered_outputs')}/{row['total_outputs']}"
-        time = f"{row['elapsed_seconds']:.0f} s" if row.get("elapsed_seconds") else ""
-        lines.append(
-            f"| `{core}` | {icon} {result} | {outputs} | {time} | {row['message']} |"
-        )
+        seconds = row.get("elapsed_seconds")
+        time = "" if seconds is None else f"{seconds:.0f} s" if seconds >= 1 else "< 1 s"
+        notes = row["message"].replace("|", "\\|")
+        lines.append(f"| `{core}` | {icon} {result} | {outputs} | {time} | {notes} |")
     lines += [
         "",
         "Details per core: the job summaries below (counterexample traces) and the "

@@ -1,0 +1,257 @@
+# SPDX-FileCopyrightText: 2026 IObundle
+#
+# SPDX-License-Identifier: GPL-3.0-only
+
+# Sequential equivalence check (SEC) of the library cores a change touches.
+#
+# Each changed core is generated with py2hwsw at the base and at the head of
+# the change, and Kepler Formal compares the two generated RTL trees at their
+# top-level ports. A refactor or lint fix should prove equivalent; an intended
+# behavior change shows up as a counterexample trace in the job summary.
+# The check is informational: it reports, it does not block.
+
+name: Formal equivalence
+
+on:
+  pull_request:
+    paths:
+      - 'py2hwsw/lib/**'
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: Commit to compare with its parent
+        required: true
+      cores:
+        description: Space-separated cores to check (default, the cores the commit changes)
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changed-cores:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      cores: ${{ steps.find.outputs.cores }}
+      via: ${{ steps.find.outputs.via }}
+      orphans: ${{ steps.find.outputs.orphans }}
+      base: ${{ steps.revs.outputs.base }}
+      head: ${{ steps.revs.outputs.head }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Select the commits to compare
+        id: revs
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          COMMIT: ${{ inputs.commit }}
+        run: |
+          if [ -n "$COMMIT" ]; then
+            head=$(git rev-parse "$COMMIT^{commit}")
+            base=$(git rev-parse "$head^")
+          else
+            base=$PR_BASE
+            head=$(git rev-parse HEAD)
+          fi
+          echo "base=$base" >> "$GITHUB_OUTPUT"
+          echo "head=$head" >> "$GITHUB_OUTPUT"
+
+      - name: Find the changed cores
+        id: find
+        env:
+          CORES: ${{ inputs.cores }}
+        run: |
+          # shellcheck disable=SC2086
+          python3 .github/formal/changed_cores.py \
+            "${{ steps.revs.outputs.base }}" "${{ steps.revs.outputs.head }}" $CORES
+
+  sec:
+    needs: changed-cores
+    if: needs.changed-cores.outputs.cores != '[]'
+    name: SEC ${{ matrix.core }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        core: ${{ fromJSON(needs.changed-cores.outputs.cores) }}
+    env:
+      CORE: ${{ matrix.core }}
+      BASE: ${{ needs.changed-cores.outputs.base }}
+      HEAD: ${{ needs.changed-cores.outputs.head }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the py2hwsw Python dependencies
+        # Same packages as pythonEnv in py2hwsw/lib/default.nix.
+        run: >-
+          python -m pip install --quiet
+          black mypy parse numpy wavedrom matplotlib scipy pyserial pydantic jinja2
+
+      - name: Generate ${{ matrix.core }} at both commits
+        id: gen
+        run: |
+          set -o pipefail
+          base_ok=true head_ok=true
+          .github/formal/generate_core.sh "$CORE" "$BASE" ".formal/$CORE/base" || base_ok=false
+          .github/formal/generate_core.sh "$CORE" "$HEAD" ".formal/$CORE/head" || head_ok=false
+          # not-generated: the core cannot be set up this way (at the head, or
+          # at both commits); setup-broken: setup works at the base only.
+          if ! $head_ok; then
+            if $base_ok; then status=setup-broken; else status=not-generated; fi
+            failed=head
+          elif ! $base_ok; then
+            status=not-generated failed=base
+          elif diff -rq ".formal/$CORE/base/build/hardware/src" ".formal/$CORE/head/build/hardware/src" >/dev/null; then
+            status=identical
+          else
+            status=changed
+          fi
+          # The root cause is the last Python exception in the setup log;
+          # py2hwsw then adds one "Failed to ..." line per enclosing block.
+          # The searches may find nothing (empty log, or no Python exception
+          # when the core generates no HDL): that must not stop the step.
+          error=""
+          if [ -n "${failed:-}" ]; then
+            log=$(sed 's/\x1b\[[0-9;]*m//g' ".formal/$CORE/$failed/setup.log" 2>/dev/null || true)
+            error=$(grep -E '^[A-Za-z_.]+(Error|Exception): ' <<<"$log" | tail -1 || true)
+            [ -n "$error" ] || error=$(grep -v '^[[:space:]]*$' <<<"$log" | tail -1 || true)
+            error=$(cut -c1-200 <<<"$error")
+          fi
+          echo "setup-error=$error" >> "$GITHUB_OUTPUT"
+          # Hold the asynchronous reset during a short bootstrap, so registers
+          # start from their reset value on both sides. The action picks each
+          # side's top (the module no other module instantiates) and rejects a
+          # reset port that is not a top-level input, so arst_i is passed only
+          # when the top of both sides has it.
+          reset=""
+          if [ "$status" = changed ]; then
+            reset="arst_i=1"
+            for side in base head; do
+              top=$(python3 .github/formal/top_module.py \
+                ".formal/$CORE/$side/build/hardware/src" --has-input arst_i) || reset=""
+              echo "$side top: ${top:-none found}"
+            done
+          fi
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          echo "reset-ports=$reset" >> "$GITHUB_OUTPUT"
+
+      - name: Prove ${{ matrix.core }} equivalent
+        id: sec
+        if: steps.gen.outputs.status == 'changed'
+        continue-on-error: true
+        uses: keplertech/kepler-formal-action@v1
+        with:
+          design1: .formal/${{ matrix.core }}/base/build/hardware/src/*.v
+          design2: .formal/${{ matrix.core }}/head/build/hardware/src/*.v
+          # No top: the action takes each side's top-level module, which is not
+          # always named after the core (iob_reg generates iob_reg_ca).
+          mode: sec
+          sec-engine: pdr
+          sec-encoding: binary
+          reset-ports: ${{ steps.gen.outputs.reset-ports }}
+          reset-cycles: '4'
+          artifact-dir: .formal/${{ matrix.core }}/kepler-formal
+
+      - name: Report
+        if: always()
+        env:
+          GEN: ${{ steps.gen.outputs.status }}
+          VERDICT: ${{ steps.sec.outputs.verdict }}
+          SETUP_ERROR: ${{ steps.gen.outputs.setup-error }}
+          VIA: ${{ fromJSON(needs.changed-cores.outputs.via)[matrix.core] }}
+          ORPHAN: ${{ contains(fromJSON(needs.changed-cores.outputs.orphans || '[]'), matrix.core) }}
+        run: |
+          result=".formal/$CORE/kepler-formal/result.json"
+          case "$GEN/$VERDICT" in
+            changed/equivalent)
+              msg="proved equivalent: the change keeps the behavior at the top-level ports" ;;
+            changed/different)
+              msg="behavior changed: see the counterexample in the job summary"
+              echo "::warning title=$CORE::$msg" ;;
+            changed/partially_proved)
+              msg="partially proved: some outputs proved equivalent, no difference found; see the kepler-formal log"
+              echo "::notice title=$CORE::$msg" ;;
+            changed/top_not_found|changed/top_ambiguous)
+              # The check did not run: no single top module was found. This
+              # says nothing about the behavior of the change.
+              msg="not checked ($VERDICT): the top module could not be selected"
+              echo "::warning title=$CORE::$msg: $(python3 .github/formal/report.py error "$result")" ;;
+            changed/*)
+              msg="no verdict ($VERDICT): see the kepler-formal log"
+              echo "::notice title=$CORE::$msg" ;;
+            identical/*)
+              msg="generated RTL is identical at both commits; nothing to compare" ;;
+            setup-broken/*)
+              msg="py2hwsw setup works at the base but fails at the head: $SETUP_ERROR"
+              echo "::warning title=$CORE::$msg" ;;
+            *)
+              if [ "$ORPHAN" = true ]; then
+                # Set up only for the core that instantiates it, and no
+                # library core does: there is nothing to generate it with.
+                msg="not checked: generated only inside the core that instantiates it, and no library core instantiates it"
+              else
+                msg="not generated (py2hwsw setup fails on its own): ${SETUP_ERROR:-see setup.log}"
+              fi
+              echo "::notice title=$CORE::$msg" ;;
+          esac
+          if [ -n "$VIA" ]; then
+            msg="checks the change to $VIA; $msg"
+          fi
+          echo "$CORE: $msg"
+          python3 .github/formal/report.py row "$CORE" "${GEN:-not-generated}" "$msg" \
+            "$result" ".formal/rows/$CORE.json"
+
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-${{ matrix.core }}
+          path: |
+            .formal/${{ matrix.core }}/kepler-formal
+            .formal/${{ matrix.core }}/*/setup.log
+          if-no-files-found: ignore
+
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: formal-row-${{ matrix.core }}
+          path: .formal/rows/${{ matrix.core }}.json
+          if-no-files-found: ignore
+          retention-days: 1
+
+  summary:
+    needs: [changed-cores, sec]
+    if: always() && needs.changed-cores.outputs.cores != '[]' && needs.changed-cores.outputs.cores != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/formal
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: formal-row-*
+          path: .formal/rows
+          merge-multiple: true
+
+      - name: Summarize the results
+        env:
+          CORES: ${{ needs.changed-cores.outputs.cores }}
+          BASE: ${{ needs.changed-cores.outputs.base }}
+          HEAD: ${{ needs.changed-cores.outputs.head }}
+        run: python3 .github/formal/report.py table .formal/rows

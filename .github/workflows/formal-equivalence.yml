@@ -40,6 +40,7 @@ jobs:
     outputs:
       cores: ${{ steps.find.outputs.cores }}
       via: ${{ steps.find.outputs.via }}
+      orphans: ${{ steps.find.outputs.orphans }}
       base: ${{ steps.revs.outputs.base }}
       head: ${{ steps.revs.outputs.head }}
     steps:
@@ -173,6 +174,7 @@ jobs:
           VERDICT: ${{ steps.sec.outputs.verdict }}
           SETUP_ERROR: ${{ steps.gen.outputs.setup-error }}
           VIA: ${{ fromJSON(needs.changed-cores.outputs.via)[matrix.core] }}
+          ORPHAN: ${{ contains(fromJSON(needs.changed-cores.outputs.orphans || '[]'), matrix.core) }}
         run: |
           result=".formal/$CORE/kepler-formal/result.json"
           case "$GEN/$VERDICT" in
@@ -198,7 +200,13 @@ jobs:
               msg="py2hwsw setup works at the base but fails at the head: $SETUP_ERROR"
               echo "::warning title=$CORE::$msg" ;;
             *)
-              msg="not generated (py2hwsw setup fails on its own): ${SETUP_ERROR:-see setup.log}"
+              if [ "$ORPHAN" = true ]; then
+                # Set up only for the core that instantiates it, and no
+                # library core does: there is nothing to generate it with.
+                msg="not checked: generated only inside the core that instantiates it, and no library core instantiates it"
+              else
+                msg="not generated (py2hwsw setup fails on its own): ${SETUP_ERROR:-see setup.log}"
+              fi
               echo "::notice title=$CORE::$msg" ;;
           esac
           if [ -n "$VIA" ]; then

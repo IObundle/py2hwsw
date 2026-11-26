@@ -13,11 +13,14 @@ Some cores cannot be set up on their own: they are generated for the core
 that instantiates them (for example iob_csrs, from the register list of a
 peripheral), and their setup reads the `instantiator` or `issuer` parameter.
 When such a core changes, the cores that instantiate it are checked instead
-(at most MAX_USERS of them, in a fixed order).
+(at most MAX_USERS of them, in a fixed order). A core that no library core
+instantiates (for example iob_memwrapper, which py2hwsw adds around a core by
+itself) cannot be checked this way; it is listed in `orphans`.
 
 Writes to $GITHUB_OUTPUT (or stdout):
   cores=<JSON list>          cores to check
   via=<JSON object>          {checked core: changed core it stands for}
+  orphans=<JSON list>        cores that need a parent but have no user in the library
 
 Usage: changed_cores.py <base> <head> [core ...]
   With explicit cores, those are checked instead of the changed ones.
@@ -73,25 +76,75 @@ def needs_parent(rev: str, path: str) -> bool:
     return bool(NEEDS_PARENT.search(git("show", f"{rev}:{path}")))
 
 
-def users_of(core: str, rev: str, files: set[str]) -> list[str]:
-    """Cores whose setup file instantiates `core`, preferred ones first.
-
-    Subblocks name their core with "core" ("core_name" before commit 7fdbc6d8e).
-    """
-    pattern = f'"(core|core_name)":[[:space:]]*"{core}"'
+def setup_files_matching(pattern: str, rev: str, files: set[str]) -> dict[str, str]:
+    """{core: setup file} of the cores whose setup file matches `pattern` (ERE)."""
     try:
         hits = git("grep", "-lE", pattern, rev, "--", LIB).splitlines()
     except subprocess.CalledProcessError:  # no match
-        return []
+        return {}
     found = {}
     for hit in hits:
         path = hit.split(":", 1)[1]
         user = core_of(path, files)
-        if user and user != core and path.endswith(f"/{user}/{user}.py"):
+        if user and path.endswith(f"/{user}/{user}.py"):
             found[user] = path
-    return sorted(
-        found, key=lambda u: (not found[u].startswith(PREFERRED_USERS_DIR), u)
+    return found
+
+
+# py2hwsw wraps a top core in iob_memwrapper by itself when the core has a
+# memory manager port: a port named <name>_m with a rom_*, ram_* or regfile_*
+# interface (see __create_memwrapper in py2hwsw/scripts/iob_core.py). Checking
+# such a core (iob_axi_m generates iob_axi_m_mwrap) checks iob_memwrapper.
+MEM_MANAGER_PORT = re.compile(
+    r'"name":\s*"\w+_m",(?:(?!"name").){0,300}?"type":\s*"(?:rom|ram|regfile)_\w+"',
+    re.S,
+)
+
+
+def implicit_users(core: str, rev: str, files: set[str]) -> dict[str, str]:
+    """Cores that py2hwsw makes use `core` without them naming it."""
+    if core != "iob_memwrapper":
+        return {}
+    candidates = setup_files_matching(
+        '"type":[[:space:]]*"(rom|ram|regfile)_', rev, files
     )
+    return {
+        user: path
+        for user, path in candidates.items()
+        if MEM_MANAGER_PORT.search(git("show", f"{rev}:{path}"))
+    }
+
+
+def users_of(core: str, rev: str, files: set[str]) -> list[str]:
+    """Cores that instantiate `core`.
+
+    A subblock names its core in a dict, with "core" ("core_name" before
+    commit 7fdbc6d8e), or as the first word of a string that starts a line,
+    followed by the instance name, such as `iob_csrs csrs -d ...` in an
+    f-string (iob_uart, iob_macc). Some cores are also added by py2hwsw itself
+    (implicit_users).
+
+    The two forms and the implicit users go through different py2hwsw code,
+    so the list takes one user of each kind in turn; within a kind, the cores
+    under PREFERRED_USERS_DIR come first, then by name.
+    """
+    as_dict = f'"(core|core_name)":[[:space:]]*"{core}"'
+    as_string = f'^[[:space:]]*[fFrR]{{0,2}}("""|"|\'){core}[[:space:]]+[A-Za-z_]'
+    groups = [
+        setup_files_matching(as_dict, rev, files),
+        setup_files_matching(as_string, rev, files),
+        implicit_users(core, rev, files),
+    ]
+    ranked = [
+        sorted(g, key=lambda u, g=g: (not g[u].startswith(PREFERRED_USERS_DIR), u))
+        for g in groups
+    ]
+    users: list[str] = []
+    for i in range(max(map(len, ranked))):
+        for group in ranked:
+            if i < len(group) and group[i] != core and group[i] not in users:
+                users.append(group[i])
+    return users
 
 
 def main() -> int:
@@ -117,6 +170,7 @@ def main() -> int:
 
     cores: list[str] = []
     via: dict[str, str] = {}
+    orphans: list[str] = []
     for core in changed:
         path = head_cores.get(core)
         if not path or not needs_parent(head, path):
@@ -133,7 +187,8 @@ def main() -> int:
             + (", ".join(users) if users else "no instantiating core found")
         )
         if not users:
-            cores.append(core)  # reported as not generated
+            cores.append(core)  # reported as not checked
+            orphans.append(core)
         for user in users:
             if user not in cores:
                 cores.append(user)
@@ -149,9 +204,13 @@ def main() -> int:
         )
         cores = cores[:MAX_CORES]
         via = {core: via[core] for core in cores if core in via}
+        orphans = [core for core in orphans if core in cores]
     print("Cores to check: " + (", ".join(cores) or "none"))
 
-    lines = f"cores={json.dumps(cores)}\nvia={json.dumps(via)}\n"
+    lines = (
+        f"cores={json.dumps(cores)}\nvia={json.dumps(via)}\n"
+        f"orphans={json.dumps(orphans)}\n"
+    )
     output = os.environ.get("GITHUB_OUTPUT")
     if output:
         with open(output, "a", encoding="utf-8") as handle:

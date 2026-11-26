@@ -122,19 +122,29 @@ jobs:
           fi
           # The root cause is the last Python exception in the setup log;
           # py2hwsw then adds one "Failed to ..." line per enclosing block.
+          # The searches may find nothing (empty log, or no Python exception
+          # when the core generates no HDL): that must not stop the step.
           error=""
           if [ -n "${failed:-}" ]; then
-            log=$(sed 's/\x1b\[[0-9;]*m//g' ".formal/$CORE/$failed/setup.log")
-            error=$(grep -E '^[A-Za-z_.]+(Error|Exception): ' <<<"$log" | tail -1)
-            [ -n "$error" ] || error=$(grep -v '^[[:space:]]*$' <<<"$log" | tail -1)
+            log=$(sed 's/\x1b\[[0-9;]*m//g' ".formal/$CORE/$failed/setup.log" 2>/dev/null || true)
+            error=$(grep -E '^[A-Za-z_.]+(Error|Exception): ' <<<"$log" | tail -1 || true)
+            [ -n "$error" ] || error=$(grep -v '^[[:space:]]*$' <<<"$log" | tail -1 || true)
             error=$(cut -c1-200 <<<"$error")
           fi
           echo "setup-error=$error" >> "$GITHUB_OUTPUT"
           # Hold the asynchronous reset during a short bootstrap, so registers
-          # start from their reset value on both sides.
+          # start from their reset value on both sides. The action picks each
+          # side's top (the module no other module instantiates) and rejects a
+          # reset port that is not a top-level input, so arst_i is passed only
+          # when the top of both sides has it.
           reset=""
-          if grep -Eq '\barst_i\b' ".formal/$CORE/head/build/hardware/src/$CORE.v" 2>/dev/null; then
+          if [ "$status" = changed ]; then
             reset="arst_i=1"
+            for side in base head; do
+              top=$(python3 .github/formal/top_module.py \
+                ".formal/$CORE/$side/build/hardware/src" --has-input arst_i) || reset=""
+              echo "$side top: ${top:-none found}"
+            done
           fi
           echo "status=$status" >> "$GITHUB_OUTPUT"
           echo "reset-ports=$reset" >> "$GITHUB_OUTPUT"
@@ -147,7 +157,8 @@ jobs:
         with:
           design1: .formal/${{ matrix.core }}/base/build/hardware/src/*.v
           design2: .formal/${{ matrix.core }}/head/build/hardware/src/*.v
-          top: ${{ matrix.core }}
+          # No top: the action takes each side's top-level module, which is not
+          # always named after the core (iob_reg generates iob_reg_ca).
           mode: sec
           sec-engine: pdr
           sec-encoding: binary
@@ -163,6 +174,7 @@ jobs:
           SETUP_ERROR: ${{ steps.gen.outputs.setup-error }}
           VIA: ${{ fromJSON(needs.changed-cores.outputs.via)[matrix.core] }}
         run: |
+          result=".formal/$CORE/kepler-formal/result.json"
           case "$GEN/$VERDICT" in
             changed/equivalent)
               msg="proved equivalent: the change keeps the behavior at the top-level ports" ;;
@@ -172,6 +184,11 @@ jobs:
             changed/partially_proved)
               msg="partially proved: some outputs proved equivalent, no difference found; see the kepler-formal log"
               echo "::notice title=$CORE::$msg" ;;
+            changed/top_not_found|changed/top_ambiguous)
+              # The check did not run: no single top module was found. This
+              # says nothing about the behavior of the change.
+              msg="not checked ($VERDICT): the top module could not be selected"
+              echo "::warning title=$CORE::$msg: $(python3 .github/formal/report.py error "$result")" ;;
             changed/*)
               msg="no verdict ($VERDICT): see the kepler-formal log"
               echo "::notice title=$CORE::$msg" ;;
@@ -189,7 +206,7 @@ jobs:
           fi
           echo "$CORE: $msg"
           python3 .github/formal/report.py row "$CORE" "${GEN:-not-generated}" "$msg" \
-            ".formal/$CORE/kepler-formal/result.json" ".formal/rows/$CORE.json"
+            "$result" ".formal/rows/$CORE.json"
 
       - if: always()
         uses: actions/upload-artifact@v4
